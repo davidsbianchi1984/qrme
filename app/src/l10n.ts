@@ -112,6 +112,44 @@ const CHROME: Table = {
   // `test_the_desktop_and_the_phone_say_different_things` exists to catch —
   // it caught this one. This control moves one card up a stream; it does not
   // leave anything.
+  "feed.autoplay": {
+    en: "Play videos from other platforms automatically",
+    es: "Reproducir automáticamente los vídeos de otras plataformas",
+    fr: "Lire automatiquement les vidéos des autres plateformes",
+    de: "Videos von anderen Plattformen automatisch abspielen",
+    pt: "Reproduzir automaticamente os vídeos de outras plataformas",
+    it: "Riprodurre automaticamente i video di altre piattaforme",
+    ja: "他のプラットフォームの動画を自動再生する",
+    zh: "自动播放其他平台的视频",
+    hi: "दूसरे प्लैटफ़ॉर्म के वीडियो अपने आप चलाएँ",
+    ar: "تشغيل مقاطع المنصات الأخرى تلقائيًا",
+  },
+  "feed.autoplay.cost": {
+    en: "Off by default. On, every one of those you scroll past is a request "
+        + "to that platform, so it learns you watched.",
+    es: "Desactivado por defecto. Activado, cada uno de esos que pasas es una "
+        + "petición a esa plataforma, así que sabe que lo viste.",
+    fr: "Désactivé par défaut. Activé, chacune de ces vidéos que vous faites "
+        + "défiler est une requête vers cette plateforme, qui apprend donc "
+        + "que vous l'avez regardée.",
+    de: "Standardmäßig aus. An bedeutet: Jedes dieser Videos, an dem Sie "
+        + "vorbeiscrollen, ist eine Anfrage an diese Plattform — sie erfährt, "
+        + "dass Sie es gesehen haben.",
+    pt: "Desativado por predefinição. Ativado, cada um desses por que passa é "
+        + "um pedido a essa plataforma, que fica a saber que viu.",
+    it: "Disattivato per impostazione predefinita. Attivo, ognuno di quelli "
+        + "che scorri è una richiesta a quella piattaforma, che quindi sa che "
+        + "l'hai guardato.",
+    ja: "既定ではオフです。オンにすると、通り過ぎた動画のたびにそのプラット"
+        + "フォームへ要求が送られ、見たことが伝わります。",
+    zh: "默认关闭。打开后，你划过的每一个视频都会向该平台发出请求，它就知道"
+        + "你看过了。",
+    hi: "डिफ़ॉल्ट रूप से बंद। चालू करने पर, आप जिन्हें स्क्रॉल करके पार करते हैं "
+        + "उनमें से हर एक उस प्लैटफ़ॉर्म से अनुरोध है, इसलिए उसे पता चल जाता है "
+        + "कि आपने देखा।",
+    ar: "معطّل افتراضيًا. عند تفعيله، كل مقطع تمرّ به هو طلب إلى تلك المنصة، "
+        + "فتعرف أنك شاهدته.",
+  },
   "feed.back": {
     en: "Previous", es: "Anterior", fr: "Précédent", de: "Vorheriges",
     pt: "Anterior", it: "Precedente", ja: "前へ", zh: "上一个",

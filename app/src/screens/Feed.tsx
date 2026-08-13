@@ -43,6 +43,23 @@ export function Feed({ onPlans, onParty }: {
   const [error, setError] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
   const frame = useRef<HTMLDivElement | null>(null);
+  const panes = useRef<(HTMLElement | null)[]>([]);
+
+  // Whether footage held elsewhere may load without being asked for.
+  //
+  // Off, and a card from another platform stays a facade until it is
+  // pressed — which is the sentence the feed prints about itself. On, and
+  // the deck plays everything as it arrives, which means every item scrolled
+  // past is a request that tells that platform somebody watched.
+  //
+  //     asked     does the feed feel like a feed
+  //     mattered  does scrolling past something tell anybody
+  //
+  // Kept on the device rather than on the profile, deliberately: this is a
+  // fact about what this browser fetches, not a fact about who somebody is,
+  // and it should not follow them onto a machine they did not choose it on.
+  const [autoOffsite, setAutoOffsite] = useState(
+    () => window.localStorage.getItem("feed.autoplay.offsite") === "yes");
 
   const load = useCallback((after?: string | null) => {
     setBusy(true);
@@ -82,8 +99,30 @@ export function Feed({ onPlans, onParty }: {
       const next = Math.max(0, Math.min(items.length - 1, i + delta));
       // One page ahead of the end, so the swipe never waits on the network.
       if (cursor && next >= items.length - 2 && !busy) load(cursor);
+      panes.current[next]?.scrollIntoView({ behavior: "smooth" });
       return next;
     });
+  }, [items.length, cursor, busy, load]);
+
+  // Which pane the person is actually looking at. Read from the scroll
+  // position rather than only from the buttons, because a swipe moves the
+  // deck without asking this component anything — and the answer decides
+  // which single video is playing.
+  useEffect(() => {
+    const deck = frame.current;
+    if (!deck) return;
+    const watching = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const seen = panes.current.indexOf(entry.target as HTMLElement);
+        if (seen >= 0) {
+          setAt(seen);
+          if (cursor && seen >= items.length - 2 && !busy) load(cursor);
+        }
+      }
+    }, { root: deck, threshold: 0.6 });
+    for (const pane of panes.current) if (pane) watching.observe(pane);
+    return () => watching.disconnect();
   }, [items.length, cursor, busy, load]);
 
   useEffect(() => {
@@ -95,7 +134,6 @@ export function Feed({ onPlans, onParty }: {
     return () => window.removeEventListener("keydown", key);
   }, [go]);
 
-  const item = items[at];
 
   return (
     <div className="screen">
@@ -112,43 +150,66 @@ export function Feed({ onPlans, onParty }: {
         </div>
       )}
 
-      {item && (
-        <div className="card feed-card" ref={frame}
-             onWheel={(e) => { if (Math.abs(e.deltaY) > 24) go(e.deltaY > 0 ? 1 : -1); }}>
-          <div className="row">
+      <div className="deck" ref={frame}>
+      {items.map((item, index) => (
+        <section className="deck-pane" key={item.id}
+                 ref={(el) => { panes.current[index] = el; }}>
+          <div className="row deck-head">
             <span className="pill">{tr(`feed.kind.${item.kind}`, lang)}</span>
             <span className="muted small" style={{ flex: 1 }}>{item.reason}</span>
-            <span className="muted small">{at + 1} / {items.length}</span>
+            <span className="muted small">{index + 1} / {items.length}</span>
           </div>
 
           {item.kind === "video" && (
             <>
-              <video src={item.src} loop autoPlay muted playsInline
-                     style={{ width: "100%", borderRadius: 8 }} />
-              <p><strong>{item.title}</strong></p>
-              <p className="muted small">{item.said}</p>
-              <p className="muted small">{item.note}</p>
+              {/* Footage this deployment holds, so playing it asks nobody
+                  anything. Only the pane being looked at gets a decoder:
+                  a deck that plays every video it has loaded is a phone
+                  that gets warm and a battery that goes. */}
+              <div className="deck-media">
+                {Math.abs(index - at) <= 1 ? (
+                  <video src={item.src} loop muted playsInline
+                         autoPlay={index === at}
+                         ref={(el) => {
+                           if (!el) return;
+                           if (index === at) void el.play().catch(() => {});
+                           else el.pause();
+                         }} />
+                ) : null}
+              </div>
+              <div className="deck-said">
+                <p><strong>{item.title}</strong></p>
+                <p className="muted small">{item.said}</p>
+                <p className="muted small">{item.note}</p>
+              </div>
             </>
           )}
 
           {item.kind === "offsite" && (
             <>
-              {/* No frame, no thumbnail, no request — until this button. */}
-              {playing[item.id] ? (
-                <iframe title={item.title} src={item.facade?.url}
-                        style={{ width: "100%", aspectRatio: "16 / 9",
-                                 border: 0, borderRadius: 8 }} />
-              ) : (
-                <div className="facade">
-                  <p><strong>{item.title}</strong></p>
-                  <p className="muted small">{item.facade?.platform_name}</p>
-                  <button className="primary"
-                          onClick={() => setPlaying((p) => ({ ...p, [item.id]: true }))}>
-                    {tr("feed.play", lang)}
-                  </button>
-                </div>
-              )}
-              <p className="muted small">{item.note}</p>
+              {/* No frame, no thumbnail, no request — until this button, or
+                  until the person turned that requirement off themselves.
+                  The frame is only built for the pane in front of them, so
+                  scrolling past an item is not a request either way. */}
+              <div className="deck-media">
+                {(playing[item.id] || autoOffsite) && index === at ? (
+                  <iframe title={item.title} src={item.facade?.url}
+                          allow="autoplay; encrypted-media; picture-in-picture"
+                          style={{ width: "100%", height: "100%", border: 0 }} />
+                ) : (
+                  <div className="deck-facade">
+                    <p><strong>{item.title}</strong></p>
+                    <p className="muted small">{item.facade?.platform_name}</p>
+                    <button className="primary"
+                            onClick={() => setPlaying((p) => ({ ...p, [item.id]: true }))}>
+                      {tr("feed.play", lang)}
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div className="deck-said">
+                <p className="muted small">{item.note}</p>
+              </div>
             </>
           )}
 
@@ -222,23 +283,39 @@ export function Feed({ onPlans, onParty }: {
             </>
           )}
 
-          <div className="row">
-            <button disabled={at === 0} onClick={() => go(-1)}>
+          {/* The swipe is the way through. These stay for the keyboard, the
+              mouse, and anybody whose gesture does not land. */}
+          <div className="row deck-steps">
+            <button disabled={index === 0} onClick={() => go(-1)}>
               {tr("feed.back", lang)}
             </button>
             <button className="primary" onClick={() => go(1)}>
               {tr("feed.next", lang)}
             </button>
           </div>
-        </div>
-      )}
+        </section>
+      ))}
 
       {rules && (
-        <div className="card">
-          <p className="muted small">{rules.public}</p>
-          <p className="muted small">{rules.facade}</p>
-        </div>
+        <section className="deck-pane deck-rules"
+                 ref={(el) => { panes.current[items.length] = el; }}>
+          <div className="card">
+            <p className="muted small">{rules.public}</p>
+            <p className="muted small">{rules.facade}</p>
+            <label className="row">
+              <input type="checkbox" checked={autoOffsite}
+                     onChange={(e) => {
+                       setAutoOffsite(e.target.checked);
+                       window.localStorage.setItem(
+                         "feed.autoplay.offsite", e.target.checked ? "yes" : "no");
+                     }} />
+              <span style={{ flex: 1 }}>{tr("feed.autoplay", lang)}</span>
+            </label>
+            <p className="muted small">{tr("feed.autoplay.cost", lang)}</p>
+          </div>
+        </section>
       )}
+      </div>
     </div>
   );
 }

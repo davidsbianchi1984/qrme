@@ -642,3 +642,62 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .capture { margin: 10px 0; }
 .capture video { width: 100%; max-width: 320px; border-radius: 14px;
   border: 1px solid var(--line); margin-bottom: 8px; }
+
+
+/* ---- the feed as a deck --------------------------------------------------
+   A feed of video is not a card with a Next button under it. One item fills
+   the screen, a swipe up brings the next, and the snap is the browser's own
+   rather than a gesture handler guessing at intent.
+
+   Vertical footage fills the frame; horizontal footage is centred inside it
+   with `contain`, which letterboxes rather than cropping somebody's video to
+   a shape they did not shoot it in. */
+.deck {
+  height: calc(100dvh - 140px);
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  overscroll-behavior-y: contain;
+  margin: 0 -16px;
+}
+.deck-pane {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  height: calc(100dvh - 140px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 16px 12px;
+  box-sizing: border-box;
+}
+.deck-head { flex: none; }
+.deck-media {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #05040f;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.deck-media video {
+  width: 100%; height: 100%;
+  object-fit: contain;          /* the letterbox, on purpose */
+}
+.deck-facade {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 10px; text-align: center; padding: 20px;
+}
+.deck-said { flex: none; }
+.deck-said p { margin: 2px 0; }
+.deck-steps { flex: none; }
+.deck-rules { justify-content: center; }
+
+@media (max-width: 760px) {
+  /* The tab bar is the bottom of the screen here, so the deck stops above
+     it rather than under it — the same 64px the corner widgets clear. */
+  .deck, .deck-pane {
+    height: calc(100dvh - 64px - env(safe-area-inset-bottom) - 76px);
+  }
+}
