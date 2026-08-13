@@ -1,4 +1,4 @@
-# status: backlog — 42 rows
+# status: backlog — 40 rows
 #
 # One English string carried by two or more keys whose ten translations do not
 # agree. Checked by test_the_same_sentence_translated_twice.py, matched exactly
