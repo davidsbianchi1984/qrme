@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.68.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v0.70.0** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -777,6 +777,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.70.0** | **The transcript is yours to curate, the QR carries a ticket not a token, and the reader learned to see a sentence chosen at render time** — turns are selected and struck or rewritten in place with the edit recorded but never the old words; an export QR carries a single-use ten-minute ticket and never the owner token; the console's own CSP stopped blanking every video player; the failure reports come home to this backend; and the extractor now reads a ternary's branches, which found nine English buttons on the screen a stranger meets |
 | **0.68.0** | **The memory door, the steering lock, the card carried in, and the room that forgets on purpose** — a persona tells you what it actually holds about you and forgets one named thing without erasing the friendship; the owner locks the dials against everyone including their own slip; a chara_card_v2/v3 card (JSON or PNG) seeds a profile with its harness instructions withheld by name; and a rehearsal room plays the hard conversation without a word of it entering the relationship's memory |
 | **0.67.0** | **The licence carries the substance** — a finetune or clone derive hands the buyer the profile's knowledge, dials and (on a clone) an aggregate adaptation summary, under a manifest of what crossed and what stayed; organizations lease a stranger's licensed specialist as a revocable department; the portrait moves at a tempo its own history sets; and a persona remembers the room between turns |
 | **0.66.0** | **Cut in step** — no QRME code changed; JIM-mini's coach became an offline add-and-norm stack over stored knowledge and current readings, with a jampacked pack, deposits from paid model turns, and a curriculum JIM studies on one press |

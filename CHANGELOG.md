@@ -4,6 +4,65 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.70.0] - 2026-08-13
+
+### Added
+
+- **Curating the transcript by hand.** `POST /memory/{interactor}/strike`
+  deletes turns selected by id, scoped to the pair — a borrowed id strikes
+  nothing — and `PUT /memory/{interactor}/turns/{id}` rewrites one turn: the
+  new words face moderation, a profile turn's synthetic-media credential is
+  dropped, and the edit is recorded as a fact but never the old words. Edit
+  mode with checkboxes, delete-selected and tap-to-rewrite in the console and
+  on all three phones.
+- **Export via QR.** A single-use ten-minute ticket whose code carries the
+  ticketed URL and never the owner token; the bundle is served exactly once.
+  Both ends on all four clients.
+- **The reports come home.** `POST /v1/problems` lives on this backend, with
+  `GET /v1/problems` behind `QRME_PROBLEMS_KEY` or the backend's own machine
+  — a live failure map of every version, counters only, never content.
+- **The waiting side of the stranger pool.** `GET /connections/mine`, polled
+  by all four clients, so a person who asked for a stranger stops waiting on
+  a screen that had already moved.
+
+### Fixed
+
+- The console's own CSP named no `frame-src`, so it fell back to
+  `default-src 'none'` and the browser refused **every** allowlisted video
+  player as a white rectangle. The policy now derives from the platform
+  allowlist itself, with a socket-level test binding the two.
+- The `✓ real photo` pill swallowed the Discover portrait under font
+  boosting; marketplace chips were full-size buttons with their effect below
+  the fold; the minimized agent light was a solid disc parked over content.
+- A room now renders its seats as tiles, the last voice lit; the Wall
+  composer no longer carries ghost placeholder text; tab changes land at the
+  top of the new screen.
+- **The apology for a failed route is in the reader's language.** The
+  catch-all is a middleware — `@app.exception_handler(Exception)` sits
+  outside the CORS layer, so a 500 raised there comes back without the
+  header and the console reads it as unreachable — and being a middleware,
+  no guard was asking it anything. Its sentence sat inline in English;
+  `i18n.SERVER_ERROR` is now a named constant translated like every other
+  refusal.
+- The onboarding screen's Show/Hide, Creating…, Checking…, Signing in…,
+  Resetting…, Verify & continue, Set new password and Create My Profile were
+  English on a screen that translates everything else — invisible to the
+  extractor because a string chosen at render time is a
+  `ConditionalExpression` and not a `JsxText` node.
+
+### Changed
+
+- `scripts/jsx-text.mjs` reads string literals in child position — both
+  branches of a ternary, either side of `&&`/`||`/`??`, the pieces of a
+  concatenation — and still refuses call arguments, so a translation key
+  stays a key.
+- `native_dead_keys.txt` 273 → 28, and what remains is a named ledger of
+  guard-pinned fixtures rather than a backlog. `native_screens_untranslated`
+  reads 0/0/0.
+- The three-repo guard estate: `shared_guards.txt` 469 → 489,
+  `guard_divergences.txt` 136 → 121, both byte-identical in QRME, JIM-mini
+  and PDI.
+
 ## [0.68.0] - 2026-08-12
 
 ### Added
@@ -10916,7 +10975,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.16.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.70.0...HEAD
+[0.70.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.70.0
 [0.61.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.61.1
 [0.19.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.19.1
 [0.19.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.19.0
