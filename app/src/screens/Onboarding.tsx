@@ -25,7 +25,8 @@ function PasswordField(props: {
                 aria-label={shown ? tr("onb.hide.password", visitorLang())
                                   : tr("onb.show.password", visitorLang())}
                 onClick={() => setShown(!shown)}>
-          {shown ? tr("onb.hide", visitorLang()) : tr("onb.show", visitorLang())}
+          {shown ? tr("onb.hide.password", visitorLang())
+                 : tr("onb.show.password", visitorLang())}
         </button>
       </span>
     </label>

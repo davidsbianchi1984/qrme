@@ -2320,16 +2320,6 @@ const CHROME: Table = {
     hi: "लिंक पर क्लिक करें और यह स्क्रीन अपने आप आगे बढ़ जाएगी।",
     ar: "انقر الرابط وستتابع هذه الشاشة من تلقاء نفسها.",
   },
-  "onb.show": {
-    en: "Show", es: "Mostrar", fr: "Afficher", de: "Zeigen",
-    pt: "Mostrar", it: "Mostra", ja: "表示", zh: "显示",
-    hi: "दिखाएँ", ar: "إظهار",
-  },
-  "onb.hide": {
-    en: "Hide", es: "Ocultar", fr: "Masquer", de: "Verbergen",
-    pt: "Ocultar", it: "Nascondi", ja: "非表示", zh: "隐藏",
-    hi: "छिपाएँ", ar: "إخفاء",
-  },
   "onb.show.password": {
     en: "Show password", es: "Mostrar la contraseña",
     fr: "Afficher le mot de passe", de: "Passwort zeigen",
@@ -2351,9 +2341,9 @@ const CHROME: Table = {
   },
   "onb.checking": {
     en: "Checking…", es: "Comprobando…", fr: "Vérification…",
-    de: "Wird geprüft…", pt: "A verificar…", it: "Verifica…",
-    ja: "確認中…", zh: "检查中…", hi: "जाँच रहे हैं…",
-    ar: "جارٍ التحقق…",
+    de: "Wird geprüft…", pt: "A verificar…", it: "Controllo in corso…",
+    ja: "確認中…", zh: "检查中…", hi: "जाँच हो रही है…",
+    ar: "جارٍ الفحص…",
   },
   "onb.signingin": {
     en: "Signing in…", es: "Iniciando sesión…", fr: "Connexion…",
@@ -2375,11 +2365,11 @@ const CHROME: Table = {
     hi: "सत्यापित करें और आगे बढ़ें", ar: "تحقّق وتابع",
   },
   "onb.reset.set": {
-    en: "Set new password", es: "Establecer la nueva contraseña",
-    fr: "Définir le nouveau mot de passe", de: "Neues Passwort festlegen",
-    pt: "Definir a nova palavra-passe", it: "Imposta la nuova password",
+    en: "Set new password", es: "Fijar nueva contraseña",
+    fr: "Définir le nouveau mot de passe", de: "Neues Passwort setzen",
+    pt: "Definir nova palavra-passe", it: "Imposta nuova password",
     ja: "新しいパスワードを設定", zh: "设置新密码",
-    hi: "नया पासवर्ड सेट करें", ar: "تعيين كلمة مرور جديدة",
+    hi: "नया पासवर्ड सेट करें", ar: "تعيين كلمة المرور الجديدة",
   },
   "onb.create.profile": {
     en: "Create My Profile", es: "Crear mi perfil", fr: "Créer mon profil",
