@@ -5639,3 +5639,108 @@ struct ExperienceOut: Decodable {
     let profile_id: String?
     let experience: [Entry]
 }
+
+// MARK: - Widgets
+//
+// Small programs somebody writes for their own profile. Every call here is
+// the owner's: the door checks it and the query behind it checks again, so
+// a widget id from another profile is not found rather than refused.
+//
+// Running one is a 200 whatever happens — a widget that throws, runs too
+// long, or is stopped by a limit is not a refusal of the request, it is an
+// answer about the code. `status` tells the screen which.
+
+struct WidgetRow: Decodable, Identifiable {
+    let id: String
+    let name: String
+    let source: String
+    let version: Int
+}
+
+/// Whatever a widget returned, rendered for a screen rather than typed.
+///
+/// A widget's answer is its author's business — a number, a string, a list,
+/// an object — so there is no type to decode it into. This keeps the JSON
+/// as text the screen can show, which is the honest shape: the phone is
+/// displaying somebody's own result, not interpreting it.
+struct AnyDecodable: Decodable {
+    let shown: String
+
+    init(from decoder: Decoder) throws {
+        let single = try decoder.singleValueContainer()
+        if let text = try? single.decode(String.self) { shown = text }
+        else if let number = try? single.decode(Double.self) {
+            shown = number == number.rounded()
+                ? String(Int(number)) : String(number)
+        }
+        else if let flag = try? single.decode(Bool.self) { shown = String(flag) }
+        else if let raw = try? single.decode([String: String].self) {
+            shown = raw.map { "\($0.key): \($0.value)" }
+                       .sorted().joined(separator: "\n")
+        }
+        else { shown = "" }
+    }
+}
+
+struct WidgetAnswer: Decodable {
+    let status: String
+    let ms: Int
+    let value: AnyDecodable?
+    let message: String?
+    let said: String?
+    let truncated: Bool?
+}
+
+extension ApiClient {
+    func widgetLimits() async throws -> WidgetLimits {
+        try await request("/studio/limits")
+    }
+
+    func widgets(profileId: String, token: String) async throws -> WidgetList {
+        try await request("/profiles/\(profileId)/widgets", token: token)
+    }
+
+    func widget(profileId: String, widgetId: String,
+                token: String) async throws -> WidgetRow {
+        try await request("/profiles/\(profileId)/widgets/\(widgetId)",
+                          token: token)
+    }
+
+    func createWidget(profileId: String, name: String, source: String,
+                      token: String) async throws -> WidgetRow {
+        try await request("/profiles/\(profileId)/widgets", method: "POST",
+                          body: ["name": name, "source": source], token: token)
+    }
+
+    func updateWidget(profileId: String, widgetId: String, name: String,
+                      source: String, token: String) async throws -> WidgetRow {
+        try await request("/profiles/\(profileId)/widgets/\(widgetId)",
+                          method: "PUT",
+                          body: ["name": name, "source": source], token: token)
+    }
+
+    func deleteWidget(profileId: String, widgetId: String,
+                      token: String) async throws -> WidgetRemoved {
+        try await request("/profiles/\(profileId)/widgets/\(widgetId)",
+                          method: "DELETE", token: token)
+    }
+
+    func runWidget(profileId: String, widgetId: String,
+                   token: String) async throws -> WidgetAnswer {
+        try await request("/profiles/\(profileId)/widgets/\(widgetId)/run",
+                          method: "POST", body: [:], token: token)
+    }
+}
+
+struct WidgetList: Decodable { let widgets: [WidgetRow] }
+struct WidgetRemoved: Decodable { let removed: String }
+struct WidgetLimits: Decodable {
+    struct Caps: Decodable {
+        let wall_seconds: Int
+        let heap_mb: Int
+        let source_bytes: Int
+    }
+    let limits: Caps
+    let available: Bool
+    let unavailable_because: String?
+}

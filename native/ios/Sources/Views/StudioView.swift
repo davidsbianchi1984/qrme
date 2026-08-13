@@ -5,7 +5,7 @@ import SwiftUI
 struct StudioView: View {
     /// Same split as `ConnectView.Tab`: raw values name the sections, the
     /// table holds the words.
-    enum Tab: String, CaseIterable { case compose, posts, study }
+    enum Tab: String, CaseIterable { case compose, posts, study, widgets }
     @EnvironmentObject var state: AppState
     @State private var tab: Tab = .compose
 
@@ -21,6 +21,7 @@ struct StudioView: View {
             case .compose: ComposeView()
             case .posts: PostsView()
             case .study: StudyView()
+            case .widgets: WidgetsView()
             }
         }
     }
@@ -126,6 +127,161 @@ struct StudyView: View {
         Task {
             try? await ApiClient.shared.learn(cid: excursion.id, token: token)
             await load()
+        }
+    }
+}
+
+/// Widgets: small programs somebody writes for their own profile.
+///
+/// The code runs on the backend, in a box with no network, one directory,
+/// no child processes and finite time — never on the phone, and never
+/// anywhere it could read another profile. This screen is the editor and
+/// the answer; `qrme/widgets.py` is the box.
+///
+/// A run that throws, runs too long, or is stopped by a limit comes back
+/// 200 with a status, because the request was fine and the code was not.
+/// The sentence beside it is the backend's, in the reader's language.
+struct WidgetsView: View {
+    @EnvironmentObject var state: AppState
+    @State private var widgets: [WidgetRow] = []
+    @State private var open: WidgetRow?
+    @State private var name = ""
+    @State private var source = "module.exports = () => 1;"
+    @State private var answer: WidgetAnswer?
+    @State private var caps: WidgetLimits?
+    @State private var busy = false
+    @State private var error: String?
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                if let error { Text(error).foregroundColor(.red).font(.footnote) }
+
+                if let caps, !caps.available {
+                    Text(L10n.t("wdg.nobox", state.language))
+                        .font(.footnote).foregroundColor(.secondary)
+                }
+
+                Text(L10n.t("wdg.yours", state.language)).font(.headline)
+                if widgets.isEmpty {
+                    Text(L10n.t("wdg.none", state.language))
+                        .font(.footnote).foregroundColor(.secondary)
+                }
+                ForEach(widgets) { widget in
+                    HStack {
+                        Button(widget.name) { openOne(widget) }
+                        Spacer()
+                        Button(L10n.t("wdg.remove", state.language)) {
+                            remove(widget)
+                        }.font(.footnote)
+                    }
+                }
+
+                Divider()
+                Text(L10n.t("wdg.name", state.language)).font(.footnote)
+                TextField("", text: $name).textFieldStyle(.roundedBorder)
+                Text(L10n.t("wdg.code", state.language)).font(.footnote)
+                TextEditor(text: $source).frame(height: 180)
+                    .font(.system(.footnote, design: .monospaced))
+                    .border(Color.secondary.opacity(0.3))
+
+                HStack {
+                    Button(L10n.t("wdg.save", state.language)) { save() }
+                        .disabled(busy || name.isEmpty)
+                    Button(L10n.t("wdg.run", state.language)) { run() }
+                        .disabled(busy || open == nil || !(caps?.available ?? true))
+                }
+
+                Text(L10n.t("wdg.walls", state.language))
+                    .font(.footnote).foregroundColor(.secondary)
+
+                if let answer {
+                    Divider()
+                    Text(L10n.t("wdg.status.\(answer.status)", state.language))
+                        .font(.headline)
+                    if let said = answer.said {
+                        Text(said).font(.footnote).foregroundColor(.secondary)
+                    }
+                    if let message = answer.message {
+                        Text(message).font(.system(.footnote, design: .monospaced))
+                    }
+                    if let value = answer.value, !value.shown.isEmpty {
+                        Text(value.shown)
+                            .font(.system(.footnote, design: .monospaced))
+                    }
+                }
+            }.padding(20)
+        }
+        .task { await load() }
+    }
+
+    private func load() async {
+        guard let pid = state.pid, let token = state.token else { return }
+        caps = try? await ApiClient.shared.widgetLimits()
+        do { widgets = try await ApiClient.shared.widgets(profileId: pid, token: token).widgets }
+        catch { self.error = error.localizedDescription }
+    }
+
+    /// Re-read rather than trusting the list: a list fetched a minute ago
+    /// holds a draft from a minute ago, and saving over it is how an edit
+    /// made on the desktop disappears.
+    private func openOne(_ widget: WidgetRow) {
+        open = widget; name = widget.name; source = widget.source; answer = nil
+        guard let pid = state.pid, let token = state.token else { return }
+        Task {
+            if let fresh = try? await ApiClient.shared.widget(profileId: pid,
+                                                       widgetId: widget.id,
+                                                       token: token) {
+                open = fresh; name = fresh.name; source = fresh.source
+            }
+        }
+    }
+
+    private func save() {
+        guard let pid = state.pid, let token = state.token else { return }
+        busy = true
+        Task {
+            defer { busy = false }
+            do {
+                let saved: WidgetRow
+                if let open {
+                    saved = try await ApiClient.shared.updateWidget(
+                        profileId: pid, widgetId: open.id, name: name,
+                        source: source, token: token)
+                } else {
+                    saved = try await ApiClient.shared.createWidget(
+                        profileId: pid, name: name, source: source, token: token)
+                }
+                open = saved
+                await load()
+            } catch { self.error = error.localizedDescription }
+        }
+    }
+
+    private func run() {
+        guard let pid = state.pid, let token = state.token,
+              let open else { return }
+        busy = true
+        answer = nil
+        Task {
+            defer { busy = false }
+            do {
+                answer = try await ApiClient.shared.runWidget(
+                    profileId: pid, widgetId: open.id, token: token)
+            } catch { self.error = error.localizedDescription }
+        }
+    }
+
+    private func remove(_ widget: WidgetRow) {
+        guard let pid = state.pid, let token = state.token else { return }
+        Task {
+            do {
+                _ = try await ApiClient.shared.deleteWidget(profileId: pid,
+                                                     widgetId: widget.id,
+                                                     token: token)
+                if open?.id == widget.id { open = nil }
+                await load()
+            } catch { self.error = error.localizedDescription }
         }
     }
 }
