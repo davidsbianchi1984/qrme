@@ -653,7 +653,7 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    with `contain`, which letterboxes rather than cropping somebody's video to
    a shape they did not shoot it in. */
 .deck {
-  height: calc(100dvh - 140px);
+  height: calc(100dvh - 76px);
   overflow-y: auto;
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
@@ -663,13 +663,44 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .deck-pane {
   scroll-snap-align: start;
   scroll-snap-stop: always;
-  height: calc(100dvh - 140px);
+  height: calc(100dvh - 76px);
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 8px 16px 12px;
   box-sizing: border-box;
+  position: relative;
 }
+
+/* A pane with footage in it is the footage, and the words are on top.
+   Stacking a header above the frame and a caption below it means the frame
+   is never the screen — which is the whole of what a deck is for. So the
+   media fills the pane and everything else rides over it, pushed to the two
+   edges. A pane that is a room or a desk has no frame to ride on and keeps
+   the ordinary stacked layout. */
+.deck-pane-full { justify-content: space-between; padding: 0; }
+.deck-pane-full > * { position: relative; z-index: 1; }
+.deck-pane-full .deck-media {
+  position: absolute; inset: 0; z-index: 0;
+  border-radius: 0;
+}
+/* Scrims, so white-on-anything stays readable over a bright frame without
+   a panel sitting between the reader and the picture. */
+.deck-pane-full .deck-head,
+.deck-pane-full .deck-said,
+.deck-pane-full .deck-steps { padding: 10px 16px; margin: 0; }
+.deck-pane-full .deck-head {
+  background: linear-gradient(rgba(5,4,15,0.75), rgba(5,4,15,0));
+}
+.deck-pane-full .deck-said {
+  background: linear-gradient(rgba(5,4,15,0), rgba(5,4,15,0.8) 40%);
+  padding-bottom: 2px;
+}
+.deck-pane-full .deck-steps {
+  background: rgba(5,4,15,0.8);
+  padding-top: 4px;
+}
+
 .deck-head { flex: none; }
 .deck-media {
   flex: 1;
@@ -681,9 +712,11 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   border-radius: 12px;
   overflow: hidden;
 }
-.deck-media video {
+.deck-media video,
+.deck-media iframe {
   width: 100%; height: 100%;
   object-fit: contain;          /* the letterbox, on purpose */
+  border: 0;
 }
 .deck-facade {
   display: flex; flex-direction: column; align-items: center;
@@ -696,8 +729,9 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 
 @media (max-width: 760px) {
   /* The tab bar is the bottom of the screen here, so the deck stops above
-     it rather than under it — the same 64px the corner widgets clear. */
+     it rather than under it — and nothing else is allowed to take a band
+     off the top, which is what kept the frame from ever being the screen. */
   .deck, .deck-pane {
-    height: calc(100dvh - 64px - env(safe-area-inset-bottom) - 76px);
+    height: calc(100dvh - 64px - env(safe-area-inset-bottom));
   }
 }

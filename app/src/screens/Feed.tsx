@@ -136,12 +136,7 @@ export function Feed({ onPlans, onParty }: {
 
 
   return (
-    <div className="screen">
-      <header className="screen-head">
-        <h2>{tr("feed.title", lang)}</h2>
-        <span className="muted small">{tr("feed.sub", lang)}</span>
-      </header>
-
+    <div className="screen screen-deck">
       {error != null && <Refusal error={error} onPlans={onPlans} />}
 
       {items.length === 0 && !busy && (
@@ -152,7 +147,9 @@ export function Feed({ onPlans, onParty }: {
 
       <div className="deck" ref={frame}>
       {items.map((item, index) => (
-        <section className="deck-pane" key={item.id}
+        <section key={item.id}
+                 className={"deck-pane" + (item.kind === "video"
+                   || item.kind === "offsite" ? " deck-pane-full" : "")}
                  ref={(el) => { panes.current[index] = el; }}>
           <div className="row deck-head">
             <span className="pill">{tr(`feed.kind.${item.kind}`, lang)}</span>
@@ -307,6 +304,8 @@ export function Feed({ onPlans, onParty }: {
         <section className="deck-pane deck-rules"
                  ref={(el) => { panes.current[items.length] = el; }}>
           <div className="card">
+            <h2 style={{ margin: "0 0 2px" }}>{tr("feed.title", lang)}</h2>
+            <p className="muted small">{tr("feed.sub", lang)}</p>
             <p className="muted small">{rules.public}</p>
             <p className="muted small">{rules.facade}</p>
             <label className="row">
