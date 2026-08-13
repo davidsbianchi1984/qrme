@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api, type Listing, type Locality, type MarketPrefs, type MarketSearch,
          type Offer, type Order } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
@@ -48,6 +48,10 @@ export function Market({ onPlans }: {
   // Which folder of the shelved catalogue is open. One at a time — the
   // point of folders is not seeing everything at once.
   const [openFolder, setOpenFolder] = useState<string | null>(null);
+  // Where the opened shelf renders. On a phone the chip cloud is taller
+  // than the screen, so a press that only changed state below the fold
+  // read as a dead button — a field report said exactly that.
+  const shelfRef = useRef<HTMLDivElement | null>(null);
 
   const fail = (e: unknown) => setError(e);
 
@@ -293,16 +297,24 @@ export function Market({ onPlans }: {
             <p className="muted small">{tr("mkt.folders.pitch", lang)}</p>
             <div className="actions" style={{ marginTop: 0 }}>
               {folderNames.map((f) => (
-                <button key={f || "other"} className="chip"
-                        onClick={() =>
-                          setOpenFolder(openFolder === f ? null : f)}>
+                <button key={f || "other"}
+                        className={"chip" + (openFolder === f ? " on" : "")}
+                        onClick={() => {
+                          const next = openFolder === f ? null : f;
+                          setOpenFolder(next);
+                          if (next !== null) setTimeout(() =>
+                            shelfRef.current?.scrollIntoView(
+                              { behavior: "smooth", block: "start" }), 0);
+                        }}>
                   {(f || tr("mkt.folder.other", lang))
                     + " · " + folders.get(f)!.length}
                 </button>
               ))}
             </div>
-            {openFolder !== null && folders.has(openFolder) &&
-              folders.get(openFolder)!.map(listingRow)}
+            <div ref={shelfRef}>
+              {openFolder !== null && folders.has(openFolder) &&
+                folders.get(openFolder)!.map(listingRow)}
+            </div>
           </>
         )}
         {Object.values(offers).some(Boolean) && (

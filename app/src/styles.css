@@ -17,6 +17,10 @@
 
 * { box-sizing: border-box; }
 html, body, #root { height: 100%; margin: 0; }
+/* Phone browsers boost small text on pages they judge desktop-shaped,
+   which is how a 9px corner badge once swallowed a portrait. The layout
+   already adapts below 760px; the boost only breaks it. */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
   font-family: var(--font);
   color: var(--txt);
@@ -150,6 +154,20 @@ label.chip {
   background: rgba(255,255,255,0.05); color: var(--txt);
   border: 1px solid var(--line); border-radius: 12px; padding: 12px 18px;
   font-weight: 600; font-size: 14px; cursor: pointer; width: auto;
+}
+/* A chip is a chip, not a full-size button. Until this rule existed the
+   class only changed labels, so forty marketplace shelves rendered as
+   forty buttons and filled a phone's whole screen — with the shelf they
+   opened out of sight below. */
+button.chip {
+  padding: 5px 10px; font-size: 12px; font-weight: 600;
+  border-radius: 10px; width: auto;
+}
+/* The pressed chip says so — the answer appears below it, and on a phone
+   the press must read even before the scroll lands there. */
+button.chip.on {
+  background: rgba(123,92,255,0.28); border-color: var(--brand);
+  color: #fff;
 }
 button.danger { background: rgba(224,104,122,0.14) !important; color: var(--red) !important; border: 1px solid var(--red) !important; }
 .error { background: rgba(224,104,122,0.12); color: var(--red); border: 1px solid var(--red); border-radius: 10px; padding: 10px 12px; font-size: 13px; margin: 10px 0; }
@@ -420,8 +438,12 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   display: inline-flex; align-items: center; justify-content: center;
   background: #0d0a24; border: 1px solid var(--line); }
 .dc-initials { font-weight: 800; font-size: 20px; color: var(--muted); }
-.dc-badge { position: absolute; bottom: -4px; right: -6px; font-size: 9px;
-  font-weight: 800; padding: 2px 6px; border-radius: 8px; letter-spacing: .3px; }
+/* In normal flow under the portrait — never absolutely positioned over it.
+   A field report showed the green pill swallowing the face once a phone's
+   font boosting inflated the 9px text. */
+.dc-badge { display: inline-block; width: fit-content; font-size: 10px;
+  font-weight: 800; padding: 2px 6px; border-radius: 8px; letter-spacing: .3px;
+  margin-bottom: 6px; white-space: nowrap; }
 .dc-badge.ai { background: rgba(123,92,255,0.9); color: #fff; }
 .dc-badge.real { background: rgba(67,224,138,0.9); color: #06281a; }
 
@@ -446,6 +468,12 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   .watch-lights .wl-label, .watch-lights .wl-name { font-size: 10px; }
   .wl-dot {
     left: 12px; bottom: calc(76px + env(safe-area-inset-bottom));
+    /* A field report showed the minimized light as a solid green disc
+       parked over whatever the screen was trying to say. On a phone it
+       shrinks to a true dot and loses the heavy shadow — still pressable,
+       no longer furniture. */
+    width: 22px; height: 22px; opacity: 0.75;
+    box-shadow: 0 2px 8px rgba(0,0,0,.35);
   }
 }
 

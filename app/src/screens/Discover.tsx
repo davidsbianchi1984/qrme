@@ -96,13 +96,16 @@ export function Discover({ onPlans }: {
                   {c.display_name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2)}
                 </span>
               )}
-              {c.avatar_kind === "ai" && (
-                <span className="dc-badge ai">{tr("dsc.badge.ai", lang)}</span>
-              )}
-              {c.avatar_kind === "real_photo" && (
-                <span className="dc-badge real">{tr("dsc.badge.real", lang)}</span>
-              )}
             </div>
+            {/* The kind label sits under the portrait, never on it — a
+                field report showed the green pill swallowing the face
+                once a phone's font boosting inflated it. */}
+            {c.avatar_kind === "ai" && (
+              <span className="dc-badge ai">{tr("dsc.badge.ai", lang)}</span>
+            )}
+            {c.avatar_kind === "real_photo" && (
+              <span className="dc-badge real">{tr("dsc.badge.real", lang)}</span>
+            )}
             <b>{c.display_name}</b>
             {c.blurb && <p className="muted small">{c.blurb}</p>}
             <div className="tag-row">
