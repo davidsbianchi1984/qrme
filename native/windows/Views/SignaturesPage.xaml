@@ -19,6 +19,8 @@
                                x:Name="CeremonyNote" />
                     <TextBox x:Name="DocumentBox"
                              AcceptsReturn="True" TextWrapping="Wrap" Height="90" />
+                    <TextBlock x:Name="SigNotes" FontSize="11" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT3Brush}" />
                     <TextBox x:Name="MeaningBox" />
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <Button x:Name="EnrollButton" Click="OnEnroll"

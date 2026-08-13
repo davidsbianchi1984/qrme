@@ -49,6 +49,8 @@ public sealed partial class SignaturesPage : Page
         HelloHead.Text = L10n.T("nsig.hello", lang);
         CeremonyNote.Text = L10n.T("nsig.ceremony.win", lang);
         DocumentBox.Header = L10n.T("nsig.signing", lang);
+        SigNotes.Text = L10n.T("nsig.hashed", lang) + " "
+            + L10n.T("nsig.tiers", lang);
         MeaningBox.Header = L10n.T("nsig.means", lang);
         // The default was the attestation itself, in English, sitting in the
         // box a person is agreeing with.

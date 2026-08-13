@@ -1,4 +1,4 @@
-# status: backlog — 171 rows
+# status: backlog — 126 rows
 #
 # ...but see below: only 72 of them are deletion work. The other 263 are a
 # to-do list about screens, and calling the whole number a backlog is the
@@ -211,17 +211,6 @@ ios: ns.lang.pre.on
 ios: ns.model.nokeyword
 ios: ns.rel.type
 ios: ns.wm.label
-ios: nsig.creds.yours
-ios: nsig.evidence
-ios: nsig.evidence.sub
-ios: nsig.fetch
-ios: nsig.hello
-ios: nsig.lookup
-ios: nsig.register
-ios: nsig.sigid
-ios: nsig.sign
-ios: nsig.verify
-ios: nsig.verify.other
 ios: nvoi.micoff
 ios: nw.needboth
 ios: pub.mark.needtext
@@ -261,25 +250,6 @@ android: ns.rel.type
 android: ns.st.age
 android: ns.st.appearance
 android: ns.wm.label.ph
-android: nsig
-android: nsig.creds.yours
-android: nsig.domain
-android: nsig.evidence
-android: nsig.evidence.sub
-android: nsig.faceid
-android: nsig.fetch
-android: nsig.hello
-android: nsig.keep
-android: nsig.lookup
-android: nsig.needaccount
-android: nsig.register
-android: nsig.revoke
-android: nsig.revoke.this
-android: nsig.revoked.note
-android: nsig.sigid
-android: nsig.signed
-android: nsig.verify
-android: nsig.verify.other
 android: nw.needboth
 android: nw.unreachable
 android: pub.mark.needtext
@@ -322,21 +292,6 @@ windows: ns.obj.attested
 windows: ns.st.age
 windows: ns.tr.engine
 windows: ns.who.checking
-windows: nsig
-windows: nsig.creds
-windows: nsig.doc
-windows: nsig.domain
-windows: nsig.domain.android
-windows: nsig.enrol
-windows: nsig.faceid
-windows: nsig.hashed
-windows: nsig.keep
-windows: nsig.needaccount
-windows: nsig.revoke
-windows: nsig.revoke.this
-windows: nsig.revoked.note
-windows: nsig.signed
-windows: nsig.tiers
 windows: nvoi.micoff
 windows: plc.venues
 windows: pub.tab.mark
