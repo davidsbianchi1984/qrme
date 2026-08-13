@@ -981,6 +981,23 @@ LESSONS: tuple[dict, ...] = (
          screens=(188,),
          try_it="Pick two theme colors, save, and look at your page the "
                 "way a stranger would."),
+    dict(key="widgets", chapter="Being yourself", title="Your own tools",
+         what="A widget is a small program you write for your own profile. "
+              "It runs on the backend, not on your phone, and it runs in a "
+              "box: no network, no files but its own, no way to start another "
+              "program, and a few seconds of time. That is what lets you "
+              "write whatever you like without being able to reach anybody "
+              "else. Above the editor you can ask for it in words instead — "
+              "an agent changes your page, your homepage or your widgets "
+              "through the same doors you would have used yourself. Its "
+              "reach is a written list you can read before you use it, it "
+              "cannot act on anybody's profile but yours, and what it did is "
+              "listed under what it said: one line per door it went through, "
+              "so you are never asked to take the description on trust.",
+         screens=(196,),
+         try_it="Open Widgets, press What it can touch and read the ten "
+                "lines, then ask it for something small — a tagline — and "
+                "check the steps under its answer against your own page."),
     dict(key="discover", chapter="Meeting others", title="Discover",
          what="The marketplace as cards — every one a real profile you can "
               "talk to, not a listing about one. The starter collection is "
