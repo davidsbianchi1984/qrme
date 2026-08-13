@@ -171,6 +171,7 @@ public sealed partial class SettingsPage : Page
         ProblemsNo.Content = L10n.T("ns.pr.dont", lang);
         ProblemsSwitch.Header = L10n.T("ns.pr.toggle", lang);
         ProblemsPreviewButton.Content = L10n.T("ns.pr.show", lang);
+        ProblemsServerTitle.Text = L10n.T("prob.server");
         ProblemsKeyBox.PlaceholderText = L10n.T("prob.key.ph");
         ProblemsFetchButton.Content = L10n.T("prob.fetch");
     }
