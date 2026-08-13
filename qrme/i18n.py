@@ -205,6 +205,8 @@ STUDIO_REFUSALS: dict[str, str] = {
                         "so nothing will run here",
     "widgets.no_node": "this deployment has no interpreter for widgets, so "
                        "nothing will run here",
+    "widgets.node_too_old": "this deployment's interpreter is too old to "
+                            "hold a widget in, so nothing will run here",
     # The agent that writes them. Its wrong answers are a genre of their own:
     # every one of these is the model failing, not the person, and each says
     # so rather than reading as something they did.
@@ -1069,6 +1071,17 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'zh': '我们这边出了问题。您发送的内容没有被记录。',
         'hi': 'हमारी ओर से कुछ गड़बड़ हो गई। आपने जो भेजा, वह दर्ज नहीं हुआ।',
         'ar': 'حدث خطأ من جانبنا. لم يُسجَّل أي شيء أرسلته.',
+    },
+    "this deployment's interpreter is too old to hold a widget in, so nothing will run here": {
+        'es': 'el intérprete de esta instalación es demasiado antiguo para contener un widget, así que aquí no se ejecutará nada',
+        'fr': "l'interpréteur de cette installation est trop ancien pour contenir un widget ; rien ne s'exécutera ici",
+        'de': 'der Interpreter dieser Installation ist zu alt, um ein Widget einzuschließen — hier läuft nichts',
+        'pt': 'o interpretador desta instalação é demasiado antigo para conter um widget, por isso nada correrá aqui',
+        'it': "l'interprete di questa installazione è troppo vecchio per contenere un widget, quindi qui non girerà nulla",
+        'ja': 'この配備のインタープリターは古すぎてウィジェットを閉じ込められないため、ここでは何も実行されません。',
+        'zh': '本部署的解释器太旧，无法把小工具关进箱子里，因此这里不会运行任何东西。',
+        'hi': 'इस डिप्लॉयमेंट का इंटरप्रेटर इतना पुराना है कि विजेट को बॉक्स में नहीं रख सकता, इसलिए यहाँ कुछ नहीं चलेगा।',
+        'ar': 'مفسّر هذا النشر أقدم من أن يحتوي أداة داخل صندوق، لذا لن يُشغَّل شيء هنا.',
     },
     'say what you would like changed': {
         'es': 'diga qué le gustaría cambiar',

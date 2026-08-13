@@ -72,6 +72,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import resource
 import shutil
 import subprocess
@@ -119,6 +120,29 @@ class WidgetError(ValueError):
 #: absence of this binary is the one condition under which this module will
 #: not run a widget at all.
 _UNSHARE = "unshare"
+
+#: The interpreter's floor, and the reason there has to be one.
+#:
+#: The filesystem wall is node's own permission model, reached through
+#: `--experimental-permission`, which arrives in **Node 20**. On Node 18 that
+#: flag is not merely ignored — it is unknown, and node exits before it runs a
+#: line.
+#:
+#: This is a floor because of what the absence of it looked like on a real
+#: host. `sandbox_available` asked `shutil.which("node")` and nothing else, so
+#: a machine carrying Ubuntu's own Node 18 answered **available** — the editor
+#: opened, the run button lit, and every widget came back failed on a flag its
+#: author never typed.
+#:
+#:     asked     is there an interpreter here
+#:     mattered  is there one that can hold a widget
+#:
+#: A missing binary and a binary that cannot build the wall are the same
+#: condition wearing different clothes, and this module already says what it
+#: does about that: it refuses to run rather than running with three walls
+#: instead of four. The version was the one way that promise could be broken
+#: without anybody being told.
+MIN_NODE = 20
 
 #: What the child is allowed to know about the machine it runs on, which is
 #: nothing. Everything in this process's environment — model keys, admin
@@ -168,12 +192,32 @@ def sandbox_available() -> tuple[bool, str]:
     """
     if shutil.which(_UNSHARE) is None:
         return False, "widgets.no_unshare"
-    if shutil.which("node") is None:
+    node = shutil.which("node")
+    if node is None:
         return False, "widgets.no_node"
+    if _node_major(node) < MIN_NODE:
+        return False, "widgets.node_too_old"
     probe = subprocess.run([_UNSHARE, "-rn", "true"], capture_output=True)
     if probe.returncode != 0:
         return False, "widgets.no_netns"
     return True, ""
+
+
+def _node_major(node: str) -> int:
+    """The interpreter's major version, or 0 when it cannot be read.
+
+    Unreadable counts as too old on purpose. Every other answer this function
+    could give — assume it is fine, raise, guess from the path — ends with a
+    run button that lights on a host where nothing runs, which is the defect
+    `MIN_NODE` exists for.
+    """
+    try:
+        said = subprocess.run([node, "--version"], capture_output=True,
+                              text=True, timeout=10)
+    except (OSError, subprocess.SubprocessError):
+        return 0
+    found = re.match(r"v(\d+)\.", (said.stdout or "").strip())
+    return int(found.group(1)) if found else 0
 
 
 def _limits() -> None:                              # pragma: no cover - child

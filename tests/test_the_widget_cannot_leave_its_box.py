@@ -235,14 +235,77 @@ def test_the_runner_refuses_rather_than_degrades_when_a_wall_is_missing(
     assert answer["detail"] == "widgets.no_unshare"
 
 
+def test_an_interpreter_too_old_to_build_the_wall_is_a_missing_wall(
+        monkeypatch):
+    """Found on a live host, not in review.
+
+    The filesystem wall is node's own permission model, which arrives in Node
+    20. `sandbox_available` asked whether *an* interpreter existed and nothing
+    more, so a machine carrying Ubuntu's own Node 18 answered **available**:
+    the editor opened, the run button lit, and every widget came back failed
+    on a flag its author never typed.
+
+        asked     is there an interpreter here
+        mattered  is there one that can hold a widget
+
+    A binary that cannot build the wall is the missing-wall case wearing
+    different clothes, and this module's whole promise is that it refuses
+    rather than running with three walls instead of four.
+    """
+    real = subprocess.run
+
+    def old(argv, *a, **kw):
+        if argv[1:] == ["--version"]:
+            return subprocess.CompletedProcess(argv, 0, "v18.19.1\n", "")
+        return real(argv, *a, **kw)                          # pragma: no cover
+    monkeypatch.setattr(widgets.subprocess, "run", old)
+    answer = widgets.run_source("module.exports = () => 1;")
+    assert answer["status"] == "refused"
+    assert answer["detail"] == "widgets.node_too_old"
+
+
+def test_an_interpreter_that_will_not_say_its_version_is_too_old(monkeypatch):
+    """Unreadable counts as too old. Every other reading — assume it is fine,
+    raise, guess from the path — ends with a run button lit on a host where
+    nothing runs, which is the whole defect."""
+    real = subprocess.run
+
+    def mute(argv, *a, **kw):
+        if argv[1:] == ["--version"]:
+            raise OSError("cannot execute")
+        return real(argv, *a, **kw)                          # pragma: no cover
+    monkeypatch.setattr(widgets.subprocess, "run", mute)
+    answer = widgets.run_source("module.exports = () => 1;")
+    assert answer["status"] == "refused"
+    assert answer["detail"] == "widgets.node_too_old"
+
+
+def test_the_floor_is_the_version_the_flag_actually_needs(monkeypatch):
+    """A guard on the guard. A floor quietly lowered to 18 would let the
+    defect back in with every test above still passing, because they assert
+    on the refusal rather than on the number that produces it."""
+    assert widgets.MIN_NODE >= 20, (
+        "--experimental-permission arrives in Node 20; a floor below that "
+        "admits an interpreter that cannot build the filesystem wall")
+    for said, major in (("v20.0.0", 20), ("v22.22.2", 22), ("v18.19.1", 18),
+                        ("not a version", 0), ("", 0)):
+        monkeypatch.setattr(
+            widgets.subprocess, "run",
+            lambda argv, *a, **kw: subprocess.CompletedProcess(
+                argv, 0, said, ""))
+        assert widgets._node_major("/nowhere/node") == major, said
+
+
 def test_the_refusal_is_also_checked_when_the_namespace_is_denied(monkeypatch):
     """`unshare` present and refused is a different failure from `unshare`
     absent — a container without user namespaces reaches this one, and it
     must refuse just as hard."""
+    real = subprocess.run
+
     def denied(argv, *a, **kw):
         if argv[:2] == ["unshare", "-rn"]:
             return subprocess.CompletedProcess(argv, 1, b"", b"denied")
-        return subprocess.run(argv, *a, **kw)                # pragma: no cover
+        return real(argv, *a, **kw)
     monkeypatch.setattr(widgets.subprocess, "run", denied)
     answer = widgets.run_source("module.exports = () => 1;")
     assert answer["status"] == "refused"

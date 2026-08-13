@@ -88,6 +88,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   English on a screen that translates everything else — invisible to the
   extractor because a string chosen at render time is a
   `ConditionalExpression` and not a `JsxText` node.
+- **The interpreter's version was the one way the sandbox could lie.**
+  `sandbox_available` asked whether *an* interpreter existed and nothing
+  more, so a host carrying Ubuntu's own Node 18 answered **available**: the
+  editor opened, the run button lit, and every widget came back failed on a
+  flag its author never typed. The filesystem wall is node's own permission
+  model, which arrives in Node 20 — a binary that cannot build the wall is
+  the missing-wall case wearing different clothes, and this module's promise
+  is that it refuses rather than running with three walls instead of four.
+  `MIN_NODE`, a version probe where unreadable counts as too old, its own
+  refusal in ten languages, and a guard on the floor itself. Found on a live
+  host, not in review.
 - **A memorial does not redecorate.** The agent's turn and a widget's run
   both drove a profile without asking whether it may still act. The turn
   takes `require_may_publish` — the page it edits is a public face, and a
