@@ -623,7 +623,7 @@ export function Identity({ onPlans, onPassing }: {
         </div>
         {exportQr && (
           <>
-            <img src={`${getBase()}/profiles/${me}/export/handoff/${exportQr.ticket}/qr.svg`}
+            <img src={getBase() + `/profiles/${me}/export/handoff/${exportQr.ticket}/qr.svg`}
                  alt={tr("idn.export.qr", lang)}
                  style={{ width: 220, height: 220, borderRadius: 12 }} />
             <p className="muted small">{exportQr.note}</p>

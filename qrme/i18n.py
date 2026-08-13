@@ -1016,6 +1016,82 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'no such handoff — mint a fresh ticket': {
+        'es': 'no existe esa entrega — genera un vale nuevo',
+        'fr': "ce transfert n'existe pas — émettez un nouveau ticket",
+        'de': 'keine solche Übergabe — stellen Sie ein frisches Ticket aus',
+        'pt': 'essa entrega não existe — emita um bilhete novo',
+        'it': 'nessuna consegna del genere — emetti un biglietto nuovo',
+        'ja': 'その受け渡しは存在しません — 新しいチケットを発行してください',
+        'zh': '没有这个交接——请重新生成一张票据',
+        'hi': 'ऐसा कोई हस्तांतरण नहीं — नया टिकट बनाएँ',
+        'ar': 'لا يوجد تسليم كهذا — أصدر تذكرة جديدة',
+    },
+    'this handoff has already been used or has expired — '
+    'mint a fresh ticket': {
+        'es': 'esta entrega ya se usó o ha caducado — genera un vale nuevo',
+        'fr': 'ce transfert a déjà servi ou a expiré — émettez un nouveau '
+              'ticket',
+        'de': 'diese Übergabe wurde schon benutzt oder ist abgelaufen — '
+              'stellen Sie ein frisches Ticket aus',
+        'pt': 'esta entrega já foi usada ou expirou — emita um bilhete novo',
+        'it': 'questa consegna è già stata usata o è scaduta — emetti un '
+              'biglietto nuovo',
+        'ja': 'この受け渡しは使用済みか期限切れです — 新しいチケットを発行してください',
+        'zh': '这个交接已被使用或已过期——请重新生成一张票据',
+        'hi': 'यह हस्तांतरण इस्तेमाल हो चुका है या समाप्त हो गया — नया टिकट बनाएँ',
+        'ar': 'استُخدم هذا التسليم من قبل أو انتهت صلاحيته — أصدر تذكرة جديدة',
+    },
+    'reading the failure map requires the QRME_PROBLEMS_KEY bearer token': {
+        'es': 'leer el mapa de fallos requiere el token portador '
+              'QRME_PROBLEMS_KEY',
+        'fr': 'lire la carte des échecs exige le jeton porteur '
+              'QRME_PROBLEMS_KEY',
+        'de': 'das Lesen der Fehlerkarte erfordert das '
+              'QRME_PROBLEMS_KEY-Bearer-Token',
+        'pt': 'ler o mapa de falhas requer o token portador '
+              'QRME_PROBLEMS_KEY',
+        'it': 'leggere la mappa dei guasti richiede il token bearer '
+              'QRME_PROBLEMS_KEY',
+        'ja': '障害マップの閲覧には QRME_PROBLEMS_KEY のベアラートークンが必要です',
+        'zh': '读取故障图需要 QRME_PROBLEMS_KEY 持有者令牌',
+        'hi': 'विफलता मानचित्र पढ़ने के लिए QRME_PROBLEMS_KEY बियरर टोकन चाहिए',
+        'ar': 'قراءة خريطة الأعطال تتطلب رمز QRME_PROBLEMS_KEY الحامل',
+    },
+    'wrong problems key': {
+        'es': 'clave de problemas incorrecta',
+        'fr': 'mauvaise clé des problèmes',
+        'de': 'falscher Problems-Schlüssel',
+        'pt': 'chave de problemas errada',
+        'it': 'chiave dei problemi sbagliata',
+        'ja': 'problemsキーが違います',
+        'zh': '问题密钥不正确',
+        'hi': 'समस्याओं की कुंजी ग़लत है',
+        'ar': 'مفتاح المشاكل خاطئ',
+    },
+    'the failure aggregate is readable from this machine only until '
+    'QRME_PROBLEMS_KEY is set — behind a proxy, set it': {
+        'es': 'el agregado de fallos solo se puede leer desde esta máquina '
+              'hasta que se fije QRME_PROBLEMS_KEY — tras un proxy, fíjala',
+        'fr': "l'agrégat des échecs n'est lisible que depuis cette machine "
+              'tant que QRME_PROBLEMS_KEY n\'est pas définie — derrière un '
+              'proxy, définissez-la',
+        'de': 'das Fehleraggregat ist nur von dieser Maschine lesbar, bis '
+              'QRME_PROBLEMS_KEY gesetzt ist — hinter einem Proxy: setzen',
+        'pt': 'o agregado de falhas só pode ser lido a partir desta máquina '
+              'até QRME_PROBLEMS_KEY estar definida — atrás de um proxy, '
+              'defina-a',
+        'it': "l'aggregato dei guasti è leggibile solo da questa macchina "
+              'finché QRME_PROBLEMS_KEY non è impostata — dietro un proxy, '
+              'impostala',
+        'ja': '障害の集計は QRME_PROBLEMS_KEY を設定するまでこの機械からしか読めません — '
+              'プロキシの背後では設定してください',
+        'zh': '在设置 QRME_PROBLEMS_KEY 之前，故障汇总只能从本机读取——在代理之后请务必设置',
+        'hi': 'जब तक QRME_PROBLEMS_KEY निर्धारित नहीं होती, विफलता समग्र केवल इसी '
+              'मशीन से पढ़ा जा सकता है — प्रॉक्सी के पीछे इसे निर्धारित करें',
+        'ar': 'لا يمكن قراءة مجمّع الأعطال إلا من هذا الجهاز حتى يُعيَّن '
+              'QRME_PROBLEMS_KEY — خلف وكيل، عيِّنه',
+    },
     'only the host decides where a party can be found': {
         'es': 'solo el anfitrión decide dónde se puede encontrar una sala',
         'fr': "seul l'hôte décide où une séance peut être trouvée",

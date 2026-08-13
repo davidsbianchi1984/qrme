@@ -25,3 +25,9 @@ ios: native/ios/Sources/Problems.swift  /+$
 # is sent by it.
 windows: native/windows/ApiClient.cs  /desks/{deskId}/view.webp
 windows: native/windows/ApiClient.cs  /signatures/ceremony?{query}
+
+# The redeem field on the export card accepts a pasted handoff URL and asks
+# whether it contains this fragment before parsing the profile id and ticket
+# out of it. A question about a string somebody pasted, not a request — the
+# actual request is the `req()` call two lines down, which the audit reads.
+console: app/src/screens/Identity.tsx  /export/handoff/

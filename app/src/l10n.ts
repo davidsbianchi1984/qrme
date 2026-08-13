@@ -3260,7 +3260,7 @@ const CHROME: Table = {
     en: "Every client of this deployment reports its failures here, folded into counters — an operation, a status, a count, never anyone's content. Reading them is the operator's: use the QRME_PROBLEMS_KEY, or ask from the machine the backend runs on.", es: "Cada cliente de esta instalación informa aquí sus fallos, plegados en contadores: una operación, un estado, un recuento, nunca el contenido de nadie. Leerlos es del operador: usa la QRME_PROBLEMS_KEY o consulta desde la máquina donde corre el backend.", fr: "Chaque client de ce déploiement rapporte ici ses échecs, repliés en compteurs — une opération, un statut, un total, jamais le contenu de quiconque. Leur lecture revient à l'opérateur : utilisez la QRME_PROBLEMS_KEY, ou interrogez depuis la machine du backend.", de: "Jeder Client dieser Installation meldet seine Fehler hierher, zu Zählern gefaltet — eine Operation, ein Status, eine Anzahl, nie jemandes Inhalte. Lesen ist Sache des Betreibers: mit dem QRME_PROBLEMS_KEY, oder von der Maschine aus, auf der das Backend läuft.", pt: "Cada cliente desta instalação comunica aqui as suas falhas, dobradas em contadores — uma operação, um estado, uma contagem, nunca o conteúdo de ninguém. Lê-las é do operador: use a QRME_PROBLEMS_KEY ou pergunte a partir da máquina onde corre o backend.", it: "Ogni client di questa installazione riporta qui i suoi errori, ripiegati in contatori — un'operazione, uno stato, un conteggio, mai il contenuto di qualcuno. Leggerli spetta all'operatore: usa la QRME_PROBLEMS_KEY, oppure chiedi dalla macchina su cui gira il backend.", ja: "この配備のすべてのクライアントが障害をここに報告し、カウンターに畳み込まれます — 操作、ステータス、件数だけで、誰かの内容は決して含まれません。読むのは運用者の役目です。QRME_PROBLEMS_KEY を使うか、バックエンドが動く機械から尋ねてください。", zh: "此部署的每个客户端都把故障报告到这里，折叠成计数——操作、状态码、次数，绝不含任何人的内容。读取属于运维者：使用 QRME_PROBLEMS_KEY，或从后端所在的机器上查询。", hi: "इस परिनियोजन का हर क्लाइंट अपनी विफलताएँ यहाँ भेजता है, गिनतियों में समेटी हुई — एक ऑपरेशन, एक स्थिति, एक संख्या, कभी किसी की सामग्री नहीं। इन्हें पढ़ना संचालक का काम है: QRME_PROBLEMS_KEY इस्तेमाल करें, या उसी मशीन से पूछें जिस पर बैकएंड चलता है।", ar: "كل عميل في هذا النشر يبلّغ أعطاله هنا، مطويةً في عدّادات — عملية وحالة وعدد، ولا محتوى لأحد أبدًا. قراءتها للمشغّل: استخدم QRME_PROBLEMS_KEY، أو اسأل من الجهاز الذي يعمل عليه الخادم.",
   },
   "prob.key.ph": {
-    en: "the problems key, if this deployment set one", es: "la clave de problemas, si esta instalación fijó una", fr: "la clé des problèmes, si ce déploiement en a défini une", de: "der Problems-Schlüssel, falls diese Installation einen gesetzt hat", pt: "a chave de problemas, se esta instalação definiu uma", it: "la chiave dei problemi, se questa installazione ne ha una", ja: "この配備で設定されていれば、そのproblemsキー", zh: "如果此部署设置了问题密钥，请输入", hi: "समस्याओं की कुंजी, अगर इस परिनियोजन ने कोई रखी है", ar: "مفتاح المشاكل، إن كان هذا النشر قد عيّن واحدًا",
+    en: "the problems key, if this deployment set one", es: "la clave de problemas, si esta instalación fijó una", fr: "la clé des problèmes, si ce déploiement en a défini une", de: "der Problems-Schlüssel, falls diese Installation einen gesetzt hat", pt: "a chave de problemas, se esta instalação definiu uma", it: "la chiave dei problemi, se questa installazione ne ha una", ja: "この配備で設定されていれば、その「problems」キー", zh: "如果此部署设置了问题密钥，请输入", hi: "समस्याओं की कुंजी, अगर इस परिनियोजन ने कोई रखी है", ar: "مفتاح المشاكل، إن كان هذا النشر قد عيّن واحدًا",
   },
   "prob.fetch": {
     en: "Read the aggregate", es: "Leer el agregado", fr: "Lire l'agrégat", de: "Das Aggregat lesen", pt: "Ler o agregado", it: "Leggi l'aggregato", ja: "集計を読む", zh: "读取汇总", hi: "समग्र पढ़ें", ar: "اقرأ المجمّع",
@@ -3588,9 +3588,6 @@ const CHROME: Table = {
   },
   "wsh.spec.domain.ph": {
     en: "a domain, e.g. plumbing", es: "un dominio, p. ej. fontanería", fr: "un domaine, p. ex. plomberie", de: "ein Gebiet, z. B. Sanitär", pt: "um domínio, p. ex. canalização", it: "un dominio, es. idraulica", ja: "領域（例: 配管）", zh: "一个领域，如管道维修", hi: "एक क्षेत्र, जैसे नलसाज़ी", ar: "مجال، مثل السباكة",
-  },
-  "wsh.spec.id.ph": {
-    en: "the specialist's profile id", es: "el id de perfil del especialista", fr: "l'id de profil du spécialiste", de: "die Profil-Id des Spezialisten", pt: "o id de perfil do especialista", it: "l'id di profilo dello specialista", ja: "専門家のプロフィールID", zh: "该专家的资料ID", hi: "विशेषज्ञ की प्रोफ़ाइल आईडी", ar: "معرّف ملف المختص",
   },
   "wsh.spec.attach": {
     en: "Attach", es: "Adjuntar", fr: "Rattacher", de: "Anhängen", pt: "Anexar", it: "Collega", ja: "紐付ける", zh: "挂接", hi: "जोड़ें", ar: "أرفق",
@@ -7747,7 +7744,7 @@ const CHROME: Table = {
     en: "Edit", es: "Editar", fr: "Modifier", de: "Bearbeiten", pt: "Editar", it: "Modifica", ja: "編集", zh: "编辑", hi: "संपादित करें", ar: "تحرير",
   },
   "mem.curate.done": {
-    en: "Done", es: "Listo", fr: "Terminé", de: "Fertig", pt: "Concluído", it: "Fatto", ja: "完了", zh: "完成", hi: "हो गया", ar: "تم",
+    en: "Done", es: "Hecho", fr: "Terminé", de: "Fertig", pt: "Concluído", it: "Fatto", ja: "完了", zh: "完成", hi: "हो गया", ar: "تمّ",
   },
   "mem.pick": {
     en: "Select this turn", es: "Seleccionar este turno", fr: "Sélectionner ce tour", de: "Diesen Beitrag auswählen", pt: "Selecionar este turno", it: "Seleziona questo turno", ja: "この発言を選択", zh: "选择这条发言", hi: "यह बारी चुनें", ar: "اختر هذه المداخلة",
