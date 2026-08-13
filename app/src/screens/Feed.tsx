@@ -195,6 +195,13 @@ export function Feed({ onPlans, onParty }: {
                 {(playing[item.id] || autoOffsite) && index === at ? (
                   <iframe title={item.title} src={item.facade?.url}
                           allow="autoplay; encrypted-media; picture-in-picture"
+                          /* The document sends no referrer at all, which is
+                             right for a page reached from a QR sticker and
+                             wrong here: a player handed no origin cannot
+                             check whether it may embed on this site, and
+                             YouTube answers `Error 153` rather than play.
+                             Origin only — the host, never the path. */
+                          referrerPolicy="strict-origin-when-cross-origin"
                           style={{ width: "100%", height: "100%", border: 0 }} />
                 ) : (
                   <div className="deck-facade">

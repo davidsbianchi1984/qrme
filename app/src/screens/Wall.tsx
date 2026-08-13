@@ -184,6 +184,10 @@ export function Wall({ onPlans }: {
         <iframe src={p.video.embed_url}
                 title={p.video.title || tr("wll.sharedvideo", lang)}
                 allow="autoplay; encrypted-media; picture-in-picture"
+                /* See Feed.tsx: the document's `no-referrer` leaves the
+                   player unable to check its own embedding and it refuses
+                   to play. Origin only. */
+                referrerPolicy="strict-origin-when-cross-origin"
                 allowFullScreen />
       ) : (
         <button className="wp-facade" onClick={() => setPlaying(p.id)}>
