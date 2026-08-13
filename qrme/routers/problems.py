@@ -96,4 +96,9 @@ def list_problems(request: Request) -> dict:
     rows = db.connect().execute(
         "SELECT * FROM problem_reports"
         " ORDER BY count DESC, last_seen DESC").fetchall()
-    return {"rows": [dict(r) for r in rows]}
+    # `status_code` on the wire, not `status`: one name, one type, in every
+    # product — `status` is a string on a dozen other payloads, and the
+    # native readers declare their fields.
+    return {"rows": [
+        {k: v for k, v in {**dict(r), "status_code": r["status"]}.items()
+         if k != "status"} for r in rows]}

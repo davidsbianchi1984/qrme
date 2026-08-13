@@ -171,6 +171,8 @@ public sealed partial class SettingsPage : Page
         ProblemsNo.Content = L10n.T("ns.pr.dont", lang);
         ProblemsSwitch.Header = L10n.T("ns.pr.toggle", lang);
         ProblemsPreviewButton.Content = L10n.T("ns.pr.show", lang);
+        ProblemsKeyBox.PlaceholderText = L10n.T("prob.key.ph");
+        ProblemsFetchButton.Content = L10n.T("prob.fetch");
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e) => await Reload();
@@ -750,6 +752,25 @@ public sealed partial class SettingsPage : Page
 
     private void OnProblemsToggled(object sender, RoutedEventArgs e) =>
         Problems.SetSending(ProblemsSwitch.IsOn);
+
+
+    // The other end of the wire: what has reached this deployment's own
+    // backend, from every client of it. Reading needs the problems key (or a
+    // caller on the backend's machine); a refusal is rendered verbatim.
+    private async void OnProblemsFetch(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var r = await ApiClient.Shared.ProblemRows(ProblemsKeyBox.Password);
+            ProblemsServerRows.Text = r.Rows.Length == 0
+                ? L10n.T("prob.none")
+                : string.Join("\n", r.Rows.Select(row =>
+                    $"{row.Op}  {row.StatusCode}  ×{row.Count}  " +
+                    $"{row.Source} {row.AppVersion} · {row.Platform} · {row.Day}"));
+        }
+        catch (Exception ex) { ProblemsServerRows.Text = ex.Message; }
+        ProblemsServerRows.Visibility = Visibility.Visible;
+    }
 
     private void OnProblemsPreview(object sender, RoutedEventArgs e)
     {
