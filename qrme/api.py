@@ -26,6 +26,7 @@ from . import db, i18n, llm, mobile, offline, tiers
 from . import terms as terms_mod
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
+from .routers import studio
 from .routers import (accounts as account_routes,
                       attention as attention_routes,
                       solitude as solitude_routes,
@@ -161,6 +162,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(tier_routes.router)
     app.include_router(viewfinder_routes.router)
     app.include_router(pages.router)
+    app.include_router(studio.router)
     app.include_router(wall.router)
     app.include_router(feed_routes.router)
     app.include_router(attention_routes.router)

@@ -53,6 +53,7 @@ import { Campaigns } from "./screens/Campaigns";
 import { Org } from "./screens/Org";
 import { Relationships } from "./screens/Relationships";
 import { Memory } from "./screens/Memory";
+import { Studio } from "./screens/Studio";
 import { Settings } from "./screens/Settings";
 import { Access } from "./screens/Access";
 import { Help } from "./Help";
@@ -61,7 +62,7 @@ import { Footsteps } from "./Footsteps";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "remainder" | "named" | "passing" | "robots" | "placements" | "plans" | "access" | "settings";
+type Tab = "home" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "remainder" | "named" | "passing" | "robots" | "placements" | "plans" | "access" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -82,6 +83,7 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "org", label: "Org", icon: "🏛" },
   { id: "relationships", label: "Relationships", icon: "👥" },
   { id: "memory", label: "Memory Vault", icon: "🔒" },
+  { id: "studio", label: "Studio", icon: "🛠" },
   { id: "delegate", label: "Delegation", icon: "🤝" },
   { id: "desk", label: "Desk", icon: "🛎" },
   { id: "identity", label: "Identity", icon: "🪪" },
@@ -235,6 +237,7 @@ export function App() {
         {tab === "org" && <Org onPlans={toPlans} />}
         {tab === "relationships" && <Relationships onPlans={toPlans} />}
         {tab === "memory" && <Memory onPlans={toPlans} />}
+        {tab === "studio" && <Studio onPlans={toPlans} />}
         {tab === "delegate" && <Delegate onPlans={toPlans} />}
         {tab === "desk" && <Desk onPlans={toPlans} />}
         {/* Beginning and passing on left the sidebar deliberately: it is not

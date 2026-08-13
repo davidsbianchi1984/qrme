@@ -183,6 +183,30 @@ SERVER_ERROR = ("Something went wrong on our side. "
                 "Nothing you sent was recorded.")
 
 
+
+#: What each way a widget can fail says to the person who wrote it.
+#:
+#: The runner answers in keys — `widgets.timeout`, `widgets.no_netns` — so
+#: that nothing builds a sentence at the point of failure. These are the
+#: English, and `_REFUSALS` carries them into the other nine like every
+#: other refusal this product makes.
+STUDIO_REFUSALS: dict[str, str] = {
+    "widgets.unnamed": "give this widget a name",
+    "widgets.no_such": "no such widget",
+    "widgets.too_long": "this widget is longer than the editor will store",
+    "widgets.too_many": "you are holding as many widgets as one profile may",
+    "widgets.threw": "your widget stopped on an error",
+    "widgets.timeout": "your widget ran longer than it is allowed to",
+    "widgets.killed": "your widget was stopped for using more than it is allowed",
+    "widgets.no_answer": "your widget finished without returning anything",
+    "widgets.no_unshare": "this deployment cannot build the box a widget runs "
+                          "in, so nothing will run here",
+    "widgets.no_netns": "this deployment cannot cut the network for a widget, "
+                        "so nothing will run here",
+    "widgets.no_node": "this deployment has no interpreter for widgets, so "
+                       "nothing will run here",
+}
+
 #: Keyed on the English source, the way JIM's and PDI's tables are, so editing
 #: the English invalidates its translations loudly — the page falls back to the
 #: new English — rather than quietly serving the old sentence in nine

@@ -3049,6 +3049,20 @@ const feedQuery = (cursor?: string, viewer?: string) =>
     ...(cursor ? { cursor } : {}), ...(viewer ? { viewer } : {}),
   }).toString();
 
+/** A small program somebody wrote for their own profile. */
+export interface Widget {
+  id: string; name: string; source: string; version: number;
+  created_at: number; updated_at: number;
+}
+
+/** What came back from running one. `status` is `ok`, `error`, `timeout`,
+ *  `killed` or `refused`; `said` is the sentence for the reader. */
+export interface WidgetRun {
+  status: string; ms: number; widget_id?: string; version?: number;
+  value?: unknown; truncated?: boolean; message?: string;
+  detail?: string; said?: string;
+}
+
 export const api = {
   // `health` used to sit here: the same route, the body thrown away, a
   // boolean returned. Nothing called it — `healthInfo` below returns the
@@ -3288,6 +3302,29 @@ export const api = {
   }, token: string) =>
     req<Homepage>(`/profiles/${profileId}/homepage`,
       { method: "PUT", body, token }),
+  // The Studio. Every one of these is the owner's own — the door checks it
+  // and the query checks it again, which is why a widget id from somebody
+  // else's profile is a 404 here rather than a 403.
+  studioLimits: () =>
+    req<{ limits: Record<string, number>; available: boolean;
+          unavailable_because: string | null }>("/studio/limits"),
+  listWidgets: (profileId: string, token: string) =>
+    req<{ widgets: Widget[] }>(`/profiles/${profileId}/widgets`, { token }),
+  createWidget: (profileId: string, body: { name: string; source: string },
+                 token: string) =>
+    req<Widget>(`/profiles/${profileId}/widgets`,
+      { method: "POST", body, token }),
+  updateWidget: (profileId: string, widgetId: string,
+                 body: { name: string; source: string }, token: string) =>
+    req<Widget>(`/profiles/${profileId}/widgets/${widgetId}`,
+      { method: "PUT", body, token }),
+  deleteWidget: (profileId: string, widgetId: string, token: string) =>
+    req<{ removed: string }>(`/profiles/${profileId}/widgets/${widgetId}`,
+      { method: "DELETE", token }),
+  runWidget: (profileId: string, widgetId: string,
+              inputs: Record<string, unknown> | undefined, token: string) =>
+    req<WidgetRun>(`/profiles/${profileId}/widgets/${widgetId}/run`,
+      { method: "POST", body: { inputs }, token }),
   listShops: (tag?: string) =>
     req<ShopCard[]>(`/shops${tag ? `?tag=${encodeURIComponent(tag)}` : ""}`),
   shopCard: (shopId: string) => req<ShopDetail>(`/shops/${shopId}`),
