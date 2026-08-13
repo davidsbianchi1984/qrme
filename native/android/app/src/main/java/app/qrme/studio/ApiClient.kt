@@ -3315,8 +3315,12 @@ object ApiClient {
                        token: String): List<String> {
         val arr = org.json.JSONArray(request(
             "/profiles/$id/memory/$interactorId", token = token))
+        // Ids ride along so the strike/rewrite doors below have something
+        // to be given; a rewritten turn wears its mark.
         return (0 until arr.length()).map {
-            arr.getJSONObject(it).optString("content")
+            val o = arr.getJSONObject(it)
+            o.optString("id") + " — " + o.optString("content") +
+                (if (o.optBoolean("edited")) " ✎" else "")
         }
     }
 
@@ -3351,6 +3355,28 @@ object ApiClient {
                             token: String) {
         request("/profiles/$id/memory/$interactorId", "DELETE",
             token = token)
+    }
+
+    // Strike selected turns by id; the kept memory re-folds from what
+    // remains — never from what was struck.
+    suspend fun strikeTurns(id: String, interactorId: String,
+                            messageIds: List<String>,
+                            token: String): String {
+        val o = JSONObject(request(
+            "/profiles/$id/memory/$interactorId/strike", "POST",
+            JSONObject().put("message_ids",
+                org.json.JSONArray(messageIds)), token = token))
+        return o.optInt("struck_turns").toString()
+    }
+
+    // Rewrite one remembered turn. A profile turn loses its synthetic-media
+    // credential — it must not vouch for words a person rewrote.
+    suspend fun editTurn(id: String, interactorId: String, messageId: String,
+                         content: String, token: String): String {
+        val o = JSONObject(request(
+            "/profiles/$id/memory/$interactorId/turns/$messageId", "PUT",
+            JSONObject().put("content", content), token = token))
+        return o.optJSONObject("turn")?.optString("content") ?: ""
     }
 
     suspend fun thread(id: String, interactorId: String,

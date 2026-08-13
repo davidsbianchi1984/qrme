@@ -1996,6 +1996,23 @@ public sealed class ApiClient
             $"/profiles/{profileId}/memory/{interactorId}/forget",
             new { about }, token));
 
+    /// <summary>Strike selected turns by id; the kept memory re-folds
+    /// from what remains — never from what was struck.</summary>
+    public Task<StrikeOut> StrikeTurns(string profileId,
+        string interactorId, string[] messageIds, string token) =>
+        Send<StrikeOut>(Post(
+            $"/profiles/{profileId}/memory/{interactorId}/strike",
+            new { message_ids = messageIds }, token));
+
+    /// <summary>Rewrite one remembered turn. A profile turn loses its
+    /// synthetic-media credential — it must not vouch for words a person
+    /// rewrote.</summary>
+    public Task<TurnEditOut> EditTurn(string profileId, string interactorId,
+        string messageId, string content, string token) =>
+        Send<TurnEditOut>(Put(
+            $"/profiles/{profileId}/memory/{interactorId}/turns/{messageId}",
+            new { content }, token));
+
     public Task<MemoryTurn> EraseMemory(string profileId,
         string interactorId, string token)
     {
@@ -4375,7 +4392,17 @@ public record ForgetOut(
 public record MemoryTurn(
     [property: JsonPropertyName("id")] string? Id,
     [property: JsonPropertyName("role")] string? Role,
-    [property: JsonPropertyName("content")] string? Content);
+    [property: JsonPropertyName("content")] string? Content,
+    // A rewritten turn says so; absent on older servers.
+    [property: JsonPropertyName("edited")] bool Edited = false);
+
+public record StrikeOut(
+    [property: JsonPropertyName("struck_turns")] int StruckTurns,
+    [property: JsonPropertyName("remembrance_reset")] bool RemembranceReset);
+
+public record TurnEditOut(
+    [property: JsonPropertyName("turn")] MemoryTurn? Turn,
+    [property: JsonPropertyName("remembrance_reset")] bool RemembranceReset);
 
 public record ThreadTurn(
     [property: JsonPropertyName("role")] string? Role,

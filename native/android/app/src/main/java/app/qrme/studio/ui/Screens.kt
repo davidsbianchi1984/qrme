@@ -4607,6 +4607,8 @@ private fun MemBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
     var rows by remember { mutableStateOf(listOf<String>()) }
     var visitorId by remember { mutableStateOf("") }
     var forgetWords by remember { mutableStateOf("") }
+    var turnId by remember { mutableStateOf("") }
+    var newWords by remember { mutableStateOf("") }
     LaunchedEffect(vm.pid) {
         vm.call({ ApiClient.memories(vm.pid!!, vm.token!!) }) { r ->
             rows = r.getOrNull() ?: emptyList() }
@@ -4651,6 +4653,28 @@ private fun MemBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
             vm.call({ ApiClient.forgetMemory(vm.pid!!, visitorId,
                 forgetWords, vm.token!!) }) { r ->
                 forgetWords = ""
+                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+        }
+        // Curating one turn by hand: strike it, or rewrite it and save.
+        // The ids ride the read above — the console's checkboxes, in the
+        // pocket's id-driven idiom.
+        labeledField(L10n.t("mem.turnid", lang), turnId, "") { turnId = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("mem.strike", lang),
+                enabled = visitorId.isNotBlank() && turnId.isNotBlank()) {
+                vm.call({ ApiClient.strikeTurns(vm.pid!!, visitorId,
+                    listOf(turnId), vm.token!!) }) { r ->
+                    turnId = ""
+                    onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+            }
+        }
+        labeledField(L10n.t("mem.newwords", lang), newWords, "") { newWords = it }
+        BrandButton(L10n.t("action.save", lang),
+            enabled = visitorId.isNotBlank() && turnId.isNotBlank()
+                && newWords.isNotBlank()) {
+            vm.call({ ApiClient.editTurn(vm.pid!!, visitorId, turnId,
+                newWords, vm.token!!) }) { r ->
+                newWords = ""
                 onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
         }
     }

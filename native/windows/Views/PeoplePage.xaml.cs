@@ -294,6 +294,10 @@ public sealed partial class PeoplePage : Page
         MemAccountButton.Content = L10n.T("mem.account");
         MemForgetBox.PlaceholderText = L10n.T("mem.forget.ph");
         MemForgetButton.Content = L10n.T("mem.forget");
+        MemTurnIdBox.PlaceholderText = L10n.T("mem.turnid");
+        MemStrikeButton.Content = L10n.T("mem.strike");
+        MemNewWordsBox.PlaceholderText = L10n.T("mem.newwords");
+        MemSaveWordsButton.Content = L10n.T("action.save");
         PairTitle.Text = L10n.T("who.title");
         PairIdBox.Header = L10n.T("mem.id");
         PairThreadButton.Content = L10n.T("who.thread");
@@ -1782,7 +1786,11 @@ public sealed partial class PeoplePage : Page
             var turns = await ApiClient.Shared.Memory(
                 AppState.Current.Pid!, MemIdBox.Text.Trim(),
                 AppState.Current.Token!);
-            var parts = turns.TakeLast(3).Select(t => t.Content).ToList();
+            // Ids ride along so the strike/rewrite doors below have
+            // something to be given; a rewritten turn wears its mark.
+            var parts = turns.TakeLast(3)
+                .Select(t => t.Id + " \u2014 " + t.Content
+                    + (t.Edited ? " \u270e" : "")).ToList();
             if (kept.Content is not null) parts.Insert(0, kept.Content);
             StatusText.Text = string.Join(" \u00b7 ", parts);
         });
@@ -1821,6 +1829,31 @@ public sealed partial class PeoplePage : Page
                 MemForgetBox.Text.Trim(), AppState.Current.Token!);
             MemForgetBox.Text = "";
             StatusText.Text = outp.ForgottenTurns.ToString();
+        });
+
+    private async void OnMemStrike(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            // Strike the selected turn; the kept memory re-folds from
+            // what remains — never from what was struck.
+            var outp = await ApiClient.Shared.StrikeTurns(
+                AppState.Current.Pid!, MemIdBox.Text.Trim(),
+                new[] { MemTurnIdBox.Text.Trim() }, AppState.Current.Token!);
+            MemTurnIdBox.Text = "";
+            StatusText.Text = outp.StruckTurns.ToString();
+        });
+
+    private async void OnMemSaveWords(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            // Rewrite one remembered turn; a profile turn loses its
+            // synthetic-media credential with the rewrite.
+            var outp = await ApiClient.Shared.EditTurn(
+                AppState.Current.Pid!, MemIdBox.Text.Trim(),
+                MemTurnIdBox.Text.Trim(), MemNewWordsBox.Text.Trim(),
+                AppState.Current.Token!);
+            MemNewWordsBox.Text = "";
+            StatusText.Text = outp.Turn?.Content ?? "";
         });
 
     private async void OnPairThread(object sender, RoutedEventArgs e) =>

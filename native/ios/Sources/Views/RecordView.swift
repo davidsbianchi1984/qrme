@@ -23,6 +23,8 @@ struct MemorySection: View {
     @State private var rows: [MemoryRow] = []
     @State private var visitorId = ""
     @State private var forgetWords = ""
+    @State private var turnId = ""
+    @State private var newWords = ""
     @State private var line: String?
     @State private var busy = false
 
@@ -47,8 +49,12 @@ struct MemorySection: View {
                         let turns = try await ApiClient.shared.memory(
                             id: state.pid!, interactorId: visitorId,
                             token: state.token!)
-                        let recent = turns.suffix(3).map(\.content)
-                            .joined(separator: " · ")
+                        // Ids ride along so the strike/rewrite fields
+                        // below have something to be given.
+                        let recent = turns.suffix(3)
+                            .map { "\($0.id) — \($0.content)"
+                                + ($0.edited == true ? " ✎" : "") }
+                            .joined(separator: "\n")
                         line = [kept?.content, recent.isEmpty ? nil : recent]
                             .compactMap { $0 }.joined(separator: " · ")
                     }
@@ -88,6 +94,41 @@ struct MemorySection: View {
                     }
                 }.font(.caption)
                     .disabled(busy || visitorId.isEmpty || forgetWords.isEmpty)
+            }
+            // Curating one turn by hand: strike it, or rewrite it and
+            // save. The ids come from the read above — the console's
+            // checkboxes, in the pocket's id-driven idiom.
+            HStack {
+                TextField(L10n.t("mem.turnid", state.language),
+                          text: $turnId)
+                    .textFieldStyle(.roundedBorder)
+                Button(L10n.t("mem.strike", state.language)) {
+                    run {
+                        let out = try await ApiClient.shared.strikeTurns(
+                            id: state.pid!, interactorId: visitorId,
+                            messageIds: [turnId], token: state.token!)
+                        turnId = ""
+                        line = String(out.struck_turns)
+                    }
+                }.font(.caption)
+                    .disabled(busy || visitorId.isEmpty || turnId.isEmpty)
+            }
+            HStack {
+                TextField(L10n.t("mem.newwords", state.language),
+                          text: $newWords)
+                    .textFieldStyle(.roundedBorder)
+                Button(L10n.t("action.save", state.language)) {
+                    run {
+                        let out = try await ApiClient.shared.editTurn(
+                            id: state.pid!, interactorId: visitorId,
+                            messageId: turnId, content: newWords,
+                            token: state.token!)
+                        newWords = ""
+                        line = out.turn.content
+                    }
+                }.font(.caption)
+                    .disabled(busy || visitorId.isEmpty || turnId.isEmpty
+                              || newWords.isEmpty)
             }
             if let line {
                 Text(line).font(.caption2).foregroundStyle(Theme.t2)

@@ -6691,29 +6691,17 @@ const CHROME: Table = {
   "wll.post": {
     en: "Post", es: "Publicar", fr: "Publier", de: "Posten", pt: "Publicar", it: "Pubblica", ja: "投稿", zh: "发布", hi: "पोस्ट करें", ar: "نشر",
   },
-  "wll.body.ph": {
-    en: "what's on your wall", es: "qué hay en tu muro", fr: "ce qu'il y a sur votre mur", de: "was auf Ihrer Pinnwand steht", pt: "o que há no seu mural", it: "cosa c'è sulla tua bacheca", ja: "ウォールに載せること", zh: "你墙上的内容", hi: "आपकी वॉल पर क्या है", ar: "ما على حائطك",
-  },
   "wll.sharevideo": {
     en: "Share a video (optional)", es: "Compartir un vídeo (opcional)", fr: "Partager une vidéo (facultatif)", de: "Ein Video teilen (optional)", pt: "Partilhar um vídeo (opcional)", it: "Condividi un video (facoltativo)", ja: "動画を共有（任意）", zh: "分享一个视频（可选）", hi: "एक वीडियो साझा करें (वैकल्पिक)", ar: "شارك مقطعًا (اختياري)",
   },
-  "wll.link.ph": {
-    en: "paste a link", es: "pega un enlace", fr: "collez un lien", de: "einen Link einfügen", pt: "cole uma ligação", it: "incolla un link", ja: "リンクを貼り付け", zh: "粘贴一个链接", hi: "एक लिंक चिपकाएँ", ar: "الصق رابطًا",
-  },
   "wll.videotitle": {
     en: "Its title, in your words", es: "Su título, con tus palabras", fr: "Son titre, avec vos mots", de: "Sein Titel, in Ihren Worten", pt: "O título dele, nas suas palavras", it: "Il suo titolo, con parole tue", ja: "その題を、あなたの言葉で", zh: "它的标题，用你自己的话", hi: "उसका शीर्षक, आपके शब्दों में", ar: "عنوانه، بكلماتك",
-  },
-  "wll.videotitle.ph": {
-    en: "what you're sharing", es: "qué estás compartiendo", fr: "ce que vous partagez", de: "was Sie teilen", pt: "o que está a partilhar", it: "cosa stai condividendo", ja: "何を共有するのか", zh: "你在分享什么", hi: "आप क्या साझा कर रहे हैं", ar: "ما الذي تشاركه",
   },
   "wll.attach": {
     en: "Attach your own photos, videos or files", es: "Adjunta tus propias fotos, vídeos o archivos", fr: "Joignez vos propres photos, vidéos ou fichiers", de: "Eigene Fotos, Videos oder Dateien anhängen", pt: "Anexe as suas próprias fotos, vídeos ou ficheiros", it: "Allega tue foto, video o file", ja: "自分の写真・動画・ファイルを添付", zh: "附上你自己的照片、视频或文件", hi: "अपनी तस्वीरें, वीडियो या फ़ाइलें जोड़ें", ar: "أرفق صورك أو مقاطعك أو ملفاتك",
   },
   "wll.alt": {
     en: "Describe what it shows", es: "Describe lo que muestra", fr: "Décrivez ce que cela montre", de: "Beschreibe, was zu sehen ist", pt: "Descreva o que mostra", it: "Descrivi cosa mostra", ja: "何が写っているか説明", zh: "描述它显示的内容", hi: "बताएँ कि इसमें क्या दिख रहा है", ar: "صف ما تُظهره",
-  },
-  "wll.alt.ph": {
-    en: "For people who can't see it — read aloud by screen readers", es: "Para quien no puede verlo — lo leen en voz alta los lectores de pantalla", fr: "Pour celles et ceux qui ne peuvent pas le voir — lu à voix haute par les lecteurs d'écran", de: "Für Menschen, die es nicht sehen können — von Screenreadern vorgelesen", pt: "Para quem não consegue ver — lido em voz alta pelos leitores de ecrã", it: "Per chi non può vederlo — letto ad alta voce dagli screen reader", ja: "見えない人のために — スクリーンリーダーが読み上げます", zh: "为看不到的人准备——屏幕阅读器会朗读", hi: "जो इसे देख नहीं सकते उनके लिए — स्क्रीन रीडर इसे पढ़कर सुनाता है", ar: "لمن لا يستطيع رؤيته — تقرؤه قارئات الشاشة بصوت مسموع",
   },
   "wll.clear": {
     en: "clear", es: "quitar", fr: "effacer", de: "leeren", pt: "limpar", it: "svuota", ja: "消す", zh: "清除", hi: "हटाएँ", ar: "امسح",
@@ -7198,6 +7186,15 @@ const CHROME: Table = {
   "ins.whatsaid": {
     en: "What has been said", es: "Lo que se ha dicho", fr: "Ce qui a été dit", de: "Was gesagt wurde", pt: "O que foi dito", it: "Cosa è stato detto", ja: "これまでの発言", zh: "已经说过的话", hi: "जो कहा जा चुका है", ar: "ما قيل",
   },
+  "ins.scene": {
+    en: "In this room", es: "En esta sala", fr: "Dans cette salle", de: "In diesem Raum", pt: "Nesta sala", it: "In questa stanza", ja: "この部屋にいる人", zh: "房间里的人", hi: "इस कमरे में", ar: "في هذه الغرفة",
+  },
+  "ins.seat.person": {
+    en: "person", es: "persona", fr: "personne", de: "Person", pt: "pessoa", it: "persona", ja: "人", zh: "真人", hi: "व्यक्ति", ar: "شخص",
+  },
+  "ins.seat.profile": {
+    en: "profile", es: "perfil", fr: "profil", de: "Profil", pt: "perfil", it: "profilo", ja: "プロフィール", zh: "档案", hi: "प्रोफ़ाइल", ar: "ملف",
+  },
   "ins.nothingyet": {
     en: "Nothing yet.", es: "Nada todavía.", fr: "Rien pour l'instant.", de: "Noch nichts.", pt: "Nada ainda.", it: "Ancora niente.", ja: "まだ何もありません。", zh: "还没有内容。", hi: "अभी कुछ नहीं।", ar: "لا شيء بعد.",
   },
@@ -7655,6 +7652,30 @@ const CHROME: Table = {
   },
   "mem.kept.covers": {
     en: "{n} older turns folded into this remembrance", es: "{n} turnos antiguos plegados en este recuerdo", fr: "{n} tours plus anciens fondus dans ce souvenir", de: "{n} ältere Beiträge in diese Erinnerung eingefaltet", pt: "{n} turnos antigos condensados nesta lembrança", it: "{n} turni più vecchi condensati in questo ricordo", ja: "古い{n}件のやり取りをこの記憶に織り込み済み", zh: "已把 {n} 条较早的对话并入这段记忆", hi: "{n} पुराने संदेश इस स्मृति में समेटे गए", ar: "طُويت {n} من الأدوار الأقدم في هذه الذكرى",
+  },
+  "mem.curate": {
+    en: "Edit", es: "Editar", fr: "Modifier", de: "Bearbeiten", pt: "Editar", it: "Modifica", ja: "編集", zh: "编辑", hi: "संपादित करें", ar: "تحرير",
+  },
+  "mem.curate.done": {
+    en: "Done", es: "Listo", fr: "Terminé", de: "Fertig", pt: "Concluído", it: "Fatto", ja: "完了", zh: "完成", hi: "हो गया", ar: "تم",
+  },
+  "mem.pick": {
+    en: "Select this turn", es: "Seleccionar este turno", fr: "Sélectionner ce tour", de: "Diesen Beitrag auswählen", pt: "Selecionar este turno", it: "Seleziona questo turno", ja: "この発言を選択", zh: "选择这条发言", hi: "यह बारी चुनें", ar: "اختر هذه المداخلة",
+  },
+  "mem.strike.sel": {
+    en: "Delete {n} selected", es: "Eliminar {n} seleccionados", fr: "Supprimer {n} sélectionnés", de: "{n} ausgewählte löschen", pt: "Excluir {n} selecionados", it: "Elimina {n} selezionati", ja: "選択した{n}件を削除", zh: "删除所选 {n} 条", hi: "चुने हुए {n} हटाएँ", ar: "احذف {n} المحددة",
+  },
+  "mem.strike.confirm": {
+    en: "Delete {n} selected turns? The kept memory will be re-written from what remains.", es: "¿Eliminar {n} turnos seleccionados? La memoria guardada se reescribirá a partir de lo que queda.", fr: "Supprimer {n} tours sélectionnés ? La mémoire gardée sera réécrite à partir de ce qui reste.", de: "{n} ausgewählte Beiträge löschen? Die bewahrte Erinnerung wird aus dem Verbliebenen neu geschrieben.", pt: "Excluir {n} turnos selecionados? A memória guardada será reescrita a partir do que resta.", it: "Eliminare {n} turni selezionati? La memoria conservata sarà riscritta da ciò che resta.", ja: "選択した{n}件を削除しますか？保存記憶は残ったものから書き直されます。", zh: "删除所选 {n} 条发言？保存的记忆将根据剩余内容重写。", hi: "चुनी हुई {n} बारियाँ हटाएँ? सहेजी स्मृति शेष से फिर लिखी जाएगी।", ar: "أتحذف {n} من المداخلات المحددة؟ ستُعاد كتابة الذاكرة المحفوظة مما تبقّى.",
+  },
+  "mem.save": {
+    en: "Save", es: "Guardar", fr: "Enregistrer", de: "Speichern", pt: "Salvar", it: "Salva", ja: "保存", zh: "保存", hi: "सहेजें", ar: "حفظ",
+  },
+  "mem.cancel": {
+    en: "Cancel", es: "Cancelar", fr: "Annuler", de: "Abbrechen", pt: "Cancelar", it: "Annulla", ja: "キャンセル", zh: "取消", hi: "रद्द करें", ar: "إلغاء",
+  },
+  "mem.edited": {
+    en: "(edited)", es: "(editado)", fr: "(modifié)", de: "(bearbeitet)", pt: "(editado)", it: "(modificato)", ja: "（編集済み）", zh: "（已编辑）", hi: "(संपादित)", ar: "(معدّل)",
   },
   "frn.title": {
     en: "Friends", es: "Amigos", fr: "Amis", de: "Freunde", pt: "Amigos", it: "Amici", ja: "友だち", zh: "好友", hi: "दोस्त", ar: "الأصدقاء",

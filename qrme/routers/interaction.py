@@ -22,8 +22,8 @@ from ..common import (require_may_publish,
 )
 from ..models import (
     ChatRequest, ChatResponse, ComposeRequest, EngagementOut, Feedback,
-    InteractorCreate, MemoryForget, MessageOut, QuietHoursSet,
-    RehearsalOpen, RehearsalSay, RelationshipSet, VoiceConsent,
+    InteractorCreate, MemoryForget, MemoryStrike, MessageOut, QuietHoursSet,
+    RehearsalOpen, RehearsalSay, RelationshipSet, TurnEdit, VoiceConsent,
     VoiceSample, VoiceSay,
 )
 
@@ -795,12 +795,20 @@ def view_memory(profile_id: str, interactor_id: str,
                 request: Request) -> list[MessageOut]:
     profile_or_404(profile_id)
     require_owner_or_interactor(profile_id, interactor_id, request)
-    rows = db.connect().execute(
+    conn = db.connect()
+    rows = conn.execute(
         "SELECT * FROM messages WHERE profile_id=? AND interactor_id=?"
         " ORDER BY created_at, rowid",
         (profile_id, interactor_id),
     ).fetchall()
-    return [message_out(dict(row)) for row in rows]
+    out = [message_out(dict(row)) for row in rows]
+    # A rewritten turn says so. One query for the whole transcript rather
+    # than one per row — the fact of an edit is part of the record.
+    edited = {r["message_id"] for r in conn.execute(
+        "SELECT message_id FROM message_edits")} if out else set()
+    for m in out:
+        m.edited = m.id in edited
+    return out
 
 
 @router.get("/profiles/{profile_id}/memory/{interactor_id}/remembrance")
@@ -877,6 +885,93 @@ def forget_one_thing(profile_id: str, interactor_id: str, body: MemoryForget,
             (profile_id, interactor_id))
     conn.commit()
     return {"forgotten_turns": len(hits), "remembrance_reset": bool(row)}
+
+
+@router.post("/profiles/{profile_id}/memory/{interactor_id}/strike")
+def strike_turns(profile_id: str, interactor_id: str, body: MemoryStrike,
+                 request: Request) -> dict:
+    """Strike the turns you selected — the checkboxes next to the scalpel.
+
+    Named-forget strikes by words; this strikes by hand, for the field
+    report that asked for "little clear boxes you could select and a
+    delete button". The ids are scoped to this pair's memory, so a
+    borrowed id from someone else's conversation strikes nothing, and the
+    distilled remembrance re-folds from the turns that remain — never
+    from what was struck. Erase-all keeps its own door."""
+    profile_or_404(profile_id)
+    require_owner_or_interactor(profile_id, interactor_id, request)
+    ids = [i.strip() for i in body.message_ids if i.strip()]
+    if not ids:
+        raise HTTPException(
+            422, "select at least one turn — nothing was struck")
+    conn = db.connect()
+    marks = ",".join("?" for _ in ids)
+    hits = [r["id"] for r in conn.execute(
+        f"SELECT id FROM messages WHERE profile_id=? AND interactor_id=?"
+        f" AND id IN ({marks})", (profile_id, interactor_id, *ids))]
+    if not hits:
+        raise HTTPException(404, "none of those turns are in this memory")
+    for message_id in hits:
+        conn.execute("DELETE FROM message_edits WHERE message_id=?",
+                     (message_id,))
+        conn.execute("DELETE FROM messages WHERE id=?", (message_id,))
+    row = remembrance.get(profile_id, interactor_id)
+    if row:
+        conn.execute(
+            "DELETE FROM remembrances WHERE profile_id=? AND interactor_id=?",
+            (profile_id, interactor_id))
+    conn.commit()
+    return {"struck_turns": len(hits), "remembrance_reset": bool(row)}
+
+
+@router.put("/profiles/{profile_id}/memory/{interactor_id}/turns/{message_id}")
+def edit_turn(profile_id: str, interactor_id: str, message_id: str,
+              body: TurnEdit, request: Request) -> dict:
+    """Rewrite one remembered turn, in place, and keep the record honest.
+
+    Three ways it stays honest: the new words face the review every other
+    sentence in this room faces; a profile turn's synthetic-media
+    credential is dropped, because a hash-of-content credential must not
+    vouch for words a person rewrote; and the edit is recorded as a fact
+    — that it happened, never what it said before, since the point of an
+    edit may be removal. The remembrance re-folds from the record as it
+    now stands."""
+    profile = profile_or_404(profile_id)
+    require_owner_or_interactor(profile_id, interactor_id, request)
+    conn = db.connect()
+    row = conn.execute(
+        "SELECT * FROM messages WHERE id=? AND profile_id=?"
+        " AND interactor_id=?",
+        (message_id, profile_id, interactor_id)).fetchone()
+    if row is None:
+        raise HTTPException(404, "no remembered turn has that id")
+    content = (body.content or "").strip()
+    if not content:
+        raise HTTPException(
+            422, "say what the turn should say — to remove it, strike it "
+                 "instead")
+    verdict = moderation.review(content, None, {"birthdate": None},
+                                maturity=profile["maturity"])
+    if not verdict.approved:
+        raise HTTPException(422, "those words cannot stand in this record")
+    conn.execute(
+        "UPDATE messages SET content=?, watermark_id=NULL WHERE id=?",
+        (content, message_id))
+    conn.execute(
+        "INSERT INTO message_edits (message_id, edits, edited_at)"
+        " VALUES (?,1,?) ON CONFLICT(message_id) DO UPDATE SET"
+        " edits = edits + 1, edited_at = excluded.edited_at",
+        (message_id, db.utcnow()))
+    had_remembrance = remembrance.get(profile_id, interactor_id) is not None
+    if had_remembrance:
+        conn.execute(
+            "DELETE FROM remembrances WHERE profile_id=? AND interactor_id=?",
+            (profile_id, interactor_id))
+    conn.commit()
+    turn = message_out(dict(conn.execute(
+        "SELECT * FROM messages WHERE id=?", (message_id,)).fetchone()))
+    turn.edited = True
+    return {"turn": turn, "remembrance_reset": had_remembrance}
 
 
 @router.delete("/profiles/{profile_id}/memory/{interactor_id}", status_code=204)

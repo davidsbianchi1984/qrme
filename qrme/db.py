@@ -1596,6 +1596,16 @@ CREATE TABLE IF NOT EXISTS remembrances (
     PRIMARY KEY (profile_id, interactor_id)
 );
 
+-- The fact that a remembered turn was rewritten — never what it said
+-- before: the point of an edit may be removal, and an edits ledger that
+-- kept the old words would undo it. Its own table because this schema has
+-- no migrations. qrme/routers/interaction.py.
+CREATE TABLE IF NOT EXISTS message_edits (
+    message_id TEXT PRIMARY KEY REFERENCES messages(id),
+    edits      INTEGER NOT NULL DEFAULT 1,
+    edited_at  TEXT NOT NULL
+);
+
 -- The upper-torso form of an avatar: the figure that stands in a live feed
 -- or an AR scene at 1:1 scale. The circular bubble is only the form of a
 -- profile that has no avatar yet; a profile with a torso renders as one.

@@ -139,6 +139,17 @@ class MemoryForget(BaseModel):
     about: str
 
 
+class MemoryStrike(BaseModel):
+    # The turns to strike, chosen by id in the transcript. Deleted
+    # together, and the remembrance re-folds from what remains.
+    message_ids: list[str]
+
+
+class TurnEdit(BaseModel):
+    # What the remembered turn should say instead.
+    content: str
+
+
 class QuietHoursSet(BaseModel):
     # UTC-hour window [start, end) during which no unprompted outreach is sent;
     # both None clears it. A window may wrap midnight (start > end).
@@ -682,6 +693,9 @@ class MessageOut(BaseModel):
     # Synthetic-media credential riding on profile turns: id, verify path,
     # disclosure, and the profile's always-displayed watermark design.
     watermark: dict | None = None
+    # A rewritten turn says so — the fact of the edit is part of the
+    # record even though the earlier words are not. Set on memory reads.
+    edited: bool = False
 
 
 class ChatResponse(BaseModel):

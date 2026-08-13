@@ -3942,6 +3942,34 @@ extension ApiClient {
             token: token)
     }
 
+    struct StrikeOut: Decodable {
+        let struck_turns: Int
+        let remembrance_reset: Bool
+    }
+
+    /// Strike selected turns by id; the kept memory re-folds from what
+    /// remains — never from what was struck.
+    func strikeTurns(id: String, interactorId: String, messageIds: [String],
+                     token: String) async throws -> StrikeOut {
+        try await request(
+            "/profiles/\(id)/memory/\(interactorId)/strike",
+            method: "POST", body: ["message_ids": messageIds], token: token)
+    }
+
+    struct TurnEditOut: Decodable {
+        let turn: MemoryTurn
+        let remembrance_reset: Bool
+    }
+
+    /// Rewrite one remembered turn. A profile turn loses its synthetic-media
+    /// credential — it must not vouch for words a person rewrote.
+    func editTurn(id: String, interactorId: String, messageId: String,
+                  content: String, token: String) async throws -> TurnEditOut {
+        try await request(
+            "/profiles/\(id)/memory/\(interactorId)/turns/\(messageId)",
+            method: "PUT", body: ["content": content], token: token)
+    }
+
     // -- between the profile and one person --
 
     func thread(id: String, interactorId: String,
@@ -4869,6 +4897,8 @@ struct MemoryTurn: Decodable, Identifiable {
     let id: String
     let role: String
     let content: String
+    // A rewritten turn says so; absent on older servers.
+    let edited: Bool?
 }
 
 struct ThreadOut: Decodable {

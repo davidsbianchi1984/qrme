@@ -1251,7 +1251,11 @@ export interface SimulationOut {
   created_at?: string;
 }
 export interface Interactor { id: string; display_name: string; token: string }
-export interface MemoryEntry { role: string; content: string; at?: string }
+export interface MemoryEntry {
+  id?: string; role: string; content: string; at?: string;
+  // A rewritten turn says so — the fact of the edit is part of the record.
+  edited?: boolean;
+}
 export interface Remembrance {
   content: string | null; covers: number; updated_at: string | null;
 }
@@ -3450,6 +3454,19 @@ export const api = {
     req<{ forgotten_turns: number; remembrance_reset: boolean }>(
       `/profiles/${profileId}/memory/${interactorId}/forget`,
       { method: "POST", body: { about }, token }),
+  // Strike the turns selected by checkbox — the delete-selected door.
+  strikeTurns: (profileId: string, interactorId: string,
+                messageIds: string[], token: string) =>
+    req<{ struck_turns: number; remembrance_reset: boolean }>(
+      `/profiles/${profileId}/memory/${interactorId}/strike`,
+      { method: "POST", body: { message_ids: messageIds }, token }),
+  // Rewrite one remembered turn in place. A profile turn loses its
+  // synthetic-media credential — it must not vouch for rewritten words.
+  editTurn: (profileId: string, interactorId: string, messageId: string,
+             content: string, token: string) =>
+    req<{ turn: MemoryEntry; remembrance_reset: boolean }>(
+      `/profiles/${profileId}/memory/${interactorId}/turns/${messageId}`,
+      { method: "PUT", body: { content }, token }),
   // The voiceprint, in FIG. 800's order (qrme/voiceprint.py).
   voiceprint: (pid: string) =>
     req<VoiceprintStatus>(`/profiles/${pid}/voiceprint`),
