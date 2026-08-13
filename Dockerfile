@@ -37,6 +37,12 @@ ENV PYTHONUNBUFFERED=1 \
 WORKDIR /srv
 COPY pyproject.toml README.md ./
 COPY qrme/ ./qrme/
+# `cloudgw` too, and not because this image serves it — it does not. The
+# wheel declares both packages, and `qrme/routers/problems.py` imports
+# `cloudgw.problems` at module load, so an image without it cannot import
+# the app at all: uvicorn dies on ModuleNotFoundError and the proxy in
+# front of it answers 502 with nothing in the body to say why.
+COPY cloudgw/ ./cloudgw/
 RUN pip install --no-cache-dir .
 
 # The built studio, mounted by the API at /app. QRME_CONSOLE_DIR points at it
