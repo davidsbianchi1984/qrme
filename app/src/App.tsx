@@ -83,7 +83,7 @@ const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "org", label: "Org", icon: "🏛" },
   { id: "relationships", label: "Relationships", icon: "👥" },
   { id: "memory", label: "Memory Vault", icon: "🔒" },
-  { id: "studio", label: "Studio", icon: "🛠" },
+  { id: "studio", label: "Widgets", icon: "🛠" },
   { id: "delegate", label: "Delegation", icon: "🤝" },
   { id: "desk", label: "Desk", icon: "🛎" },
   { id: "identity", label: "Identity", icon: "🪪" },
