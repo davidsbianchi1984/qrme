@@ -1512,14 +1512,15 @@ fun ChatScreen(vm: StudioViewModel) {
         // profile infers from the wording and the reply says which.
         Row(Modifier.padding(horizontal = 20.dp).padding(bottom = 6.dp),
             horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            listOf("" to "Read my prompt", "advisor" to "Advisor",
-                   "collaborator" to "Collaborator", "operator" to "Operator")
-                .forEach { (value, label) ->
+            listOf("" to "nchat.role.read", "advisor" to "nchat.role.advisor",
+                   "collaborator" to "nchat.role.collaborator",
+                   "operator" to "nchat.role.operator")
+                .forEach { (value, key) ->
                     Box(Modifier.clip(RoundedCornerShape(50))
                             .background(if (role == value) Qrme.BrandA else Qrme.Card)
                             .clickable { role = value }
                             .padding(horizontal = 10.dp, vertical = 6.dp)) {
-                        Text(label, fontSize = 11.sp,
+                        Text(L10n.t(key, vm.language), fontSize = 11.sp,
                             color = if (role == value) Color.White else Qrme.T2)
                     }
                 }
@@ -2297,6 +2298,7 @@ private fun GamingPanel(vm: StudioViewModel) {
                             .padding(horizontal = 10.dp, vertical = 6.dp))
                 }
             }
+            Text(L10n.t("ngam.role", vm.language), color = Qrme.T3, fontSize = 11.sp)
             Row(Modifier.horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 roles.forEach { rl ->

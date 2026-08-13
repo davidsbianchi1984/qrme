@@ -41,7 +41,6 @@ public sealed partial class DeskPage : Page
         DeskIdBox.PlaceholderText = "dsk_…";
         OpenButton.Content = L10n.T("nmg.open");
         NoteBox.Header = L10n.T("ndsk.note.ph");
-        NoteBox.PlaceholderText = L10n.T("ndsk.needkey");
         RingButton.Content = L10n.T("ndsk.bell");
     }
 

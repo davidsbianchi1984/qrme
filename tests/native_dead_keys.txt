@@ -1,4 +1,4 @@
-# status: backlog — 98 rows
+# status: backlog — 58 rows
 #
 # ...but see below: only 72 of them are deletion work. The other 263 are a
 # to-do list about screens, and calling the whole number a backlog is the
@@ -190,19 +190,7 @@ ios: nc.find
 ios: nc.lettalk
 ios: nc.rooms
 ios: nc.tier
-ios: nchat.rolepick
-ios: nchat.send
 ios: ncon.h.handle
-ios: ndsk
-ios: ndsk.id
-ios: ndsk.needkey
-ios: ndsk.open
-ios: ngam.active
-ios: ngam.end.session
-ios: ngam.game.ph
-ios: ngam.situation
-ios: ngam.situation.example
-ios: ngam.sub
 ios: nov.refresh
 ios: nvoi.micoff
 ios: nw.needboth
@@ -216,20 +204,7 @@ android: asst.works
 android: nc.birthdate.ph
 android: nc.find
 android: nc.tier
-android: nchat.role.advisor
-android: nchat.role.collaborator
-android: nchat.role.operator
-android: nchat.role.read
-android: nchat.rolepick
-android: nchat.send
-android: nchat.type.ph
 android: ncon.handle.ph
-android: ndsk
-android: ngam.active
-android: ngam.end.session
-android: ngam.role
-android: ngam.situation.ph
-android: ngam.sub.full
 android: nov.refresh
 android: nw.needboth
 android: nw.unreachable
@@ -249,21 +224,6 @@ windows: deals.sign.note
 windows: dele.offer
 windows: nc.a_stranger
 windows: ncon.handle.ph
-windows: ndsk.adult
-windows: ndsk.bell.off
-windows: ndsk.human
-windows: ndsk.join
-windows: ndsk.joined
-windows: ndsk.note
-windows: ndsk.open
-windows: ndsk.ringing
-windows: ndsk.room
-windows: ndsk.waiting
-windows: ngam
-windows: ngam.end
-windows: ngam.session
-windows: ngam.situation.ph
-windows: ngam.sub
 windows: nvoi.micoff
 windows: plc.venues
 windows: pub.tab.mark
