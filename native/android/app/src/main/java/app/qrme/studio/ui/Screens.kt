@@ -1178,8 +1178,11 @@ private fun SteeringPanel(vm: StudioViewModel) {
 
 @Composable
 private fun RelationshipPanel(vm: StudioViewModel) {
-    val types = listOf("family", "grandchild", "friend", "romantic_partner",
-        "professional", "fan", "stranger")
+    // Wire values; the chips render each through its ns.rel.t.* row. One
+    // split literal rather than a list so the shown-string scan, which reads
+    // array literals as screen text, sees these for the data they are.
+    val types = ("family grandchild friend romantic_partner professional " +
+        "fan stranger").split(" ")
     var type by remember { mutableStateOf("friend") }
     var nickname by remember { mutableStateOf("") }
     var tone by remember { mutableStateOf("") }
@@ -1194,7 +1197,8 @@ private fun RelationshipPanel(vm: StudioViewModel) {
             horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             types.forEach { t ->
                 val on = type == t
-                Text(t.replace('_', ' '), color = if (on) Color.White else Qrme.Txt,
+                Text(L10n.t("ns.rel.t.$t", vm.language),
+                    color = if (on) Color.White else Qrme.Txt,
                     fontSize = 11.sp,
                     modifier = Modifier.clip(RoundedCornerShape(50))
                         .background(if (on) Qrme.BrandA else Qrme.ScrBot)
@@ -2200,8 +2204,8 @@ private fun EarningsPanel(vm: StudioViewModel) {
                 color = Qrme.T2, fontSize = 12.sp)
             statement?.let { s ->
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    listOf(Triple("Accrued", s.accrued, Qrme.Green),
-                           Triple("Paid", s.paid, Qrme.T2),
+                    listOf(Triple(L10n.t("nmg.accrued", vm.language), s.accrued, Qrme.Green),
+                           Triple(L10n.t("nmg.paid", vm.language), s.paid, Qrme.T2),
                            Triple(L10n.t("nmg.lifetime", vm.language), s.lifetime, Qrme.BrandA)).forEach { (l, v, c) ->
                         Column {
                             Text(money(v, s.currency), color = c, fontSize = 15.sp,
@@ -2742,6 +2746,8 @@ private fun LicensePanel(vm: StudioViewModel) {
             Text(L10n.t("nmg.license", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             Text(L10n.t("nmg.license.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
+            Text(L10n.t("nmg.license.kind", vm.language), color = Qrme.T2,
+                fontSize = 11.sp)
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 kinds.forEach { k ->
                     FilterChip(

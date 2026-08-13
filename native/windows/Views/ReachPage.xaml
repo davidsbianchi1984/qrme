@@ -383,6 +383,8 @@
                                        Foreground="{StaticResource QrmeGreenBrush}" Visibility="Collapsed" />
                         </StackPanel>
                     </Border>
+                    <TextBlock x:Name="LedgerHead" FontSize="13" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
                     <ItemsControl x:Name="LedgerList">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>

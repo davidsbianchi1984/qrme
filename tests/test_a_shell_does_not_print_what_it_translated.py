@@ -147,10 +147,7 @@ SHELLS = {
 #: server sends is displayed as sent, so the fallback has to be the word the
 #: server would have sent.
 RECORDED = {
-    ('android', 'grandchild'),
     ('windows', 'restricted'),
-    ('android', 'professional'),
-    ('android', 'stranger'),
     ('ios', 'grandchild'),
     ('ios', 'professional'),
     ('ios', 'restricted'),

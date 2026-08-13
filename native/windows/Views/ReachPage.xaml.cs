@@ -48,11 +48,14 @@ public sealed partial class ReachPage : Page
         public string PriceLabel { get; init; } = "";
         public string ActionLabel { get; init; } = "";
         public bool Installed { get; init; }
+        public bool InstalledOnRobot { get; init; }
         public Visibility InstalledVisibility =>
             Installed ? Visibility.Visible : Visibility.Collapsed;
         public Visibility AvailableVisibility =>
             Installed ? Visibility.Collapsed : Visibility.Visible;
-        public string InstalledLabel => L10n.T("nmg.packs.installed");
+        public string InstalledLabel =>
+            L10n.T(InstalledOnRobot ? "nmg.pack.installed.robot"
+                                    : "nmg.pack.installed.pack");
         public string RemoveLabel => L10n.T("nmg.remove");
     }
 
@@ -153,6 +156,7 @@ public sealed partial class ReachPage : Page
 
         EarningsHead.Text = L10n.T("nmg.earnings", lang);
         EarningsSub.Text = L10n.T("nmg.earnings.sub", lang);
+        LedgerHead.Text = L10n.T("nmg.ledger", lang);
         AccruedLabel.Text = L10n.T("nmg.accrued", lang);
         PaidLabel.Text = L10n.T("nmg.paid", lang);
         LifetimeLabel.Text = L10n.T("nmg.lifetime", lang);
@@ -169,6 +173,12 @@ public sealed partial class ReachPage : Page
             chip.Click += OnQuickTag;
             return chip;
         }).ToList();
+        if (AppState.Current.Pid is null)
+        {
+            ShowSummonError(L10n.T("nmg.needprofile",
+                AppState.Current.Language));
+            return;
+        }
         await ReloadBeacons();
         await ReloadListings();
         await ReloadPacks();
@@ -272,8 +282,16 @@ public sealed partial class ReachPage : Page
                 Id = p.Id,
                 Title = p.Title,
                 Blurb = p.Blurb ?? "",
-                Meta = $"#{p.Industry} · {p.Items} items · {p.Installs} installs · {p.Publisher}"
-                       + (p.OriginUrl is { } u ? $" · from {u}" : ""),
+                Meta = L10n.Fill("nmg.pack.meta", AppState.Current.Language,
+                                 ("industry", p.Industry),
+                                 ("items", p.Items.ToString()),
+                                 ("installs", p.Installs.ToString()),
+                                 ("publisher", p.Publisher))
+                       + (p.OriginUrl is { } u
+                          ? " · " + L10n.Fill("nmg.pack.from",
+                                              AppState.Current.Language,
+                                              ("source", u))
+                          : ""),
                 // `nmg.pack.robot.tasks` rather than `nmg.pack.robot`: both
                 // rows existed on both shells with different words — "ROBOT"
                 // here, "ROBOT TASKS" on the iPhone — for the same badge on
@@ -282,13 +300,16 @@ public sealed partial class ReachPage : Page
                 // for nobody.
                 PriceLabel = (p.Audience == "robot"
                               ? L10n.T("nmg.pack.robot.tasks") + " · " : "")
-                             + (p.Free ? "FREE" : $"{p.Price:F2} {p.Currency}"),
+                             + (p.Free ? L10n.T("nmg.pack.free")
+                                       : $"{p.Price:F2} {p.Currency}"),
                 ActionLabel = p.Free
                     ? L10n.T("nmg.packs.download")
                     : L10n.Fill("nmg.packs.buy", AppState.Current.Language,
                                 ("price", p.Price.ToString("F2")),
                                 ("currency", p.Currency)),
                 Installed = _installedOn.ContainsKey(p.Id),
+                InstalledOnRobot = _installedOn.TryGetValue(p.Id, out var onR)
+                                   && onR != "",
             }).ToList();
             PackError.Visibility = Visibility.Collapsed;
         }
@@ -405,7 +426,8 @@ public sealed partial class ReachPage : Page
         {
             var r = await ApiClient.Shared.ClaimHandle(s.Pid!, handle,
                 s.Token ?? "");
-            ClaimedText.Text = $"claimed {r.Handle}";
+            ClaimedText.Text = L10n.Fill("nmg.claimed",
+                AppState.Current.Language, ("handle", r.Handle));
             ClaimedText.Visibility = Visibility.Visible;
             HandleBox.Text = "";
         }
@@ -448,7 +470,8 @@ public sealed partial class ReachPage : Page
         {
             var placed = await ApiClient.Shared.PlaceBeacon(
                 s.Pid!, label, BeaconLocationBox.Text.Trim());
-            QrText.Text = $"QR: {placed.QrSvg} · {placed.SummonUrl}";
+            QrText.Text = L10n.Fill("nmg.qr", s.Language,
+                ("svg", placed.QrSvg)) + " · " + placed.SummonUrl;
             QrText.Visibility = Visibility.Visible;
             BeaconLabelBox.Text = "";
             BeaconLocationBox.Text = "";

@@ -1,4 +1,4 @@
-# status: backlog — 273 rows
+# status: backlog — 171 rows
 #
 # ...but see below: only 72 of them are deletion work. The other 263 are a
 # to-do list about screens, and calling the whole number a backlog is the
@@ -164,14 +164,28 @@
 # total: 273
 
 # ios: 67 of 82 are asked for by another shell
+# Five keys below are asked for by no screen but pinned at full
+# strength by the block guards (acct/till/life and the workshop
+# families read the whole family on every shell), so the rows stay
+# and are recorded here instead: acct.reset.code, life.legend,
+# task.gid, task.list, work.phase.
+# `action.send` is held by all three tables and asked by no screen —
+# it is the parse-probe two table-reading guards are pinned to
+# (test_the_same_sentence_translated_twice, test_the_three_shells_say
+# _the_same_thing), so the rows stay and are recorded here instead.
+android: acct.reset.code
+android: life.legend
+android: task.gid
+android: task.list
+android: work.phase
+android: action.send
 ios: acct.reset.code
-ios: action.refresh
-ios: action.send
-ios: cam.bystanders
-ios: comp.title
-ios: front.title
-ios: inbox.empty
 ios: life.legend
+ios: task.gid
+ios: task.list
+ios: work.phase
+ios: action.send
+ios: action.refresh
 ios: nc.find
 ios: nc.lettalk
 ios: nc.rooms
@@ -189,25 +203,6 @@ ios: ngam.game.ph
 ios: ngam.situation
 ios: ngam.situation.example
 ios: ngam.sub
-ios: nmg
-ios: nmg.beacon.label.example
-ios: nmg.beacon.scan.sub
-ios: nmg.filter.industry
-ios: nmg.h.blurb
-ios: nmg.h.label
-ios: nmg.h.location
-ios: nmg.h.price
-ios: nmg.h.tags
-ios: nmg.h.terms
-ios: nmg.h.title
-ios: nmg.handle.example
-ios: nmg.license.kind
-ios: nmg.pack.free
-ios: nmg.pack.installed.pack
-ios: nmg.pack.installed.robot
-ios: nmg.packs.buy
-ios: nmg.packs.sync
-ios: nmg.packs.synced
 ios: nov.refresh
 ios: ns.fb.cat
 ios: ns.fb.rating.opt
@@ -228,26 +223,14 @@ ios: nsig.sign
 ios: nsig.verify
 ios: nsig.verify.other
 ios: nvoi.micoff
-ios: nvoi.owner
 ios: nw.needboth
 ios: pub.mark.needtext
 ios: pub.object.needid
 ios: pub.object.ref.ph
-ios: sig.package
-ios: task.gid
-ios: task.list
-ios: work.phase
 
 # android: 83 of 110 are asked for by another shell
-android: acct.reset.code
 android: action.refresh
-android: action.send
 android: asst.works
-android: cam.bystanders
-android: comp.title
-android: front.title
-android: inbox.empty
-android: life.legend
 android: nc.birthdate.ph
 android: nc.find
 android: nc.tier
@@ -265,27 +248,6 @@ android: ngam.end.session
 android: ngam.role
 android: ngam.situation.ph
 android: ngam.sub.full
-android: nmg
-android: nmg.accrued
-android: nmg.beacon.label.ph
-android: nmg.beacon.loc.ph
-android: nmg.done
-android: nmg.filter.industry
-android: nmg.filter.industry.full
-android: nmg.filter.tag
-android: nmg.grants
-android: nmg.h.label
-android: nmg.handle.ph
-android: nmg.license.kind
-android: nmg.pack.commandable
-android: nmg.pack.grounding
-android: nmg.paid
-android: nmg.price.ph
-android: nmg.t.gaming
-android: nmg.t.sign
-android: nmg.tags.ph
-android: nmg.terms.ph
-android: nmg.title.ph
 android: nov.refresh
 android: ns.fb.cat
 android: ns.fb.mine
@@ -295,13 +257,6 @@ android: ns.lang.pre.off
 android: ns.lang.pre.on
 android: ns.model.nokeyword
 android: ns.pr.short
-android: ns.rel.t.family
-android: ns.rel.t.fan
-android: ns.rel.t.friend
-android: ns.rel.t.grandchild
-android: ns.rel.t.professional
-android: ns.rel.t.romantic_partner
-android: ns.rel.t.stranger
 android: ns.rel.type
 android: ns.st.age
 android: ns.st.appearance
@@ -325,34 +280,22 @@ android: nsig.sigid
 android: nsig.signed
 android: nsig.verify
 android: nsig.verify.other
-android: nvoi.owner
 android: nw.needboth
 android: nw.unreachable
 android: pub.mark.needtext
 android: pub.mark.title
 android: pub.object.needid
-android: sig.package
-android: task.gid
-android: task.list
 android: task.scope
-android: work.phase
 
 # windows: 113 of 143 are asked for by another shell
 windows: acct.password
-windows: acct.reset.code
 windows: acct.reset.new
-windows: action.send
 windows: asst.works
-windows: cam.bystanders
-windows: comp.title
 windows: counter.pick
 windows: deals.pick
 windows: deals.sign
 windows: deals.sign.note
 windows: dele.offer
-windows: front.title
-windows: inbox.empty
-windows: life.legend
 windows: nc.a_stranger
 windows: ncon.handle.ph
 windows: ndsk.adult
@@ -370,43 +313,6 @@ windows: ngam.end
 windows: ngam.session
 windows: ngam.situation.ph
 windows: ngam.sub
-windows: nmg
-windows: nmg.beacon.label.ph
-windows: nmg.beacon.loc.ph
-windows: nmg.beacon.scan
-windows: nmg.beacon.scan.sub
-windows: nmg.blurb.ph
-windows: nmg.claimed
-windows: nmg.done
-windows: nmg.filter.industry.full
-windows: nmg.found.beacon
-windows: nmg.grants
-windows: nmg.handle.ph
-windows: nmg.ledger
-windows: nmg.needprofile
-windows: nmg.pack.free
-windows: nmg.pack.from
-windows: nmg.pack.installed.pack
-windows: nmg.pack.installed.robot
-windows: nmg.pack.meta
-windows: nmg.price.ph
-windows: nmg.qr
-windows: nmg.t.counter
-windows: nmg.t.deals
-windows: nmg.t.desk
-windows: nmg.t.gaming
-windows: nmg.t.general
-windows: nmg.t.sign
-windows: nmg.t.trade
-windows: nmg.t.voice
-windows: nmg.tags.ph
-windows: nmg.terms.ph
-windows: nmg.title.ph
-windows: ns.fb.c.bug
-windows: ns.fb.c.idea
-windows: ns.fb.c.improvement
-windows: ns.fb.c.other
-windows: ns.fb.c.praise
 windows: ns.fb.rating
 windows: ns.fb.sofar
 windows: ns.lang.pre.sub
@@ -432,12 +338,13 @@ windows: nsig.revoked.note
 windows: nsig.signed
 windows: nsig.tiers
 windows: nvoi.micoff
-windows: nvoi.owner
 windows: plc.venues
 windows: pub.tab.mark
-windows: sig.package
-windows: task.gid
-windows: task.list
 windows: task.scope
 windows: trade.sales
+windows: acct.reset.code
+windows: life.legend
+windows: task.gid
+windows: task.list
 windows: work.phase
+windows: action.send

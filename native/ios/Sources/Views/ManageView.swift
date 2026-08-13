@@ -179,9 +179,13 @@ private struct SummonSection: View {
                 // camera and draws the profile onto the sticker rather than
                 // sending anyone to a URL.
                 Button { scanning = true } label: {
-                    HStack(spacing: 8) {
-                        Image(systemName: "viewfinder")
-                        Text(L10n.t("nmg.beacon.scan", state.language)).font(.subheadline.weight(.semibold))
+                    VStack(spacing: 4) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "viewfinder")
+                            Text(L10n.t("nmg.beacon.scan", state.language)).font(.subheadline.weight(.semibold))
+                        }
+                        Text(L10n.t("nmg.beacon.scan.sub", state.language))
+                            .font(.caption2).multilineTextAlignment(.center)
                     }
                     .frame(maxWidth: .infinity).padding(12)
                     .background(Theme.brand)
@@ -511,6 +515,8 @@ private struct ManageLicenseSection: View {
                     Text(L10n.t("nmg.license", state.language)).font(.headline).foregroundStyle(Theme.txt)
                     Text(L10n.t("nmg.license.sub", state.language))
                         .font(.caption).foregroundStyle(Theme.t2)
+                    Text(L10n.t("nmg.license.kind", state.language))
+                        .font(.caption2).foregroundStyle(Theme.t2)
                     Picker("", selection: $kind) {
                         ForEach(["consult", "finetune", "clone"], id: \.self) {
                             Text($0).tag($0)

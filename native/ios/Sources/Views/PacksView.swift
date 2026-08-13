@@ -47,7 +47,9 @@ struct PacksSection: View {
                                 .font(.caption2).foregroundStyle(Theme.t3)
                         }
                         Spacer()
-                        Button(reg.synced >= reg.available_packs ? "Synced" : "Sync") {
+                        Button(reg.synced >= reg.available_packs
+                               ? L10n.t("nmg.packs.synced", state.language)
+                               : L10n.t("nmg.packs.sync", state.language)) {
                             sync(reg)
                         }
                         .font(.caption.bold())
@@ -76,7 +78,7 @@ struct PacksSection: View {
                                 .foregroundStyle(Theme.brandA)
                                 .clipShape(Capsule())
                         }
-                        Text(pack.free ? "FREE"
+                        Text(pack.free ? L10n.t("nmg.pack.free", state.language)
                              : String(format: "%.2f %@", pack.price, pack.currency))
                             .font(.caption2.bold())
                             .padding(.horizontal, 7).padding(.vertical, 3)
@@ -97,12 +99,18 @@ struct PacksSection: View {
                     HStack {
                         Spacer()
                         if installed.keys.contains(pack.id) {
-                            Text(L10n.t("nmg.packs.installed", state.language)).font(.caption.bold()).foregroundStyle(Theme.green)
+                            let onRobot = !(installed[pack.id] ?? "").isEmpty
+                            Text(L10n.t(onRobot ? "nmg.pack.installed.robot"
+                                                : "nmg.pack.installed.pack",
+                                        state.language))
+                                .font(.caption.bold()).foregroundStyle(Theme.green)
                             Button(L10n.t("nmg.remove", state.language)) { uninstall(pack) }
                                 .font(.caption).foregroundStyle(Theme.red)
                         } else {
                             Button(pack.free ? L10n.t("nmg.packs.download", state.language)
-                                   : String(format: "Buy %.2f %@", pack.price, pack.currency)) {
+                                   : L10n.fill("nmg.packs.buy", state.language,
+                                               ["price": String(format: "%.2f", pack.price),
+                                                "currency": pack.currency])) {
                                 install(pack)
                             }
                             .font(.caption.bold()).foregroundStyle(.white)
