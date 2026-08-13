@@ -105,6 +105,7 @@ public sealed partial class PostsPage : Page
             "offsite" => L10n.T("feed.kind.offsite", lang),
             "room" => L10n.T("feed.kind.room", lang),
             "desk" => L10n.T("feed.kind.desk", lang),
+            "party" => L10n.T("feed.kind.party", lang),
             _ => L10n.T("feed.kind.video", lang),
         };
         StreamReason.Text = c.Reason ?? "";
@@ -112,18 +113,23 @@ public sealed partial class PostsPage : Page
         {
             "room" => c.Topic ?? L10n.T("feed.room.untitled", lang),
             "desk" => (c.DisplayName ?? "—") + " · " + (c.Trade ?? ""),
+            "party" => (c.Title ?? "—") + " · "
+                + (c.Video?.PlatformName ?? "") + " · " + (c.People ?? 0),
             _ => c.Title ?? "—",
         };
         StreamSays.Text = c.Kind switch
         {
             "room" => c.Entering ?? "",
             "desk" => c.Ringing ?? "",
+            // Before the button. Joining puts your name in the room.
+            "party" => c.Joining ?? "",
             _ => c.Note ?? "",
         };
         StreamAct.Content = c.Kind switch
         {
             "room" => L10n.T("feed.enter", lang),
             "desk" => L10n.T("feed.ring", lang),
+            "party" => L10n.T("party.join", lang),
             "offsite" => _opened.Contains(c.Id ?? "") ? "" : L10n.T("feed.play", lang),
             _ => "",
         };
@@ -152,12 +158,26 @@ public sealed partial class PostsPage : Page
         ShowCard();
     }
 
-    private void OnStreamAct(object sender, RoutedEventArgs e)
+    private async void OnStreamAct(object sender, RoutedEventArgs e)
     {
         if (_stream.Count == 0) return;
         var c = _stream[System.Math.Clamp(_at, 0, _stream.Count - 1)];
         // The first request an off-site card ever makes is this one.
         if (c.Kind == "offsite" && c.Id != null) _opened.Add(c.Id);
+        if (c.Kind == "party" && c.Id != null)
+        {
+            // Joining is the one press here that acts, so it answers with
+            // the server's outcome rather than a line copied off the card.
+            try
+            {
+                var joined = await ApiClient.Shared.JoinParty(
+                    c.Id, AppState.Current.Pid!, AppState.Current.Token!);
+                StreamLine.Text = joined.Title ?? c.Title ?? "";
+            }
+            catch (System.Exception ex) { StreamLine.Text = ex.Message; }
+            ShowCard();
+            return;
+        }
         StreamLine.Text = c.Kind switch
         {
             "room" => c.Entering ?? "",

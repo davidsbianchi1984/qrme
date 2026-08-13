@@ -181,7 +181,9 @@ data class FeedCard(val id: String, val kind: String, val reason: String,
                     val people: Int, val entering: String?,
                     val displayName: String?, val trade: String?,
                     val presence: String?, val ringing: String?,
-                    val human: Boolean, val ai: Boolean)
+                    val human: Boolean, val ai: Boolean,
+                    // party — a watch party whose host chose to be found.
+                    val joining: String? = null)
 data class SummonCard(val profileId: String, val displayName: String, val handle: String?,
                       val status: String, val note: String?)
 data class SummonResult(val type: String, val label: String?, val scans: Int?,
@@ -968,7 +970,9 @@ object ApiClient {
         feedCard(JSONObject(request("/feed/$id")))
 
     private fun feedCard(o: JSONObject): FeedCard {
-        val f = o.optJSONObject("facade")
+        // A party card carries its facade under "video"; the fields inside
+        // are the same shape, so one pair of columns serves both.
+        val f = o.optJSONObject("facade") ?: o.optJSONObject("video")
         return FeedCard(
             o.optString("id", ""), o.optString("kind", ""),
             o.optString("reason", ""),
@@ -985,7 +989,8 @@ object ApiClient {
             if (o.isNull("trade")) null else o.optString("trade"),
             if (o.isNull("presence")) null else o.optString("presence"),
             if (o.isNull("ringing")) null else o.optString("ringing"),
-            o.optBoolean("human", false), o.optBoolean("ai", false))
+            o.optBoolean("human", false), o.optBoolean("ai", false),
+            if (o.isNull("joining")) null else o.optString("joining"))
     }
 
     // ---- live desks ----

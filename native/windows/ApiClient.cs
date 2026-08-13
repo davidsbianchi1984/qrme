@@ -4747,7 +4747,12 @@ public record FeedCard(
     [property: JsonPropertyName("presence")] string? Presence,
     [property: JsonPropertyName("ringing")] string? Ringing,
     [property: JsonPropertyName("human")] bool? Human,
-    [property: JsonPropertyName("ai")] bool? Ai);
+    [property: JsonPropertyName("ai")] bool? Ai,
+    // party — a watch party whose host chose to be found. Counts and a
+    // facade only; joining is the viewer's own press.
+    [property: JsonPropertyName("video")] FeedFacade? Video = null,
+    [property: JsonPropertyName("joining")] string? Joining = null,
+    [property: JsonPropertyName("people")] int? People = null);
 
 public record FeedFacade(
     [property: JsonPropertyName("platform_name")] string? PlatformName,

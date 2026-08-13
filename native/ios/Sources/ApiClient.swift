@@ -5303,6 +5303,11 @@ struct FeedCard: Decodable {
     let ringing: String?
     let human: Bool?
     let ai: Bool?
+    // party — a watch party whose host chose to be found. Counts and a
+    // facade only; joining is the viewer's own press.
+    let video: FeedFacade?
+    let joining: String?
+    let profiles: Int?
 }
 
 struct FeedFacade: Decodable {

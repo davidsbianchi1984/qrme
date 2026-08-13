@@ -642,6 +642,7 @@ fun StreamSection(vm: StudioViewModel) {
                     "video" -> L10n.t("feed.kind.video", vm.language)
                     "offsite" -> L10n.t("feed.kind.offsite", vm.language)
                     "room" -> L10n.t("feed.kind.room", vm.language)
+                    "party" -> L10n.t("feed.kind.party", vm.language)
                     else -> L10n.t("feed.kind.desk", vm.language)
                 }
                 Text(kindLabel, color = Qrme.BrandA,
@@ -665,6 +666,20 @@ fun StreamSection(vm: StudioViewModel) {
                         Text(c.entering ?: "", color = Qrme.T3, fontSize = 10.sp)
                         TextButton(onClick = { line = c.entering }) {
                             Text(L10n.t("feed.enter", vm.language), color = Qrme.BrandA, fontSize = 12.sp)
+                        }
+                    }
+                    "party" -> {
+                        Text(c.title ?: "—", color = Qrme.Txt, fontSize = 14.sp)
+                        Text((c.platformName ?: "") + " · " + c.people,
+                            color = Qrme.T2, fontSize = 12.sp)
+                        // Before the button. Joining puts your name in the room.
+                        Text(c.joining ?: "", color = Qrme.T3, fontSize = 10.sp)
+                        TextButton(onClick = {
+                            vm.call({ ApiClient.joinParty(c.id, vm.pid!!, vm.token!!) }) { r ->
+                                line = r.getOrNull()?.title ?: r.exceptionOrNull()?.message
+                            }
+                        }) {
+                            Text(L10n.t("party.join", vm.language), color = Qrme.BrandA, fontSize = 12.sp)
                         }
                     }
                     "desk" -> {

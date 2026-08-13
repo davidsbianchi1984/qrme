@@ -538,6 +538,7 @@ enum L10n {
         "feed.kind.video": ["en": "Video", "es": "Vídeo", "fr": "Vidéo", "de": "Video", "pt": "Vídeo", "it": "Video", "ja": "動画", "zh": "视频", "hi": "वीडियो", "ar": "فيديو"],
         "feed.kind.offsite": ["en": "Elsewhere", "es": "En otro sitio", "fr": "Ailleurs", "de": "Anderswo", "pt": "Noutro sítio", "it": "Altrove", "ja": "よそのサイト", "zh": "站外", "hi": "अन्यत्र", "ar": "في موقع آخر"],
         "feed.kind.room": ["en": "Live room", "es": "Sala en directo", "fr": "Salon en direct", "de": "Live-Raum", "pt": "Sala em direto", "it": "Sala dal vivo", "ja": "ライブの部屋", "zh": "直播房间", "hi": "लाइव रूम", "ar": "غرفة حيّة"],
+        "feed.kind.party": ["en": "Watch party", "es": "Sala de visionado", "fr": "Séance partagée", "de": "Watch-Party", "pt": "Sessão conjunta", "it": "Visione insieme", "ja": "ウォッチパーティ", "zh": "放映会", "hi": "वॉच पार्टी", "ar": "جلسة مشاهدة"],
         "feed.kind.desk": ["en": "Desk", "es": "Mostrador", "fr": "Comptoir", "de": "Theke", "pt": "Balcão", "it": "Banco", "ja": "受付", "zh": "服务台", "hi": "डेस्क", "ar": "المكتب"],
         "feed.play": ["en": "Play it", "es": "Reproducirlo", "fr": "Le lire", "de": "Abspielen", "pt": "Reproduzir", "it": "Riproducilo", "ja": "再生する", "zh": "播放", "hi": "चलाएँ", "ar": "شغّله"],
         "feed.enter": ["en": "Walk in", "es": "Entrar", "fr": "Entrer", "de": "Hineingehen", "pt": "Entrar", "it": "Entrare", "ja": "入る", "zh": "走进去", "hi": "अंदर जाएँ", "ar": "ادخل"],

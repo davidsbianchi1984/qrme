@@ -70,6 +70,7 @@ struct StreamSection: View {
         case "video": return L10n.t("feed.kind.video", state.language)
         case "offsite": return L10n.t("feed.kind.offsite", state.language)
         case "room": return L10n.t("feed.kind.room", state.language)
+        case "party": return L10n.t("feed.kind.party", state.language)
         default: return L10n.t("feed.kind.desk", state.language)
         }
     }
@@ -120,6 +121,25 @@ struct StreamSection: View {
                 }
                 Button(L10n.t("feed.enter", state.language)) {
                     line = c.entering
+                }.font(.caption)
+            case "party":
+                Text(c.title ?? "—").font(.subheadline).foregroundStyle(Theme.txt)
+                Text((c.video?.platform_name ?? "") + " · "
+                     + String(c.people ?? 0))
+                    .font(.caption).foregroundStyle(Theme.t2)
+                // Before the button. Joining puts your name in the room.
+                if let j = c.joining {
+                    Text(j).font(.caption2).foregroundStyle(Theme.t3)
+                }
+                Button(L10n.t("party.join", state.language)) {
+                    Task {
+                        do {
+                            _ = try await ApiClient.shared.joinParty(
+                                partyId: c.id, memberId: state.pid ?? "",
+                                kind: "profile", token: state.token ?? "")
+                            line = c.title
+                        } catch { line = error.localizedDescription }
+                    }
                 }.font(.caption)
             default:
                 Text(c.display_name ?? "—")
