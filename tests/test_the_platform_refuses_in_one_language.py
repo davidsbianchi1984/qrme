@@ -140,6 +140,102 @@ def test_the_backlog_only_shrinks():
         "guard started at")
 
 
+def test_every_handler_returns_through_the_one_place():
+    """The structural half, ported from the siblings.
+
+    PDI and JIM-mini have asked this since the round that gave them one
+    `i18n.refuse`; this product answers its refusals a shape of its own —
+    `refusal_language`, then `localize_detail` and `sentence_of` — and so the
+    question never crossed. It stood on `guard_divergences.txt` as a name
+    this suite lacked, which is the same thing as nobody asking here whether
+    a new exception handler would answer in English.
+
+        asked     is this refusal translated where it is raised
+        mattered  does every handler that answers one consult the reader
+
+    Checked structurally rather than by driving each handler: a driven check
+    would cover the ones that exist today and say nothing about the next.
+    """
+    tree = ast.parse((REPO / "qrme" / "api.py").read_text(encoding="utf-8"))
+    handlers: list[tuple[str, bool]] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        if not any(isinstance(d, ast.Call)
+                   and getattr(d.func, "attr", "") == "exception_handler"
+                   for d in node.decorator_list):
+            continue
+        routed = any(
+            isinstance(n, ast.Call)
+            and getattr(n.func, "attr", "") == "refusal_language"
+            and getattr(getattr(n.func, "value", None), "id", "") == "i18n"
+            for n in ast.walk(node))
+        handlers.append((node.name, routed))
+
+    assert len(handlers) >= 2, (
+        f"only {len(handlers)} exception handlers found in api.py — the "
+        "pattern has stopped matching, so this check would pass on nothing")
+    astray = sorted(name for name, routed in handlers if not routed)
+    assert not astray, (
+        f"{astray} build a response without asking what language the reader "
+        "is in. Every sentence they carry is a refusal somebody reads, and "
+        "it will be in English no matter what language they chose.")
+
+
+def test_every_failure_answers_in_the_readers_language():
+    """The path the handler guard above cannot see, and where the port
+    found something.
+
+    `@app.exception_handler(Exception)` cannot be the catch-all here:
+    Starlette hands it to `ServerErrorMiddleware`, outside the CORS layer, so
+    the 500 goes back without the header and the console reads it as
+    unreachable rather than refused. The catch-all is therefore a middleware
+    — and being a middleware, it was not a handler, so no guard in any of the
+    three products was asking it anything. Its sentence sat inline in English
+    in all three.
+
+        asked     does every exception handler answer in the reader's language
+        mattered  does every failure answer in the reader's language
+
+    The one answer every route can give is the one a person meets when the
+    product is already failing them, and it was the only one that came back
+    in a language they might not read.
+    """
+    tree = ast.parse((REPO / "qrme" / "api.py").read_text(encoding="utf-8"))
+    caught = []
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        if not any(isinstance(d, ast.Call)
+                   and getattr(d.func, "attr", "") == "middleware"
+                   for d in node.decorator_list):
+            continue
+        # The catch-all specifically, not any middleware that happens to
+        # handle an error. A bare `except:` counts, because that is a
+        # catch-all written the other way.
+        if not any(isinstance(n, ast.ExceptHandler)
+                   and (n.type is None
+                        or getattr(n.type, "id", "") == "Exception")
+                   for n in ast.walk(node)):
+            continue
+        asked = any(
+            isinstance(n, ast.Call)
+            and getattr(n.func, "attr", "") == "refusal_language"
+            and getattr(getattr(n.func, "value", None), "id", "") == "i18n"
+            for n in ast.walk(node))
+        caught.append((node.name, asked))
+
+    assert caught, (
+        "no middleware in api.py catches an exception — either the catch-all "
+        "is gone, in which case a failing route answers with nothing the "
+        "console can read, or this guard has stopped matching")
+    astray = sorted(name for name, asked in caught if not asked)
+    assert not astray, (
+        f"{astray} answer a failed route without asking what language the "
+        "reader is in. A person who is already being failed reads the "
+        "apology in English.")
+
+
 def test_the_extractor_can_still_see(tmp_path):
     """A guard on the guard, against a fixture whose answer is known.
 

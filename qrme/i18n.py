@@ -175,6 +175,14 @@ def negotiate(header: str | None) -> str:
 #: state for display through `pub.state.*` in `l10n.ts`, which is where a
 #: display decision belongs.
 #:
+#: The one sentence a person can meet on any route in this product,
+#: because it is the answer to a route that failed. Named here so
+#: `_REFUSALS` can carry it and the middleware can look it up — a
+#: refusal built inline is a refusal in English.
+SERVER_ERROR = ("Something went wrong on our side. "
+                "Nothing you sent was recorded.")
+
+
 #: Keyed on the English source, the way JIM's and PDI's tables are, so editing
 #: the English invalidates its translations loudly — the page falls back to the
 #: new English — rather than quietly serving the old sentence in nine
@@ -1016,6 +1024,17 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'Something went wrong on our side. Nothing you sent was recorded.': {
+        'es': 'Algo falló de nuestro lado. No se registró nada de lo que envió.',
+        'fr': "Quelque chose a échoué de notre côté. Rien de ce que vous avez envoyé n'a été enregistré.",
+        'de': 'Auf unserer Seite ist etwas schiefgegangen. Nichts von dem, was Sie gesendet haben, wurde gespeichert.',
+        'pt': 'Algo correu mal do nosso lado. Nada do que enviou ficou registado.',
+        'it': 'Qualcosa è andato storto dalla nostra parte. Nulla di ciò che ha inviato è stato registrato.',
+        'ja': 'こちら側で問題が発生しました。送信された内容は記録されていません。',
+        'zh': '我们这边出了问题。您发送的内容没有被记录。',
+        'hi': 'हमारी ओर से कुछ गड़बड़ हो गई। आपने जो भेजा, वह दर्ज नहीं हुआ।',
+        'ar': 'حدث خطأ من جانبنا. لم يُسجَّل أي شيء أرسلته.',
+    },
     'no such handoff — mint a fresh ticket': {
         'es': 'no existe esa entrega — genera un vale nuevo',
         'fr': "ce transfert n'existe pas — émettez un nouveau ticket",
