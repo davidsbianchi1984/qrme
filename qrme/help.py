@@ -439,6 +439,12 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     # they use when they have noticed the reporting and want it to stop.
     "market": ("marketplace", "buy", "sell", "shop", "price", "for sale",
                "find a plumber", "hire", "listing", "search for someone"),
+    # The words of somebody who wants a line of the record gone or said
+    # right — the checkboxes and the pen.
+    "curation": ("edit the transcript", "delete a message", "delete a turn",
+                 "rewrite", "rewrite a turn", "edit what it said",
+                 "fix what it said", "curate", "strike", "checkboxes",
+                 "remove something it remembers", "change a message"),
     "problems": ("what went wrong", "error", "errors", "it failed",
                  "something broke", "bug", "report a bug", "crash",
                  "stop sending", "stop reporting", "opt out", "diagnostics"),
