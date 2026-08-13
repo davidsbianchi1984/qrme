@@ -244,22 +244,26 @@ export function Wall({ onPlans }: {
 
       <div className="card">
         <h3>{tr("wll.saysomething", lang)}</h3>
+        {/* Blank boxes under plain labels. The composer wore a hint
+            inside every field until a field report asked for them gone —
+            the label above each box already says everything the ghost
+            text repeated. */}
         <label>{tr("wll.post", lang)}
-          <textarea rows={2} value={body} placeholder={tr("wll.body.ph", lang)}
+          <textarea rows={2} value={body}
                     onChange={(e) => setBody(e.target.value)} />
         </label>
         <div className="row">
           <label>{tr("wll.sharevideo", lang)}
-            <input value={videoUrl} placeholder={tr("wll.link.ph", lang)}
+            <input value={videoUrl}
                    onChange={(e) => setVideoUrl(e.target.value)} />
           </label>
           <label>{tr("wll.videotitle", lang)}
-            <input value={videoTitle} placeholder={tr("wll.videotitle.ph", lang)}
+            <input value={videoTitle}
                    onChange={(e) => setVideoTitle(e.target.value)} />
           </label>
         </div>
         <label>{tr("wll.alt", lang)}
-          <input value={mediaAlt} placeholder={tr("wll.alt.ph", lang)}
+          <input value={mediaAlt}
                  onChange={(e) => setMediaAlt(e.target.value)} />
         </label>
         <label>{tr("wll.attach", lang)}

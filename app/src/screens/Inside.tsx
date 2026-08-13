@@ -51,6 +51,8 @@ export function Inside({ onPlans, start = "" }: {
   const [roomId, setRoomId] = useState(start);
   const [transcript, setTranscript] = useState<RoomMsg[]>([]);
   const [mics, setMics] = useState<MicsHere | null>(null);
+  const [seats, setSeats] = useState<
+    { kind: string; id: string; display: string }[]>([]);
   const [draft, setDraft] = useState("");
 
   const [error, setError] = useState<unknown>(null);
@@ -63,8 +65,19 @@ export function Inside({ onPlans, start = "" }: {
     if (!open || !token) return;
     api.roomMessages(open, token).then(setTranscript).catch(setError);
     api.micsInRoom(open, token).then(setMics).catch(() => setMics(null));
+    // The seats. Joining twice is being there once, so the join door
+    // doubles as the who-is-here read — and going in renders a scene
+    // rather than leaving you on the same form, which a field report
+    // described as "it just stayed here in the same menu".
+    api.joinRoom(open, token).then((r) => setSeats(r.participants))
+      .catch(() => setSeats([]));
   }
   useEffect(load, [open, token]);
+
+  // Whose square is lit: the last voice in the transcript. `from` carries
+  // the display name each seat also carries.
+  const talking = transcript.length > 0
+    ? transcript[transcript.length - 1].from : null;
 
   const act = (fn: () => Promise<unknown>, said?: string) => async () => {
     setError(null); setNote(null); setBusy(true);
@@ -97,6 +110,32 @@ export function Inside({ onPlans, start = "" }: {
           <p className="muted small">{tr("ins.signinperson", lang)}</p>
         )}
       </div>
+
+      {open && seats.length > 0 && (
+        // The scene: everyone in the room in their own square, and the
+        // square of whoever spoke last wears the light. The transcript
+        // stays below — the scene is where you are, the transcript is
+        // what was said.
+        <div className="card">
+          <h3>{tr("ins.scene", lang)}</h3>
+          <div className="room-scene">
+            {seats.map((s) => (
+              <div key={s.id}
+                   className={"rs-tile" + (talking === s.display ? " talking" : "")}>
+                <span className="rs-face">
+                  {(s.display || "?").split(/\s+/)
+                    .map((w) => w[0]).join("").slice(0, 2)}
+                </span>
+                <span className="rs-name">{s.display}</span>
+                <span className="muted small">
+                  {s.kind === "person"
+                    ? tr("ins.seat.person", lang) : tr("ins.seat.profile", lang)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {open && (
         <>
