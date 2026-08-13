@@ -6818,6 +6818,14 @@ fun WidgetsScreen(state: AppState) {
     var caps by remember { mutableStateOf<WidgetCaps?>(null) }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
+    // The agent. Its conversation lives here rather than on the server: it
+    // has no memory of its own, so leaving this screen is all of forgetting.
+    var reach by remember { mutableStateOf<AgentReach?>(null) }
+    var ask by remember { mutableStateOf("") }
+    var asking by remember { mutableStateOf(false) }
+    var showsReach by remember { mutableStateOf(false) }
+    var talk by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
+    var did by remember { mutableStateOf<AgentTurn?>(null) }
     val lang = state.language
     val pid = state.profileId
     val token = state.ownerToken
@@ -6831,6 +6839,7 @@ fun WidgetsScreen(state: AppState) {
 
     LaunchedEffect(pid) {
         caps = runCatching { state.api.widgetLimits() }.getOrNull()
+        reach = runCatching { state.api.studioAgent() }.getOrNull()
         reload()
     }
 
@@ -6839,6 +6848,59 @@ fun WidgetsScreen(state: AppState) {
             fontWeight = FontWeight.Bold)
         error?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
         caps?.let { if (!it.available) Text(L10n.t("wdg.nobox", lang), color = Qrme.T2, fontSize = 12.sp) }
+
+        // Ask for it in words. What it did is listed under what it said,
+        // because prose describing an edit is asking to be believed and the
+        // steps are the part that can be checked.
+        Text(L10n.t("wdg.ask.title", lang), color = Qrme.Txt, fontWeight = FontWeight.Bold)
+        Text(L10n.t("wdg.ask.sub", lang), color = Qrme.T2, fontSize = 12.sp)
+        Text(if (showsReach) L10n.t("wdg.reach.hide", lang)
+             else L10n.t("wdg.reach.show", lang),
+            color = Qrme.T2, fontSize = 12.sp,
+            modifier = Modifier.clickable { showsReach = !showsReach })
+        if (showsReach) reach?.canTouch?.forEach {
+            Text("• $it", color = Qrme.T2, fontSize = 12.sp)
+        }
+        reach?.let {
+            if (!it.available) Text(L10n.t("wdg.ask.nomodel", lang),
+                color = Qrme.T2, fontSize = 12.sp)
+        }
+        labeledField(L10n.t("wdg.ask.title", lang), ask, "") { ask = it }
+        BrandButton(L10n.t("wdg.ask.go", lang), enabled = ask.isNotBlank(),
+            busy = asking) {
+            scope.launch {
+                asking = true; did = null
+                val id = pid; val bearer = token
+                if (id != null && bearer != null) {
+                    runCatching { state.api.authoringTurn(id, ask.trim(), talk, bearer) }
+                        .onSuccess { turn ->
+                            did = turn
+                            talk = talk + ("user" to ask.trim()) +
+                                ("assistant" to turn.reply)
+                            ask = ""
+                            // It may have written, revised or removed one.
+                            // Re-read rather than reason about which.
+                            reload()
+                        }.onFailure { error = it.message }
+                }
+                asking = false
+            }
+        }
+        if (talk.isNotEmpty()) {
+            Text(L10n.t("wdg.ask.forget", lang), color = Qrme.T2, fontSize = 12.sp,
+                modifier = Modifier.clickable { talk = emptyList(); did = null })
+        }
+        talk.forEach { (who, line) ->
+            Text(line, color = if (who == "user") Qrme.Txt else Qrme.T2,
+                fontSize = 12.sp)
+        }
+        did?.let { turn ->
+            turn.said?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+            turn.acted.forEach { step ->
+                Text(step.said ?: "${step.tool} — ${step.answered}",
+                    color = Qrme.T2, fontSize = 12.sp)
+            }
+        }
 
         Text(L10n.t("wdg.yours", lang), color = Qrme.Txt, fontWeight = FontWeight.Bold)
         if (widgets.isEmpty()) Text(L10n.t("wdg.none", lang), color = Qrme.T2, fontSize = 12.sp)

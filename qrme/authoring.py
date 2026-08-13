@@ -351,7 +351,7 @@ def converse(said: str, history: list[dict], *, app, profile_id: str,
         reply = provider.generate(SYSTEM, turns)
         wanted = wants_a_tool(reply)
         if wanted is None:
-            return {"reply": reply.strip(), "steps": steps, "stopped": None}
+            return {"reply": reply.strip(), "acted": steps, "stopped": None}
         name, arguments = wanted
         try:
             result = call(name, arguments, app=app, profile_id=profile_id,
@@ -360,15 +360,15 @@ def converse(said: str, history: list[dict], *, app, profile_id: str,
             # A refused call is a turn in the conversation, not the end of
             # one: the model asked for something it does not have, and being
             # told so is how it stops asking.
-            steps.append({"tool": name, "status": None, "refused": str(exc)})
+            steps.append({"tool": name, "answered": None, "refused": str(exc)})
             turns += [{"role": "assistant", "content": reply},
                       {"role": "user", "content": f"REFUSED {str(exc)}"}]
             continue
-        steps.append({"tool": name, "status": result["status"]})
+        steps.append({"tool": name, "answered": result["status"]})
         turns += [{"role": "assistant", "content": reply},
                   {"role": "user", "content": a_result_for_the_model(result)}]
 
     # Out of steps with no answer. Said plainly rather than dressed as one —
     # the screen shows what it did reach, and the person decides whether to
     # ask again.
-    return {"reply": "", "steps": steps, "stopped": "agent.too_many_steps"}
+    return {"reply": "", "acted": steps, "stopped": "agent.too_many_steps"}

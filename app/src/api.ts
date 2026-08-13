@@ -3063,6 +3063,17 @@ export interface WidgetRun {
   detail?: string; said?: string;
 }
 
+/** One turn of the Studio agent: what it did, and what it said afterwards.
+ *  `steps` is the record — an agent that describes an edit in prose is
+ *  asking to be believed, and this is the part that can be checked. */
+export interface AgentTurn {
+  reply: string;
+  acted: { tool: string; answered: number | null; refused?: string;
+           said?: string }[];
+  stopped: string | null;
+  said: string | null;
+}
+
 export const api = {
   // `health` used to sit here: the same route, the body thrown away, a
   // boolean returned. Nothing called it — `healthInfo` below returns the
@@ -3308,6 +3319,17 @@ export const api = {
   studioLimits: () =>
     req<{ allowances: Record<string, number>; available: boolean;
           unavailable_because: string | null }>("/studio/limits"),
+  studioAgent: () =>
+    req<{ can_touch: string[]; tools: string[];
+          available: boolean }>("/studio/agent"),
+  // The conversation is the console's to keep — the agent has no memory of
+  // its own, which is both cheaper and the design where *forget this* is
+  // something a person can actually do.
+  authoringTurn: (profileId: string, said: string,
+                  history: { role: string; content: string }[],
+                  token: string) =>
+    req<AgentTurn>(`/profiles/${profileId}/authoring/turn`,
+      { method: "POST", body: { said, history }, token }),
   listWidgets: (profileId: string, token: string) =>
     req<{ widgets: Widget[] }>(`/profiles/${profileId}/widgets`, { token }),
   readWidget: (profileId: string, widgetId: string, token: string) =>

@@ -151,11 +151,65 @@ struct WidgetsView: View {
     @State private var caps: WidgetLimits?
     @State private var busy = false
     @State private var error: String?
+    // The agent. Its conversation lives here rather than on the server: it
+    // has no memory of its own, so leaving this screen is all of forgetting.
+    @State private var reach: AgentReach?
+    @State private var ask = ""
+    @State private var asking = false
+    @State private var showsReach = false
+    @State private var talk: [[String: String]] = []
+    @State private var did: AgentTurn?
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 if let error { Text(error).foregroundColor(.red).font(.footnote) }
+
+                Text(L10n.t("wdg.ask.title", state.language)).font(.headline)
+                Text(L10n.t("wdg.ask.sub", state.language))
+                    .font(.footnote).foregroundColor(.secondary)
+                Button(showsReach ? L10n.t("wdg.reach.hide", state.language)
+                                  : L10n.t("wdg.reach.show", state.language)) {
+                    showsReach.toggle()
+                }.font(.footnote)
+                if showsReach, let reach {
+                    ForEach(reach.can_touch, id: \.self) { line in
+                        Text("• " + line).font(.footnote)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                if let reach, !reach.available {
+                    Text(L10n.t("wdg.ask.nomodel", state.language))
+                        .font(.footnote).foregroundColor(.secondary)
+                }
+                TextEditor(text: $ask).frame(height: 70)
+                    .font(.footnote).border(Color.secondary.opacity(0.3))
+                HStack {
+                    Button(asking ? L10n.t("wdg.ask.working", state.language)
+                                  : L10n.t("wdg.ask.go", state.language)) { send() }
+                        .disabled(asking || ask.trimmingCharacters(
+                            in: .whitespacesAndNewlines).isEmpty)
+                    if !talk.isEmpty {
+                        Button(L10n.t("wdg.ask.forget", state.language)) {
+                            talk = []; did = nil
+                        }.font(.footnote)
+                    }
+                }
+                ForEach(Array(talk.enumerated()), id: \.offset) { _, turn in
+                    Text(turn["content"] ?? "").font(.footnote)
+                        .foregroundColor(turn["role"] == "user" ? .primary
+                                                                : .secondary)
+                }
+                if let did {
+                    if let said = did.said {
+                        Text(said).font(.footnote).foregroundColor(.secondary)
+                    }
+                    ForEach(did.acted) { step in
+                        Text(step.said ?? "\(step.tool) — \(step.answered ?? 0)")
+                            .font(.footnote).foregroundColor(.secondary)
+                    }
+                }
+                Divider()
 
                 if let caps, !caps.available {
                     Text(L10n.t("wdg.nobox", state.language))
@@ -215,9 +269,35 @@ struct WidgetsView: View {
         .task { await load() }
     }
 
+    /// Ask for it in words. Afterwards the list and the open draft are
+    /// re-read rather than reasoned about: it may have written, revised or
+    /// removed one, and a stale list is the one thing here that can be wrong
+    /// without anybody noticing.
+    private func send() {
+        guard let pid = state.pid, let token = state.token else { return }
+        let said = ask.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !said.isEmpty else { return }
+        asking = true
+        did = nil
+        Task {
+            defer { asking = false }
+            do {
+                let turn = try await ApiClient.shared.authoringTurn(
+                    profileId: pid, said: said, history: talk, token: token)
+                did = turn
+                talk.append(["role": "user", "content": said])
+                talk.append(["role": "assistant", "content": turn.reply])
+                ask = ""
+                await load()
+                if let open { openOne(open) }
+            } catch { self.error = error.localizedDescription }
+        }
+    }
+
     private func load() async {
         guard let pid = state.pid, let token = state.token else { return }
         caps = try? await ApiClient.shared.widgetLimits()
+        reach = try? await ApiClient.shared.studioAgent()
         do { widgets = try await ApiClient.shared.widgets(profileId: pid, token: token).widgets }
         catch { self.error = error.localizedDescription }
     }

@@ -23,6 +23,11 @@ public sealed partial class WidgetsPage : Page
     private WidgetRow[] _widgets = Array.Empty<WidgetRow>();
     private WidgetRow? _open;
     private WidgetCaps? _caps;
+    // The agent. Its conversation lives here rather than on the server: it
+    // has no memory of its own, so leaving this page is all of forgetting.
+    private AgentReach? _reach;
+    private readonly System.Collections.Generic.List<AgentSaid> _talk = new();
+    private bool _showsReach;
 
     public WidgetsPage()
     {
@@ -44,6 +49,67 @@ public sealed partial class WidgetsPage : Page
         RunButton.Content = L10n.T("wdg.run", lang);
         RemoveButton.Content = L10n.T("wdg.remove", lang);
         Walls.Text = L10n.T("wdg.walls", lang);
+        AskTitle.Text = L10n.T("wdg.ask.title", lang);
+        AskSub.Text = L10n.T("wdg.ask.sub", lang);
+        AskButton.Content = L10n.T("wdg.ask.go", lang);
+        ForgetButton.Content = L10n.T("wdg.ask.forget", lang);
+        NoModel.Text = L10n.T("wdg.ask.nomodel", lang);
+        ReachButton.Content = L10n.T(
+            _showsReach ? "wdg.reach.hide" : "wdg.reach.show", lang);
+    }
+
+    private void OnToggleReach(object sender, RoutedEventArgs e)
+    {
+        _showsReach = !_showsReach;
+        ReachList.Visibility = _showsReach && _reach is not null
+            ? Visibility.Visible : Visibility.Collapsed;
+        if (_reach is not null)
+            ReachList.Text = string.Join("\n",
+                _reach.CanTouch.Select(line => "\u2022 " + line));
+        Localize();
+    }
+
+    /// <summary>Ask for it in words. Afterwards the list and the open draft
+    /// are re-read rather than reasoned about: it may have written, revised
+    /// or removed one, and a stale list is the thing here that can be wrong
+    /// without anybody noticing.</summary>
+    private async void OnAsk(object sender, RoutedEventArgs e)
+    {
+        var state = AppState.Current;
+        if (state.Pid is null || state.Token is null) return;
+        var said = AskBox.Text.Trim();
+        if (said.Length == 0) return;
+        AskButton.IsEnabled = false;
+        try
+        {
+            var turn = await ApiClient.Shared.AuthoringTurn(
+                state.Pid, said, _talk.ToArray(), state.Token);
+            _talk.Add(new AgentSaid("user", said));
+            _talk.Add(new AgentSaid("assistant", turn.Reply));
+            AskBox.Text = "";
+            TalkText.Text = string.Join("\n",
+                _talk.Select(t => t.Content));
+            TalkText.Visibility = Visibility.Visible;
+            ForgetButton.Visibility = Visibility.Visible;
+            StepsText.Text = string.Join("\n",
+                new[] { turn.Said ?? "" }
+                    .Concat(turn.Acted.Select(
+                        s => s.Said ?? $"{s.Tool} \u2014 {s.Answered ?? 0}"))
+                    .Where(line => line.Length > 0));
+            StepsText.Visibility = StepsText.Text.Length == 0
+                ? Visibility.Collapsed : Visibility.Visible;
+            await LoadAsync();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+        finally { AskButton.IsEnabled = true; }
+    }
+
+    private void OnForget(object sender, RoutedEventArgs e)
+    {
+        _talk.Clear();
+        TalkText.Visibility = Visibility.Collapsed;
+        StepsText.Visibility = Visibility.Collapsed;
+        ForgetButton.Visibility = Visibility.Collapsed;
     }
 
     private async System.Threading.Tasks.Task LoadAsync()
@@ -56,6 +122,9 @@ public sealed partial class WidgetsPage : Page
             NoBox.Visibility = _caps.Available ? Visibility.Collapsed
                                                : Visibility.Visible;
             RunButton.IsEnabled = _caps.Available;
+            _reach = await ApiClient.Shared.StudioAgent();
+            NoModel.Visibility = _reach.Available ? Visibility.Collapsed
+                                                  : Visibility.Visible;
             _widgets = await ApiClient.Shared.Widgets(state.Pid, state.Token);
             WidgetList.ItemsSource = _widgets.Select(w => w.Name).ToList();
         }

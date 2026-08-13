@@ -11,6 +11,25 @@
             <TextBlock x:Name="ErrorText" Foreground="#ff8fa0"
                        TextWrapping="Wrap" Visibility="Collapsed"/>
 
+            <TextBlock x:Name="AskTitle" FontWeight="Bold"/>
+            <TextBlock x:Name="AskSub" Opacity="0.7" TextWrapping="Wrap"/>
+            <Button x:Name="ReachButton" Click="OnToggleReach"/>
+            <TextBlock x:Name="ReachList" Opacity="0.7" TextWrapping="Wrap"
+                       Visibility="Collapsed"/>
+            <TextBlock x:Name="NoModel" Opacity="0.7" TextWrapping="Wrap"
+                       Visibility="Collapsed"/>
+            <TextBox x:Name="AskBox" AcceptsReturn="True" Height="70"
+                     TextWrapping="Wrap"/>
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button x:Name="AskButton" Click="OnAsk"/>
+                <Button x:Name="ForgetButton" Click="OnForget"
+                        Visibility="Collapsed"/>
+            </StackPanel>
+            <TextBlock x:Name="TalkText" TextWrapping="Wrap"
+                       Visibility="Collapsed"/>
+            <TextBlock x:Name="StepsText" Opacity="0.7" TextWrapping="Wrap"
+                       Visibility="Collapsed"/>
+
             <TextBlock x:Name="YoursLabel" FontWeight="Bold"/>
             <ListView x:Name="WidgetList" SelectionChanged="OnPick"
                       MaxHeight="180"/>

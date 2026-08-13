@@ -14,7 +14,7 @@
  */
 import { useCallback, useEffect, useState } from "react";
 
-import { api, type Widget, type WidgetRun } from "../api";
+import { api, type AgentTurn, type Widget, type WidgetRun } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
@@ -39,6 +39,16 @@ export function Studio({ onPlans }: { onPlans: () => void }) {
   const [error, setError] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
 
+  // The agent. Its conversation lives here rather than on the server: it has
+  // no memory of its own, so closing this screen is the whole of forgetting.
+  const [agent, setAgent] = useState<{ can_touch: string[];
+                                       available: boolean } | null>(null);
+  const [ask, setAsk] = useState("");
+  const [asking, setAsking] = useState(false);
+  const [showsReach, setShowsReach] = useState(false);
+  const [talk, setTalk] = useState<{ role: string; content: string }[]>([]);
+  const [did, setDid] = useState<AgentTurn | null>(null);
+
   const owner = session.profileId && session.ownerToken;
 
   const load = useCallback(() => {
@@ -50,6 +60,29 @@ export function Studio({ onPlans }: { onPlans: () => void }) {
 
   useEffect(() => { load(); }, [load]);
   useEffect(() => { api.studioLimits().then(setBox).catch(() => {}); }, []);
+  useEffect(() => { api.studioAgent().then(setAgent).catch(() => {}); }, []);
+
+  function send() {
+    if (!owner || !ask.trim()) return;
+    const said = ask.trim();
+    setAsking(true);
+    setDid(null);
+    api.authoringTurn(session.profileId!, said, talk, session.ownerToken!)
+      .then((turn) => {
+        setDid(turn);
+        setTalk([...talk, { role: "user", content: said },
+                 { role: "assistant", content: turn.reply }]);
+        setAsk("");
+        // It may have written, revised or removed one, and it may have
+        // changed the page under the editor. Re-read rather than reason
+        // about which — the list on screen is the one thing here that can
+        // be wrong without anybody noticing.
+        load();
+        if (open) edit(open);
+      })
+      .catch((e) => setError(e))
+      .finally(() => setAsking(false));
+  }
 
   function edit(widget: Widget | null) {
     setOpen(widget);
@@ -123,6 +156,58 @@ export function Studio({ onPlans }: { onPlans: () => void }) {
           {tr("studio.noBox", lang)}
         </p></div>
       )}
+
+      {/* Ask for it in words. What it did is listed under what it said,
+          because an agent that describes an edit in prose is asking to be
+          believed and the steps are the part that can be checked. */}
+      <div className="card">
+        <div className="row">
+          <strong style={{ flex: 1 }}>{tr("studio.ask.title", lang)}</strong>
+          <button onClick={() => setShowsReach(!showsReach)}>
+            {showsReach ? tr("studio.reach.hide", lang)
+                        : tr("studio.reach.show", lang)}
+          </button>
+        </div>
+        <p className="muted small">{tr("studio.ask.sub", lang)}</p>
+        {showsReach && agent && (
+          <ul className="muted small">
+            {agent.can_touch.map((line) => <li key={line}>{line}</li>)}
+          </ul>
+        )}
+        {agent && !agent.available && (
+          <p className="muted small">{tr("studio.ask.nomodel", lang)}</p>
+        )}
+        <textarea rows={3} value={ask} placeholder={tr("studio.ask.ph", lang)}
+                  onChange={(e) => setAsk(e.target.value)} />
+        <div className="row">
+          <button className="primary"
+                  disabled={asking || !owner || !ask.trim()}
+                  onClick={send}>
+            {asking ? tr("studio.ask.working", lang) : tr("studio.ask.go", lang)}
+          </button>
+          {talk.length > 0 && (
+            <button onClick={() => { setTalk([]); setDid(null); }}>
+              {tr("studio.ask.forget", lang)}
+            </button>
+          )}
+        </div>
+        {talk.map((turn, i) => (
+          <p key={i} className={turn.role === "user" ? "small" : "muted small"}>
+            {turn.content}
+          </p>
+        ))}
+        {did && did.said && <p className="muted small">{did.said}</p>}
+        {did && did.acted.length > 0 && (
+          <ul className="muted small">
+            {did.acted.map((step, i) => (
+              <li key={i}>
+                {step.said ?? fill(tr("studio.step", lang), {
+                  tool: step.tool, code: String(step.answered ?? 0) })}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       <div className="card">
         <div className="row">

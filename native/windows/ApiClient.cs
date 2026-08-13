@@ -3811,6 +3811,19 @@ public sealed class ApiClient
     public Task<WidgetCaps> WidgetLimits() =>
         Send<WidgetCaps>(Get("/studio/limits", null));
 
+    /// <summary>What the agent may touch, published so somebody can read the
+    /// whole list before letting it near anything.</summary>
+    public Task<AgentReach> StudioAgent() =>
+        Send<AgentReach>(Get("/studio/agent", null));
+
+    /// <summary>One turn. The conversation is the shell's to keep — the agent
+    /// has no memory of its own, so leaving the page is all of forgetting.
+    /// </summary>
+    public Task<AgentTurn> AuthoringTurn(string profileId, string said,
+                                         AgentSaid[] history, string token) =>
+        Send<AgentTurn>(Post($"/profiles/{profileId}/authoring/turn",
+                             new { said, history }, token));
+
     public async Task<WidgetRow[]> Widgets(string profileId, string token)
     {
         var box = await Send<WidgetBox>(Get($"/profiles/{profileId}/widgets",
@@ -5131,6 +5144,27 @@ public sealed record WidgetAnswer(
 public sealed record WidgetCaps(
     [property: JsonPropertyName("allowances")] WidgetCapNumbers Allowances,
     [property: JsonPropertyName("available")] bool Available);
+
+public sealed record AgentReach(
+    [property: JsonPropertyName("can_touch")] string[] CanTouch,
+    [property: JsonPropertyName("available")] bool Available);
+
+public sealed record AgentSaid(
+    [property: JsonPropertyName("role")] string Role,
+    [property: JsonPropertyName("content")] string Content);
+
+/// <summary>What one turn did, under what it said. An agent that describes an
+/// edit in prose is asking to be believed; the steps are the checkable part.
+/// </summary>
+public sealed record AgentStep(
+    [property: JsonPropertyName("tool")] string Tool,
+    [property: JsonPropertyName("answered")] int? Answered,
+    [property: JsonPropertyName("said")] string? Said);
+
+public sealed record AgentTurn(
+    [property: JsonPropertyName("reply")] string Reply,
+    [property: JsonPropertyName("acted")] AgentStep[] Acted,
+    [property: JsonPropertyName("said")] string? Said);
 
 public sealed record WidgetCapNumbers(
     [property: JsonPropertyName("wall_seconds")] int WallSeconds,

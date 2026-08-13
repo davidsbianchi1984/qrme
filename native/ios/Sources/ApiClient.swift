@@ -5696,6 +5696,23 @@ extension ApiClient {
         try await request("/studio/limits")
     }
 
+    /// What the agent may touch, published so somebody can read the whole
+    /// list before letting it near anything.
+    func studioAgent() async throws -> AgentReach {
+        try await request("/studio/agent")
+    }
+
+    /// One turn. The conversation is the shell's to keep — the agent has no
+    /// memory of its own, so leaving this screen is the whole of forgetting.
+    func authoringTurn(profileId: String, said: String,
+                       history: [[String: String]],
+                       token: String) async throws -> AgentTurn {
+        try await request("/profiles/\(profileId)/authoring/turn",
+                          method: "POST",
+                          body: ["said": said, "history": history],
+                          token: token)
+    }
+
     func widgets(profileId: String, token: String) async throws -> WidgetList {
         try await request("/profiles/\(profileId)/widgets", token: token)
     }
@@ -5733,6 +5750,29 @@ extension ApiClient {
 }
 
 struct WidgetList: Decodable { let widgets: [WidgetRow] }
+
+struct AgentReach: Decodable {
+    let can_touch: [String]
+    let tools: [String]
+    let available: Bool
+}
+
+/// What one turn did, under what it said. An agent that describes an edit in
+/// prose is asking to be believed; `steps` is the part that can be checked.
+struct AgentStep: Decodable, Identifiable {
+    let tool: String
+    let answered: Int?
+    let refused: String?
+    let said: String?
+    var id: String { "\(tool)-\(answered ?? 0)-\(refused ?? "")" }
+}
+
+struct AgentTurn: Decodable {
+    let reply: String
+    let acted: [AgentStep]
+    let stopped: String?
+    let said: String?
+}
 struct WidgetRemoved: Decodable { let removed: Bool; let widget_id: String }
 struct WidgetLimits: Decodable {
     struct Caps: Decodable {

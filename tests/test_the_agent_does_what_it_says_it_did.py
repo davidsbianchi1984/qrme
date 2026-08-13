@@ -83,8 +83,8 @@ def test_the_edit_it_describes_is_the_edit_that_happened(
                    said="change my tagline")
     assert answer.status_code == 200, answer.text
     body = answer.json()
-    assert [s["tool"] for s in body["steps"]] == ["edit_page"]
-    assert body["steps"][0]["status"] == 200
+    assert [s["tool"] for s in body["acted"]] == ["edit_page"]
+    assert body["acted"][0]["answered"] == 200
 
     page = client.get(f"/profiles/{profile_id}/page").json()
     assert page["tagline"] == "still gardening", (
@@ -104,7 +104,7 @@ def test_a_widget_it_writes_is_a_widget_that_runs(
     answer = _turn(client, profile_id, owner_token, None,
                    said="write me something that adds one")
     assert answer.status_code == 200, answer.text
-    assert [s["tool"] for s in answer.json()["steps"]] == ["write_widget"]
+    assert [s["tool"] for s in answer.json()["acted"]] == ["write_widget"]
 
     mine = client.get(f"/profiles/{profile_id}/widgets",
                       headers={"Authorization": f"Bearer {owner_token}"})
@@ -137,8 +137,8 @@ def test_a_tool_the_model_invented_is_refused_and_the_turn_goes_on(
     answer = _turn(client, profile_id, owner_token, None)
     assert answer.status_code == 200, answer.text
     body = answer.json()
-    assert body["steps"][0]["refused"] == "agent.unknown_tool"
-    assert body["steps"][0]["said"], "the refusal reached the screen as a key"
+    assert body["acted"][0]["refused"] == "agent.unknown_tool"
+    assert body["acted"][0]["said"], "the refusal reached the screen as a key"
     assert body["reply"].startswith("I can't")
 
 
@@ -192,7 +192,7 @@ def test_it_stops_rather_than_looping(client, profile_id, owner_token,
     body = answer.json()
     assert body["stopped"] == "agent.too_many_steps"
     assert body["said"], "it stopped and said nothing about stopping"
-    assert len(body["steps"]) == authoring.STEPS
+    assert len(body["acted"]) == authoring.STEPS
 
 
 def test_an_empty_ask_is_refused_before_a_model_is_paid_for_it(
@@ -213,7 +213,7 @@ def test_prose_that_merely_mentions_a_call_is_prose(
         "I could CALL edit_page {} for you if you like — shall I?"))
     answer = _turn(client, profile_id, owner_token, None, said="what can you do")
     assert answer.status_code == 200, answer.text
-    assert answer.json()["steps"] == []
+    assert answer.json()["acted"] == []
 
 
 def test_what_it_can_touch_is_readable_without_signing_in(client):

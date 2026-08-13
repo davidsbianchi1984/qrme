@@ -4335,6 +4335,38 @@ object ApiClient {
             caps?.optInt("heap_mb") ?: 0, o.optBoolean("available"))
     }
 
+    /** What the agent may touch, published so somebody can read the whole
+     *  list before letting it near anything. */
+    suspend fun studioAgent(): AgentReach {
+        val o = JSONObject(request("/studio/agent"))
+        val rows = o.optJSONArray("can_touch")
+        return AgentReach(
+            (0 until (rows?.length() ?: 0)).map { rows!!.getString(it) },
+            o.optBoolean("available"))
+    }
+
+    /** One turn. The conversation is the shell's to keep — the agent has no
+     *  memory of its own, so leaving the screen is all of forgetting. */
+    suspend fun authoringTurn(profileId: String, said: String,
+                              history: List<Pair<String, String>>,
+                              token: String): AgentTurn {
+        val turns = org.json.JSONArray()
+        history.forEach {
+            turns.put(JSONObject().put("role", it.first).put("content", it.second))
+        }
+        val body = JSONObject().put("said", said).put("history", turns)
+        val o = JSONObject(request("/profiles/$profileId/authoring/turn",
+            "POST", body, token))
+        val rows = o.optJSONArray("acted")
+        val steps = (0 until (rows?.length() ?: 0)).map {
+            val step = rows!!.getJSONObject(it)
+            AgentStep(step.optString("tool"), step.optInt("answered"),
+                step.optString("said").ifEmpty { null })
+        }
+        return AgentTurn(o.optString("reply"), steps,
+            o.optString("said").ifEmpty { null })
+    }
+
     private fun widgetOf(o: JSONObject) = WidgetRow(
         o.optString("id"), o.optString("name"), o.optString("source"),
         o.optInt("version", 1))
@@ -4493,4 +4525,13 @@ data class WidgetAnswer(val status: String, val ms: Int, val said: String?,
                         val message: String?, val value: String?)
 
 data class WidgetCaps(val wallSeconds: Int, val heapMb: Int, val available: Boolean)
+
+data class AgentReach(val canTouch: List<String>, val available: Boolean)
+
+/** What one turn did, under what it said. An agent that describes an edit in
+ *  prose is asking to be believed; the steps are the part that can be checked. */
+data class AgentStep(val tool: String, val answered: Int, val said: String?)
+
+data class AgentTurn(val reply: String, val acted: List<AgentStep>,
+                     val said: String?)
 

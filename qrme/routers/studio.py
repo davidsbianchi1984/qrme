@@ -83,7 +83,6 @@ def studio_agent() -> dict:
     """
     return {"can_touch": authoring.what_it_can_touch(),
             "tools": list(authoring.tool_names()),
-            "steps": authoring.STEPS,
             "available": bool(llm.available())}
 
 
@@ -123,7 +122,7 @@ def authoring_turn(profile_id: str, body: AgentTurn, request: Request) -> dict:
             authoring.AgentError("agent.model_silent")) from exc
     # The keys travel as keys with the sentence beside them, so a screen can
     # show the sentence and a client that knows better can show its own.
-    for step in turn["steps"]:
+    for step in turn["acted"]:
         if step.get("refused"):
             step["said"] = i18n.STUDIO_REFUSALS.get(step["refused"],
                                                     step["refused"])
