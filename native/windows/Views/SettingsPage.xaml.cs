@@ -90,6 +90,7 @@ public sealed partial class SettingsPage : Page
         PreTranslateToggle.Header = L10n.T("ns.lang.pre", lang);
         PreTranslateToggle.OnContent = L10n.T("ns.lang.pre.on", lang);
         PreTranslateToggle.OffContent = L10n.T("ns.lang.pre.off", lang);
+        PreTranslateSub.Text = L10n.T("ns.lang.pre.sub", lang);
         TranslateBox.Header = L10n.T("ns.tr", lang);
         TranslateBox.PlaceholderText = L10n.T("ns.tr.ph", lang);
         TranslateButton.Content = L10n.T("action.translate", lang);
@@ -506,7 +507,8 @@ public sealed partial class SettingsPage : Page
             var r = await ApiClient.Shared.Translate(s.Pid!, s.Token!, text);
             TranslateOut.Text = r.Translation;
             TranslateOut.Visibility = Visibility.Visible;
-            TranslateEngine.Text = $"engine: {r.Engine}" +
+            TranslateEngine.Text = L10n.Fill("ns.tr.engine",
+                AppState.Current.Language, ("engine", r.Engine)) +
                 (r.Note is { } n ? $" — {n}" : "");
             TranslateEngine.Visibility = Visibility.Visible;
         }
@@ -536,6 +538,9 @@ public sealed partial class SettingsPage : Page
         try
         {
             await ApiClient.Shared.Attest(s.Pid!, oid, s.Token!);
+            ObjStatus.Text = L10n.T("ns.obj.attested",
+                AppState.Current.Language);
+            ObjStatus.Visibility = Visibility.Visible;
             await Reload();
         }
         catch (Exception ex) { ShowError(ex.Message); }
@@ -650,6 +655,8 @@ public sealed partial class SettingsPage : Page
         var text = RecoverBox.Text;
         if (string.IsNullOrWhiteSpace(text)) return;
         RecoverButton.IsEnabled = false;
+        RecoverVerdict.Text = L10n.T("ns.who.checking",
+            AppState.Current.Language);
         try
         {
             var r = await ApiClient.Shared.RecoverWatermark(text);

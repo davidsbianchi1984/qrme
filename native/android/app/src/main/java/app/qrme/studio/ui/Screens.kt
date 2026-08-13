@@ -6606,6 +6606,8 @@ fun ProblemReportingCard(lang: String) {
                 // the iOS shell said "the day it happened". One row now.
                 Text(L10n.t("ns.pr.explain", lang),
                      style = MaterialTheme.typography.bodySmall)
+                Text(L10n.t("ns.pr.short", lang),
+                     style = MaterialTheme.typography.bodySmall)
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     OutlinedButton(onClick = {
                         Problems.answerNotice(true); answered = true; sending = true

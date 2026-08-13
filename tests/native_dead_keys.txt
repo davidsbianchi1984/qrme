@@ -1,4 +1,4 @@
-# status: backlog — 126 rows
+# status: backlog — 98 rows
 #
 # ...but see below: only 72 of them are deletion work. The other 263 are a
 # to-do list about screens, and calling the whole number a backlog is the
@@ -204,13 +204,6 @@ ios: ngam.situation
 ios: ngam.situation.example
 ios: ngam.sub
 ios: nov.refresh
-ios: ns.fb.cat
-ios: ns.fb.rating.opt
-ios: ns.lang.pre.off
-ios: ns.lang.pre.on
-ios: ns.model.nokeyword
-ios: ns.rel.type
-ios: ns.wm.label
 ios: nvoi.micoff
 ios: nw.needboth
 ios: pub.mark.needtext
@@ -238,18 +231,6 @@ android: ngam.role
 android: ngam.situation.ph
 android: ngam.sub.full
 android: nov.refresh
-android: ns.fb.cat
-android: ns.fb.mine
-android: ns.fb.rating
-android: ns.fb.rating.opt
-android: ns.lang.pre.off
-android: ns.lang.pre.on
-android: ns.model.nokeyword
-android: ns.pr.short
-android: ns.rel.type
-android: ns.st.age
-android: ns.st.appearance
-android: ns.wm.label.ph
 android: nw.needboth
 android: nw.unreachable
 android: pub.mark.needtext
@@ -283,15 +264,6 @@ windows: ngam.end
 windows: ngam.session
 windows: ngam.situation.ph
 windows: ngam.sub
-windows: ns.fb.rating
-windows: ns.fb.sofar
-windows: ns.lang.pre.sub
-windows: ns.model.nokey
-windows: ns.model.ready
-windows: ns.obj.attested
-windows: ns.st.age
-windows: ns.tr.engine
-windows: ns.who.checking
 windows: nvoi.micoff
 windows: plc.venues
 windows: pub.tab.mark

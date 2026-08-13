@@ -62,6 +62,8 @@
                               SelectionChanged="OnLanguagePicked" />
                     <ToggleSwitch x:Name="PreTranslateToggle"
                                   IsOn="True" Toggled="OnModeToggled" />
+                    <TextBlock x:Name="PreTranslateSub" FontSize="11" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT3Brush}" />
                     <TextBox x:Name="TranslateBox" />
                     <Button x:Name="TranslateButton" Click="OnTranslate"
                             Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
@@ -104,6 +106,8 @@
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock x:Name="NoObjections"
                                Foreground="{StaticResource QrmeT2Brush}" FontSize="13" />
+                    <TextBlock x:Name="ObjStatus" FontSize="12" Visibility="Collapsed"
+                               Foreground="{StaticResource QrmeGreenBrush}" />
                     <ItemsControl x:Name="ObjectionsList">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
