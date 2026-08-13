@@ -467,3 +467,37 @@ def test_a_page_built_outside_a_request_carries_no_borrowed_nonce():
     pagehead._NONCE.set("")
     assert pagehead.script_open() == "<script>"
     assert "script-src 'none'" in pagehead.policy("")
+
+
+def test_the_players_are_not_blanked_by_the_console_policy(served):
+    """The beta's second live CSP defect, same species as the first.
+
+    The wall's facade swaps in the platform's player iframe on press. With
+    no ``frame-src`` named, the directive fell back to ``default-src
+    'none'`` and the browser refused every player — a white rectangle
+    where the video should be, reported from a phone as "it seemed to
+    attach the video but it's not playing". Measured here at a real
+    socket, and bound to the platform allowlist itself so a new platform
+    cannot be added without its player origin reaching the policy.
+    """
+    from qrme import embeds
+
+    port, _ = served
+    status, headers, _ = _page(port, "/app/")
+    assert status == 200
+    got = _directives(headers.get("content-security-policy", ""))
+    frame = got.get("frame-src", "")
+    assert frame, (
+        "the console policy names no frame-src, so it falls back to "
+        "default-src 'none' and every video player is refused — the white "
+        "rectangle bug. See pagehead.console_policy.")
+    for origin in embeds.embed_origins():
+        assert origin in frame, (
+            f"{origin} hosts an allowlisted platform's player but the "
+            "console policy does not permit it — pressing play on that "
+            "platform renders a white rectangle")
+    # Straight from the table too, in case embed_origins() itself ever
+    # drops a platform on the floor.
+    for spec in embeds.PLATFORMS.values():
+        scheme, _, host = spec["embed"].split("/", 3)[:3]
+        assert f"{scheme}//{host}" in frame

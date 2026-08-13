@@ -90,6 +90,26 @@ PLATFORMS: dict[str, dict] = {
     },
 }
 
+def embed_origins() -> tuple[str, ...]:
+    """The origins the players load from — for the console's CSP.
+
+    Derived from the same table the parser trusts, so a platform added
+    here reaches the policy without a second list somebody forgets. This
+    existed as a need before it existed as a function: the console's CSP
+    named no ``frame-src``, fell back to ``default-src 'none'``, and every
+    press of play produced a white rectangle where the browser refused the
+    player — on the real host only, because a TestClient enforces no CSP.
+    """
+    from urllib.parse import urlsplit
+    outs: list[str] = []
+    for spec in PLATFORMS.values():
+        parts = urlsplit(spec["embed"])
+        origin = f"{parts.scheme}://{parts.netloc}"
+        if origin not in outs:
+            outs.append(origin)
+    return tuple(outs)
+
+
 MAX_TITLE = 120
 
 # The sentence a viewer reads before anything is fetched. Kept as one constant

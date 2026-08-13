@@ -119,6 +119,7 @@ def console_policy() -> str:
     ``manifest-src`` for what a phone reads when the console is added to a
     home screen.
     """
+    from . import embeds
     return "; ".join((
         "default-src 'none'",
         "script-src 'self'",
@@ -128,6 +129,14 @@ def console_policy() -> str:
         "connect-src 'self'",
         "manifest-src 'self'",
         "worker-src 'self'",
+        # The video players. Absent, `frame-src` fell back to
+        # `default-src 'none'` and every press of play was a white
+        # rectangle where the browser refused the embed — on a real host
+        # only, the same way the nonce bug above shipped: a TestClient
+        # reads this policy and enforces none of it. The origins come from
+        # the platform allowlist itself (embeds.PLATFORMS), so adding a
+        # platform cannot leave the policy behind.
+        "frame-src " + " ".join(embeds.embed_origins()),
         "form-action 'self'",
         "base-uri 'none'",
         "frame-ancestors 'none'",
