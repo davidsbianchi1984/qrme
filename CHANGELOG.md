@@ -96,8 +96,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   model, which arrives in Node 20 — a binary that cannot build the wall is
   the missing-wall case wearing different clothes, and this module's promise
   is that it refuses rather than running with three walls instead of four.
-  `MIN_NODE`, a version probe where unreadable counts as too old, its own
-  refusal in ten languages, and a guard on the floor itself. Found on a live
+  `MIN_NODE`, a version probe where unreadable counts as too old, and its own
+  refusal in ten languages. The floor is guarded by measurement rather than by
+  a literal: the interpreter this host offers either passes `MIN_NODE` or does
+  not, and either accepts the flag or does not, and those two answers have to
+  agree — so a floor lowered under an interpreter that rejects the flag fails,
+  and so does one raised above an interpreter that accepts it. Found on a live
   host, not in review.
 - **A memorial does not redecorate.** The agent's turn and a widget's run
   both drove a profile without asking whether it may still act. The turn

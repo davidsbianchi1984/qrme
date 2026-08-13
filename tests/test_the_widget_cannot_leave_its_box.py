@@ -280,20 +280,39 @@ def test_an_interpreter_that_will_not_say_its_version_is_too_old(monkeypatch):
     assert answer["detail"] == "widgets.node_too_old"
 
 
-def test_the_floor_is_the_version_the_flag_actually_needs(monkeypatch):
-    """A guard on the guard. A floor quietly lowered to 18 would let the
-    defect back in with every test above still passing, because they assert
-    on the refusal rather than on the number that produces it."""
-    assert widgets.MIN_NODE >= 20, (
-        "--experimental-permission arrives in Node 20; a floor below that "
-        "admits an interpreter that cannot build the filesystem wall")
-    for said, major in (("v20.0.0", 20), ("v22.22.2", 22), ("v18.19.1", 18),
-                        ("not a version", 0), ("", 0)):
-        monkeypatch.setattr(
-            widgets.subprocess, "run",
-            lambda argv, *a, **kw: subprocess.CompletedProcess(
-                argv, 0, said, ""))
-        assert widgets._node_major("/nowhere/node") == major, said
+def test_the_floor_agrees_with_what_the_interpreter_actually_does():
+    """The floor, checked against the thing it is a floor *for*.
+
+    The two tests above assert on the refusal rather than on the version that
+    produces it, so a floor quietly lowered to 18 would leave both of them
+    green. The obvious guard — `assert MIN_NODE >= 20` — is the shape
+    `unregistered_floors.txt` exists to refuse, and it is right to: 20 is a
+    fact about node's release history, and nothing in this repository can
+    measure it, so the number would sit in an assertion with nothing ever
+    comparing it to anything.
+
+    What *can* be measured is the consequence. The interpreter this host
+    offers either passes the floor or does not, and either accepts
+    `--experimental-permission` or does not, and those two answers have to be
+    the same answer. A floor lowered under an interpreter that rejects the
+    flag fails here; so does a floor raised above one that accepts it.
+
+        asked     is MIN_NODE twenty
+        mattered  does MIN_NODE admit exactly the interpreters that work
+    """
+    node = shutil.which("node")
+    if node is None:
+        pytest.skip("no interpreter on this host to measure the floor against")
+    admitted = widgets._node_major(node) >= widgets.MIN_NODE
+    accepted = subprocess.run(
+        [node, "--experimental-permission", "--allow-fs-read=/tmp", "-e", "0"],
+        capture_output=True).returncode == 0
+    assert admitted == accepted, (
+        f"MIN_NODE={widgets.MIN_NODE} "
+        f"{'admits' if admitted else 'refuses'} this host's node, which "
+        f"{'accepts' if accepted else 'rejects'} the flag the runner depends "
+        "on — the floor and the interpreter disagree, and the interpreter is "
+        "the one telling the truth")
 
 
 def test_the_refusal_is_also_checked_when_the_namespace_is_denied(monkeypatch):
