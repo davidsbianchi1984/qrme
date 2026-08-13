@@ -5733,14 +5733,14 @@ extension ApiClient {
 }
 
 struct WidgetList: Decodable { let widgets: [WidgetRow] }
-struct WidgetRemoved: Decodable { let removed: String }
+struct WidgetRemoved: Decodable { let removed: Bool; let widget_id: String }
 struct WidgetLimits: Decodable {
     struct Caps: Decodable {
         let wall_seconds: Int
         let heap_mb: Int
         let source_bytes: Int
     }
-    let limits: Caps
+    let allowances: Caps
     let available: Bool
     let unavailable_because: String?
 }

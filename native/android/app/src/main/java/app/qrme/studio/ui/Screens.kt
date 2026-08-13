@@ -6835,16 +6835,16 @@ fun WidgetsScreen(state: AppState) {
     }
 
     screenScroll {
-        Text(L10n.t("wdg.title", lang), color = Qrme.T1, fontSize = 20.sp,
+        Text(L10n.t("wdg.title", lang), color = Qrme.Txt, fontSize = 20.sp,
             fontWeight = FontWeight.Bold)
         error?.let { Text(it, color = Color.Red, fontSize = 12.sp) }
         caps?.let { if (!it.available) Text(L10n.t("wdg.nobox", lang), color = Qrme.T2, fontSize = 12.sp) }
 
-        Text(L10n.t("wdg.yours", lang), color = Qrme.T1, fontWeight = FontWeight.Bold)
+        Text(L10n.t("wdg.yours", lang), color = Qrme.Txt, fontWeight = FontWeight.Bold)
         if (widgets.isEmpty()) Text(L10n.t("wdg.none", lang), color = Qrme.T2, fontSize = 12.sp)
         widgets.forEach { row ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(row.name, color = Qrme.T1, modifier = Modifier.clickable {
+                Text(row.name, color = Qrme.Txt, modifier = Modifier.clickable {
                     open = row; name = row.name; source = row.source; answer = null
                     // Re-read rather than trust the list: a list fetched a
                     // minute ago holds a draft from a minute ago.
@@ -6901,11 +6901,11 @@ fun WidgetsScreen(state: AppState) {
         Text(L10n.t("wdg.walls", lang), color = Qrme.T2, fontSize = 12.sp)
 
         answer?.let { ran ->
-            Text(L10n.t("wdg.status.${ran.status}", lang), color = Qrme.T1,
+            Text(L10n.t("wdg.status.${ran.status}", lang), color = Qrme.Txt,
                 fontWeight = FontWeight.Bold)
             ran.said?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
             ran.message?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
-            ran.value?.let { Text(it, color = Qrme.T1, fontSize = 12.sp) }
+            ran.value?.let { Text(it, color = Qrme.Txt, fontSize = 12.sp) }
         }
     }
 }

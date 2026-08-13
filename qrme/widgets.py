@@ -316,7 +316,9 @@ def remove(profile_id: str, widget_id: str) -> dict:
     conn.execute("DELETE FROM widgets WHERE id=? AND profile_id=?",
                  (widget_id, profile_id))
     conn.commit()
-    return {"removed": widget_id}
+    # `removed` is a yes/no everywhere else on this wire; the id
+    # travels beside it rather than inside it.
+    return {"removed": True, "widget_id": widget_id}
 
 
 def run(profile_id: str, widget_id: str, inputs: dict | None = None) -> dict:

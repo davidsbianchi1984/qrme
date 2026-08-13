@@ -31,7 +31,7 @@ export function Studio({ onPlans }: { onPlans: () => void }) {
   const [widgets, setWidgets] = useState<Widget[]>([]);
   const [box, setBox] = useState<{ available: boolean;
                                    unavailable_because: string | null;
-                                   limits: Record<string, number> } | null>(null);
+                                   allowances: Record<string, number> } | null>(null);
   const [open, setOpen] = useState<Widget | null>(null);
   const [name, setName] = useState("");
   const [source, setSource] = useState(STARTER);
@@ -173,9 +173,9 @@ export function Studio({ onPlans }: { onPlans: () => void }) {
         {box && (
           <p className="muted small">
             {fill(tr("studio.limits.line", lang), {
-              seconds: String(box.limits.wall_seconds),
-              memory: String(box.limits.heap_mb),
-              size: String(Math.round(box.limits.source_bytes / 1024)),
+              seconds: String(box.allowances.wall_seconds),
+              memory: String(box.allowances.heap_mb),
+              size: String(Math.round(box.allowances.source_bytes / 1024)),
             })}
           </p>
         )}

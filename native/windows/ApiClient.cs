@@ -5114,7 +5114,8 @@ public sealed record WidgetBox(
     [property: JsonPropertyName("widgets")] WidgetRow[] Widgets);
 
 public sealed record WidgetRemoved(
-    [property: JsonPropertyName("removed")] string Removed);
+    [property: JsonPropertyName("removed")] bool Removed,
+    [property: JsonPropertyName("widget_id")] string WidgetId);
 
 /// <summary>What a run said. `Status` is ok, error, timeout, killed or
 /// refused; `Said` is the sentence for the reader, in their language.
@@ -5128,7 +5129,7 @@ public sealed record WidgetAnswer(
     [property: JsonPropertyName("value")] JsonElement? Value);
 
 public sealed record WidgetCaps(
-    [property: JsonPropertyName("limits")] WidgetCapNumbers Limits,
+    [property: JsonPropertyName("allowances")] WidgetCapNumbers Allowances,
     [property: JsonPropertyName("available")] bool Available);
 
 public sealed record WidgetCapNumbers(

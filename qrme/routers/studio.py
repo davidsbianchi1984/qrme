@@ -20,7 +20,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from .. import i18n, widgets
+from .. import authoring, i18n, llm, offline, widgets
 from ..common import profile_or_404, require_owner
 
 router = APIRouter()
@@ -56,8 +56,84 @@ def studio_limits() -> dict:
     button says why it will not press.
     """
     ready, why = widgets.sandbox_available()
-    return {"limits": widgets.LIMITS, "available": ready,
+    # `allowances` rather than `limits`: on this wire `limits` already means a
+    # list of sentences about what a signature tier permits, and a name that
+    # carries two shapes is the one thing a reader cannot check
+    # (tests/test_one_name_one_type_on_the_wire.py).
+    return {"allowances": widgets.LIMITS, "available": ready,
             "unavailable_because": why or None}
+
+
+class AgentTurn(BaseModel):
+    said: str = Field(..., max_length=8000,
+                      description="What you would like changed.")
+    history: list[dict] = Field(
+        default_factory=list, description=(
+            "The conversation so far, as `{role, content}` — the console "
+            "keeps it, because the agent does not."))
+
+
+@router.get("/studio/agent")
+def studio_agent() -> dict:
+    """What the agent may touch, and whether it can be driven here.
+
+    Published so a person can read the whole list before they let it near
+    anything. The sentences are `qrme/authoring.py`'s and every one of them
+    resolves to a route a guard checks.
+    """
+    return {"can_touch": authoring.what_it_can_touch(),
+            "tools": list(authoring.tool_names()),
+            "steps": authoring.STEPS,
+            "available": bool(llm.available())}
+
+
+@router.post("/profiles/{profile_id}/authoring/turn")
+def authoring_turn(profile_id: str, body: AgentTurn, request: Request) -> dict:
+    """One turn of the agent that edits somebody's own app.
+
+    The caller's own credential is what the agent then acts with — forwarded,
+    not exchanged for something broader — so this door is the whole of its
+    authority, and `require_owner` here is the whole of the check.
+
+    The profile's own model choice answers: somebody who brought their own
+    key is driving their own key, and the house key is the fallback it always
+    was.
+    """
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    provider = llm.provider_for_profile(profile_id,
+                                        cloud=request.app.state.cloud)
+    try:
+        turn = authoring.converse(
+            body.said, body.history, app=request.app, profile_id=profile_id,
+            authorization=request.headers.get("authorization"),
+            provider=provider)
+    except authoring.AgentError as exc:
+        raise _agent_refusal(exc) from None
+    except offline.LeftTheHost:
+        # Offline mode is its own answer everywhere else in this product, and
+        # dressing it as a quiet model would be the one sentence that reads
+        # like the switch is not working.
+        raise
+    except Exception as exc:                       # noqa: BLE001
+        # The provider's own message is written for an operator and would
+        # arrive here as a sentence in one language, on a screen that has
+        # ten.
+        raise _agent_refusal(
+            authoring.AgentError("agent.model_silent")) from exc
+    # The keys travel as keys with the sentence beside them, so a screen can
+    # show the sentence and a client that knows better can show its own.
+    for step in turn["steps"]:
+        if step.get("refused"):
+            step["said"] = i18n.STUDIO_REFUSALS.get(step["refused"],
+                                                    step["refused"])
+    turn["said"] = (i18n.STUDIO_REFUSALS[turn["stopped"]]
+                    if turn["stopped"] else None)
+    return turn
+
+
+def _agent_refusal(exc: authoring.AgentError) -> HTTPException:
+    return HTTPException(422, i18n.STUDIO_REFUSALS[str(exc)])
 
 
 @router.get("/profiles/{profile_id}/widgets")

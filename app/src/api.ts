@@ -3306,7 +3306,7 @@ export const api = {
   // and the query checks it again, which is why a widget id from somebody
   // else's profile is a 404 here rather than a 403.
   studioLimits: () =>
-    req<{ limits: Record<string, number>; available: boolean;
+    req<{ allowances: Record<string, number>; available: boolean;
           unavailable_because: string | null }>("/studio/limits"),
   listWidgets: (profileId: string, token: string) =>
     req<{ widgets: Widget[] }>(`/profiles/${profileId}/widgets`, { token }),
@@ -3321,8 +3321,8 @@ export const api = {
     req<Widget>(`/profiles/${profileId}/widgets/${widgetId}`,
       { method: "PUT", body, token }),
   deleteWidget: (profileId: string, widgetId: string, token: string) =>
-    req<{ removed: string }>(`/profiles/${profileId}/widgets/${widgetId}`,
-      { method: "DELETE", token }),
+    req<{ removed: boolean; widget_id: string }>(
+      `/profiles/${profileId}/widgets/${widgetId}`, { method: "DELETE", token }),
   runWidget: (profileId: string, widgetId: string,
               inputs: Record<string, unknown> | undefined, token: string) =>
     req<WidgetRun>(`/profiles/${profileId}/widgets/${widgetId}/run`,

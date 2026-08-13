@@ -49,14 +49,14 @@ public sealed partial class WidgetsPage : Page
     private async System.Threading.Tasks.Task LoadAsync()
     {
         var state = AppState.Current;
-        if (state.ProfileId is null || state.Token is null) return;
+        if (state.Pid is null || state.Token is null) return;
         try
         {
-            _caps = await state.Api.WidgetLimits();
+            _caps = await ApiClient.Shared.WidgetLimits();
             NoBox.Visibility = _caps.Available ? Visibility.Collapsed
                                                : Visibility.Visible;
             RunButton.IsEnabled = _caps.Available;
-            _widgets = await state.Api.Widgets(state.ProfileId, state.Token);
+            _widgets = await ApiClient.Shared.Widgets(state.Pid, state.Token);
             WidgetList.ItemsSource = _widgets.Select(w => w.Name).ToList();
         }
         catch (Exception ex) { ShowError(ex.Message); }
@@ -70,10 +70,10 @@ public sealed partial class WidgetsPage : Page
         var index = WidgetList.SelectedIndex;
         if (index < 0 || index >= _widgets.Length) return;
         var state = AppState.Current;
-        if (state.ProfileId is null || state.Token is null) return;
+        if (state.Pid is null || state.Token is null) return;
         try
         {
-            var fresh = await state.Api.Widget(state.ProfileId,
+            var fresh = await ApiClient.Shared.Widget(state.Pid,
                                                _widgets[index].Id, state.Token);
             _open = fresh;
             NameBox.Text = fresh.Name;
@@ -86,15 +86,15 @@ public sealed partial class WidgetsPage : Page
     private async void OnSave(object sender, RoutedEventArgs e)
     {
         var state = AppState.Current;
-        if (state.ProfileId is null || state.Token is null) return;
+        if (state.Pid is null || state.Token is null) return;
         var name = NameBox.Text.Trim();
         if (name.Length == 0) return;
         try
         {
             _open = _open is null
-                ? await state.Api.CreateWidget(state.ProfileId, name,
+                ? await ApiClient.Shared.CreateWidget(state.Pid, name,
                                                SourceBox.Text, state.Token)
-                : await state.Api.UpdateWidget(state.ProfileId, _open.Id, name,
+                : await ApiClient.Shared.UpdateWidget(state.Pid, _open.Id, name,
                                                SourceBox.Text, state.Token);
             await LoadAsync();
         }
@@ -104,10 +104,10 @@ public sealed partial class WidgetsPage : Page
     private async void OnRun(object sender, RoutedEventArgs e)
     {
         var state = AppState.Current;
-        if (state.ProfileId is null || state.Token is null || _open is null) return;
+        if (state.Pid is null || state.Token is null || _open is null) return;
         try
         {
-            var answer = await state.Api.RunWidget(state.ProfileId, _open.Id,
+            var answer = await ApiClient.Shared.RunWidget(state.Pid, _open.Id,
                                                    state.Token);
             var lang = state.Language;
             AnswerStatus.Text = L10n.T($"wdg.status.{answer.Status}", lang);
@@ -125,10 +125,10 @@ public sealed partial class WidgetsPage : Page
     private async void OnRemove(object sender, RoutedEventArgs e)
     {
         var state = AppState.Current;
-        if (state.ProfileId is null || state.Token is null || _open is null) return;
+        if (state.Pid is null || state.Token is null || _open is null) return;
         try
         {
-            await state.Api.DeleteWidget(state.ProfileId, _open.Id, state.Token);
+            await ApiClient.Shared.DeleteWidget(state.Pid, _open.Id, state.Token);
             _open = null;
             NameBox.Text = "";
             HideAnswer();
