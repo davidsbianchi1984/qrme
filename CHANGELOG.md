@@ -24,6 +24,45 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **The waiting side of the stranger pool.** `GET /connections/mine`, polled
   by all four clients, so a person who asked for a stranger stops waiting on
   a screen that had already moved.
+- **Widgets — somebody's own code, in a box.** A widget is a function its
+  author wrote, kept against their profile and run on the backend in a
+  namespace with no interfaces, one readable directory, no child processes,
+  a capped heap and a wall clock: `qrme/widgets.py`, with sixteen escape
+  attempts run through the real runner in
+  `tests/test_the_widget_cannot_leave_its_box.py`. If the network cut cannot
+  be built on a host, the runner refuses to run anything at all rather than
+  running with three walls instead of four. `GET /studio/limits` publishes
+  the allowances and says so honestly when the box is unavailable, so no
+  screen states a number the runner does not hold. Six owner-scoped routes,
+  a console screen and a page on all three shells.
+- **An agent that edits somebody's own app.** Say what you want changed and
+  it does it, through the same doors you would have used yourself:
+  `POST /profiles/{id}/authoring/turn`, owner-only, forwarding the caller's
+  own credential rather than minting anything broader. Its reach is a
+  written allowlist of ten — `qrme/authoring.py` — and two guards make the
+  list load-bearing: every row resolves against the app's own route table
+  and every row that *changes* something must land on a door that demands
+  the owner, and the profile is bound from the session rather than named by
+  the model, so a model answering with somebody else's id does not move the
+  request off the person driving it. `GET /studio/agent` publishes the ten
+  sentences so *what can this thing do to my account* can be read before it
+  is used. What it did is listed under what it said — one line per door it
+  went through — because an agent that describes an edit in prose is asking
+  to be believed. The conversation stays on the client: the agent has no
+  memory of its own, so *forget this* actually forgets. Nothing in its
+  instructions names this machine, its paths, its environment or its
+  sibling services, and a guard reads both the prompt and every sentence
+  written for a person, because a leak is as likely to arrive in prose.
+- **The Feed is a deck you swipe.** One item fills the screen and a swipe up
+  brings the next, snapped by the browser's own `scroll-snap-type: y
+  mandatory` with `scroll-snap-stop: always` rather than a gesture handler
+  guessing from a wheel delta. Vertical footage fills the frame; horizontal
+  is centred and letterboxed rather than cropped into a shape nobody shot
+  it in. Footage this deployment holds plays muted the moment its pane is in
+  front of you, one decoder at a time; footage held elsewhere is a
+  full-frame facade that waits for a press, because auto-rendering an embed
+  as it scrolls past would make the feed's own sentence about itself false.
+  `feed.autoplay` turns that off — off by default, kept on the device.
 
 ### Fixed
 
@@ -49,6 +88,26 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   English on a screen that translates everything else — invisible to the
   extractor because a string chosen at render time is a
   `ConditionalExpression` and not a `JsxText` node.
+- **A memorial does not redecorate.** The agent's turn and a widget's run
+  both drove a profile without asking whether it may still act. The turn
+  takes `require_may_publish` — the page it edits is a public face, and a
+  profile restricted pending an objection review is not putting new work in
+  front of the person contesting it, whether a person typed the change or a
+  model did. The run takes the narrower `require_may_speak`: a widget's
+  answer goes to its author alone.
+- **The console's own l10n table had stopped being readable in one place.**
+  The Studio rows were written single-line in a file whose entries are
+  multi-line, and the table reader matches an opening brace to a closing one
+  at the start of a line — so each single-line row swallowed everything up
+  to the *next* multi-line entry's close, and `feed.autoplay` fell out of
+  the audited table entirely. Thirty-six rows rewrapped; the guard on the
+  guard is exact again.
+- Three wire names carried two shapes each: `limits` (a list of sentences
+  about a signature tier, and a dict of numbers from the widget runner) is
+  now `allowances` on the runner; a step's `status` and the tutorial's
+  `steps` are `answered` and `acted`. The Android widget bindings were
+  top-level extensions in a file of class members, which filed every key
+  they read under the wrong route.
 
 ### Changed
 
