@@ -399,6 +399,8 @@ fun WithoutAnAccountScreen(vm: StudioViewModel, onBack: () -> Unit) {
                 }
             } else if (pane == 1) {
                 Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(L10n.t("pub.mark.title", lang), color = Qrme.Txt,
+                        fontSize = 15.sp, fontWeight = FontWeight.Bold)
                     Text(L10n.t("pub.mark.explain", lang),
                         color = Qrme.T2, fontSize = 12.sp)
                     labeledField(L10n.t("pub.mark.paste", lang), content, "") { content = it }

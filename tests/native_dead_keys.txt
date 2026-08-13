@@ -1,4 +1,4 @@
-# status: backlog — 58 rows
+# status: backlog — 28 rows
 #
 # ...but see below: only 72 of them are deletion work. The other 263 are a
 # to-do list about screens, and calling the whole number a backlog is the
@@ -164,6 +164,14 @@
 # total: 273
 
 # ios: 67 of 82 are asked for by another shell
+# Nine rows below stay for reasons beside the five block-pinned keys:
+# acct.password / acct.reset.new (windows) and task.scope, asst.works,
+# dele.offer, plc.venues sit inside families the acct/till/life and
+# workshop block guards read at full strength on every shell, so the
+# rows cannot leave; deals.sign.note (windows) is read by the
+# counter-and-deals block guard the same way; nw.unreachable (android)
+# waits for the welcome
+# screen's error path to learn the sentence.
 # Five keys below are asked for by no screen but pinned at full
 # strength by the block guards (acct/till/life and the workshop
 # families read the whole family on every shell), so the rows stay
@@ -185,50 +193,20 @@ ios: task.gid
 ios: task.list
 ios: work.phase
 ios: action.send
-ios: action.refresh
-ios: nc.find
-ios: nc.lettalk
-ios: nc.rooms
-ios: nc.tier
-ios: ncon.h.handle
-ios: nov.refresh
-ios: nvoi.micoff
-ios: nw.needboth
-ios: pub.mark.needtext
-ios: pub.object.needid
-ios: pub.object.ref.ph
 
 # android: 83 of 110 are asked for by another shell
-android: action.refresh
 android: asst.works
-android: nc.birthdate.ph
-android: nc.find
-android: nc.tier
-android: ncon.handle.ph
-android: nov.refresh
-android: nw.needboth
 android: nw.unreachable
-android: pub.mark.needtext
-android: pub.mark.title
-android: pub.object.needid
 android: task.scope
 
 # windows: 113 of 143 are asked for by another shell
+windows: deals.sign.note
 windows: acct.password
 windows: acct.reset.new
 windows: asst.works
-windows: counter.pick
-windows: deals.pick
-windows: deals.sign
-windows: deals.sign.note
 windows: dele.offer
-windows: nc.a_stranger
-windows: ncon.handle.ph
-windows: nvoi.micoff
 windows: plc.venues
-windows: pub.tab.mark
 windows: task.scope
-windows: trade.sales
 windows: acct.reset.code
 windows: life.legend
 windows: task.gid
