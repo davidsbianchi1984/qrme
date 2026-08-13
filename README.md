@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.70.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v0.70.1** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -795,6 +795,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.70.1** | **The sandbox could lie about itself** — the widget runner asked whether *an* interpreter existed and never whether it was new enough, so a host carrying Node 18 reported ready and then failed every run on a flag its author never typed; the floor is Node 20, where the filesystem wall arrives, and it is guarded by measurement rather than by a literal — the interpreter this host offers either passes the floor or does not, and either accepts the flag or does not, and those two answers have to agree |
 | **0.70.0** | **Your own code in a box, an agent that writes it, and a Feed you swipe** — a widget runs on the backend with no network, one directory, no child processes and finite time, and the runner refuses outright rather than running with three walls instead of four; an agent edits your page, your homepage and your widgets through the same doors you would have used, reaching no further than a written list of ten that a guard resolves against the route table, with the profile bound from your session rather than named by the model and every door it went through listed under what it said; the Feed became a deck where one item fills the screen and a swipe brings the next, with anything held on somebody else's platform still waiting for a press. Also: turns are selected and struck or rewritten in place with the edit recorded but never the old words; an export QR carries a single-use ten-minute ticket and never the owner token; the console's own CSP stopped blanking every video player; the failure reports come home to this backend; and the extractor now reads a ternary's branches, which found nine English buttons on the screen a stranger meets |
 | **0.68.0** | **The memory door, the steering lock, the card carried in, and the room that forgets on purpose** — a persona tells you what it actually holds about you and forgets one named thing without erasing the friendship; the owner locks the dials against everyone including their own slip; a chara_card_v2/v3 card (JSON or PNG) seeds a profile with its harness instructions withheld by name; and a rehearsal room plays the hard conversation without a word of it entering the relationship's memory |
 | **0.67.0** | **The licence carries the substance** — a finetune or clone derive hands the buyer the profile's knowledge, dials and (on a clone) an aggregate adaptation summary, under a manifest of what crossed and what stayed; organizations lease a stranger's licensed specialist as a revocable department; the portrait moves at a tempo its own history sets; and a persona remembers the room between turns |

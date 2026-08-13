@@ -4,6 +4,32 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.70.1] - 2026-08-13
+
+### Fixed
+
+- **The interpreter's version was the one way the sandbox could lie.**
+  `sandbox_available` asked whether *an* interpreter existed and nothing
+  more, so a host carrying Ubuntu's own Node 18 answered **available**: the
+  editor opened, the run button lit, and every widget came back failed on a
+  flag its author never typed. The filesystem wall is node's own permission
+  model, which arrives in Node 20 — a binary that cannot build the wall is
+  the missing-wall case wearing different clothes, and this module's promise
+  is that it refuses rather than running with three walls instead of four.
+  `MIN_NODE`, a version probe where unreadable counts as too old, and its own
+  refusal in ten languages. The floor is guarded by measurement rather than by
+  a literal: the interpreter this host offers either passes `MIN_NODE` or does
+  not, and either accepts the flag or does not, and those two answers have to
+  agree — so a floor lowered under an interpreter that rejects the flag fails,
+  and so does one raised above an interpreter that accepts it. Found on a live
+  host, not in review.
+
+  Nothing else changes. 0.70.0 was tagged before this landed, so its
+  installers ask whether *an* interpreter exists and not whether it can build
+  the wall — on a machine carrying Node 18 or 19 they light the run button
+  over a feature that cannot work. A deployment with no interpreter at all is
+  reported honestly by both.
+
 ## [0.70.0] - 2026-08-13
 
 ### Added
@@ -88,21 +114,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   English on a screen that translates everything else — invisible to the
   extractor because a string chosen at render time is a
   `ConditionalExpression` and not a `JsxText` node.
-- **The interpreter's version was the one way the sandbox could lie.**
-  `sandbox_available` asked whether *an* interpreter existed and nothing
-  more, so a host carrying Ubuntu's own Node 18 answered **available**: the
-  editor opened, the run button lit, and every widget came back failed on a
-  flag its author never typed. The filesystem wall is node's own permission
-  model, which arrives in Node 20 — a binary that cannot build the wall is
-  the missing-wall case wearing different clothes, and this module's promise
-  is that it refuses rather than running with three walls instead of four.
-  `MIN_NODE`, a version probe where unreadable counts as too old, and its own
-  refusal in ten languages. The floor is guarded by measurement rather than by
-  a literal: the interpreter this host offers either passes `MIN_NODE` or does
-  not, and either accepts the flag or does not, and those two answers have to
-  agree — so a floor lowered under an interpreter that rejects the flag fails,
-  and so does one raised above an interpreter that accepts it. Found on a live
-  host, not in review.
 - **A memorial does not redecorate.** The agent's turn and a widget's run
   both drove a profile without asking whether it may still act. The turn
   takes `require_may_publish` — the page it edits is a public face, and a
@@ -11049,7 +11060,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.70.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.70.1...HEAD
+[0.70.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.70.1
 [0.70.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.70.0
 [0.61.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.61.1
 [0.19.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.19.1
