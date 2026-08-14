@@ -365,6 +365,27 @@ def test_no_key_is_translated_into_ten_languages_and_used_nowhere():
         # convention is "a field named for holding a key", and `subKey`,
         # `labelKey` and `titleKey` are all that convention.
         used |= set(re.findall(r'\b\w*[Kk]ey:\s*"([\w.]+)"', text))
+        # And a key can be *composed away from the call site entirely*:
+        #
+        #     export function presenceKey(p: Presence): string {
+        #       return `talk.state.${p}`;
+        #     }
+        #     …<div>{tr(presenceKey(presence), lang)}</div>
+        #
+        # There is no literal after `tr(` and no template after `tr(` either
+        # — the template lives in the module that owns the naming convention,
+        # which is where it belongs. Seven live `talk.state.*` rows came up
+        # dead on the run that first drew them, and the advice attached was
+        # "wire them, or delete them" for keys already wired.
+        #
+        # This is the third road to the same failure the template escape and
+        # the `key:` escape each exist to block: a convention held in one
+        # place, read as an absence. Restricted to a returned template so it
+        # stays a lookup rather than becoming "any backtick anywhere".
+        #
+        #     asked     is this key composed at the call site
+        #     mattered  is this key composed anywhere this bundle runs
+        prefixes |= set(re.findall(r'return\s+`([\w.]+)\$\{', text))
     dead = sorted(k for k in table - used
                   if not any(k.startswith(p) for p in prefixes))
 

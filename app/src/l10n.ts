@@ -7276,12 +7276,6 @@ const CHROME: Table = {
   "chat.talk": {
     en: "Talk to the profile", es: "Habla con el perfil", fr: "Parlez au profil", de: "Mit dem Profil sprechen", pt: "Fale com o perfil", it: "Parla con il profilo", ja: "プロフィールと話す", zh: "与档案对话", hi: "प्रोफ़ाइल से बात करें", ar: "تحدث مع الملف",
   },
-  "chat.talk.listening": {
-    en: "Listening…", es: "Escuchando…", fr: "À l'écoute…", de: "Hört zu…", pt: "A ouvir…", it: "In ascolto…", ja: "聞いています…", zh: "正在聆听…", hi: "सुन रहा है…", ar: "يستمع…",
-  },
-  "chat.talk.tap": {
-    en: "Heard you — send it, or speak again.", es: "Te escuché: envíalo o habla de nuevo.", fr: "Je vous ai entendu — envoyez, ou parlez encore.", de: "Gehört — abschicken oder noch einmal sprechen.", pt: "Ouvi — envie, ou fale novamente.", it: "Ti ho sentito — invia, o parla di nuovo.", ja: "聞き取りました — 送信するか、もう一度話してください。", zh: "听到了 — 发送，或再说一次。", hi: "सुन लिया — भेजें, या फिर से बोलें।", ar: "سمعتك — أرسلها أو تحدث مرة أخرى.",
-  },
   "chat.talk.again": {
     en: "Speak again", es: "Habla de nuevo", fr: "Parler encore", de: "Noch einmal sprechen", pt: "Falar novamente", it: "Parla di nuovo", ja: "もう一度話す", zh: "再说一次", hi: "फिर से बोलें", ar: "تحدث مرة أخرى",
   },
