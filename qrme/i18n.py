@@ -1063,6 +1063,17 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'kind is one of image, video, file — or leave it off': {
+        'es': 'kind es image, video o file — o déjelo sin poner',
+        'fr': "kind vaut image, video ou file — ou bien laissez-le de côté",
+        'de': 'kind ist image, video oder file — oder lassen Sie es weg',
+        'pt': 'kind é image, video ou file — ou deixe-o de fora',
+        'it': 'kind è image, video o file — oppure lascialo perdere',
+        'ja': 'kind は image、video、file のいずれかです。指定しなくても構いません。',
+        'zh': 'kind 只能是 image、video 或 file——不填也可以。',
+        'hi': 'kind इनमें से एक है: image, video, file — या इसे छोड़ दें।',
+        'ar': 'kind يكون image أو video أو file — أو اتركه دون تحديد.',
+    },
     'Something went wrong on our side. Nothing you sent was recorded.': {
         'es': 'Algo falló de nuestro lado. No se registró nada de lo que envió.',
         'fr': "Quelque chose a échoué de notre côté. Rien de ce que vous avez envoyé n'a été enregistré.",

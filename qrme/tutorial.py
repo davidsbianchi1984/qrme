@@ -998,6 +998,25 @@ LESSONS: tuple[dict, ...] = (
          try_it="Open Widgets, press What it can touch and read the ten "
                 "lines, then ask it for something small — a tagline — and "
                 "check the steps under its answer against your own page."),
+    dict(key="their_homepage", chapter="Meeting others",
+         title="Somebody else's homepage",
+         what="Press a friend's face anywhere and you land on their page as "
+              "they built it — their theme and colour, what they wrote about "
+              "themselves, their links, and their own markup if they wrote "
+              "any. Their Top 8 is on it too, and every face in it is "
+              "another door, so you can walk from person to person and press "
+              "Back to retrace the walk. Their wall, their photographs and "
+              "their footage are there, and three things you can do: talk to "
+              "their profile, send them a message, or open a room with the "
+              "two of you in it. Messages travel between friends in both "
+              "directions, so if you have not added each other yet the page "
+              "offers you that first and says why. There are no numbers "
+              "about them on the page: how much a profile remembers and how "
+              "it scores are its owner's to read, and nobody else's.",
+         screens=(197,),
+         try_it="Press a face in your Top friends, read their page, then "
+                "press one of the faces in *their* Top 8 and keep going — "
+                "Back should walk you home the way you came."),
     dict(key="discover", chapter="Meeting others", title="Discover",
          what="The marketplace as cards — every one a real profile you can "
               "talk to, not a listing about one. The starter collection is "
