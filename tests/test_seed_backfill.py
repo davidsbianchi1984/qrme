@@ -6,7 +6,7 @@ initials on a profile whose face is sitting in the package — and running the
 seed again, the obvious repair, did nothing at all.
 """
 
-from qrme import db, landing, seed as seed_mod
+from qrme import avatars, db, landing, seed as seed_mod
 from qrme.seed import seed
 
 
@@ -31,8 +31,15 @@ def test_reseeding_restores_a_missing_portrait(client):
     assert _profile("Marcus Bell")["appearance"]
 
 
-def test_a_repaired_profile_shows_its_face_instead_of_initials(client):
-    """The screenshot this fixes: three starter cards reading MB, OM, DS."""
+def test_a_repaired_profile_shows_its_face(client):
+    """The screenshot this fixes: three starter cards with no portrait.
+
+    The "before" assertion used to look for `class="initials"`, from when a
+    face-less profile fell back to a monogram. It now falls back to the empty
+    frame every surface shows — so the check is that the *portrait* is
+    missing, which is the thing the backfill repairs, rather than which
+    stand-in was drawn in its place.
+    """
     seed()
     conn = db.connect()
     conn.execute("UPDATE profiles SET avatar=NULL WHERE display_name='Marcus Bell'")
@@ -40,14 +47,14 @@ def test_a_repaired_profile_shows_its_face_instead_of_initials(client):
 
     before = landing.profile_page(_profile("Marcus Bell"), "teller window 4",
                                   "https://example.test")
-    assert 'class="initials"' in before
+    assert avatars.ADD_PHOTO in before
     assert "marcus_bell.webp" not in before
 
     seed()
     after = landing.profile_page(_profile("Marcus Bell"), "teller window 4",
                                  "https://example.test")
     assert "marcus_bell.webp" in after
-    assert 'class="initials"' not in after
+    assert avatars.ADD_PHOTO not in after
 
 
 def test_backfill_never_overwrites_what_an_owner_set(client):

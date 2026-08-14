@@ -57,7 +57,7 @@ test_it_observes_and_talks.py:93: len(never[thing]) > 60
 test_nothing_leaves_the_host.py:161: len(sites) >= 5
 test_one_name_one_type_on_the_wire.py:134: len(_declared()) >= 400
 test_overlays.py:161: len(overlays.FACE_KINDS) >= 15
-test_seed_backfill.py:79: out['repaired'] >= 34
+test_seed_backfill.py:86: out['repaired'] >= 34
 test_spec_mined.py:147: conditioned['basis']['remembered_turns'] >= 12
 test_starter_profiles.py:15: len(industries) >= 30
 test_steering_hub.py:51: hub['age']['effective_age'] >= 41

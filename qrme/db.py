@@ -2336,12 +2336,57 @@ def db_path() -> str:
     return os.environ.get("QRME_DB", "qrme.db")
 
 
+#: Columns added to tables that already shipped, as (table, column, type).
+#:
+#: ## Why this exists
+#:
+#: `CREATE TABLE IF NOT EXISTS` is not a migration. On a database that already
+#: has the table it does nothing at all, so a column added to the declaration
+#: above appears on fresh installs and on **no existing one** — including
+#: every live deployment and the developer's own `qrme.db`.
+#:
+#: Nothing had ever depended on that until `interactors.account_id`, which is
+#: indexed. The index named a column the old table did not have, `executescript`
+#: raised, and `connect()` raised with it: not one broken feature but the whole
+#: backend refusing to open its database. It passed 3511 tests because every
+#: fixture builds a fresh file.
+#:
+#:     asked     is the column in the schema
+#:     mattered  is it in the database this deployment already has
+#:
+#: Additive only, and deliberately so. `ADD COLUMN` is the one alteration
+#: SQLite does cheaply and safely; anything that rewrites or drops belongs in a
+#: considered migration with a backup, not in a startup path that runs on
+#: every connection.
+_ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
+    ("interactors", "account_id", "TEXT REFERENCES accounts(id)"),
+)
+
+
+def _add_missing_columns(conn: sqlite3.Connection) -> None:
+    """Bring an existing database up to the declared shape.
+
+    Runs *before* the schema script, because the script's own indexes may
+    name these columns — which is exactly how this was found. On a fresh
+    database every table is absent here, the loop does nothing, and the
+    script creates each table with its columns already in place.
+    """
+    for table, column, decl in _ADDED_COLUMNS:
+        existing = {r[1] for r in conn.execute(
+            f"PRAGMA table_info({table})").fetchall()}
+        if not existing or column in existing:
+            continue          # not created yet, or already carrying it
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {decl}")
+    conn.commit()
+
+
 def connect() -> sqlite3.Connection:
     conn = getattr(_local, "conn", None)
     if conn is None or getattr(_local, "path", None) != db_path():
         conn = sqlite3.connect(db_path())
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA journal_mode=WAL")  # concurrent readers
+        _add_missing_columns(conn)
         conn.executescript(_SCHEMA)
         _local.conn = conn
         _local.path = db_path()

@@ -7,7 +7,7 @@ get wrong because nobody scans them on purpose: a rated profile, and a
 beacon that was picked up.
 """
 
-from qrme import db
+from qrme import avatars, db
 
 
 def _profile(client, **over):
@@ -78,13 +78,23 @@ def test_the_disclosure_is_unavoidable(client):
     assert "AI-generated synthetic media" in r.text
 
 
-def test_a_profile_with_no_portrait_shows_initials_not_a_stock_face(client):
+def test_a_profile_with_no_portrait_shows_no_stock_face(client):
     """A stranger's first impression of a person who does not exist should
-    not be a stock photograph of someone who does."""
+    not be a stock photograph of someone who does.
+
+    That is the property, and it still holds exactly. The assertion used to
+    be `"<img" not in r.text` — a proxy that assumed initials were the only
+    way to satisfy it, from when three surfaces each invented their own
+    answer for a missing face. The page now shows the empty frame every
+    surface shows: our own drawing, depicting nobody, and no more a
+    photograph of a real person than a monogram was.
+    """
     pid, _ = _profile(client)
     r = client.get(f"/b/{_beacon(client, pid)['id']}")
-    assert "<img" not in r.text
-    assert ">MB<" in r.text
+    assert avatars.ADD_PHOTO in r.text
+    # Nothing from the burned portrait collection, and no outside photograph.
+    assert avatars.ASSET_ROUTE not in r.text
+    assert avatars.PHOTO_ROUTE not in r.text
 
 
 def test_the_page_is_self_contained(client):

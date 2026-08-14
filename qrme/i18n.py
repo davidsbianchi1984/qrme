@@ -3542,7 +3542,12 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     'lesson': {'en': 'Step', 'es': 'Paso', 'fr': 'Étape', 'de': 'Schritt', 'pt': 'Passo', 'it': 'Passo', 'ja': 'ステップ', 'zh': '步骤', 'hi': 'चरण', 'ar': 'الخطوة'},
     'position_s': {'en': 'Position, in seconds', 'es': 'Posición, en segundos', 'fr': 'Position, en secondes', 'de': 'Position, in Sekunden', 'pt': 'Posição, em segundos', 'it': 'Posizione, in secondi', 'ja': '位置（秒）', 'zh': '位置（秒）', 'hi': 'स्थिति, सेकंड में', 'ar': 'الموضع بالثواني'},
     'verification_ref': {'en': 'Verification reference', 'es': 'Referencia de verificación', 'fr': 'Référence de vérification', 'de': 'Verifizierungsnachweis', 'pt': 'Referência de verificação', 'it': 'Riferimento di verifica', 'ja': '確認書類の参照', 'zh': '核验凭证', 'hi': 'सत्यापन संदर्भ', 'ar': 'مرجع التحقق'},
-    'interactor_id': {'en': 'Visitor', 'es': 'Visitante', 'fr': 'Visiteur', 'de': 'Besucher', 'pt': 'Visitante', 'it': 'Visitatore', 'ja': '訪問者', 'zh': '访客', 'hi': 'आगंतुक', 'ar': 'الزائر'},
+    'interactor_id': {'en': 'Visitor', 'es': 'Visitante', 'fr': 'Visiteur', 'de': 'Besucher', 'pt': 'Visitante', 'it': 'Visitatore', 'ja': '訪問者', 'zh': '访客', 'hi': 'आगंतुक', 'ar': 'الزائर'},
+    # The same visitor as the row above, named at the moment an account claims
+    # them: the person who has been talking to profiles on this device without
+    # signing in. Worded off `interactor_id` rather than invented, so the two
+    # rows cannot come to disagree about what they name.
+    'adopt_interactor_id': {'en': 'Visitor to attach', 'es': 'Visitante que vincular', 'fr': 'Visiteur à rattacher', 'de': 'Zu verknüpfender Besucher', 'pt': 'Visitante a associar', 'it': 'Visitatore da collegare', 'ja': '引き継ぐ訪問者', 'zh': '要关联的访客', 'hi': 'जोड़ने के लिए आगंतुक', 'ar': 'الزائر المراد ربطه'},
     'phases': {'en': 'Phases', 'es': 'Fases', 'fr': 'Phases', 'de': 'Phasen', 'pt': 'Fases', 'it': 'Fasi', 'ja': 'フェーズ', 'zh': '阶段', 'hi': 'चरण', 'ar': 'المراحل'},
     'items': {'en': 'Items', 'es': 'Elementos', 'fr': 'Éléments', 'de': 'Einträge', 'pt': 'Itens', 'it': 'Voci', 'ja': '項目', 'zh': '条目', 'hi': 'आइटम', 'ar': 'العناصر'},
     'text': {'en': 'Text', 'es': 'Texto', 'fr': 'Texte', 'de': 'Text', 'pt': 'Texto', 'it': 'Testo', 'ja': 'テキスト', 'zh': '文本', 'hi': 'पाठ', 'ar': 'النص'},
@@ -3586,6 +3591,10 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     'handle': {'en': 'Handle', 'es': 'Identificador', 'fr': 'Identifiant', 'de': 'Kürzel', 'pt': 'Identificador', 'it': 'Handle', 'ja': 'ハンドル名', 'zh': '账号名', 'hi': 'हैंडल', 'ar': 'المعرّف'},
     'goal': {'en': 'Goal', 'es': 'Objetivo', 'fr': 'Objectif', 'de': 'Ziel', 'pt': 'Objetivo', 'it': 'Obiettivo', 'ja': '目標', 'zh': '目标', 'hi': 'लक्ष्य', 'ar': 'الهدف'},
     'motion_style': {'en': 'Motion style', 'es': 'Estilo de movimiento', 'fr': 'Style de mouvement', 'de': 'Bewegungsstil', 'pt': 'Estilo de movimento', 'it': 'Stile di movimento', 'ja': '動きのスタイル', 'zh': '动态样式', 'hi': 'गति शैली', 'ar': 'نمط الحركة'},
+    # `presentation_kind` rides in the same body as `motion_style`, set by the
+    # same owner from the same panel. A refusal that labels one and hands back
+    # the identifier for the other is the arbitrariness this table ends.
+    'presentation_kind': {'en': 'What the avatar is', 'es': 'Qué es el avatar', 'fr': 'Ce qu’est l’avatar', 'de': 'Was der Avatar ist', 'pt': 'O que é o avatar', 'it': 'Che cos’è l’avatar', 'ja': 'アバターの種類', 'zh': '化身的类型', 'hi': 'अवतार क्या है', 'ar': 'ما هو الأفاتار'},
     'name': {'en': 'Name', 'es': 'Nombre', 'fr': 'Nom', 'de': 'Name', 'pt': 'Nome', 'it': 'Nome', 'ja': '名前', 'zh': '名称', 'hi': 'नाम', 'ar': 'الاسم'},
     'about': {'en': 'About', 'es': 'Acerca de', 'fr': 'À propos', 'de': 'Über', 'pt': 'Sobre', 'it': 'Info', 'ja': '自己紹介', 'zh': '关于', 'hi': 'परिचय', 'ar': 'نبذة'},
     'accent': {'en': 'Accent', 'es': 'Acento', 'fr': 'Accent', 'de': 'Akzent', 'pt': 'Realce', 'it': 'Accento', 'ja': 'アクセント', 'zh': '强调色', 'hi': 'उभार रंग', 'ar': 'اللون المميز'},
