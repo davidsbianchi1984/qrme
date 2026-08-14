@@ -4,6 +4,55 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.71.0] - 2026-08-14
+
+### Fixed
+
+- **A player handed no origin will not play.** From the beta, on a phone: a
+  YouTube post on the Wall rendering a grey panel reading *Error 153 — video
+  player configuration error*. The link was fine and the embed was fine.
+  `pagehead.HEADERS` sends `referrer-policy: no-referrer` on every HTML
+  response, and the reason is written where it is set — a page reached from a
+  QR sticker must not tell the next host which sticker somebody knelt over,
+  because the referrer *is* the beacon. Right for that page, and it applies to
+  the console too, which embeds other platforms' players. A player handed no
+  referrer cannot check whether it may embed on the site it finds itself in,
+  so it does not play, and what a person reads is the other platform's error
+  code.
+
+      asked     does the page carry the header
+      mattered  does the thing inside the page still work
+
+  `referrerPolicy` on the element overrides the document's policy for that one
+  subresource, so the beacon pages keep `no-referrer` and the two players get
+  `strict-origin-when-cross-origin`: the host, never the path. The platform
+  learns the origin of an embed it is already serving, which the request
+  itself told it, and learns it only when somebody presses play — until then
+  there is no request at all. House-held footage was never affected; it is our
+  own `<video>`, with no third party to satisfy, which is why the defect
+  looked like one broken post rather than a broken feature.
+
+### Changed
+
+- **The frame was never the screen.** From the beta: the deck swiped, and what
+  it swiped between was still a card — a header above the frame, a caption
+  below it, and the screen's own title above all of that, so the video got
+  whatever height was left over, which on a phone is about half.
+
+      asked     can you swipe to the next one
+      mattered  is the one you are on the screen
+
+  A pane holding footage is now the footage, and the words are on top of it:
+  the media fills the pane absolutely and the pill, the position and the
+  caption ride over it at the two edges, on scrims rather than panels, so
+  nothing sits between the reader and the picture. The screen's own header is
+  gone from this deck — its two lines moved onto the rules pane, which is the
+  one that already explains what the feed is. A pane that is a room, a desk or
+  a party has no frame to ride on and keeps the ordinary stacked layout,
+  decided by the item's own kind rather than by whether a frame happened to
+  load. Back and Next stay, on the bottom scrim, for the keyboard, the mouse
+  and any gesture that does not land.
+
 ## [0.70.1] - 2026-08-13
 
 ### Fixed
