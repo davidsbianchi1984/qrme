@@ -635,6 +635,7 @@ is exactly how the old card came to be showing yours in place of theirs.
 <table>
   <tr>
     <td align="center" width="25%"><a href="docs/screens/197-their-homepage.svg"><img src="docs/screens/197-their-homepage.svg" width="210" alt="Their homepage"></a><br><sub><b>197</b> · Their homepage · a face is a door</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/198-beside-the-face.svg"><img src="docs/screens/198-beside-the-face.svg" width="210" alt="Beside the face"></a><br><sub><b>198</b> · Beside the face · four panels, only what you can open</sub></td>
   </tr>
 </table>
 

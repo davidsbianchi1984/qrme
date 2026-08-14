@@ -3757,6 +3757,22 @@ SCREENS = [
         dict(icon="lock", color="silver", k="No numbers of theirs",
              s="stats are the owner's alone"),
     ], button=("Open a room with them", "brand")),
+    # 198: the four panels beside the face. Each card is a door that already
+    # existed somewhere else in the console and had no business being three
+    # screens away from the one surface it is about. The third is the round's
+    # finding: the relationship had a PUT and no GET, so the only way to read
+    # what a profile called you was to overwrite it and read the answer.
+    dict(num=198, title="Beside The Face", sub="Who they are, and what you are to each other",
+         accent="brand", tab=0, cards=[
+        dict(icon="eye", color="brand", k="Who they are",
+             s="the persona, and the AI mark"),
+        dict(icon="doc", color="cyan", k="What they hold",
+             s="counts first, then the paragraph"),
+        dict(icon="heart", color="pink", k="What you are",
+             s="readable now, not only writable"),
+        dict(icon="lock", color="silver", k="How they behave",
+             s="the dials, and the lock on them"),
+    ], button=("Only what you can open", "brand")),
     # 184: the console before there is a profile. The first card is the
     # defect and it is the whole round — three routes the backend made
     # public on purpose, reachable only after signing up to the platform the
