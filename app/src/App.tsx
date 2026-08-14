@@ -5,6 +5,7 @@ import { useSession } from "./store";
 import { Onboarding } from "./screens/Onboarding";
 import { Public, type Pane as PublicPane } from "./screens/Public";
 import { Home } from "./screens/Home";
+import { Profile } from "./screens/Profile";
 import { Chat } from "./screens/Chat";
 import { Delegate } from "./screens/Delegate";
 import { Desk } from "./screens/Desk";
@@ -62,7 +63,10 @@ import { Footsteps } from "./Footsteps";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
 
-type Tab = "home" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "remainder" | "named" | "passing" | "robots" | "placements" | "plans" | "access" | "settings";
+// `profile` is deliberately not in NAV: somebody else's homepage is a place
+// you are taken to by pressing their face, not a standing destination — the
+// same reason `passing` is reachable and unlisted.
+type Tab = "profile" | "home" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "remainder" | "named" | "passing" | "robots" | "placements" | "plans" | "access" | "settings";
 
 const NAV: { id: Tab; label: string; icon: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
@@ -135,6 +139,30 @@ export function App() {
   const toPlans = () => setTab("plans");
   // A join on the Rooms screen lands the person Inside, on that room.
   const [insideRoom, setInsideRoom] = useState("");
+  // Whose homepage is open, and where pressing Back should return to. The
+  // trail is a stack rather than a single id because their Top 8 is eight
+  // more doors: walking friend-to-friend and pressing Back should retrace
+  // the walk, not drop you at whichever screen started it.
+  const [visitingId, setVisitingId] = useState("");
+  // Read only through its own updater — the trail is history, never render
+  // state, so nothing below needs to see it.
+  const [, setVisitTrail] = useState<{ tab: Tab; id: string }[]>([]);
+  const visitProfile = (id: string) => {
+    // Where you were, not merely which tab — otherwise stepping from one
+    // homepage to another and pressing Back lands on "profile" again, which
+    // is the page you are already standing on.
+    setVisitTrail((trail) => [...trail, { tab, id: visitingId }]);
+    setVisitingId(id);
+    setTab("profile");
+  };
+  const leaveProfile = () => {
+    setVisitTrail((trail) => {
+      const back = trail[trail.length - 1];
+      setVisitingId(back?.id ?? "");
+      setTab(back?.tab ?? "home");
+      return trail.slice(0, -1);
+    });
+  };
   // A party joined from a feed card. The join succeeded where the person was
   // — the feed — and the room is on another tab; this is how they land in it
   // instead of having joined invisibly.
@@ -219,7 +247,12 @@ export function App() {
 
       <main className="content" ref={contentRef}>
         <ProblemNotice />
-        {tab === "home" && <Home go={setTab} />}
+        {tab === "home" && <Home go={setTab} onVisit={visitProfile} />}
+        {tab === "profile" && (
+          <Profile profileId={visitingId} onBack={leaveProfile}
+                   onPlans={toPlans} onVisit={visitProfile}
+                   onInside={(id) => { setInsideRoom(id); setTab("inside"); }} />
+        )}
         {tab === "chat" && <Chat onPlans={toPlans} />}
         {tab === "discover" && <Discover onPlans={toPlans} />}
         {tab === "market" && <Market onPlans={toPlans} />}

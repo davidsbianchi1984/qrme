@@ -618,6 +618,26 @@ believed and the steps are the part you can check.
   </tr>
 </table>
 
+**Their homepage — where pressing a face actually takes you.** A friend's
+picture used to open a panel with their name and tagline on it and the
+*signed-in* profile's memory count, engagement average and moderation rate
+underneath, so four different friends drew four identical screens. Now it opens
+their page as they built it: their theme and accent, their about, their links,
+their own markup in a sandboxed frame, their Top 8 — which are eight more doors,
+so you can keep walking friend to friend and press Back to retrace the walk —
+their wall, their photographs, their footage, and the three things a visitor may
+actually do: talk to their profile, send them a message, open a room with them.
+A synthetic profile has the same homepage; here a friend *is* a profile, so this
+is one screen and not two. There is no numbers row on it, and that absence is
+the fix rather than an omission: `GET /profiles/{id}/stats` is owner-only, which
+is exactly how the old card came to be showing yours in place of theirs.
+
+<table>
+  <tr>
+    <td align="center" width="25%"><a href="docs/screens/197-their-homepage.svg"><img src="docs/screens/197-their-homepage.svg" width="210" alt="Their homepage"></a><br><sub><b>197</b> · Their homepage · a face is a door</sub></td>
+  </tr>
+</table>
+
 The strip changes with the room and only with the room. An audio room has no
 gift button because there is no stage to gift at; a posted video has no bell and
 no guest request because there is nobody at a desk to ring and no host to ask.

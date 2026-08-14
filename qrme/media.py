@@ -195,6 +195,39 @@ def row_facade(row) -> dict:
             "ai_marked": False}
 
 
+def gallery(profile_id: str, kind: str | None = None,
+            limit: int = 60) -> list[dict]:
+    """Everything one profile has uploaded, newest first.
+
+    There was an upload door and no way to see what came through it. Media
+    could only ever be found by scrolling the wall post it happened to be
+    attached to, so a photograph posted a year ago was, in practice, gone —
+    and an upload attached to nothing was invisible from the first second.
+
+        asked     can somebody put a photograph here
+        mattered  can anybody find it afterwards
+
+    Public, like the wall it appears on: `save` already refuses anything
+    outside the whitelist, `row_facade` hands back a URL and never a path,
+    and nothing here reads a byte of the file. A profile's uploads are the
+    pictures on its page — the thing a visitor came to look at.
+
+    `kind` narrows to `image`, `video` or `file`, because *photos* and
+    *videos* are two doors on a screen and one query with a filter is how
+    they stay one behaviour.
+    """
+    sql = ("SELECT m.*, a.alt AS alt FROM media m"
+           " LEFT JOIN media_alt a ON a.media_id = m.id"
+           " WHERE m.profile_id=?")
+    args: list = [profile_id]
+    if kind:
+        sql += " AND m.kind=?"
+        args.append(kind)
+    sql += " ORDER BY m.created_at DESC, m.rowid DESC LIMIT ?"
+    args.append(max(1, min(int(limit), 200)))
+    return [row_facade(r) for r in db.connect().execute(sql, args).fetchall()]
+
+
 def for_posts(post_ids: list[str]) -> dict[str, list[dict]]:
     """Hydration for a page of posts, one query — see qrme.wall._hydrate."""
     if not post_ids:

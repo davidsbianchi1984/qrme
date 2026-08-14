@@ -1809,6 +1809,22 @@ export type PageCatalog = {
 
 export type PageLink = { label: string; url: string };
 
+/** A face in somebody's Top 8. The route builds it from `friends_of`, so it
+ *  is the same row the friends list carries — which is what lets a visitor
+ *  keep walking: their Top 8 is eight more doors, not eight names. */
+export type PageFriend = {
+  profile_id: string; display_name: string;
+  avatar?: string | null; handle?: string | null;
+  pinned?: boolean; founder?: boolean;
+};
+
+/** The storefront half of a page: what this profile is offering, read out of
+ *  the marketplace rather than retyped onto the page. */
+export type PageOffer = {
+  id: string; kind: string; title: string;
+  blurb?: string | null; area?: string | null;
+};
+
 export type ProfilePage = {
   profile_id: string;
   theme: Theme;
@@ -1818,15 +1834,21 @@ export type ProfilePage = {
   /** Set when moderation held the about text, with the reason, so it can be
    *  fixed rather than silently dropped. Owner's view only. */
   about_blocked: string | null;
-  top_friends: unknown[];
+  top_friends: PageFriend[];
   html: string | null;
   /** Tag names the sanitiser removed. The edit still succeeds — so without
    *  showing this, somebody's `<script>` vanishes and the page just quietly
    *  does less than they wrote. */
   html_removed: string[];
   links: PageLink[];
-  offers: unknown[];
+  offers: PageOffer[];
   feed: unknown[];
+  show_offers: boolean;
+  /** False when this profile has no page row at all — everything above is
+   *  then the default theme rather than anything they chose. A visitor
+   *  should be told that, not shown an empty page as though it were one. */
+  customised: boolean;
+  updated_at: string | null;
 };
 
 /** What a stranger lands on. Public, and the AI disclosure is part of it
@@ -3261,6 +3283,12 @@ export const api = {
   mediaLimits: () =>
     req<{ image: { max_bytes: number }; video: { max_bytes: number } }>(
       `/media/limits`),
+  // Everything one profile has uploaded, newest first — the other side of
+  // the upload door. `kind` narrows it, so Photos and Videos are one call
+  // with a filter rather than two behaviours that can drift apart.
+  profileMedia: (profileId: string, kind?: "image" | "video" | "file") =>
+    req<{ profile_id: string; kind: string | null; media: MediaUpload[] }>(
+      `/profiles/${profileId}/media` + (kind ? `?kind=${kind}` : "")),
   videoPlatforms: () =>
     req<{ platforms: { key: string; name: string; hosts: string[] }[];
           note: string }>(`/videos/platforms`),

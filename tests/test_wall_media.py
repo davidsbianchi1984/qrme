@@ -115,3 +115,83 @@ def test_a_post_cannot_borrow_somebody_elses_upload(client):
     assert r.status_code == 422
     # And the refused post left nothing behind on either wall.
     assert client.get(f"/profiles/{a['id']}/wall").json()["posts"] == []
+
+
+# -- the other side of the upload door ---------------------------------------
+#
+# `POST /profiles/{id}/media` shipped in 0.42.x with nothing that lists what
+# came through it. Media was reachable only through the wall post it happened
+# to ride on, so a photograph posted a year ago was in practice gone, and an
+# upload attached to nothing was invisible from the first second. The profile
+# homepage screen is what needed it: Photos and Videos would have been two
+# buttons with no query behind them.
+#
+#     asked     can somebody put a photograph here
+#     mattered  can anybody find it afterwards
+
+
+def test_the_gallery_lists_what_came_through_the_upload_door(client):
+    me = make_profile(client, display_name="Poster")
+    picture = _upload(client, me, PNG).json()
+    footage = _upload(client, me, MP4).json()
+    # Attached to nothing at all — the case that was invisible before.
+    assert client.get(f"/profiles/{me['id']}/media").json()["media"], \
+        "an upload attached to no post is still theirs and still findable"
+
+    got = client.get(f"/profiles/{me['id']}/media").json()
+    assert {m["id"] for m in got["media"]} == {picture["id"], footage["id"]}
+    assert got["kind"] is None
+    # Newest first, so a page opens on what they did last.
+    assert got["media"][0]["id"] == footage["id"]
+    # The same facade the wall serves: a URL, never a path, and no AI mark on
+    # somebody's own photograph.
+    assert got["media"][0]["url"].startswith(media.ROUTE + "/")
+    assert got["media"][0]["ai_marked"] is False
+
+
+def test_photos_and_videos_are_one_query_with_a_filter(client):
+    me = make_profile(client, display_name="Poster")
+    picture = _upload(client, me, PNG).json()
+    footage = _upload(client, me, MP4).json()
+
+    images = client.get(f"/profiles/{me['id']}/media?kind=image").json()
+    assert [m["id"] for m in images["media"]] == [picture["id"]]
+    assert images["kind"] == "image"
+    videos = client.get(f"/profiles/{me['id']}/media?kind=video").json()
+    assert [m["id"] for m in videos["media"]] == [footage["id"]]
+
+    # A kind outside the whitelist is a 422 rather than an empty list: an
+    # empty answer to a misspelled filter reads as "they have no photos".
+    assert client.get(
+        f"/profiles/{me['id']}/media?kind=pictures").status_code == 422
+    assert client.get("/profiles/prf_nobody/media").status_code == 404
+
+
+def test_the_gallery_is_a_visitors_view_and_holds_only_its_own_profile(client):
+    """Public on purpose, and scoped all the same.
+
+    This is what a visitor came to look at, so it takes no token — but a
+    profile's gallery is that profile's uploads and nobody else's, which is
+    the half a public route still has to get right.
+    """
+    me = make_profile(client, display_name="Poster")
+    them = make_profile(client, display_name="Somebody Else")
+    mine = _upload(client, me, PNG).json()
+    theirs = _upload(client, them, MP4).json()
+
+    # No authorization header at all.
+    ours = client.get(f"/profiles/{me['id']}/media").json()["media"]
+    assert [m["id"] for m in ours] == [mine["id"]]
+    yours = client.get(f"/profiles/{them['id']}/media").json()["media"]
+    assert [m["id"] for m in yours] == [theirs["id"]]
+
+
+def test_the_alt_text_travels_with_the_picture(client):
+    """The uploader's own words for what it shows, served to people who
+    cannot see it — on the gallery as well as on the post, or a photograph
+    described once is undescribed everywhere it is actually looked at."""
+    me = make_profile(client, display_name="Poster")
+    client.post(f"/profiles/{me['id']}/media?alt=a gate at dusk",
+                content=PNG, headers=auth_header(me))
+    got = client.get(f"/profiles/{me['id']}/media").json()["media"]
+    assert got[0]["alt"] == "a gate at dusk"

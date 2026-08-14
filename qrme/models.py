@@ -269,7 +269,16 @@ class RoomParticipant(BaseModel):
 
 
 class RoomCreate(BaseModel):
-    topic: str
+    # Optional, and the only reader that ever thought otherwise was this
+    # line. `create_room` writes it straight through, the rooms list declares
+    # `topic?: string | null`, and the console has always sent nothing when
+    # the field is left blank — so leaving the topic empty answered 422
+    # "Topic — Field required" on a form that offers it as a blank you may
+    # skip. A room opened *with a person* is named by who is in it.
+    #
+    #     asked     may a room be opened without a topic
+    #     mattered  does the button that offers to do it work
+    topic: str | None = None
     channel: Channel = "chat"
     participants: list[RoomParticipant] = Field(min_length=2, max_length=8)
 

@@ -156,13 +156,46 @@ def run(workdir: str | None = None) -> dict:
         # above only needs the vault, which Basic has. The refusal is recorded
         # rather than skipped past, because "this is the tier that buys it" is
         # the answer somebody deciding whether to pay actually needs.
-        refused = jim.post(f"/users/{user['id']}/specialist-tasks", json={
+        #
+        # Whether that gate is *running* is JIM's to say, not this run's to
+        # assume. It stands down for the duration of the beta — no capability
+        # refuses anybody, whatever plan the account records — and this
+        # assertion was written when it could not: a hard 402 that broke the
+        # whole arc the day the flag flipped, seven steps in, reporting a
+        # specialist that "does not accept delegated work" as if the tandem
+        # had come apart.
+        #
+        #     asked     does the arc pay for what it uses
+        #     mattered  does the arc still run when nobody is charged
+        #
+        # So it reads the posture off `/plans` and asserts the branch that is
+        # actually in force. Both branches are real assertions — a stood-down
+        # gate must let the request *through*, which is the claim that would
+        # have caught it going the other way too.
+        priced = jim.get("/plans")
+        assert priced.status_code == 200, f"plans: {priced.text}"
+        gate_running = priced.json()["enforcing"]
+        # Either way the price list still says what Pro buys — standing the
+        # gate down is not the same as saying it is free forever.
+        free = next(p for p in priced.json()["plans"] if p["plan"] == "free")
+        assert "synthetic_agents" in free["locked"], priced.text
+        asked = jim.post(f"/users/{user['id']}/specialist-tasks", json={
             "condition": "financial_stress", "goal": "x"})
-        assert refused.status_code == 402, f"expected the plan gate: {refused.text}"
-        assert refused.json()["detail"]["needs"] == "pro", refused.text
+        if gate_running:
+            assert asked.status_code == 402, \
+                f"expected the plan gate: {asked.text}"
+            assert asked.json()["detail"]["needs"] == "pro", asked.text
+        else:
+            assert asked.status_code != 402, \
+                f"the beta stands the gate down and it refused: {asked.text}"
+        # The upgrade is recorded either way: the arc below is Pro work, and
+        # a run that only reached it because nothing was being enforced would
+        # prove less than one that paid.
         r = jim.post(f"/memberships/{user['id']}", json={"plan": "pro"})
         assert r.status_code == 200, f"upgrade: {r.text}"
-        step("workflow_needs_pro", {"gate": "synthetic_agents", "upgraded": "pro"})
+        step("workflow_needs_pro", {"gate": "synthetic_agents",
+                                    "enforcing": gate_running,
+                                    "upgraded": "pro"})
 
         # The specialist's owner has to opt in: delegation is off until
         # somebody says which phases a stranger may start, and `research` is

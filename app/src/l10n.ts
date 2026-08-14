@@ -7641,9 +7641,6 @@ const CHROME: Table = {
   "pln.erasure": {
     en: "Erasure: {how}", es: "Borrado: {how}", fr: "Effacement : {how}", de: "Löschung: {how}", pt: "Apagamento: {how}", it: "Cancellazione: {how}", ja: "消去: {how}", zh: "抹除：{how}", hi: "मिटाना: {how}", ar: "المحو: {how}",
   },
-  "hom.visit.close": {
-    en: "Close", es: "Cerrar", fr: "Fermer", de: "Schließen", pt: "Fechar", it: "Chiudi", ja: "閉じる", zh: "关闭", hi: "बंद करें", ar: "إغलاق",
-  },
   "hom.title": {
     en: "Home", es: "Inicio", fr: "Accueil", de: "Start", pt: "Início", it: "Home", ja: "ホーム", zh: "主页", hi: "होम", ar: "الرئيسية",
   },
@@ -7701,11 +7698,86 @@ const CHROME: Table = {
   "hom.roulette": {
     en: "🎯 Drop into the stranger pool", es: "🎯 Cae en la ruleta de desconocidos", fr: "🎯 Plongez dans la roulette des inconnus", de: "🎯 In den Fremden-Pool springen", pt: "🎯 Cair na roleta de desconhecidos", it: "🎯 Tuffati nella roulette degli sconosciuti", ja: "🎯 ストレンジャープールに飛び込む", zh: "🎯 跳进陌生人轮盘", hi: "🎯 अजनबियों की रूले में उतरें", ar: "🎯 انزل إلى قرعة الغرباء",
   },
-  "hom.visit.theirfriends": {
-    en: "Their top friends:", es: "Sus mejores amigos:", fr: "Leurs meilleurs amis :", de: "Ihre engsten Freunde:", pt: "Os melhores amigos deles:", it: "I loro migliori amici:", ja: "この人のトップフレンド：", zh: "对方的挚友：", hi: "उनके खास दोस्त:", ar: "أفضل أصدقائهم:",
+  // Somebody else's homepage — screens/Profile.tsx. The `hom.visit.*` keys
+  // this replaces belonged to a card that showed their name over your own
+  // numbers; those keys went with it rather than being left to rot.
+  "prf.back": {
+    en: "← Back", es: "← Atrás", fr: "← Retour", de: "← Zurück", pt: "← Voltar", it: "← Indietro", ja: "← 戻る", zh: "← 返回", hi: "← वापस", ar: "← رجوع",
   },
-  "hom.visit.empty": {
-    en: "They have not put anything on their page yet.", es: "Aún no han puesto nada en su página.", fr: "Ils n'ont encore rien mis sur leur page.", de: "Sie haben noch nichts auf ihre Seite gestellt.", pt: "Ainda não puseram nada na sua página.", it: "Non hanno ancora messo nulla sulla loro pagina.", ja: "まだページに何も載せていません。", zh: "对方还没有在页面上放任何内容。", hi: "उन्होंने अभी अपने पृष्ठ पर कुछ नहीं रखा है।", ar: "لم يضعوا شيئًا على صفحتهم بعد.",
+  "prf.theirs": {
+    en: "their page, as they made it", es: "su página, tal como la hicieron", fr: "leur page, telle qu'ils l'ont faite", de: "ihre Seite, so wie sie sie gemacht haben", pt: "a página deles, tal como a fizeram", it: "la loro pagina, come l'hanno fatta", ja: "本人がつくったままのページ", zh: "他们亲手做的页面", hi: "उनका पृष्ठ, जैसा उन्होंने बनाया", ar: "صفحتهم، كما صنعوها",
+  },
+  "prf.theirmarkup": {
+    en: "their own markup", es: "su propio marcado", fr: "leur propre balisage", de: "ihr eigenes Markup", pt: "a marcação deles", it: "il loro markup", ja: "本人が書いたマークアップ", zh: "他们自己写的标记", hi: "उनका अपना मार्कअप", ar: "الترميز الخاص بهم",
+  },
+  "prf.plain": {
+    en: "{name} has not decorated this page yet.", es: "{name} aún no ha decorado esta página.", fr: "{name} n'a pas encore décoré cette page.", de: "{name} hat diese Seite noch nicht gestaltet.", pt: "{name} ainda não decorou esta página.", it: "{name} non ha ancora decorato questa pagina.", ja: "{name} はまだこのページを飾っていません。", zh: "{name} 还没有装点这个页面。", hi: "{name} ने अभी यह पृष्ठ सजाया नहीं है।", ar: "لم يزيّن {name} هذه الصفحة بعد.",
+  },
+  "prf.saylabel": {
+    en: "Say something to {name}", es: "Dile algo a {name}", fr: "Dites quelque chose à {name}", de: "Sag {name} etwas", pt: "Diz algo a {name}", it: "Di' qualcosa a {name}", ja: "{name} に何か伝える", zh: "对 {name} 说点什么", hi: "{name} से कुछ कहें", ar: "قل شيئًا لـ {name}",
+  },
+  "prf.sayhint": {
+    en: "a question, or a hello", es: "una pregunta, o un saludo", fr: "une question, ou un bonjour", de: "eine Frage oder ein Hallo", pt: "uma pergunta, ou um olá", it: "una domanda, o un saluto", ja: "質問でも、あいさつでも", zh: "一个问题，或一句问候", hi: "एक सवाल, या एक नमस्ते", ar: "سؤال، أو تحية",
+  },
+  "prf.talk": {
+    en: "Talk to their profile", es: "Hablar con su perfil", fr: "Parler à leur profil", de: "Mit ihrem Profil sprechen", pt: "Falar com o perfil deles", it: "Parla con il loro profilo", ja: "本人のプロフィールと話す", zh: "与他们的档案对话", hi: "उनकी प्रोफ़ाइल से बात करें", ar: "تحدّث إلى ملفهم",
+  },
+  "prf.message": {
+    en: "Send it as a message", es: "Enviarlo como mensaje", fr: "L'envoyer en message", de: "Als Nachricht senden", pt: "Enviar como mensagem", it: "Invialo come messaggio", ja: "メッセージとして送る", zh: "作为私信发送", hi: "संदेश के रूप में भेजें", ar: "أرسله كرسالة",
+  },
+  "prf.room": {
+    en: "Open a room with them", es: "Abrir una sala con ellos", fr: "Ouvrir un salon avec eux", de: "Einen Raum mit ihnen öffnen", pt: "Abrir uma sala com eles", it: "Apri una stanza con loro", ja: "この人とルームを開く", zh: "与他们开一个房间", hi: "उनके साथ एक कक्ष खोलें", ar: "افتح غرفة معهم",
+  },
+  "prf.actionsnote": {
+    en: "Talking answers here; a message lands in their inbox; a room opens with the two of you in it.", es: "Hablar responde aquí; un mensaje llega a su bandeja; una sala se abre con los dos dentro.", fr: "Parler répond ici ; un message arrive dans leur boîte ; un salon s'ouvre avec vous deux dedans.", de: "Sprechen antwortet hier; eine Nachricht landet in ihrem Posteingang; ein Raum öffnet sich mit euch beiden darin.", pt: "Falar responde aqui; uma mensagem chega à caixa deles; uma sala abre-se com os dois lá dentro.", it: "Parlare risponde qui; un messaggio arriva nella loro posta; una stanza si apre con voi due dentro.", ja: "話しかけるとここに返事が出ます。メッセージは相手の受信箱へ。ルームは二人で入る場所として開きます。", zh: "对话会在此处回复；私信会进入对方收件箱；房间则会开成你们两人的场所。", hi: "बात करने पर जवाब यहीं आता है; संदेश उनके इनबॉक्स में जाता है; कक्ष आप दोनों के साथ खुलता है।", ar: "الحديث يُجاب هنا؛ والرسالة تصل صندوقهم؛ والغرفة تُفتح وأنتما فيها.",
+  },
+  "prf.befriend": {
+    en: "Add them as a friend", es: "Añadirlos como amigo", fr: "Les ajouter en ami", de: "Als Freund hinzufügen", pt: "Adicioná-los como amigo", it: "Aggiungili agli amici", ja: "フレンドに追加する", zh: "把他们加为好友", hi: "उन्हें दोस्त बनाएँ", ar: "أضفهم كصديق",
+  },
+  "prf.befriended": {
+    en: "{name} is on your list now, and they have been told. Messages open when they add you back.", es: "{name} ya está en tu lista y se le ha avisado. Los mensajes se abren cuando te añada de vuelta.", fr: "{name} figure maintenant dans votre liste et en a été informé. Les messages s'ouvrent quand cette personne vous ajoute en retour.", de: "{name} steht jetzt auf deiner Liste und wurde benachrichtigt. Nachrichten öffnen sich, wenn du zurück hinzugefügt wirst.", pt: "{name} já está na tua lista e foi avisado. As mensagens abrem quando te adicionarem de volta.", it: "{name} ora è nella tua lista ed è stato avvisato. I messaggi si aprono quando ti aggiunge a sua volta.", ja: "{name} をリストに追加し、相手にも通知しました。相手があなたを追加し返すとメッセージが開きます。", zh: "{name} 已在你的列表里，对方也收到了通知。等对方也把你加上，私信就会打开。", hi: "{name} अब आपकी सूची में हैं और उन्हें बता दिया गया है। जब वे आपको जोड़ेंगे, तब संदेश खुलेंगे।", ar: "{name} الآن في قائمتك وقد أُخبروا. تُفتح الرسائل حين يضيفونك بدورهم.",
+  },
+  "prf.waiting": {
+    en: "{name} is on your list. Messages open when they add you back — that is mutual on purpose, because consent only one person can end is not consent.", es: "{name} está en tu lista. Los mensajes se abren cuando te añada de vuelta: es mutuo a propósito, porque un consentimiento que solo una parte puede terminar no es consentimiento.", fr: "{name} est dans votre liste. Les messages s'ouvrent quand cette personne vous ajoute en retour — c'est réciproque à dessein, car un consentement qu'une seule partie peut rompre n'en est pas un.", de: "{name} steht auf deiner Liste. Nachrichten öffnen sich, wenn du zurück hinzugefügt wirst — beidseitig mit Absicht, denn eine Zustimmung, die nur eine Seite beenden kann, ist keine.", pt: "{name} está na tua lista. As mensagens abrem quando te adicionarem de volta — é mútuo de propósito, porque um consentimento que só um lado pode terminar não é consentimento.", it: "{name} è nella tua lista. I messaggi si aprono quando ti aggiunge a sua volta: è reciproco di proposito, perché un consenso che solo una parte può chiudere non è consenso.", ja: "{name} はあなたのリストにいます。相手があなたを追加し返すとメッセージが開きます。相互なのは意図的で、片方だけが終わらせられる同意は同意ではないからです。", zh: "{name} 已在你的列表里。等对方也把你加上，私信才会打开——双向是有意为之：只有一方能终止的同意不算同意。", hi: "{name} आपकी सूची में हैं। संदेश तब खुलेंगे जब वे आपको भी जोड़ेंगे — यह जानबूझकर पारस्परिक है, क्योंकि जिस सहमति को केवल एक पक्ष समाप्त कर सके, वह सहमति नहीं।", ar: "{name} في قائمتك. تُفتح الرسائل حين يضيفونك بدورهم — والتبادل مقصود، لأن موافقة يستطيع طرف واحد فقط إنهاءها ليست موافقة.",
+  },
+  "prf.notyetfriends": {
+    en: "Messages travel between friends, both ways. Talking to their profile and opening a room do not wait on that.", es: "Los mensajes viajan entre amigos, en ambos sentidos. Hablar con su perfil y abrir una sala no dependen de eso.", fr: "Les messages circulent entre amis, dans les deux sens. Parler à leur profil et ouvrir un salon n'attendent pas cela.", de: "Nachrichten laufen zwischen Freunden, in beide Richtungen. Mit ihrem Profil sprechen und einen Raum öffnen warten nicht darauf.", pt: "As mensagens viajam entre amigos, nos dois sentidos. Falar com o perfil deles e abrir uma sala não dependem disso.", it: "I messaggi viaggiano tra amici, in entrambe le direzioni. Parlare con il loro profilo e aprire una stanza non aspettano.", ja: "メッセージは双方向のフレンド同士でやり取りします。プロフィールと話すこととルームを開くことは、それを待ちません。", zh: "私信在互为好友之间往来。与他们的档案对话和开房间不需要等这个。", hi: "संदेश दोस्तों के बीच, दोनों ओर से चलते हैं। उनकी प्रोफ़ाइल से बात करना और कक्ष खोलना इस पर नहीं रुकते।", ar: "الرسائل تنتقل بين الأصدقاء في الاتجاهين. أما التحدث إلى ملفهم وفتح غرفة فلا ينتظران ذلك.",
+  },
+  "prf.sent": {
+    en: "Message sent.", es: "Mensaje enviado.", fr: "Message envoyé.", de: "Nachricht gesendet.", pt: "Mensagem enviada.", it: "Messaggio inviato.", ja: "メッセージを送りました。", zh: "私信已发送。", hi: "संदेश भेजा गया।", ar: "أُرسلت الرسالة.",
+  },
+  "prf.needuser": {
+    en: "A room needs you as a person, not only as a profile — open one from Rooms first.", es: "Una sala te necesita como persona, no solo como perfil: abre una desde Salas primero.", fr: "Un salon a besoin de vous en tant que personne, pas seulement de votre profil — ouvrez-en un depuis Salons d'abord.", de: "Ein Raum braucht dich als Person, nicht nur als Profil — öffne zuerst einen unter Räume.", pt: "Uma sala precisa de ti como pessoa, não só como perfil — abre uma em Salas primeiro.", it: "Una stanza ha bisogno di te come persona, non solo come profilo: aprine una da Stanze prima.", ja: "ルームにはプロフィールだけでなく、人としてのあなたが要ります。まず「ルーム」から一つ開いてください。", zh: "房间需要作为“人”的你，而不只是档案——请先从“房间”开一个。", hi: "कक्ष को केवल प्रोफ़ाइल नहीं, व्यक्ति के रूप में आप चाहिए — पहले कक्ष से एक खोलें।", ar: "الغرفة تحتاجك كشخص لا كملف فقط — افتح واحدة من الغرف أولًا.",
+  },
+  "prf.topfriends": {
+    en: "Their top {n}", es: "Sus {n} mejores", fr: "Leur top {n}", de: "Ihre Top {n}", pt: "Os {n} melhores deles", it: "I loro top {n}", ja: "この人のトップ {n}", zh: "他们的挚友 {n} 位", hi: "उनके खास {n}", ar: "أفضل {n} لديهم",
+  },
+  "prf.pane.wall": {
+    en: "Wall ({n})", es: "Muro ({n})", fr: "Mur ({n})", de: "Wand ({n})", pt: "Mural ({n})", it: "Muro ({n})", ja: "ウォール（{n}）", zh: "墙（{n}）", hi: "दीवार ({n})", ar: "الحائط ({n})",
+  },
+  "prf.pane.photos": {
+    en: "Photos ({n})", es: "Fotos ({n})", fr: "Photos ({n})", de: "Fotos ({n})", pt: "Fotos ({n})", it: "Foto ({n})", ja: "写真（{n}）", zh: "照片（{n}）", hi: "तस्वीरें ({n})", ar: "الصور ({n})",
+  },
+  "prf.pane.videos": {
+    en: "Videos ({n})", es: "Vídeos ({n})", fr: "Vidéos ({n})", de: "Videos ({n})", pt: "Vídeos ({n})", it: "Video ({n})", ja: "動画（{n}）", zh: "视频（{n}）", hi: "वीडियो ({n})", ar: "الفيديو ({n})",
+  },
+  "prf.pane.friends": {
+    en: "Friends ({n})", es: "Amigos ({n})", fr: "Amis ({n})", de: "Freunde ({n})", pt: "Amigos ({n})", it: "Amici ({n})", ja: "フレンド（{n}）", zh: "好友（{n}）", hi: "दोस्त ({n})", ar: "الأصدقاء ({n})",
+  },
+  "prf.nowall": {
+    en: "{name} has not posted anything yet.", es: "{name} aún no ha publicado nada.", fr: "{name} n'a encore rien publié.", de: "{name} hat noch nichts gepostet.", pt: "{name} ainda não publicou nada.", it: "{name} non ha ancora pubblicato nulla.", ja: "{name} はまだ何も投稿していません。", zh: "{name} 还没有发布任何内容。", hi: "{name} ने अभी कुछ पोस्ट नहीं किया।", ar: "لم ينشر {name} شيئًا بعد.",
+  },
+  "prf.nophotos": {
+    en: "No photographs on this page yet.", es: "Aún no hay fotografías en esta página.", fr: "Pas encore de photographies sur cette page.", de: "Noch keine Fotografien auf dieser Seite.", pt: "Ainda não há fotografias nesta página.", it: "Ancora nessuna fotografia su questa pagina.", ja: "このページにはまだ写真がありません。", zh: "此页面还没有照片。", hi: "इस पृष्ठ पर अभी कोई तस्वीर नहीं।", ar: "لا صور على هذه الصفحة بعد.",
+  },
+  "prf.novideos": {
+    en: "No footage on this page yet.", es: "Aún no hay vídeos en esta página.", fr: "Pas encore de vidéos sur cette page.", de: "Noch keine Aufnahmen auf dieser Seite.", pt: "Ainda não há vídeos nesta página.", it: "Ancora nessun filmato su questa pagina.", ja: "このページにはまだ映像がありません。", zh: "此页面还没有影片。", hi: "इस पृष्ठ पर अभी कोई फ़ुटेज नहीं।", ar: "لا مقاطع على هذه الصفحة بعد.",
+  },
+  "prf.nofriends": {
+    en: "Nobody on this page's friends list yet.", es: "Aún no hay nadie en la lista de amigos de esta página.", fr: "Personne encore dans la liste d'amis de cette page.", de: "Noch niemand auf der Freundesliste dieser Seite.", pt: "Ainda ninguém na lista de amigos desta página.", it: "Ancora nessuno nella lista amici di questa pagina.", ja: "このページのフレンド一覧にはまだ誰もいません。", zh: "此页面的好友列表还是空的。", hi: "इस पृष्ठ की दोस्त-सूची अभी खाली है।", ar: "لا أحد في قائمة أصدقاء هذه الصفحة بعد.",
+  },
+  "prf.offers": {
+    en: "What they offer", es: "Lo que ofrecen", fr: "Ce qu'ils proposent", de: "Was sie anbieten", pt: "O que oferecem", it: "Cosa offrono", ja: "この人が提供しているもの", zh: "他们提供的服务", hi: "वे क्या देते हैं", ar: "ما يقدّمونه",
   },
   "hom.newinrelease": {
     en: "New in this release", es: "Novedades de esta versión", fr: "Nouveautés de cette version", de: "Neu in dieser Ausgabe", pt: "Novidades desta versão", it: "Novità di questa versione", ja: "このリリースで新しくなったこと", zh: "本次发布的新内容", hi: "इस रिलीज़ में नया", ar: "الجديد في هذا الإصدار",

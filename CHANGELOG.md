@@ -4,6 +4,63 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Their homepage — where pressing a face actually takes you.** A friend's
+  picture on Home opened a panel with their name and tagline on it, and
+  underneath it the *signed-in* profile's memory count, engagement average
+  and moderation rate. Four different friends drew four identical screens,
+  because only the header was ever theirs.
+
+      asked     does pressing a face open something
+      mattered  is what opens theirs
+
+  `app/src/screens/Profile.tsx` is that screen: their page as they built it
+  — theme, accent, about, links, and their own markup — their Top 8, which
+  are eight more doors so the walk continues and Back retraces it, their
+  wall, their photographs, their footage, and the three things a visitor may
+  actually do. It carries no numbers row, and that absence *is* the fix:
+  `GET /profiles/{id}/stats` is owner-only, which is exactly how the old card
+  came to be showing yours in place of theirs. A synthetic profile has the
+  same homepage — here a friend is a profile, so this is one screen and not
+  two.
+
+  Their markup renders in a sandboxed frame rather than in this document.
+  `pages.py` sanitises on the way in and does it well; this is about who pays
+  if it is ever wrong. React's escape hatch is a floor at zero in this repo,
+  and being the screen that finally wanted it is not a reason to move it.
+
+- **`GET /profiles/{id}/media` — the other side of the upload door.** Uploads
+  have been accepted since 0.42.x with nothing that lists them: media was
+  reachable only through the wall post it happened to ride on, so a
+  photograph posted a year ago was in practice gone and an upload attached to
+  nothing was invisible from the first second. `media.gallery` answers newest
+  first, narrows to `image`/`video`/`file`, and is public for the same reason
+  the wall is — this is what a visitor came to look at.
+
+      asked     can somebody put a photograph here
+      mattered  can anybody find it afterwards
+
+### Fixed
+
+- **A room could not be opened without a topic.** `RoomCreate.topic` was
+  required by that one line and optional everywhere else — `create_room`
+  writes it straight through, the rooms list declares it nullable, and the
+  console has always sent nothing when the field is left blank. So pressing
+  Open on the Rooms screen without typing a topic answered 422 "Topic — Field
+  required", on a form that offers the topic as a blank you may skip. A room
+  opened *with a person* is named by who is in it.
+
+- **The cross-product smoke assumed a gate that JIM stands down.** `suite/
+  smoke.py` drove a Basic account into JIM's `synthetic_agents` gate and
+  asserted the 402. Correct while the gate is enforcing, wrong the moment the
+  beta stands it down — and the run died seven steps in reporting a
+  specialist that "does not accept delegated work", which reads as the tandem
+  coming apart. It now reads the posture off `/plans` and asserts the branch
+  in force; JIM publishes `enforcing` there so it can.
+
 ## [0.71.1] - 2026-08-14
 
 ### Fixed

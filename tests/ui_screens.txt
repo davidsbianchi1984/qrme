@@ -1,4 +1,4 @@
-# status: floor — 58 rows
+# status: floor — 59 rows
 #
 # Which console surface each screen drawing depicts.
 #
@@ -106,6 +106,7 @@ Shops           187
 Corner          188
 Feed            189,190,191
 Studio          196
+Profile         197
 ProviderTiles   22
 
 Problems        150

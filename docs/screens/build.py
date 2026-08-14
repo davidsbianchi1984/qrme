@@ -3740,6 +3740,23 @@ SCREENS = [
         dict(icon="doc", color="amber", k="A new version",
              s="the one that answered is named"),
     ], button=("Run it and see", "brand")),
+    # 197: somebody else's homepage. The first card is the defect and the
+    # whole round — a face you pressed opened a panel with their name on it
+    # and the signed-in profile's own numbers underneath, so four different
+    # friends drew four identical screens. The last card is why no stats row
+    # came over with the fix: theirs are owner-only, which is exactly how
+    # yours came to be standing in for them.
+    dict(num=197, title="Their Homepage", sub="Where a face actually takes you",
+         accent="brand", tab=0, cards=[
+        dict(icon="eye", color="brand", k="Their page, their theme",
+             s="accent, about, their markup"),
+        dict(icon="heart", color="pink", k="Their top 8",
+             s="eight more doors, not names", pill=("8", "good")),
+        dict(icon="grid", color="cyan", k="Photos and video",
+             s="the upload door, seen at last"),
+        dict(icon="lock", color="silver", k="No numbers of theirs",
+             s="stats are the owner's alone"),
+    ], button=("Open a room with them", "brand")),
     # 184: the console before there is a profile. The first card is the
     # defect and it is the whole round — three routes the backend made
     # public on purpose, reachable only after signing up to the platform the

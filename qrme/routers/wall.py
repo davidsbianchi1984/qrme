@@ -49,6 +49,27 @@ def create_post(profile_id: str, body: PostCreate, request: Request) -> dict:
         raise HTTPException(exc.status, exc.message) from None
 
 
+@router.get("/profiles/{profile_id}/media")
+def list_media(profile_id: str, kind: str | None = None,
+               limit: int = 60) -> dict:
+    """One profile's uploads, newest first — their photos and their videos.
+
+    The upload door has existed since 0.42.x with nothing on the other side
+    of it: media could be reached only through the wall post it happened to
+    ride on, so an upload attached to nothing was invisible, and one attached
+    to an old post was findable only by scrolling to it.
+
+    Public, because this is what a visitor came to look at. See
+    `media.gallery` for why that costs nothing.
+    """
+    profile_or_404(profile_id)
+    if kind is not None and kind not in ("image", "video", "file"):
+        raise HTTPException(
+            422, "kind is one of image, video, file — or leave it off")
+    return {"profile_id": profile_id, "kind": kind,
+            "media": media_mod.gallery(profile_id, kind=kind, limit=limit)}
+
+
 @router.post("/profiles/{profile_id}/media", status_code=201)
 async def upload_media(profile_id: str, request: Request,
                        filename: str = "", alt: str = "") -> dict:

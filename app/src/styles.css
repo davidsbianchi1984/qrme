@@ -735,3 +735,34 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
     height: calc(100dvh - 64px - env(safe-area-inset-bottom));
   }
 }
+
+/* Somebody else's homepage. The point of the screen is that it looks like
+   *theirs*, so the hero takes their theme background and their accent as its
+   border, and everything below stays out of the way of it. */
+.profile-page .screen-head { gap: 12px; align-items: baseline; }
+.pp-hero { border: 1px solid var(--line); }
+.pp-hero h3 { margin: 0 0 6px; }
+/* Their own markup, in its own sandboxed frame. Sized here because a
+   sandboxed document cannot resize its own frame — this is the band it gets,
+   and it scrolls inside rather than pushing the screen sideways. */
+.pp-markup {
+  display: block; width: 100%; height: 320px; margin-top: 10px;
+  border: 1px solid var(--line); border-radius: 12px; background: #fff;
+}
+.pp-actions textarea { width: 100%; margin-top: 6px; }
+.pp-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px; }
+.pp-reply {
+  border-left: 2px solid var(--brand); padding-left: 10px; margin-top: 8px;
+}
+.pp-face { background: none; border: 0; padding: 0; cursor: pointer;
+           display: flex; flex-direction: column; align-items: center;
+           gap: 4px; }
+.pp-panes { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 10px; }
+.friends-row.wrap { gap: 12px 14px; }
+.pp-gallery {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+.pp-gallery img, .pp-gallery video {
+  width: 100%; border-radius: 12px; background: #05070d;
+}

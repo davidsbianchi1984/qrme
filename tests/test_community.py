@@ -337,3 +337,41 @@ def test_consented_handoff_to_local_provider(pdi_pair):
     assert f"qrme/handoffs/{handoff['id']}" not in fake.store
     assert client.get(f"/handoffs/{handoff['id']}",
                       params={"token": handoff["token"]}).status_code == 403
+
+
+def test_a_room_may_be_opened_without_a_topic(client):
+    """The topic was required by one line and optional everywhere else.
+
+    `create_room` writes it straight through, `list_rooms` declares it
+    nullable, and the console has always sent nothing when the field is left
+    blank — the Rooms screen offers it as a blank you may skip. So pressing
+    the button without typing a topic answered 422 "Topic — Field required",
+    and the profile homepage's "open a room with them" would have done the
+    same: a room opened *with a person* is named by who is in it.
+
+        asked     may a room be opened without a topic
+        mattered  does the button that offers to do it work
+    """
+    user = make_interactor(client, "Theo", "1990-01-01")
+    dana = make_profile(client)
+    r = client.post("/rooms", json={
+        "channel": "chat",
+        "participants": [{"kind": "user", "id": user},
+                         {"kind": "profile", "id": dana["id"]}]})
+    assert r.status_code == 201, r.text
+    assert r.json()["topic"] is None
+    # And it is a room like any other: it lists, and it can be stepped into.
+    listed = {row["id"]: row for row in client.get("/rooms").json()}
+    assert r.json()["id"] in listed
+    assert listed[r.json()["id"]]["topic"] is None
+    joined = client.post(f"/rooms/{r.json()['id']}/join",
+                         headers=as_interactor(user))
+    assert joined.status_code == 201, joined.text
+
+    # A topic still travels when there is one — this widened the field, it
+    # did not stop reading it.
+    named = client.post("/rooms", json={
+        "topic": "what memory means", "channel": "chat",
+        "participants": [{"kind": "user", "id": user},
+                         {"kind": "profile", "id": dana["id"]}]})
+    assert named.json()["topic"] == "what memory means"

@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
-import { api, getBase, type Avatar, type Homepage, type ProfilePage,
-         type Stats } from "../api";
+import { api, getBase, type Avatar, type Stats } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
-export function Home({ go }: {
+export function Home({ go, onVisit }: {
   go: (t: "chat" | "relationships" | "memory" | "blend" | "simulate"
         | "campaigns" | "org" | "plans" | "friends"
         | "identity" | "stranger" | "rooms" | "studio") => void;
+  /** Press a face and land on that person's homepage. */
+  onVisit: (profileId: string) => void;
 }) {
   const { session } = useSession();
   const lang = visitorLang();
@@ -16,15 +17,6 @@ export function Home({ go }: {
   const [face, setFace] = useState<Avatar | null>(null);
   const [pals, setPals] = useState<
     Awaited<ReturnType<typeof api.friends>>["friends"]>([]);
-  // The face you clicked, and their page as a visitor sees it. Two field
-  // reports shaped this: tapping a friend's picture went to the whole
-  // friends list — a crowd instead of a person — and then the card that
-  // replaced it showed a name and a Close button, which reads as broken.
-  // So the tap now brings their actual homepage when they have made one
-  // public, and never renders emptier than a sentence.
-  const [visiting, setVisiting] = useState<
-    { name: string; avatar: string | null; page: ProfilePage;
-      home: Homepage | null } | null>(null);
   const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
@@ -103,16 +95,14 @@ export function Home({ go }: {
           </button>
           <div className="friends-row">
             {pals.map((f) => (
-              <button key={f.profile_id} onClick={() =>
-                Promise.all([
-                  api.page(f.profile_id),
-                  // A homepage kept private answers 404; that is a choice,
-                  // not an error, so it degrades to the plain page.
-                  api.homepage(f.profile_id).catch(() => null),
-                ]).then(([page, home]) => setVisiting(
-                  { name: f.display_name, avatar: f.avatar ?? null,
-                    page, home }))
-                  .catch(setError)}>
+              // Their homepage, not a card about them. What stood here read
+              // their name and tagline into a panel and then drew the
+              // signed-in profile's own tiles, persona and chat button
+              // underneath — four different faces, four identical screens.
+              // See screens/Profile.tsx for why no stats row followed them
+              // over.
+              <button key={f.profile_id}
+                      onClick={() => onVisit(f.profile_id)}>
                 {f.avatar ? (
                   <img className="presence-bubble" alt=""
                        src={f.avatar.startsWith("http")
@@ -126,81 +116,6 @@ export function Home({ go }: {
               </button>
             ))}
           </div>
-        </div>
-      )}
-
-      {visiting && (
-        <div className="card friend-visit">
-          <div className="friend-visit-head">
-            {visiting.avatar ? (
-              <img className="presence-bubble" alt=""
-                   src={visiting.avatar.startsWith("http")
-                          ? visiting.avatar : getBase() + visiting.avatar} />
-            ) : (
-              <div className="presence-bubble orbfill">
-                {visiting.name.slice(0, 1)}
-              </div>
-            )}
-            <div>
-              <h3>{visiting.name}</h3>
-              {visiting.page.tagline && (
-                <p className="muted small">{visiting.page.tagline}</p>
-              )}
-            </div>
-            <button className="ghost" onClick={() => setVisiting(null)}>
-              {tr("hom.visit.close", lang)}
-            </button>
-          </div>
-          {visiting.home ? (
-            <>
-              {/* Their homepage, as they built it — headline, about, links,
-                  their own top friends — with its accent color kept. */}
-              {visiting.home.headline && (
-                <p className="small" style={{
-                  color: visiting.home.theme?.accent || undefined }}>
-                  <strong>{visiting.home.headline}</strong>
-                </p>
-              )}
-              {visiting.home.about && (
-                <p className="small">{visiting.home.about}</p>
-              )}
-              {visiting.home.links.length > 0 && (
-                <p className="muted small">
-                  {visiting.home.links.map((l) => (
-                    <a key={l.url} href={l.url} target="_blank"
-                       rel="noreferrer"
-                       style={{ marginRight: 10 }}>{l.label || l.url}</a>
-                  ))}
-                </p>
-              )}
-              {visiting.home.top_friends.length > 0 && (
-                <p className="muted small">
-                  {tr("hom.visit.theirfriends", lang)}{" "}
-                  {visiting.home.top_friends
-                    .map((t) => t.display_name).join(" · ")}
-                </p>
-              )}
-            </>
-          ) : (
-            <>
-              {visiting.page.about && (
-                <p className="small">{visiting.page.about}</p>
-              )}
-              {visiting.page.links.length > 0 && (
-                <p className="muted small">
-                  {visiting.page.links.map((l) => (
-                    <a key={l.url} href={l.url} target="_blank"
-                       rel="noreferrer"
-                       style={{ marginRight: 10 }}>{l.label || l.url}</a>
-                  ))}
-                </p>
-              )}
-              {!visiting.page.about && !visiting.page.tagline
-                && visiting.page.links.length === 0 && (
-                <p className="muted small">{tr("hom.visit.empty", lang)}</p>
-              )}
-            </>
-          )}
         </div>
       )}
 
