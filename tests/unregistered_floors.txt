@@ -124,7 +124,7 @@ test_the_starters_know_their_trade.py:140: len(tags) >= 8
 test_the_sticker_the_queue_and_the_stamp.py:283: len(keys) >= 34
 test_the_stranger_has_a_language_too.py:118: len(keys) > 15
 test_the_strangers_language_on_a_phone.py:427: len(text) > 800
-test_the_tabs_are_translated_and_the_screens_are_not.py:448: english + calls >= 50
-test_the_tabs_are_translated_and_the_screens_are_not.py:637: len(rows) >= 10
+test_the_tabs_are_translated_and_the_screens_are_not.py:543: english + calls >= 50
+test_the_tabs_are_translated_and_the_screens_are_not.py:764: len(rows) >= 10
 test_the_workshop_in_the_pocket.py:268: len(keys) >= 49
 test_two_questions_a_mark_answers.py:196: len(why) > 40
