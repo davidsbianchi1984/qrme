@@ -73,8 +73,8 @@ test_the_body_the_route_requires.py:264: matched >= 150
 test_the_crowd_the_couch_and_the_loan.py:206: len(keys) >= 45
 test_the_desktop_and_the_phone_say_different_things.py:302: len(shared) > 120
 test_the_face_it_shows_the_world.py:251: len(keys) >= 43
-test_the_files_the_release_never_touched.py:231: len(sorted(REPO.glob('native/ios/Sources/**/*.swift'))) >= 40
-test_the_files_the_release_never_touched.py:232: len(sorted(REPO.glob('native/android/**/*.kt'))) >= 10
+test_the_files_the_release_never_touched.py:272: len(sorted(REPO.glob('native/ios/Sources/**/*.swift'))) >= 40
+test_the_files_the_release_never_touched.py:273: len(sorted(REPO.glob('native/android/**/*.kt'))) >= 10
 test_the_key_the_server_never_sends.py:221: len(vocabulary) >= 500
 test_the_keys_the_android_client_reads.py:359: len(reads) >= 165
 test_the_keys_the_android_client_reads.py:360: sum((len(k) for _, k in reads)) >= 370
