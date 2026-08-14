@@ -299,6 +299,15 @@ struct MediaSection: View {
     @State private var filename = ""
     @State private var line: String?
     @State private var busy = false
+    /// What came through the door above. The upload has been here since
+    /// 0.42.x with nothing that lists it: an upload could be found only
+    /// through the wall post it happened to ride on, so one attached to
+    /// nothing was invisible from the first second and one attached to an
+    /// old post was findable only by scrolling to it.
+    ///
+    ///     asked     can somebody put a photograph here
+    ///     mattered  can anybody find it afterwards
+    @State private var uploads: [MediaOut] = []
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -332,6 +341,24 @@ struct MediaSection: View {
                         filename = ""
                     }
                 }.font(.caption).disabled(busy || filename.isEmpty)
+            }
+            Button(L10n.t("med.gallery", state.language)) {
+                run {
+                    uploads = try await ApiClient.shared.profileMedia(
+                        profileId: state.pid!)
+                }
+            }.font(.caption).disabled(busy || state.pid == nil)
+            if uploads.isEmpty {
+                Text(L10n.t("med.none", state.language))
+                    .font(.caption2).foregroundStyle(Theme.t2)
+            }
+            ForEach(uploads, id: \.id) { m in
+                // The alt text is the uploader's own words for what it
+                // shows, and it is the row's label rather than a footnote:
+                // this list is read aloud by people who cannot see any of
+                // it, and a filename tells them nothing.
+                Text("\(m.kind ?? "—") · \(m.alt ?? m.name ?? m.id ?? "—")")
+                    .font(.caption2).foregroundStyle(Theme.t2)
             }
             if let line {
                 Text(line).font(.caption2).foregroundStyle(Theme.t2)

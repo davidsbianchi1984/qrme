@@ -4749,6 +4749,20 @@ extension ApiClient {
         return try JSONDecoder().decode(MediaOut.self, from: out)
     }
 
+    /// Everything one profile has uploaded, newest first — the other side
+    /// of the upload door above. Public, like the wall it appears on; the
+    /// filter is `image`, `video` or `file`, and leaving it off asks for
+    /// all three.
+    func profileMedia(profileId: String) async throws -> [MediaOut] {
+        struct Box: Decodable { let media: [MediaOut]? }
+        // No `?kind=` here on purpose: this strip shows everything the
+        // profile has put up, and the route's filter exists for a screen
+        // that offers Photos and Videos as two doors. One list is the
+        // honest shape for one button.
+        let box: Box = try await request("/profiles/\(profileId)/media")
+        return box.media ?? []
+    }
+
     func videoPlatforms() async throws -> VideoPlatformBoard {
         try await request("/videos/platforms")
     }
@@ -5480,6 +5494,10 @@ struct MediaLimits: Decodable {
 struct MediaOut: Decodable {
     let id: String?
     let kind: String?
+    let url: String?
+    let name: String?
+    /// What the uploader said it shows, for somebody who cannot see it.
+    let alt: String?
     let ai_marked: Bool?
 }
 

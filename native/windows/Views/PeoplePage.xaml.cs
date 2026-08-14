@@ -462,6 +462,7 @@ public sealed partial class PeoplePage : Page
         MedPlatformsButton.Content = L10n.T("med.platforms");
         MedFilenameBox.Header = L10n.T("wear.name");
         MedUploadButton.Content = L10n.T("med.upload");
+        MedGalleryButton.Content = L10n.T("med.gallery");
         WearTitle.Text = L10n.T("wear.title");
         WearListButton.Content = L10n.T("wear.list");
         WearNameBox.Header = L10n.T("wear.name");
@@ -2634,6 +2635,22 @@ public sealed partial class PeoplePage : Page
                 AppState.Current.Token!);
             MedFilenameBox.Text = "";
             StatusText.Text = outp.Kind ?? outp.Id ?? "";
+        });
+
+    /// The other side of the upload door above. The alt text leads each
+    /// row rather than trailing it: this list is read aloud to people who
+    /// cannot see any of it, and a filename tells them nothing.
+    private async void OnMedGallery(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var outp = await ApiClient.Shared.ProfileMedia(
+                AppState.Current.Pid!);
+            var rows = outp.Media ?? [];
+            MedGalleryText.Text = rows.Length == 0
+                ? L10n.T("med.none")
+                : string.Join("\n", rows.Select(m =>
+                    $"{m.Kind ?? "\u2014"} \u00b7 "
+                    + (m.Alt ?? m.Name ?? m.Id ?? "\u2014")));
         });
 
     private async void OnWearList(object sender, RoutedEventArgs e) =>

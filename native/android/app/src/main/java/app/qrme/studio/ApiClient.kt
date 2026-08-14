@@ -4057,6 +4057,33 @@ object ApiClient {
         }
     }
 
+    /**
+     * What came through the upload door, newest first. The upload has
+     * been here since 0.42.x with nothing that lists it — media was
+     * findable only through the wall post it happened to ride on, so one
+     * attached to nothing was invisible from the first second.
+     *
+     *     asked     can somebody put a photograph here
+     *     mattered  can anybody find it afterwards
+     *
+     * The alt text leads each row rather than trailing it: this list is
+     * read aloud to people who cannot see any of it, and a filename tells
+     * them nothing.
+     */
+    suspend fun profileMedia(id: String): List<String> {
+        // No `?kind=` here on purpose: this strip shows everything the
+        // profile has put up, and the route's filter exists for a screen
+        // that offers Photos and Videos as two doors.
+        val rows = JSONObject(request("/profiles/$id/media"))
+            .optJSONArray("media") ?: return emptyList()
+        return (0 until rows.length()).map { i ->
+            val m = rows.getJSONObject(i)
+            val said = m.optString("alt").ifEmpty {
+                m.optString("name").ifEmpty { m.optString("id", "\u2014") } }
+            "${m.optString("kind", "\u2014")} \u00b7 $said"
+        }
+    }
+
     /** Raw bytes in the body; the kind is read from the bytes. */
     suspend fun uploadMedia(id: String, filename: String, bytes: ByteArray,
                             token: String): String =

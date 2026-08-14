@@ -1160,6 +1160,9 @@
                     </StackPanel>
                     <TextBox x:Name="MedFilenameBox" />
                     <Button x:Name="MedUploadButton" Click="OnMedUpload" />
+                    <Button x:Name="MedGalleryButton" Click="OnMedGallery" />
+                    <TextBlock x:Name="MedGalleryText" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
                 </StackPanel>
             </Border>
 

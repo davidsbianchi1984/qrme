@@ -5506,6 +5506,7 @@ private fun WmBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
 private fun MedBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
     val lang = L10n.deviceLanguage()
     var filename by remember { mutableStateOf("") }
+    var uploads by remember { mutableStateOf(emptyList<String>()) }
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(L10n.t("med.title", lang), color = Qrme.Txt, fontSize = 16.sp,
             fontWeight = FontWeight.Bold)
@@ -5526,6 +5527,16 @@ private fun MedBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
                 filename = ""
                 onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
         }
+        // The other side of the door above.
+        BrandButton(L10n.t("med.gallery", lang)) {
+            vm.call({ ApiClient.profileMedia(vm.pid!!) }) { r ->
+                uploads = r.getOrNull() ?: emptyList()
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        if (uploads.isEmpty()) {
+            Text(L10n.t("med.none", lang), color = Qrme.T2, fontSize = 12.sp)
+        }
+        uploads.forEach { Text(it, color = Qrme.T2, fontSize = 12.sp) }
     }
 }
 

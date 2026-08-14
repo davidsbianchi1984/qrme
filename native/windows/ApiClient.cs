@@ -2606,6 +2606,20 @@ public sealed class ApiClient
         return await Send<MediaOut>(req);
     }
 
+    /// <summary>What came through the upload door, newest first. The
+    /// upload has been here since 0.42.x with nothing that lists it —
+    /// media was findable only through the wall post it happened to ride
+    /// on, so one attached to nothing was invisible from the first
+    /// second.
+    ///
+    ///     asked     can somebody put a photograph here
+    ///     mattered  can anybody find it afterwards
+    /// </summary>
+    public Task<MediaGallery> ProfileMedia(string profileId,
+        string kind = "") =>
+        Send<MediaGallery>(Get($"/profiles/{profileId}/media"
+            + (kind.Length == 0 ? "" : $"?kind={kind}")));
+
     public Task<VideoPlatformBoard> VideoPlatforms() =>
         Send<VideoPlatformBoard>(Get("/videos/platforms"));
 
@@ -4957,6 +4971,8 @@ public record MediaLimit(
     [property: JsonPropertyName("max_bytes")] long? MaxBytes,
     [property: JsonPropertyName("types")] string[]? Types);
 
+public record MediaGallery(MediaOut[]? Media);
+
 public record MediaLimitsCard(
     [property: JsonPropertyName("image")] MediaLimit? Image,
     [property: JsonPropertyName("video")] MediaLimit? Video,
@@ -4966,6 +4982,11 @@ public record MediaLimitsCard(
 public record MediaOut(
     [property: JsonPropertyName("id")] string? Id,
     [property: JsonPropertyName("kind")] string? Kind,
+    [property: JsonPropertyName("url")] string? Url,
+    [property: JsonPropertyName("name")] string? Name,
+    /// <summary>What the uploader said it shows, for somebody who cannot
+    /// see it.</summary>
+    [property: JsonPropertyName("alt")] string? Alt,
     [property: JsonPropertyName("ai_marked")] bool? AiMarked);
 
 public record VideoPlatformBoard(
