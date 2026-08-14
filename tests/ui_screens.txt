@@ -1,4 +1,4 @@
-# status: floor — 63 rows
+# status: floor — 64 rows
 #
 # Which console surface each screen drawing depicts.
 #
@@ -56,6 +56,7 @@ Briefcase       6,197
 SkinPicker      44,156
 SkinTiles       44
 TalkRail        198
+Waveform        199
 Solitude        192
 Chat            6,45,83
 Desk            69,70

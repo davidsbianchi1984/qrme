@@ -1017,6 +1017,30 @@ LESSONS: tuple[dict, ...] = (
          try_it="Press a face in your Top friends, read their page, then "
                 "press one of the faces in *their* Top 8 and keep going — "
                 "Back should walk you home the way you came."),
+    dict(key="beside_the_face", chapter="Meeting others",
+         title="What sits beside the face",
+         what="Open the talk surface and there is a rail down the right: who "
+              "they are, what they hold about you, what the two of you are to "
+              "each other, and how they behave. Each one used to live three "
+              "screens away from the conversation it was about. The memory "
+              "panel answers from the records rather than by asking the "
+              "profile — how many turns were distilled, how many are still "
+              "recent, and the paragraph as it actually stands — and it can "
+              "strike one thing without ending the friendship. The rail only "
+              "draws what you can actually open: two panels are the owner's, "
+              "so a visitor sees the other two rather than four buttons that "
+              "refuse. Under the figure, a line and a strip of bars say what "
+              "is happening — listening, thinking, speaking, reading "
+              "something you handed over, or nothing at all. The bars move "
+              "only when something is moving, because a strip that animates "
+              "on a closed microphone tells you the room is being heard when "
+              "it is not.",
+         screens=(198, 199),
+         try_it="Open the talk surface and watch the line under the name "
+                "while you tap to speak, while it answers, and while it sits "
+                "idle. Then press the camera and show it something — the "
+                "bars should say it is reading, and the profile should say "
+                "plainly that it cannot see the picture."),
     dict(key="discover", chapter="Meeting others", title="Discover",
          what="The marketplace as cards — every one a real profile you can "
               "talk to, not a listing about one. The starter collection is "

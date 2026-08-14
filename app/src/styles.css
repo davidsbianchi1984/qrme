@@ -793,6 +793,25 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
                    text-overflow: ellipsis; white-space: nowrap; }
 .talk-panel { max-height: 46vh; overflow-y: auto; width: min(92vw, 560px);
               text-align: left; }
+/* The reading under the figure. Height and gap only — the bars are scaled
+   by the component, because a CSS keyframe cannot be told what is happening
+   and would animate on a dead microphone. */
+.waveform { display: flex; align-items: center; justify-content: center;
+            gap: 3px; height: 34px; margin: 2px 0 4px; }
+.wf-bar { width: 3px; height: 100%; border-radius: 2px;
+          background: var(--accent); transform: scaleY(0.08);
+          transform-origin: center;
+          transition: background 200ms ease; }
+.wf-still .wf-bar { background: var(--line); }
+.wf-busy  .wf-bar { background: #9fd8e8; }
+.wf-out   .wf-bar { background: var(--brand, var(--accent)); }
+@media (prefers-reduced-motion: reduce) {
+  /* The reading still has to be readable without the movement, so the bars
+     hold a state-coloured resting height rather than going flat and losing
+     the distinction the strip exists to make. */
+  .wf-bar { transform: scaleY(0.34) !important; }
+  .wf-still .wf-bar { transform: scaleY(0.08) !important; }
+}
 .talk-panel-body { display: flex; flex-direction: column; gap: 8px; }
 .talk-dial { display: grid; grid-template-columns: 1fr 2fr auto;
              align-items: center; gap: 8px; }

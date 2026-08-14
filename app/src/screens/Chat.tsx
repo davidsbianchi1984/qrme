@@ -5,6 +5,8 @@ import { Briefcase } from "../Briefcase";
 import { Refusal } from "../Refusal";
 import { SkinPicker } from "../SkinPicker";
 import { TalkRail } from "../TalkRail";
+import { Waveform } from "../Waveform";
+import { presenceOf, presenceKey, animatedIn } from "../presence";
 import { useSession } from "../store";
 
 interface Msg { who: "you" | "assistant"; text: string; note?: string;
@@ -59,6 +61,34 @@ export function Chat({ onPlans }: {
   // and could not give one to the profile built from their own life.
   const [bcOpen, setBcOpen] = useState(false);
   const [skinOpen, setSkinOpen] = useState(false);
+  // The camera. A photograph goes into the briefcase rather than into a
+  // route of its own — the briefcase is already the place material handed to
+  // a profile lives, already says plainly that this deployment cannot see a
+  // picture, and already scopes what you hand over to the two of you.
+  const camRef = useRef<HTMLInputElement | null>(null);
+  const [shooting, setShooting] = useState(false);
+  const shoot = (file: File) => {
+    if (!session.profileId || !session.interactorId) return;
+    setShooting(true);
+    api.importFile(session.profileId, session.interactorId, file,
+                   tr("chat.camera.note", lang))
+      .then(() => setBcOpen(true))   // land where it went, not nowhere
+      .catch(setError)
+      .finally(() => setShooting(false));
+  };
+
+  // What the conversation is doing, decided once. Before this the surface
+  // had `listening` and used it for the pulse, the caption, and nothing
+  // else — a profile that was thinking, speaking, or had just failed looked
+  // identical to one sitting idle. `presence.ts` was written for this and
+  // then nothing imported it, which is a module with no door.
+  const presence = presenceOf({
+    listening,
+    awaiting: busy,
+    speaking: speakOn && !!window.speechSynthesis?.speaking,
+    working: shooting,
+    failed: !!error,
+  });
 
   // The conversation follows itself. The previous version scrolled from
   // `finally` inside a requestAnimationFrame, which can fire before React
@@ -267,7 +297,7 @@ export function Chat({ onPlans }: {
               circular face is next; the orb is only for a profile with no
               portrait at all. */}
           {talkAvatar?.torso ? (
-            <img className={"talk-torso" + (listening ? " listening" : "")}
+            <img className={"talk-torso" + (animatedIn(presence) ? " listening" : "")}
                  src={talkAvatar.torso.startsWith("http")
                         ? talkAvatar.torso
                         : getBase() + talkAvatar.torso}
@@ -279,7 +309,7 @@ export function Chat({ onPlans }: {
                placeholder, which made every portrait-less profile look
                identical to every other and looked like a thing rather than
                like something to fill. */
-            <div className={"talk-face" + (listening ? " listening" : "")
+            <div className={"talk-face" + (animatedIn(presence) ? " listening" : "")
                             + (talkAvatar.placeholder ? " empty" : "")}>
               <img src={talkAvatar.asset.startsWith("http")
                           ? talkAvatar.asset
@@ -288,10 +318,13 @@ export function Chat({ onPlans }: {
             </div>
           ) : null}
           <div className="talk-name">{session.profile?.display_name}</div>
+          {/* Seven states rather than two, and the strip below reads from the
+              same decision — so the caption and the bars cannot disagree
+              about what is happening. */}
           <div className="talk-state muted small">
-            {listening ? tr("chat.talk.listening", lang)
-                       : tr("chat.talk.tap", lang)}
+            {tr(presenceKey(presence), lang)}
           </div>
+          <Waveform presence={presence} lang={lang} />
           {heard && <div className="talk-heard">{heard}</div>}
           {talkAvatar && (!talkAvatar.asset || talkAvatar.placeholder) && (
             <div className="muted small">{tr("chat.talk.noface", lang)}</div>
@@ -394,6 +427,23 @@ export function Chat({ onPlans }: {
                 aria-label={tr("prf.bc.heading", lang)}
                 className={bcOpen ? "primary" : ""}
                 onClick={() => setBcOpen((o) => !o)}>📎</button>
+        {/* The camera. `capture="environment"` is what makes a phone open the
+            lens rather than the picker — without it this is the paperclip
+            again with a different glyph, which is how a camera button ends up
+            shipping that never took a photograph. On a desktop browser the
+            attribute is ignored and the file chooser opens, which is the
+            honest fallback rather than a control that does nothing. */}
+        <input ref={camRef} type="file" accept="image/*" capture="environment"
+               style={{ display: "none" }}
+               onChange={(e) => {
+                 const f = e.target.files?.[0];
+                 e.target.value = "";
+                 if (f) shoot(f);
+               }} />
+        <button title={tr("chat.camera", lang)}
+                aria-label={tr("chat.camera", lang)}
+                disabled={!session.profileId || !session.interactorId}
+                onClick={() => camRef.current?.click()}>📷</button>
         <button title={tr("cht.rh", lang)}
                 className={rhOpen || rehearsal ? "primary" : ""}
                 onClick={() => setRhOpen((o) => !o)}>🎭</button>

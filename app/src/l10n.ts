@@ -8195,6 +8195,50 @@ const CHROME: Table = {
   "rail.ctl.locked": {
     en: "The dials are locked. Nothing here will move until you turn the key.", es: "Los diales están bloqueados. Nada se moverá hasta que gires la llave.", fr: "Les molettes sont verrouillées. Rien ne bougera avant que vous tourniez la clé.", de: "Die Regler sind gesperrt. Hier bewegt sich nichts, bis du den Schlüssel drehst.", pt: "Os mostradores estão bloqueados. Nada se move até virares a chave.", it: "Le manopole sono bloccate. Nulla si muove finché non giri la chiave.", ja: "ダイヤルは施錠されています。鍵を回すまで何も動きません。", zh: "旋钮已锁定。在你转动钥匙之前，这里不会有任何变化。", hi: "डायल बंद हैं। जब तक आप चाबी नहीं घुमाते, यहाँ कुछ नहीं हिलेगा।", ar: "الأقراص مقفلة. لن يتحرك شيء هنا حتى تدير المفتاح.",
   },
+  // The seven states, one key each so a translator sees the set rather than
+  // a sentence assembled at the call site. `idle` is an invitation because
+  // it is the only one of the seven where the person is the one who acts.
+  "talk.state.idle": {
+    en: "Tap to talk", es: "Toca para hablar", fr: "Touchez pour parler", de: "Zum Sprechen tippen", pt: "Toque para falar", it: "Tocca per parlare", ja: "タップして話す", zh: "点按说话", hi: "बोलने के लिए टैप करें", ar: "انقر للتحدث",
+  },
+  "talk.state.listening": {
+    en: "Listening…", es: "Escuchando…", fr: "À l'écoute…", de: "Hört zu…", pt: "A ouvir…", it: "In ascolto…", ja: "聞いています…", zh: "正在聆听…", hi: "सुन रहे हैं…", ar: "يستمع…",
+  },
+  "talk.state.thinking": {
+    en: "Thinking…", es: "Pensando…", fr: "Réfléchit…", de: "Denkt nach…", pt: "A pensar…", it: "Sta pensando…", ja: "考えています…", zh: "正在思考…", hi: "सोच रहे हैं…", ar: "يفكر…",
+  },
+  "talk.state.speaking": {
+    en: "Speaking", es: "Hablando", fr: "Parle", de: "Spricht", pt: "A falar", it: "Sta parlando", ja: "話しています", zh: "正在说话", hi: "बोल रहे हैं", ar: "يتحدث",
+  },
+  "talk.state.paused": {
+    en: "Held — not listening", es: "En pausa: no escucha", fr: "En pause — n'écoute pas", de: "Angehalten – hört nicht zu", pt: "Em pausa — não está a ouvir", it: "In pausa — non ascolta", ja: "停止中 — 聞いていません", zh: "已暂停 — 未在聆听", hi: "रुका हुआ — सुन नहीं रहा", ar: "متوقف — لا يستمع",
+  },
+  "talk.state.processing": {
+    en: "Reading what you gave it…", es: "Leyendo lo que le diste…", fr: "Lit ce que vous avez donné…", de: "Liest, was du gegeben hast…", pt: "A ler o que lhe deste…", it: "Sta leggendo ciò che gli hai dato…", ja: "渡したものを読んでいます…", zh: "正在读你交给它的东西…", hi: "आपने जो दिया उसे पढ़ रहे हैं…", ar: "يقرأ ما أعطيته…",
+  },
+  "talk.state.error": {
+    en: "That did not go through", es: "Eso no se completó", fr: "Cela n'a pas abouti", de: "Das ist nicht durchgegangen", pt: "Isso não passou", it: "Non è andata a buon fine", ja: "うまくいきませんでした", zh: "那一步没有成功", hi: "वह पूरा नहीं हुआ", ar: "لم يتم ذلك",
+  },
+  // What the strip is a reading of. Announced rather than left as decoration
+  // a screen reader walks into and cannot name.
+  "wave.in": {
+    en: "Your voice, coming in", es: "Tu voz, entrando", fr: "Votre voix, qui entre", de: "Deine Stimme, eingehend", pt: "A tua voz, a entrar", it: "La tua voce, in entrata", ja: "あなたの声が入っています", zh: "你的声音，正在进入", hi: "आपकी आवाज़, आ रही है", ar: "صوتك، وارد",
+  },
+  "wave.out": {
+    en: "Their voice, going out", es: "Su voz, saliendo", fr: "Sa voix, qui sort", de: "Ihre Stimme, ausgehend", pt: "A voz dele, a sair", it: "La sua voce, in uscita", ja: "相手の声が出ています", zh: "对方的声音，正在发出", hi: "उनकी आवाज़, जा रही है", ar: "صوتهم، صادر",
+  },
+  "wave.busy": {
+    en: "Working — nobody is speaking", es: "Trabajando: nadie habla", fr: "En travail — personne ne parle", de: "Arbeitet – niemand spricht", pt: "A trabalhar — ninguém fala", it: "Al lavoro — nessuno parla", ja: "処理中 — 誰も話していません", zh: "正在处理 — 无人说话", hi: "काम चल रहा है — कोई नहीं बोल रहा", ar: "يعمل — لا أحد يتحدث",
+  },
+  "wave.still": {
+    en: "Silent", es: "En silencio", fr: "Silencieux", de: "Still", pt: "Em silêncio", it: "In silenzio", ja: "無音", zh: "静默", hi: "मौन", ar: "صامت",
+  },
+  "chat.camera": {
+    en: "Show it something", es: "Muéstrale algo", fr: "Montrez-lui quelque chose", de: "Zeig ihm etwas", pt: "Mostra-lhe algo", it: "Mostragli qualcosa", ja: "何かを見せる", zh: "给它看点东西", hi: "इसे कुछ दिखाएँ", ar: "أرِه شيئًا",
+  },
+  "chat.camera.note": {
+    en: "a photo I took just now", es: "una foto que acabo de tomar", fr: "une photo que je viens de prendre", de: "ein Foto, das ich gerade gemacht habe", pt: "uma foto que acabei de tirar", it: "una foto appena scattata", ja: "今撮った写真", zh: "我刚拍的一张照片", hi: "अभी ली गई एक तस्वीर", ar: "صورة التقطتها للتو",
+  },
   "rail.ctl.saving": {
     en: "Moving…", es: "Ajustando…", fr: "Réglage…", de: "Wird verstellt…", pt: "A ajustar…", it: "Regolazione…", ja: "調整中…", zh: "调整中…", hi: "बदल रहे हैं…", ar: "جارٍ الضبط…",
   },

@@ -3773,6 +3773,21 @@ SCREENS = [
         dict(icon="lock", color="silver", k="How they behave",
              s="the dials, and the lock on them"),
     ], button=("Only what you can open", "brand")),
+    # 199: what the conversation is doing. Seven states where the surface had
+    # one boolean, and a strip of bars that reads rather than decorates — the
+    # last card is why: bars that move on a closed microphone are a lie about
+    # the one thing a person needs to be sure of before they speak.
+    dict(num=199, title="What It Is Doing", sub="Seven states, and bars that mean them",
+         accent="cyan", tab=0, cards=[
+        dict(icon="mic", color="green", k="Listening",
+             s="your voice, coming in"),
+        dict(icon="chat", color="brand", k="Speaking",
+             s="theirs, going out"),
+        dict(icon="clock", color="amber", k="Thinking",
+             s="a turn is out, nobody talks"),
+        dict(icon="lock", color="silver", k="Silent",
+             s="flat, and it means flat"),
+    ], button=("One decision, four readings", "brand")),
     # 184: the console before there is a profile. The first card is the
     # defect and it is the whole round — three routes the backend made
     # public on purpose, reachable only after signing up to the platform the
