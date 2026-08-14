@@ -28,6 +28,14 @@ class Signup(BaseModel):
 class SignIn(BaseModel):
     email: str
     password: str
+    #: The person this device has been talking as, if it has one.
+    #:
+    #: Somebody talks to three starters as a stranger, then makes an account.
+    #: Minting a fresh person at that moment would throw away every
+    #: conversation they had just had — the account would be the moment their
+    #: history was deleted, which is the worst possible time for it. Handed
+    #: over here, that stranger becomes them.
+    adopt_interactor_id: str | None = None
 
 
 class VerifyEmail(BaseModel):
@@ -127,7 +135,8 @@ def signin(body: SignIn) -> dict:
     wrong password get the same answer; an unverified address cannot sign
     in at all."""
     try:
-        return accounts.signin(body.email, body.password)
+        return accounts.signin(body.email, body.password,
+                               adopt_interactor_id=body.adopt_interactor_id)
     except accounts.AccountError as exc:
         raise HTTPException(exc.status, exc.detail)
 

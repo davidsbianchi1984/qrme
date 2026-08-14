@@ -36,7 +36,7 @@ function PasswordField(props: {
 // Stage 1: the account — email verified by a 6-digit code before anything
 // can sign in. Stage 2 (below): the profile, created under the account.
 function AccountGate() {
-  const { setSession } = useSession();
+  const { session, setSession } = useSession();
   const [mode, setMode] = useState<Mode>("signup");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -94,8 +94,18 @@ function AccountGate() {
   }
 
   const passwordsMatch = password === confirm;
-  const finishSession = (a: { account_id: string; account_token: string; email: string }) =>
-    setSession({ accountId: a.account_id, accountToken: a.account_token, accountEmail: a.email });
+  // The account *and* the person. Memory is keyed on (profile, interactor),
+  // so a session that carries only the account leaves every conversation
+  // attached to whatever id this browser happened to mint — which is how a
+  // starter you had talked to for an hour had never met you on your phone.
+  const finishSession = (a: { account_id: string; account_token: string;
+                              email: string; interactor_id?: string;
+                              interactor_token?: string }) =>
+    setSession({ accountId: a.account_id, accountToken: a.account_token,
+                 accountEmail: a.email,
+                 ...(a.interactor_id ? { interactorId: a.interactor_id } : {}),
+                 ...(a.interactor_token
+                       ? { interactorToken: a.interactor_token } : {}) });
 
   const isDesktop = Boolean((window as unknown as { qrmeDesktop?: unknown }).qrmeDesktop);
   const whereIsTheCode = delivery === "console"
@@ -112,7 +122,10 @@ function AccountGate() {
     if (mode !== "code" || !password) return;
     const timer = setInterval(async () => {
       try {
-        const a = await accountApi.signin({ email: email.trim(), password });
+        const a = await accountApi.signin({ email: email.trim(), password,
+                                  ...(session.interactorId
+                                        ? { adopt_interactor_id: session.interactorId }
+                                        : {}) });
         finishSession(a);
       } catch { /* not verified yet — keep waiting */ }
     }, 3000);
@@ -263,7 +276,10 @@ function AccountGate() {
       {mode === "signin" && (<>
         <button className="primary" disabled={busy || !email.trim() || !password}
                 onClick={() => run(
-                  () => accountApi.signin({ email: email.trim(), password }),
+                  () => accountApi.signin({ email: email.trim(), password,
+                                  ...(session.interactorId
+                                        ? { adopt_interactor_id: session.interactorId }
+                                        : {}) }),
                   finishSession)}>
           {busy ? tr("onb.signingin", visitorLang()) : tr("onb.signin", visitorLang())}
         </button>

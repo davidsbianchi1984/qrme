@@ -97,8 +97,19 @@ export const accountApi = {
   resendCode: (email: string) =>
     req<{ email: string; code_delivery: string }>(
       "/verify-email/resend", { method: "POST", body: { email } }),
-  signin: (body: { email: string; password: string }) =>
-    req<{ account_id: string; email: string; display_name?: string; account_token: string }>(
+  // The response carries the *person*, not only the account.
+  //
+  // Memory is keyed on (profile, interactor), and an interactor used to be
+  // minted per device and kept in this browser's local storage — so a
+  // starter remembered a browser. Same account on a phone and Dr. Osei had
+  // never met you. `adopt_interactor_id` hands over the stranger this device
+  // has already been talking as, so making an account keeps the
+  // conversations rather than being the moment they were deleted.
+  signin: (body: { email: string; password: string;
+                   adopt_interactor_id?: string }) =>
+    req<{ account_id: string; email: string; display_name?: string;
+          account_token: string; interactor_id: string;
+          interactor_token: string }>(
       "/signin", { method: "POST", body }),
   // Which model answers, as a picker rather than a config file.
   listModels: () =>

@@ -265,7 +265,8 @@ def verify_link(token: str) -> dict:
     return {"email": row["email"], "already": False}
 
 
-def signin(email: str, password: str) -> dict:
+def signin(email: str, password: str,
+           adopt_interactor_id: str | None = None) -> dict:
     email = _normalize(email)
     account = db.connect().execute(
         "SELECT * FROM accounts WHERE email=?", (email,)
@@ -284,9 +285,82 @@ def signin(email: str, password: str) -> dict:
             403, "this address has not been verified — enter the emailed "
                  "code, or request a new one")
     from . import auth
+    # A stranger who has been talking becomes this account's person, rather
+    # than being replaced by a fresh one who has met nobody.
+    if adopt_interactor_id:
+        who = adopt(account["id"], adopt_interactor_id)
+    else:
+        who = interactor_for(account["id"], account["display_name"])
     return {"account_id": account["id"], "email": email,
             "display_name": account["display_name"],
-            "account_token": auth.issue("account", account["id"])}
+            "account_token": auth.issue("account", account["id"]),
+            # The person, not the browser. Folded into this response rather
+            # than given a route of its own: a client that has just signed in
+            # is exactly the client that needs it, and a second door would be
+            # one more thing a shell could forget to knock on — which is how
+            # one client ends up the odd one out.
+            "interactor_id": who["id"],
+            "interactor_token": auth.issue("interactor", who["id"])}
+
+
+def interactor_for(account_id: str, display_name: str | None = None) -> dict:
+    """This account's person, made once and returned thereafter.
+
+    Memory is keyed on (profile, interactor). While an interactor was minted
+    per device and kept in local storage, a profile remembered the browser
+    rather than the human: sign in on a phone after a week on the desktop and
+    a starter you had talked to for an hour had never met you.
+
+        asked     does the profile remember the conversation
+        mattered  does it remember the person
+
+    Idempotent on purpose. Signing in twice must not produce two people, or
+    the fix would reintroduce the defect with extra steps — the second one
+    would be a stranger again.
+    """
+    conn = db.connect()
+    row = conn.execute(
+        "SELECT * FROM interactors WHERE account_id=?"
+        " ORDER BY created_at LIMIT 1", (account_id,)).fetchone()
+    if row is not None:
+        return dict(row)
+    interactor_id = db.new_id("usr")
+    conn.execute(
+        "INSERT INTO interactors (id, display_name, account_id, created_at)"
+        " VALUES (?,?,?,?)",
+        (interactor_id, (display_name or "").strip() or "You", account_id,
+         db.utcnow()))
+    conn.commit()
+    return dict(conn.execute("SELECT * FROM interactors WHERE id=?",
+                             (interactor_id,)).fetchone())
+
+
+def adopt(account_id: str, interactor_id: str) -> dict:
+    """Bind an interactor this device already had to the account signing in.
+
+    The upgrade path, and the reason it matters: somebody talks to three
+    starters as a stranger, then makes an account. Minting a fresh person at
+    that moment would throw away every conversation they had just had — the
+    account would be the moment their history was deleted, which is the worst
+    possible time for it.
+
+    Refused when the interactor already belongs to somebody else. An
+    unattached interactor is a device's; one with an account is a person's,
+    and moving it would hand one person's remembered conversations to
+    another.
+    """
+    conn = db.connect()
+    row = conn.execute("SELECT * FROM interactors WHERE id=?",
+                       (interactor_id,)).fetchone()
+    if row is None:
+        raise AccountError(404, "no such person on this device")
+    if row["account_id"] and row["account_id"] != account_id:
+        raise AccountError(403, "that person belongs to another account")
+    conn.execute("UPDATE interactors SET account_id=? WHERE id=?",
+                 (account_id, interactor_id))
+    conn.commit()
+    return dict(conn.execute("SELECT * FROM interactors WHERE id=?",
+                             (interactor_id,)).fetchone())
 
 
 def request_reset(email: str) -> dict:

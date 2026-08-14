@@ -1509,8 +1509,29 @@ CREATE TABLE IF NOT EXISTS interactors (
     birthdate    TEXT,
     quiet_start  INTEGER,             -- quiet-hours window (UTC hour, inclusive)
     quiet_end    INTEGER,             -- quiet-hours window (UTC hour, exclusive)
+    -- Whose person this is, when they have an account.
+    --
+    -- Memory is keyed on (profile, interactor), and an interactor used to be
+    -- minted per device and kept in that browser's local storage. So a
+    -- starter remembered you perfectly until you opened the app on your
+    -- phone — same account, same person, and a profile that had never met
+    -- you. Everything about the memory worked; it was attached to the
+    -- browser rather than to you.
+    --
+    --     asked     does the profile remember the conversation
+    --     mattered  does it remember the person
+    --
+    -- Nullable, and that is not a shortcut: an accountless visitor is a
+    -- first-class case in this product — a stranger scanning a beacon has no
+    -- account and still gets a conversation, and still gets it remembered
+    -- for as long as their device holds the id. Binding is what an account
+    -- adds, not what a conversation requires.
+    account_id   TEXT REFERENCES accounts(id),
     created_at   TEXT NOT NULL
 );
+
+CREATE INDEX IF NOT EXISTS idx_interactors_account
+    ON interactors (account_id);
 
 -- Objections: a real person (or their estate) contesting a profile that
 -- represents them. Opening one moves the profile to 'restricted' (public
