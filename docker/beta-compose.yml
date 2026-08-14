@@ -148,6 +148,13 @@ services:
       JIM_PDI_URL: http://pdi:8100
       JIM_LLM: anthropic
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?}
+      # The house key for the spoken voice — how a deployment buys speech on
+      # behalf of everybody who opens the app. Optional on purpose: `:-` and
+      # not `:?`, because a deployment that does not pay for a voice is a
+      # working deployment. Unset, every user gets the device's own
+      # recogniser and speech, and `GET /voice/quota` says so rather than
+      # degrading in silence. Only JIM reads it; QRME has no ElevenLabs path.
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
     volumes:
       - shared:/shared
       - jim-data:/data
