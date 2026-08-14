@@ -51,13 +51,50 @@ def test_a_custom_watermark_still_declares_ai_on_the_portrait(client):
 
 
 def test_a_profile_with_no_portrait_says_so_rather_than_faking_one(client):
-    """No asset is an answer: fall back to initials, never an unbadged
-    placeholder image."""
+    """No portrait is an answer, and now it is *one* answer.
+
+    This used to assert `asset is None`, on the reasoning that surfaces
+    should "fall back to initials, never an unbadged placeholder image". The
+    first half was the defect: three surfaces fell back three different ways
+    — initials on Home and the Top 8, an abstract orb on the talk surface,
+    the empty frame for an anonymous profile — so the same profile had three
+    faces and the one on the conversation screen made every portrait-less
+    person look identical.
+
+    The property the test was really protecting is the second half, and it
+    still holds exactly: `placeholder` stays true, so nothing captions the
+    frame as somebody's face, and the badge is still always displayed.
+    """
     pid = client.post("/profiles", json=_profile_body()).json()["id"]
     body = client.get(f"/profiles/{pid}/avatar").json()
-    assert body["asset"] is None
+    assert body["asset"] == avatars.ADD_PHOTO
     assert body["placeholder"] is True
+    # Not their own face, so nothing may claim the mark is in these pixels.
+    assert body["asset_marked"] is False
     assert body["watermark"]["always_displayed"] is True
+
+
+def test_the_frame_is_the_only_answer_to_a_missing_face(client):
+    """One picture, whichever way the profile got here.
+
+    A profile with no portrait and an anonymous profile that has chosen
+    nothing arrive at the same frame — which is the point: *two defaults
+    meant two things that could disagree about the same profile*, and there
+    were three.
+    """
+    created = client.post("/profiles", json=_profile_body()).json()
+    pid = created["id"]
+    auth = {"authorization": f"Bearer {created['owner_token']}"}
+    plain = client.get(f"/profiles/{pid}/avatar").json()
+
+    veiled = client.put(f"/profiles/{pid}/anonymity",
+                        json={"anonymous": True}, headers=auth)
+    assert veiled.status_code == 200, veiled.text
+    hidden = client.get(f"/profiles/{pid}/avatar").json()
+
+    assert plain["asset"] == hidden["asset"] == avatars.ADD_PHOTO
+    # The flags still tell the two apart — one is veiled, one is merely bare.
+    assert plain["silhouette"] is False and hidden["silhouette"] is True
 
 
 def test_only_the_owner_can_attach_a_portrait(client):

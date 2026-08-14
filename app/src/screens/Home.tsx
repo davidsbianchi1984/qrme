@@ -107,11 +107,7 @@ export function Home({ go, onVisit }: {
                   <img className="presence-bubble" alt=""
                        src={f.avatar.startsWith("http")
                               ? f.avatar : getBase() + f.avatar} />
-                ) : (
-                  <div className="presence-bubble orbfill">
-                    {f.display_name.slice(0, 1)}
-                  </div>
-                )}
+                ) : null}
                 <span className="presence-name">{f.display_name}</span>
               </button>
             ))}

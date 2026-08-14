@@ -133,6 +133,26 @@ def photo_path(handle: str) -> str | None:
             if (photos_dir() / f"{handle}.webp").is_file() else None)
 
 
+def shown(asset: str | None) -> str:
+    """The picture a *row* shows — the asset, or the empty frame.
+
+    `render()` is the full answer and costs several queries; a list of forty
+    friends does not want forty of those. This is the same terminal decision
+    without them, so a row-shaped payload and a rendered profile agree about
+    what a face-less profile looks like.
+
+        asked     does this row have a picture
+        mattered  does every surface draw the same thing when it does not
+
+    Before this, four list builders handed the raw column straight out and
+    each client invented its own fallback — initials in two places, an
+    abstract orb in a third. Anonymity is *not* handled here on purpose: that
+    substitution needs the profile's own chosen emblem and belongs in
+    `render`, which is where it already is.
+    """
+    return asset or ADD_PHOTO
+
+
 def asset_is_marked(asset: str | None) -> bool:
     """Whether the image itself carries the AI mark, as opposed to needing a
     surface to composite one.
@@ -521,6 +541,21 @@ def render(profile_id: str) -> dict:
         # the thing the flag exists to withhold.
         from . import identity
         asset = identity.emblem_asset(profile_id)
+    elif not asset:
+        # And a profile that simply has no portrait yet gets the same empty
+        # frame, decided here rather than left to each surface.
+        #
+        # `emblem_asset` already ends at this frame when an anonymous profile
+        # has chosen nothing, so the terminal answer existed — it was reachable
+        # only by turning anonymity on. Everyone else fell through to whatever
+        # the surface invented, which was initials in two places and a blue orb
+        # in a third.
+        #
+        # The empty frame is the honest drawing of an empty frame, and it reads
+        # as something to fill rather than as a thing somebody chose. The name
+        # beside it does the identifying, which is the argument the anonymous
+        # placeholder was settled on.
+        asset = ADD_PHOTO
 
     return {
         "profile_id": profile_id,
@@ -567,10 +602,25 @@ def render(profile_id: str) -> dict:
         "presentation": presentation_mod.presentation(
             profile_id, asset, torso=None if anonymous
                                      else torso_of(profile_id)),
-        # A portrait with no asset yet is still an answer: surfaces fall back
-        # to initials rather than showing an unbadged placeholder. Never true
-        # for an anonymous profile — the silhouette *is* the picture there, and
-        # falling back would put a monogram of the hidden name on the page.
+        # A portrait with no asset yet is still an answer, and now it is *one*
+        # answer. `asset` carries the empty frame (see the substitution above),
+        # and this flag says the picture is not their own face — so a surface
+        # can draw it as the invitation it is rather than captioning it as
+        # somebody's portrait.
+        #
+        # It used to mean "draw whatever you like", and three surfaces liked
+        # three different things: initials on Home and the Top 8, a blue orb on
+        # the talk surface, the empty frame for an anonymous profile. Same
+        # profile, three faces, and the one on the conversation screen made
+        # every face-less person look identical to every other.
+        #
+        #     asked     does a profile with no face have something to show
+        #     mattered  does it show the same thing everywhere
+        #
+        # This module already argued the point when the anonymous placeholder
+        # was chosen — *two defaults meant two things that could disagree
+        # about the same profile, which is the shape of bug this codebase keeps
+        # finding* — and then there were three.
         "placeholder": not anonymous and not row["avatar"],
     }
 

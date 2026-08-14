@@ -37,7 +37,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from . import audience, db, embeds, moderation
+from . import audience, avatars, db, embeds, moderation
 
 MAX_BODY = 2000
 
@@ -252,7 +252,8 @@ def for_you(viewer_profile_id: str, limit: int = 25,
 
         out.append({
             "id": r["id"], "profile_id": r["profile_id"],
-            "display_name": r["display_name"], "avatar": r["avatar"],
+            "display_name": r["display_name"],
+            "avatar": avatars.shown(r["avatar"]),
             "body": r["body"], "created_at": r["created_at"],
             "likes": likes,
             "score": round(score, 1),

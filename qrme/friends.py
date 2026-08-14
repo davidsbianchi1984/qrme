@@ -35,7 +35,7 @@ Three decisions worth keeping in view:
 
 from __future__ import annotations
 
-from . import db, inbox, verification
+from . import avatars, db, inbox, verification
 
 # The founder's two profiles, in the order they stand. One constant, because
 # "who is pinned" is a product decision and should be greppable rather than
@@ -239,7 +239,7 @@ def friends_of(profile_id: str) -> list[dict]:
             "profile_id": r["friend_id"],
             "display_name": r["display_name"],
             "handle": r["handle"],
-            "avatar": r["avatar"],
+            "avatar": avatars.shown(r["avatar"]),
             "kind": r["kind"],
             "founder": founder,
             # Said out loud so a client renders the row without a remove
@@ -397,7 +397,7 @@ def suggestions(profile_id: str, limit: int = 10) -> list[dict]:
             continue
         out.append({
             "profile_id": pid, "display_name": info["display_name"],
-            "handle": info["handle"], "avatar": info["avatar"],
+            "handle": info["handle"], "avatar": avatars.shown(info["avatar"]),
             "kind": info["kind"], "score": score,
             "mutual_friends": n, "shared_subjects": sorted(shared),
             "reason": reason,

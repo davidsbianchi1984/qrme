@@ -271,16 +271,21 @@ export function Chat({ onPlans }: {
                         ? talkAvatar.torso
                         : getBase() + talkAvatar.torso}
                  alt={session.profile?.display_name || ""} />
-          ) : talkAvatar && talkAvatar.asset && !talkAvatar.placeholder ? (
-            <div className={"talk-face" + (listening ? " listening" : "")}>
+          ) : talkAvatar?.asset ? (
+            /* The face, or the empty frame — `render()` decides which, and
+               `placeholder` only says how to caption it. This branch used to
+               fall through to an abstract orb whenever the asset was a
+               placeholder, which made every portrait-less profile look
+               identical to every other and looked like a thing rather than
+               like something to fill. */
+            <div className={"talk-face" + (listening ? " listening" : "")
+                            + (talkAvatar.placeholder ? " empty" : "")}>
               <img src={talkAvatar.asset.startsWith("http")
                           ? talkAvatar.asset
                           : getBase() + talkAvatar.asset}
                    alt={session.profile?.display_name || ""} />
             </div>
-          ) : (
-            <div className={"talk-orb" + (listening ? " listening" : "")} />
-          )}
+          ) : null}
           <div className="talk-name">{session.profile?.display_name}</div>
           <div className="talk-state muted small">
             {listening ? tr("chat.talk.listening", lang)

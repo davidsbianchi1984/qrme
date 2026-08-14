@@ -98,8 +98,12 @@ export function presenceKey(p: Presence): string {
  *  and reaching every surface; the console showing the still and saying so
  *  is better than the console rendering the poster and letting the owner
  *  believe their model is on screen. Same call `ProfilePageView` makes about
- *  a stranger's markup: name the gap rather than paper over it. */
-export type Renderer = "image" | "video" | "still" | "orb";
+ *  a stranger's markup: name the gap rather than paper over it.
+ *
+ *  There is no `orb`. A profile with no portrait yet gets the empty frame,
+ *  and it gets it from `render()` rather than from here — one answer, decided
+ *  in one place, so no surface can invent a second. */
+export type Renderer = "image" | "video" | "still";
 
 /** What this console can run today. A kind absent from here falls back with
  *  a sentence rather than silently. */
@@ -124,18 +128,17 @@ export interface AvatarSource {
 /** `(renderer, src)` — what to draw and what to draw it from. */
 export function rendererFor(a: AvatarSource | null | undefined):
     { renderer: Renderer; src: string | null } {
-  if (!a) return { renderer: "orb", src: null };
+  if (!a) return { renderer: "image", src: null };
   const kind = a.kind || "image";
-  const face = a.placeholder ? null : (a.torso || a.asset || null);
+  // The frame is an image like any other, so `placeholder` no longer decides
+  // *whether* to draw — only how to caption it. Treating it as "nothing to
+  // draw" is what sent this surface looking for a fallback of its own.
+  const face = a.torso || a.asset || null;
   if (RENDERS[kind]) {
     if (kind === "video") return { renderer: "video", src: a.asset || null };
-    return face ? { renderer: "image", src: face }
-                : { renderer: "orb", src: null };
+    return { renderer: "image", src: face };
   }
   // A kind this surface cannot run. `still` is the backend's own answer for
-  // what stands in; it is null when there honestly is nothing, and an orb is
-  // the right drawing of nothing.
-  const stand = a.still || a.torso || null;
-  return stand ? { renderer: "still", src: stand }
-               : { renderer: "orb", src: null };
+  // what stands in; the frame is the floor under it.
+  return { renderer: "still", src: a.still || a.torso || a.asset || null };
 }

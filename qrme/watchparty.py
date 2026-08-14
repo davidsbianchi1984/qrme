@@ -42,7 +42,7 @@ runs strict, the same rule rooms already use.
 
 from __future__ import annotations
 
-from . import db, embeds, moderation, sharing
+from . import avatars, db, embeds, moderation, sharing
 
 MAX_PARTY = 50
 MAX_LINE = 600
@@ -292,7 +292,8 @@ def members(party_id: str) -> list[dict]:
         " WHERE m.party_id=? AND m.left_at IS NULL ORDER BY m.joined_at",
         (party_id,)).fetchall()
     return [{"member_id": r["member_id"], "kind": r["kind"], "role": r["role"],
-             "display_name": r["display_name"], "avatar": r["avatar"],
+             "display_name": r["display_name"],
+             "avatar": avatars.shown(r["avatar"]),
              # The mark travels into the party. A room where you cannot tell
              # which of the six names is a person is the room this platform
              # exists not to build.

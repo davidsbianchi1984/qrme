@@ -186,7 +186,6 @@ button.danger { background: rgba(224,104,122,0.14) !important; color: var(--red)
   display: flex; align-items: center; justify-content: center;
   font-weight: 700; font-size: 18px; color: #fff;
 }
-.presence-bubble.orbfill { background: radial-gradient(circle at 36% 30%, #d9ccff, #7b5cff 40%, #3f3bc0 78%, #140f34); border: 0; }
 .presence-name {
   font-size: 10px; font-weight: 700; color: #dff3ff;
   background: rgba(8,6,20,0.7); border-radius: 8px; padding: 2px 8px;
@@ -597,11 +596,12 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .talk-face img { width: 100%; height: 100%; object-fit: cover; }
 .talk-face.listening { animation: talk-pulse 1.6s ease-in-out infinite;
   border-color: var(--brand, #40e0ff); }
-.talk-orb { width: min(50vw, 200px); height: min(50vw, 200px);
-  border-radius: 50%;
-  background: radial-gradient(circle at 34% 30%, #b0e8ff, #40b0ff 45%, #1a4a90 80%, #0a1430);
-  box-shadow: 0 0 46px rgba(64,176,255,0.5); }
-.talk-orb.listening { animation: talk-pulse 1.6s ease-in-out infinite; }
+/* No orb. A profile with no portrait yet shows the empty frame, like it does
+   everywhere else — the picture is the same picture, and only the treatment
+   says it is waiting to be filled: dimmer, dashed, and not glowing as though
+   somebody chose it. */
+.talk-face.empty { border-style: dashed; box-shadow: none; opacity: 0.72; }
+.talk-face.empty img { object-fit: contain; padding: 18%; }
 /* The upper-torso form, standing on the talk surface at full figure. */
 .talk-torso {
   width: min(46vw, 220px); height: min(62vw, 300px);
