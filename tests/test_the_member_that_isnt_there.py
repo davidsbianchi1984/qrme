@@ -179,12 +179,64 @@ def _expand_aliases(text: str) -> str:
     return text
 
 
+def _skip_quoted(text: str, i: int) -> int:
+    """Index of the closing quote of the literal starting at `i`."""
+    i += 1
+    while i < len(text) and text[i] != '"':
+        i += 2 if text[i] == "\\" else 1
+    return min(i, len(text) - 1)
+
+
+def _strip_comments(text: str) -> str:
+    """Comments out, literals left alone — one left-to-right pass.
+
+    This was `re.sub(r"/\\*.*?\\*/", "", text, flags=re.S)` over the whole
+    file, which is the fourth scanner in this repository to mistake something
+    inside a string for syntax. `Screens.kt` now contains
+    `pickFile.launch("*/*")` — a MIME filter meaning *any file* — and the
+    `/*` in the middle of it opened a comment that the next KDoc below it
+    closed. Two hundred and thirty-four members vanished between them, and
+    the scan compared what was left against the declarations and found
+    nothing missing, which passes.
+
+        asked     is this `/*` a comment
+        mattered  is it inside a string
+
+    The brace checker and the capability scanner were rewritten this way when
+    the same literal deleted four braces and a `MediaRecorder` call. This one
+    was not, because nothing this scanner reads had carried a `/*` inside a
+    literal until now.
+    """
+    out, i, n = [], 0, len(text)
+    while i < n:
+        c = text[i]
+        if c == '"':
+            j = _skip_quoted(text, i)
+            out.append(text[i:j + 1])
+            i = j + 1
+            continue
+        if c == "/" and i + 1 < n:
+            # Not `://` — a URL's slashes are not a line comment.
+            if text[i + 1] == "/" and not (i and text[i - 1] == ":"):
+                j = text.find("\n", i)
+                i = n if j == -1 else j
+                continue
+            if text[i + 1] == "*":
+                j = text.find("*/", i + 2)
+                i = n if j == -1 else j + 2
+                continue
+        out.append(c)
+        i += 1
+    return "".join(out)
+
+
 def _code(path: Path) -> str:
     """Source with comments stripped. Prose about a member is not a member,
     and prose about a *missing* member is how this file would report a
     sentence as a defect."""
-    text = path.read_text(encoding="utf-8")
-    text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
+    text = _strip_comments(path.read_text(encoding="utf-8"))
+    # What survives the pass above: `///` doc lines, and the `*` continuation
+    # lines of a block comment whose opener sat inside a literal.
     text = re.sub(r"^\s*(?://|///|\*)[^\n]*$", "", text, flags=re.M)
     if path.suffix == ".cs":
         text = _expand_aliases(text)

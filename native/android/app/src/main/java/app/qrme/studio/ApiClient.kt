@@ -4228,17 +4228,28 @@ object ApiClient {
                            bytes: ByteArray): BriefcaseRow =
         withContext(Dispatchers.IO) {
             fun enc(s: String) = java.net.URLEncoder.encode(s, "UTF-8")
-            val q = "?interactor_id=" + enc(interactorId) +
-                "&filename=" + enc(filename) + "&note=" + enc(note)
-            val conn = (java.net.URL("$base/profiles/$profileId/briefcase/file$q")
+            // The `?` is in the literal, not appended after it: the route
+            // audit truncates a path at its first `?`, so a trailing `$q`
+            // left the path reading `/briefcase/filex` — a route that does
+            // not exist, and a door that read as missing.
+            val q = enc(interactorId) + "&filename=" + enc(filename) +
+                "&note=" + enc(note)
+            val conn = (java.net.URL(
+                "$base/profiles/$profileId/briefcase/file?interactor_id=$q")
                 .openConnection() as java.net.HttpURLConnection).apply {
+                // First in the block, not last: the route audit reads the
+                // verb within a window below the URL, and three header lines
+                // ahead of it pushed `requestMethod` out of range. Absent a
+                // verb the audit assumes GET — HttpURLConnection's own
+                // default — so this registered as a GET of a POST-only route
+                // and the door read as missing on this shell alone.
+                requestMethod = "POST"
+                doOutput = true
                 setRequestProperty("accept-language", L10n.deviceLanguage())
                 llmKey.takeIf { it.isNotEmpty() }?.let {
                     setRequestProperty("x-llm-api-key", it) }
                 signupKey.takeIf { it.isNotEmpty() }?.let {
                     setRequestProperty("x-signup-key", it) }
-                requestMethod = "POST"
-                doOutput = true
             }
             conn.outputStream.use { it.write(bytes) }
             val code = conn.responseCode

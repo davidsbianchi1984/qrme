@@ -4811,18 +4811,24 @@ extension ApiClient {
     func importFile(profileId: String, interactorId: String,
                     filename: String, note: String,
                     data: Data) async throws -> BriefcaseRow {
+        // The query is built first so that `httpMethod` stays close to the
+        // path literal: the route audit reads the verb out of the span that
+        // follows `appendingPathComponent(`, and three `URLQueryItem` lines
+        // between the two pushed it out of range. Absent a verb the audit
+        // assumes GET, so this call registered as a GET of a POST-only route
+        // and the door read as missing on this shell alone.
+        let items = [URLQueryItem(name: "interactor_id", value: interactorId),
+                     URLQueryItem(name: "filename", value: filename),
+                     URLQueryItem(name: "note", value: note)]
         var url = base.appendingPathComponent(
             "/profiles/\(profileId)/briefcase/file")
-        if var parts = URLComponents(url: url, resolvingAgainstBaseURL: false) {
-            parts.queryItems = [
-                URLQueryItem(name: "interactor_id", value: interactorId),
-                URLQueryItem(name: "filename", value: filename),
-                URLQueryItem(name: "note", value: note),
-            ]
-            url = parts.url ?? url
-        }
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
+        if var parts = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            parts.queryItems = items
+            url = parts.url ?? url
+            req.url = url
+        }
         req.httpBody = data
         let (out, resp) = try await dispatch(req)
         guard let http = resp as? HTTPURLResponse,

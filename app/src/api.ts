@@ -3325,8 +3325,12 @@ export const api = {
                      note = "") => {
     const q = new URLSearchParams({ interactor_id: interactorId,
                                     filename: file.name, note });
+    // `getBase() + ` rather than interpolating the base *inside* the
+    // template: the route audit reads the path out of a literal that starts
+    // with `/`, and a template beginning `${getBase()}` carries no such
+    // literal — the call became invisible and the door read as missing.
     const res = await fetch(
-      `${getBase()}/profiles/${profileId}/briefcase/file?${q.toString()}`,
+      getBase() + `/profiles/${profileId}/briefcase/file?${q.toString()}`,
       { method: "POST", body: file,
         headers: { "content-type": "application/octet-stream" } });
     const data = await res.json().catch(() => ({}));

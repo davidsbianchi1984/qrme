@@ -17,7 +17,8 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from .. import briefcase, llm, media, offline
-from ..common import interactor_or_404, profile_or_404
+from ..common import (interactor_or_404, profile_or_404,
+                      require_may_speak)
 
 router = APIRouter()
 
@@ -29,9 +30,34 @@ class LinkImport(BaseModel):
     note: str = ""
 
 
-def _pair(profile_id: str, interactor_id: str) -> None:
-    profile_or_404(profile_id)
+def _pair(profile_id: str, interactor_id: str) -> dict:
+    profile = profile_or_404(profile_id)
     interactor_or_404(interactor_id)
+    return dict(profile)
+
+
+#: A departed or terminated profile takes nothing new.
+#:
+#: Importing is not a passive store: the distillation runs the profile's own
+#: provider, so handing something over puts the profile to work. A memorial is
+#: frozen and a terminated profile is gone, and neither should be reading on
+#: somebody's behalf.
+#:
+#: `require_may_speak` rather than `require_may_publish`, deliberately. A
+#: restricted profile may still answer somebody it already knows — `chat` keeps
+#: that nuance — and a briefcase is only ever useful mid-conversation, so
+#: gating it harder than the conversation it belongs to would close a door the
+#: door beside it leaves open. Nothing here is published: the digest is read by
+#: this pair and nobody else.
+#:
+#: Reading the briefcase back and taking things out of it stay open in every
+#: status, for the same reason a departed profile's memory remains viewable —
+#: what you handed over is yours, and a memorial must not be a place your
+#: documents are stuck in.
+#:
+#: Called inline in each handler rather than through a helper: the guard in
+#: `test_a_memorial_does_not_keep_posting.py` reads the handler's own source,
+#: and a gate one indirection away is one a reader cannot see either.
 
 
 @router.post("/profiles/{profile_id}/briefcase/link", status_code=201)
@@ -43,7 +69,7 @@ def import_link(profile_id: str, body: LinkImport,
     not a failure to import — the item lands unread, carrying whatever the
     person said it was, and the profile is told plainly it has not seen it.
     """
-    _pair(profile_id, body.interactor_id)
+    require_may_speak(_pair(profile_id, body.interactor_id))
     url = body.url.strip()
     if not url.lower().startswith(("http://", "https://")):
         raise HTTPException(422, "a link starts with http:// or https://")
@@ -70,7 +96,7 @@ async def import_file(profile_id: str, request: Request,
     and explicitly *not* read — this deployment has no eyes, and a profile
     that describes a photograph it cannot see is the worse outcome.
     """
-    _pair(profile_id, interactor_id)
+    require_may_speak(_pair(profile_id, interactor_id))
     data = await request.body()
     if not data:
         raise HTTPException(422, "the upload arrived empty")

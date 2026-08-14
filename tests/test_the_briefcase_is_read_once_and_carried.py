@@ -195,6 +195,50 @@ def test_taking_it_back_removes_it(client, profile_id, interactor_id):
     assert again.status_code == 404
 
 
+def test_a_departed_profile_takes_nothing_new(
+        client, profile_id, interactor_id):
+    """Importing is not a passive store — the distillation runs the profile's
+    own provider. A memorial is frozen and must not be reading on somebody's
+    behalf."""
+    from qrme import db
+
+    conn = db.connect()
+    conn.execute("UPDATE profiles SET status='departed' WHERE id=?",
+                 (profile_id,))
+    conn.commit()
+    handed = _import_text(client, profile_id, interactor_id, b"read this")
+    assert handed.status_code == 410, handed.text
+    linked = client.post(f"/profiles/{profile_id}/briefcase/link",
+                         json={"interactor_id": interactor_id,
+                               "url": "https://example.test/x"})
+    assert linked.status_code == 410
+
+
+def test_a_memorial_still_hands_back_what_you_gave_it(
+        client, profile_id, interactor_id):
+    """The other half. Reading the briefcase and emptying it stay open in
+    every status, for the same reason a departed profile's memory remains
+    viewable — what you handed over is yours, and a memorial must not be a
+    place your documents are stuck in."""
+    from qrme import db
+
+    made = _import_text(client, profile_id, interactor_id, b"my filing")
+    item_id = made.json()["id"]
+    conn = db.connect()
+    conn.execute("UPDATE profiles SET status='departed' WHERE id=?",
+                 (profile_id,))
+    conn.commit()
+    listed = client.get(f"/profiles/{profile_id}/briefcase",
+                        params={"interactor_id": interactor_id})
+    assert listed.status_code == 200 and len(listed.json()["items"]) == 1
+    read = client.get(f"/profiles/{profile_id}/briefcase/{item_id}",
+                      params={"interactor_id": interactor_id})
+    assert read.status_code == 200 and "filing" in read.json()["text"]
+    gone = client.delete(f"/profiles/{profile_id}/briefcase/{item_id}",
+                         params={"interactor_id": interactor_id})
+    assert gone.status_code == 204
+
+
 def test_an_empty_upload_is_refused(client, profile_id, interactor_id):
     assert _import_text(client, profile_id, interactor_id,
                         b"").status_code == 422
