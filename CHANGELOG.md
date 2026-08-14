@@ -4,6 +4,36 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.71.1] - 2026-08-14
+
+### Fixed
+
+- **The API did not import on Windows, and the suite could not see it.**
+  `qrme/widgets.py` imported `resource` at module scope. It is POSIX-only,
+  and `qrme/api.py` imports `routers/studio`, which imports `widgets` — so
+  this was not "the sandbox is unavailable on Windows", it was *the whole
+  API failing to import there*. The frozen desktop backend died on first
+  run with `ModuleNotFoundError: No module named 'resource'`, which failed
+  the Windows installer job, which skipped the release job, which is why
+  0.70.0 and 0.70.1 published with **no installers attached at all** — not
+  even the macOS and Linux ones that had built cleanly.
+
+      asked     does the module import
+      mattered  does it import on every platform we ship
+
+  Absent, it is the missing-wall case wearing different clothes, so it is
+  handled the way this module already handles a host with no `unshare`: the
+  import is allowed to fail, `sandbox_available` returns `widgets.no_rlimits`
+  in the reader's own language, and every other route on the API still
+  answers. A widget still never runs with three walls instead of four.
+
+  The suite runs on Linux, where `resource` is present, so no test could
+  have caught this by importing anything. The new guard is a property of the
+  *text* instead: no module under `qrme/` may import a module some target
+  platform lacks unless the import is wrapped in a handler for its absence —
+  and the guard is shown the exact line that shipped, and required to object
+  to it.
+
 ## [0.71.0] - 2026-08-14
 
 ### Fixed
@@ -11109,7 +11139,9 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.70.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.71.1...HEAD
+[0.71.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.71.1
+[0.71.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.71.0
 [0.70.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.70.1
 [0.70.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.70.0
 [0.61.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.61.1

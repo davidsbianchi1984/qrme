@@ -73,12 +73,31 @@ from __future__ import annotations
 import json
 import os
 import re
-import resource
 import shutil
 import subprocess
 import tempfile
 import time
 import uuid
+
+# `resource` is POSIX-only, and this module is imported by qrme.api through
+# routers/studio — so a bare `import resource` at the top of the file is not
+# "the sandbox is unavailable on Windows", it is *the whole API fails to
+# import on Windows*. The frozen desktop backend died here on first run,
+# which took the Windows installer job down, which skipped the release job,
+# which is why 0.70.0 and 0.70.1 published with no installers attached at
+# all — not even the macOS and Linux ones that had built.
+#
+#     asked     does the module import
+#     mattered  does it import on every platform we ship
+#
+# Absent, it is the missing-wall case wearing different clothes: this module
+# refuses to run anything rather than running a widget with three walls
+# instead of four. So the import is allowed to fail and `sandbox_available`
+# says so in a sentence, exactly like a host with no `unshare`.
+try:
+    import resource
+except ImportError:                                 # pragma: no cover - POSIX
+    resource = None
 
 from . import db
 
@@ -190,6 +209,8 @@ def sandbox_available() -> tuple[bool, str]:
     a screen instead of a stack trace, and so the guard for the refusal can
     read the same sentence the person reads.
     """
+    if resource is None:
+        return False, "widgets.no_rlimits"
     if shutil.which(_UNSHARE) is None:
         return False, "widgets.no_unshare"
     node = shutil.which("node")

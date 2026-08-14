@@ -168,6 +168,46 @@ with it. Downloading `/root/backups` somewhere else now and then — or
 pointing a cron job at it from another box — is still a manual step, and
 the one that matters in the fire that actually burns.
 
+## 7. Updating a running beta
+
+Everything above stands the beta up once. This is the other thing, and it
+was missing from this page long enough that the four commands lived only in
+a chat message — which is the shape of every other drift this estate keeps
+finding in itself.
+
+```bash
+cd /srv/qrme     && git pull --ff-only
+cd /srv/jim-mini && git pull --ff-only
+cd /srv/pdi      && git pull --ff-only
+
+cd /srv/qrme
+docker compose -f docker/beta-compose.yml --env-file .env up -d --build
+```
+
+All three, every time, even for a release that changed only one of them —
+the version guard in each console compares itself against the backend
+answering the port, and a box carrying two versions reports the mismatch to
+whoever is using it rather than to you.
+
+There is no migration step and there is not meant to be one. Each product
+runs its schema on connect with `CREATE TABLE IF NOT EXISTS`, and columns
+added to tables somebody already has are applied there too, so a table
+added in a release appears the first time the new code opens the file. The
+databases live in named volumes and the rebuild does not touch them.
+
+Then check what actually answers, from your own machine rather than the
+host — `/health` carries the version for exactly this:
+
+```bash
+for h in sntheticprofiles.com jim-mini.com pdisystems.net; do
+  printf '%-22s ' "$h"; curl -s "https://$h/health" | jq -r .version
+done
+```
+
+Three lines, all reading the version you just deployed. A name still
+reporting the old one is a container that did not rebuild, not a slow
+rollout — there is one host and nothing behind it to lag.
+
 ---
 
 ## What this is not

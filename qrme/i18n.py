@@ -207,6 +207,8 @@ STUDIO_REFUSALS: dict[str, str] = {
                        "nothing will run here",
     "widgets.node_too_old": "this deployment's interpreter is too old to "
                             "hold a widget in, so nothing will run here",
+    "widgets.no_rlimits": "this deployment cannot cap what a widget may use, "
+                          "so nothing will run here",
     # The agent that writes them. Its wrong answers are a genre of their own:
     # every one of these is the model failing, not the person, and each says
     # so rather than reading as something they did.
@@ -1082,6 +1084,17 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'zh': '本部署的解释器太旧，无法把小工具关进箱子里，因此这里不会运行任何东西。',
         'hi': 'इस डिप्लॉयमेंट का इंटरप्रेटर इतना पुराना है कि विजेट को बॉक्स में नहीं रख सकता, इसलिए यहाँ कुछ नहीं चलेगा।',
         'ar': 'مفسّر هذا النشر أقدم من أن يحتوي أداة داخل صندوق، لذا لن يُشغَّل شيء هنا.',
+    },
+    'this deployment cannot cap what a widget may use, so nothing will run here': {
+        'es': 'esta instalación no puede limitar lo que un widget puede consumir, así que aquí no se ejecutará nada',
+        'fr': "cette installation ne peut pas plafonner ce qu'un widget consomme ; rien ne s'exécutera ici",
+        'de': 'diese Installation kann nicht begrenzen, was ein Widget verbraucht — hier läuft nichts',
+        'pt': 'esta instalação não consegue limitar o que um widget pode consumir, por isso nada correrá aqui',
+        'it': "questa installazione non può limitare ciò che un widget consuma, quindi qui non girerà nulla",
+        'ja': 'この配備はウィジェットが使える量に上限をかけられないため、ここでは何も実行されません。',
+        'zh': '本部署无法限制小工具能占用多少资源，因此这里不会运行任何东西。',
+        'hi': 'यह डिप्लॉयमेंट यह सीमित नहीं कर सकता कि विजेट कितना इस्तेमाल करे, इसलिए यहाँ कुछ नहीं चलेगा।',
+        'ar': 'لا يستطيع هذا النشر تحديد سقف لما تستهلكه الأداة، لذا لن يُشغَّل شيء هنا.',
     },
     'say what you would like changed': {
         'es': 'diga qué le gustaría cambiar',
