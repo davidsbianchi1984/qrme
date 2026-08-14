@@ -742,6 +742,14 @@ public sealed class ApiClient
 
     public void SetBase(string url) => _http.BaseAddress = new Uri(url.TrimEnd('/'));
 
+    /// <summary>
+    /// Where this shell is actually pointed, for a message that has to name
+    /// it. The address was settable and unreadable: a person told that two
+    /// versions are answering needs to know *which* address is serving the
+    /// other one, and "somewhere" is not an answer they can act on.
+    /// </summary>
+    public string BaseAddress => _http.BaseAddress?.ToString() ?? "";
+
     private async Task<T> Send<T>(HttpRequestMessage req)
     {
         // The path as written, for the recorder. Read before the send, which
@@ -5155,10 +5163,19 @@ public record ExperienceOut(
     [property: JsonPropertyName("experience")]
     ExperienceEntryOut[] Experience);
 
+/// <summary>
+/// <c>Version</c> is nullable twice over: a backend old enough to predate
+/// the field answers without it, and that is exactly the deployment the
+/// version guard exists to name — so it must decode to null rather than
+/// throw and leave the shell with no answer. It was not decoded at all
+/// until the guard needed it, which is why nothing here could tell a stale
+/// backend from a current one.
+/// </summary>
 public record HealthOut(
     [property: JsonPropertyName("status")] string? Status,
     [property: JsonPropertyName("cloud")] bool? Cloud,
-    [property: JsonPropertyName("offline")] bool? Offline);
+    [property: JsonPropertyName("offline")] bool? Offline,
+    [property: JsonPropertyName("version")] string? Version);
 
 public record RemovedOut(
     [property: JsonPropertyName("removed")] bool? Removed);
@@ -5174,7 +5191,7 @@ public sealed record WidgetRow(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("source")] string Source,
-    [property: JsonPropertyName("version")] int Version);
+    [property: JsonPropertyName("revision")] int Revision);
 
 public sealed record WidgetBox(
     [property: JsonPropertyName("widgets")] WidgetRow[] Widgets);

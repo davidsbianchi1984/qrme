@@ -314,7 +314,13 @@ def run_source(source: str, inputs: dict | None = None) -> dict:
 
 def _row(row) -> dict:
     return {"id": row["id"], "name": row["name"], "source": row["source"],
-            "version": row["version"], "created_at": row["created_at"],
+            # `revision` and not `version`: `/health` answers a `version`
+            # too, and that one is a semantic version string while this is a
+            # save count. One wire name carrying two types is the defect
+            # `test_no_wire_name_carries_two_types` was written for — the
+            # column stays `version`, because the ambiguity was never in the
+            # database.
+            "revision": row["version"], "created_at": row["created_at"],
             "updated_at": row["updated_at"]}
 
 
@@ -392,5 +398,5 @@ def run(profile_id: str, widget_id: str, inputs: dict | None = None) -> dict:
     widget = read(profile_id, widget_id)
     answer = run_source(widget["source"], inputs)
     answer["widget_id"] = widget_id
-    answer["version"] = widget["version"]
+    answer["revision"] = widget["version"]
     return answer

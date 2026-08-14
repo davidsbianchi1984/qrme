@@ -4398,6 +4398,18 @@ object ApiClient {
         return JSONObject(request("/health")).optString("status", "ok")
     }
 
+    /**
+     * The backend's own version, for the guard that compares it with this
+     * build's. Empty when the field is absent, which is a real answer and
+     * not an error: a backend old enough to predate the field is exactly
+     * the deployment the guard exists to name. `health` above reads the
+     * same response and throws this away, which is why nothing on this
+     * shell could tell a stale backend from a current one.
+     */
+    suspend fun backendVersion(): String {
+        return JSONObject(request("/health")).optString("version", "")
+    }
+
     suspend fun marketplaceListings(): Int {
         return org.json.JSONArray(request("/marketplace/listings")).length()
     }
@@ -4636,7 +4648,7 @@ data class GrantUse(val usedAt: String, val what: String)
 // with no network, one directory, no child processes and finite time — never
 // on the phone.
 
-data class WidgetRow(val id: String, val name: String, val source: String, val version: Int)
+data class WidgetRow(val id: String, val name: String, val source: String, val revision: Int)
 
 /** What a run said. `status` is ok, error, timeout, killed or refused; the
  *  value is kept as text because a widget's answer is its author's shape. */

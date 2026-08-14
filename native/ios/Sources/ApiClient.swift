@@ -26,7 +26,14 @@ struct Post: Decodable {
     let watermark: WatermarkBrief?
 }
 
-struct Health: Decodable { let status: String }
+/// `version` is optional twice over: a backend old enough to predate the
+/// field answers without it, and that case is exactly the one the version
+/// guard exists to catch — so decoding must survive its absence rather than
+/// throw and leave the shell with no answer at all. It was decoded away
+/// entirely until the guard needed it; a binding that discards the answer is
+/// worse than none, because the next person to want it finds a health call
+/// that looks complete.
+struct Health: Decodable { let status: String; let version: String? }
 
 // MARK: Live desks — a real person, so never an AI watermark
 
@@ -5716,7 +5723,9 @@ struct WidgetRow: Decodable, Identifiable {
     let id: String
     let name: String
     let source: String
-    let version: Int
+    /// A save count, not a semantic version — `/health` uses `version` for
+    /// the latter and the two cannot share a wire name.
+    let revision: Int
 }
 
 /// Whatever a widget returned, rendered for a screen rather than typed.

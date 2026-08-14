@@ -3073,14 +3073,14 @@ const feedQuery = (cursor?: string, viewer?: string) =>
 
 /** A small program somebody wrote for their own profile. */
 export interface Widget {
-  id: string; name: string; source: string; version: number;
+  id: string; name: string; source: string; revision: number;
   created_at: number; updated_at: number;
 }
 
 /** What came back from running one. `status` is `ok`, `error`, `timeout`,
  *  `killed` or `refused`; `said` is the sentence for the reader. */
 export interface WidgetRun {
-  status: string; ms: number; widget_id?: string; version?: number;
+  status: string; ms: number; widget_id?: string; revision?: number;
   value?: unknown; truncated?: boolean; message?: string;
   detail?: string; said?: string;
 }

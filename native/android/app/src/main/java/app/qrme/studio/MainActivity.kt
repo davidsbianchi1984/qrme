@@ -35,6 +35,7 @@ import app.qrme.studio.ui.OverviewScreen
 import app.qrme.studio.ui.StudioScreen
 import app.qrme.studio.ui.ManageScreen
 import app.qrme.studio.ui.WelcomeScreen
+import app.qrme.studio.ui.VersionGuardBar
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,10 +55,17 @@ class MainActivity : ComponentActivity() {
         setContent {
             QrmeTheme {
                 val vm: StudioViewModel = viewModel()
-                if (!vm.isSignedIn) {
-                    WelcomeScreen(vm)
-                } else {
-                    HomeShell(vm)
+                // Over the tab bar and over the welcome flow both: a stale
+                // backend breaks the screens a signed-out person meets
+                // first, and saying so only after they get in would be
+                // saying it after the part that fails.
+                Box {
+                    if (!vm.isSignedIn) {
+                        WelcomeScreen(vm)
+                    } else {
+                        HomeShell(vm)
+                    }
+                    VersionGuardBar(vm.language)
                 }
             }
         }

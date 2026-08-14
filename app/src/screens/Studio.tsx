@@ -226,7 +226,7 @@ export function Studio({ onPlans }: { onPlans: () => void }) {
               {w.name}
             </button>
             <span className="muted small">
-              {fill(tr("studio.version", lang), { n: String(w.version) })}
+              {fill(tr("studio.version", lang), { n: String(w.revision) })}
             </span>
             <button onClick={() => remove(w)}>{tr("studio.remove", lang)}</button>
           </div>
