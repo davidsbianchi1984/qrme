@@ -1775,6 +1775,25 @@ export type Avatar = {
   motion: { style: string; energy: number; warmth: number; tempo_ms: number;
             states: { idle: string; speaking: string; listening: string };
             updated_with: number };
+  /** What kind of thing the asset *is*, and the presence states a
+   *  conversation can put it in.
+   *
+   *  Rides this response rather than a route of its own, for the same
+   *  reason the badge does: a surface cannot hold the picture without the
+   *  fact of what the picture is. `presence_states` comes from the backend
+   *  rather than being compiled in, so a client cannot quietly know a
+   *  smaller set than the others. */
+  presentation?: {
+    kind: "image" | "video" | "model" | "scene";
+    /** True when the owner said so rather than the address saying so. */
+    declared: boolean;
+    /** What to draw when this surface cannot render `kind`. Null means
+     *  there honestly is nothing — do not fall back to the asset, which an
+     *  `<img>` renders as a broken picture. */
+    still: string | null;
+    presence_states: string[];
+    presence_default: string;
+  };
 };
 
 export type AvatarBrief = {

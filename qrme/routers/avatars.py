@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import avatars
+from .. import avatars, presentation
 from ..common import profile_or_404, require_owner
 
 router = APIRouter()
@@ -26,6 +26,12 @@ class AvatarSet(BaseModel):
         default=None, max_length=20,
         description="How the portrait moves: still, breathe, or lively. "
                     "The animation itself follows the interaction history.")
+    presentation_kind: str | None = Field(
+        default=None, max_length=10,
+        description="What the asset is — image, video, model or scene — for "
+                    "an asset whose address does not say. Leave it off and "
+                    "the address decides, which is right for anything with "
+                    "an extension on it.")
 
 
 @router.get("/profiles/{profile_id}/avatar")
@@ -44,6 +50,14 @@ def set_avatar(profile_id: str, body: AvatarSet, request: Request) -> dict:
     if body.motion_style is not None:
         try:
             avatars.set_motion(profile_id, body.motion_style)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from None
+    # An empty string clears the override and hands the question back to the
+    # address, which is what an owner who mis-declared once needs.
+    if body.presentation_kind is not None:
+        try:
+            presentation.set_kind(profile_id,
+                                  body.presentation_kind.strip() or None)
         except ValueError as exc:
             raise HTTPException(422, str(exc)) from None
     return avatars.set_avatar(profile_id, body.asset)

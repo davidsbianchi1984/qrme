@@ -858,6 +858,18 @@ CREATE TABLE IF NOT EXISTS avatar_motion (
     updated_at TEXT NOT NULL
 );
 
+-- What kind of thing the avatar asset is, when the asset itself cannot say.
+-- `presentation.kind_of` reads the kind off the string — a `.glb` is a model,
+-- a `.mp4` is a video — which covers every asset that carries an extension.
+-- A provider serving a model from `/v1/avatar/8831` with the type in a header
+-- does not, and guessing wrong there is worse than asking; this row is the
+-- owner's own answer for exactly that case. Absent, the string decides.
+CREATE TABLE IF NOT EXISTS avatar_presentation (
+    profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
+    kind       TEXT NOT NULL,      -- image | video | model | scene
+    created_at TEXT NOT NULL
+);
+
 -- AI for lease: an organization seats somebody else's licensed specialist as
 -- one of its departments. The lease is the authorization that crosses the
 -- account boundary — departments otherwise require the org's own profiles —

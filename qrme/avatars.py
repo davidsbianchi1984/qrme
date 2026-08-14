@@ -35,7 +35,7 @@ to open on.
 
 from __future__ import annotations
 
-from . import db, watermark
+from . import db, presentation as presentation_mod, watermark
 
 # Shared direction, so 34 portraits look like one collection rather than 34
 # stock photos. Kept separate from the per-profile line below because it is
@@ -549,6 +549,24 @@ def render(profile_id: str) -> dict:
         # the likeness record, so nothing can animate the face without
         # having been handed the disclosure alongside it.
         "motion": motion_of(profile_id),
+        # What kind of thing the asset *is* — a still, a loop, a 3-D model, a
+        # scene — and the presence states a conversation can put it in.
+        #
+        # This docstring has claimed since it was written that "2-D, 3-D, VR
+        # and AR surfaces all read this one shape", and the shape was a URL.
+        # The import shelf has offered Ready Player Me's `.glb` link the whole
+        # time, so an owner could already hand this platform a model and every
+        # surface downstream would put it in an `<img>`.
+        #
+        #     asked     can a profile carry more than a still picture
+        #     mattered  can a surface tell what it was handed
+        #
+        # Attached here for the same reason the badge is: a client cannot opt
+        # out of it by not knowing about it, and a second route would mean a
+        # surface could hold the picture without the fact of what it is.
+        "presentation": presentation_mod.presentation(
+            profile_id, asset, torso=None if anonymous
+                                     else torso_of(profile_id)),
         # A portrait with no asset yet is still an answer: surfaces fall back
         # to initials rather than showing an unbadged placeholder. Never true
         # for an anonymous profile — the silhouette *is* the picture there, and
