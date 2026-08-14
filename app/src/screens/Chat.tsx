@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { api, getBase, type Avatar } from "../api";
+import { Briefcase } from "../Briefcase";
 import { Refusal } from "../Refusal";
+import { SkinPicker } from "../SkinPicker";
 import { useSession } from "../store";
 
 interface Msg { who: "you" | "assistant"; text: string; note?: string;
@@ -50,6 +52,12 @@ export function Chat({ onPlans }: {
   const [talking, setTalking] = useState(false);
   const [talkAvatar, setTalkAvatar] = useState<Avatar | null>(null);
   const [heard, setHeard] = useState("");
+  // Handing your own profile something to read, and changing the face it
+  // wears. Both shipped with a door on somebody *else's* homepage and none
+  // here — so a person could give a starter they had just met a document,
+  // and could not give one to the profile built from their own life.
+  const [bcOpen, setBcOpen] = useState(false);
+  const [skinOpen, setSkinOpen] = useState(false);
 
   // The conversation follows itself. The previous version scrolled from
   // `finally` inside a requestAnimationFrame, which can fire before React
@@ -292,7 +300,23 @@ export function Chat({ onPlans }: {
                     onClick={() => { setHeard(""); send(); }}>
               {tr("chat.send", lang)}
             </button>
+            {/* Changing the face here rather than on a settings screen: this
+                is the one surface where you are actually looking at it. */}
+            {session.profileId && session.ownerToken && (
+              <button className={skinOpen ? "primary" : ""}
+                      onClick={() => setSkinOpen((o) => !o)}>
+                {tr("idn.deck.market", lang)}
+              </button>
+            )}
           </div>
+          {skinOpen && session.profileId && session.ownerToken && (
+            <div className="card talk-skin">
+              <SkinPicker profileId={session.profileId}
+                          token={session.ownerToken}
+                          onError={setError}
+                          onChanged={setTalkAvatar} />
+            </div>
+          )}
         </div>
       )}
 
@@ -339,7 +363,20 @@ export function Chat({ onPlans }: {
         </div>
       )}
 
+      {bcOpen && session.profileId && session.interactorId && (
+        <div className="card">
+          <Briefcase profileId={session.profileId}
+                     interactorId={session.interactorId}
+                     name={session.profile?.display_name || ""}
+                     onError={setError} />
+        </div>
+      )}
+
       <div className="composer">
+        <button title={tr("prf.bc.heading", lang)}
+                aria-label={tr("prf.bc.heading", lang)}
+                className={bcOpen ? "primary" : ""}
+                onClick={() => setBcOpen((o) => !o)}>📎</button>
         <button title={tr("cht.rh", lang)}
                 className={rhOpen || rehearsal ? "primary" : ""}
                 onClick={() => setRhOpen((o) => !o)}>🎭</button>
