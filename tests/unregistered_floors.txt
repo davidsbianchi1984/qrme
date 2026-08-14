@@ -110,13 +110,13 @@ test_the_shape_the_swift_client_expects.py:218: len(_structs()) >= 200
 test_the_shape_the_swift_client_expects.py:219: fields >= 900
 test_the_shape_the_swift_client_expects.py:220: len(_bindings()) >= 150
 test_the_shape_the_swift_client_expects.py:227: len(driven) >= 25
-test_the_shells_still_parse.py:363: len(SWIFT) >= 40
-test_the_shells_still_parse.py:364: len(KOTLIN) >= 10
-test_the_shells_still_parse.py:365: len(CSHARP) >= 25
-test_the_shells_still_parse.py:375: len(XAML) >= 20
-test_the_shells_still_parse.py:378: named >= 900
-test_the_shells_still_parse.py:380: checked >= 340
-test_the_shells_still_parse.py:382: driven >= 780
+test_the_shells_still_parse.py:394: len(SWIFT) >= 40
+test_the_shells_still_parse.py:395: len(KOTLIN) >= 10
+test_the_shells_still_parse.py:396: len(CSHARP) >= 25
+test_the_shells_still_parse.py:406: len(XAML) >= 20
+test_the_shells_still_parse.py:409: named >= 900
+test_the_shells_still_parse.py:411: checked >= 340
+test_the_shells_still_parse.py:413: driven >= 780
 test_the_shells_table_answers_every_reader.py:107: len(_rows(shell)) >= 200
 test_the_starters_know_their_trade.py:69: len(d['expertise']) >= 350
 test_the_starters_know_their_trade.py:72: len(d['services']) >= 250
@@ -124,7 +124,7 @@ test_the_starters_know_their_trade.py:140: len(tags) >= 8
 test_the_sticker_the_queue_and_the_stamp.py:283: len(keys) >= 34
 test_the_stranger_has_a_language_too.py:118: len(keys) > 15
 test_the_strangers_language_on_a_phone.py:427: len(text) > 800
-test_the_tabs_are_translated_and_the_screens_are_not.py:543: english + calls >= 50
-test_the_tabs_are_translated_and_the_screens_are_not.py:764: len(rows) >= 10
+test_the_tabs_are_translated_and_the_screens_are_not.py:554: english + calls >= 50
+test_the_tabs_are_translated_and_the_screens_are_not.py:775: len(rows) >= 10
 test_the_workshop_in_the_pocket.py:268: len(keys) >= 49
 test_two_questions_a_mark_answers.py:196: len(why) > 40
