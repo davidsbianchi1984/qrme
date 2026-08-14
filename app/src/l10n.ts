@@ -7288,6 +7288,27 @@ const CHROME: Table = {
   "chat.talk.noface": {
     en: "This profile has no portrait yet — pick one in Identity, under the avatar deck.", es: "Este perfil aún no tiene retrato: elige uno en Identidad, en la baraja de avatares.", fr: "Ce profil n'a pas encore de portrait — choisissez-en un dans Identité, sous le jeu d'avatars.", de: "Dieses Profil hat noch kein Porträt — wähle eines unter Identität im Avatar-Deck.", pt: "Este perfil ainda não tem retrato — escolha um em Identidade, no baralho de avatares.", it: "Questo profilo non ha ancora un ritratto — scegline uno in Identità, nel mazzo degli avatar.", ja: "このプロフィールにはまだ肖像がありません — アイデンティティのアバターデッキから選んでください。", zh: "此档案还没有肖像 — 在“身份”的头像卡组中选择一个。", hi: "इस प्रोफ़ाइल का अभी कोई चित्र नहीं है — पहचान में अवतार डेक से एक चुनें।", ar: "لا صورة لهذا الملف بعد — اختر واحدة في الهوية، ضمن مجموعة الصور الرمزية.",
   },
+  // What the profile is actually wearing, said in terms of what the asset
+  // *is* rather than what it points at. An owner who pasted a `.glb` had no
+  // way to learn whether anything downstream knew it was a model.
+  "skin.now": {
+    en: "Wearing now: {kind}.", es: "Ahora lleva: {kind}.", fr: "Porte actuellement : {kind}.", de: "Trägt gerade: {kind}.", pt: "Usa agora: {kind}.", it: "Indossa ora: {kind}.", ja: "現在の見た目：{kind}。", zh: "当前使用：{kind}。", hi: "अभी पहना हुआ: {kind}।", ar: "يرتدي الآن: {kind}.",
+  },
+  "skin.kind.image": {
+    en: "a still picture", es: "una imagen fija", fr: "une image fixe", de: "ein Standbild", pt: "uma imagem fixa", it: "un'immagine fissa", ja: "静止画", zh: "一张静态图", hi: "एक स्थिर चित्र", ar: "صورة ثابتة",
+  },
+  "skin.kind.video": {
+    en: "a moving figure", es: "una figura en movimiento", fr: "une figure animée", de: "eine bewegte Figur", pt: "uma figura em movimento", it: "una figura in movimento", ja: "動く姿", zh: "一个会动的形象", hi: "एक चलती आकृति", ar: "هيئة متحركة",
+  },
+  "skin.kind.model": {
+    en: "a 3-D model", es: "un modelo 3D", fr: "un modèle 3D", de: "ein 3-D-Modell", pt: "um modelo 3D", it: "un modello 3D", ja: "3D モデル", zh: "一个 3D 模型", hi: "एक 3-D मॉडल", ar: "مجسّم ثلاثي الأبعاد",
+  },
+  "skin.kind.scene": {
+    en: "a scene", es: "una escena", fr: "une scène", de: "eine Szene", pt: "uma cena", it: "una scena", ja: "シーン", zh: "一个场景", hi: "एक दृश्य", ar: "مشهد",
+  },
+  "skin.notshown": {
+    en: "This screen shows the still it has — the figure itself is attached and reaches the surfaces that can run it.", es: "Esta pantalla muestra la imagen fija que tiene: la figura en sí está adjunta y llega a las superficies que pueden ejecutarla.", fr: "Cet écran affiche l'image fixe dont il dispose — la figure elle-même est attachée et parvient aux surfaces capables de l'exécuter.", de: "Dieser Bildschirm zeigt das Standbild, das er hat — die Figur selbst ist angehängt und erreicht die Oberflächen, die sie ausführen können.", pt: "Este ecrã mostra a imagem fixa que tem — a figura em si está anexada e chega às superfícies que a conseguem executar.", it: "Questa schermata mostra il fermo immagine che ha: la figura stessa è allegata e raggiunge le superfici in grado di eseguirla.", ja: "この画面は手元の静止画を表示します。姿そのものは登録済みで、それを動かせる画面には届いています。", zh: "此屏幕显示它手上的静态图——形象本身已附加，并会送达能够运行它的界面。", hi: "यह स्क्रीन अपने पास मौजूद स्थिर चित्र दिखाती है — आकृति स्वयं संलग्न है और उन सतहों तक पहुँचती है जो उसे चला सकती हैं।", ar: "تعرض هذه الشاشة الصورة الثابتة المتاحة لها — أما الهيئة نفسها فمرفقة وتصل إلى الأسطح القادرة على تشغيلها.",
+  },
   "idn.deck.characters": {
     en: "Pick a character", es: "Elige un personaje", fr: "Choisissez un personnage", de: "Wähle eine Figur", pt: "Escolha um personagem", it: "Scegli un personaggio", ja: "キャラクターを選ぶ", zh: "选择一个角色", hi: "एक किरदार चुनें", ar: "اختر شخصية",
   },

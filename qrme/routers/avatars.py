@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import avatars, presentation
+from .. import avatars, presentation, skins
 from ..common import profile_or_404, require_owner
 
 router = APIRouter()
@@ -118,7 +118,19 @@ def list_briefs() -> dict:
     from": every starter portrait is an invented person, and the brief that
     produced it says so in its own constraints.
     """
-    return {"style": avatars.STYLE, "briefs": avatars.catalog()}
+    return {
+        "style": avatars.STYLE,
+        "briefs": avatars.catalog(),
+        # The standing figures, on the same door for the same reason the
+        # presentation block rides `render()`: a second route would let a
+        # caller hold half the collection's art direction and not know the
+        # other half existed. `undrawn` is the honest headline — today it is
+        # the whole collection, and a surface that wants bodies should be
+        # able to read that rather than discover it one starter at a time.
+        "figure_style": skins.FIGURE_STYLE,
+        "figures": skins.catalog(),
+        "figures_undrawn": skins.missing(),
+    }
 
 
 @router.get("/avatars/briefs/{handle}")

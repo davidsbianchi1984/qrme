@@ -851,6 +851,16 @@ def seed() -> dict:
         if asset:
             conn.execute("UPDATE profiles SET avatar=? WHERE id=?",
                          (asset, profile["id"]))
+        # The standing figure, when one ships. Set here for the same reason
+        # the portrait is: a starter is not somebody's to dress, so the body
+        # it stands up in has to arrive with the package or not at all. None
+        # until the art lands, and `render` falls back to the face — so this
+        # line is what turns thirty-four drawn figures into thirty-four
+        # profiles that stand up, with nothing else to change.
+        from . import skins
+        figure = skins.skin_path(handle)
+        if figure:
+            avatars.set_torso(profile["id"], figure)
         all_tags = list(dict.fromkeys([industry.replace("_", "-"), *tags]))
         blurb = persona.split(". ")[0] + "."
         # Both marketplace surfaces: the generalized listings (browse) and
