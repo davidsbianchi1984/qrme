@@ -45,7 +45,56 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   read your document" is a claim somebody is entitled to check — and
   `DELETE …/briefcase/{item}`, on the console and all three shells.
 
+- **The avatar is not the profile.** A portrait was an image and nothing
+  else, so a video loop, a rigged model, or a bought character skin had no
+  way to be somebody's face. `qrme/presentation.py` names what an asset *is*
+  — `image`, `video`, `model`, `scene` — reading it off the address where the
+  address says (query strings stripped, so `figure.glb?sig=…` is still a
+  model) and taking the owner's word where it does not. Seven presence
+  states — idle, listening, thinking, speaking, paused, processing, error —
+  ride in the same block. It travels inside `avatars.render()` rather than
+  behind a route of its own, which is the difference between one change and
+  four new doorless rows.
+
+- **A skin from the market, picked the way a voice is.** The console's
+  provider tiles were already the pattern for "bring your own": eight drawn
+  tiles — Ready Player Me, Bitmoji, Meta Avatar, Memoji, Xbox, ZEPETO, Mii,
+  and one for anything else — plus a URL box, a torso box and a file upload.
+  Six `skin.*` keys in ten languages.
+
+- **A starter has a body to stand up in.** The 34 starters shipped with
+  portraits and nothing below the collar, so every one of them was a head in
+  a conversation screen built around a figure. `qrme/skins.py` carries a
+  standing pose per starter and *composes* the portrait brief rather than
+  restating it, so the two cannot come to describe different people.
+
+- **The profile remembers the person, not the browser.** Memory was keyed to
+  the interactor a device minted on first visit, so signing in on a laptop
+  and then a phone met the same profile as two strangers — and clearing a
+  browser lost the relationship outright. `interactors.account_id` attaches a
+  visitor to an account; `accounts.signin()` hands back the interactor, and
+  `adopt` claims the stranger this device has been talking as (403 if another
+  account already owns them).
+
 ### Changed
+
+- **One picture for a face that is not there, not five.** `render()` returned
+  `asset: None` for a portrait-less profile and left each surface to invent
+  something. Five did, differently: initials on Home and in a Top 8, a blue
+  orb on the talk surface, initials again on the beacon landing page, and —
+  the sharpest one — an Android overlay that drew a monogram *always*, never
+  reading the portrait it was sent, so one sticker scanned on a phone and on
+  a laptop showed two different profiles. On a profile whose name is hidden,
+  a monogram is the hidden name.
+
+      asked     does a profile with no face have something to show
+      mattered  does it show the same thing everywhere
+
+  `render()` is now terminal about the face: no portrait means the empty
+  frame, which reads as something to fill rather than as a thing. The orb,
+  both monograms and the `initials` field on `/b/{id}/card` are gone, and
+  `avatars.shown()` is the same decision for list payloads that cannot
+  afford a full render per row.
 
 - **Enter sends, and the button says Send.** The composer on somebody's
   homepage was a textarea with no key handler, so the only way out of it was

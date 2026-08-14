@@ -347,7 +347,6 @@ def beacon_card(beacon_id: str, request: Request) -> dict:
         # label and is real text — but a surface QRME does not control needs to
         # know whether compositing is mandatory or merely additive.
         "portrait_marked": art["asset_marked"],
-        "initials": landing._initials(name),
         "label": beacon["label"],
         "shared_room": beacon["room_id"],
         "open_url": f"{_public_base()}/b/{beacon_id}",

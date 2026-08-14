@@ -19,6 +19,20 @@ something to fill.
 settled: *two defaults meant two things that could disagree about the same
 profile, which is the shape of bug this codebase keeps finding.* That was
 written about two. There were three.
+
+There were five. Counting the console's three stopped at the surfaces a
+`.tsx` grep reaches, and two more were drawing their own answer outside it:
+
+* the beacon landing page, which a stranger meets before any client does,
+  kept an `if art["asset"]` branch that fell to initials;
+* the in-camera overlay, which was *handed* initials by `/b/{id}/card` — so
+  iOS drew a monogram while the image loaded, and Android drew one always,
+  never fetching the portrait at all.
+
+Android is the sharper half. It was not a fallback that fired rarely: the
+overlay had no portrait path in it, so scanning one sticker on a phone and
+on a laptop showed two different things every time, and on a profile whose
+name is hidden it showed initials of the hidden name.
 """
 
 from __future__ import annotations
@@ -92,3 +106,43 @@ def test_the_orb_is_gone_from_the_stylesheet_too():
     css = (REPO / "app" / "src" / "styles.css").read_text()
     assert ".talk-orb" not in css
     assert ".presence-bubble.orbfill" not in css
+
+
+def test_no_server_surface_draws_initials():
+    """The landing page and the overlay card, which the `.tsx` sweep above
+    cannot see. `landing.py` built a monogram from the display name; the card
+    handed one to every native overlay. Both are the same defect as the orb,
+    one layer further out."""
+    bad = []
+    for name in ("landing.py", "routers/summon.py"):
+        path = REPO / "qrme" / name
+        for n, line in enumerate(path.read_text().splitlines(), 1):
+            if line.strip().startswith("#"):
+                continue
+            if "initials" in line:
+                bad.append(f"qrme/{name}:{n}: {line.strip()}")
+    assert not bad, (
+        "a monogram of the display name is being drawn or shipped — "
+        "`render()` sends the frame, and on a profile with a hidden name a "
+        "monogram is the hidden name:\n    " + "\n    ".join(bad))
+
+
+def test_the_phones_draw_the_portrait_they_are_sent():
+    """Android's overlay never read `portrait` at all: it drew initials in
+    every case, so one sticker looked like two different profiles depending
+    on what scanned it. This fails if either shell goes back to inventing a
+    face, and if Android stops drawing the one it is given."""
+    native = REPO / "native"
+    ios = (native / "ios/Sources/Views/BeaconScannerView.swift").read_text()
+    android = (native / "android/app/src/main/java/app/qrme/studio"
+                        "/ui/BeaconScanner.kt").read_text()
+
+    for what, text in (("iOS", ios), ("Android", android)):
+        offenders = [f"{what}:{n}: {ln.strip()}"
+                     for n, ln in enumerate(text.splitlines(), 1)
+                     if "initials" in ln and not ln.strip().startswith(
+                         ("//", "*", "/*"))]
+        assert not offenders, "\n    ".join(offenders)
+
+    assert "AsyncImage" in android and "shown.portrait" in android, (
+        "the Android overlay is not drawing the portrait the card carries")

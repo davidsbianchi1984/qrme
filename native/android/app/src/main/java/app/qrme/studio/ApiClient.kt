@@ -166,7 +166,7 @@ data class SignatureReceipt(val signatureId: String, val signedAt: String,
 // What the in-camera overlay draws. Mirrors GET /b/{id}/card, and carries the
 // AI watermark in the same payload as the face so the two cannot come apart.
 data class BeaconCard(val profileId: String, val displayName: String,
-                      val watermark: String, val initials: String,
+                      val watermark: String,
                       val portrait: String?, val label: String?,
                       val sharedRoom: Boolean, val openUrl: String?,
                       val ageWall: Boolean)
@@ -967,7 +967,6 @@ object ApiClient {
             o.optString("profile_id", bid),
             o.optString("display_name", ""),
             o.optString("watermark", ""),
-            o.optString("initials", ""),
             if (o.isNull("portrait")) null else o.optString("portrait", null),
             if (o.isNull("label")) null else o.optString("label", null),
             !o.isNull("shared_room"),

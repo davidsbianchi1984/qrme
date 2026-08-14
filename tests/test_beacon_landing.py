@@ -333,10 +333,14 @@ def test_the_card_is_small_enough_to_fetch_while_the_camera_runs(client):
     # a URL from this string; a root-relative path is a valid href only in a
     # browser already on the origin, and the overlay is never that.
     assert card["portrait"] == "https://qrme.app/a/m.png"
-    assert card["initials"] == "MB"
     assert card["age_wall"] is False
+    # `initials` used to ride along so an overlay could draw a monogram when
+    # the portrait was absent. The portrait is never absent now — a profile
+    # with no face is sent the frame — so the field was a second answer to a
+    # question that has one, and on a hidden profile it was a monogram of the
+    # name being hidden.
     assert set(card) == {"profile_id", "display_name", "watermark", "portrait",
-                         "portrait_marked", "initials", "label", "shared_room",
+                         "portrait_marked", "label", "shared_room",
                          "open_url", "age_wall"}
 
 

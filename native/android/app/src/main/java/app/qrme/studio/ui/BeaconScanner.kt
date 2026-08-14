@@ -43,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -50,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import coil.compose.AsyncImage
 import androidx.core.content.ContextCompat
 import app.qrme.studio.ApiClient
 import app.qrme.studio.BeaconCard
@@ -206,13 +208,21 @@ private fun BeaconCameraSurface(onOpen: (String) -> Unit, onClose: () -> Unit,
                                 fontWeight = FontWeight.Black)
                         }
                     } else {
+                        // The face the card carries. This drew a monogram of
+                        // the display name and never the portrait at all, so
+                        // scanning the same sticker on a phone and a laptop
+                        // showed two different things — and on a profile with
+                        // a hidden name, initials of the name being hidden.
                         Box(
                             Modifier.size(side)
                                 .clip(RoundedCornerShape(18.dp))
                                 .background(Qrme.Card),
                             Alignment.Center) {
-                            Text(shown.initials, color = Qrme.BrandA,
-                                fontSize = 34.sp, fontWeight = FontWeight.Bold)
+                            AsyncImage(
+                                model = shown.portrait,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize())
                             Box(Modifier.align(Alignment.BottomStart)
                                 .padding(6.dp)
                                 .clip(CircleShape)

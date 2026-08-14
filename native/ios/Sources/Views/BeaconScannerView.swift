@@ -112,7 +112,6 @@ struct BeaconCard: Equatable {
     let profileId: String
     let displayName: String
     let watermark: String
-    let initials: String
     let portrait: URL?
     let label: String?
     let sharedRoom: Bool
@@ -165,23 +164,22 @@ private struct BeaconOverlay: View {
         .position(x: quad.midX, y: quad.midY - quad.height * 0.75)
     }
 
+    // The card always carries a portrait — a profile with no face of its own
+    // is sent the empty frame, so the only thing left to draw here is the
+    // ground the image lands on while it loads. Drawing initials in that gap
+    // was a monogram of a name the profile may have hidden.
     @ViewBuilder private var portrait: some View {
         if let url = card.portrait {
             AsyncImage(url: url) { image in
                 image.resizable().scaledToFill()
-            } placeholder: { initialsTile }
+            } placeholder: { waiting }
         } else {
-            initialsTile
+            waiting
         }
     }
 
-    private var initialsTile: some View {
-        ZStack {
-            Color(red: 0.09, green: 0.07, blue: 0.20)
-            Text(card.initials)
-                .font(.system(size: quad.width * 0.34, weight: .bold))
-                .foregroundStyle(Color(red: 0.49, green: 0.36, blue: 1.0))
-        }
+    private var waiting: some View {
+        Color(red: 0.09, green: 0.07, blue: 0.20)
     }
 }
 
@@ -286,7 +284,6 @@ final class BeaconScanner: NSObject, ObservableObject,
                 profileId: json["profile_id"] as? String ?? beaconId,
                 displayName: json["display_name"] as? String ?? "",
                 watermark: json["watermark"] as? String ?? "",
-                initials: json["initials"] as? String ?? "",
                 portrait: (json["portrait"] as? String).flatMap(URL.init),
                 label: json["label"] as? String,
                 sharedRoom: json["shared_room"] is String,

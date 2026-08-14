@@ -47,9 +47,6 @@ body{background:#0d0a20;color:#f4f1ff;min-height:100dvh;display:flex;
  overflow:hidden;background:#181233;box-shadow:0 24px 60px rgba(0,0,0,.55);
  animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
 .frame img{width:100%;height:100%;object-fit:cover;display:block}
-.initials{width:100%;height:100%;display:flex;align-items:center;
- justify-content:center;font-size:84px;font-weight:700;color:#7c5cff;
- letter-spacing:2px}
 /* The AI mark rides on the portrait, not the chrome — a stranger who
    screenshots this still carries the disclosure with the image. */
 .mark{position:absolute;left:12px;bottom:12px;padding:7px 12px;
@@ -117,11 +114,6 @@ def first_name(display_name: str) -> str:
         if part.lower().strip(".,") not in {h.strip(".") for h in _HONORIFICS}:
             return part
     return display_name
-
-
-def _initials(name: str) -> str:
-    parts = [p for p in name.replace(".", " ").split() if p]
-    return "".join(p[0] for p in parts[:2]).upper() or "?"
 
 
 def gone(what: str = "beacon") -> str:
@@ -301,12 +293,10 @@ def profile_page(profile: dict, base: str, label: str | None = None,
     watermark = art["watermark"]["line"]
     name = identity.shown_name(profile)
 
-    if art["asset"]:
-        portrait = f'<img src="{html.escape(art["asset"])}" alt="" >'
-    else:
-        # No portrait yet: initials rather than a stock face, which would be
-        # a stranger's first impression of a person who does not exist.
-        portrait = f'<div class="initials">{html.escape(_initials(name))}</div>'
+    # `render()` is terminal about the face: a profile with no portrait gets
+    # the empty frame, so there is no second branch here to disagree with the
+    # console about what a stranger sees.
+    portrait = f'<img src="{html.escape(art["asset"])}" alt="" >'
 
     blurb = db.connect().execute(
         "SELECT blurb FROM marketplace WHERE profile_id=?", (pid,)).fetchone()
