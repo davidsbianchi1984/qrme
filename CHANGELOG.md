@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.73.0] - 2026-08-14
+
 ### Added
 
 - **The briefcase — hand a profile something to read, and it keeps it.** A
@@ -11329,7 +11331,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.72.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.73.0...HEAD
+[0.73.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.73.0
 [0.72.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.72.0
 [0.71.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.71.1
 [0.71.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.71.0
