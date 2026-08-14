@@ -840,7 +840,23 @@ def memory_account(profile_id: str, interactor_id: str,
     generation: the distilled paragraph as it actually stands, how many
     turns it was folded from, how many are still in the recent window, and
     when the conversation first and last moved. A trust door tells the
-    truth it can prove; the persona's own telling is a chat away."""
+    truth it can prove; the persona's own telling is a chat away.
+
+    The relationship rides here too, and deliberately does not get a route
+    of its own. `PUT /profiles/{id}/relationships/{interactor_id}` was the
+    only door it had, so the standing was *writable and unreadable*: an
+    owner could set how a profile relates to somebody and then had no way
+    to ask what it currently was, short of writing again to see what came
+    back.
+
+        asked     can the relationship be set
+        mattered  can either of you read what it is
+
+    This payload is already the pair's own account of itself, behind the
+    same `require_owner_or_interactor` the relationship needs, so folding
+    it in costs no new route — and a new route is four doorless rows on
+    four clients before it is anything else.
+    """
     profile = profile_or_404(profile_id)
     require_owner_or_interactor(profile_id, interactor_id, request)
     stats = db.connect().execute(
@@ -850,6 +866,7 @@ def memory_account(profile_id: str, interactor_id: str,
         (profile_id, interactor_id)).fetchone()
     row = remembrance.get(profile_id, interactor_id)
     folded = row["covers"] if row else 0
+    rel = get_relationship(profile_id, interactor_id)
     return {
         "profile_name": profile["display_name"],
         "remembers": row["content"] if row else None,
@@ -857,6 +874,14 @@ def memory_account(profile_id: str, interactor_id: str,
         "recent_turns": max(stats["turns"] - folded, 0),
         "first_at": stats["first_at"],
         "last_at": stats["last_at"],
+        # None until somebody sets one — a pair with no declared standing
+        # is the ordinary case, not a missing record.
+        "relationship": {
+            "relationship_type": rel["relationship_type"],
+            "nickname": rel["nickname"],
+            "tone": rel["tone"],
+            "boundaries": json.loads(rel["boundaries"] or "[]"),
+        } if rel else None,
     }
 
 

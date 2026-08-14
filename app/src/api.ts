@@ -1288,6 +1288,15 @@ export interface MemoryAccount {
   recent_turns: number;
   first_at: string | null;
   last_at: string | null;
+  /** The pair's declared standing, folded in here rather than given a route
+   *  of its own — the relationship had only a PUT, so it was writable and
+   *  unreadable. `null` until somebody sets one. */
+  relationship: {
+    relationship_type: string;
+    nickname: string | null;
+    tone: string | null;
+    boundaries: string[];
+  } | null;
 }
 
 // ---- endpoints ----

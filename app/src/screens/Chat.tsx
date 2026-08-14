@@ -4,6 +4,7 @@ import { api, getBase, type Avatar } from "../api";
 import { Briefcase } from "../Briefcase";
 import { Refusal } from "../Refusal";
 import { SkinPicker } from "../SkinPicker";
+import { TalkRail } from "../TalkRail";
 import { useSession } from "../store";
 
 interface Msg { who: "you" | "assistant"; text: string; note?: string;
@@ -321,6 +322,17 @@ export function Chat({ onPlans }: {
                           onError={setError}
                           onChanged={setTalkAvatar} />
             </div>
+          )}
+          {/* Who they are, what they hold about you, what you are to each
+              other, and how they behave — beside the face rather than three
+              screens away from it. */}
+          {session.profileId && (
+            <TalkRail profileId={session.profileId}
+                      interactorId={session.interactorId || null}
+                      lang={lang}
+                      ownerToken={session.ownerToken || null}
+                      interactorToken={session.interactorToken || null}
+                      onError={setError} />
           )}
         </div>
       )}

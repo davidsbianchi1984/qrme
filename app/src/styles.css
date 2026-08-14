@@ -775,6 +775,33 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    should not be pushed off screen by the thing that changes it. */
 .talk-skin { max-height: 46vh; overflow-y: auto; width: min(92vw, 560px);
              text-align: left; }
+/* The four panels beside the face. On a phone the rail lies along the
+   bottom rather than the right edge — a vertical strip at that width eats
+   the face it is supposed to sit beside. */
+.talk-rail { position: absolute; right: 14px; top: 50%;
+             transform: translateY(-50%);
+             display: flex; flex-direction: column; gap: 8px; z-index: 2; }
+.talk-rail-btn { display: flex; flex-direction: column; align-items: center;
+                 gap: 2px; min-width: 62px; padding: 8px 6px;
+                 font-size: 18px; line-height: 1.1;
+                 border-radius: 14px; background: rgba(13,10,32,0.62);
+                 border: 1px solid var(--line); color: inherit;
+                 cursor: pointer; }
+.talk-rail-btn.on { background: var(--accent); color: #0d0a20; }
+.talk-rail-label { font-size: 10px; font-weight: 600; max-width: 60px;
+                   text-align: center; overflow: hidden;
+                   text-overflow: ellipsis; white-space: nowrap; }
+.talk-panel { max-height: 46vh; overflow-y: auto; width: min(92vw, 560px);
+              text-align: left; }
+.talk-panel-body { display: flex; flex-direction: column; gap: 8px; }
+.talk-dial { display: grid; grid-template-columns: 1fr 2fr auto;
+             align-items: center; gap: 8px; }
+.talk-dial-n { font-variant-numeric: tabular-nums; min-width: 2.5em;
+               text-align: right; }
+@media (max-width: 640px) {
+  .talk-rail { position: static; transform: none; flex-direction: row;
+               flex-wrap: wrap; justify-content: center; }
+}
 .skin-preview { max-width: 140px; border-radius: 12px; margin-top: 8px;
                 border: 1px solid var(--line); }
 .pp-face { background: none; border: 0; padding: 0; cursor: pointer;

@@ -8135,6 +8135,69 @@ const CHROME: Table = {
   "frn.add": {
     en: "Add", es: "Añadir", fr: "Ajouter", de: "Hinzufügen", pt: "Adicionar", it: "Aggiungi", ja: "追加", zh: "添加", hi: "जोड़ें", ar: "إضافة",
   },
+  // The rail beside the face: who they are, what they hold about you, what
+  // you are to each other, and how they behave. Two of the four are the
+  // owner's, and the rail draws only what the person can actually open.
+  "rail.group": {
+    en: "About this conversation", es: "Sobre esta conversación", fr: "À propos de cette conversation", de: "Über dieses Gespräch", pt: "Sobre esta conversa", it: "Su questa conversazione", ja: "この会話について", zh: "关于这次对话", hi: "इस बातचीत के बारे में", ar: "عن هذه المحادثة",
+  },
+  "rail.profile": {
+    en: "Who they are", es: "Quién es", fr: "Qui c'est", de: "Wer sie sind", pt: "Quem é", it: "Chi è", ja: "この人について", zh: "他们是谁", hi: "वे कौन हैं", ar: "من هم",
+  },
+  "rail.memory": {
+    en: "What they hold", es: "Qué guarda", fr: "Ce qu'il retient", de: "Was sie behalten", pt: "O que guarda", it: "Cosa conserva", ja: "覚えていること", zh: "记住了什么", hi: "क्या याद है", ar: "ما يحتفظون به",
+  },
+  "rail.relationship": {
+    en: "What you are to each other", es: "Qué sois el uno para el otro", fr: "Ce que vous êtes l'un pour l'autre", de: "Was ihr füreinander seid", pt: "O que são um para o outro", it: "Cosa siete l'uno per l'altro", ja: "お互いの関係", zh: "彼此的关系", hi: "आप एक-दूसरे के क्या हैं", ar: "ما تعنيانه لبعضكما",
+  },
+  "rail.controls": {
+    en: "How they behave", es: "Cómo se comporta", fr: "Comment il se comporte", de: "Wie sie sich verhalten", pt: "Como se comporta", it: "Come si comporta", ja: "ふるまい方", zh: "行为方式", hi: "वे कैसे व्यवहार करते हैं", ar: "كيف يتصرفون",
+  },
+  "rail.loading": {
+    en: "Reading…", es: "Leyendo…", fr: "Lecture…", de: "Wird gelesen…", pt: "A ler…", it: "Lettura…", ja: "読み込み中…", zh: "读取中…", hi: "पढ़ रहे हैं…", ar: "جارٍ القراءة…",
+  },
+  "rail.profile.ai": {
+    en: "A synthetic profile. Everything it says is generated.", es: "Un perfil sintético. Todo lo que dice es generado.", fr: "Un profil synthétique. Tout ce qu'il dit est généré.", de: "Ein synthetisches Profil. Alles, was es sagt, ist generiert.", pt: "Um perfil sintético. Tudo o que diz é gerado.", it: "Un profilo sintetico. Tutto ciò che dice è generato.", ja: "合成プロフィールです。発言はすべて生成されたものです。", zh: "这是合成资料，所说的一切都是生成的。", hi: "एक सिंथेटिक प्रोफ़ाइल। यह जो कहती है वह सब उत्पन्न किया गया है।", ar: "ملف تعريف اصطناعي. كل ما يقوله مُولَّد.",
+  },
+  "rail.mem.counts": {
+    en: "{folded} turns distilled, {recent} still in the recent window.", es: "{folded} turnos destilados, {recent} aún en la ventana reciente.", fr: "{folded} tours distillés, {recent} encore dans la fenêtre récente.", de: "{folded} Beiträge destilliert, {recent} noch im jüngsten Fenster.", pt: "{folded} turnos destilados, {recent} ainda na janela recente.", it: "{folded} turni distillati, {recent} ancora nella finestra recente.", ja: "{folded} 件を要約、{recent} 件は直近の範囲に残っています。", zh: "已凝练 {folded} 轮，{recent} 轮仍在近期窗口内。", hi: "{folded} बारियाँ सार में, {recent} अब भी हालिया खिड़की में।", ar: "{folded} مداخلة مُقطَّرة، و{recent} ما زالت ضمن النافذة الأخيرة.",
+  },
+  "rail.mem.nothing": {
+    en: "Nothing distilled yet — the conversation is still short.", es: "Todavía nada destilado: la conversación aún es corta.", fr: "Rien de distillé pour l'instant — la conversation est encore courte.", de: "Noch nichts destilliert — das Gespräch ist noch kurz.", pt: "Ainda nada destilado — a conversa ainda é curta.", it: "Ancora nulla di distillato — la conversazione è breve.", ja: "まだ要約はありません。会話がまだ短いためです。", zh: "尚未凝练——对话还很短。", hi: "अभी कुछ सार में नहीं — बातचीत अभी छोटी है।", ar: "لا شيء مُقطَّر بعد — المحادثة ما زالت قصيرة.",
+  },
+  "rail.mem.forgethint": {
+    en: "words to strike", es: "palabras que borrar", fr: "mots à effacer", de: "zu streichende Wörter", pt: "palavras a apagar", it: "parole da cancellare", ja: "消したい言葉", zh: "要抹去的字句", hi: "मिटाने के शब्द", ar: "كلمات تُمحى",
+  },
+  "rail.mem.forget": {
+    en: "Forget that", es: "Olvidar eso", fr: "Oublier ça", de: "Das vergessen", pt: "Esquecer isso", it: "Dimenticalo", ja: "それを忘れる", zh: "忘掉那件事", hi: "वह भूल जाएँ", ar: "انسَ ذلك",
+  },
+  "rail.mem.scalpel": {
+    en: "This strikes one thing without ending the friendship.", es: "Esto borra una cosa sin terminar la amistad.", fr: "Cela efface une chose sans mettre fin à la relation.", de: "Das streicht eine Sache, ohne die Freundschaft zu beenden.", pt: "Isto apaga uma coisa sem acabar com a amizade.", it: "Cancella una cosa senza chiudere il rapporto.", ja: "関係を終わらせずに、その一件だけを消します。", zh: "这只抹去一件事，不会结束这段关系。", hi: "यह एक बात मिटाता है, दोस्ती ख़त्म नहीं करता।", ar: "هذا يمحو أمرًا واحدًا دون إنهاء الصداقة.",
+  },
+  "rail.rel.nobody": {
+    en: "Nobody is signed in to have a relationship with.", es: "No hay nadie con quien tener una relación.", fr: "Personne n'est connecté avec qui avoir une relation.", de: "Niemand ist angemeldet, mit dem eine Beziehung bestehen könnte.", pt: "Não há ninguém com quem ter uma relação.", it: "Non c'è nessuno con cui avere una relazione.", ja: "関係を結ぶ相手がサインインしていません。", zh: "没有已登录的人可以建立关系。", hi: "संबंध बनाने के लिए कोई साइन-इन नहीं है।", ar: "لا أحد مُسجَّل الدخول لتكون بينكما علاقة.",
+  },
+  "rail.rel.type": {
+    en: "Standing", es: "Vínculo", fr: "Lien", de: "Verhältnis", pt: "Vínculo", it: "Legame", ja: "間柄", zh: "关系", hi: "रिश्ता", ar: "الصفة",
+  },
+  "rail.rel.nickname": {
+    en: "What it calls you", es: "Cómo te llama", fr: "Comment il vous appelle", de: "Wie es dich nennt", pt: "Como te chama", it: "Come ti chiama", ja: "あなたの呼び方", zh: "怎么称呼你", hi: "यह आपको क्या कहता है", ar: "بماذا يناديك",
+  },
+  "rail.rel.tone": {
+    en: "How it speaks to you", es: "Cómo te habla", fr: "Comment il vous parle", de: "Wie es mit dir spricht", pt: "Como te fala", it: "Come ti parla", ja: "話しかけ方", zh: "对你说话的方式", hi: "यह आपसे कैसे बोलता है", ar: "كيف يخاطبك",
+  },
+  "rail.rel.save": {
+    en: "Set it", es: "Establecer", fr: "Définir", de: "Festlegen", pt: "Definir", it: "Imposta", ja: "設定する", zh: "设定", hi: "तय करें", ar: "حدِّدها",
+  },
+  "rail.rel.saved": {
+    en: "Set.", es: "Establecido.", fr: "Défini.", de: "Festgelegt.", pt: "Definido.", it: "Impostato.", ja: "設定しました。", zh: "已设定。", hi: "तय हो गया।", ar: "تم التحديد.",
+  },
+  "rail.ctl.locked": {
+    en: "The dials are locked. Nothing here will move until you turn the key.", es: "Los diales están bloqueados. Nada se moverá hasta que gires la llave.", fr: "Les molettes sont verrouillées. Rien ne bougera avant que vous tourniez la clé.", de: "Die Regler sind gesperrt. Hier bewegt sich nichts, bis du den Schlüssel drehst.", pt: "Os mostradores estão bloqueados. Nada se move até virares a chave.", it: "Le manopole sono bloccate. Nulla si muove finché non giri la chiave.", ja: "ダイヤルは施錠されています。鍵を回すまで何も動きません。", zh: "旋钮已锁定。在你转动钥匙之前，这里不会有任何变化。", hi: "डायल बंद हैं। जब तक आप चाबी नहीं घुमाते, यहाँ कुछ नहीं हिलेगा।", ar: "الأقراص مقفلة. لن يتحرك شيء هنا حتى تدير المفتاح.",
+  },
+  "rail.ctl.saving": {
+    en: "Moving…", es: "Ajustando…", fr: "Réglage…", de: "Wird verstellt…", pt: "A ajustar…", it: "Regolazione…", ja: "調整中…", zh: "调整中…", hi: "बदल रहे हैं…", ar: "جارٍ الضبط…",
+  },
 };
 
 export function t(key: string, lang: string | undefined): string {
