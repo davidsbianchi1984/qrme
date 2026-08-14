@@ -77,6 +77,23 @@ TOOLS: tuple[dict, ...] = (
     {"name": "read_page", "writes": False,
      "route": ("GET", "/profiles/{profile_id}/page"),
      "says": "read your page as it stands"},
+    # The read `edit_page` needs to be usable rather than merely present:
+    # putting somebody in your Top 8 means knowing which profile is theirs,
+    # so an agent holding only the write could accept "put Ana in my Top 8"
+    # and have no way to find Ana. A read of the person's own friends,
+    # through their own credential, which is why it costs nothing to grant.
+    #
+    # The *theme* names are not here, and deliberately. `/pages/themes` is a
+    # vocabulary this product publishes, not anybody's record, so its path
+    # has no profile in it — and a row like that would have had to widen
+    # `test_the_tools_are_scoped_to_one_profile`, which is the guard that
+    # keeps every row in this list pointed at one person. Widening a scope
+    # guard to admit a constant is a bad trade. The constant goes in the
+    # prompt instead; see `system_prompt`.
+    {"name": "list_friends", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/friends"),
+     "says": "list your friends, so a name you say can become the right "
+             "person in your Top 8"},
     {"name": "edit_page", "writes": True,
      "route": ("PUT", "/profiles/{profile_id}/page"),
      "says": "change your page — theme, colour, tagline, about, links, "
@@ -119,9 +136,14 @@ SYSTEM = """
 You are the Studio agent. You help one person change their own profile:
 their page, their homepage sandbox, and the small programs they write.
 
-You act only through the tools you were given. Each one touches that
-person's own records and nothing else — there is no tool that reaches
-another profile, and you should not describe yourself as able to.
+You act only through the tools below. Each one touches that person's own
+records and nothing else — there is no tool that reaches another profile,
+and you should not describe yourself as able to.
+
+These are all of them. There are no others, and a name that is not on this
+list will be refused:
+
+{tools}
 
 To use a tool, reply with one line and nothing else:
 
@@ -132,6 +154,15 @@ named in your arguments is dropped. You will be handed the result as the
 next message, and you may then call another tool or answer the person. One
 call per reply. When you have nothing left to do, answer in plain words
 with no CALL line at all.
+
+A page's theme must be one of these exact names, and its layout one of
+these. Anything else is refused, so pick from the list rather than
+inventing a name; if somebody asks for a look you have no name for, say
+which of these comes closest and offer the accent colour, which is any
+#rrggbb you like.
+
+    themes:  {themes}
+    layouts: {layouts}
 
 A widget is JavaScript that exports a function. It runs with no network, no
 files, no other programs, and a few seconds of time, so write code that
@@ -160,6 +191,50 @@ HOST_WORDS: tuple[str, ...] = (
     "uvicorn", "vps", "ssh", "port 8", "env var", "environment variable",
     "QRME_", "JIM_", "PDI_", "_TOKEN", "_KEY",
 )
+
+
+def roster() -> str:
+    """The tool list, written the way the model is told it.
+
+    This did not exist, and `SYSTEM` said *you act only through the tools you
+    were given* while giving it none. What the model actually received was
+    the CALL syntax and no vocabulary to use it with, so it guessed a name,
+    was refused, and reported back that it had no tool for the job — while
+    holding `edit_page`, whose own description says it changes the theme and
+    the colour. A person reading that reply learns the wrong thing about
+    their own product.
+
+        asked     is the agent told how to call a tool
+        mattered  is the agent told which tools it has
+
+    Rendered from `TOOLS` rather than written out beside it, because a
+    hand-kept second copy is how a tool gets added and never offered.
+    """
+    lines = []
+    for tool in TOOLS:
+        _, template = tool["route"]
+        slots = [s for s in _PLACEHOLDER.findall(template)
+                 if s != "profile_id"]
+        needs = f"  (needs {', '.join(slots)})" if slots else ""
+        mark = "changes something" if tool["writes"] else "reads only"
+        lines.append(f"  {tool['name']} — {tool['says']} [{mark}]{needs}")
+    return "\n".join(lines)
+
+
+def system_prompt() -> str:
+    """What is actually sent. `SYSTEM` is the frame; this fills in the roster
+    and the page vocabulary, and is what every guard about the prompt reads.
+
+    The theme and layout names are rendered rather than fetched, because they
+    are a fixed list this product publishes and not a record belonging to
+    anybody — see the note in `TOOLS`. Read from `pages` rather than copied,
+    so a theme added there is offered here without anybody remembering to.
+    """
+    from . import pages
+    return (SYSTEM
+            .replace("{tools}", roster())
+            .replace("{themes}", ", ".join(pages.THEMES))
+            .replace("{layouts}", ", ".join(pages.LAYOUTS)))
 
 
 def tool_names() -> tuple[str, ...]:
@@ -348,7 +423,7 @@ def converse(said: str, history: list[dict], *, app, profile_id: str,
 
     steps: list[dict] = []
     for _ in range(STEPS):
-        reply = provider.generate(SYSTEM, turns)
+        reply = provider.generate(system_prompt(), turns)
         wanted = wants_a_tool(reply)
         if wanted is None:
             return {"reply": reply.strip(), "acted": steps, "stopped": None}
