@@ -87,6 +87,42 @@
                                Foreground="{StaticResource QrmeT2Brush}" />
                     <TextBlock x:Name="VisitReply" FontSize="13" TextWrapping="Wrap"
                                Foreground="{StaticResource QrmeTxtBrush}" />
+                    <!-- The briefcase. Handing somebody a document is part of
+                         talking to them, so it sits inside this panel rather
+                         than behind a page of its own. What is handed over is
+                         read once at import and carried as a digest — the
+                         counts on each row are that claim made checkable. -->
+                    <TextBlock x:Name="BcHeading" FontSize="13" FontWeight="Bold"
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="BcWhy" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT3Brush}" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="BcFileButton" Click="OnBriefcaseFile" />
+                        <TextBox x:Name="BcLinkBox" Width="220" />
+                        <TextBox x:Name="BcNoteBox" Width="180" />
+                        <Button x:Name="BcImportButton" Click="OnBriefcaseLink" />
+                    </StackPanel>
+                    <TextBlock x:Name="BcOffline" FontSize="12" TextWrapping="Wrap"
+                               Visibility="Collapsed"
+                               Foreground="{StaticResource QrmeT3Brush}" />
+                    <ListView x:Name="BcList" SelectionMode="Single"
+                              SelectionChanged="OnBriefcaseSelected"
+                              MaxHeight="180">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12"
+                                           TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="BcShowButton" Click="OnBriefcaseShow" />
+                        <Button x:Name="BcRemoveButton" Click="OnBriefcaseRemove" />
+                    </StackPanel>
+                    <TextBlock x:Name="BcTaken" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
                     <TextBlock x:Name="VisitTopLabel" FontSize="12"
                                Foreground="{StaticResource QrmeT2Brush}" />
                     <ItemsControl x:Name="VisitTopList">

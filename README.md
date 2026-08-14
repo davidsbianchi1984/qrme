@@ -815,6 +815,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **Unreleased** | **The briefcase — hand a profile something to read, and it keeps it** — a link pasted into a turn was already fetched and read, and then evaporated: the next turn carried no page, so discussing a document meant pasting it again and paying its full length again, and a photograph, a filing or a video had no way in at all. `qrme/briefcase.py` reads what you hand over **once** at import, distils it to a digest, and it is the digest every later turn carries — scoped to the pair, so the next visitor inherits none of it. What this deployment cannot see it says it cannot see: a photograph, a video and a scanned PDF import anyway, marked unread, with the prompt forbidding the profile to describe them. Five routes, on the console and all three shells. Also: Enter sends on somebody's homepage, and the button is called Send |
 | **0.72.0** | **Their homepage, and the phones that can now open one** — pressing a face opened a card showing the *signed-in* profile's numbers under somebody else's name; the new screen carries their page, their Top 8 walking onward, their wall and their uploads, and no stats row at all, because `/stats` is owner-only and that is how the old card came to be wrong. `GET /profiles/{id}/media` gives the upload door its other side. iOS, Android and Windows get the same screen — their `PageCard` bindings were three fields out of a payload carrying eight, which is why no shell had one before |
 | **0.71.1** | **The API did not import on Windows** — `widgets.py` imported `resource`, which is POSIX-only, at the top of the file, and `api.py` reaches it through `routers/studio`, so this was not an unavailable sandbox but the whole API failing to import: the frozen desktop backend died on first run, the Windows installer job failed, the release job was skipped, and 0.70.0 and 0.70.1 published with no installers attached at all — not even the macOS and Linux ones that had built. The import is now allowed to fail and the runner says so in the reader's own language; the guard is a property of the text, because a suite that only runs on Linux can never import its way to this |
 | **0.71.0** | **The player learned the origin, and the deck became the screen** — a YouTube post on the Wall rendered the platform's own *Error 153* because `referrer-policy: no-referrer` is right for a page reached from a QR sticker and wrong for the players the console embeds, so the beacon pages keep it and the two players get the host and never the path; and a pane holding footage is now the footage, with the pill, the position and the caption riding over it on scrims rather than a header above the frame and a caption below it taking half a phone |
@@ -1285,6 +1286,56 @@ account and no other way to know.
 everybody who scans the same sticker is talking to the profile together — a
 class, a workshop, a Q&A after a set. See [docs/beacons.md](docs/beacons.md),
 including what a camera app can and cannot actually do with a QR code.
+
+## The briefcase — handing a profile something to read
+
+A conversation is usually *about* something: a filing, a spreadsheet, a page,
+a photograph. Until now the only one of those a profile could take was a link,
+and only for the length of one turn. `interaction.py` pulled the first URL out
+of the message, fetched the page through the same offline-gated fetcher every
+outbound path uses, and put the text into *that turn's* prompt. Then it was
+gone. To keep discussing the page you pasted it again, and every paste
+re-fetched the whole of it and re-sent the whole of it to the model.
+
+    asked     can the profile read what you hand it
+    mattered  can it still remember it on the next turn
+
+**Read once, carried as a digest.** `POST /profiles/{id}/briefcase/link` and
+`…/file` extract the material at import — pages through `scrape`, plain text as
+itself, PDFs through their text layer, `.docx`/`.pptx`/`.xlsx` out of their XML
+— and distil it *once* into a digest capped at 700 characters. That digest is
+what the system prompt carries on this turn and every turn after it. A forty
+page filing costs its full length exactly once; re-pasting it costs its full
+length every time. That difference is the whole point of the feature.
+
+**It belongs to the two of you.** A briefcase item is deliberately not a
+`source_items` row. Source material is what a profile recalls *as its own*, and
+every visitor to that profile sees it; this is keyed on the pair (profile,
+interactor) and stays there. The person after you in the queue does not inherit
+your medical records, and the profile's owner does not acquire them either —
+the same line `persona.build_system_prompt` already draws around a clinician's
+notes, for the same reason.
+
+| door | what it is for |
+| --- | --- |
+| `POST /profiles/{id}/briefcase/link` | A page, read through the offline gate |
+| `POST /profiles/{id}/briefcase/file` | Raw bytes; the kind is read from the bytes, never from the name |
+| `GET /profiles/{id}/briefcase` | What this conversation is carrying, with `chars` beside `digest_chars` |
+| `GET /profiles/{id}/briefcase/{item}` | The text that was actually extracted |
+| `DELETE /profiles/{id}/briefcase/{item}` | Take it back; the profile stops carrying it from the next turn |
+
+**It does not pretend to have seen what it cannot see.** This deployment has no
+eyes: a photograph is pixels, a video is pixels, and a scanned PDF has no text
+layer to find. Those import anyway — the item exists, carrying whatever the
+person said it was — and `was_read` is 0, which puts them in a second block of
+the prompt that says the profile has **not** opened them and must not describe
+or summarise anything in the list. A profile inventing the contents of a
+picture it was handed is worse than one asking what is in it.
+
+**The single-item door is the receipt.** "It read your document" is a claim
+somebody is entitled to check, so the extracted text is readable on its own
+route and rendered on every client behind one press. The full text lives there
+and only there; it is never what goes to the model.
 
 ## Editing what you already said
 

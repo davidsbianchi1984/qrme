@@ -4779,6 +4779,67 @@ extension ApiClient {
         try await request("/videos/platforms")
     }
 
+    // MARK: The briefcase — what you hand a profile, read once and kept
+
+    /// Scoped to the pair, not to the profile: `interactorId` is who the
+    /// material belongs to, and the next visitor inherits none of it.
+    func briefcase(profileId: String,
+                   interactorId: String) async throws -> BriefcaseBoard {
+        try await request("/profiles/\(profileId)/briefcase",
+                          query: ["interactor_id": interactorId])
+    }
+
+    /// The text that was actually extracted, for somebody who wants to check
+    /// what the profile took from their file. Never what the prompt carries.
+    func briefcaseItem(profileId: String, interactorId: String,
+                       itemId: String) async throws -> BriefcaseRow {
+        try await request("/profiles/\(profileId)/briefcase/\(itemId)",
+                          query: ["interactor_id": interactorId])
+    }
+
+    func importLink(profileId: String, interactorId: String, url: String,
+                    note: String = "") async throws -> BriefcaseRow {
+        try await request("/profiles/\(profileId)/briefcase/link",
+                          method: "POST",
+                          body: ["interactor_id": interactorId, "url": url,
+                                 "note": note])
+    }
+
+    /// Raw bytes, like `uploadMedia` above and for the same reason: the
+    /// backend reads the kind from the bytes, and the filename is a display
+    /// hint that only a whitelisted extension survives.
+    func importFile(profileId: String, interactorId: String,
+                    filename: String, note: String,
+                    data: Data) async throws -> BriefcaseRow {
+        var url = base.appendingPathComponent(
+            "/profiles/\(profileId)/briefcase/file")
+        if var parts = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            parts.queryItems = [
+                URLQueryItem(name: "interactor_id", value: interactorId),
+                URLQueryItem(name: "filename", value: filename),
+                URLQueryItem(name: "note", value: note),
+            ]
+            url = parts.url ?? url
+        }
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.httpBody = data
+        let (out, resp) = try await dispatch(req)
+        guard let http = resp as? HTTPURLResponse,
+              (200..<300).contains(http.statusCode) else {
+            throw ApiError.http("import failed")
+        }
+        return try JSONDecoder().decode(BriefcaseRow.self, from: out)
+    }
+
+    func forgetImport(profileId: String, interactorId: String,
+                      itemId: String) async throws {
+        struct Ok: Decodable {}
+        let _: Ok = try await request(
+            "/profiles/\(profileId)/briefcase/\(itemId)", method: "DELETE",
+            query: ["interactor_id": interactorId])
+    }
+
     // -- the wearables --
 
     /// A paired device here is a screen and a set of buttons — no sensor
@@ -5540,6 +5601,32 @@ struct MediaLimits: Decodable {
     let video: MediaLimit?
     let file: MediaLimit?
     let note: String?
+}
+
+/// One thing handed to a profile mid-conversation. `chars` against
+/// `digest_chars` is the point made visible: the long number was read once,
+/// the short one is what every later turn carries. `read` false means the
+/// bytes arrived and nobody could turn them into words — a photograph, a
+/// video, a scan — and the screen says so rather than implying otherwise.
+struct BriefcaseRow: Decodable, Identifiable {
+    let id: String
+    let kind: String
+    let title: String
+    let note: String?
+    let source: String?
+    let read: Bool
+    let digest: String
+    let chars: Int
+    let digest_chars: Int
+    /// Only the single-item door returns this; the list leaves it out
+    /// because the full text is not what a list is for.
+    let text: String?
+}
+
+struct BriefcaseBoard: Decodable {
+    let items: [BriefcaseRow]?
+    let max_items: Int?
+    let offline: Bool?
 }
 
 struct MediaOut: Decodable {

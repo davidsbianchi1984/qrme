@@ -512,6 +512,33 @@ CREATE TABLE IF NOT EXISTS source_items (
     created_at TEXT NOT NULL
 );
 
+-- The briefcase: material one INTERACTOR handed one profile, mid-conversation
+-- — a link, a photograph, a filing, a video. Deliberately not a `source_items`
+-- row: source material is what the profile recalls as its own and every
+-- visitor sees it, whereas this belongs to the pair and stays with the pair.
+-- `text` is what was extracted at import; `digest` is the distillation the
+-- prompt carries on every later turn, so a long document is paid for once.
+-- `was_read` is 0 when this deployment held the bytes and could not turn them
+-- into words (a photograph, a video, a scanned PDF) — the item still exists,
+-- and the prompt says plainly that the profile has not seen it.
+CREATE TABLE IF NOT EXISTS briefcase_items (
+    id            TEXT PRIMARY KEY,
+    profile_id    TEXT NOT NULL REFERENCES profiles(id),
+    interactor_id TEXT NOT NULL REFERENCES interactors(id),
+    kind          TEXT NOT NULL,   -- link | photo | video | document
+    title         TEXT NOT NULL,
+    note          TEXT,            -- what the person said it is
+    source        TEXT,            -- the URL, or the uploaded filename
+    text          TEXT,            -- extracted once, kept for reading back
+    digest        TEXT,            -- what every turn carries
+    was_read      INTEGER NOT NULL DEFAULT 1,
+    bytes         INTEGER,
+    created_at    TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_briefcase_pair
+    ON briefcase_items (profile_id, interactor_id);
+
 -- Cross-platform presence: the surfaces this profile is live on.
 CREATE TABLE IF NOT EXISTS surfaces (
     profile_id TEXT NOT NULL REFERENCES profiles(id),

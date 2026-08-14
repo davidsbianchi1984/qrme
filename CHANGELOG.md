@@ -6,6 +6,53 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The briefcase — hand a profile something to read, and it keeps it.** A
+  link pasted into a turn was already fetched and read: `interaction.py`
+  pulled the first URL out of the message, visited the page through the same
+  offline-gated fetcher every outbound path uses, and put the visible text
+  into *that turn's* system prompt. It worked, and then it evaporated. The
+  next turn — the one where you actually discuss the thing — carried no page
+  at all, so keeping the conversation going meant pasting the link again, and
+  every paste re-fetched the whole of it and re-sent the whole of it.
+
+      asked     can the profile read what you hand it
+      mattered  can it still remember it on the next turn
+
+  And a link was the only thing you could hand over. A photograph, a filing,
+  a spreadsheet, a video — the material a conversation is usually *about* —
+  had no way in, so the only route to "tell me about your patents" was to
+  retype the patents.
+
+  `qrme/briefcase.py` is a briefcase scoped to one conversation: the pair
+  (profile, interactor). Material is read at import — pages through `scrape`,
+  plain text as itself, PDFs through their text layer, `.docx`/`.pptx`/`.xlsx`
+  out of their XML — distilled **once** into a digest, and it is the digest
+  every later turn carries. A forty-page filing enters the prompt at the size
+  of its reading, paid for a single time instead of on every turn.
+
+  Deliberately not a `source_items` row. Source material is what a profile
+  recalls as its own and every visitor sees it; this belongs to the two of
+  you and stays there, the same line the clinical-notes block already draws.
+
+  What it will not do is pretend. This deployment cannot see a photograph or
+  watch a video, and a scanned PDF has no text in it to find. Those import
+  anyway, carrying whatever the person said they were, and the prompt states
+  plainly that the profile has *not* seen them and must not describe them.
+  `POST /profiles/{id}/briefcase/link`, `…/file`, `GET …/briefcase`,
+  `GET …/briefcase/{item}` — which returns the extracted text, because "it
+  read your document" is a claim somebody is entitled to check — and
+  `DELETE …/briefcase/{item}`, on the console and all three shells.
+
+### Changed
+
+- **Enter sends, and the button says Send.** The composer on somebody's
+  homepage was a textarea with no key handler, so the only way out of it was
+  the button — and the button read "Talk to their profile", which describes
+  the screen rather than naming the act. Enter now submits (Shift+Enter still
+  breaks the line) and `prf.talk` is "Send" in all ten languages.
+
 ## [0.72.0] - 2026-08-14
 
 ### Added

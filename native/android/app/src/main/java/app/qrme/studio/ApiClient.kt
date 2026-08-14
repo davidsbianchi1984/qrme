@@ -4181,6 +4181,104 @@ object ApiClient {
                 .optString("id"))
         }
 
+    // ---- The briefcase: what you hand a profile, read once and kept ----
+
+    /**
+     * Scoped to the pair, not to the profile: `interactorId` is who the
+     * material belongs to, and the next visitor inherits none of it.
+     */
+    suspend fun briefcase(profileId: String,
+                          interactorId: String): BriefcaseBoard {
+        val who = java.net.URLEncoder.encode(interactorId, "UTF-8")
+        val o = JSONObject(
+            request("/profiles/$profileId/briefcase?interactor_id=$who"))
+        val rows = o.optJSONArray("items") ?: JSONArray()
+        return BriefcaseBoard(
+            (0 until rows.length()).map { briefcaseRow(rows.getJSONObject(it)) },
+            o.optInt("max_items", 0), o.optBoolean("offline", false))
+    }
+
+    /**
+     * The text that was actually extracted, for somebody who wants to check
+     * what the profile took from their file. Never what the prompt carries.
+     */
+    suspend fun briefcaseItem(profileId: String, interactorId: String,
+                              itemId: String): BriefcaseRow {
+        val who = java.net.URLEncoder.encode(interactorId, "UTF-8")
+        return briefcaseRow(JSONObject(request(
+            "/profiles/$profileId/briefcase/$itemId?interactor_id=$who")))
+    }
+
+    suspend fun importLink(profileId: String, interactorId: String,
+                           url: String, note: String): BriefcaseRow {
+        val body = JSONObject()
+            .put("interactor_id", interactorId).put("url", url)
+            .put("note", note)
+        return briefcaseRow(JSONObject(
+            request("/profiles/$profileId/briefcase/link", "POST", body)))
+    }
+
+    /**
+     * Raw bytes, like `uploadMedia` above and for the same reason: the
+     * backend reads the kind from the bytes, and the filename is a display
+     * hint that only a whitelisted extension survives.
+     */
+    suspend fun importFile(profileId: String, interactorId: String,
+                           filename: String, note: String,
+                           bytes: ByteArray): BriefcaseRow =
+        withContext(Dispatchers.IO) {
+            fun enc(s: String) = java.net.URLEncoder.encode(s, "UTF-8")
+            val q = "?interactor_id=" + enc(interactorId) +
+                "&filename=" + enc(filename) + "&note=" + enc(note)
+            val conn = (java.net.URL("$base/profiles/$profileId/briefcase/file$q")
+                .openConnection() as java.net.HttpURLConnection).apply {
+                setRequestProperty("accept-language", L10n.deviceLanguage())
+                llmKey.takeIf { it.isNotEmpty() }?.let {
+                    setRequestProperty("x-llm-api-key", it) }
+                signupKey.takeIf { it.isNotEmpty() }?.let {
+                    setRequestProperty("x-signup-key", it) }
+                requestMethod = "POST"
+                doOutput = true
+            }
+            conn.outputStream.use { it.write(bytes) }
+            val code = conn.responseCode
+            val text = (if (code < 300) conn.inputStream else conn.errorStream)
+                .bufferedReader().readText()
+            if (code >= 300) {
+                Problems.record("POST", "/profiles/{id}/briefcase/file", code)
+                // `message` first, `detail` only when it is a string: a 422's
+                // `detail` is pydantic's list of rows, and `optString`
+                // coerces a JSONArray through toString(), so reading it
+                // first hands the person raw JSON. Same order as the shared
+                // helper, for the same reason.
+                val said = runCatching {
+                    val body = JSONObject(text)
+                    body.optString("message").ifBlank {
+                        if (body.opt("detail") is String)
+                            body.optString("detail") else ""
+                    }
+                }.getOrNull()
+                throw ApiException(
+                    if (said.isNullOrBlank()) "HTTP $code" else said)
+            }
+            briefcaseRow(JSONObject(text))
+        }
+
+    suspend fun forgetImport(profileId: String, interactorId: String,
+                             itemId: String) {
+        val who = java.net.URLEncoder.encode(interactorId, "UTF-8")
+        request("/profiles/$profileId/briefcase/$itemId?interactor_id=$who",
+                "DELETE")
+    }
+
+    private fun briefcaseRow(o: JSONObject) = BriefcaseRow(
+        o.optString("id"), o.optString("kind"), o.optString("title"),
+        if (o.isNull("note")) null else o.optString("note"),
+        if (o.isNull("source")) null else o.optString("source"),
+        o.optBoolean("read", false), o.optString("digest"),
+        o.optInt("chars", 0), o.optInt("digest_chars", 0),
+        if (o.isNull("text")) null else o.optString("text"))
+
     suspend fun videoPlatforms(): String {
         val arr = JSONObject(request("/videos/platforms"))
             .optJSONArray("platforms") ?: org.json.JSONArray()
@@ -4566,6 +4664,22 @@ data class PageLink(val label: String?, val url: String)
 data class PageOffer(val title: String, val blurb: String?)
 data class MediaRow(val kind: String, val alt: String, val name: String,
                     val id: String)
+
+/**
+ * One thing handed to a profile mid-conversation. `chars` against
+ * `digestChars` is the point made visible: the long number was read once,
+ * the short one is what every later turn carries. `read` false means the
+ * bytes arrived and nobody could turn them into words — a photograph, a
+ * video, a scan — and the screen says so rather than implying otherwise.
+ */
+data class BriefcaseRow(val id: String, val kind: String, val title: String,
+                        val note: String?, val source: String?,
+                        val read: Boolean, val digest: String,
+                        val chars: Int, val digestChars: Int,
+                        val text: String?)
+
+data class BriefcaseBoard(val items: List<BriefcaseRow>, val maxItems: Int,
+                          val offline: Boolean)
 
 data class InboxEvent(val id: String, val kind: String, val actorId: String,
                       val actorName: String?, val seen: Boolean)

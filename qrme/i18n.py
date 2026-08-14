@@ -1063,6 +1063,39 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'a link starts with http:// or https://': {
+        'es': 'un enlace empieza por http:// o https://',
+        'fr': "un lien commence par http:// ou https://",
+        'de': 'ein Link beginnt mit http:// oder https://',
+        'pt': 'um link começa por http:// ou https://',
+        'it': 'un link comincia con http:// o https://',
+        'ja': 'リンクは http:// または https:// で始まります。',
+        'zh': '链接以 http:// 或 https:// 开头。',
+        'hi': 'लिंक http:// या https:// से शुरू होता है।',
+        'ar': 'الرابط يبدأ بـ http:// أو https://',
+    },
+    'no such imported item in this conversation': {
+        'es': 'no hay ningún elemento importado así en esta conversación',
+        'fr': "aucun élément importé de ce genre dans cette conversation",
+        'de': 'in diesem Gespräch gibt es kein solches importiertes Element',
+        'pt': 'não há nenhum item importado assim nesta conversa',
+        'it': 'in questa conversazione non c’è nessun elemento importato così',
+        'ja': 'この会話にそのような取り込み済みの資料はありません。',
+        'zh': '这场对话里没有这样一份已导入的材料。',
+        'hi': 'इस बातचीत में ऐसा कोई आयातित आइटम नहीं है।',
+        'ar': 'لا يوجد عنصر مستورد بهذا الوصف في هذه المحادثة.',
+    },
+    'the upload arrived empty': {
+        'es': 'la subida llegó vacía',
+        'fr': "l’envoi est arrivé vide",
+        'de': 'der Upload kam leer an',
+        'pt': 'o carregamento chegou vazio',
+        'it': 'il caricamento è arrivato vuoto',
+        'ja': 'アップロードは空のまま届きました。',
+        'zh': '上传过来的内容是空的。',
+        'hi': 'अपलोड खाली आया।',
+        'ar': 'وصل الرفع فارغًا.',
+    },
     'kind is one of image, video, file — or leave it off': {
         'es': 'kind es image, video o file — o déjelo sin poner',
         'fr': "kind vaut image, video ou file — ou bien laissez-le de côté",

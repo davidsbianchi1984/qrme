@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { api, getBase, type ChatMessage, type Homepage, type MediaUpload,
+import { api, getBase, type BriefcaseItem, type ChatMessage, type Homepage,
+         type MediaUpload,
          type PageFriend, type Profile as ProfileRow, type ProfilePage,
          type WallPost } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
@@ -23,9 +24,15 @@ import { useSession } from "../store";
 //
 // Everything here is a public route. The page, the homepage sandbox, the
 // wall, the friends and the uploads are all visitor-readable by design: this
-// is what a visitor came to look at. The three actions are the ones a
-// visitor may actually take — talk to their profile, send them a message,
-// open a room with them — and each is signed as the person pressing it.
+// is what a visitor came to look at. The actions are the ones a visitor may
+// actually take — say something to their profile, send them a message, open
+// a room with them, and hand them something to read — and each is signed as
+// the person pressing it.
+//
+// The briefcase is the fourth of those and the odd one: what you hand over
+// belongs to the two of you, not to the page. It is drawn inside the same
+// card as the composer because handing somebody a document is part of
+// talking to them, not a separate errand.
 //
 // In QRME a friend *is* a profile, so a synthetic profile has this same
 // homepage: one screen, not two.
@@ -73,6 +80,15 @@ export function Profile({ profileId, onBack, onPlans, onVisit, onInside }: {
   const [note, setNote] = useState<ReactNode>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
+  // The briefcase: what this visitor has handed this profile. Held in the
+  // screen rather than derived from `posts` or `media`, because it is
+  // neither — it belongs to the pair, and nobody else can see it.
+  const [carried, setCarried] = useState<BriefcaseItem[]>([]);
+  const [bcOffline, setBcOffline] = useState(false);
+  const [handUrl, setHandUrl] = useState("");
+  const [handNote, setHandNote] = useState("");
+  const [opened, setOpened] = useState<string | null>(null);
+  const [takenText, setTakenText] = useState("");
 
   const mine = profileId === session.profileId;
 
@@ -99,7 +115,17 @@ export function Profile({ profileId, onBack, onPlans, onVisit, onInside }: {
         .then((r) => setBefriended(r.friends.map((f) => f.profile_id)))
         .catch(() => setBefriended([]));
     }
-  }, [profileId, session.profileId]);
+    // What you have already handed *this* profile. Cleared first, because
+    // walking from one page to the next must not carry the last person's
+    // briefcase onto somebody else's screen even for a frame.
+    setCarried([]); setHandUrl(""); setHandNote("");
+    setOpened(null); setTakenText("");
+    if (session.interactorId) {
+      api.briefcase(profileId, session.interactorId)
+        .then((r) => { setCarried(r.items); setBcOffline(r.offline); })
+        .catch(() => setCarried([]));
+    }
+  }, [profileId, session.profileId, session.interactorId]);
 
   // Their Top 8 as they arranged it; their friends list is the fallback, so
   // a page whose owner never picked eight is still somewhere you can walk on
@@ -122,6 +148,67 @@ export function Profile({ profileId, onBack, onPlans, onVisit, onInside }: {
         { interactor_id: session.interactorId, message: said.trim() });
       setReply(answer.profile_message);
       setSaid("");
+    } catch (e) { setError(e); }
+    finally { setBusy(false); }
+  }
+
+  // --- the briefcase -------------------------------------------------- //
+
+  async function refreshCarried(interactorId: string) {
+    try {
+      const held = await api.briefcase(profileId, interactorId);
+      setCarried(held.items);
+      setBcOffline(held.offline);
+    } catch { setCarried([]); }
+  }
+
+  async function handOver(file: File) {
+    if (!session.interactorId) { setNote(tr("prf.needuser", lang)); return; }
+    setBusy(true); setError(null); setNote(null);
+    try {
+      await api.importFile(profileId, session.interactorId, file,
+                           handNote.trim());
+      setHandNote("");
+      await refreshCarried(session.interactorId);
+    } catch (e) { setError(e); }
+    finally { setBusy(false); }
+  }
+
+  async function handLink() {
+    if (!session.interactorId) { setNote(tr("prf.needuser", lang)); return; }
+    if (!handUrl.trim()) return;
+    setBusy(true); setError(null); setNote(null);
+    try {
+      await api.importLink(profileId, session.interactorId, handUrl.trim(),
+                           handNote.trim());
+      setHandUrl(""); setHandNote("");
+      await refreshCarried(session.interactorId);
+    } catch (e) { setError(e); }
+    finally { setBusy(false); }
+  }
+
+  // What the profile actually took from a file is readable, because "it read
+  // your document" is a claim somebody is entitled to check.
+  async function showTaken(itemId: string) {
+    if (opened === itemId) { setOpened(null); setTakenText(""); return; }
+    if (!session.interactorId) return;
+    setBusy(true); setError(null);
+    try {
+      const one = await api.briefcaseItem(profileId, session.interactorId,
+                                          itemId);
+      setOpened(itemId);
+      setTakenText(one.text || one.digest);
+    } catch (e) { setError(e); }
+    finally { setBusy(false); }
+  }
+
+  async function takeBack(itemId: string) {
+    if (!session.interactorId) return;
+    setBusy(true); setError(null);
+    try {
+      await api.forgetImport(profileId, session.interactorId, itemId);
+      if (opened === itemId) { setOpened(null); setTakenText(""); }
+      await refreshCarried(session.interactorId);
     } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
@@ -248,9 +335,21 @@ export function Profile({ profileId, onBack, onPlans, onVisit, onInside }: {
           <label className="muted small" htmlFor="pp-say">
             {fill(tr("prf.saylabel", lang), { name })}
           </label>
+          {/* Enter sends, Shift+Enter breaks the line. The field was a
+              textarea with no key handler, so the only way out of it was the
+              button — and the button said "Talk to their profile", which is
+              a description of the screen rather than a name for the act.
+              Both halves of that are the same fix: make the obvious gesture
+              work, and name the control after what it does. */}
           <textarea id="pp-say" rows={2} value={said}
                     placeholder={tr("prf.sayhint", lang)}
-                    onChange={(e) => setSaid(e.target.value)} />
+                    onChange={(e) => setSaid(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        if (!busy && said.trim()) void talk();
+                      }
+                    }} />
           <div className="pp-buttons">
             <button disabled={busy || !said.trim()} onClick={talk}>
               {tr("prf.talk", lang)}
@@ -274,6 +373,85 @@ export function Profile({ profileId, onBack, onPlans, onVisit, onInside }: {
                 : tr("prf.notyetfriends", lang)}
           </p>
           {reply && <p className="small pp-reply">{reply.content}</p>}
+
+          {/* The briefcase. Handing something over is part of talking to
+              somebody, so it lives in the same card as the composer rather
+              than behind a tab you would have to know about. */}
+          {session.interactorId && (
+            <div className="pp-briefcase">
+              <div className="tile-label">{tr("prf.bc.heading", lang)}</div>
+              <p className="muted small">
+                {fill(tr("prf.bc.why", lang), { name })}
+              </p>
+              <div className="pp-bc-add">
+                <input type="file" disabled={busy}
+                      aria-label={tr("prf.bc.file", lang)}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        e.target.value = "";
+                        if (file) void handOver(file);
+                      }} />
+                <input type="url" value={handUrl} disabled={busy || bcOffline}
+                      placeholder={tr("prf.bc.linkhint", lang)}
+                      aria-label={tr("prf.bc.linkhint", lang)}
+                      onChange={(e) => setHandUrl(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          if (!busy && handUrl.trim()) void handLink();
+                        }
+                      }} />
+                <input type="text" value={handNote} disabled={busy}
+                      placeholder={tr("prf.bc.notehint", lang)}
+                      aria-label={tr("prf.bc.notehint", lang)}
+                      onChange={(e) => setHandNote(e.target.value)} />
+                <button disabled={busy || !handUrl.trim() || bcOffline}
+                        onClick={handLink}>
+                  {tr("prf.bc.import", lang)}
+                </button>
+              </div>
+              {bcOffline && (
+                <p className="muted small">{tr("prf.bc.offline", lang)}</p>
+              )}
+              {carried.length === 0 ? (
+                <p className="muted small">{tr("prf.bc.empty", lang)}</p>
+              ) : (
+                <ul className="pp-bc-list">
+                  {carried.map((item) => (
+                    <li key={item.id} className="pp-bc-row">
+                      <div className="pp-bc-head">
+                        <strong>{item.title}</strong>
+                        <span className="chip small">{item.kind}</span>
+                      </div>
+                      <p className="muted small">
+                        {item.read
+                          ? fill(tr("prf.bc.read", lang), {
+                              chars: String(item.chars),
+                              digest: String(item.digest_chars) })
+                          : fill(tr("prf.bc.unread", lang), { name })}
+                      </p>
+                      <div className="pp-buttons">
+                        {item.read && (
+                          <button className="chip small" disabled={busy}
+                                  onClick={() => showTaken(item.id)}>
+                            {opened === item.id ? tr("prf.bc.hide", lang)
+                                                : tr("prf.bc.show", lang)}
+                          </button>
+                        )}
+                        <button className="chip small" disabled={busy}
+                                onClick={() => void takeBack(item.id)}>
+                          {tr("prf.bc.remove", lang)}
+                        </button>
+                      </div>
+                      {opened === item.id && (
+                        <p className="small pp-bc-text">{takenText}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
         </div>
       )}
 

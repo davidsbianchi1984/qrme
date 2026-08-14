@@ -6,6 +6,16 @@ public partial class App : Application
 {
     private Window? _window;
 
+    /// <summary>
+    /// The shell's window, for the WinRT pickers that need a handle.
+    ///
+    /// A file chooser on WinUI 3 has no implicit owner — <c>PickSingleFileAsync</c>
+    /// throws rather than opening anything until <c>InitializeWithWindow</c>
+    /// has been handed one. The window was private, so a page that wanted to
+    /// let somebody choose a file had nothing to pass.
+    /// </summary>
+    public static Window? Window => (Current as App)?._window;
+
     public App()
     {
         InitializeComponent();

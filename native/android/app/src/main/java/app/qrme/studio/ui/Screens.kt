@@ -94,6 +94,8 @@ import app.qrme.studio.SummonResult
 import app.qrme.studio.TranslateResult
 import app.qrme.studio.WatermarkRecovery
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
 import app.qrme.studio.SignatureReceipt
 import app.qrme.studio.Signing
@@ -3404,6 +3406,48 @@ private fun ProfilePagePanel(vm: StudioViewModel, profileId: String,
     var said by remember(profileId) { mutableStateOf("") }
     var reply by remember(profileId) { mutableStateOf<String?>(null) }
     var note by remember(profileId) { mutableStateOf<String?>(null) }
+    // The briefcase: what *you* have handed *this* profile. Keyed on
+    // profileId like everything else here, so walking on to the next page
+    // does not carry the last person's papers onto somebody else's screen.
+    var carried by remember(profileId) {
+        mutableStateOf<List<BriefcaseRow>>(emptyList()) }
+    var bcOffline by remember(profileId) { mutableStateOf(false) }
+    var handUrl by remember(profileId) { mutableStateOf("") }
+    var handNote by remember(profileId) { mutableStateOf("") }
+    var opened by remember(profileId) { mutableStateOf<String?>(null) }
+    var takenText by remember(profileId) { mutableStateOf("") }
+    val ctx = LocalContext.current
+    // A real chooser rather than a filename box: the point of the feature is
+    // the file itself, and a name with no bytes behind it imports nothing.
+    // The filter is deliberately everything — a patent filing, a photograph
+    // and a spreadsheet are all things somebody might hand over.
+    val pickFile = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()) { uri ->
+        val who = vm.interactorId
+        if (uri != null && who != null) {
+            val bytes = runCatching {
+                ctx.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+            }.getOrNull()
+            val shown = runCatching {
+                uri.lastPathSegment?.substringAfterLast('/') ?: ""
+            }.getOrDefault("")
+            if (bytes == null || bytes.isEmpty()) {
+                note = L10n.t("prf.bc.empty", lang)
+            } else {
+                val said = handNote.trim(); handNote = ""
+                vm.call({ ApiClient.importFile(profileId, who, shown, said,
+                    bytes) }) { r ->
+                    note = r.exceptionOrNull()?.message
+                    vm.call({ ApiClient.briefcase(profileId, who) }) { b ->
+                        b.getOrNull()?.let {
+                            carried = it.items; bcOffline = it.offline }
+                    }
+                }
+            }
+        } else if (uri != null) {
+            note = L10n.t("prf.needuser", lang)
+        }
+    }
 
     LaunchedEffect(profileId) {
         vm.call({ ApiClient.profile(profileId) }) { r -> who = r.getOrNull() }
@@ -3417,6 +3461,11 @@ private fun ProfilePagePanel(vm: StudioViewModel, profileId: String,
         vm.pid?.let { mine ->
             vm.call({ ApiClient.friends(mine) }) { r ->
                 befriended = r.getOrDefault(emptyList()).map { it.profileId } }
+        }
+        vm.interactorId?.let { who ->
+            vm.call({ ApiClient.briefcase(profileId, who) }) { r ->
+                r.getOrNull()?.let { carried = it.items; bcOffline = it.offline }
+            }
         }
     }
 
@@ -3532,6 +3581,108 @@ private fun ProfilePagePanel(vm: StudioViewModel, profileId: String,
                      else L10n.t("prf.notyetfriends", lang),
                     color = Qrme.T3, fontSize = 11.sp)
                 reply?.let { Text(it, color = Qrme.Txt, fontSize = 12.sp) }
+
+                // The briefcase. Handing somebody a document is part of
+                // talking to them, so it sits inside this card rather than
+                // behind a tab of its own. What is handed over is read once
+                // at import and carried as a digest — the counts on each row
+                // are that claim made checkable.
+                vm.interactorId?.let { who ->
+                    HorizontalDivider(color = Qrme.Line)
+                    Text(L10n.t("prf.bc.heading", lang), color = Qrme.Txt,
+                        fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text(L10n.t("prf.bc.why", lang).replace("{name}", name),
+                        color = Qrme.T3, fontSize = 11.sp)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        SmallAction(L10n.t("prf.bc.file", lang)) {
+                            pickFile.launch("*/*")
+                        }
+                        SmallAction(L10n.t("prf.bc.import", lang),
+                            enabled = handUrl.isNotBlank() && !bcOffline) {
+                            val url = handUrl.trim(); handUrl = ""
+                            val said = handNote.trim(); handNote = ""
+                            vm.call({ ApiClient.importLink(profileId, who, url,
+                                said) }) { r ->
+                                note = r.exceptionOrNull()?.message
+                                vm.call({ ApiClient.briefcase(profileId,
+                                    who) }) { b ->
+                                    b.getOrNull()?.let {
+                                        carried = it.items
+                                        bcOffline = it.offline }
+                                }
+                            }
+                        }
+                    }
+                    labeledField(L10n.t("prf.bc.linkhint", lang), handUrl,
+                        L10n.t("prf.bc.linkhint", lang)) { handUrl = it }
+                    labeledField(L10n.t("prf.bc.notehint", lang), handNote,
+                        L10n.t("prf.bc.notehint", lang)) { handNote = it }
+                    if (bcOffline) {
+                        Text(L10n.t("prf.bc.offline", lang), color = Qrme.T3,
+                            fontSize = 11.sp)
+                    }
+                    if (carried.isEmpty()) {
+                        Text(L10n.t("prf.bc.empty", lang), color = Qrme.T3,
+                            fontSize = 11.sp)
+                    }
+                    carried.forEach { item ->
+                        Column(verticalArrangement =
+                                   Arrangement.spacedBy(4.dp)) {
+                            Text("${item.title} · ${item.kind}",
+                                color = Qrme.Txt, fontSize = 12.sp)
+                            Text(if (item.read)
+                                     L10n.t("prf.bc.read", lang)
+                                         .replace("{chars}",
+                                                  item.chars.toString())
+                                         .replace("{digest}",
+                                                  item.digestChars.toString())
+                                 else L10n.t("prf.bc.unread", lang)
+                                         .replace("{name}", name),
+                                color = Qrme.T3, fontSize = 11.sp)
+                            Row(horizontalArrangement =
+                                    Arrangement.spacedBy(8.dp)) {
+                                if (item.read) {
+                                    SmallAction(if (opened == item.id)
+                                                    L10n.t("prf.bc.hide", lang)
+                                                else
+                                                    L10n.t("prf.bc.show", lang)) {
+                                        if (opened == item.id) {
+                                            opened = null; takenText = ""
+                                        } else {
+                                            vm.call({ ApiClient.briefcaseItem(
+                                                profileId, who, item.id) }) { r ->
+                                                r.getOrNull()?.let {
+                                                    opened = item.id
+                                                    takenText = it.text
+                                                        ?: it.digest
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                SmallAction(L10n.t("prf.bc.remove", lang)) {
+                                    vm.call({ ApiClient.forgetImport(profileId,
+                                        who, item.id) }) { r ->
+                                        note = r.exceptionOrNull()?.message
+                                        if (opened == item.id) {
+                                            opened = null; takenText = ""
+                                        }
+                                        vm.call({ ApiClient.briefcase(profileId,
+                                            who) }) { b ->
+                                            b.getOrNull()?.let {
+                                                carried = it.items
+                                                bcOffline = it.offline }
+                                        }
+                                    }
+                                }
+                            }
+                            if (opened == item.id) {
+                                Text(takenText, color = Qrme.Txt,
+                                    fontSize = 11.sp)
+                            }
+                        }
+                    }
+                }
             }
         }
 

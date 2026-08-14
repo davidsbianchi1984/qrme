@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Somebody else's homepage, in the pocket.
 ///
@@ -62,6 +63,15 @@ struct ProfilePageView: View {
     @State private var reply: String?
     @State private var note: String?
     @State private var busy = false
+    /// The briefcase: what *you* have handed *this* profile. Held per pair,
+    /// so walking on to the next page must clear it rather than carry it.
+    @State private var carried: [BriefcaseRow] = []
+    @State private var bcOffline = false
+    @State private var handUrl = ""
+    @State private var handNote = ""
+    @State private var picking = false
+    @State private var opened: String?
+    @State private var takenText = ""
 
     private var mine: Bool { profileId == state.pid }
     private var name: String {
@@ -189,7 +199,95 @@ struct ProfilePageView: View {
             if let reply {
                 Text(reply).font(.caption).foregroundStyle(Theme.txt)
             }
+            if state.interactorId != nil {
+                Divider().background(Theme.line)
+                briefcase
+            }
         }.card()
+    }
+
+    // MARK: - the briefcase
+
+    /// Handing somebody a document is part of talking to them, so this sits
+    /// inside the actions card rather than behind a tab of its own. What is
+    /// handed over is read once at import and carried as a digest — the
+    /// counts on each row are that claim made checkable.
+    private var briefcase: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(L10n.t("prf.bc.heading", state.language))
+                .font(.caption.bold()).foregroundStyle(Theme.txt)
+            Text(L10n.t("prf.bc.why", state.language)
+                    .replacingOccurrences(of: "{name}", with: name))
+                .font(.caption2).foregroundStyle(Theme.t2)
+            Button(L10n.t("prf.bc.file", state.language)) { picking = true }
+                .font(.caption).foregroundStyle(Theme.brandA)
+                .disabled(busy)
+            HStack(spacing: 8) {
+                TextField(L10n.t("prf.bc.linkhint", state.language),
+                          text: $handUrl)
+                    .textFieldStyle(.roundedBorder)
+                    .textInputAutocapitalization(.never)
+                    .disabled(bcOffline)
+                Button(L10n.t("prf.bc.import", state.language)) { handLink() }
+                    .font(.caption2).foregroundStyle(Theme.t2)
+                    .disabled(busy || bcOffline || handUrl.trimmingCharacters(
+                        in: .whitespaces).isEmpty)
+            }
+            TextField(L10n.t("prf.bc.notehint", state.language),
+                      text: $handNote)
+                .textFieldStyle(.roundedBorder)
+            if bcOffline {
+                Text(L10n.t("prf.bc.offline", state.language))
+                    .font(.caption2).foregroundStyle(Theme.t2)
+            }
+            if carried.isEmpty {
+                Text(L10n.t("prf.bc.empty", state.language))
+                    .font(.caption2).foregroundStyle(Theme.t2)
+            }
+            ForEach(carried) { item in
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("\(item.title) · \(item.kind)")
+                        .font(.caption).foregroundStyle(Theme.txt)
+                    Text(item.read
+                         ? L10n.t("prf.bc.read", state.language)
+                             .replacingOccurrences(of: "{chars}",
+                                                   with: "\(item.chars)")
+                             .replacingOccurrences(of: "{digest}",
+                                                   with: "\(item.digest_chars)")
+                         : L10n.t("prf.bc.unread", state.language)
+                             .replacingOccurrences(of: "{name}", with: name))
+                        .font(.caption2).foregroundStyle(Theme.t2)
+                    HStack(spacing: 10) {
+                        if item.read {
+                            Button(opened == item.id
+                                   ? L10n.t("prf.bc.hide", state.language)
+                                   : L10n.t("prf.bc.show", state.language)) {
+                                showTaken(item.id)
+                            }.font(.caption2).foregroundStyle(Theme.brandA)
+                        }
+                        Button(L10n.t("prf.bc.remove", state.language)) {
+                            takeBack(item.id)
+                        }.font(.caption2).foregroundStyle(Theme.t2)
+                    }.disabled(busy)
+                    if opened == item.id {
+                        Text(takenText)
+                            .font(.caption2).foregroundStyle(Theme.txt)
+                    }
+                }
+                .padding(8).background(Theme.scrBot)
+                .clipShape(RoundedRectangle(cornerRadius: 9))
+            }
+        }
+        // A real picker rather than a filename box: the point of the feature
+        // is the file itself, and a name with no bytes behind it imports
+        // nothing.
+        .fileImporter(isPresented: $picking,
+                      allowedContentTypes: [.item],
+                      allowsMultipleSelection: false) { result in
+            guard case .success(let urls) = result, let url = urls.first
+            else { return }
+            handOver(url)
+        }
     }
 
     // MARK: - their eight, and walking on
@@ -326,6 +424,84 @@ struct ProfilePageView: View {
         if let mine = state.pid {
             befriended = ((try? await ApiClient.shared.friends(
                 profileId: mine)) ?? []).map(\.profile_id)
+        }
+        // Cleared before the fetch, because walking from one page to the next
+        // must not show the last person's briefcase under somebody else's
+        // name even for a frame.
+        carried = []; handUrl = ""; handNote = ""
+        opened = nil; takenText = ""
+        if let interactor = state.interactorId,
+           let board = try? await ApiClient.shared.briefcase(
+               profileId: profileId, interactorId: interactor) {
+            carried = board.items ?? []
+            bcOffline = board.offline ?? false
+        }
+    }
+
+    private func refreshCarried(_ interactor: String) async {
+        let board = try? await ApiClient.shared.briefcase(
+            profileId: profileId, interactorId: interactor)
+        carried = board?.items ?? []
+        bcOffline = board?.offline ?? false
+    }
+
+    private func handOver(_ url: URL) {
+        guard let interactor = state.interactorId else {
+            note = L10n.t("prf.needuser", state.language); return
+        }
+        run {
+            // A file chosen from the document picker lives outside this app's
+            // container, so the read has to be bracketed by the security
+            // scope or it comes back empty on a real device.
+            let scoped = url.startAccessingSecurityScopedResource()
+            defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+            let data = try Data(contentsOf: url)
+            _ = try await ApiClient.shared.importFile(
+                profileId: profileId, interactorId: interactor,
+                filename: url.lastPathComponent,
+                note: handNote.trimmingCharacters(in: .whitespaces),
+                data: data)
+            handNote = ""
+            await refreshCarried(interactor)
+        }
+    }
+
+    private func handLink() {
+        guard let interactor = state.interactorId else {
+            note = L10n.t("prf.needuser", state.language); return
+        }
+        run {
+            _ = try await ApiClient.shared.importLink(
+                profileId: profileId, interactorId: interactor,
+                url: handUrl.trimmingCharacters(in: .whitespaces),
+                note: handNote.trimmingCharacters(in: .whitespaces))
+            handUrl = ""; handNote = ""
+            await refreshCarried(interactor)
+        }
+    }
+
+    /// What the profile actually took from a file is readable, because "it
+    /// read your document" is a claim somebody is entitled to check.
+    private func showTaken(_ itemId: String) {
+        if opened == itemId { opened = nil; takenText = ""; return }
+        guard let interactor = state.interactorId else { return }
+        run {
+            let one = try await ApiClient.shared.briefcaseItem(
+                profileId: profileId, interactorId: interactor,
+                itemId: itemId)
+            opened = itemId
+            takenText = one.text ?? one.digest
+        }
+    }
+
+    private func takeBack(_ itemId: String) {
+        guard let interactor = state.interactorId else { return }
+        run {
+            try await ApiClient.shared.forgetImport(
+                profileId: profileId, interactorId: interactor,
+                itemId: itemId)
+            if opened == itemId { opened = nil; takenText = "" }
+            await refreshCarried(interactor)
         }
     }
 

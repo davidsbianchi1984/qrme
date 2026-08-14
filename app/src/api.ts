@@ -1129,6 +1129,17 @@ export interface MediaUpload {
   id: string; kind: "image" | "video" | "file"; url: string;
   name?: string | null; alt?: string | null; ai_marked: false;
 }
+// One thing handed to a profile mid-conversation. `chars` against
+// `digest_chars` is the point made visible: the long number was read once,
+// the short number is what every later turn carries. `read` false means the
+// bytes arrived and nobody could turn them into words — a photograph, a
+// video, a scan — and the screen must say so rather than imply otherwise.
+export interface BriefcaseItem {
+  id: string; kind: "link" | "photo" | "video" | "document";
+  title: string; note?: string | null; source?: string | null;
+  read: boolean; digest: string; chars: number; digest_chars: number;
+  bytes?: number | null; created_at: string;
+}
 export interface WallPost {
   id: string; profile_id: string; display_name?: string;
   avatar?: string | null; body: string; created_at?: string;
@@ -3289,6 +3300,48 @@ export const api = {
   profileMedia: (profileId: string, kind?: "image" | "video" | "file") =>
     req<{ profile_id: string; kind: string | null; media: MediaUpload[] }>(
       `/profiles/${profileId}/media` + (kind ? `?kind=${kind}` : "")),
+  // The briefcase: material a visitor hands the profile they are talking to,
+  // read once at import and carried as a digest thereafter. Scoped to the
+  // pair — `interactor_id` is not decoration, it is who the material belongs
+  // to, and the person after you in the queue does not inherit it.
+  briefcase: (profileId: string, interactorId: string) =>
+    req<{ profile_id: string; interactor_id: string;
+          items: BriefcaseItem[]; max_items: number; offline: boolean }>(
+      `/profiles/${profileId}/briefcase` +
+      `?interactor_id=${encodeURIComponent(interactorId)}`),
+  briefcaseItem: (profileId: string, interactorId: string, itemId: string) =>
+    req<BriefcaseItem & { text: string }>(
+      `/profiles/${profileId}/briefcase/${itemId}` +
+      `?interactor_id=${encodeURIComponent(interactorId)}`),
+  importLink: (profileId: string, interactorId: string, url: string,
+               note = "") =>
+    req<BriefcaseItem>(`/profiles/${profileId}/briefcase/link`, {
+      method: "POST",
+      body: { interactor_id: interactorId, url, note },
+    }),
+  // Raw bytes for the same reason `uploadMedia` sends them raw: the backend
+  // reads the kind from the bytes, and the filename is a display hint only.
+  importFile: async (profileId: string, interactorId: string, file: File,
+                     note = "") => {
+    const q = new URLSearchParams({ interactor_id: interactorId,
+                                    filename: file.name, note });
+    const res = await fetch(
+      `${getBase()}/profiles/${profileId}/briefcase/file?${q.toString()}`,
+      { method: "POST", body: file,
+        headers: { "content-type": "application/octet-stream" } });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const body = data as { detail?: unknown; message?: unknown };
+      throw new RequestError(res.status,
+                             body.detail ?? `import failed (${res.status})`,
+                             body.message);
+    }
+    return data as BriefcaseItem;
+  },
+  forgetImport: (profileId: string, interactorId: string, itemId: string) =>
+    req<void>(`/profiles/${profileId}/briefcase/${itemId}` +
+              `?interactor_id=${encodeURIComponent(interactorId)}`,
+              { method: "DELETE" }),
   videoPlatforms: () =>
     req<{ platforms: { key: string; name: string; hosts: string[] }[];
           note: string }>(`/videos/platforms`),

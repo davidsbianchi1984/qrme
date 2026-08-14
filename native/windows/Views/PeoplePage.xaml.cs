@@ -44,6 +44,14 @@ public sealed partial class PeoplePage : Page
         VisitBefriendButton.Content = L10n.T("prf.befriend");
         VisitRoomButton.Content = L10n.T("prf.room");
         VisitCloseButton.Content = L10n.T("prf.back");
+        BcHeading.Text = L10n.T("prf.bc.heading");
+        BcFileButton.Content = L10n.T("prf.bc.file");
+        BcLinkBox.PlaceholderText = L10n.T("prf.bc.linkhint");
+        BcNoteBox.PlaceholderText = L10n.T("prf.bc.notehint");
+        BcImportButton.Content = L10n.T("prf.bc.import");
+        BcShowButton.Content = L10n.T("prf.bc.show");
+        BcRemoveButton.Content = L10n.T("prf.bc.remove");
+        BcOffline.Text = L10n.T("prf.bc.offline");
         CrowdTitle.Text = L10n.T("crowd.title");
         CrowdKindBox.Header = "kind";
         CrowdKindBox.Text = "profiles";
@@ -737,6 +745,9 @@ public sealed partial class PeoplePage : Page
             VisitStateNote.Text = mutual ? L10n.T("prf.actionsnote")
                 : listedThem ? L10n.T("prf.waiting").Replace("{name}", name)
                 : L10n.T("prf.notyetfriends");
+
+            BcWhy.Text = L10n.T("prf.bc.why").Replace("{name}", name);
+            await LoadBriefcase();
         }
         catch (Exception ex) { StatusText.Text = ex.Message; }
     }
@@ -753,6 +764,133 @@ public sealed partial class PeoplePage : Page
                 _visiting, tok, who, VisitSayBox.Text.Trim());
             VisitReply.Text = answer.ProfileMessage.Content ?? "";
             VisitSayBox.Text = "";
+        }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
+    }
+
+    // ---- The briefcase -------------------------------------------------
+
+    /// <summary>The rows currently held, so the list's selected index can be
+    /// turned back into an id without asking the backend again.</summary>
+    private BriefcaseItem[] _carried = System.Array.Empty<BriefcaseItem>();
+
+    private async System.Threading.Tasks.Task LoadBriefcase()
+    {
+        var s = AppState.Current;
+        BcTaken.Text = "";
+        if (_visiting.Length == 0 || s.InteractorId is not { Length: > 0 } who)
+        { _carried = System.Array.Empty<BriefcaseItem>(); BcList.ItemsSource = null; return; }
+        try
+        {
+            var board = await ApiClient.Shared.Briefcase(_visiting, who);
+            _carried = board.Items ?? System.Array.Empty<BriefcaseItem>();
+            BcOffline.Visibility = board.Offline == true
+                ? Visibility.Visible : Visibility.Collapsed;
+            BcList.ItemsSource = _carried.Length == 0
+                ? new List<Row> { new(L10n.T("prf.bc.empty")) }
+                : _carried.Select(i => new Row(
+                    $"{i.Title} · {i.Kind} — " + (i.Read == true
+                        ? L10n.T("prf.bc.read")
+                            .Replace("{chars}", (i.Chars ?? 0).ToString())
+                            .Replace("{digest}", (i.DigestChars ?? 0).ToString())
+                        : L10n.T("prf.bc.unread")
+                            .Replace("{name}", VisitName.Text)))).ToList();
+        }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
+    }
+
+    /// <summary>A real chooser rather than a filename box: the point of the
+    /// feature is the file itself, and a name with no bytes behind it imports
+    /// nothing.</summary>
+    private async void OnBriefcaseFile(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        if (_visiting.Length == 0) return;
+        if (s.InteractorId is not { Length: > 0 } who)
+        { StatusText.Text = L10n.T("prf.needuser"); return; }
+        try
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            // WinUI 3 pickers need the window they belong to; without this
+            // the call throws rather than opening anything.
+            WinRT.Interop.InitializeWithWindow.Initialize(picker,
+                WinRT.Interop.WindowNative.GetWindowHandle(App.Window));
+            picker.FileTypeFilter.Add("*");
+            var file = await picker.PickSingleFileAsync();
+            if (file is null) return;
+            var buffer = await Windows.Storage.FileIO.ReadBufferAsync(file);
+            var bytes = buffer.ToArray();
+            await ApiClient.Shared.ImportFile(_visiting, who, file.Name,
+                                              BcNoteBox.Text.Trim(), bytes);
+            BcNoteBox.Text = "";
+            await LoadBriefcase();
+        }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
+    }
+
+    private async void OnBriefcaseLink(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        if (_visiting.Length == 0 || BcLinkBox.Text.Trim().Length == 0) return;
+        if (s.InteractorId is not { Length: > 0 } who)
+        { StatusText.Text = L10n.T("prf.needuser"); return; }
+        try
+        {
+            await ApiClient.Shared.ImportLink(_visiting, who,
+                BcLinkBox.Text.Trim(), BcNoteBox.Text.Trim());
+            BcLinkBox.Text = ""; BcNoteBox.Text = "";
+            await LoadBriefcase();
+        }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
+    }
+
+    // Changing the selection clears the shown text rather than leaving one
+    // item's reading under another item's name.
+    private void OnBriefcaseSelected(object sender, SelectionChangedEventArgs e)
+    {
+        BcTaken.Text = "";
+        BcShowButton.Content = L10n.T("prf.bc.show");
+    }
+
+    /// <summary>What the profile actually took from a file, because "it read
+    /// your document" is a claim somebody is entitled to check.</summary>
+    private async void OnBriefcaseShow(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        var picked = BcList.SelectedIndex;
+        if (picked < 0 || picked >= _carried.Length) return;
+        if (s.InteractorId is not { Length: > 0 } who) return;
+        // The button is the same control both ways, so it has to say which
+        // way it is about to go — a permanent "show" over text already shown
+        // reads as a control that did nothing.
+        if (BcTaken.Text.Length > 0)
+        {
+            BcTaken.Text = "";
+            BcShowButton.Content = L10n.T("prf.bc.show");
+            return;
+        }
+        try
+        {
+            var one = await ApiClient.Shared.BriefcaseItem(_visiting, who,
+                                                           _carried[picked].Id!);
+            BcTaken.Text = one.Text is { Length: > 0 } t ? t : one.Digest ?? "";
+            if (BcTaken.Text.Length > 0)
+                BcShowButton.Content = L10n.T("prf.bc.hide");
+        }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
+    }
+
+    private async void OnBriefcaseRemove(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        var picked = BcList.SelectedIndex;
+        if (picked < 0 || picked >= _carried.Length) return;
+        if (s.InteractorId is not { Length: > 0 } who) return;
+        try
+        {
+            await ApiClient.Shared.ForgetImport(_visiting, who,
+                                                _carried[picked].Id!);
+            await LoadBriefcase();
         }
         catch (Exception ex) { StatusText.Text = ex.Message; }
     }

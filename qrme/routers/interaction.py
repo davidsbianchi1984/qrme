@@ -9,9 +9,9 @@ from datetime import date
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import (adaptation, auth, companion, db, engagement, i18n, llm,
-                moderation, offline, persona, referral, remembrance, roles,
-                scrape, voiceprint, watermark)
+from .. import (adaptation, auth, briefcase, companion, db, engagement, i18n,
+                llm, moderation, offline, persona, referral, remembrance,
+                roles, scrape, voiceprint, watermark)
 from ..common import (require_may_publish, 
     age_of, anonymized_exchange, biometric_domain, biometrics_recovered,
     clear_active_handoff, clear_awaiting_reply, get_active_handoff,
@@ -323,10 +323,19 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
                    "with this person, before the recent transcript:\n"
                    + remembered)
     # The link handed mid-conversation: read it where this deployment may,
-    # and say so plainly where it may not.
-    page_block = _handed_link_block(body.message)
-    if page_block:
-        system += "\n\n" + page_block
+    # and say so plainly where it may not. Only for a link this turn has not
+    # already imported — a briefcase item is the same page, read once and
+    # kept, and carrying both would pay for it twice in the same prompt.
+    if not briefcase.holds_link(profile_id, body.interactor_id, body.message):
+        page_block = _handed_link_block(body.message)
+        if page_block:
+            system += "\n\n" + page_block
+    # The briefcase: everything this person has handed this profile, as
+    # digests. Long material enters the prompt at the size of its reading,
+    # on this turn and every turn after it.
+    carried = briefcase.block(profile_id, body.interactor_id)
+    if carried:
+        system += "\n\n" + carried
     # Attention conditioning from the latent embedding (claims 21/22).
     attention = adaptation.attention_prompt(
         adaptation.get(profile_id, body.interactor_id))

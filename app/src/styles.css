@@ -754,6 +754,22 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .pp-reply {
   border-left: 2px solid var(--brand); padding-left: 10px; margin-top: 8px;
 }
+/* The briefcase. Set off from the composer by a rule rather than its own
+   card: it is part of the same conversation, not a second errand. */
+.pp-briefcase { border-top: 1px solid var(--line); margin-top: 12px;
+                padding-top: 10px; }
+.pp-bc-add { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.pp-bc-add input[type="url"], .pp-bc-add input[type="text"] { flex: 1 1 180px; }
+.pp-bc-list { list-style: none; margin: 6px 0 0; padding: 0;
+              display: flex; flex-direction: column; gap: 10px; }
+.pp-bc-row { border: 1px solid var(--line); border-radius: 12px;
+             padding: 8px 10px; }
+.pp-bc-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+/* The extracted text can be long; it scrolls in place rather than pushing
+   the rest of the page down when somebody checks what was read. */
+.pp-bc-text { max-height: 220px; overflow-y: auto; white-space: pre-wrap;
+              border-left: 2px solid var(--line); padding-left: 10px;
+              margin-top: 6px; }
 .pp-face { background: none; border: 0; padding: 0; cursor: pointer;
            display: flex; flex-direction: column; align-items: center;
            gap: 4px; }

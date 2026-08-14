@@ -7720,7 +7720,51 @@ const CHROME: Table = {
     en: "a question, or a hello", es: "una pregunta, o un saludo", fr: "une question, ou un bonjour", de: "eine Frage oder ein Hallo", pt: "uma pergunta, ou um olá", it: "una domanda, o un saluto", ja: "質問でも、あいさつでも", zh: "一个问题，或一句问候", hi: "एक सवाल, या एक नमस्ते", ar: "سؤال، أو تحية",
   },
   "prf.talk": {
-    en: "Talk to their profile", es: "Hablar con su perfil", fr: "Parler à leur profil", de: "Mit ihrem Profil sprechen", pt: "Falar com o perfil deles", it: "Parla con il loro profilo", ja: "本人のプロフィールと話す", zh: "与他们的档案对话", hi: "उनकी प्रोफ़ाइल से बात करें", ar: "تحدّث إلى ملفهم",
+    en: "Send", es: "Enviar", fr: "Envoyer", de: "Senden", pt: "Enviar", it: "Invia", ja: "送信", zh: "发送", hi: "भेजें", ar: "إرسال",
+  },
+  "prf.bc.heading": {
+    en: "Give them something to read", es: "Dales algo que leer", fr: "Donnez-leur quelque chose à lire", de: "Gib ihnen etwas zu lesen", pt: "Dá-lhes algo para ler", it: "Dai loro qualcosa da leggere", ja: "読んでもらう資料を渡す", zh: "给他们一份可读的材料", hi: "उन्हें पढ़ने के लिए कुछ दें", ar: "أعطهم شيئًا ليقرأوه",
+  },
+  "prf.bc.why": {
+    en: "A photo, a document, a video or a link. It is read once when you hand it over, and {name} keeps it for the rest of this conversation — so you never have to paste it again.", es: "Una foto, un documento, un vídeo o un enlace. Se lee una sola vez al entregarlo, y {name} lo conserva durante el resto de esta conversación, así que no tendrás que volver a pegarlo.", fr: "Une photo, un document, une vidéo ou un lien. C'est lu une seule fois au moment où vous le remettez, et {name} le garde pour le reste de cette conversation — vous n'aurez plus à le recoller.", de: "Ein Foto, ein Dokument, ein Video oder ein Link. Es wird beim Übergeben einmal gelesen, und {name} behält es für den Rest dieses Gesprächs — du musst es nie wieder einfügen.", pt: "Uma foto, um documento, um vídeo ou um link. É lido uma só vez quando o entregas, e {name} guarda-o durante o resto desta conversa — nunca mais terás de o colar.", it: "Una foto, un documento, un video o un link. Viene letto una sola volta quando lo consegni, e {name} lo conserva per il resto di questa conversazione — non dovrai più incollarlo.", ja: "写真、書類、動画、リンク。渡したときに一度だけ読み、{name} はこの会話のあいだそれを覚えています。二度と貼り直す必要はありません。", zh: "照片、文件、视频或链接。递交时只读取一次，{name} 会在这场对话中一直记着它——你不必再粘贴第二遍。", hi: "एक फ़ोटो, एक दस्तावेज़, एक वीडियो या एक लिंक। सौंपते समय इसे एक ही बार पढ़ा जाता है, और {name} इसे इस बातचीत भर याद रखते हैं — आपको इसे दोबारा चिपकाना नहीं पड़ेगा।", ar: "صورة أو مستند أو مقطع أو رابط. يُقرأ مرة واحدة عند تسليمه، ويحتفظ به {name} لبقية هذه المحادثة — فلن تضطر إلى لصقه مرة أخرى.",
+  },
+  "prf.bc.file": {
+    en: "Choose a file", es: "Elegir un archivo", fr: "Choisir un fichier", de: "Datei wählen", pt: "Escolher um ficheiro", it: "Scegli un file", ja: "ファイルを選ぶ", zh: "选择文件", hi: "फ़ाइल चुनें", ar: "اختر ملفًا",
+  },
+  "prf.bc.linkhint": {
+    en: "or paste a link", es: "o pega un enlace", fr: "ou collez un lien", de: "oder einen Link einfügen", pt: "ou cola um link", it: "oppure incolla un link", ja: "またはリンクを貼る", zh: "或粘贴一个链接", hi: "या एक लिंक चिपकाएँ", ar: "أو الصق رابطًا",
+  },
+  "prf.bc.notehint": {
+    en: "what is it? (optional)", es: "¿qué es? (opcional)", fr: "qu'est-ce que c'est ? (facultatif)", de: "was ist das? (optional)", pt: "o que é? (opcional)", it: "che cos'è? (facoltativo)", ja: "これは何ですか（任意）", zh: "这是什么？（可选）", hi: "यह क्या है? (वैकल्पिक)", ar: "ما هذا؟ (اختياري)",
+  },
+  "prf.bc.import": {
+    en: "Hand it over", es: "Entregarlo", fr: "Le remettre", de: "Übergeben", pt: "Entregar", it: "Consegnalo", ja: "渡す", zh: "递交", hi: "सौंपें", ar: "سلّمه",
+  },
+  "prf.bc.empty": {
+    en: "Nothing handed over yet.", es: "Todavía no has entregado nada.", fr: "Rien de remis pour l'instant.", de: "Noch nichts übergeben.", pt: "Ainda não entregaste nada.", it: "Non hai ancora consegnato nulla.", ja: "まだ何も渡していません。", zh: "还没有递交任何东西。", hi: "अभी कुछ नहीं सौंपा गया।", ar: "لم تسلّم شيئًا بعد.",
+  },
+  "prf.bc.read": {
+    en: "read once — {chars} characters, carried as {digest}", es: "leído una vez — {chars} caracteres, conservado como {digest}", fr: "lu une fois — {chars} caractères, conservé sous {digest}", de: "einmal gelesen — {chars} Zeichen, behalten als {digest}", pt: "lido uma vez — {chars} caracteres, guardado como {digest}", it: "letto una volta — {chars} caratteri, conservato come {digest}", ja: "一度読みました — {chars} 文字、要約 {digest} 文字として保持", zh: "已读取一次 —— {chars} 个字符，以 {digest} 个字符留存", hi: "एक बार पढ़ा गया — {chars} अक्षर, {digest} अक्षरों में सहेजा गया", ar: "قُرئ مرة واحدة — {chars} حرفًا، محفوظ في {digest} حرفًا",
+  },
+  "prf.bc.unread": {
+    en: "kept, but not opened — {name} has not seen what is inside it", es: "conservado, pero no abierto: {name} no ha visto lo que hay dentro", fr: "conservé, mais non ouvert — {name} n'a pas vu ce qu'il contient", de: "behalten, aber nicht geöffnet — {name} hat den Inhalt nicht gesehen", pt: "guardado, mas não aberto — {name} não viu o que está lá dentro", it: "conservato, ma non aperto — {name} non ha visto cosa contiene", ja: "受け取りましたが開けていません — {name} は中身を見ていません", zh: "已收下，但未打开——{name} 没有看到里面的内容", hi: "रखा गया, पर खोला नहीं — {name} ने इसके भीतर का कुछ नहीं देखा", ar: "محفوظ لكنه لم يُفتح — لم يرَ {name} ما بداخله",
+  },
+  "prf.bc.show": {
+    en: "What they took from it", es: "Lo que sacaron de ello", fr: "Ce qu'ils en ont retenu", de: "Was sie daraus mitgenommen haben", pt: "O que retiraram daí", it: "Che cosa ne hanno tratto", ja: "そこから読み取った内容", zh: "他们从中读到的内容", hi: "उन्होंने इससे क्या लिया", ar: "ما استخلصوه منه",
+  },
+  "prf.bc.hide": {
+    en: "Hide", es: "Ocultar", fr: "Masquer", de: "Ausblenden", pt: "Ocultar", it: "Nascondi", ja: "隠す", zh: "隐藏", hi: "छिपाएँ", ar: "إخفاء",
+  },
+  // Not "Take it back": three other keys already carry that English with
+  // different translations behind it — a moderator retracting a decision and
+  // two people reclaiming a lent microphone. One English string with two
+  // wordings in a reader's own language is the defect the split-wordings
+  // guard exists for, and this names the mechanic anyway.
+  "prf.bc.remove": {
+    en: "Stop carrying it", es: "Dejar de llevarlo", fr: "Ne plus le porter", de: "Nicht mehr mittragen", pt: "Deixar de o levar", it: "Smetti di portarlo", ja: "持ち歩くのをやめる", zh: "不再随身带着", hi: "इसे साथ रखना बंद करें", ar: "توقّف عن حمله",
+  },
+  "prf.bc.offline": {
+    en: "This deployment is offline, so a link cannot be fetched — hand over the file instead.", es: "Este despliegue está sin conexión, así que no se puede descargar un enlace: entrega el archivo en su lugar.", fr: "Ce déploiement est hors ligne, un lien ne peut donc pas être récupéré — remettez plutôt le fichier.", de: "Diese Installation ist offline, ein Link kann also nicht geladen werden — übergib stattdessen die Datei.", pt: "Esta instalação está offline, por isso não é possível buscar um link — entrega antes o ficheiro.", it: "Questa installazione è offline, quindi un link non può essere scaricato — consegna invece il file.", ja: "この環境はオフラインのためリンクを取得できません。ファイルを渡してください。", zh: "此部署处于离线状态，无法抓取链接——请改为递交文件。", hi: "यह परिनियोजन ऑफ़लाइन है, इसलिए लिंक नहीं लाया जा सकता — इसके बजाय फ़ाइल सौंपें।", ar: "هذا النشر غير متصل، لذا لا يمكن جلب رابط — سلّم الملف بدلًا من ذلك.",
   },
   "prf.message": {
     en: "Send it as a message", es: "Enviarlo como mensaje", fr: "L'envoyer en message", de: "Als Nachricht senden", pt: "Enviar como mensagem", it: "Invialo come messaggio", ja: "メッセージとして送る", zh: "作为私信发送", hi: "संदेश के रूप में भेजें", ar: "أرسله كرسالة",

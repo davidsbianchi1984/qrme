@@ -2614,6 +2614,51 @@ public sealed class ApiClient
         return await Send<MediaOut>(req);
     }
 
+    // ---- The briefcase: what you hand a profile, read once and kept ----
+
+    /// <summary>
+    /// Scoped to the pair, not to the profile: <c>interactorId</c> is who the
+    /// material belongs to, and the next visitor inherits none of it.
+    /// </summary>
+    public Task<BriefcaseBoard> Briefcase(string profileId,
+        string interactorId) =>
+        Send<BriefcaseBoard>(Get($"/profiles/{profileId}/briefcase" +
+            $"?interactor_id={Uri.EscapeDataString(interactorId)}"));
+
+    /// <summary>The text that was actually extracted, for somebody who wants
+    /// to check what the profile took from their file. Never what the prompt
+    /// carries.</summary>
+    public Task<BriefcaseItem> BriefcaseItem(string profileId,
+        string interactorId, string itemId) =>
+        Send<BriefcaseItem>(Get($"/profiles/{profileId}/briefcase/{itemId}" +
+            $"?interactor_id={Uri.EscapeDataString(interactorId)}"));
+
+    public Task<BriefcaseItem> ImportLink(string profileId,
+        string interactorId, string url, string note) =>
+        Send<BriefcaseItem>(Post($"/profiles/{profileId}/briefcase/link",
+            new { interactor_id = interactorId, url, note }));
+
+    /// <summary>Raw bytes, like <c>UploadMedia</c> above and for the same
+    /// reason: the backend reads the kind from the bytes, and the filename is
+    /// a display hint that only a whitelisted extension survives.</summary>
+    public async Task<BriefcaseItem> ImportFile(string profileId,
+        string interactorId, string filename, string note, byte[] bytes)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Post,
+            $"/profiles/{profileId}/briefcase/file" +
+            $"?interactor_id={Uri.EscapeDataString(interactorId)}" +
+            $"&filename={Uri.EscapeDataString(filename)}" +
+            $"&note={Uri.EscapeDataString(note)}")
+        { Content = new ByteArrayContent(bytes) };
+        return await Send<BriefcaseItem>(req);
+    }
+
+    public Task ForgetImport(string profileId, string interactorId,
+        string itemId) =>
+        Send<BriefcaseGone>(new HttpRequestMessage(HttpMethod.Delete,
+            $"/profiles/{profileId}/briefcase/{itemId}" +
+            $"?interactor_id={Uri.EscapeDataString(interactorId)}"));
+
     /// <summary>What came through the upload door, newest first. The
     /// upload has been here since 0.42.x with nothing that lists it —
     /// media was findable only through the wall post it happened to ride
@@ -5018,6 +5063,35 @@ public record MediaLimitsCard(
     [property: JsonPropertyName("video")] MediaLimit? Video,
     [property: JsonPropertyName("file")] MediaLimit? File,
     [property: JsonPropertyName("detected_from")] string? DetectedFrom);
+
+/// <summary>
+/// One thing handed to a profile mid-conversation. <c>Chars</c> against
+/// <c>DigestChars</c> is the point made visible: the long number was read
+/// once, the short one is what every later turn carries. <c>Read</c> false
+/// means the bytes arrived and nobody could turn them into words — a
+/// photograph, a video, a scan — and the screen says so rather than implying
+/// otherwise. <c>Text</c> comes back only from the single-item door.
+/// </summary>
+public record BriefcaseItem(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("kind")] string? Kind,
+    [property: JsonPropertyName("title")] string? Title,
+    [property: JsonPropertyName("note")] string? Note,
+    [property: JsonPropertyName("source")] string? Source,
+    [property: JsonPropertyName("read")] bool? Read,
+    [property: JsonPropertyName("digest")] string? Digest,
+    [property: JsonPropertyName("chars")] int? Chars,
+    [property: JsonPropertyName("digest_chars")] int? DigestChars,
+    [property: JsonPropertyName("text")] string? Text);
+
+public record BriefcaseBoard(
+    [property: JsonPropertyName("items")] BriefcaseItem[]? Items,
+    [property: JsonPropertyName("max_items")] int? MaxItems,
+    [property: JsonPropertyName("offline")] bool? Offline);
+
+/// <summary>A 204 carries no body; the type exists so the shared
+/// <c>Send&lt;T&gt;</c> has something to name.</summary>
+public record BriefcaseGone();
 
 public record MediaOut(
     [property: JsonPropertyName("id")] string? Id,
