@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.71.1** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v0.72.0** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -815,6 +815,7 @@ Full detail in [CHANGELOG.md](CHANGELOG.md).
 
 | Release | What landed |
 |---|---|
+| **0.72.0** | **Their homepage, and the phones that can now open one** — pressing a face opened a card showing the *signed-in* profile's numbers under somebody else's name; the new screen carries their page, their Top 8 walking onward, their wall and their uploads, and no stats row at all, because `/stats` is owner-only and that is how the old card came to be wrong. `GET /profiles/{id}/media` gives the upload door its other side. iOS, Android and Windows get the same screen — their `PageCard` bindings were three fields out of a payload carrying eight, which is why no shell had one before |
 | **0.71.1** | **The API did not import on Windows** — `widgets.py` imported `resource`, which is POSIX-only, at the top of the file, and `api.py` reaches it through `routers/studio`, so this was not an unavailable sandbox but the whole API failing to import: the frozen desktop backend died on first run, the Windows installer job failed, the release job was skipped, and 0.70.0 and 0.70.1 published with no installers attached at all — not even the macOS and Linux ones that had built. The import is now allowed to fail and the runner says so in the reader's own language; the guard is a property of the text, because a suite that only runs on Linux can never import its way to this |
 | **0.71.0** | **The player learned the origin, and the deck became the screen** — a YouTube post on the Wall rendered the platform's own *Error 153* because `referrer-policy: no-referrer` is right for a page reached from a QR sticker and wrong for the players the console embeds, so the beacon pages keep it and the two players get the host and never the path; and a pane holding footage is now the footage, with the pill, the position and the caption riding over it on scrims rather than a header above the frame and a caption below it taking half a phone |
 | **0.70.1** | **The sandbox could lie about itself** — the widget runner asked whether *an* interpreter existed and never whether it was new enough, so a host carrying Node 18 reported ready and then failed every run on a flag its author never typed; the floor is Node 20, where the filesystem wall arrives, and it is guarded by measurement rather than by a literal — the interpreter this host offers either passes the floor or does not, and either accepts the flag or does not, and those two answers have to agree |

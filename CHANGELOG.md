@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.72.0] - 2026-08-14
+
 ### Added
 
 - **Their homepage — where pressing a face actually takes you.** A friend's
@@ -11231,7 +11233,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.71.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.72.0...HEAD
+[0.72.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.72.0
 [0.71.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.71.1
 [0.71.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.71.0
 [0.70.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.70.1
