@@ -5131,10 +5131,49 @@ struct PageTheme: Decodable {
     let label: String?
 }
 
+/// A profile's decorated page, as a visitor receives it.
+///
+/// Every field below the first three was already on the wire and read by
+/// nothing on this shell: the accent they picked, the eight faces they
+/// arranged, the links they listed, what they are offering, and whether
+/// they ever decorated the page at all. A binding narrower than the route
+/// is how a screen ends up unable to show the thing it exists to show.
 struct PageCard: Decodable {
     let theme: PageTheme?
     let tagline: String?
     let about: String?
+    let accent: String?
+    let top_friends: [PageFriendRow]?
+    let links: [PageLink]?
+    let offers: [PageOffer]?
+    /// Sanitised in storage, and deliberately not rendered on the phones —
+    /// see `ProfilePageView`. Decoded so the screen can say it is there.
+    let html: String?
+    /// False when this profile never decorated a page. The route answers a
+    /// full default rather than 404, so without this a bare page and a
+    /// styled one are indistinguishable.
+    let customised: Bool?
+}
+
+struct PageFriendRow: Decodable, Identifiable {
+    let profile_id: String
+    let display_name: String?
+    let avatar: String?
+    var id: String { profile_id }
+}
+
+struct PageLink: Decodable, Identifiable {
+    let label: String?
+    let url: String
+    var id: String { url }
+}
+
+struct PageOffer: Decodable, Identifiable {
+    let id: String
+    let kind: String?
+    let title: String
+    let blurb: String?
+    let area: String?
 }
 
 struct FrontCard: Decodable {

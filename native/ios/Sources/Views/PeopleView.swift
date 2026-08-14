@@ -33,6 +33,10 @@ struct PeopleSection: View {
     @State private var note: String?
     @State private var busy = false
     @State private var inboxPage: InboxPage?
+    /// Whose page is open over this one, or nil. A sheet rather than a push:
+    /// their Top 8 walks onward *inside* the sheet, so the stack never grows
+    /// however far somebody wanders.
+    @State private var visiting: String?
 
     var body: some View {
         ScrollView {
@@ -86,7 +90,12 @@ struct PeopleSection: View {
                         HStack {
                             let who = f.display_name ?? f.profile_id
                             let line = f.founder ? who + " ★" : who
-                            Text(line).font(.caption)
+                            // The name is the door. Until this round a
+                            // friend on this shell was a row of text with a
+                            // remove button: you could see that somebody was
+                            // your friend and never see anything they made.
+                            Button(line) { visiting = f.profile_id }
+                                .font(.caption)
                                 .foregroundStyle(Theme.txt)
                             Spacer()
                             if f.pinned {
@@ -259,7 +268,19 @@ struct PeopleSection: View {
             }.padding(20)
         }
         .task { await load() }
+        .sheet(item: Binding(get: { visiting.map(Visited.init) },
+                             set: { visiting = $0?.id })) { v in
+            NavigationStack {
+                ProfilePageView(profileId: v.id) { visiting = nil }
+                    .environmentObject(state)
+            }
+        }
     }
+
+    /// `sheet(item:)` wants something `Identifiable`; the id is the whole
+    /// value here, and wrapping it keeps the sheet re-presenting when the
+    /// visited profile changes rather than going stale on the first one.
+    private struct Visited: Identifiable { let id: String }
 
     private func load() async {
         guard let pid = state.pid else { return }

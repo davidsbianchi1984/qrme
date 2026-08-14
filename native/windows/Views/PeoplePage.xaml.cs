@@ -34,6 +34,16 @@ public sealed partial class PeoplePage : Page
         TitleText.Text = L10n.T("people.friends");
         InboxTitle.Text = L10n.T("inbox.title");
         InboxSeenButton.Content = L10n.T("inbox.seen");
+        VisitIdBox.Header = L10n.T("prf.visit.id");
+        VisitButton.Content = L10n.T("prf.visit");
+        VisitTheirs.Text = L10n.T("prf.theirs");
+        VisitOffersLabel.Text = L10n.T("prf.offers");
+        VisitSayBox.PlaceholderText = L10n.T("prf.sayhint");
+        VisitTalkButton.Content = L10n.T("prf.talk");
+        VisitMessageButton.Content = L10n.T("prf.message");
+        VisitBefriendButton.Content = L10n.T("prf.befriend");
+        VisitRoomButton.Content = L10n.T("prf.room");
+        VisitCloseButton.Content = L10n.T("prf.back");
         CrowdTitle.Text = L10n.T("crowd.title");
         CrowdKindBox.Header = "kind";
         CrowdKindBox.Text = "profiles";
@@ -606,6 +616,188 @@ public sealed partial class PeoplePage : Page
                 .ToList();
         }
         catch { /* leave as-is */ }
+    }
+
+    // ---- somebody else's homepage -----------------------------------------
+
+    /// Whose page is open, or empty. Their Top 8 walks onward by reassigning
+    /// this and reloading in place, so wandering never grows a back stack.
+    private string _visiting = "";
+    /// Your own list, so the card can tell which of three states this is.
+    /// `_are_friends` is mutual on purpose — consent only one person can end
+    /// is not consent — so a Message button on a stranger's page always
+    /// fails, and one drawn the moment you add them still fails, which is
+    /// the worse of the two because it looks like it should have worked.
+    private string[] _befriended = System.Array.Empty<string>();
+
+    private async void OnVisit(object sender, RoutedEventArgs e)
+    {
+        var id = VisitIdBox.Text.Trim();
+        if (id.Length > 0) await Visit(id);
+    }
+
+    private void OnVisitClose(object sender, RoutedEventArgs e)
+    {
+        _visiting = "";
+        VisitCard.Visibility = Visibility.Collapsed;
+    }
+
+    private async System.Threading.Tasks.Task Visit(string profileId)
+    {
+        _visiting = profileId;
+        var s = AppState.Current;
+        VisitCard.Visibility = Visibility.Visible;
+        VisitReply.Text = "";
+        try
+        {
+            var who = await ApiClient.Shared.Profile(profileId);
+            var name = who.DisplayName is { Length: > 0 } d ? d : profileId;
+            VisitName.Text = name;
+
+            var page = await ApiClient.Shared.PageOf(profileId);
+            VisitAbout.Text = page.About ?? page.Tagline ?? "";
+            VisitLinks.ItemsSource = (page.Links ?? System.Array.Empty<PageLink>())
+                .Select(l => new Row(l.Label is { Length: > 0 } lb ? lb : l.Url))
+                .ToList();
+            // Named, not drawn — a WebView2 pointed at a stranger's stored
+            // markup is a different proposition from one running the app's
+            // own signature ceremony.
+            VisitMarkupText.Text = L10n.T("prf.markuponweb");
+            VisitMarkupText.Visibility = page.Html is { Length: > 0 }
+                ? Visibility.Visible : Visibility.Collapsed;
+            VisitPlain.Text = L10n.T("prf.plain").Replace("{name}", name);
+            VisitPlain.Visibility = page.Customised
+                ? Visibility.Collapsed : Visibility.Visible;
+            VisitOffers.ItemsSource = (page.Offers ?? System.Array.Empty<PageOffer>())
+                .Select(o => new Row(o.Blurb is { Length: > 0 } b
+                                     ? $"{o.Title} — {b}" : o.Title)).ToList();
+
+            var friends = await ApiClient.Shared.Friends(profileId);
+            // Their Top 8 as they arranged it, their friends as the fallback
+            // — a page whose owner never picked eight is somewhere to walk on
+            // from rather than a dead end.
+            var top = (page.TopFriends ?? System.Array.Empty<PageFriendRow>())
+                .Select(f => (f.ProfileId, f.DisplayName)).ToList();
+            if (top.Count == 0)
+                top = friends.Take(8).Select(f => (f.ProfileId, f.DisplayName))
+                             .ToList();
+            VisitTopLabel.Text = L10n.T("prf.topfriends")
+                .Replace("{n}", top.Count.ToString());
+            VisitTopList.ItemsSource = top
+                .Select(f => new Row($"{f.ProfileId} · {f.DisplayName ?? ""}"))
+                .ToList();
+
+            var posts = await ApiClient.Shared.Wall(profileId);
+            VisitWall.ItemsSource = posts.Length == 0
+                ? new List<Row> { new(L10n.T("prf.nowall").Replace("{name}", name)) }
+                : posts.Select(p => new Row(p.Body)).ToList();
+
+            VisitSayLabel.Text = L10n.T("prf.saylabel").Replace("{name}", name);
+
+            var media = (await ApiClient.Shared.ProfileMedia(profileId)).Media
+                ?? System.Array.Empty<MediaOut>();
+            var photos = media.Where(m => m.Kind == "image").ToArray();
+            var videos = media.Where(m => m.Kind == "video").ToArray();
+            VisitCounts.Text =
+                L10n.T("prf.pane.wall").Replace("{n}", posts.Length.ToString())
+                + " · " + L10n.T("prf.pane.photos")
+                    .Replace("{n}", photos.Length.ToString())
+                + " · " + L10n.T("prf.pane.videos")
+                    .Replace("{n}", videos.Length.ToString())
+                + " · " + L10n.T("prf.pane.friends")
+                    .Replace("{n}", friends.Length.ToString());
+            // The alt text leads each row rather than trailing it: this list
+            // is read aloud to people who cannot see any of it, and a
+            // filename tells them nothing. An empty kind says which kind is
+            // empty — "no photographs" and "no footage" are different facts
+            // and a single blank strip cannot tell them apart.
+            var rows = new List<Row>();
+            rows.AddRange(photos.Length == 0
+                ? new[] { new Row(L10n.T("prf.nophotos")) }
+                : photos.Select(m => new Row(m.Alt ?? m.Name ?? m.Id ?? "—")));
+            rows.AddRange(videos.Length == 0
+                ? new[] { new Row(L10n.T("prf.novideos")) }
+                : videos.Select(m => new Row(m.Alt ?? m.Name ?? m.Id ?? "—")));
+            rows.AddRange(friends.Length == 0
+                ? new[] { new Row(L10n.T("prf.nofriends")) }
+                : friends.Select(f => new Row(
+                    $"{f.ProfileId} · {f.DisplayName ?? ""}")));
+            VisitMedia.ItemsSource = rows;
+
+            if (s.Pid is { Length: > 0 } mine)
+                _befriended = (await ApiClient.Shared.Friends(mine))
+                    .Select(f => f.ProfileId).ToArray();
+            var listedThem = _befriended.Contains(profileId);
+            var listedYou = friends.Any(f => f.ProfileId == s.Pid);
+            var mutual = listedThem && listedYou;
+            VisitMessageButton.Visibility = mutual
+                ? Visibility.Visible : Visibility.Collapsed;
+            VisitBefriendButton.Visibility = !mutual && !listedThem
+                ? Visibility.Visible : Visibility.Collapsed;
+            VisitStateNote.Text = mutual ? L10n.T("prf.actionsnote")
+                : listedThem ? L10n.T("prf.waiting").Replace("{name}", name)
+                : L10n.T("prf.notyetfriends");
+        }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
+    }
+
+    private async void OnVisitTalk(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        if (_visiting.Length == 0 || s.InteractorId is not { Length: > 0 } who
+            || s.InteractorToken is not { Length: > 0 } tok)
+        { StatusText.Text = L10n.T("prf.needuser"); return; }
+        try
+        {
+            var answer = await ApiClient.Shared.Chat(
+                _visiting, tok, who, VisitSayBox.Text.Trim());
+            VisitReply.Text = answer.ProfileMessage.Content ?? "";
+            VisitSayBox.Text = "";
+        }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
+    }
+
+    private async void OnVisitMessage(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        if (_visiting.Length == 0) return;
+        try
+        {
+            await ApiClient.Shared.SendDm(s.Pid!, _visiting,
+                                          VisitSayBox.Text.Trim(), s.Token!);
+            VisitSayBox.Text = "";
+            StatusText.Text = L10n.T("prf.sent");
+        }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
+    }
+
+    private async void OnVisitBefriend(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        if (_visiting.Length == 0) return;
+        try
+        {
+            await ApiClient.Shared.AddFriend(s.Pid!, _visiting, s.Token!);
+            StatusText.Text = L10n.T("prf.befriended")
+                .Replace("{name}", VisitName.Text);
+            await Visit(_visiting);
+        }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
+    }
+
+    private async void OnVisitRoom(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        if (_visiting.Length == 0 || s.InteractorId is not { Length: > 0 } who)
+        { StatusText.Text = L10n.T("prf.needuser"); return; }
+        try
+        {
+            // You as a person, them as a profile — the two-participant shape
+            // the backend requires, with the second one actually being them.
+            await ApiClient.Shared.CreateRoom("", _visiting, who);
+            StatusText.Text = L10n.T("prf.roomopened");
+        }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
     }
 
     private async void OnInboxSeen(object sender, RoutedEventArgs e)

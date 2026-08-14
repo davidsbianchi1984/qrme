@@ -3663,6 +3663,68 @@ object ApiClient {
             " \u00b7 " + o.optString("tagline", "\u2014")
     }
 
+    /**
+     * The same route, read whole.
+     *
+     * `page` above flattens it to "theme · tagline" for a one-line card, and
+     * that was every field this shell had ever read. The accent they picked,
+     * the eight faces they arranged, their links, what they offer and
+     * whether they decorated the page at all were all on the wire and shown
+     * nowhere — which is why there was no screen that could open a friend.
+     *
+     *     asked     does the shell call the page route
+     *     mattered  does it read what the page route answers
+     */
+    suspend fun pageCard(id: String): PageCardFull {
+        val o = JSONObject(request("/profiles/$id/page"))
+        val top = mutableListOf<PageFriendRow>()
+        o.optJSONArray("top_friends")?.let { a ->
+            for (i in 0 until a.length()) {
+                val f = a.getJSONObject(i)
+                top.add(PageFriendRow(f.getString("profile_id"),
+                    if (f.isNull("display_name")) null
+                    else f.optString("display_name")))
+            }
+        }
+        val links = mutableListOf<PageLink>()
+        o.optJSONArray("links")?.let { a ->
+            for (i in 0 until a.length()) {
+                val l = a.getJSONObject(i)
+                links.add(PageLink(l.optString("label"), l.optString("url")))
+            }
+        }
+        val offers = mutableListOf<PageOffer>()
+        o.optJSONArray("offers")?.let { a ->
+            for (i in 0 until a.length()) {
+                val f = a.getJSONObject(i)
+                offers.add(PageOffer(f.optString("title"),
+                    if (f.isNull("blurb")) null else f.optString("blurb")))
+            }
+        }
+        return PageCardFull(
+            if (o.isNull("tagline")) null else o.optString("tagline"),
+            if (o.isNull("about")) null else o.optString("about"),
+            if (o.isNull("accent")) null else o.optString("accent"),
+            top, links, offers,
+            if (o.isNull("html")) null else o.optString("html"),
+            o.optBoolean("customised", false))
+    }
+
+    /**
+     * The uploads as rows rather than as sentences. `profileMedia` above
+     * formats each one for a single strip; a screen that offers Photos and
+     * Videos as two doors has to be able to tell them apart.
+     */
+    suspend fun profileMediaRows(id: String): List<MediaRow> {
+        val rows = JSONObject(request("/profiles/$id/media"))
+            .optJSONArray("media") ?: return emptyList()
+        return (0 until rows.length()).map { i ->
+            val m = rows.getJSONObject(i)
+            MediaRow(m.optString("kind", ""), m.optString("alt"),
+                     m.optString("name"), m.optString("id"))
+        }
+    }
+
     suspend fun editPage(id: String, theme: String, tagline: String,
                          about: String, token: String) {
         val body = JSONObject()
@@ -4462,6 +4524,28 @@ data class ObjectionTimeline(val status: String, val note: String,
 data class FriendRow(val profileId: String, val displayName: String?,
                      val founder: Boolean, val pinned: Boolean,
                      val mutual: Boolean)
+
+/**
+ * A profile's decorated page, as a visitor receives it — the whole answer
+ * rather than the one line `page` flattens it to. `customised` is false when
+ * they never decorated it: the route replies with a full default instead of
+ * 404, so without this a bare page and a styled one look the same.
+ */
+data class PageCardFull(val tagline: String?, val about: String?,
+                        val accent: String?,
+                        val topFriends: List<PageFriendRow>,
+                        val links: List<PageLink>,
+                        val offers: List<PageOffer>,
+                        /** Sanitised in storage, deliberately not rendered
+                         *  here — see `ProfilePagePanel`. */
+                        val html: String?,
+                        val customised: Boolean)
+
+data class PageFriendRow(val profileId: String, val displayName: String?)
+data class PageLink(val label: String?, val url: String)
+data class PageOffer(val title: String, val blurb: String?)
+data class MediaRow(val kind: String, val alt: String, val name: String,
+                    val id: String)
 
 data class InboxEvent(val id: String, val kind: String, val actorId: String,
                       val actorName: String?, val seen: Boolean)

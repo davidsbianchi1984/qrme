@@ -32,6 +32,41 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   if it is ever wrong. React's escape hatch is a floor at zero in this repo,
   and being the screen that finally wanted it is not a reason to move it.
 
+- **The homepage reaches the phones.** The console got the screen above; the
+  three shells got the route and nowhere to land. A friend on a phone was a
+  row of text with a remove button beside it — you could see that somebody
+  was your friend and never see one thing they had made.
+
+      asked     can the phone list your friends
+      mattered  can it open one
+
+  `ProfilePageView` (iOS), `ProfilePagePanel` (Android) and the visiting card
+  on `PeoplePage` (Windows) carry their page, their Top 8 walking onward,
+  their wall, their uploads split into photographs and footage, their friends
+  and what they offer — with the same three visitor actions and the same
+  absent stats row, for the same reason.
+
+  On the way, `PageCard` on all three shells was a binding narrower than its
+  route: theme, tagline and about, out of a payload that also carries the
+  accent they chose, the eight faces they arranged, their links, their offers
+  and whether they ever decorated the page at all. Android's read the route
+  and flattened the whole answer to `"theme · tagline"`. A binding that
+  narrow is how a shell ends up with no screen it *could* build.
+
+  **The markup block is named rather than drawn, and that is deliberate.**
+  The console renders a page's own HTML in an iframe with `sandbox=""` —
+  every capability off. No shell has an equivalent: rendering it would mean
+  introducing a `WKWebView`/`WebView` to run a stranger's stored markup, and
+  a web view's default posture is nothing like `sandbox=""`. Windows has one
+  WebView2 and it runs the app's own signature ceremony, which is not the
+  same proposition. So the page renders from its structured parts, which is
+  most of it, and a line in the reader's language says the markup is there
+  and where to see it.
+
+      asked     does the phone show their page
+      mattered  does it show it without giving a stranger's markup
+                somewhere to run
+
 - **`GET /profiles/{id}/media` — the other side of the upload door.** Uploads
   have been accepted since 0.42.x with nothing that lists them: media was
   reachable only through the wall post it happened to ride on, so a

@@ -3112,6 +3112,15 @@ private fun PeoplePanel(vm: StudioViewModel) {
     var commentDraft by remember { mutableStateOf("") }
     var note by remember { mutableStateOf<String?>(null) }
     var inboxPage by remember { mutableStateOf<InboxPage?>(null) }
+    // Whose page is open over this one, or null. Their Top 8 walks onward by
+    // reassigning this, so wandering never grows a back stack.
+    var visiting by remember { mutableStateOf<String?>(null) }
+
+    visiting?.let { who ->
+        ProfilePagePanel(vm, who, onVisit = { visiting = it },
+                         onBack = { visiting = null })
+        return
+    }
 
     fun reload() {
         vm.call({ ApiClient.friends(vm.pid!!) }) { r ->
@@ -3173,7 +3182,14 @@ private fun PeoplePanel(vm: StudioViewModel) {
             friends.forEach { f ->
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     val who = f.displayName ?: f.profileId
-                    Text(if (f.founder) "$who ★" else who, color = Qrme.Txt, fontSize = 12.sp)
+                    // The name is the door. Until this round a friend on
+                    // this shell was a row of text with a remove button:
+                    // you could see that somebody was your friend and never
+                    // see anything they had made.
+                    TextButton(onClick = { visiting = f.profileId }) {
+                        Text(if (f.founder) "$who ★" else who,
+                            color = Qrme.Txt, fontSize = 12.sp)
+                    }
                     if (f.pinned) {
                         Text(L10n.t("people.pinned", lang), color = Qrme.T3, fontSize = 11.sp)
                     } else {
@@ -3331,6 +3347,257 @@ private fun PeoplePanel(vm: StudioViewModel) {
         ReachBlock(vm) { note = it }
         LicBlock(vm) { note = it }
         SensBlock(vm) { note = it }
+
+        note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+    }
+}
+
+/**
+ * Somebody else's homepage, in the pocket.
+ *
+ * The console got this screen in the homepage round; the phones got the
+ * route and no screen. Until now a friend on this shell was a row of text
+ * with a remove button — you could see that somebody was your friend and
+ * never see anything they had made.
+ *
+ *     asked     can the phone list your friends
+ *     mattered  can it open one
+ *
+ * Every route here is visitor-readable by design. There is no stats row,
+ * and that is not an omission: `GET /profiles/{id}/stats` is
+ * `require_owner`, which is exactly why the console's old inline card,
+ * having no way to fetch theirs, showed *your* numbers under their name.
+ *
+ * ## The markup is the one thing this panel does not render
+ *
+ * A decorated page may carry the owner's own HTML. The console renders it
+ * in an iframe with `sandbox=""` — every capability off — and says why:
+ * `pages.py` sanitises on the way in and does it well, but the iframe is
+ * about who pays if that is ever wrong.
+ *
+ * This shell has no equivalent. Showing it would mean introducing a
+ * `WebView` — the first in this app — to run a stranger's stored markup,
+ * and a WebView's default posture is nothing like `sandbox=""`. So the page
+ * is rendered from its structured parts, which is most of it, and the
+ * markup block is named rather than drawn.
+ *
+ *     asked     does the phone show their page
+ *     mattered  does it show it without giving a stranger's markup
+ *               somewhere to run
+ */
+@Composable
+private fun ProfilePagePanel(vm: StudioViewModel, profileId: String,
+                             onVisit: (String) -> Unit, onBack: () -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var who by remember(profileId) { mutableStateOf<ProfileCard?>(null) }
+    var page by remember(profileId) { mutableStateOf<PageCardFull?>(null) }
+    var posts by remember(profileId) { mutableStateOf<List<WallPost>>(emptyList()) }
+    var friends by remember(profileId) { mutableStateOf<List<FriendRow>>(emptyList()) }
+    var media by remember(profileId) { mutableStateOf<List<MediaRow>>(emptyList()) }
+    // Your own list, so the panel can tell which of three states this is.
+    // `_are_friends` is mutual on purpose — consent only one person can end
+    // is not consent — so a Message button on a stranger's page always
+    // fails, and one drawn the moment you add them still fails, which is
+    // the worse of the two because it looks like it should have worked.
+    var befriended by remember(profileId) { mutableStateOf<List<String>>(emptyList()) }
+    var pane by remember(profileId) { mutableStateOf("wall") }
+    var said by remember(profileId) { mutableStateOf("") }
+    var reply by remember(profileId) { mutableStateOf<String?>(null) }
+    var note by remember(profileId) { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(profileId) {
+        vm.call({ ApiClient.profile(profileId) }) { r -> who = r.getOrNull() }
+        vm.call({ ApiClient.pageCard(profileId) }) { r -> page = r.getOrNull() }
+        vm.call({ ApiClient.wall(profileId) }) { r ->
+            posts = r.getOrDefault(emptyList()) }
+        vm.call({ ApiClient.friends(profileId) }) { r ->
+            friends = r.getOrDefault(emptyList()) }
+        vm.call({ ApiClient.profileMediaRows(profileId) }) { r ->
+            media = r.getOrDefault(emptyList()) }
+        vm.pid?.let { mine ->
+            vm.call({ ApiClient.friends(mine) }) { r ->
+                befriended = r.getOrDefault(emptyList()).map { it.profileId } }
+        }
+    }
+
+    val name = who?.displayName ?: profileId
+    val photos = media.filter { it.kind == "image" }
+    val videos = media.filter { it.kind == "video" }
+    // Their Top 8 as they arranged it, their friends list as the fallback —
+    // a page whose owner never picked eight is somewhere to walk on from
+    // rather than a dead end.
+    val top = page?.topFriends?.takeIf { it.isNotEmpty() }?.take(8)
+        ?: friends.take(8).map { PageFriendRow(it.profileId, it.displayName) }
+    val listedThem = befriended.contains(profileId)
+    val listedYou = friends.any { it.profileId == vm.pid }
+    val mutual = listedThem && listedYou
+    val mine = profileId == vm.pid
+
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            TextButton(onClick = onBack) {
+                Text(L10n.t("prf.back", lang), color = Qrme.T2, fontSize = 12.sp)
+            }
+            Text(name, color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(L10n.t("prf.theirs", lang), color = Qrme.T3, fontSize = 11.sp)
+            Text(page?.tagline ?: name, color = Qrme.Txt, fontSize = 14.sp,
+                fontWeight = FontWeight.Bold)
+            page?.about?.takeIf { it.isNotEmpty() }?.let {
+                Text(it, color = Qrme.Txt, fontSize = 12.sp)
+            }
+            page?.links?.forEach { l ->
+                Text(l.label?.ifEmpty { l.url } ?: l.url,
+                    color = Qrme.BrandA, fontSize = 11.sp)
+            }
+            // Named, not drawn. See this function's header.
+            page?.html?.takeIf { it.isNotEmpty() }?.let {
+                Text(L10n.t("prf.markuponweb", lang), color = Qrme.T3,
+                    fontSize = 11.sp)
+            }
+            if (page?.customised == false) {
+                Text(L10n.t("prf.plain", lang).replace("{name}", name),
+                    color = Qrme.T3, fontSize = 11.sp)
+            }
+        }
+
+        if (!mine) {
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                labeledField(L10n.t("prf.saylabel", lang).replace("{name}", name),
+                    said, L10n.t("prf.sayhint", lang)) { said = it }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    BrandButton(L10n.t("prf.talk", lang),
+                        enabled = said.isNotBlank()) {
+                        // Talking is signed as the *person*, not the
+                        // profile, and a device that has never minted an
+                        // interactor identity has nobody to sign as. Said
+                        // rather than crashed on a `!!`.
+                        val who = vm.interactorId
+                        val tok = vm.interactorToken
+                        if (who == null || tok == null) {
+                            note = L10n.t("prf.needuser", lang)
+                        } else {
+                            val body = said.trim(); said = ""
+                            vm.call({ ApiClient.chat(profileId, tok, who,
+                                body) }) { r ->
+                                reply = r.getOrNull()?.content
+                                r.exceptionOrNull()?.let { note = it.message }
+                            }
+                        }
+                    }
+                    if (mutual) {
+                        SmallAction(L10n.t("prf.message", lang),
+                            enabled = said.isNotBlank()) {
+                            val body = said.trim(); said = ""
+                            vm.call({ ApiClient.sendDm(vm.pid!!, profileId,
+                                body, vm.token!!) }) { r ->
+                                note = r.exceptionOrNull()?.message
+                                    ?: L10n.t("prf.sent", lang)
+                            }
+                        }
+                    } else if (!listedThem) {
+                        SmallAction(L10n.t("prf.befriend", lang)) {
+                            vm.call({ ApiClient.addFriend(vm.pid!!, profileId,
+                                vm.token!!) }) { r ->
+                                note = r.exceptionOrNull()?.message
+                                    ?: L10n.t("prf.befriended", lang)
+                                        .replace("{name}", name)
+                                if (r.isSuccess) befriended = befriended + profileId
+                            }
+                        }
+                    }
+                    SmallAction(L10n.t("prf.room", lang)) {
+                        val who = vm.interactorId
+                        if (who == null) {
+                            note = L10n.t("prf.needuser", lang)
+                        } else {
+                            // You as a person, them as a profile — the
+                            // two-participant shape the backend requires,
+                            // with the second one actually being them.
+                            vm.call({ ApiClient.createRoom("", profileId,
+                                who) }) { r ->
+                                note = r.exceptionOrNull()?.message
+                                    ?: L10n.t("prf.roomopened", lang)
+                            }
+                        }
+                    }
+                }
+                Text(if (mutual) L10n.t("prf.actionsnote", lang)
+                     else if (listedThem) L10n.t("prf.waiting", lang)
+                         .replace("{name}", name)
+                     else L10n.t("prf.notyetfriends", lang),
+                    color = Qrme.T3, fontSize = 11.sp)
+                reply?.let { Text(it, color = Qrme.Txt, fontSize = 12.sp) }
+            }
+        }
+
+        if (top.isNotEmpty()) {
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(L10n.t("prf.topfriends", lang)
+                        .replace("{n}", top.size.toString()),
+                    color = Qrme.T3, fontSize = 11.sp)
+                top.forEach { f ->
+                    TextButton(onClick = { onVisit(f.profileId) }) {
+                        Text(f.displayName ?: f.profileId, color = Qrme.T2,
+                            fontSize = 12.sp)
+                    }
+                }
+            }
+        }
+
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            listOf("wall" to posts.size, "photos" to photos.size,
+                   "videos" to videos.size, "friends" to friends.size)
+                .forEach { (key, n) ->
+                    FilterChip(selected = pane == key, onClick = { pane = key },
+                        label = { Text(L10n.t("prf.pane.$key", lang)
+                            .replace("{n}", n.toString()), fontSize = 10.sp) })
+                }
+        }
+
+        when (pane) {
+            "wall" -> if (posts.isEmpty())
+                Text(L10n.t("prf.nowall", lang).replace("{name}", name),
+                    color = Qrme.T3, fontSize = 11.sp)
+                else posts.forEach {
+                    Text(it.body, color = Qrme.Txt, fontSize = 12.sp) }
+            // The alt text leads each row rather than trailing it: this list
+            // is read aloud to people who cannot see any of it, and a
+            // filename tells them nothing.
+            "photos" -> if (photos.isEmpty())
+                Text(L10n.t("prf.nophotos", lang), color = Qrme.T3, fontSize = 11.sp)
+                else photos.forEach {
+                    Text(it.alt.ifEmpty { it.name.ifEmpty { it.id } },
+                        color = Qrme.T2, fontSize = 11.sp) }
+            "videos" -> if (videos.isEmpty())
+                Text(L10n.t("prf.novideos", lang), color = Qrme.T3, fontSize = 11.sp)
+                else videos.forEach {
+                    Text(it.alt.ifEmpty { it.name.ifEmpty { it.id } },
+                        color = Qrme.T2, fontSize = 11.sp) }
+            else -> if (friends.isEmpty())
+                Text(L10n.t("prf.nofriends", lang), color = Qrme.T3, fontSize = 11.sp)
+                else friends.forEach { f ->
+                    TextButton(onClick = { onVisit(f.profileId) }) {
+                        Text(f.displayName ?: f.profileId, color = Qrme.T2,
+                            fontSize = 12.sp)
+                    }
+                }
+        }
+
+        page?.offers?.takeIf { it.isNotEmpty() }?.let { offers ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(L10n.t("prf.offers", lang), color = Qrme.T3, fontSize = 11.sp)
+                offers.forEach { o ->
+                    Text(o.blurb?.takeIf { it.isNotEmpty() }
+                            ?.let { "${o.title} — $it" } ?: o.title,
+                        color = Qrme.Txt, fontSize = 12.sp)
+                }
+            }
+        }
 
         note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
     }

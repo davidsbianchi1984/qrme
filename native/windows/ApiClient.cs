@@ -4676,10 +4676,42 @@ public record PageTheme(
     [property: JsonPropertyName("id")] string? Id,
     [property: JsonPropertyName("label")] string? Label);
 
+/// <summary>
+/// A profile's decorated page, as a visitor receives it.
+///
+/// Everything below the first three was already on the wire and read by
+/// nothing on this shell: the accent they picked, the eight faces they
+/// arranged, their links, what they offer, and whether they decorated the
+/// page at all. A binding narrower than the route is how a screen ends up
+/// unable to show the thing it exists to show.
+/// </summary>
 public record PageCard(
     [property: JsonPropertyName("theme")] PageTheme? Theme,
     [property: JsonPropertyName("tagline")] string? Tagline,
-    [property: JsonPropertyName("about")] string? About);
+    [property: JsonPropertyName("about")] string? About,
+    [property: JsonPropertyName("accent")] string? Accent = null,
+    [property: JsonPropertyName("top_friends")] PageFriendRow[]? TopFriends = null,
+    [property: JsonPropertyName("links")] PageLink[]? Links = null,
+    [property: JsonPropertyName("offers")] PageOffer[]? Offers = null,
+    /// Sanitised in storage, and deliberately not rendered here — see
+    /// ProfilePagePage. Bound so the screen can say it is there.
+    [property: JsonPropertyName("html")] string? Html = null,
+    /// False when this profile never decorated a page. The route answers a
+    /// full default rather than 404, so without this a bare page and a
+    /// styled one are indistinguishable.
+    [property: JsonPropertyName("customised")] bool Customised = false);
+
+public record PageFriendRow(
+    [property: JsonPropertyName("profile_id")] string ProfileId,
+    [property: JsonPropertyName("display_name")] string? DisplayName);
+
+public record PageLink(
+    [property: JsonPropertyName("label")] string? Label,
+    [property: JsonPropertyName("url")] string Url);
+
+public record PageOffer(
+    [property: JsonPropertyName("title")] string Title,
+    [property: JsonPropertyName("blurb")] string? Blurb);
 
 public record FrontCard(
     [property: JsonPropertyName("display_name")] string? DisplayName,

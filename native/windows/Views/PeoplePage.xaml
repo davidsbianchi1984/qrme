@@ -33,9 +33,110 @@
                 </StackPanel>
             </Border>
 
+            <!-- Somebody else's homepage, in place. The console got this
+                 screen in the homepage round; this shell got the routes and
+                 nowhere to land, so a friend here was a line of text and
+                 nothing you could open.
+
+                 No stats row, and that is not an omission:
+                 `GET /profiles/{id}/stats` is require_owner, which is
+                 exactly why the console's old inline card — having no way to
+                 fetch theirs — showed *your* numbers under their name.
+
+                 The markup block is named rather than drawn. Rendering it
+                 would mean pointing a WebView2 at a stranger's stored HTML,
+                 and this app's only WebView2 runs the first-party signature
+                 ceremony. See VisitMarkupText. -->
+            <Border x:Name="VisitCard" Visibility="Collapsed"
+                    Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="VisitName" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="VisitTheirs" FontSize="12"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <TextBlock x:Name="VisitAbout" FontSize="13" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="VisitMarkupText" FontSize="12" TextWrapping="Wrap"
+                               Visibility="Collapsed"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <TextBlock x:Name="VisitPlain" FontSize="12" TextWrapping="Wrap"
+                               Visibility="Collapsed"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <ItemsControl x:Name="VisitLinks">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeBrandABrush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock x:Name="VisitSayLabel" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <TextBox x:Name="VisitSayBox" AcceptsReturn="True" Height="60" />
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button x:Name="VisitTalkButton" Click="OnVisitTalk" />
+                        <Button x:Name="VisitMessageButton" Click="OnVisitMessage"
+                                Visibility="Collapsed" />
+                        <Button x:Name="VisitBefriendButton" Click="OnVisitBefriend"
+                                Visibility="Collapsed" />
+                        <Button x:Name="VisitRoomButton" Click="OnVisitRoom" />
+                        <Button x:Name="VisitCloseButton" Click="OnVisitClose" />
+                    </StackPanel>
+                    <TextBlock x:Name="VisitStateNote" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <TextBlock x:Name="VisitReply" FontSize="13" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="VisitTopLabel" FontSize="12"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <ItemsControl x:Name="VisitTopList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock x:Name="VisitCounts" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <ItemsControl x:Name="VisitWall">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeTxtBrush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <ItemsControl x:Name="VisitMedia">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock x:Name="VisitOffersLabel" FontSize="12"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <ItemsControl x:Name="VisitOffers">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="12" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeTxtBrush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="8">
+                    <!-- The id typed here is the door. A friend row above is
+                         a line of text on this shell; this is what opens
+                         one, and it takes any profile id, which is what a
+                         visitor arriving from a QR sticker actually has. -->
+                    <TextBox x:Name="VisitIdBox" />
+                    <Button x:Name="VisitButton" Click="OnVisit" />
                     <ItemsControl x:Name="FriendList">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
