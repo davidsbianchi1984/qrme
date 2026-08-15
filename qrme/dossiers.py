@@ -808,3 +808,87 @@ def colleague_prose(handle: str, name_of: dict[str, str]) -> str:
         "in the marketplace by name. When your question leaves my trade, I "
         "will say whose it is and send you to them rather than improvise."
     )
+
+
+# -- the homepage ------------------------------------------------------------
+#
+# The friends grid opens a homepage, and all thirty-four starters had the same
+# one: `social._DEFAULT_DOC`, which is a blank headline, a blank about and one
+# purple. Clicking any face in the collection arrived at the same empty page.
+#
+#     asked     the friends picture should open their profile homepage
+#     mattered  it did — thirty-four identical blank ones
+#
+# Composed from the dossier rather than written a second time, for the reason
+# `colleague_prose` is: this page and the persona's own source material make
+# the same claims about the same profile, and two hand-written copies of one
+# claim is how a page ends up saying something its profile does not know.
+#
+# **No links.** A homepage carries up to eight, and a fictional physician has
+# no website — inventing one would put an address on a public page that either
+# goes nowhere or, worse, goes somewhere real that has nothing to do with her.
+# The field stays empty until a profile has something true to point at.
+
+#: Theme by family of trade, not by industry. Thirty-four hand-picked palettes
+#: would be thirty-four opinions to maintain; seven say the useful thing — a
+#: page reads as its kind of work before a visitor has read a word of it.
+_PALETTES: dict[str, dict[str, str]] = {
+    "care":      {"bg": "#0e2018", "accent": "#4fbf8b"},
+    "money":     {"bg": "#10182b", "accent": "#d8b25c"},
+    "technical": {"bg": "#0a1120", "accent": "#4fd1e0"},
+    "making":    {"bg": "#1b1710", "accent": "#e0913f"},
+    "culture":   {"bg": "#1d1029", "accent": "#c96fb0"},
+    "civic":     {"bg": "#101a2b", "accent": "#6f9fe0"},
+    # Deliberately muted. The rated tier's page is behind the age wall either
+    # way, and a lurid palette would be the platform editorializing about a
+    # profile whose own text is careful.
+    "adult":     {"bg": "#1a1014", "accent": "#9a6a78"},
+}
+
+#: Every industry in `seed.STARTERS + seed.RATED`, mapped to its family. A
+#: starter whose industry is missing here is a `KeyError` in the test rather
+#: than a quiet fall back to the default purple.
+FAMILY_OF: dict[str, str] = {
+    "healthcare": "care", "mental_health": "care", "psychiatry": "care",
+    "counseling": "care", "sports_fitness": "care",
+
+    "finance": "money", "insurance": "money", "real_estate": "money",
+    "retail": "money",
+
+    "technology": "technical", "cybersecurity": "technical",
+    "telecom": "technical", "science": "technical", "aerospace": "technical",
+
+    "manufacturing": "making", "construction": "making",
+    "automotive": "making", "energy": "making", "transportation": "making",
+    "agriculture": "making", "environment": "making",
+
+    "arts_design": "culture", "music": "culture", "media": "culture",
+    "fashion_beauty": "culture", "marketing": "culture",
+    "culinary": "culture", "hospitality": "culture",
+
+    "education": "civic", "legal": "civic", "government": "civic",
+    "human_resources": "civic", "nonprofit": "civic",
+
+    "adult": "adult",
+}
+
+
+def homepage_doc(handle: str, industry: str) -> dict:
+    """This starter's homepage, composed from its dossier.
+
+    Returns the document `social.set_homepage` validates — headline, about
+    and theme. `top_friends` is left to the caller, which has the profile ids
+    the graph is keyed on; `links` is left empty on purpose (see above).
+    """
+    entry = DOSSIERS[handle]
+    trade = industry.replace("_", " ")
+    chips = " · ".join(s.replace("-", " ") for s in entry["skills"][:3])
+    return {
+        "headline": f"{trade.title()} — {chips}"[:120],
+        # What I know, then what I can do, in the profile's own voice. The
+        # same two texts the persona is grounded in, so the page a stranger
+        # reads and the material the profile answers from are one thing.
+        "about": f"{entry['expertise']}\n\n{entry['services']}",
+        "theme": dict(_PALETTES[FAMILY_OF[industry]]),
+        "links": [],
+    }

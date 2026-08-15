@@ -41,9 +41,14 @@ _MAX_LINKS = 8
 _MAX_TOP_FRIENDS = 8
 
 
-def _are_friends(a: str, b: str) -> bool:
+def are_friends(a: str, b: str) -> bool:
     """Mutual, deliberately: either side removing the edge closes the door
-    for both. Consent that only one person can end is not consent."""
+    for both. Consent that only one person can end is not consent.
+
+    Public because a caller building a document for :func:`set_homepage` has
+    to ask the same question this module will ask of it — a top friend who is
+    not a friend refuses the *whole* page, so `seed` filters the list first.
+    One definition of the question, asked by both sides of it."""
     conn = db.connect()
     one = conn.execute(
         "SELECT 1 FROM friendships WHERE profile_id=? AND friend_id=? AND"
@@ -101,7 +106,7 @@ def send_message(sender_id: str, recipient_id: str, body: str) -> dict:
                           "is better at those")
     if not (body or "").strip():
         raise SocialError("a message needs words")
-    if not _are_friends(sender_id, recipient_id):
+    if not are_friends(sender_id, recipient_id):
         raise SocialError("messages travel between friends; befriend them "
                           "first")
     if not enabled(recipient_id, "messaging"):
@@ -204,7 +209,7 @@ def _validate_doc(profile_id: str, doc: dict) -> dict:
         raise SocialError(f"top friends is at most {_MAX_TOP_FRIENDS} — "
                           "that is what makes it a ranking")
     for friend_id in tops:
-        if not _are_friends(profile_id, str(friend_id)):
+        if not are_friends(profile_id, str(friend_id)):
             raise SocialError("top friends are chosen from your actual "
                               "friends")
     out["top_friends"] = [str(f) for f in tops]

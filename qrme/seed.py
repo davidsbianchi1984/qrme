@@ -781,6 +781,41 @@ def _dossier(conn, profile_id: str, handle: str) -> bool:
     return changed
 
 
+def _homepage(conn, profile_id: str, handle: str, industry: str) -> bool:
+    """Install this starter's homepage — see :func:`dossiers.homepage_doc`.
+
+    Blank-only, like every other repair here: a profile that already has a
+    `homepages` row has been edited by somebody, and this does not argue with
+    them. A deployment seeded before this shipped has no row at all, so the
+    same call installs and repairs.
+
+    Top friends come from the dossier's colleagues, resolved to profile ids
+    and filtered to the ones the graph actually holds. `social.set_homepage`
+    refuses a top friend who is not a friend, and refuses the *whole document*
+    when it does — so filtering here is what keeps one absent colleague from
+    costing this starter its entire page.
+    """
+    from . import social
+    from .dossiers import DOSSIERS, homepage_doc
+
+    if handle not in DOSSIERS:
+        return False
+    if conn.execute("SELECT 1 FROM homepages WHERE profile_id=?",
+                    (profile_id,)).fetchone():
+        return False
+
+    doc = homepage_doc(handle, industry)
+    tops = []
+    for colleague in DOSSIERS[handle]["colleagues"]:
+        row = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
+                           (colleague,)).fetchone()
+        if row and social.are_friends(profile_id, row["profile_id"]):
+            tops.append(row["profile_id"])
+    doc["top_friends"] = tops
+    social.set_homepage(profile_id, doc)
+    return True
+
+
 def seed() -> dict:
     """Create the starter collection.
 
@@ -895,6 +930,15 @@ def seed() -> dict:
         if row and _dossier(conn, row["profile_id"], handle):
             dossiered.append(handle)
 
+    # The homepages, after the dossiers — top friends are chosen from actual
+    # friends, and the friendships are made in the pass above.
+    homed = []
+    for handle, industry, *_rest in STARTERS + RATED:
+        row = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
+                           (handle,)).fetchone()
+        if row and _homepage(conn, row["profile_id"], handle, industry):
+            homed.append(handle)
+
     # Anybody who predates the founder, including profiles a deployment made
     # before this shipped. Runs last so it sees every profile created above.
     from . import friends as _friends
@@ -914,6 +958,11 @@ def seed() -> dict:
             # and colleagues. The answer to "can this specialist speak for
             # its own trade", separate from `grounded` (the industry pack).
             "dossiered": len(dossiered), "dossiered_handles": dossiered,
+            # Starters that just got a homepage. Its own count for the reason
+            # `dossiered` has one: a deployment seeded before this shipped has
+            # thirty-four blank pages behind thirty-four friends pictures, and
+            # this is the number that says they are gone.
+            "homed": len(homed), "homed_handles": homed,
             "industries": len(STARTERS), "rated": len(RATED),
             # Reported separately from the collection counts, because it is not
             # part of the collection: the starters are invented people and this
