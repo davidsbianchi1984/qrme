@@ -2924,11 +2924,42 @@ struct MicDisclosure: Decodable {
     let note: String?
 }
 
+/// What one person's box in the room scene holds. `ai_marked` is always
+/// false and is decoded anyway: a person's own photograph and a person's own
+/// camera are not synthetic media, and carrying the field is what stops a
+/// client stamping them for consistency with the profiles beside them.
+struct RoomFace: Decodable {
+    let interactor_id: String?
+    /// voice | photo | camera — and all three are a box.
+    let showing: String?
+    let means: String?
+    let media_url: String?
+    let ai_marked: Bool?
+}
+
+struct RoomFaces: Decodable {
+    /// Keyed on the person, and **sparse**: somebody with no entry is
+    /// showing `voice`, which is a person in the room. The seats come from
+    /// the join, not from here.
+    let faces: [String: RoomFace]?
+    let on_camera: Int?
+    /// "…a name in a box is a person in the room."
+    let note: String?
+    /// The masks, riding along — a second call to learn whether a face is a
+    /// face would draw one frame without the disclosure on it.
+    let wearing: [WornDisclosure.Worn]?
+}
+
 struct WornDisclosure: Decodable {
     struct Worn: Decodable, Identifiable {
         let interactor_id: String?
         let kind: String?
         let title: String?
+        /// "not their face — The Wolf, drawn over the camera in real time. A
+        /// real person is underneath." The sentence the other people in the
+        /// room are shown, composed by the backend rather than here: a
+        /// disclosure each client words for itself is several disclosures.
+        let disclosure: String?
         var id: String { interactor_id ?? "?" }
     }
     let overlays: [Worn]?
@@ -3637,6 +3668,86 @@ extension ApiClient {
     func roomMicDisclosure(roomId: String,
                            token: String) async throws -> MicDisclosure {
         try await request("/rooms/\(roomId)/mic", token: token)
+    }
+
+    /// Ask somebody into a room you are already in. The only route that gets
+    /// a particular person into a particular room without naming them in the
+    /// create body — which needs their id before the room exists.
+    func inviteToRoom(roomId: String, profileId: String,
+                      token: String) async throws -> Bool {
+        struct Out: Decodable { let already_invited: Bool? }
+        let out: Out = try await request("/rooms/\(roomId)/invite",
+                                         method: "POST",
+                                         body: ["profile_id": profileId],
+                                         token: token)
+        return out.already_invited ?? false
+    }
+
+    /// Saying yes. Authorized as the **guest** — a host who could seat
+    /// somebody from their own screen would make "invite" a word for
+    /// something that is not one.
+    func acceptRoomInvite(roomId: String, profileId: String,
+                          ownerToken: String) async throws {
+        struct Out: Decodable { let id: String? }
+        let _: Out = try await request("/rooms/\(roomId)/invites/accept",
+                                       method: "POST",
+                                       body: ["profile_id": profileId],
+                                       token: ownerToken)
+    }
+
+    // -- what each box in the room holds --
+    //
+    // Three answers and all three are a box: a person who has their camera
+    // off keeps theirs, at the same size. See qrme/roomface.py.
+
+    /// Everybody's box, for everybody in the room. In-room only — a room id
+    /// rides on printed stickers, so holding one is not being here.
+    func roomFaces(roomId: String, token: String) async throws -> RoomFaces {
+        try await request("/rooms/\(roomId)/faces", token: token)
+    }
+
+    /// Turn your camera on, or go back to a name in a box. Yours alone: the
+    /// id in the body is checked against the token rather than believed.
+    func setRoomFace(roomId: String, interactorId: String, showing: String,
+                     token: String) async throws {
+        struct Out: Decodable { let showing: String? }
+        let _: Out = try await request("/rooms/\(roomId)/face", method: "PUT",
+                                       body: ["interactor_id": interactorId,
+                                              "showing": showing],
+                                       token: token)
+    }
+
+    /// Back to a name in a box — which is still a box, and still here.
+    func clearRoomFace(roomId: String, interactorId: String,
+                       token: String) async throws {
+        struct Out: Decodable { let showing: String? }
+        let _: Out = try await request("/rooms/\(roomId)/face",
+                                       method: "DELETE", token: token,
+                                       query: ["interactor_id": interactorId])
+    }
+
+    /// The picture that stands in for you here. Raw bytes, like
+    /// `uploadMedia`: the backend reads the kind from the file's own magic
+    /// numbers. Uploading also puts it up — a first press with no visible
+    /// effect is how a control ends up looking broken.
+    func uploadRoomFace(roomId: String, interactorId: String,
+                        filename: String, data: Data,
+                        token: String) async throws -> RoomFace {
+        let plain = base.appendingPathComponent("/rooms/\(roomId)/face/photo")
+        var parts = URLComponents(url: plain, resolvingAgainstBaseURL: false)
+        parts?.queryItems = [
+            URLQueryItem(name: "interactor_id", value: interactorId),
+            URLQueryItem(name: "filename", value: filename)]
+        var req = URLRequest(url: parts?.url ?? plain)
+        req.httpMethod = "POST"
+        req.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+        req.httpBody = data
+        let (out, resp) = try await dispatch(req)
+        guard let http = resp as? HTTPURLResponse,
+              (200..<300).contains(http.statusCode) else {
+            throw ApiError.http("upload failed")
+        }
+        return try JSONDecoder().decode(RoomFace.self, from: out)
     }
 
     // -- the fixed screen --

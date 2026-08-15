@@ -697,6 +697,20 @@
                     <Button x:Name="RoomMicLendButton" Click="OnRoomMicLend" />
                     <Button x:Name="RoomMicBackButton" Click="OnRoomMicBack" />
                     <Button x:Name="RoomMicWhoButton" Click="OnRoomMicWho" />
+                    <!-- Asking somebody in: the only route that gets a
+                         particular person into a particular room without
+                         naming them before the room exists. -->
+                    <TextBox x:Name="RoomGuestBox" />
+                    <Button x:Name="RoomAskButton" Click="OnRoomAsk" />
+                    <Button x:Name="RoomAskAcceptButton" Click="OnRoomAskAccept" />
+                    <!-- What your box holds. All three answers are a box, so
+                         turning a camera off keeps you in the scene. -->
+                    <TextBlock x:Name="RoomFaceTitle" FontSize="13" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <Button x:Name="RoomFaceCameraButton" Click="OnRoomFaceCamera" />
+                    <Button x:Name="RoomFacePhotoButton" Click="OnRoomFacePhoto" />
+                    <Button x:Name="RoomFacePlainButton" Click="OnRoomFacePlain" />
+                    <Button x:Name="RoomFaceWhoButton" Click="OnRoomFaceWho" />
                 </StackPanel>
             </Border>
 

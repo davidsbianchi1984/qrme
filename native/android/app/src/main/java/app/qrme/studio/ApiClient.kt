@@ -3009,6 +3009,96 @@ object ApiClient {
         request("/rooms/$roomId/mic/$interactorId", "DELETE", token = token)
     }
 
+    /** Ask somebody into a room you are already in. The only route that gets
+     *  a particular person into a particular room without naming them in the
+     *  create body — which needs their id before the room exists. Returns
+     *  whether they had already been asked: a second press is not a second
+     *  event, because a button that can be pressed repeatedly into somebody's
+     *  inbox is a button for filling somebody's inbox. */
+    suspend fun inviteToRoom(roomId: String, profileId: String,
+                             token: String): Boolean {
+        val o = JSONObject(request("/rooms/$roomId/invite", "POST",
+            JSONObject().put("profile_id", profileId), token))
+        return o.optBoolean("already_invited", false)
+    }
+
+    /** Saying yes. Authorized as the **guest** — a host who could seat
+     *  somebody from their own screen would make "invite" a word for
+     *  something that is not one. */
+    suspend fun acceptRoomInvite(roomId: String, profileId: String,
+                                 ownerToken: String) {
+        request("/rooms/$roomId/invites/accept", "POST",
+            JSONObject().put("profile_id", profileId), ownerToken)
+    }
+
+    // -- what each box in the room holds --
+    //
+    // Three answers and all three are a box: somebody with their camera off
+    // keeps theirs, at the same size. See qrme/roomface.py.
+
+    /** Everybody's box, and who is wearing what — one call, because a client
+     *  that needed a second to learn whether a face is a face would draw one
+     *  frame without the disclosure. In-room only: a room id rides on printed
+     *  stickers, so holding one is not being here. */
+    suspend fun roomFaces(roomId: String, token: String): List<String> {
+        val o = JSONObject(request("/rooms/$roomId/faces", token = token))
+        val out = mutableListOf<String>()
+        o.optJSONObject("faces")?.let { faces ->
+            for (who in faces.keys()) {
+                val f = faces.getJSONObject(who)
+                out.add(who + " · " + f.optString("means"))
+            }
+        }
+        o.optJSONArray("wearing")?.let { a ->
+            for (i in 0 until a.length()) {
+                out.add(a.getJSONObject(i).optString("disclosure"))
+            }
+        }
+        o.optString("note").takeIf { it.isNotEmpty() }?.let { out.add(it) }
+        return out
+    }
+
+    /** Turn your camera on, or go back to a name in a box. Yours alone: the
+     *  id in the body is checked against the token rather than believed. */
+    suspend fun setRoomFace(roomId: String, interactorId: String,
+                            showing: String, token: String) {
+        request("/rooms/$roomId/face", "PUT",
+            JSONObject().put("interactor_id", interactorId)
+                .put("showing", showing), token)
+    }
+
+    /** Back to a name in a box — which is still a box, and still here. */
+    suspend fun clearRoomFace(roomId: String, interactorId: String,
+                              token: String) {
+        request("/rooms/$roomId/face?interactor_id=$interactorId", "DELETE",
+            token = token)
+    }
+
+    /** The picture that stands in for you here. Raw bytes like
+     *  `uploadMedia`, and for the same reason: the backend reads the kind
+     *  from the file's own magic numbers rather than trusting the name.
+     *  Uploading also puts it up — a first press with no visible effect is
+     *  how a control ends up looking broken. */
+    suspend fun uploadRoomFace(roomId: String, interactorId: String,
+                               filename: String, bytes: ByteArray,
+                               token: String): String =
+        withContext(Dispatchers.IO) {
+            val q = "?interactor_id=" +
+                java.net.URLEncoder.encode(interactorId, "UTF-8") +
+                "&filename=" + java.net.URLEncoder.encode(filename, "UTF-8")
+            val conn = (java.net.URL("$base/rooms/$roomId/face/photo" + q)
+                .openConnection() as java.net.HttpURLConnection).apply {
+                requestMethod = "POST"
+                setRequestProperty("accept-language", L10n.deviceLanguage())
+                setRequestProperty("authorization", "Bearer $token")
+                doOutput = true
+            }
+            conn.outputStream.use { it.write(bytes) }
+            val text = (if (conn.responseCode < 300) conn.inputStream
+                        else conn.errorStream).bufferedReader().readText()
+            JSONObject(text).optString("showing")
+        }
+
     /** Readable by anyone in the room — a disclosure only its subject can
      *  see is not a disclosure. */
     suspend fun roomMicDisclosure(roomId: String,

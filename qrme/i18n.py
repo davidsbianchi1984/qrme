@@ -2797,6 +2797,56 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'hi': 'अभी किसी ने यह कमरा नहीं खोला है, और कमरा आपके और एक प्रोफ़ाइल के भीतर होने से खुलता है — पहले एक प्रोफ़ाइल चुनें।',
         'ar': 'لم يفتح أحد هذه الغرفة بعد، والغرفة تُفتح وأنت وملف بداخلها — اختر ملفًا أولًا.',
     },
+    'they are already in this room': {
+        'es': 'ya está en esta sala.',
+        'fr': 'cette personne est déjà dans cette salle.',
+        'de': 'diese Person ist schon in diesem Raum.',
+        'pt': 'já está nesta sala.',
+        'it': 'è già in questa stanza.',
+        'ja': 'その相手はすでにこの部屋にいます。',
+        'zh': '对方已经在这个房间里了。',
+        'hi': 'वे पहले से ही इस कमरे में हैं।',
+        'ar': 'هو موجود في هذه الغرفة بالفعل.',
+    },
+    'this room filled up before you answered — eight seats, and every one '
+    'taken': {
+        'es': 'la sala se llenó antes de que respondieras: ocho asientos, y '
+              'todos ocupados.',
+        'fr': "la salle s'est remplie avant votre réponse — huit places, et "
+              'toutes prises.',
+        'de': 'der Raum war voll, bevor du geantwortet hast — acht Plätze, '
+              'und jeder besetzt.',
+        'pt': 'a sala encheu antes de responderes: oito lugares, e todos '
+              'ocupados.',
+        'it': 'la stanza si è riempita prima della tua risposta — otto posti, '
+              'e tutti occupati.',
+        'ja': 'あなたが答える前に部屋がいっぱいになりました。席は八つ、すべて埋まっています。',
+        'zh': '你还没回应，房间就满了——八个座位，全都坐了人。',
+        'hi': 'आपके जवाब देने से पहले ही कमरा भर गया — आठ सीटें, और हर एक भरी हुई।',
+        'ar': 'امتلأت الغرفة قبل أن تجيب — ثمانية مقاعد، وكلها مشغولة.',
+    },
+    'you have not been asked into this room': {
+        'es': 'no te han invitado a esta sala.',
+        'fr': "vous n'avez pas été invité dans cette salle.",
+        'de': 'du wurdest nicht in diesen Raum eingeladen.',
+        'pt': 'não foste convidado para esta sala.',
+        'it': 'non sei stato invitato in questa stanza.',
+        'ja': 'あなたはこの部屋に招かれていません。',
+        'zh': '没有人邀请你进这个房间。',
+        'hi': 'आपको इस कमरे में नहीं बुलाया गया है।',
+        'ar': 'لم تُدعَ إلى هذه الغرفة.',
+    },
+    'a box holds a picture — JPEG, PNG, GIF or WebP': {
+        'es': 'un recuadro contiene una imagen: JPEG, PNG, GIF o WebP.',
+        'fr': 'une case contient une image — JPEG, PNG, GIF ou WebP.',
+        'de': 'ein Kästchen hält ein Bild — JPEG, PNG, GIF oder WebP.',
+        'pt': 'um quadrado contém uma imagem — JPEG, PNG, GIF ou WebP.',
+        'it': "un riquadro contiene un'immagine — JPEG, PNG, GIF o WebP.",
+        'ja': '枠に入るのは写真です。JPEG、PNG、GIF、WebP のいずれか。',
+        'zh': '方框里放的是图片——JPEG、PNG、GIF 或 WebP。',
+        'hi': 'खाने में तस्वीर आती है — JPEG, PNG, GIF या WebP।',
+        'ar': 'المربع يحمل صورة — JPEG أو PNG أو GIF أو WebP.',
+    },
     'this room has closed': {
         'es': 'esta sala ha cerrado.',
         'fr': 'cette salle a fermé.',

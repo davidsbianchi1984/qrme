@@ -1,3 +1,4 @@
+import PhotosUI
 import SwiftUI
 
 /// Seven small blocks that close out the mid-sized doorless groups: the
@@ -148,6 +149,9 @@ struct RoomsSection: View {
     @State private var micList: [MicDisclosure.Lent] = []
     @State private var note: String?
     @State private var busy = false
+    @State private var guestId = ""
+    @State private var scene: RoomFaces?
+    @State private var pick: PhotosPickerItem?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -198,10 +202,107 @@ struct RoomsSection: View {
                 Text("\(who) · \(device)")
                     .font(.caption2).foregroundStyle(Theme.t2)
             }
+
+            // Asking somebody in. Without this the only way to get a
+            // particular person into a particular room was to name them in
+            // the create body, which needs their id before the room exists.
+            Divider().overlay(Theme.line)
+            TextField(L10n.t("room.ask.who", state.language), text: $guestId)
+                .textFieldStyle(.roundedBorder)
+            HStack {
+                Button(L10n.t("room.ask", state.language)) {
+                    run {
+                        let again = try await ApiClient.shared.inviteToRoom(
+                            roomId: roomId, profileId: guestId,
+                            token: state.interactorToken ?? state.token ?? "")
+                        note = L10n.t(again ? "room.ask.already" : "room.asked",
+                                      state.language)
+                    }
+                }.disabled(busy || roomId.isEmpty || guestId.isEmpty)
+                // Authorized as the guest, so this is the profile owner's
+                // press and not the host's — the half that makes it an
+                // invitation rather than a seating chart.
+                Button(L10n.t("room.ask.accept", state.language)) {
+                    run { try await ApiClient.shared.acceptRoomInvite(
+                        roomId: roomId, profileId: state.pid ?? "",
+                        ownerToken: state.token ?? "") }
+                }.disabled(busy || roomId.isEmpty || state.pid == nil)
+            }.font(.caption)
+
+            // What each box in the room holds. All three answers are a box,
+            // so turning a camera off keeps you in the scene — see
+            // qrme/roomface.py.
+            Divider().overlay(Theme.line)
+            Text(L10n.t("room.face.title", state.language))
+                .font(.subheadline).foregroundStyle(Theme.txt)
+            HStack {
+                Button(L10n.t("room.face.camera", state.language)) {
+                    run { try await ApiClient.shared.setRoomFace(
+                        roomId: roomId, interactorId: state.interactorId ?? "",
+                        showing: "camera",
+                        token: state.interactorToken ?? "")
+                        scene = try await ApiClient.shared.roomFaces(
+                            roomId: roomId,
+                            token: state.interactorToken ?? "") }
+                }
+                Button(L10n.t("room.face.plain", state.language)) {
+                    run { try await ApiClient.shared.clearRoomFace(
+                        roomId: roomId, interactorId: state.interactorId ?? "",
+                        token: state.interactorToken ?? "")
+                        scene = try await ApiClient.shared.roomFaces(
+                            roomId: roomId,
+                            token: state.interactorToken ?? "") }
+                }
+                Button(L10n.t("room.face.who", state.language)) {
+                    run { scene = try await ApiClient.shared.roomFaces(
+                        roomId: roomId,
+                        token: state.interactorToken ?? "") }
+                }
+            }.font(.caption).disabled(busy || roomId.isEmpty
+                                      || state.interactorToken == nil)
+            // A real picker rather than a filename field: the photograph
+            // this asks for is one already on the phone, and typing its name
+            // is not how anybody has ever chosen a picture.
+            PhotosPicker(selection: $pick, matching: .images) {
+                Text(L10n.t("room.face.photo", state.language)).font(.caption)
+            }.disabled(busy || roomId.isEmpty || state.interactorToken == nil)
+            if let scene {
+                // Everybody's, not just mine. A scene each person draws from
+                // their own state alone is not a scene.
+                ForEach(Array((scene.faces ?? [:]).keys.sorted()), id: \.self) { who in
+                    let f = scene.faces?[who]
+                    Text("\(who) · \(f?.means ?? "")")
+                        .font(.caption2).foregroundStyle(Theme.t2)
+                }
+                // The masks ride with the scene, so a face that is not a
+                // face says so on the frame it is drawn in.
+                ForEach(scene.wearing ?? []) { w in
+                    Text(w.disclosure ?? w.title ?? "")
+                        .font(.caption2).foregroundStyle(Theme.t2)
+                }
+                if let line = scene.note {
+                    Text(line).font(.caption2).foregroundStyle(Theme.t2)
+                }
+            }
+
             if let note {
                 Text(note).font(.caption2).foregroundStyle(Theme.t2)
             }
         }.card()
+        .onChange(of: pick) { item in
+            guard let item else { return }
+            run {
+                guard let data = try await item.loadTransferable(
+                    type: Data.self) else { return }
+                _ = try await ApiClient.shared.uploadRoomFace(
+                    roomId: roomId, interactorId: state.interactorId ?? "",
+                    filename: "face.jpg", data: data,
+                    token: state.interactorToken ?? "")
+                scene = try await ApiClient.shared.roomFaces(
+                    roomId: roomId, token: state.interactorToken ?? "")
+                pick = nil
+            }
+        }
     }
 
     private func run(_ op: @escaping () async throws -> Void) {

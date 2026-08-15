@@ -3491,6 +3491,73 @@ public sealed class ApiClient
         string token) =>
         Send<MicDisclosure>(Get($"/rooms/{roomId}/mic", token));
 
+    /// <summary>Ask somebody into a room you are already in. The only route
+    /// that gets a particular person into a particular room without naming
+    /// them in the create body, which needs their id before the room exists.
+    /// A second press is not a second event: a button that can be pressed
+    /// repeatedly into somebody's inbox is a button for filling it.</summary>
+    public Task<RoomInvited> InviteToRoom(string roomId, string profileId,
+        string token) =>
+        Send<RoomInvited>(Post($"/rooms/{roomId}/invite",
+            new { profile_id = profileId }, token));
+
+    /// <summary>Saying yes. Authorized as the <b>guest</b> — a host who
+    /// could seat somebody from their own screen would make "invite" a word
+    /// for something that is not one.</summary>
+    public Task<RoomCreated> AcceptRoomInvite(string roomId, string profileId,
+        string ownerToken) =>
+        Send<RoomCreated>(Post($"/rooms/{roomId}/invites/accept",
+            new { profile_id = profileId }, ownerToken));
+
+    // ---- What each box in the room holds ----
+    //
+    // Three answers and all three are a box: somebody with their camera off
+    // keeps theirs, at the same size. See qrme/roomface.py.
+
+    /// <summary>Everybody's box, and who is wearing what — one call, because
+    /// a client that needed a second to learn whether a face is a face would
+    /// draw one frame without the disclosure. In-room only: a room id rides
+    /// on printed stickers, so holding one is not being here.</summary>
+    public Task<RoomFaces> RoomFaces(string roomId, string token) =>
+        Send<RoomFaces>(Get($"/rooms/{roomId}/faces", token));
+
+    /// <summary>Turn your camera on, or go back to a name in a box. Yours
+    /// alone: the id in the body is checked against the token rather than
+    /// believed.</summary>
+    public Task<RoomFace> SetRoomFace(string roomId, string interactorId,
+        string showing, string token) =>
+        Send<RoomFace>(Put($"/rooms/{roomId}/face",
+            new { interactor_id = interactorId, showing }, token));
+
+    /// <summary>Back to a name in a box — which is still a box, and still
+    /// in the room.</summary>
+    public Task<RoomFace> ClearRoomFace(string roomId, string interactorId,
+        string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/rooms/{roomId}/face?interactor_id=" +
+            Uri.EscapeDataString(interactorId));
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<RoomFace>(req);
+    }
+
+    /// <summary>The picture that stands in for you here. Raw bytes, like
+    /// <c>UploadMedia</c> above and for the same reason: the backend reads
+    /// the kind from the file's own magic numbers rather than trusting the
+    /// name. Uploading also puts it up — a first press with no visible
+    /// effect is how a control ends up looking broken.</summary>
+    public async Task<RoomFace> UploadRoomFace(string roomId,
+        string interactorId, string filename, byte[] bytes, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Post,
+            $"/rooms/{roomId}/face/photo?interactor_id=" +
+            Uri.EscapeDataString(interactorId) + "&filename=" +
+            Uri.EscapeDataString(filename))
+        { Content = new ByteArrayContent(bytes) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return await Send<RoomFace>(req);
+    }
+
     public Task<DisplayVocabulary> DisplayVocabulary() =>
         Send<DisplayVocabulary>(Get("/displays/vocabulary"));
 
@@ -4274,7 +4341,40 @@ public record MicDisclosure(
 public record WornRow(
     [property: JsonPropertyName("interactor_id")] string? InteractorId,
     [property: JsonPropertyName("kind")] string? Kind,
-    [property: JsonPropertyName("title")] string? Title);
+    [property: JsonPropertyName("title")] string? Title,
+    // "not their face — The Wolf, drawn over the camera in real time. A real
+    // person is underneath." Composed by the backend rather than here: a
+    // disclosure each client words for itself is several disclosures.
+    [property: JsonPropertyName("disclosure")] string? Disclosure);
+
+public record RoomInvited(
+    [property: JsonPropertyName("invited")] bool Invited,
+    // A second press is not a second event, and the client says which one
+    // happened rather than reporting both the same way.
+    [property: JsonPropertyName("already_invited")] bool AlreadyInvited);
+
+/// <summary>What one person's box in the room scene holds. `AiMarked` is
+/// always false and is decoded anyway: a person's own photograph and a
+/// person's own camera are not synthetic media, and carrying the field is
+/// what stops a client stamping them for consistency with the profiles
+/// beside them.</summary>
+public record RoomFace(
+    [property: JsonPropertyName("interactor_id")] string? InteractorId,
+    // voice | photo | camera — and all three are a box.
+    [property: JsonPropertyName("showing")] string? Showing,
+    [property: JsonPropertyName("means")] string? Means,
+    [property: JsonPropertyName("media_url")] string? MediaUrl,
+    [property: JsonPropertyName("ai_marked")] bool AiMarked);
+
+public record RoomFaces(
+    // Keyed on the person, and sparse: somebody with no entry is showing
+    // `voice`, which is a person in the room. The seats come from the join.
+    [property: JsonPropertyName("faces")]
+    System.Collections.Generic.Dictionary<string, RoomFace>? Faces,
+    [property: JsonPropertyName("on_camera")] int OnCamera,
+    [property: JsonPropertyName("note")] string? Note,
+    // The masks, riding along.
+    [property: JsonPropertyName("wearing")] WornRow[]? Wearing);
 
 public record WornDisclosure(
     [property: JsonPropertyName("overlays")] WornRow[]? Overlays,

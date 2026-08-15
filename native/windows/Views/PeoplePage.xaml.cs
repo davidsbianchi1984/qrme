@@ -231,6 +231,14 @@ public sealed partial class PeoplePage : Page
         RoomMicLendButton.Content = L10n.T("room.mic.lend");
         RoomMicBackButton.Content = L10n.T("room.mic.back");
         RoomMicWhoButton.Content = L10n.T("room.mic.who");
+        RoomGuestBox.Header = L10n.T("room.ask.who");
+        RoomAskButton.Content = L10n.T("room.ask");
+        RoomAskAcceptButton.Content = L10n.T("room.ask.accept");
+        RoomFaceTitle.Text = L10n.T("room.face.title");
+        RoomFaceCameraButton.Content = L10n.T("room.face.camera");
+        RoomFacePhotoButton.Content = L10n.T("room.face.photo");
+        RoomFacePlainButton.Content = L10n.T("room.face.plain");
+        RoomFaceWhoButton.Content = L10n.T("room.face.who");
         DispTitle.Text = L10n.T("disp.title");
         DispRulesButton.Content = L10n.T("disp.rules");
         DispIdBox.Header = L10n.T("disp.id");
@@ -1783,6 +1791,99 @@ public sealed partial class PeoplePage : Page
                 .Select(m => new Row($"{m.InteractorId} · {m.Device}"))
                 .ToList();
         });
+
+    // Asking somebody into a room you are in. Without this the only way to
+    // get a particular person into a particular room was to name them in the
+    // create body, which needs their id before the room exists.
+    private async void OnRoomAsk(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var r = await ApiClient.Shared.InviteToRoom(
+                RoomIdBox.Text.Trim(), RoomGuestBox.Text.Trim(),
+                AppState.Current.InteractorToken!);
+            StatusText.Text = L10n.T(r.AlreadyInvited
+                ? "room.ask.already" : "room.asked");
+        });
+
+    // Authorized as the guest, so this is the profile owner's press and not
+    // the host's — the half that makes it an invitation rather than a
+    // seating chart.
+    private async void OnRoomAskAccept(object sender, RoutedEventArgs e) =>
+        await Try(async () => await ApiClient.Shared.AcceptRoomInvite(
+            RoomIdBox.Text.Trim(), AppState.Current.Pid!,
+            AppState.Current.Token!));
+
+    // ---- What your box in the room holds ----
+    //
+    // All three answers are a box, so turning a camera off keeps you in the
+    // scene at the same size. See qrme/roomface.py.
+
+    private async void OnRoomFaceCamera(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.SetRoomFace(
+                RoomIdBox.Text.Trim(), AppState.Current.InteractorId!,
+                "camera", AppState.Current.InteractorToken!);
+            await ShowRoomFaces();
+        });
+
+    private async void OnRoomFacePlain(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            await ApiClient.Shared.ClearRoomFace(
+                RoomIdBox.Text.Trim(), AppState.Current.InteractorId!,
+                AppState.Current.InteractorToken!);
+            await ShowRoomFaces();
+        });
+
+    private async void OnRoomFaceWho(object sender, RoutedEventArgs e) =>
+        await Try(ShowRoomFaces);
+
+    /// <summary>Everybody's box, not just mine — a scene each person draws
+    /// from their own state alone is not a scene. The mask disclosures come
+    /// back in the same call, so a face that is not a face says so on the
+    /// frame it is drawn in.</summary>
+    private async Task ShowRoomFaces()
+    {
+        var s = await ApiClient.Shared.RoomFaces(
+            RoomIdBox.Text.Trim(), AppState.Current.InteractorToken!);
+        var rows = (s.Faces ?? [])
+            .Select(f => new Row($"{f.Key} · {f.Value.Means}")).ToList();
+        rows.AddRange((s.Wearing ?? Array.Empty<WornRow>())
+            .Select(w => new Row(w.Disclosure ?? w.Title ?? "")));
+        if (s.Note is { Length: > 0 }) rows.Add(new Row(s.Note));
+        RoomList.ItemsSource = rows;
+    }
+
+    private async void OnRoomFacePhoto(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        if (RoomIdBox.Text.Trim().Length == 0) return;
+        if (s.InteractorId is not { Length: > 0 } who)
+        { StatusText.Text = L10n.T("prf.needuser"); return; }
+        try
+        {
+            // A real chooser rather than a filename box. Pictures only: a
+            // box holds a picture, and the backend refuses the rest from the
+            // bytes themselves rather than from the extension.
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            WinRT.Interop.InitializeWithWindow.Initialize(picker,
+                WinRT.Interop.WindowNative.GetWindowHandle(App.Window));
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            picker.FileTypeFilter.Add(".png");
+            picker.FileTypeFilter.Add(".gif");
+            picker.FileTypeFilter.Add(".webp");
+            var file = await picker.PickSingleFileAsync();
+            if (file is null) return;
+            var buffer = await Windows.Storage.FileIO.ReadBufferAsync(file);
+            await ApiClient.Shared.UploadRoomFace(
+                RoomIdBox.Text.Trim(), who, file.Name, buffer.ToArray(),
+                s.InteractorToken!);
+            await ShowRoomFaces();
+        }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
+    }
 
     private async void OnDispRules(object sender, RoutedEventArgs e) =>
         await Try(async () =>

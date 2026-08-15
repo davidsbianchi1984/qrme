@@ -4608,6 +4608,33 @@ private fun RoomsBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
     var rooms by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
     var roomId by remember { mutableStateOf("") }
     var rows by remember { mutableStateOf<List<String>>(emptyList()) }
+    var guestId by remember { mutableStateOf("") }
+    var scene by remember { mutableStateOf<List<String>>(emptyList()) }
+    val ctx = LocalContext.current
+    // A real chooser rather than a filename box. The picture this asks for
+    // is one already on the phone, and typing its name is not how anybody
+    // has ever chosen a photograph. Images only: a box holds a picture, and
+    // the backend refuses the rest from the bytes themselves.
+    val pickFace = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()) { uri ->
+        val who = vm.interactorId
+        if (uri != null && who != null && roomId.isNotBlank()) {
+            val bytes = runCatching {
+                ctx.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+            }.getOrNull()
+            if (bytes == null || bytes.isEmpty()) {
+                onNote(L10n.t("room.face.empty", lang))
+            } else {
+                vm.call({
+                    ApiClient.uploadRoomFace(roomId, who, "face.jpg", bytes,
+                        vm.interactorToken.orEmpty())
+                    ApiClient.roomFaces(roomId, vm.interactorToken.orEmpty())
+                }) { r ->
+                    scene = r.getOrDefault(emptyList())
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+    }
 
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(L10n.t("room.title", lang), color = Qrme.Txt, fontSize = 16.sp,
@@ -4646,6 +4673,70 @@ private fun RoomsBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
             }
         }
         rows.forEach { Text(it, color = Qrme.T3, fontSize = 11.sp) }
+
+        // Asking somebody in. Without this the only way to get a particular
+        // person into a particular room was to name them in the create body,
+        // which needs their id before the room exists.
+        labeledField(L10n.t("room.ask.who", lang), guestId, "") { guestId = it }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("room.ask", lang),
+                enabled = roomId.isNotBlank() && guestId.isNotBlank()) {
+                vm.call({ ApiClient.inviteToRoom(roomId, guestId,
+                    vm.interactorToken.orEmpty()) }) { r ->
+                    onNote(r.exceptionOrNull()?.message
+                        ?: L10n.t(if (r.getOrDefault(false)) "room.ask.already"
+                                  else "room.asked", lang)) }
+            }
+            // Authorized as the guest, so this is the profile owner's press
+            // and not the host's — the half that makes it an invitation
+            // rather than a seating chart.
+            BrandButton(L10n.t("room.ask.accept", lang),
+                enabled = roomId.isNotBlank() && vm.pid != null) {
+                vm.call({ ApiClient.acceptRoomInvite(roomId, vm.pid!!,
+                    vm.token!!) }) { r -> onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+
+        // What each box in the room holds. All three answers are a box, so
+        // turning a camera off keeps you in the scene — see qrme/roomface.py.
+        Text(L10n.t("room.face.title", lang), color = Qrme.Txt, fontSize = 14.sp,
+            fontWeight = FontWeight.Bold)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("room.face.camera", lang),
+                enabled = roomId.isNotBlank() && vm.interactorId != null) {
+                vm.call({
+                    ApiClient.setRoomFace(roomId, vm.interactorId!!, "camera",
+                        vm.interactorToken.orEmpty())
+                    ApiClient.roomFaces(roomId, vm.interactorToken.orEmpty())
+                }) { r ->
+                    scene = r.getOrDefault(emptyList())
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            BrandButton(L10n.t("room.face.photo", lang),
+                enabled = roomId.isNotBlank() && vm.interactorId != null) {
+                pickFace.launch("image/*")
+            }
+            BrandButton(L10n.t("room.face.plain", lang),
+                enabled = roomId.isNotBlank() && vm.interactorId != null) {
+                vm.call({
+                    ApiClient.clearRoomFace(roomId, vm.interactorId!!,
+                        vm.interactorToken.orEmpty())
+                    ApiClient.roomFaces(roomId, vm.interactorToken.orEmpty())
+                }) { r ->
+                    scene = r.getOrDefault(emptyList())
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+        // Everybody's, not just mine — a scene each person draws from their
+        // own state alone is not a scene. The mask disclosures come back in
+        // the same call, so a face that is not a face says so.
+        BrandButton(L10n.t("room.face.who", lang), enabled = roomId.isNotBlank()) {
+            vm.call({ ApiClient.roomFaces(roomId,
+                vm.interactorToken.orEmpty()) }) { r ->
+                scene = r.getOrDefault(emptyList())
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        scene.forEach { Text(it, color = Qrme.T3, fontSize = 11.sp) }
     }
 }
 
