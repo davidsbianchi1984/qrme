@@ -292,8 +292,10 @@ export function Lobby({ onPlans }: { onPlans: () => void }) {
             <p className="muted small">
               {opened.user} · {opened.provider_area}
               {opened.specialist && ` · via ${opened.specialist}`}
-              {opened.sessions !== null && ` · ${opened.sessions} session`}
-              {opened.sessions !== null && opened.sessions !== 1 && "s"}
+              {opened.sessions !== null && (opened.sessions === 1
+                ? tr("lby.sessions.one", lang)
+                : tr("lby.sessions", lang)
+                    .replace("{n}", String(opened.sessions)))}
             </p>
             {(opened.recent_exchange || []).map((m, i) => (
               <p className="small" key={i}>

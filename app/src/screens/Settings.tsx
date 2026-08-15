@@ -49,7 +49,7 @@ export function Settings({ onPlans }: {
           {tr("set.api.url", lang)}
           <input value={base} onChange={(e) => setBaseInput(e.target.value)} />
         </label>
-        <button className="primary" onClick={save}>{saved ? "Saved ✓" : "Save"}</button>
+        <button className="primary" onClick={save}>{saved ? tr("set.saved", lang) : tr("set.save", lang)}</button>
         <Refusal error={error} onPlans={onPlans} variant="inline" />
       </div>
 
@@ -66,7 +66,9 @@ export function Settings({ onPlans }: {
         </label>
         <button className="primary" onClick={() => {
           setLlmKey(llmKey); setKeySaved(true); setTimeout(() => setKeySaved(false), 1500);
-        }}>{keySaved ? "Saved ✓" : llmKey.trim() ? "Save key" : "Clear key"}</button>
+        }}>{keySaved ? tr("set.saved", lang)
+            : llmKey.trim() ? tr("set.key.save", lang)
+            : tr("set.key.clear", lang)}</button>
       </div>
 
       {/* Plain sentences instead of a JSON dump — a field report read the
@@ -216,11 +218,13 @@ function MailPanel({ onPlans }: { onPlans: () => void }) {
           <button className="primary" disabled={busy || !host.trim()}
                   onClick={() => run(() => accountApi.saveMailSettings({
                     host, port, username, password: password || undefined,
-                    sender, public_url: publicUrl }), "Saved.")}>
-            {busy ? "Saving…" : "Save mail settings"}
+                    sender, public_url: publicUrl }),
+                    tr("set.mail.saved.note", lang))}>
+            {busy ? tr("set.saving", lang) : tr("set.mail.save", lang)}
           </button>
           {cfg?.transport === "smtp" && (
-            <button disabled={busy} onClick={() => run(() => accountApi.clearMailSettings(), "Cleared.")}>
+            <button disabled={busy} onClick={() => run(() => accountApi.clearMailSettings(),
+                                     tr("set.mail.cleared.note", lang))}>
               {tr("set.mail.clear", lang)}
             </button>
           )}
@@ -230,8 +234,9 @@ function MailPanel({ onPlans }: { onPlans: () => void }) {
         <label>{tr("set.mail.test", lang)}<input value={testTo} placeholder={tr("set.mail.test.ph", lang)} onChange={(e) => setTestTo(e.target.value)} /></label>
         <button disabled={busy || !testTo.trim()}
                 onClick={() => run(() => accountApi.testMailSettings(testTo.trim()),
-                  `Sent to ${testTo.trim()} — check the inbox.`)}>
-          {busy ? "Sending…" : "Send test email"}
+                  tr("set.mail.sent.note", lang)
+                    .replace("{to}", testTo.trim()))}>
+          {busy ? tr("set.mail.sending", lang) : tr("set.mail.test.send", lang)}
         </button>
       </>)}
       {note && <div className="muted small">{note}</div>}

@@ -105,8 +105,8 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
             <strong>{offer.kind}</strong> · {money(offer.price, offer.currency)}
             {offer.terms && ` · ${offer.terms}`}
             {offer.allow_derivatives
-              ? " · a buyer may derive an agent"
-              : " · consult only"}
+              ? tr("sell.derive.may", lang)
+              : tr("sell.derive.consult", lang)}
           </p>
         ) : (
           <p className="muted small">{tr("sell.offer.none", lang)}</p>
@@ -156,8 +156,8 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
           <p className="small" key={h.id}>
             <code>{h.id}</code> · {h.kind} · {h.created_at}
             {h.derived_profile_id
-              ? " · an agent has been derived from it"
-              : " · nothing derived yet"}
+              ? tr("sell.derive.done", lang)
+              : tr("sell.derive.none", lang)}
             {h.manifest && (
               <>
                 <br />
@@ -170,7 +170,7 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
                 </span>
               </>
             )}
-            {h.revoked ? " · revoked" : ""}
+            {h.revoked ? tr("sell.revoked", lang) : ""}
             {!h.revoked && (
               <>
                 {" "}

@@ -183,7 +183,7 @@ export function Remainder() {
                 <button className="ghost" onClick={() => go(
                   () => api.pack(k.pack_id, token || undefined),
                   setShopWindow)}>{k.title}</button>
-                {k.price === 0 ? " · free" : ` · ${k.price}`}
+                {k.price === 0 ? tr("rem.pack.free", lang) : ` · ${k.price}`}
               </p>
             ))}
           </div>
@@ -345,11 +345,15 @@ export function Remainder() {
             <p className="small">{t.findings}</p>
             <p className="muted small">
               {t.topic} · {t.redactions === 0
-                ? "nothing needed stripping"
-                : `${t.redactions} thing${t.redactions === 1 ? "" : "s"} stripped out first`}
+                ? tr("rem.exc.nostrip", lang)
+                : tr("rem.exc.stripped", lang).replace("{n}",
+                    t.redactions === 1
+                      ? tr("rem.exc.thing.one", lang)
+                      : tr("rem.exc.thing.many", lang)
+                          .replace("{n}", String(t.redactions)))}
               {" · "}
-              {t.left_host ? "left this machine" : "never left this machine"}
-              {t.learned && " · folded in"}
+              {t.left_host ? tr("rem.exc.left", lang) : tr("rem.exc.stayed", lang)}
+              {t.learned && tr("rem.exc.folded", lang)}
             </p>
             {!t.learned && (
               <button className="ghost" onClick={() => go(
@@ -369,16 +373,15 @@ export function Remainder() {
           <p className="muted small">
             {fill(tr("rem.hub.dials", lang), { n: hub.dials.length })}
             {hub.adult_mode
-              ? ", including the ones only a rated profile has."
-              : ". The rated-only ones are listed and refused here, rather "
-                + "than hidden, so the refusal has something to point at."}
+              ? tr("rem.hub.rated.on", lang)
+              : tr("rem.hub.rated.off", lang)}
           </p>
         )}
         {(hub?.dials || []).map((d) => (
           <div key={d.name} className="row">
             <p className="muted small">
               <strong>{d.label}</strong> ({d.group}) — {d.low} … {d.high}
-              {d.adult_only && " · 18+ only"}
+              {d.adult_only && tr("rem.hub.adult", lang)}
             </p>
             <input type="range" min={d.min} max={d.max}
                    defaultValue={hub?.values?.[d.name] ?? d.default}

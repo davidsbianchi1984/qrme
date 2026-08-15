@@ -6,6 +6,40 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **The console-untranslated ceiling goes back to 1.** It was 1, then 58 when
+  0.69.1 taught the reader to see a sentence chosen at render time, and the
+  file said in its own closing paragraph that the next rounds would take it
+  back down. This is those rounds.
+
+      asked     is this screen translated
+      mattered  is every sentence on it translated, including the ones
+                a condition picks between at render time
+
+  Fifty-seven strings across Settings, Robots, Selling, Workshop, Referrals,
+  Assist, Desk, Identity, Lobby and Remainder now have keys and ten
+  translations each. Where the table already held the same English under
+  another key, the new row copies that wording rather than inventing a second
+  one — two words for one thing in the same language is the defect
+  `native_split_wordings.txt` exists to catch, and it is cheaper not to create
+  it than to reconcile it later.
+
+  Two of the fifty-seven were not translation work at all, and they are the
+  ones worth naming. Lobby rendered a bare `"s"` as its own JSX node after a
+  session count — English pluralisation as a suffix, which is not how the
+  plural works in most of the other nine languages and was never going to be.
+  Remainder did the same with `thing`/`things`. Both are one whole sentence
+  per number now. A reader looking only for untranslated words would have
+  found `"s"` and shrugged; the reason it is on the list is that it is not a
+  word.
+
+  The row that stays is `TheMark: AI ·`, and it stays for the reason that file
+  has always given: the designation is quoted, not written. The server
+  hardcodes those two characters into `design.line`, so translating the
+  quotation to `IA ·` would put a mark on the screen that the product never
+  produces.
+
 ## [0.74.0] - 2026-08-15
 
 ### Changed

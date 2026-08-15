@@ -259,11 +259,12 @@ export function Desk({ onPlans }: {
             {who && (
               <p className="muted">
                 {who.real_person
-                  ? `A real person: ${who.whose ?? "—"}`
-                  : "No person attested."}
+                  ? tr("desk.who.real", visitorLang())
+                      .replace("{whose}", who.whose ?? "—")
+                  : tr("desk.who.none", visitorLang())}
                 {who.attestor ? ` · attested by ${who.attestor}` : ""}
                 {who.attestation_basis ? ` (${who.attestation_basis})` : ""}
-                {who.burned ? " · CLAIM BURNED" : ""}
+                {who.burned ? tr("desk.who.burned", visitorLang()) : ""}
               </p>
             )}
             {/* The frame a visitor is shown. It was never rendered anywhere
@@ -276,7 +277,8 @@ export function Desk({ onPlans }: {
                  width={240} alt={tr("desk.view.alt", visitorLang())} />
             {desk.feed && (
               <p className="muted small">
-                {desk.feed.live ? "Live." : "Not live."} {desk.feed.note}
+                {desk.feed.live ? tr("desk.feed.live", visitorLang())
+                                : tr("desk.feed.notlive", visitorLang())} {desk.feed.note}
                 {desk.feed.watermark && ` · watermark: ${desk.feed.watermark}`}
               </p>
             )}

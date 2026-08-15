@@ -129,7 +129,7 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
                 {cl.area}{cl.location && ` · ${cl.location}`} ·{" "}
                 {/* In words, not a score. */}
                 {tr("ref.find.matched", lang)} {cl.match}
-                {cl.in_your_area && " · near you"}
+                {cl.in_your_area && tr("ref.clin.near", lang)}
               </div>
             </div>
             <button disabled={busy || !me || !interactor || !token}
@@ -173,7 +173,7 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
           <h4>{tr("ref.sign.summary", lang)}</h4>
           {prepared.package.recent_exchange.map((m, i) => (
             <p className="small" key={i}>
-              <strong>{m.role === "profile" ? "the profile" : "you"}</strong>:{" "}
+              <strong>{m.role === "profile" ? tr("ref.who.profile", lang) : tr("ref.who.you", lang)}</strong>:{" "}
               {m.content}
             </p>
           ))}
@@ -220,7 +220,7 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
         <h3>{tr("ref.creds", lang)}</h3>
         <p className="muted small">{tr("ref.creds.pitch", lang)}</p>
         {creds.length === 0 && (
-          <p className="muted small">{tr("ref.creds.none", lang)}</p>
+          <p className="muted small">{tr("ref.creds.cansign.none", lang)}</p>
         )}
         {creds.map((cr) => (
           <div key={cr.id}>
@@ -235,9 +235,9 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
             </p>
             {/* The consequence, not the rule. */}
             <p className="muted small">
-              {tr("ref.creds.cansign", lang)} {cr.can_sign.join(", ") || "nothing"}
+              {tr("ref.creds.cansign", lang)} {cr.can_sign.join(", ") || tr("ref.creds.cansign.none", lang)}
               {!cr.can_sign.includes("high")
-                && " — not enough for a referral yet"}
+                && tr("ref.creds.notenough", lang)}
             </p>
             <Reproof rowId={cr.id} token={token} onDone={load} />
           </div>
@@ -251,8 +251,9 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
             <p className="small" key={h.id}>
               <code>{h.id}</code> ·{" "}
               {h.opened_at
-                ? `opened ${h.opened_at.replace("T", " ").slice(0, 16)}`
-                : "not opened yet"}
+                ? tr("ref.hist.opened", lang).replace(
+                    "{when}", h.opened_at.replace("T", " ").slice(0, 16))
+                : tr("ref.hist.unopened", lang)}
               {h.signature_id && (
                 <>
                   {" "}·{" "}
@@ -325,7 +326,7 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
             </div>
             {opened.package.recent_exchange.map((m, i) => (
               <p className="small" key={i}>
-                <strong>{m.role === "profile" ? "the profile" : "the patient"}
+                <strong>{m.role === "profile" ? tr("ref.who.profile", lang) : tr("ref.who.patient", lang)}
                 </strong>: {m.content}
               </p>
             ))}

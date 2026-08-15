@@ -2824,6 +2824,21 @@ const CHROME: Table = {
   "asst.media.lead": {
     en: "The kind is read from the bytes rather than the file name, and nothing you took yourself is AI-marked.", es: "El tipo se lee de los bytes y no del nombre del archivo, y nada que hayas tomado tú lleva la marca de IA.", fr: "Le type est lu dans les octets et non dans le nom du fichier, et rien de ce que vous avez pris vous-même n'est marqué IA.", de: "Die Art wird aus den Bytes gelesen, nicht aus dem Dateinamen, und nichts Selbstaufgenommenes trägt das KI-Zeichen.", pt: "O tipo é lido dos bytes e não do nome do ficheiro, e nada que tenha captado tem marca de IA.", it: "Il tipo si legge dai byte e non dal nome del file, e nulla di ciò che hai scattato tu porta il marchio IA.", ja: "種類はファイル名ではなくバイト列から読み取られ、自分で撮ったものにAIマークは付きません。", zh: "类型从字节读取而非文件名，你自己拍摄的内容不会带AI标记。", hi: "प्रकार फ़ाइल नाम से नहीं, बाइट्स से पढ़ा जाता है, और आपकी खुद की ली गई चीज़ों पर AI-चिह्न नहीं होता।", ar: "يُقرأ النوع من البايتات لا من اسم الملف، وما التقطته بنفسك لا يحمل علامة الذكاء الاصطناعي.",
   },
+  "asst.mark.mismatch": {
+    en: "this content does not match the credential", es: "este contenido no coincide con la credencial", fr: "ce contenu ne correspond pas au justificatif", de: "dieser Inhalt passt nicht zum Nachweis", pt: "este conteúdo não corresponde à credencial", it: "questo contenuto non corrisponde alla credenziale", ja: "この内容は資格情報と一致しません", zh: "此内容与该凭据不符", hi: "यह सामग्री क्रेडेंशियल से मेल नहीं खाती", ar: "هذا المحتوى لا يطابق بيانات الاعتماد",
+  },
+  "asst.who.it": {
+    en: "it", es: "ello", fr: "lui", de: "es", pt: "ele", it: "esso", ja: "それ", zh: "它", hi: "यह", ar: "هو",
+  },
+  "asst.who.you": {
+    en: "you", es: "tú", fr: "vous", de: "Sie", pt: "você", it: "tu", ja: "あなた", zh: "你", hi: "आप", ar: "أنت",
+  },
+  "asst.media.aimarked": {
+    en: " · marked as AI-generated", es: " · marcado como generado por IA", fr: " · marqué comme généré par IA", de: " · als KI-erzeugt gekennzeichnet", pt: " · marcado como gerado por IA", it: " · contrassegnato come generato da IA", ja: " · AI生成として表示", zh: " · 已标记为AI生成", hi: " · AI-जनित के रूप में चिह्नित", ar: " · موسوم بأنه من إنتاج ذكاء اصطناعي",
+  },
+  "asst.media.notaimarked": {
+    en: " · not AI-marked, because you made it", es: " · sin marca de IA, porque lo hiciste tú", fr: " · non marqué IA, parce que vous l'avez fait", de: " · nicht KI-gekennzeichnet, weil Sie es gemacht haben", pt: " · sem marca de IA, porque foi você que o fez", it: " · senza marchio IA, perché l'hai fatto tu", ja: " · あなたが作ったものなのでAI表示なし", zh: " · 未标记AI，因为这是你做的", hi: " · AI-चिह्नित नहीं, क्योंकि यह आपने बनाया", ar: " · دون وسم ذكاء اصطناعي، لأنك صنعته",
+  },
   "asst.media.bytes": {
     en: "{name} — {n} bytes", es: "{name} — {n} bytes", fr: "{name} — {n} octets", de: "{name} — {n} Bytes", pt: "{name} — {n} bytes", it: "{name} — {n} byte", ja: "{name} — {n}バイト", zh: "{name} — {n}字节", hi: "{name} — {n} बाइट", ar: "{name} — {n} بايت",
   },
@@ -2892,6 +2907,39 @@ const CHROME: Table = {
   },
   "set.session.out": {
     en: "Sign out & end session", es: "Cerrar sesión y terminarla", fr: "Se déconnecter et clore la session", de: "Abmelden & Sitzung beenden", pt: "Terminar sessão", it: "Esci e chiudi la sessione", ja: "サインアウトしてセッションを終了", zh: "退出并结束会话", hi: "साइन आउट करें और सत्र समाप्त करें", ar: "تسجيل الخروج وإنهاء الجلسة",
+  },
+  "set.save": {
+    en: "Save", es: "Guardar", fr: "Enregistrer", de: "Speichern", pt: "Guardar", it: "Salva", ja: "保存", zh: "保存", hi: "सहेजें", ar: "حفظ",
+  },
+  "set.saving": {
+    en: "Saving…", es: "Guardando…", fr: "Enregistrement…", de: "Wird gespeichert…", pt: "A guardar…", it: "Salvataggio…", ja: "保存中…", zh: "保存中…", hi: "सहेजा जा रहा है…", ar: "جارٍ الحفظ…",
+  },
+  "set.saved": {
+    en: "Saved ✓", es: "Guardado ✓", fr: "Enregistré ✓", de: "Gespeichert ✓", pt: "Guardado ✓", it: "Salvato ✓", ja: "保存しました ✓", zh: "已保存 ✓", hi: "सहेजा गया ✓", ar: "تم الحفظ ✓",
+  },
+  "set.key.save": {
+    en: "Save key", es: "Guardar clave", fr: "Enregistrer la clé", de: "Schlüssel speichern", pt: "Guardar chave", it: "Salva chiave", ja: "キーを保存", zh: "保存密钥", hi: "कुंजी सहेजें", ar: "احفظ المفتاح",
+  },
+  "set.key.clear": {
+    en: "Clear key", es: "Borrar clave", fr: "Effacer la clé", de: "Schlüssel löschen", pt: "Limpar chave", it: "Cancella chiave", ja: "キーを消去", zh: "清除密钥", hi: "कुंजी हटाएँ", ar: "امسح المفتاح",
+  },
+  "set.mail.save": {
+    en: "Save mail settings", es: "Guardar ajustes de correo", fr: "Enregistrer les réglages e-mail", de: "Mail-Einstellungen speichern", pt: "Guardar definições de correio", it: "Salva impostazioni e-mail", ja: "メール設定を保存", zh: "保存邮件设置", hi: "मेल सेटिंग सहेजें", ar: "احفظ إعدادات البريد",
+  },
+  "set.mail.test.send": {
+    en: "Send test email", es: "Enviar correo de prueba", fr: "Envoyer un e-mail de test", de: "Test-E-Mail senden", pt: "Enviar e-mail de teste", it: "Invia e-mail di prova", ja: "テストメールを送信", zh: "发送测试邮件", hi: "परीक्षण ईमेल भेजें", ar: "أرسل بريد اختبار",
+  },
+  "set.mail.sending": {
+    en: "Sending…", es: "Enviando…", fr: "Envoi…", de: "Wird gesendet…", pt: "A enviar…", it: "Invio…", ja: "送信中…", zh: "发送中…", hi: "भेजा जा रहा है…", ar: "جارٍ الإرسال…",
+  },
+  "set.mail.saved.note": {
+    en: "Saved.", es: "Guardado.", fr: "Enregistré.", de: "Gespeichert.", pt: "Guardado.", it: "Salvato.", ja: "保存しました。", zh: "已保存。", hi: "सहेजा गया।", ar: "تم الحفظ.",
+  },
+  "set.mail.cleared.note": {
+    en: "Cleared.", es: "Borrado.", fr: "Effacé.", de: "Gelöscht.", pt: "Limpo.", it: "Cancellato.", ja: "消去しました。", zh: "已清除。", hi: "हटा दिया गया।", ar: "تم المسح.",
+  },
+  "set.mail.sent.note": {
+    en: "Sent to {to} — check the inbox.", es: "Enviado a {to} — revisa la bandeja de entrada.", fr: "Envoyé à {to} — vérifiez la boîte de réception.", de: "An {to} gesendet — schauen Sie ins Postfach.", pt: "Enviado para {to} — verifique a caixa de entrada.", it: "Inviato a {to} — controlla la posta in arrivo.", ja: "{to} に送信しました — 受信箱を確認してください。", zh: "已发送至 {to} — 请查看收件箱。", hi: "{to} को भेजा गया — इनबॉक्स देखें।", ar: "أُرسل إلى {to} — تفقّد صندوق الوارد.",
   },
   "set.mail": {
     en: "Email delivery", es: "Envío de correo", fr: "Envoi d'e-mails", de: "E-Mail-Versand", pt: "Envio de e-mail", it: "Invio e-mail", ja: "メール配信", zh: "邮件投递", hi: "ईमेल डिलीवरी", ar: "تسليم البريد",
@@ -3094,6 +3142,21 @@ const CHROME: Table = {
   "sell.place.remote": {
     en: "also served from anywhere", es: "también se sirve desde cualquier lugar", fr: "aussi servi depuis n'importe où", de: "auch von überall bedient", pt: "também servido de qualquer lugar", it: "servito anche da ovunque", ja: "どこからでも提供可", zh: "也可远程提供", hi: "कहीं से भी सेवा उपलब्ध", ar: "يُقدَّم أيضًا من أي مكان",
   },
+  "sell.derive.may": {
+    en: " · a buyer may derive an agent", es: " · un comprador puede derivar un agente", fr: " · un acheteur peut en dériver un agent", de: " · ein Käufer darf daraus einen Agenten ableiten", pt: " · um comprador pode derivar um agente", it: " · un acquirente può derivarne un agente", ja: " · 購入者はエージェントを派生できます", zh: " · 买家可据此衍生代理", hi: " · खरीदार एक एजेंट व्युत्पन्न कर सकता है", ar: " · يجوز للمشتري اشتقاق وكيل",
+  },
+  "sell.derive.consult": {
+    en: " · consult only", es: " · solo consulta", fr: " · consultation seulement", de: " · nur zur Beratung", pt: " · apenas consulta", it: " · solo consultazione", ja: " · 相談のみ", zh: " · 仅供咨询", hi: " · केवल परामर्श", ar: " · للاستشارة فقط",
+  },
+  "sell.derive.done": {
+    en: " · an agent has been derived from it", es: " · se ha derivado un agente de él", fr: " · un agent en a été dérivé", de: " · daraus wurde ein Agent abgeleitet", pt: " · foi derivado dele um agente", it: " · ne è stato derivato un agente", ja: " · ここからエージェントが派生しました", zh: " · 已由此衍生出代理", hi: " · इससे एक एजेंट व्युत्पन्न हुआ है", ar: " · اشتُقّ منه وكيل",
+  },
+  "sell.derive.none": {
+    en: " · nothing derived yet", es: " · nada derivado todavía", fr: " · rien de dérivé pour l'instant", de: " · noch nichts abgeleitet", pt: " · nada derivado ainda", it: " · ancora nulla di derivato", ja: " · まだ何も派生していません", zh: " · 尚未衍生任何内容", hi: " · अभी कुछ भी व्युत्पन्न नहीं", ar: " · لم يُشتقّ شيء بعد",
+  },
+  "sell.revoked": {
+    en: " · revoked", es: " · revocado", fr: " · révoqué", de: " · widerrufen", pt: " · revogado", it: " · revocato", ja: " · 取り消し済み", zh: " · 已撤销", hi: " · निरस्त", ar: " · مُلغى",
+  },
   "sell.place.say": {
     en: "Say where it is", es: "Decir dónde está", fr: "Dire où c'est", de: "Sagen, wo es ist", pt: "Dizer onde está", it: "Di' dov'è", ja: "場所を示す", zh: "标明位置", hi: "बताएँ कहाँ है", ar: "قل أين هو",
   },
@@ -3234,6 +3297,21 @@ const CHROME: Table = {
   },
   "desk.card.agewall": {
     en: "This desk is rated, so a scan lands on the age wall. A sticker carries no token that could clear it — that is the right answer rather than a gap.", es: "Este mostrador está clasificado, así que un escaneo cae en el muro de edad. Una pegatina no lleva token que pueda superarlo — esa es la respuesta correcta, no un hueco.", fr: "Ce comptoir est classé, donc un scan tombe sur le mur d'âge. Un autocollant ne porte aucun jeton qui pourrait le franchir — c'est la bonne réponse, pas une lacune.", de: "Dieser Schalter ist bewertet, also landet ein Scan auf der Alterswand. Ein Aufkleber trägt kein Token, das sie überwinden könnte — das ist die richtige Antwort, keine Lücke.", pt: "Este balcão é classificado, por isso uma digitalização cai no muro de idade. Um autocolante não carrega token que o possa passar — essa é a resposta certa, não uma falha.", it: "Questo banco è classificato, quindi una scansione finisce sul muro dell'età. Un adesivo non porta alcun token che possa superarlo — quella è la risposta giusta, non una lacuna.", ja: "このデスクはレーティング付きのため、スキャンは年齢の壁に着地します。ステッカーはそれを通過できるトークンを持ちません — それは欠陥ではなく正しい答えです。", zh: "此柜台已分级，因此扫描会落在年龄墙上。贴纸不携带任何能通过它的令牌 — 这是正确的答案，而非缺口。", hi: "यह डेस्क रेटेड है, इसलिए स्कैन आयु-दीवार पर उतरता है। स्टिकर में ऐसा कोई टोकन नहीं जो उसे पार कर सके — यही सही उत्तर है, कोई कमी नहीं।", ar: "هذا المكتب مصنّف، فيهبط المسح على جدار العمر. الملصق لا يحمل رمزًا يجتازه — وهذا هو الجواب الصحيح لا ثغرة.",
+  },
+  "desk.who.real": {
+    en: "A real person: {whose}", es: "Una persona real: {whose}", fr: "Une personne réelle : {whose}", de: "Eine echte Person: {whose}", pt: "Uma pessoa real: {whose}", it: "Una persona reale: {whose}", ja: "実在の人物: {whose}", zh: "真实的人：{whose}", hi: "एक असली व्यक्ति: {whose}", ar: "شخص حقيقي: {whose}",
+  },
+  "desk.who.none": {
+    en: "No person attested.", es: "Ninguna persona atestiguada.", fr: "Aucune personne attestée.", de: "Keine Person bezeugt.", pt: "Nenhuma pessoa atestada.", it: "Nessuna persona attestata.", ja: "証明された人物はいません。", zh: "无人作证。", hi: "किसी व्यक्ति की पुष्टि नहीं।", ar: "لم يُشهد على أي شخص.",
+  },
+  "desk.who.burned": {
+    en: " · CLAIM BURNED", es: " · DECLARACIÓN QUEMADA", fr: " · REVENDICATION BRÛLÉE", de: " · ANSPRUCH VERBRANNT", pt: " · ALEGAÇÃO QUEIMADA", it: " · DICHIARAZIONE BRUCIATA", ja: " · 主張は取り消し済み", zh: " · 声明已作废", hi: " · दावा रद्द", ar: " · الادعاء مُحرق",
+  },
+  "desk.feed.live": {
+    en: "Live.", es: "En directo.", fr: "En direct.", de: "Live.", pt: "Em direto.", it: "In diretta.", ja: "ライブです。", zh: "正在直播。", hi: "लाइव।", ar: "بث مباشر.",
+  },
+  "desk.feed.notlive": {
+    en: "Not live.", es: "No está en directo.", fr: "Pas en direct.", de: "Nicht live.", pt: "Não está em direto.", it: "Non in diretta.", ja: "ライブではありません。", zh: "未在直播。", hi: "लाइव नहीं।", ar: "ليس بثًا مباشرًا.",
   },
   "desk.card.attested": {
     en: "Attested by {who}: {basis}. {note}", es: "Atestiguado por {who}: {basis}. {note}", fr: "Attesté par {who} : {basis}. {note}", de: "Bezeugt von {who}: {basis}. {note}", pt: "Atestado por {who}: {basis}. {note}", it: "Attestato da {who}: {basis}. {note}", ja: "{who}による証明：{basis}。{note}", zh: "由{who}证明：{basis}。{note}", hi: "{who} द्वारा पुष्टि: {basis}। {note}", ar: "شهد به {who}: {basis}. {note}",
@@ -3384,6 +3462,30 @@ const CHROME: Table = {
   },
   "ref.clin.reply": {
     en: "Write back, once", es: "Responder, una vez", fr: "Répondre, une fois", de: "Einmal zurückschreiben", pt: "Responder, uma vez", it: "Rispondi, una volta", ja: "一度だけ返信", zh: "回复（仅一次）", hi: "एक बार उत्तर लिखें", ar: "اكتب ردًا مرة واحدة",
+  },
+  "ref.clin.near": {
+    en: " · near you", es: " · cerca de ti", fr: " · près de vous", de: " · in Ihrer Nähe", pt: " · perto de si", it: " · vicino a te", ja: " · お近くです", zh: " · 在你附近", hi: " · आपके पास", ar: " · بالقرب منك",
+  },
+  "ref.creds.cansign.none": {
+    en: "nothing", es: "nada", fr: "rien", de: "nichts", pt: "nada", it: "niente", ja: "なし", zh: "无", hi: "कुछ नहीं", ar: "لا شيء",
+  },
+  "ref.creds.notenough": {
+    en: " — not enough for a referral yet", es: " — todavía no basta para una derivación", fr: " — pas encore suffisant pour une orientation", de: " — noch nicht genug für eine Überweisung", pt: " — ainda não chega para um encaminhamento", it: " — non ancora sufficiente per un invio", ja: " — 紹介にはまだ足りません", zh: " — 尚不足以转诊", hi: " — रेफ़रल के लिए अभी पर्याप्त नहीं", ar: " — لا يكفي بعد للإحالة",
+  },
+  "ref.hist.opened": {
+    en: "opened {when}", es: "abierto {when}", fr: "ouvert {when}", de: "geöffnet {when}", pt: "aberto {when}", it: "aperto {when}", ja: "{when} に開封", zh: "{when} 打开", hi: "{when} को खोला गया", ar: "فُتح {when}",
+  },
+  "ref.hist.unopened": {
+    en: "not opened yet", es: "todavía sin abrir", fr: "pas encore ouvert", de: "noch nicht geöffnet", pt: "ainda não aberto", it: "non ancora aperto", ja: "未開封", zh: "尚未打开", hi: "अभी तक नहीं खोला गया", ar: "لم يُفتح بعد",
+  },
+  "ref.who.profile": {
+    en: "the profile", es: "el perfil", fr: "le profil", de: "das Profil", pt: "o perfil", it: "il profilo", ja: "プロフィール", zh: "该档案", hi: "प्रोफ़ाइल", ar: "الملف",
+  },
+  "ref.who.you": {
+    en: "you", es: "tú", fr: "vous", de: "Sie", pt: "você", it: "tu", ja: "あなた", zh: "你", hi: "आप", ar: "أنت",
+  },
+  "ref.who.patient": {
+    en: "the patient", es: "el paciente", fr: "le patient", de: "die Patientin oder der Patient", pt: "o doente", it: "il paziente", ja: "患者", zh: "该患者", hi: "मरीज़", ar: "المريض",
   },
   "ref.clin.reply.ph": {
     en: "what you want the patient to know", es: "lo que quieres que el paciente sepa", fr: "ce que vous voulez que le patient sache", de: "was der Patient wissen soll", pt: "o que quer que o paciente saiba", it: "ciò che vuoi che il paziente sappia", ja: "患者に知らせたいこと", zh: "你想让患者知道的内容", hi: "आप मरीज़ को क्या बताना चाहते हैं", ar: "ما تريد أن يعرفه المريض",
@@ -3573,6 +3675,39 @@ const CHROME: Table = {
   },
   "rem.pub.collect.ph": {
     en: "a post to read in", es: "una publicación para leer", fr: "un post à lire", de: "ein Beitrag zum Einlesen", pt: "uma publicação para ler", it: "un post da leggere", ja: "読み込む投稿", zh: "要读入的一条帖子", hi: "पढ़ने के लिए एक पोस्ट", ar: "منشور لقراءته",
+  },
+  "rem.pack.free": {
+    en: " · free", es: " · gratis", fr: " · gratuit", de: " · kostenlos", pt: " · grátis", it: " · gratis", ja: " · 無料", zh: " · 免费", hi: " · मुफ़्त", ar: " · مجاني",
+  },
+  "rem.exc.nostrip": {
+    en: "nothing needed stripping", es: "no hubo que quitar nada", fr: "rien n'a eu besoin d'être retiré", de: "es musste nichts entfernt werden", pt: "não foi preciso retirar nada", it: "non c'era nulla da rimuovere", ja: "取り除くものはありませんでした", zh: "无需剥离任何内容", hi: "कुछ भी हटाने की ज़रूरत नहीं पड़ी", ar: "لم يلزم حذف شيء",
+  },
+  "rem.exc.stripped": {
+    en: "{n} stripped out first", es: "{n} quitadas antes", fr: "{n} retirées d'abord", de: "{n} zuvor entfernt", pt: "{n} retiradas primeiro", it: "{n} rimosse prima", ja: "先に {n} を除去", zh: "先剥离了 {n}", hi: "पहले {n} हटाई गईं", ar: "حُذف {n} أولًا",
+  },
+  "rem.exc.thing.one": {
+    en: "1 thing", es: "1 cosa", fr: "1 élément", de: "1 Sache", pt: "1 coisa", it: "1 cosa", ja: "1件", zh: "1项", hi: "1 चीज़", ar: "شيء واحد",
+  },
+  "rem.exc.thing.many": {
+    en: "{n} things", es: "{n} cosas", fr: "{n} éléments", de: "{n} Sachen", pt: "{n} coisas", it: "{n} cose", ja: "{n}件", zh: "{n}项", hi: "{n} चीज़ें", ar: "{n} أشياء",
+  },
+  "rem.exc.left": {
+    en: "left this machine", es: "salió de esta máquina", fr: "a quitté cette machine", de: "hat diese Maschine verlassen", pt: "saiu desta máquina", it: "ha lasciato questa macchina", ja: "この端末を出ました", zh: "离开了这台机器", hi: "इस मशीन से बाहर गया", ar: "غادر هذا الجهاز",
+  },
+  "rem.exc.stayed": {
+    en: "never left this machine", es: "nunca salió de esta máquina", fr: "n'a jamais quitté cette machine", de: "hat diese Maschine nie verlassen", pt: "nunca saiu desta máquina", it: "non ha mai lasciato questa macchina", ja: "この端末から出ていません", zh: "从未离开这台机器", hi: "इस मशीन से कभी बाहर नहीं गया", ar: "لم يغادر هذا الجهاز قط",
+  },
+  "rem.exc.folded": {
+    en: " · folded in", es: " · incorporado", fr: " · intégré", de: " · eingearbeitet", pt: " · incorporado", it: " · integrato", ja: " · 取り込み済み", zh: " · 已并入", hi: " · समाहित", ar: " · مُدمج",
+  },
+  "rem.hub.rated.on": {
+    en: ", including the ones only a rated profile has.", es: ", incluidos los que solo tiene un perfil clasificado.", fr: ", y compris ceux que seul un profil classé possède.", de: ", einschließlich derer, die nur ein eingestuftes Profil hat.", pt: ", incluindo os que só um perfil classificado tem.", it: ", compresi quelli che ha solo un profilo classificato.", ja: "（レーティング付きプロフィールだけが持つものを含む）。", zh: "，包括只有分级档案才有的那些。", hi: ", उनमें वे भी जो केवल रेटेड प्रोफ़ाइल के पास हैं।", ar: "، بما فيها ما لا يملكه إلا ملف مُصنّف.",
+  },
+  "rem.hub.rated.off": {
+    en: ". The rated-only ones are listed and refused here, rather than hidden, so the refusal has something to point at.", es: ". Los exclusivos de perfiles clasificados se listan y se rechazan aquí, en vez de ocultarse, para que el rechazo tenga a qué señalar.", fr: ". Ceux réservés aux profils classés sont listés et refusés ici plutôt que masqués, pour que le refus ait quelque chose à désigner.", de: ". Die nur für eingestufte Profile sind hier gelistet und abgelehnt statt versteckt, damit die Ablehnung auf etwas zeigen kann.", pt: ". Os exclusivos de perfis classificados são listados e recusados aqui, em vez de escondidos, para que a recusa tenha a que apontar.", it: ". Quelli riservati ai profili classificati sono elencati e rifiutati qui, anziché nascosti, così il rifiuto ha qualcosa da indicare.", ja: "。レーティング付き専用のものは隠さずここに列挙して拒否します。拒否が指し示す対象を持つためです。", zh: "。仅限分级档案的项在此列出并被拒绝，而不是隐藏，好让拒绝有可指之物。", hi: "। केवल-रेटेड वाले यहाँ सूचीबद्ध कर के मना किए जाते हैं, छिपाए नहीं जाते, ताकि इनकार के पास दिखाने को कुछ हो।", ar: ". أما الخاصة بالملفات المُصنّفة فتُدرج وتُرفض هنا بدل إخفائها، ليكون للرفض ما يشير إليه.",
+  },
+  "rem.hub.adult": {
+    en: " · 18+ only", es: " · solo mayores de 18", fr: " · réservé aux 18 ans et plus", de: " · nur ab 18", pt: " · apenas maiores de 18", it: " · solo 18+", ja: " · 18歳以上限定", zh: " · 仅限18岁以上", hi: " · केवल 18+", ar: " · للبالغين 18+ فقط",
   },
   "rem.pub.collect": {
     en: "Read it in", es: "Leerlo", fr: "L'importer", de: "Einlesen", pt: "Lê-lo", it: "Leggilo", ja: "読み込む", zh: "读入", hi: "पढ़ लें", ar: "اقرأه",
@@ -3868,6 +4003,24 @@ const CHROME: Table = {
   "wsh.see.goal.ph": {
     en: "what you are trying to do", es: "qué intentas hacer", fr: "ce que vous essayez de faire", de: "was Sie vorhaben", pt: "o que está a tentar fazer", it: "cosa stai cercando di fare", ja: "やろうとしていること", zh: "你想做什么", hi: "आप क्या करना चाह रहे हैं", ar: "ما تحاول فعله",
   },
+  "wsh.bur.self": {
+    en: " · answers for itself", es: " · responde por sí mismo", fr: " · répond par lui-même", de: " · antwortet selbst", pt: " · responde por si", it: " · risponde da sé", ja: " · 自分で答えます", zh: " · 自行作答", hi: " · स्वयं उत्तर देता है", ar: " · يجيب بنفسه",
+  },
+  "wsh.bur.relay": {
+    en: " · relays only", es: " · solo retransmite", fr: " · relaie seulement", de: " · leitet nur weiter", pt: " · apenas retransmite", it: " · si limita a inoltrare", ja: " · 中継のみ", zh: " · 仅转发", hi: " · केवल रिले करता है", ar: " · ينقل فقط",
+  },
+  "wsh.run.sent": {
+    en: "Something was transmitted externally.", es: "Algo se transmitió al exterior.", fr: "Quelque chose a été transmis à l'extérieur.", de: "Etwas wurde nach außen übertragen.", pt: "Algo foi transmitido para fora.", it: "Qualcosa è stato trasmesso all'esterno.", ja: "外部へ何かが送信されました。", zh: "有内容被对外传输。", hi: "कुछ बाहर भेजा गया।", ar: "أُرسل شيء إلى الخارج.",
+  },
+  "wsh.run.nosend": {
+    en: "Nothing was transmitted anywhere.", es: "No se transmitió nada a ninguna parte.", fr: "Rien n'a été transmis nulle part.", de: "Es wurde nichts irgendwohin übertragen.", pt: "Nada foi transmitido para lado nenhum.", it: "Non è stato trasmesso nulla da nessuna parte.", ja: "どこへも何も送信されていません。", zh: "没有任何内容被传输到任何地方。", hi: "कहीं कुछ भी नहीं भेजा गया।", ar: "لم يُرسل شيء إلى أي مكان.",
+  },
+  "wsh.run.sealed": {
+    en: "The result is sealed in the vault.", es: "El resultado queda sellado en la bóveda.", fr: "Le résultat est scellé dans le coffre.", de: "Das Ergebnis ist im Tresor versiegelt.", pt: "O resultado fica selado no cofre.", it: "Il risultato è sigillato nel caveau.", ja: "結果は保管庫に封印されています。", zh: "结果已封存于保险库。", hi: "परिणाम तिजोरी में सील है।", ar: "النتيجة مختومة في الخزنة.",
+  },
+  "wsh.run.clear": {
+    en: "No vault here, so the result stays in the clear.", es: "Aquí no hay bóveda, así que el resultado queda en claro.", fr: "Pas de coffre ici, le résultat reste en clair.", de: "Hier gibt es keinen Tresor, das Ergebnis bleibt im Klartext.", pt: "Não há cofre aqui, portanto o resultado fica em claro.", it: "Qui non c'è un caveau, quindi il risultato resta in chiaro.", ja: "ここには保管庫がないため、結果は平文のまま残ります。", zh: "此处没有保险库，因此结果以明文保存。", hi: "यहाँ कोई तिजोरी नहीं, इसलिए परिणाम खुला रहता है।", ar: "لا خزنة هنا، فتبقى النتيجة في العلن.",
+  },
   "wsh.see.ask": {
     en: "Ask", es: "Preguntar", fr: "Demander", de: "Fragen", pt: "Perguntar", it: "Chiedi", ja: "質問する", zh: "提问", hi: "पूछें", ar: "اسأل",
   },
@@ -3975,6 +4128,33 @@ const CHROME: Table = {
   },
   "rbt.steer.becomes": {
     en: "What that becomes in a body", es: "En qué se convierte eso en un cuerpo", fr: "Ce que cela devient dans un corps", de: "Was daraus in einem Körper wird", pt: "No que isso se torna num corpo", it: "Cosa diventa in un corpo", ja: "それが身体では何になるか", zh: "这在身体上会变成什么", hi: "शरीर में यह क्या बन जाता है", ar: "ما يصير إليه ذلك في جسد",
+  },
+  "rbt.market.show": {
+    en: "Show the full list", es: "Ver la lista completa", fr: "Afficher la liste complète", de: "Vollständige Liste anzeigen", pt: "Ver a lista completa", it: "Mostra l'elenco completo", ja: "全リストを表示", zh: "显示完整列表", hi: "पूरी सूची दिखाएँ", ar: "أظهر القائمة الكاملة",
+  },
+  "rbt.market.hide": {
+    en: "Hide the full list", es: "Ocultar la lista completa", fr: "Masquer la liste complète", de: "Vollständige Liste ausblenden", pt: "Ocultar a lista completa", it: "Nascondi l'elenco completo", ja: "全リストを隠す", zh: "隐藏完整列表", hi: "पूरी सूची छिपाएँ", ar: "أخفِ القائمة الكاملة",
+  },
+  "rbt.bound.none": {
+    en: "Nothing bound yet.", es: "Nada vinculado todavía.", fr: "Rien de lié pour l'instant.", de: "Noch nichts gebunden.", pt: "Nada vinculado ainda.", it: "Ancora nulla di collegato.", ja: "まだ何も紐づいていません。", zh: "尚未绑定任何设备。", hi: "अभी कुछ भी बाइंड नहीं हुआ।", ar: "لا شيء مرتبط بعد.",
+  },
+  "rbt.bound.signin": {
+    en: "Sign in as an owner.", es: "Inicia sesión como propietario.", fr: "Connectez-vous en tant que propriétaire.", de: "Melden Sie sich als Eigentümer an.", pt: "Inicie sessão como proprietário.", it: "Accedi come proprietario.", ja: "所有者としてサインインしてください。", zh: "请以所有者身份登录。", hi: "स्वामी के रूप में साइन इन करें।", ar: "سجّل الدخول بصفتك المالك.",
+  },
+  "rbt.conn.on.profile": {
+    en: "on the profile itself", es: "en el perfil mismo", fr: "sur le profil lui-même", de: "am Profil selbst", pt: "no próprio perfil", it: "sul profilo stesso", ja: "プロフィール本体に", zh: "在档案本身上", hi: "प्रोफ़ाइल पर ही", ar: "على الملف نفسه",
+  },
+  "rbt.conn.on.body": {
+    en: "on body {id}", es: "en el cuerpo {id}", fr: "sur le corps {id}", de: "am Körper {id}", pt: "no corpo {id}", it: "sul corpo {id}", ja: "ボディ {id} に", zh: "在机体 {id} 上", hi: "बॉडी {id} पर", ar: "على الجسد {id}",
+  },
+  "rbt.mdl.nocharacter": {
+    en: " · cannot speak in character", es: " · no puede hablar en personaje", fr: " · ne peut pas parler en personnage", de: " · kann nicht in der Rolle sprechen", pt: " · não pode falar em personagem", it: " · non può parlare nel personaggio", ja: " · キャラクターとして話せません", zh: " · 无法以角色身份说话", hi: " · किरदार में नहीं बोल सकता", ar: " · لا يستطيع التحدث بالشخصية",
+  },
+  "rbt.mdl.notbindable": {
+    en: " — cannot be bound yet", es: " — todavía no se puede vincular", fr: " — pas encore liable", de: " — noch nicht bindbar", pt: " — ainda não se pode vincular", it: " — non ancora collegabile", ja: " — まだ紐づけできません", zh: " — 尚不可绑定", hi: " — अभी बाइंड नहीं किया जा सकता", ar: " — لا يمكن ربطه بعد",
+  },
+  "rbt.pack.free": {
+    en: " · free", es: " · gratis", fr: " · gratuit", de: " · kostenlos", pt: " · grátis", it: " · gratis", ja: " · 無料", zh: " · 免费", hi: " · मुफ़्त", ar: " · مجاني",
   },
   "rbt.log": {
     en: "Everything it has been told", es: "Todo lo que se le ha dicho", fr: "Tout ce qu'on lui a dit", de: "Alles, was ihm gesagt wurde", pt: "Tudo o que lhe foi dito", it: "Tutto ciò che gli è stato detto", ja: "命じられたことすべて", zh: "它被吩咐过的一切", hi: "इसे जो कुछ कहा गया", ar: "كل ما قيل له",
@@ -5793,6 +5973,12 @@ const CHROME: Table = {
   },
   "lby.revoked.said": {
     en: "Revoked, and the package purged.", es: "Revocado, y el paquete purgado.", fr: "Révoqué, et le paquet purgé.", de: "Widerrufen, und das Paket gelöscht.", pt: "Revogado, e o pacote apagado.", it: "Revocato, e il pacchetto cancellato.", ja: "取り消し、一式を消去しました。", zh: "已撤销，且该包已清除。", hi: "वापस लिया गया, और पैकेज मिटा दिया गया।", ar: "أُلغي، ومُحيت الحزمة.",
+  },
+  "lby.sessions": {
+    en: " · {n} sessions", es: " · {n} sesiones", fr: " · {n} séances", de: " · {n} Sitzungen", pt: " · {n} sessões", it: " · {n} sessioni", ja: " · {n}セッション", zh: " · {n} 次会话", hi: " · {n} सत्र", ar: " · {n} جلسات",
+  },
+  "lby.sessions.one": {
+    en: " · 1 session", es: " · 1 sesión", fr: " · 1 séance", de: " · 1 Sitzung", pt: " · 1 sessão", it: " · 1 sessione", ja: " · 1セッション", zh: " · 1 次会话", hi: " · 1 सत्र", ar: " · جلسة واحدة",
   },
   "lby.package": {
     en: "The package", es: "El paquete", fr: "Le paquet", de: "Das Paket", pt: "O pacote", it: "Il pacchetto", ja: "一式", zh: "这个包", hi: "पैकेज", ar: "الحزمة",
@@ -8068,6 +8254,18 @@ const CHROME: Table = {
   },
   "idn.export.redeem.ph": {
     en: "Paste a handoff link from another device", es: "Pega un enlace de traspaso de otro dispositivo", fr: "Collez un lien de transfert d'un autre appareil", de: "Übergabelink von einem anderen Gerät einfügen", pt: "Cole um link de repasse de outro dispositivo", it: "Incolla un link di passaggio da un altro dispositivo", ja: "別の端末からの受け渡しリンクを貼り付け", zh: "粘贴来自另一台设备的交接链接", hi: "दूसरे डिवाइस से सौंपा गया लिंक चिपकाएँ", ar: "الصق رابط التسليم من جهاز آخر",
+  },
+  "idn.proof.whochecked": {
+    en: " — who checked is part of the record, not a footnote.", es: " — quién lo comprobó forma parte del registro, no es una nota al pie.", fr: " — qui a vérifié fait partie du dossier, pas d'une note de bas de page.", de: " — wer geprüft hat, gehört zum Eintrag, nicht in eine Fußnote.", pt: " — quem verificou faz parte do registo, não é um rodapé.", it: " — chi ha verificato fa parte del registro, non è una nota a piè di pagina.", ja: " — 誰が確認したかは記録の一部であり、脚注ではありません。", zh: " — 谁核实过是记录的一部分，而非脚注。", hi: " — किसने जाँचा यह रिकॉर्ड का हिस्सा है, फ़ुटनोट नहीं।", ar: " — من تحقّق جزء من السجل، لا حاشية.",
+  },
+  "idn.anon.publish": {
+    en: "Publish my name again", es: "Publicar mi nombre otra vez", fr: "Republier mon nom", de: "Meinen Namen wieder veröffentlichen", pt: "Publicar o meu nome novamente", it: "Pubblica di nuovo il mio nome", ja: "名前をふたたび公開する", zh: "重新公开我的名字", hi: "मेरा नाम फिर प्रकाशित करें", ar: "انشر اسمي مجددًا",
+  },
+  "idn.anon.withhold": {
+    en: "Withhold my name", es: "Ocultar mi nombre", fr: "Ne pas divulguer mon nom", de: "Meinen Namen zurückhalten", pt: "Reter o meu nome", it: "Non mostrare il mio nome", ja: "名前を伏せる", zh: "隐去我的名字", hi: "मेरा नाम रोकें", ar: "احجب اسمي",
+  },
+  "idn.bubble.empty": {
+    en: "Nothing in it yet.", es: "Todavía no hay nada.", fr: "Rien dedans pour l'instant.", de: "Noch nichts darin.", pt: "Ainda não há nada.", it: "Ancora niente dentro.", ja: "まだ何も入っていません。", zh: "里面还什么都没有。", hi: "इसमें अभी कुछ नहीं है।", ar: "لا شيء فيه بعد.",
   },
   "idn.export.redeem": {
     en: "Redeem it", es: "Canjearlo", fr: "L'utiliser", de: "Einlösen", pt: "Resgatá-lo", it: "Riscattalo", ja: "受け取る", zh: "领取", hi: "प्राप्त करें", ar: "استرده",

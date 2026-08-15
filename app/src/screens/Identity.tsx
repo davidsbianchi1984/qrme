@@ -351,7 +351,7 @@ export function Identity({ onPlans, onPassing }: {
             </div>
             <p className="muted small">
               {vocab?.proofing_levels.find((l) => l.level === level)?.means}
-              {needsAttestor && " — who checked is part of the record, not a footnote."}
+              {needsAttestor && tr("idn.proof.whochecked", lang)}
             </p>
           </>
         )}
@@ -375,7 +375,8 @@ export function Identity({ onPlans, onPassing }: {
                 reload();
               } catch (e) { fail(e); }
             }}>
-              {anon.anonymous ? "Publish my name again" : "Withhold my name"}
+              {anon.anonymous ? tr("idn.anon.publish", lang)
+                : tr("idn.anon.withhold", lang)}
             </button>
             {anon.reversible && (
               <span className="muted small">{tr("idn.anon.reversible", lang)}</span>
@@ -407,7 +408,7 @@ export function Identity({ onPlans, onPassing }: {
           <>
             <p className="small">
               {avatar.placeholder || avatar.silhouette
-                ? "Nothing in it yet."
+                ? tr("idn.bubble.empty", lang)
                 : fill(tr("idn.bubble.showing", lang),
                     { asset: <code>{avatar.asset}</code> })}
             </p>

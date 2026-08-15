@@ -188,7 +188,7 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
           return m ? (
             <p className="muted small">
               {m.kind.replace(/_/g, " ")} — {m.capabilities.join(", ")}
-              {!m.llm_capable && " · cannot speak in character"}
+              {!m.llm_capable && tr("rbt.mdl.nocharacter", lang)}
             </p>
           ) : null;
         })()}
@@ -222,7 +222,7 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
         )}
         <div className="row">
           <button onClick={() => setShowAll((v) => !v)}>
-            {showAll ? "Hide the full list" : "Show the full list"}
+            {showAll ? tr("rbt.market.hide", lang) : tr("rbt.market.show", lang)}
           </button>
         </div>
         {showAll && market && Object.entries(market.by_kind).map(([kind, list]) => (
@@ -232,11 +232,11 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
               <p className="small" key={m.model}>
                 <strong>{m.label}</strong> · {m.maker} ·{" "}
                 <em>{m.availability}</em>
-                {!m.bindable && " — cannot be bound yet"}
+                {!m.bindable && tr("rbt.mdl.notbindable", lang)}
                 <br />
                 <span className="muted small">
                   {m.capabilities.join(", ")}
-                  {!m.llm_capable && " · cannot speak in character"}
+                  {!m.llm_capable && tr("rbt.mdl.nocharacter", lang)}
                 </span>
               </p>
             ))}
@@ -255,7 +255,7 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
         {shelf.map((k) => (
           <p className="small" key={k.id}>
             <strong>{k.title}</strong> · {k.industry} · {k.publisher}
-            {k.price ? ` · ${k.price}` : " · free"}
+            {k.price ? ` · ${k.price}` : tr("rbt.pack.free", lang)}
             {" "}
             <button disabled={!me || !token || !open}
                     onClick={act(async () => {
@@ -283,7 +283,9 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
         {fitted.map((k) => (
           <p className="small" key={`${k.id}-${k.robot_id ?? "profile"}`}>
             <strong>{k.title}</strong> ·{" "}
-            {k.robot_id ? `on body ${k.robot_id}` : "on the profile itself"} ·
+            {k.robot_id
+              ? tr("rbt.conn.on.body", lang).replace("{id}", k.robot_id)
+              : tr("rbt.conn.on.profile", lang)} ·
             {" "}{k.installed_at}
             {" "}
             <button disabled={!token}
@@ -324,7 +326,7 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
         <h3>{tr("rbt.bound", lang)}</h3>
         {rows.length === 0 && (
           <p className="muted small">
-            {me && token ? "Nothing bound yet." : "Sign in as an owner."}
+            {me && token ? tr("rbt.bound.none", lang) : tr("rbt.bound.signin", lang)}
           </p>
         )}
         {rows.map((r) => (

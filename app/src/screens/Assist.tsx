@@ -255,7 +255,7 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
               <div className="error">
                 <p className="small">
                   {verdict.note
-                    || "this content does not match the credential"}
+                    || tr("asst.mark.mismatch", lang)}
                 </p>
               </div>
             )}
@@ -392,7 +392,7 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
           {thread.messages.map((m) => (
             <div key={m.id}>
               <p className="small">
-                <strong>{m.role === "profile" ? "it" : "you"}</strong>:{" "}
+                <strong>{m.role === "profile" ? tr("asst.who.it", lang) : tr("asst.who.you", lang)}</strong>:{" "}
                 {m.content}
                 {m.edited && (
                   <span className="muted"> · {m.edit_count > 1
@@ -469,8 +469,8 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
               tr("asst.media.open", lang)}</a>
             <span className="muted">
               {uploaded.ai_marked
-                ? " · marked as AI-generated"
-                : " · not AI-marked, because you made it"}
+                ? tr("asst.media.aimarked", lang)
+                : tr("asst.media.notaimarked", lang)}
             </span>
           </p>
         )}

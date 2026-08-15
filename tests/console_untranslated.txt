@@ -1,4 +1,4 @@
-# status: backlog — 58 rows
+# status: backlog — 1 row
 #
 # ## 0.69.1: the reader learned to see a sentence chosen at render time
 #
@@ -79,67 +79,18 @@
 # such. A floor of zero would have been a nicer number and a less honest one.
 #
 #
-# ceiling: 58
+# ceiling: 1
 #
-# The ceiling was 1 and is 58: the reader widened, not the console.
-# Every row it gained was already on the glass. Raising a ceiling is the
-# one move this estate treats as a claim rather than a chore, so it is
-# written here beside the reason, and the next rounds take it back down.
-Assist: it
-Assist: this content does not match the credential
-Assist: you
-Assist: · marked as AI-generated
-Assist: · not AI-marked, because you made it
-Desk: Live.
-Desk: No person attested.
-Desk: Not live.
-Desk: · CLAIM BURNED
-Identity: Nothing in it yet.
-Identity: Publish my name again
-Identity: Withhold my name
-Identity: — who checked is part of the record, not a footnote.
-Lobby: s
-Referrals: not opened yet
-Referrals: nothing
-Referrals: the patient
-Referrals: the profile
-Referrals: you
-Referrals: · near you
-Referrals: — not enough for a referral yet
-Remainder: , including the ones only a rated profile has.
-Remainder: . The rated-only ones are listed and refused here, rather
-Remainder: left this machine
-Remainder: never left this machine
-Remainder: nothing needed stripping
-Remainder: than hidden, so the refusal has something to point at.
-Remainder: · 18+ only
-Remainder: · folded in
-Remainder: · free
-Robots: Hide the full list
-Robots: Nothing bound yet.
-Robots: Show the full list
-Robots: Sign in as an owner.
-Robots: on the profile itself
-Robots: · cannot speak in character
-Robots: · free
-Robots: — cannot be bound yet
-Selling: · a buyer may derive an agent
-Selling: · an agent has been derived from it
-Selling: · consult only
-Selling: · nothing derived yet
-Selling: · revoked
-Settings: Clear key
-Settings: Save
-Settings: Save key
-Settings: Save mail settings
-Settings: Saved ✓
-Settings: Saving…
-Settings: Send test email
-Settings: Sending…
+# **0.75.0.** The next rounds took it back down. The ceiling was 1, went to
+# 58 when the reader widened, and is 1 again: every string the widened reader
+# found has been given a key and ten translations, across Settings, Robots,
+# Selling, Workshop, Referrals, Assist, Desk, Identity, Lobby and Remainder.
+#
+# Two of them were not translation work at all and are worth naming. Lobby
+# rendered a bare `"s"` after a count — English pluralisation as a separate
+# JSX node, which is not a suffix in most of the ten languages and was never
+# going to be. Remainder did the same with `thing`/`things`. Both are now one
+# sentence per number rather than a stem and a letter.
+#
+# What is left is the row this file has always said would be left.
 TheMark: AI ·
-Workshop: No vault here, so the result stays in the clear.
-Workshop: Nothing was transmitted anywhere.
-Workshop: Something was transmitted externally.
-Workshop: The result is sealed in the vault.
-Workshop: · answers for itself
-Workshop: · relays only

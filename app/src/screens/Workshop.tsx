@@ -377,7 +377,7 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
           <p className="small" key={b.name}>
             <strong>{b.name}</strong> — {b.kind}
             <span className="muted">
-              {b.has_llm ? " · answers for itself" : " · relays only"}
+              {b.has_llm ? tr("wsh.bur.self", lang) : tr("wsh.bur.relay", lang)}
             </span>
           </p>
         ))}
@@ -407,11 +407,11 @@ export function Workshop({ onPlans }: { onPlans: () => void }) {
             <p className="muted small">
               {fill(tr("wsh.fold.computed", lang), { when: run.computed })}{" "}
               {run.external_transmission
-                ? "Something was transmitted externally."
-                : "Nothing was transmitted anywhere."}{" "}
+                ? tr("wsh.run.sent", lang)
+                : tr("wsh.run.nosend", lang)}{" "}
               {run.sealed_in_vault
-                ? "The result is sealed in the vault."
-                : "No vault here, so the result stays in the clear."}
+                ? tr("wsh.run.sealed", lang)
+                : tr("wsh.run.clear", lang)}
             </p>
           </>
         )}
