@@ -32,7 +32,7 @@ import subprocess
 
 import pytest
 
-from qrme import widgets
+from qrme import i18n, widgets
 
 
 def _ran(source: str, inputs: dict | None = None) -> dict:
@@ -329,3 +329,53 @@ def test_the_refusal_is_also_checked_when_the_namespace_is_denied(monkeypatch):
     answer = widgets.run_source("module.exports = () => 1;")
     assert answer["status"] == "refused"
     assert answer["detail"] == "widgets.no_netns"
+
+# --- the button, not only the box -------------------------------------------
+#
+# Everything above proves the walls. None of it ran a *stored* widget: every
+# case reaches `run_source` directly with a source string, and `run` — the
+# function the run button actually calls — was covered by nothing.
+#
+# It was broken the whole time. `read` returns what `_row` built, and `_row`
+# renames the `version` column to `revision` on the way out; `run` then asked
+# the returned dict for `["version"]` and raised `KeyError` before the widget
+# ever started. Four releases of a Studio whose run button answered a 500.
+#
+#     asked     does a widget run inside all four walls
+#     mattered  does the button that runs one work at all
+#
+# So these two drive the stored path end to end, through the API, the way a
+# person does. The `profile_id` fixture authenticates the client as the
+# profile's owner, which is the credential every route below requires.
+
+def test_a_stored_widget_runs_and_answers(client, profile_id):
+    if not widgets.sandbox_available()[0]:
+        pytest.skip("this host cannot build the box; the refusal is tested above")
+    made = client.post(
+        f"/profiles/{profile_id}/widgets",
+        json={"name": "adds up", "source":
+              "module.exports = ({a, b}) => (a || 0) + (b || 0);"})
+    assert made.status_code in (200, 201), made.text
+    wid = made.json()["id"]
+
+    ran = client.post(f"/profiles/{profile_id}/widgets/{wid}/run",
+                      json={"inputs": {"a": 2, "b": 3}})
+    assert ran.status_code == 200, ran.text
+    answer = ran.json()
+    assert answer["status"] == "ok", answer
+    assert answer["value"] == 5
+    assert answer["widget_id"] == wid
+    # The name this wire uses for a save count, spelled the one way. `version`
+    # here would be the `/health` version's name carrying an integer.
+    assert answer["revision"] == 1
+    assert "version" not in answer
+
+
+def test_running_a_widget_that_is_not_yours_is_not_found(client, profile_id):
+    """Scoped at the query and not only at the door. A widget id that is not
+    this profile's is *not found* rather than run, which is the difference
+    between a check somebody could forget and a row never selected."""
+    ran = client.post(f"/profiles/{profile_id}/widgets/wdg_notmine/run",
+                      json={"inputs": {}})
+    assert ran.status_code == 422, ran.text
+    assert ran.json()["detail"] == i18n.STUDIO_REFUSALS["widgets.no_such"]

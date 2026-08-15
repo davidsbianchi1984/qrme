@@ -394,9 +394,20 @@ def remove(profile_id: str, widget_id: str) -> dict:
 
 def run(profile_id: str, widget_id: str, inputs: dict | None = None) -> dict:
     """Run a stored widget. The record of the run is the answer itself —
-    nothing about a person's own widget is kept beyond what they can see."""
+    nothing about a person's own widget is kept beyond what they can see.
+
+    `revision` is read off the row this function already loaded, spelled the
+    way `_row` spells it. It said `widget["version"]` for four releases, and
+    `_row` renames that column to `revision` on the way out — so every press
+    of the run button raised `KeyError: 'version'` and the console showed a
+    500. The suite proved the walls of the box and never once ran a *stored*
+    widget through this function; `run_source` was covered and `run` was not.
+
+        asked     does a widget run inside all four walls
+        mattered  does the button that runs one work at all
+    """
     widget = read(profile_id, widget_id)
     answer = run_source(widget["source"], inputs)
     answer["widget_id"] = widget_id
-    answer["revision"] = widget["version"]
+    answer["revision"] = widget["revision"]
     return answer
