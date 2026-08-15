@@ -150,6 +150,11 @@ def _files_swept() -> int:
     return parsed_files()
 
 
+
+def _nav_tabs() -> int:
+    from .test_nav_labels_are_localised import _nav_ids
+    return len(_nav_ids())
+
 #: The registry. Every entry replaced a bare literal inside an assertion; the
 #: assertion now reads its number from here, which is what takes it out of the
 #: unregistered backlog.
@@ -194,6 +199,15 @@ RATCHETS: tuple[Ratchet, ...] = (
             "test functions this suite declares"),
     Ratchet("sweep.files_parsed", 175, _files_swept,
             "test files the bare-floor sweep can read"),
+    # 40 against 51, not the 20 this was first written with. That 20 came
+    # from the sibling product, where it is four-fifths of a 24-tab console
+    # and honest — and here it was two-fifths, which is this file's own
+    # opening example of a floor that ages into decoration. One number
+    # written to work in three repositories is a number calibrated for
+    # whichever of them was smallest when it was written.
+    Ratchet("console.nav_tabs", 40, _nav_tabs,
+            "tabs the console navigation declares — the floor under the "
+            "check that every one of them has a label"),
 )
 
 _BY_NAME = {r.name: r for r in RATCHETS}

@@ -277,3 +277,64 @@ def test_the_new_tabs_are_wired_end_to_end(tab):
     src = APP.read_text(encoding="utf-8")
     assert f'id: "{tab}"' in src, f"{tab} is not in NAV"
     assert f'tab === "{tab}"' in src, f"{tab} has no branch in the render"
+
+
+# --------------------------------------------------------------------------- #
+# The general case, arrived at from the sibling
+# --------------------------------------------------------------------------- #
+#
+# The two checks below came back from JIM-mini, where the same defect turned up
+# again a dozen releases after this file closed it here: a `presence` tab with
+# no `nav.presence` row, reading its own key between two real words. This file
+# had the tab half and not the general one.
+#
+#     asked     does every tab have a label
+#     mattered  does every key any screen asks for exist
+#
+# A sidebar is one place a console looks a key up. This console looks keys up
+# in fifty-odd files, and nothing was checking the other forty-nine.
+
+from .ratchets import floor  # noqa: E402
+
+
+def _console_sources() -> list[Path]:
+    src = REPO / "app/src"
+    return [f for f in list(src.rglob("*.tsx")) + list(src.rglob("*.ts"))
+            if f.name != "l10n.ts"]
+
+
+def _all_keys() -> set[str]:
+    return set(re.findall(r'^  "([\w.]+)":', L10N.read_text("utf-8"), re.M))
+
+
+def test_the_tab_scan_is_finding_tabs():
+    """A guard on the guard: a walk that stopped matching would report every
+    tab labelled by finding none of them."""
+    assert len(_nav_ids()) >= floor("console.nav_tabs"), (
+        f"only {len(_nav_ids())} tab(s) parsed out of NAV — this console has "
+        "more, and every check above would pass on almost nothing")
+
+
+def test_no_literal_lookup_is_missing_its_row():
+    """Every key a screen spells out, across the whole console.
+
+    Only literal keys — `t("a.b", lang)` — because a composed key cannot be
+    resolved without running the app, and a check that guessed at those would
+    fail on working code.
+
+    The comma at the end of the pattern is what makes "literal" mean it. PDI,
+    where this check went next, builds some lookups by concatenation —
+    `t("pos.cap." + k, lang)` — and a pattern stopping at the closing quote
+    read `pos.cap.` as a key of its own and reported six missing rows that
+    were not rows at all.
+    """
+    table, asked = _all_keys(), set()
+    for f in _console_sources():
+        asked |= set(re.findall(r'\b(?:t|tr|L)\(\s*"([\w.]+)"\s*,',
+                                f.read_text(encoding="utf-8")))
+    missing = sorted(asked - table)
+    assert not missing, (
+        f"{len(missing)} key(s) are looked up and have no row:\n    "
+        + "\n    ".join(missing)
+        + "\n  `t()` falls back to the key, so each renders as its own name "
+          "on screen, in every language.")

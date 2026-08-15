@@ -6,6 +6,24 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The sidebar was checked and the other forty-nine files were not.** This
+  console's nav guard has asserted since 0.27.0 that every tab in `NAV` has a
+  `nav.<id>` row. It looked at the sidebar and nowhere else. JIM-mini shipped
+  the same defect a dozen releases later in a different file — a tab reading
+  its own key between two real words — and the fix that came back from it is
+  the general case: every key any screen writes down literally must have a
+  row, across the whole console, not just the fifteen the navigation uses.
+
+      asked     does every tab have a label
+      mattered  does every key any screen asks for exist
+
+  Nothing was missing here, so this is a latch on work already done rather
+  than a new backlog. The floor under the tab scan is registered rather than
+  written into the assertion, which takes it out of the unregistered-floor
+  record on the way past.
+
 ## [0.73.0] - 2026-08-14
 
 ### Added
