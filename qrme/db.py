@@ -260,6 +260,35 @@ CREATE TABLE IF NOT EXISTS overlays (
 CREATE INDEX IF NOT EXISTS idx_overlays_live
     ON overlays (surface, surface_id) WHERE removed_at IS NULL;
 
+-- What each person in a room is showing: a name in a box, a picture they
+-- uploaded, or their camera. See qrme/roomface.py — the important part is that
+-- all three are a box, so a person who is muted or off-camera stays in the
+-- scene at the same size as everybody else.
+--
+-- Absence is meaningful and is the default: no row means `voice`, which is a
+-- person who is here. So the seats come from `room_participants` and this
+-- table only says what is in them.
+--
+-- `camera` stores the *fact*, never the pixels. Capture and rendering are on
+-- the device, the same division qrme/overlays.py draws; what a shared row buys
+-- is that every other client in the room draws the same scene.
+--
+-- Separate from `overlays` on purpose. Showing and wearing are two questions —
+-- a wolf mask can sit on a live camera or on nothing at all — and one row
+-- holding both would make taking a mask off and turning a camera off the same
+-- action.
+CREATE TABLE IF NOT EXISTS room_faces (
+    room_id       TEXT NOT NULL REFERENCES rooms(id),
+    interactor_id TEXT NOT NULL,
+    showing       TEXT NOT NULL DEFAULT 'voice',  -- voice | photo | camera
+    -- The upload, when there is one. Kept across a switch to camera or voice
+    -- so turning a camera off does not throw away the picture underneath.
+    media_id      TEXT,
+    media_url     TEXT,
+    updated_at    TEXT NOT NULL,
+    PRIMARY KEY (room_id, interactor_id)
+);
+
 -- The picture an anonymous profile shows instead of a face. One row per
 -- profile, and a **separate table from `profiles.avatar`** on purpose: the two
 -- are pictures for two different states, exactly like a display name and an

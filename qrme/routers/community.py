@@ -31,7 +31,7 @@ from ..common import (age_of, interactor_or_404, profile_or_404,
 from ..models import (
     HandoffCreate, ListingCreate, ListingPlace, MarketAssist, MarketPrefs,
     ProviderCreate, ReferralPrepare, ReferralRelease, ReferralReply,
-    RoomCreate, RoomInvite, RoomMessage, RoomMicLend,
+    RoomCreate, RoomFace, RoomInvite, RoomMessage, RoomMicLend,
 )
 
 router = APIRouter()
@@ -487,6 +487,115 @@ def accept_room_invite(room_id: str, body: RoomInvite,
             for p in _participants(room_id)
         ],
     }
+
+
+# --- what your box holds -----------------------------------------------------
+#
+# The room scene draws everybody in their own box, and a box could hold exactly
+# one thing: two initials and a name. See qrme/roomface.py for why all three
+# answers are a box and why a mask is not a fourth one.
+
+
+@router.get("/rooms/{room_id}/faces")
+def room_faces(room_id: str, request: Request) -> dict:
+    """Everybody's box, for everybody in the room.
+
+    In-room only. A scene each person draws from their own state alone is not
+    a scene, so the read is wide — but wide among the people here, not among
+    the people holding the id. That distinction is the one `roommic` got
+    wrong: its docstring said the disclosure was for the people in the room
+    while the code checked nothing, and a room id rides on printed stickers.
+
+    The masks ride along. A client that had to make a second call to know
+    whether the face in a box is a face would draw one frame without the
+    disclosure, and one frame is the whole of some rooms.
+    """
+    _room_or_404(room_id)
+    _require_in_room(room_id, request)
+    from .. import overlays, roomface
+
+    return {**roomface.showing_in(room_id),
+            "wearing": overlays.worn("room", room_id)["overlays"]}
+
+
+@router.put("/rooms/{room_id}/face")
+def set_room_face(room_id: str, body: RoomFace, request: Request) -> dict:
+    """Turn your camera on, put your picture up, or go back to a name.
+
+    Yours alone: `require_interactor` pins it to the token, so the id in the
+    body is checked rather than believed. Deciding what somebody else's box
+    shows is not a control this product offers anybody.
+    """
+    room = _room_or_404(room_id)
+    if room["status"] != "active":
+        raise HTTPException(409, "this room has closed")
+    require_interactor(body.interactor_id, request)
+    if not any(p["kind"] == "user" and p["ref_id"] == body.interactor_id
+               for p in _participants(room_id)):
+        raise HTTPException(403, "you are not in this room")
+
+    from .. import roomface
+
+    try:
+        return roomface.set_showing(room_id, body.interactor_id, body.showing,
+                                    media_id=body.media_id,
+                                    media_url=body.media_url)
+    except roomface.RoomFaceError as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@router.post("/rooms/{room_id}/face/photo", status_code=201)
+async def upload_room_face(room_id: str, request: Request,
+                           interactor_id: str, filename: str | None = None
+                           ) -> dict:
+    """The picture that stands in for you here.
+
+    Raw bytes, like `POST /profiles/{id}/media` and for the same reason — the
+    kind is decided by the file's own magic numbers rather than its name. This
+    one narrows the whitelist to pictures: a room box is not a place to serve
+    a PDF.
+
+    **Never AI-marked.** It is the person's own photograph, and stamping the
+    synthetic-media mark into an authentic picture is a false statement in
+    exactly the direction the mark exists to prevent. The profiles sharing
+    this room keep their marks; the mark belongs to what is depicted, not to
+    the box it is drawn in.
+
+    Uploading also puts it up. Two presses to make a picture appear, where the
+    first one has no visible effect, is how a control ends up looking broken.
+    """
+    room = _room_or_404(room_id)
+    if room["status"] != "active":
+        raise HTTPException(409, "this room has closed")
+    require_interactor(interactor_id, request)
+    if not any(p["kind"] == "user" and p["ref_id"] == interactor_id
+               for p in _participants(room_id)):
+        raise HTTPException(403, "you are not in this room")
+
+    from .. import media as media_mod, roomface
+
+    data = await request.body()
+    try:
+        saved = media_mod.save(interactor_id, data, name=filename or None)
+    except media_mod.MediaError as exc:
+        raise HTTPException(exc.status, exc.message) from exc
+    if saved["kind"] not in roomface.FACE_KINDS:
+        raise HTTPException(
+            422, "a box holds a picture — JPEG, PNG, GIF or WebP")
+    return roomface.set_showing(room_id, interactor_id, "photo",
+                                media_id=saved["id"],
+                                media_url=saved["url"])
+
+
+@router.delete("/rooms/{room_id}/face")
+def clear_room_face(room_id: str, interactor_id: str,
+                    request: Request) -> dict:
+    """Back to a name in a box — which is still a box, and still in the room."""
+    _room_or_404(room_id)
+    require_interactor(interactor_id, request)
+    from .. import roomface
+
+    return roomface.clear(room_id, interactor_id)
 
 
 @router.get("/microphones/vocabulary")

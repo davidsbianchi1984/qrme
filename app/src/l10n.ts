@@ -7725,6 +7725,38 @@ const CHROME: Table = {
   "ins.scene": {
     en: "In this room", es: "En esta sala", fr: "Dans cette salle", de: "In diesem Raum", pt: "Nesta sala", it: "In questa stanza", ja: "この部屋にいる人", zh: "房间里的人", hi: "इस कमरे में", ar: "في هذه الغرفة",
   },
+  // The three controls on your own box, and what the other boxes render.
+  // All three states are a box: turning a camera off is not leaving.
+  // Word for word what the three shells already say for `counter.camera`.
+  // A better phrasing here would be the desktop and the phone saying
+  // different things to the same reader, which is a guard, not a taste.
+  "ins.face.cameraon": {
+    en: "Camera on", es: "Cámara encendida", fr: "Caméra activée", de: "Kamera an", pt: "Câmara ligada", it: "Fotocamera accesa", ja: "カメラをオン", zh: "开启摄像头", hi: "कैमरा चालू", ar: "تشغيل الكاميرا",
+  },
+  "ins.face.cameraoff": {
+    en: "Camera off", es: "Apagar cámara", fr: "Couper la caméra", de: "Kamera aus", pt: "Desligar câmara", it: "Spegni fotocamera", ja: "カメラを切る", zh: "关闭摄像头", hi: "कैमरा बंद", ar: "أوقف الكاميرا",
+  },
+  "ins.face.photo": {
+    en: "Put a picture up", es: "Poner una foto", fr: "Mettre une photo", de: "Bild hochladen", pt: "Pôr uma foto", it: "Metti una foto", ja: "写真を出す", zh: "放一张照片", hi: "एक तस्वीर लगाएँ", ar: "ضع صورة",
+  },
+  "ins.face.plain": {
+    en: "Just my name", es: "Solo mi nombre", fr: "Juste mon nom", de: "Nur mein Name", pt: "Só o meu nome", it: "Solo il mio nome", ja: "名前だけにする", zh: "只显示名字", hi: "सिर्फ़ मेरा नाम", ar: "اسمي فقط",
+  },
+  "ins.face.nomask": {
+    en: "No mask", es: "Sin máscara", fr: "Sans masque", de: "Keine Maske", pt: "Sem máscara", it: "Nessuna maschera", ja: "マスクなし", zh: "不戴面具", hi: "कोई मुखौटा नहीं", ar: "بلا قناع",
+  },
+  "ins.face.yourcamera": {
+    en: "your camera", es: "tu cámara", fr: "votre caméra", de: "deine Kamera", pt: "a sua câmara", it: "la tua fotocamera", ja: "あなたのカメラ", zh: "你的摄像头", hi: "आपका कैमरा", ar: "كاميرتك",
+  },
+  // What somebody else's live box says. Their camera is on and their pixels
+  // do not travel through this product — so the box says the fact rather
+  // than drawing a picture that would not be theirs.
+  "ins.face.theirs": {
+    en: "their camera is on — this deployment carries the fact, not the picture", es: "su cámara está encendida: aquí viaja el dato, no la imagen", fr: "sa caméra est allumée — ici circule le fait, pas l'image", de: "ihre Kamera ist an — hier reist die Tatsache, nicht das Bild", pt: "a câmara dela está ligada — aqui viaja o facto, não a imagem", it: "la sua fotocamera è accesa — qui viaggia il fatto, non l'immagine", ja: "相手のカメラは入っています。ここを流れるのは事実であって映像ではありません", zh: "对方的摄像头已打开——这里传的是这个事实，不是画面", hi: "उनका कैमरा चालू है — यहाँ तथ्य पहुँचता है, तस्वीर नहीं", ar: "كاميرته تعمل — ما ينتقل هنا هو الخبر لا الصورة",
+  },
+  "ins.face.camicon": {
+    en: "ON AIR", es: "EN VIVO", fr: "EN DIRECT", de: "LIVE", pt: "NO AR", it: "IN ONDA", ja: "ライブ", zh: "直播中", hi: "लाइव", ar: "على الهواء",
+  },
   "ins.seat.person": {
     en: "person", es: "persona", fr: "personne", de: "Person", pt: "pessoa", it: "persona", ja: "人", zh: "真人", hi: "व्यक्ति", ar: "شخص",
   },

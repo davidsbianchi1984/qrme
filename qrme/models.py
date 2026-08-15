@@ -281,6 +281,21 @@ class RoomInvite(BaseModel):
     profile_id: str
 
 
+class RoomFace(BaseModel):
+    """What your box in the room scene holds.
+
+    `media_id` and `media_url` are optional on every call: the upload route
+    sets them, and a later switch between `camera` and `voice` leaves the
+    picture where it was. Sending neither means "keep whatever is there",
+    which is what somebody toggling a camera expects to happen.
+    """
+
+    interactor_id: str
+    showing: Literal["voice", "photo", "camera"]
+    media_id: str | None = None
+    media_url: str | None = None
+
+
 class RoomCreate(BaseModel):
     # Optional, and the only reader that ever thought otherwise was this
     # line. `create_room` writes it straight through, the rooms list declares

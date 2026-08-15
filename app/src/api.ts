@@ -2118,6 +2118,35 @@ export type OverlaysHere = {
   note: string;
 };
 
+/** What one person's box in a room scene holds. `ai_marked` is always false
+ *  and is carried anyway: a person's own photograph and a person's own camera
+ *  are not synthetic media, and the field is what stops a client deciding to
+ *  stamp them for consistency with the profiles beside them. */
+export type RoomFace = {
+  room_id: string; interactor_id: string;
+  showing: "voice" | "photo" | "camera";
+  /** The person's own words for it, from the backend's vocabulary. */
+  means: string;
+  media_id: string | null; media_url: string | null;
+  ai_marked: boolean;
+  since?: string;
+};
+
+export type RoomFaces = {
+  room_id: string;
+  /** Keyed on the person, and **sparse**: somebody with no entry is showing
+   *  `voice`, which is a person in the room. The seats come from the join. */
+  faces: Record<string, RoomFace>;
+  default: "voice";
+  vocabulary: { showing: string; means: string }[];
+  on_camera: number;
+  /** "…a name in a box is a person in the room." */
+  note: string;
+  /** The masks, riding along — a second call to learn whether a face is a
+   *  face would draw one frame without the disclosure. */
+  wearing: Overlay[];
+};
+
 /** Whose place this is. Small, and the point is `is` — "the host". */
 export type WhosePlace = {
   surface: string; surface_id: string; account_id: string;
@@ -4502,6 +4531,45 @@ export const api = {
   takeBackMicInRoom: (roomId: string, interactorId: string, token: string) =>
     req<{ lending: boolean; id: string }>(
       `/rooms/${roomId}/mic/${interactorId}`, { method: "DELETE", token }),
+
+  // What each box in the room scene holds. Three answers and all three are a
+  // box — see qrme/roomface.py. `faces` is keyed on the person and is sparse:
+  // somebody who has decided nothing is showing `voice`, which is a person in
+  // the room, so the seats come from the join and this only fills them.
+  roomFaces: (roomId: string, token: string) =>
+    req<RoomFaces>(`/rooms/${roomId}/faces`, { token }),
+  setRoomFace: (roomId: string, interactorId: string,
+                showing: "voice" | "photo" | "camera", token: string) =>
+    req<RoomFace>(`/rooms/${roomId}/face`, {
+      method: "PUT", token,
+      body: { interactor_id: interactorId, showing },
+    }),
+  clearRoomFace: (roomId: string, interactorId: string, token: string) =>
+    req<RoomFace>(
+      `/rooms/${roomId}/face?interactor_id=${encodeURIComponent(interactorId)}`,
+      { method: "DELETE", token }),
+
+  uploadRoomFace: async (roomId: string, interactorId: string, file: File,
+                         token: string) => {
+    // Raw bytes, like `uploadMedia`, and for the same reason: the backend
+    // decides the kind from the file's own magic numbers rather than trusting
+    // the name. Uploading also puts it up — a first press with no visible
+    // effect is how a control ends up looking broken.
+    const res = await fetch(getBase() +
+      `/rooms/${roomId}/face/photo?interactor_id=${encodeURIComponent(interactorId)}` +
+      `&filename=${encodeURIComponent(file.name)}`, {
+      method: "POST", body: file,
+      headers: { authorization: `Bearer ${token}` },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const body = data as { detail?: unknown; message?: unknown };
+      throw new RequestError(res.status,
+                             body.detail ?? `upload failed (${res.status})`,
+                             body.message);
+    }
+    return data as RoomFace;
+  },
 
   overlayCatalogue: () => req<OverlayCatalogue>("/overlays/catalogue"),
 

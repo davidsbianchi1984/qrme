@@ -460,18 +460,47 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    only the same form with a transcript under it. */
 .room-scene { display: grid; gap: 10px;
   grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+.room-scene { grid-auto-rows: 1fr; }
+/* `aspect-ratio: 1` was on the tile, which meant anything added inside it
+   pushed the tile out of square or spilled. The square moved to the picture
+   area below, and `grid-auto-rows: 1fr` equalises the row — so the tile with
+   controls in it sets the height and every other box in that row matches.
+   Same size, same place, whatever somebody is showing. */
 .rs-tile { display: flex; flex-direction: column; align-items: center;
-  gap: 4px; aspect-ratio: 1; justify-content: center; text-align: center;
+  gap: 4px; justify-content: flex-start; text-align: center;
   background: #0d0a24; border: 2px solid var(--line); border-radius: 14px;
   padding: 8px; transition: border-color .2s, box-shadow .2s; }
 .rs-tile.talking { border-color: var(--brand);
   box-shadow: 0 0 14px rgba(123,92,255,0.45); }
-.rs-face { width: 40px; height: 40px; border-radius: 50%; flex: none;
+/* The picture area, one square for all four things that can fill it — the
+   initials, an uploaded photo, your own live camera, and somebody else's
+   on-air marker. One size, so the box does not resize as people come and go
+   from their cameras. */
+.rs-face, .rs-photo, .rs-live, .rs-oncam {
+  width: 64px; height: 64px; border-radius: 50%; flex: none;
   display: inline-flex; align-items: center; justify-content: center;
   background: rgba(123,92,255,0.16); border: 1px solid var(--line);
-  font-weight: 800; }
+  font-weight: 800; overflow: hidden; }
+.rs-photo, .rs-live { object-fit: cover; background: #05030f; }
+/* Somebody else's camera. Deliberately not a video element with nothing in
+   it: an empty black frame reads as a broken stream, and the fact is what
+   this deployment actually knows. */
+.rs-oncam { font-size: 9px; letter-spacing: .08em; font-weight: 800;
+  color: #ff6b6b; background: rgba(255,107,107,0.12);
+  border-color: rgba(255,107,107,0.5); }
 .rs-name { font-size: 12px; font-weight: 700; max-width: 100%;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* The mask disclosure sits on the face it is about, and wraps rather than
+   truncating — a disclosure cut off at the ellipsis is not one. */
+.rs-worn { line-height: 1.25; font-size: 10px; text-wrap: balance; }
+/* Your own controls. `margin-top: auto` pins them to the bottom of the tile
+   so they line up across the row instead of floating under names of
+   different lengths. */
+.rs-controls { margin-top: auto; padding-top: 6px; display: flex;
+  flex-wrap: wrap; gap: 4px; justify-content: center; width: 100%; }
+.rs-controls .chip { font-size: 10px; padding: 3px 7px; }
+/* The mask picker is a select and would otherwise inherit the form width. */
+.rs-controls select.chip { max-width: 100%; }
 
 /* ---- Corner widgets on a phone ------------------------------------------
    Last in the file on purpose: these override .help-fab/.watch-lights/.wl-dot,
