@@ -58,6 +58,21 @@ export function Friends({ onPlans, onVisit }: {
     finally { setBusy(false); }
   }
 
+  // Saying yes to a room somebody asked you into. The invite is the inbox
+  // row, so accepting does not remove it — the news that you were asked
+  // stays true after you have gone.
+  async function acceptRoom(roomId: string) {
+    if (!session.profileId || !session.ownerToken) return;
+    setBusy(true); setError(null); setNote(null);
+    try {
+      const room = await api.acceptRoomInvite(
+        roomId, session.profileId, session.ownerToken);
+      setNote(tr("frn.roomjoined", lang)
+        .replace("{topic}", room.topic || tr("frn.aroom", lang)));
+    } catch (e) { setError(e); }
+    finally { setBusy(false); }
+  }
+
   if (!session.profileId) {
     return <div className="screen">
       <p className="muted center">{tr("frn.signin", lang)}</p>
@@ -113,6 +128,16 @@ export function Friends({ onPlans, onVisit }: {
               <span className="muted small">
                 {tr(`inbox.kind.${e.kind}`, lang)}
               </span>
+              {/* The half that makes it an invitation rather than a
+                  notification. The accept is authorized as the guest, so
+                  this row — in the guest's own inbox, under the guest's own
+                  owner token — is the only place it can be pressed. */}
+              {e.kind === "room_invite" && e.ref && (
+                <button className="primary" disabled={busy}
+                        onClick={() => acceptRoom(e.ref!)}>
+                  {tr("frn.acceptroom", lang)}
+                </button>
+              )}
             </div>
           ))}
           {inbox.unseen > 0 && (

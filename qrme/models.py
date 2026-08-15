@@ -268,6 +268,19 @@ class RoomParticipant(BaseModel):
     id: str
 
 
+class RoomInvite(BaseModel):
+    """Who is being asked into a room, or who is answering.
+
+    One model for both doors on purpose: the invite names the guest and the
+    acceptance names the same guest, so a client that can build one can build
+    the other. The *authority* differs — the host holds a room seat, the guest
+    holds their own owner token — and that is checked at each route rather
+    than expressed as two shapes on the wire.
+    """
+
+    profile_id: str
+
+
 class RoomCreate(BaseModel):
     # Optional, and the only reader that ever thought otherwise was this
     # line. `create_room` writes it straight through, the rooms list declares

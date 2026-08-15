@@ -35,11 +35,25 @@ export function Rooms({ onPlans, onInside }: {
   const [channel, setChannel] = useState("voice");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
+  // Who you might ask in. The friends list is the picker rather than a text
+  // box wanting a `prf_…`: an id somebody has to fetch from somewhere else
+  // is a form nobody fills in.
+  const [friends, setFriends] =
+    useState<{ profile_id: string; display_name: string }[]>([]);
+  const [asking, setAsking] = useState<Record<string, string>>({});
+  const [asked, setAsked] = useState<string | null>(null);
 
   function load() {
     api.listRooms().then(setRooms).catch((e) => setError(e));
     api.listDesks().then(setDesks).catch(() => setDesks([]));
     api.roomTemplates().then(setTemplates).catch(() => setTemplates([]));
+    // This profile's own friends. Without one signed in there is nobody to
+    // offer, and the control below is absent rather than empty.
+    if (session.profileId) {
+      api.friends(session.profileId)
+        .then((r) => setFriends(r.friends))
+        .catch(() => setFriends([]));
+    }
   }
   useEffect(load, []);
 
@@ -158,8 +172,45 @@ export function Rooms({ onPlans, onInside }: {
                     }}>
               {tr("rms.standing.open", lang)}
             </button>
+            {/* Asking somebody in. Rooms could be opened and walked into and
+                nobody could be invited to one: the only ways were to name
+                them in the create body — which needs their id before the
+                room exists — or to send them the id by some means this
+                product does not provide. */}
+            {friends.length > 0 && session.interactorToken && (
+              <>
+                <select value={asking[r.id] || ""}
+                        onChange={(e) => setAsking(
+                          { ...asking, [r.id]: e.target.value })}>
+                  <option value="">{tr("rms.askwho", lang)}</option>
+                  {friends.map((f) => (
+                    <option key={f.profile_id} value={f.profile_id}>
+                      {f.display_name}
+                    </option>
+                  ))}
+                </select>
+                <button className="ghost" disabled={busy || !asking[r.id]}
+                        onClick={async () => {
+                          setBusy(true); setError(null); setAsked(null);
+                          try {
+                            const out = await api.inviteToRoom(
+                              r.id, asking[r.id], session.interactorToken!);
+                            // Said rather than implied: a second press is a
+                            // no-op, and whoever pressed again deserves to be
+                            // told it already went rather than left to wonder.
+                            setAsked(out.already_invited
+                              ? tr("rms.askedalready", lang)
+                              : tr("rms.asked", lang));
+                          } catch (e) { setError(e); }
+                          finally { setBusy(false); }
+                        }}>
+                  {tr("rms.ask", lang)}
+                </button>
+              </>
+            )}
           </div>
         ))}
+        {asked && <p className="muted small">{asked}</p>}
       </div>
 
       <div className="card">

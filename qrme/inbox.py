@@ -42,6 +42,7 @@ KINDS = (
     "friend",          # somebody added you as a friend
     "exchange_signed",  # the other party signed your exchange
     "guest_accepted",  # a host gave you your place on their stream
+    "room_invite",     # somebody in a room asked you into it
 )
 
 
@@ -83,9 +84,20 @@ def events(profile_id: str, limit: int = 50) -> dict:
     are.
     """
     conn = db.connect()
+    # Both kinds of actor. A profile acts on you — comments, friends — and so
+    # does a *person*: an interactor in a room is who asked you into it, and
+    # they hold no profile. Joining profiles alone left `actor_name` null for
+    # those rows and the clients fall back to printing the id, so the news
+    # read "9f3c1e7a… asked you into a room".
+    #
+    #     asked     what is this actor's display name
+    #     mattered  what is this actor's display name whichever table they
+    #               are in
     rows = conn.execute(
-        "SELECT e.*, p.display_name AS actor_name FROM inbox_events e"
+        "SELECT e.*, COALESCE(p.display_name, i.display_name) AS actor_name"
+        " FROM inbox_events e"
         " LEFT JOIN profiles p ON p.id = e.actor_id"
+        " LEFT JOIN interactors i ON i.id = e.actor_id"
         " WHERE e.profile_id=? ORDER BY e.created_at DESC LIMIT ?",
         (profile_id, limit)).fetchall()
     unseen = conn.execute(

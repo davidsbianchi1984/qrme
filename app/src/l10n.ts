@@ -426,6 +426,16 @@ const CHROME: Table = {
     ja: "が配信への出演を認めました", zh: "让你加入了他们的直播",
     hi: "ने आपको अपनी स्ट्रीम में जगह दी", ar: "منحك مكانًا في بثه",
   },
+  "inbox.kind.room_invite": {
+    en: "asked you into a room",
+    es: "te invitó a una sala",
+    fr: "vous a invité dans une salle",
+    de: "hat dich in einen Raum eingeladen",
+    pt: "convidou você para uma sala",
+    it: "ti ha invitato in una stanza",
+    ja: "が部屋にあなたを招きました", zh: "邀请你进入一个房间",
+    hi: "ने आपको एक कमरे में बुलाया", ar: "دعاك إلى غرفة",
+  },
   "nav.corner": {
     en: "Your corner", es: "Tu rincón", fr: "Votre coin", de: "Deine Ecke",
     pt: "O seu cantinho", it: "Il tuo angolo", ja: "あなたのコーナー", zh: "你的角落",
@@ -7828,6 +7838,21 @@ const CHROME: Table = {
   "rms.headset": {
     en: "— join from a headset or phone; this desktop shows the room", es: "— únete desde unas gafas o un teléfono; este escritorio muestra la sala", fr: "— rejoignez depuis un casque ou un téléphone ; ce bureau montre la salle", de: "— treten Sie über Headset oder Telefon bei; dieser Desktop zeigt den Raum", pt: "— junte-se a partir de óculos ou telemóvel; este ambiente de trabalho mostra a sala", it: "— entra da un visore o dal telefono; questo desktop mostra la stanza", ja: "— ヘッドセットかスマートフォンから参加してください。このデスクトップは部屋を映すだけです", zh: "— 请从头显或手机加入；这台桌面只是把房间显示出来", hi: "— हेडसेट या फ़ोन से जुड़िए; यह डेस्कटॉप कमरे को दिखाता भर है", ar: "— انضمّ من نظّارة أو هاتف؛ هذا المكتب يعرض الغرفة فحسب",
   },
+  // Asking somebody into a room you are already in. The only route by which
+  // a particular person gets into a particular room without being named in
+  // the create body — before the room, and therefore before its id, exists.
+  "rms.ask": {
+    en: "Ask in", es: "Invitar", fr: "Inviter", de: "Einladen", pt: "Convidar", it: "Invita", ja: "招く", zh: "邀请", hi: "बुलाएँ", ar: "ادعُ",
+  },
+  "rms.askwho": {
+    en: "a friend…", es: "una amistad…", fr: "un ami…", de: "eine Freundin…", pt: "um amigo…", it: "un amico…", ja: "友だちを…", zh: "选一位好友…", hi: "कोई मित्र…", ar: "صديقًا…",
+  },
+  "rms.asked": {
+    en: "Asked. It is in their inbox.", es: "Invitación enviada. Está en su bandeja.", fr: "Invitation envoyée. Elle est dans sa boîte.", de: "Eingeladen. Es liegt in ihrem Posteingang.", pt: "Convite enviado. Está na caixa de entrada.", it: "Invito inviato. È nella sua posta.", ja: "招きました。相手の受信箱にあります。", zh: "已邀请，就在对方的收件箱里。", hi: "बुला लिया। यह उनके इनबॉक्स में है।", ar: "تمت الدعوة. إنها في صندوق وارده.",
+  },
+  "rms.askedalready": {
+    en: "Already asked — the news is not sent twice.", es: "Ya estaba invitado: el aviso no se envía dos veces.", fr: "Déjà invité — l'avis n'est pas envoyé deux fois.", de: "Schon eingeladen — die Nachricht geht nicht zweimal raus.", pt: "Já convidado — o aviso não é enviado duas vezes.", it: "Già invitato — l'avviso non parte due volte.", ja: "すでに招いています。同じ知らせは二度送りません。", zh: "已经邀请过了，同一条消息不会再发一次。", hi: "पहले ही बुलाया जा चुका है — सूचना दोबारा नहीं जाती।", ar: "سبق أن دُعي — لا يُرسل الإشعار مرتين.",
+  },
   "rms.livedesks": {
     en: "Live desks", es: "Escritorios en vivo", fr: "Bureaux en direct", de: "Schreibtische live", pt: "Secretárias em direto", it: "Scrivanie dal vivo", ja: "ライブのデスク", zh: "在线的工位", hi: "लाइव डेस्क", ar: "مكاتب مباشرة",
   },
@@ -8372,6 +8397,18 @@ const CHROME: Table = {
   },
   "frn.notafriend": {
     en: "not a friend", es: "no es una amistad", fr: "pas un ami", de: "keine Freundschaft", pt: "não é amigo", it: "non è un amico", ja: "友だちではありません", zh: "不是好友", hi: "मित्र नहीं है", ar: "ليس صديقًا",
+  },
+  // Somebody asked you into a room. The invite is the inbox row itself, so
+  // the accept lives on that row and nowhere else — the guest presses it,
+  // never the host.
+  "frn.acceptroom": {
+    en: "Go in", es: "Entrar", fr: "Y aller", de: "Beitreten", pt: "Entrar", it: "Entra", ja: "入る", zh: "进入", hi: "अंदर जाएँ", ar: "ادخل",
+  },
+  "frn.roomjoined": {
+    en: "You are in {topic}.", es: "Estás en {topic}.", fr: "Vous êtes dans {topic}.", de: "Du bist in {topic}.", pt: "Você está em {topic}.", it: "Sei in {topic}.", ja: "{topic} に入りました。", zh: "你已进入{topic}。", hi: "आप {topic} में हैं।", ar: "أنت الآن في {topic}.",
+  },
+  "frn.aroom": {
+    en: "the room", es: "la sala", fr: "la salle", de: "dem Raum", pt: "a sala", it: "la stanza", ja: "その部屋", zh: "该房间", hi: "कमरे", ar: "الغرفة",
   },
   "frn.suggested": {
     en: "Suggested", es: "Sugerencias", fr: "Suggestions", de: "Vorschläge", pt: "Sugestões", it: "Suggeriti", ja: "おすすめ", zh: "推荐", hi: "सुझाए गए", ar: "مقترحون",

@@ -1363,8 +1363,8 @@ export interface ObjectionTimeline {
 export interface InboxEvent {
   id: string;
   /** One of the closed set in qrme/inbox.py — message | comment | friend |
-   *  exchange_signed | guest_accepted. The sentence is the client's to
-   *  compose; the backend names the deed, never the words. */
+   *  exchange_signed | guest_accepted | room_invite. The sentence is the
+   *  client's to compose; the backend names the deed, never the words. */
   kind: string;
   actor_id: string; actor_name: string | null;
   ref: string | null; created_at: string; seen: boolean;
@@ -3535,6 +3535,20 @@ export const api = {
     req<{ id: string }>(`/rooms`, { method: "POST", body }),
   // Step into a live room: the token names the joiner, joining twice is
   // being there once, and the table seats eight.
+  // Asking somebody into a room, and taking it up. Two doors because the
+  // authority differs: the first takes a token that is *in* the room, the
+  // second the invited profile's own owner token. A host who could accept
+  // for you would make "invite" a word for something else.
+  inviteToRoom: (roomId: string, profileId: string, token: string) =>
+    req<{ room_id: string; profile_id: string; invited: boolean;
+          asked_by: string; already_invited: boolean }>(
+      `/rooms/${roomId}/invite`,
+      { method: "POST", body: { profile_id: profileId }, token }),
+  acceptRoomInvite: (roomId: string, profileId: string, ownerToken: string) =>
+    req<{ id: string; topic?: string | null; channel: string;
+          participants: { kind: string; id: string; display: string }[] }>(
+      `/rooms/${roomId}/invites/accept`,
+      { method: "POST", body: { profile_id: profileId }, token: ownerToken }),
   joinRoom: (roomId: string, token: string) =>
     req<{ id: string; topic?: string | null; channel: string;
           participants: { kind: string; id: string; display: string }[] }>(

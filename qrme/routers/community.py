@@ -22,15 +22,16 @@ from datetime import date
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import (auth, db, engagement, identity, llm, marketplace, moderation,
-                persona, referral, roommic, storage, tiers, watermark)
+from .. import (auth, db, engagement, identity, inbox, llm, marketplace,
+                moderation, persona, referral, roommic, storage, tiers,
+                watermark)
 from ..common import (age_of, interactor_or_404, profile_or_404,
                       require_interactor, require_owner_or_interactor,
                       source_items)
 from ..models import (
     HandoffCreate, ListingCreate, ListingPlace, MarketAssist, MarketPrefs,
     ProviderCreate, ReferralPrepare, ReferralRelease, ReferralReply,
-    RoomCreate, RoomMessage, RoomMicLend,
+    RoomCreate, RoomInvite, RoomMessage, RoomMicLend,
 )
 
 router = APIRouter()
@@ -367,6 +368,116 @@ def join_room(room_id: str, request: Request) -> dict:
         "INSERT OR IGNORE INTO room_participants (room_id, kind, ref_id)"
         " VALUES (?,'user',?)", (room_id, who))
     conn.commit()
+    return {
+        "id": room_id, "topic": room["topic"], "channel": room["channel"],
+        "presence": _CHANNEL_NOTES[room["channel"]],
+        "participants": [
+            {"kind": p["kind"], "id": p["ref_id"],
+             "display": _display(p["kind"], p["ref_id"])}
+            for p in _participants(room_id)
+        ],
+    }
+
+
+@router.post("/rooms/{room_id}/invite", status_code=201)
+def invite_to_room(room_id: str, body: RoomInvite, request: Request) -> dict:
+    """Ask somebody into a room you are in.
+
+    Rooms could be created and joined, and the standing ones are listed for
+    anybody to walk into — so the only way to get a particular person into a
+    particular room was to name them at creation, or to send them the id by
+    some means this product does not provide.
+
+        asked     can I open a room
+        mattered  can I ask somebody into it
+
+    **The invite is the inbox event.** There is no second table: `kind` is
+    `room_invite` and `ref` is the room, so the thing the person reads and
+    the thing `accept` checks are one row. Two records of one fact is how a
+    withdrawn invite stays acceptable.
+
+    The inviter must already be in the room — `_require_in_room` takes either
+    identity, a person holding an interactor token or an owner holding a
+    profile's — because inviting somebody somewhere you are not is how a room
+    id becomes a way to send mail.
+
+    One invite per person per room. A second press is not a second event: an
+    invite that could be repeated is a button that fills somebody's inbox,
+    and the person who wants to nudge a friend has messaging for that.
+    """
+    room = _room_or_404(room_id)
+    if room["status"] != "active":
+        raise HTTPException(409, "this room has closed")
+    asker = _require_in_room(room_id, request)
+
+    guest = profile_or_404(body.profile_id)
+    if guest["status"] == "departed":
+        raise HTTPException(
+            410, f"profile {body.profile_id} has departed")
+
+    present = _participants(room_id)
+    if any(p["kind"] == "profile" and p["ref_id"] == body.profile_id
+           for p in present):
+        raise HTTPException(409, "they are already in this room")
+    # Eight, the same number `RoomCreate` and `join_room` hold. An invite into
+    # a full room is an invite that cannot be accepted, and offering one is
+    # worse than refusing it.
+    if len(present) >= 8:
+        raise HTTPException(
+            409, "this room is full — eight seats, and every one taken")
+
+    conn = db.connect()
+    already = conn.execute(
+        "SELECT 1 FROM inbox_events WHERE profile_id=? AND kind='room_invite'"
+        " AND ref=?", (body.profile_id, room_id)).fetchone()
+    if already is None:
+        inbox.note(body.profile_id, "room_invite", asker, ref=room_id)
+    return {"room_id": room_id, "profile_id": body.profile_id,
+            "invited": True, "asked_by": asker,
+            # Said plainly rather than implied by a 200: a repeated press is
+            # a no-op and the caller should be able to tell.
+            "already_invited": already is not None}
+
+
+@router.post("/rooms/{room_id}/invites/accept", status_code=201)
+def accept_room_invite(room_id: str, body: RoomInvite,
+                       request: Request) -> dict:
+    """Take up an invite, and be in the room.
+
+    The half that makes the invite a round trip rather than a notification.
+    Without it the news arrived and the only way to act on it was a route
+    that seats interactors, not profiles — so an invited profile could read
+    that it had been asked and had no way to say yes.
+
+    Authorized as the guest, not the host: `auth.require(..., "owner", ...)`
+    is the profile's own owner token. A host who could seat somebody by
+    pressing a button on their own screen would make "invite" a word for
+    something that is not one.
+    """
+    room = _room_or_404(room_id)
+    if room["status"] != "active":
+        raise HTTPException(409, "this room has closed")
+    auth.require(request, "owner", body.profile_id)
+
+    conn = db.connect()
+    invite = conn.execute(
+        "SELECT id FROM inbox_events WHERE profile_id=? AND"
+        " kind='room_invite' AND ref=?",
+        (body.profile_id, room_id)).fetchone()
+    if invite is None:
+        raise HTTPException(403, "you have not been asked into this room")
+
+    present = _participants(room_id)
+    if not any(p["kind"] == "profile" and p["ref_id"] == body.profile_id
+               for p in present):
+        if len(present) >= 8:
+            raise HTTPException(
+                409, "this room filled up before you answered — eight seats, "
+                     "and every one taken")
+        conn.execute(
+            "INSERT OR IGNORE INTO room_participants (room_id, kind, ref_id)"
+            " VALUES (?,'profile',?)", (room_id, body.profile_id))
+        conn.commit()
     return {
         "id": room_id, "topic": room["topic"], "channel": room["channel"],
         "presence": _CHANNEL_NOTES[room["channel"]],
