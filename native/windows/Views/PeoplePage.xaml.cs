@@ -557,6 +557,9 @@ public sealed partial class PeoplePage : Page
     {
         await Load();
         await LoadWorkshop();
+        // On appear, not on the Import press. A picker that is empty until
+        // you press the button it governs is not a picker.
+        try { await LoadSkinShelf(); } catch { /* the box stays empty */ }
     }
 
     /// <summary>What the workshop shows before any button: the delegation
@@ -2422,13 +2425,48 @@ public sealed partial class PeoplePage : Page
             StatusText.Text = b.Brief ?? "";
         });
 
+    /// <summary>The shelf, held so the picker has rows to show.</summary>
+    private MarketSource[] _skinShelf = [];
+
+    /// <summary>
+    /// Fill the source picker from the shelf. Eight systems are named on the
+    /// wire and this page showed a count of them.
+    /// </summary>
+    private async System.Threading.Tasks.Task LoadSkinShelf()
+    {
+        if (_skinShelf.Length > 0) return;
+        var shelf = await ApiClient.Shared.AvatarMarket();
+        _skinShelf = shelf.Sources;
+        AvaSourceBox.ItemsSource = _skinShelf.Select(s => s.Name).ToArray();
+        if (_skinShelf.Length > 0) AvaSourceBox.SelectedIndex = 0;
+    }
+
+    /// <summary>The provider's own export route, in their words — the useful
+    /// half of the shelf, which no shell was showing.</summary>
+    private void OnAvaSourceChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var i = AvaSourceBox.SelectedIndex;
+        AvaSourceHow.Text = i >= 0 && i < _skinShelf.Length
+            ? _skinShelf[i].How : "";
+    }
+
     private async void OnAvaImport(object sender, RoutedEventArgs e) =>
         await Try(async () =>
         {
-            var shelf = await ApiClient.Shared.AvatarMarket();
+            await LoadSkinShelf();
+            var i = AvaSourceBox.SelectedIndex;
+            // No silent fallback to "other": if the shelf did not load there
+            // is nothing honest to file this under, and a wrong provenance is
+            // worse than a refused import.
+            if (i < 0 || i >= _skinShelf.Length)
+            {
+                StatusText.Text = L10n.T("ava.market");
+                return;
+            }
             await ApiClient.Shared.ImportAvatar(AppState.Current.Pid!,
-                "other", AvaImportBox.Text.Trim(), AppState.Current.Token!);
-            StatusText.Text = $"{shelf.Sources.Length} · imported";
+                _skinShelf[i].Key, AvaImportBox.Text.Trim(),
+                AppState.Current.Token!);
+            StatusText.Text = L10n.T("ava.imported");
             AvaImportBox.Text = "";
         });
 

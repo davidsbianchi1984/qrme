@@ -5357,6 +5357,11 @@ private fun AvaBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
     var asset by remember { mutableStateOf("") }
     var handle by remember { mutableStateOf("") }
     var importUrl by remember { mutableStateOf("") }
+    // The shelf, and which of it this import is coming from. Read once and
+    // held: eight systems is a picker, and re-fetching per tap is what the
+    // old block did with an answer it then threw away.
+    var shelf by remember { mutableStateOf<List<ApiClient.MarketSource>>(emptyList()) }
+    var chosenSource by remember { mutableStateOf("ready_player_me") }
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(L10n.t("ava.title", lang), color = Qrme.Txt, fontSize = 16.sp,
             fontWeight = FontWeight.Bold)
@@ -5381,17 +5386,54 @@ private fun AvaBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
             vm.call({ ApiClient.avatarBrief(handle) }) { r ->
                 onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
         }
+        // Which system the face came from, picked rather than assumed.
+        //
+        // This block fetched the shelf, counted it, and then posted
+        // `source = "other"` — so eight named systems were on the wire, a
+        // number off them went on screen, and every import from a phone was
+        // filed under the one that means "somewhere else". The whole reason
+        // `import_avatar` takes a source is that the provenance survives
+        // beside the face.
+        //
+        //     asked     did the import go through
+        //     mattered  does the record say where it came from
         Text(L10n.t("ava.market", lang), color = Qrme.Txt, fontSize = 13.sp,
             fontWeight = FontWeight.Bold)
+        LaunchedEffect(Unit) {
+            if (shelf.isEmpty()) {
+                shelf = runCatching { ApiClient.avatarMarket() }
+                    .getOrElse { emptyList() }
+                if (shelf.none { it.key == chosenSource }) {
+                    shelf.firstOrNull()?.let { chosenSource = it.key }
+                }
+            }
+        }
+        Row(Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            shelf.forEach { source ->
+                val on = source.key == chosenSource
+                Text(source.name, fontSize = 11.sp,
+                    color = if (on) Qrme.Bg else Qrme.Txt,
+                    modifier = Modifier
+                        .background(if (on) Qrme.Brand else Qrme.ScrBot,
+                            RoundedCornerShape(50))
+                        .clickable { chosenSource = source.key }
+                        .padding(horizontal = 10.dp, vertical = 6.dp))
+            }
+        }
+        // The provider's own export route, in their words — the useful half
+        // of the shelf, which no shell was showing.
+        shelf.firstOrNull { it.key == chosenSource }?.let {
+            Text(it.how, color = Qrme.T2, fontSize = 11.sp)
+        }
         labeledField(L10n.t("ava.url.ph", lang), importUrl, "") { importUrl = it }
         BrandButton(L10n.t("ava.import", lang), enabled = importUrl.isNotBlank()) {
             vm.call({
-                val n = ApiClient.avatarMarket()
-                ApiClient.importAvatar(vm.pid!!, "other", importUrl, vm.token!!)
-                n
+                ApiClient.importAvatar(vm.pid!!, chosenSource, importUrl, vm.token!!)
             }) { r ->
                 importUrl = ""
-                onNote(r.getOrNull()?.toString() ?: r.exceptionOrNull()?.message) }
+                onNote(r.exceptionOrNull()?.message
+                    ?: L10n.t("ava.imported", lang)) }
         }
     }
 }

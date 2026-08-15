@@ -1035,6 +1035,17 @@
                     <TextBox x:Name="AvaHandleBox" />
                     <Button x:Name="AvaBriefButton" Click="OnAvaBrief" />
                     <TextBlock x:Name="AvaMarketTitle" FontWeight="Bold" FontSize="13" />
+                    <!-- Which system the face is coming from. This page used
+                         to fetch the eight-row shelf, show its length, and
+                         then import everything as "other" — the provenance
+                         the route exists to keep, discarded at the last
+                         step. -->
+                    <ComboBox x:Name="AvaSourceBox"
+                              SelectionChanged="OnAvaSourceChanged"
+                              HorizontalAlignment="Stretch" />
+                    <TextBlock x:Name="AvaSourceHow" FontSize="12"
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
                     <TextBox x:Name="AvaImportBox" />
                     <Button x:Name="AvaImportButton" Click="OnAvaImport" />
                 </StackPanel>

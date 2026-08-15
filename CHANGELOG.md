@@ -8,6 +8,32 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **Every face imported from a phone was filed under "somewhere else".** The
+  skin shelf has named eight systems since the avatar deck was written — Ready
+  Player Me, Bitmoji, Meta, Memoji, Xbox, Zepeto, Mii, and a catch-all — each
+  with the provider's own export route in that provider's words. The console
+  grew a picker for it. The three shells fetched the shelf, counted it, put the
+  number on screen, and then posted `source: "other"`.
+
+      asked     did the import go through
+      mattered  does the record say where it came from
+
+  `import_avatar` takes a source for exactly one reason, stated in its own
+  docstring: the import is written onto the profile's record as a source item,
+  *so the face's provenance survives next to the face*. Filing all of it under
+  the value that means "somewhere else" is that provenance thrown away at the
+  last step, by the code that had just been handed it.
+
+  Android's binding was the clearest form: `avatarMarket()` decoded the eight
+  rows and returned `arr.length()` — a binding that reads the answer, discards
+  it, and returns a count of what it discarded. All three shells now carry the
+  rows, offer them as a picker, and show the `how` line beside the chosen one,
+  which is the sentence that turns a URL box into something somebody can
+  actually complete and which only the console has ever rendered.
+
+  Windows refuses rather than falling back if the shelf did not load: a wrong
+  provenance is worse than a refused import.
+
 - **The sidebar was checked and the other forty-nine files were not.** This
   console's nav guard has asserted since 0.27.0 that every tab in `NAV` has a
   `nav.<id>` row. It looked at the sidebar and nowhere else. JIM-mini shipped

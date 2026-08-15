@@ -155,6 +155,11 @@ def _nav_tabs() -> int:
     from .test_nav_labels_are_localised import _nav_ids
     return len(_nav_ids())
 
+
+def _skin_shelf() -> int:
+    from qrme import avatars
+    return len(avatars.MARKET)
+
 #: The registry. Every entry replaced a bare literal inside an assertion; the
 #: assertion now reads its number from here, which is what takes it out of the
 #: unregistered backlog.
@@ -208,6 +213,9 @@ RATCHETS: tuple[Ratchet, ...] = (
     Ratchet("console.nav_tabs", 40, _nav_tabs,
             "tabs the console navigation declares — the floor under the "
             "check that every one of them has a label"),
+    Ratchet("avatars.skin_shelf", 6, _skin_shelf,
+            "systems a face can be imported from — the floor under the "
+            "check that a source picker is picking between things"),
 )
 
 _BY_NAME = {r.name: r for r in RATCHETS}

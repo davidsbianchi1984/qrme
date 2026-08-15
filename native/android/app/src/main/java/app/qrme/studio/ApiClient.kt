@@ -3604,14 +3604,33 @@ object ApiClient {
                 ?.optString("note") ?: "\u2014")
     }
 
+
+    // One row of the skin shelf: the system, its name, and the provider's own
+    // export route. `how` is the useful half and no shell was carrying it.
+    data class MarketSource(val key: String, val name: String, val how: String)
+
     suspend fun setAvatar(id: String, asset: String, token: String) {
         request("/profiles/$id/avatar", "PUT",
             JSONObject().put("asset", asset), token)
     }
 
-    suspend fun avatarMarket(): Int {
+    /**
+     * The eight systems a face can be brought from, and how to export from
+     * each in that provider's own words.
+     *
+     * This returned an `Int` — the length of the array it had just decoded —
+     * so the shell could say "8" and had no way to name any of them. The
+     * caller then imported everything as `other`, which is the provenance
+     * this route exists to preserve, discarded at the last step.
+     */
+    suspend fun avatarMarket(): List<MarketSource> {
         val o = JSONObject(request("/avatars/market"))
-        return o.optJSONArray("sources")?.length() ?: 0
+        val arr = o.optJSONArray("sources") ?: JSONArray()
+        return (0 until arr.length()).map {
+            val s = arr.getJSONObject(it)
+            MarketSource(s.getString("key"), s.optString("name", ""),
+                s.optString("how", ""))
+        }
     }
 
     suspend fun importAvatar(id: String, source: String, asset: String, token: String) {

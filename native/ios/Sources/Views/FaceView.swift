@@ -29,6 +29,11 @@ struct AvatarSection: View {
     @State private var importUrl = ""
     @State private var line: String?
     @State private var busy = false
+    /// The shelf, and which of it this import is coming from. Read once and
+    /// held: eight systems is a picker, and re-fetching per tap is what the
+    /// old block did with the answer it then threw away.
+    @State private var shelf: [ApiClient.MarketSource] = []
+    @State private var chosenSource = "ready_player_me"
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -75,19 +80,49 @@ struct AvatarSection: View {
                     }
                 }.font(.caption).disabled(busy || handle.isEmpty)
             }
+            // Which system the face came from, picked rather than assumed.
+            //
+            // This block used to fetch the shelf, count it, and then post
+            // `source: "other"` — so eight named systems were on the wire, a
+            // number off them went on screen, and every import from a phone
+            // was filed under the one that means "somewhere else". The whole
+            // reason `import_avatar` takes a source is that the provenance
+            // survives beside the face; "other" is that provenance thrown
+            // away at the last step.
+            //
+            //     asked     did the import go through
+            //     mattered  does the record say where it came from
             Text(L10n.t("ava.market", state.language))
                 .font(.caption.bold()).foregroundStyle(Theme.txt)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach(shelf, id: \.key) { source in
+                        Button(source.name) { chosenSource = source.key }
+                            .font(.caption2)
+                            .padding(.horizontal, 10).padding(.vertical, 6)
+                            .background(chosenSource == source.key
+                                        ? Theme.brand : Theme.scrBot)
+                            .foregroundStyle(chosenSource == source.key
+                                             ? .white : Theme.txt)
+                            .clipShape(Capsule())
+                    }
+                }
+            }
+            // The provider's own export route, in their words. It is the
+            // useful half of the shelf and no shell was showing it.
+            if let how = shelf.first(where: { $0.key == chosenSource })?.how {
+                Text(how).font(.caption2).foregroundStyle(Theme.t2)
+            }
             HStack {
                 TextField(L10n.t("ava.url.ph", state.language),
                           text: $importUrl)
                     .textFieldStyle(.roundedBorder)
                 Button(L10n.t("ava.import", state.language)) {
                     run {
-                        let shelf = try await ApiClient.shared.avatarMarket()
                         _ = try await ApiClient.shared.importAvatar(
-                            id: state.pid!, source: "other",
+                            id: state.pid!, source: chosenSource,
                             asset: importUrl, token: state.token!)
-                        line = "\(shelf.sources.count) · imported"
+                        line = L10n.t("ava.imported", state.language)
                         importUrl = ""
                     }
                 }.font(.caption).disabled(busy || importUrl.isEmpty)
@@ -95,7 +130,18 @@ struct AvatarSection: View {
             if let line {
                 Text(line).font(.caption2).foregroundStyle(Theme.t2)
             }
-        }.card()
+        }
+        .card()
+        .task {
+            if shelf.isEmpty,
+               let s = try? await ApiClient.shared.avatarMarket() {
+                shelf = s.sources
+                if !s.sources.contains(where: { $0.key == chosenSource }),
+                   let first = s.sources.first {
+                    chosenSource = first.key
+                }
+            }
+        }
     }
 
     private func run(_ op: @escaping () async throws -> Void) {
