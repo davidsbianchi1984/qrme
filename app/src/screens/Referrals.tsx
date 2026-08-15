@@ -220,7 +220,7 @@ export function Referrals({ onPlans }: { onPlans: () => void }) {
         <h3>{tr("ref.creds", lang)}</h3>
         <p className="muted small">{tr("ref.creds.pitch", lang)}</p>
         {creds.length === 0 && (
-          <p className="muted small">{tr("ref.creds.cansign.none", lang)}</p>
+          <p className="muted small">{tr("ref.creds.none", lang)}</p>
         )}
         {creds.map((cr) => (
           <div key={cr.id}>
