@@ -3587,6 +3587,12 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     'doing': {'en': 'What were you trying to do?', 'es': '¿Qué intentabas hacer?', 'fr': 'Qu’essayiez-vous de faire ?', 'de': 'Was hast du versucht zu tun?', 'pt': 'O que você estava tentando fazer?', 'it': 'Cosa stavi cercando di fare?', 'ja': '何をしようとしていましたか？', 'zh': '你当时想做什么？', 'hi': 'आप क्या करने की कोशिश कर रहे थे?', 'ar': 'ما الذي كنت تحاول فعله؟'},
     'wall': {'en': 'What stood in the way?', 'es': '¿Qué se interpuso?', 'fr': 'Qu’est-ce qui a fait obstacle ?', 'de': 'Was stand im Weg?', 'pt': 'O que ficou no caminho?', 'it': 'Cosa ti ha ostacolato?', 'ja': '何が妨げになりましたか？', 'zh': '是什么挡住了你？', 'hi': 'क्या आड़े आया?', 'ar': 'ما الذي وقف في الطريق؟'},
     'help': {'en': 'What would help?', 'es': '¿Qué ayudaría?', 'fr': 'Qu’est-ce qui aiderait ?', 'de': 'Was würde helfen?', 'pt': 'O que ajudaria?', 'it': 'Cosa aiuterebbe?', 'ja': '何があれば助かりますか？', 'zh': '什么会有帮助？', 'hi': 'क्या मदद करेगा?', 'ar': 'ما الذي قد يساعد؟'},
+    # The room scene's box. `showing` is the one field here a person never
+    # types: the console offers it as three buttons, so the label is the
+    # question those buttons answer rather than a name for the field.
+    'showing': {'en': 'What your box shows', 'es': 'Lo que muestra tu recuadro', 'fr': 'Ce que montre votre case', 'de': 'Was dein Kästchen zeigt', 'pt': 'O que o seu quadrado mostra', 'it': 'Cosa mostra il tuo riquadro', 'ja': 'あなたの枠に出るもの', 'zh': '你的方框显示什么', 'hi': 'आपका खाना क्या दिखाता है', 'ar': 'ما يعرضه مربعك'},
+    'media_url': {'en': 'Picture', 'es': 'Imagen', 'fr': 'Image', 'de': 'Bild', 'pt': 'Imagem', 'it': 'Immagine', 'ja': '写真', 'zh': '图片', 'hi': 'तस्वीर', 'ar': 'الصورة'},
+    'media_id': {'en': 'Upload', 'es': 'Archivo subido', 'fr': 'Fichier envoyé', 'de': 'Hochgeladene Datei', 'pt': 'Ficheiro enviado', 'it': 'File caricato', 'ja': 'アップロード', 'zh': '上传的文件', 'hi': 'अपलोड', 'ar': 'الملف المرفوع'},
     'lang': {'en': 'Language', 'es': 'Idioma', 'fr': 'Langue', 'de': 'Sprache', 'pt': 'Idioma', 'it': 'Lingua', 'ja': '言語', 'zh': '语言', 'hi': 'भाषा', 'ar': 'اللغة'},
     'beneficiary': {'en': 'Beneficiary', 'es': 'Beneficiario', 'fr': 'Bénéficiaire', 'de': 'Begünstigter', 'pt': 'Beneficiário', 'it': 'Beneficiario', 'ja': '受取人', 'zh': '受益人', 'hi': 'लाभार्थी', 'ar': 'المستفيد'},
     'designees': {'en': 'Designees', 'es': 'Designados', 'fr': 'Désignataires', 'de': 'Benannte', 'pt': 'Designados', 'it': 'Designati', 'ja': '指定先', 'zh': '指定人', 'hi': 'नामित', 'ar': 'المعيَّنون'},
