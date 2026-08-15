@@ -46,6 +46,35 @@ _REQUEST_KEY: ContextVar[str | None] = ContextVar("qrme_llm_request_key",
                                                   default=None)
 
 
+# How much room a reply gets, and what happens when it runs out.
+#
+# This was 1024 with the comment "chat replies are deliberately short", and
+# short is right for a chat turn — but the same door answers a question like
+# "write me the migration" or "explain both patents", and a long answer met the
+# wall mid-sentence and simply stopped. Ten times the room is the field call.
+#
+# A bigger wall is still a wall, so the second half matters more than the
+# first: when the model stops because it ran out of room rather than because it
+# finished, the reply says so. Silence at the cut is the failure — a person
+# reading a sentence that ends in the middle has no way to tell a truncation
+# from a model that lost the thread, and the two call for opposite responses.
+MAX_REPLY_TOKENS = 10240
+
+#: Appended when, and only when, the room ran out. The platform speaking, not
+#: the persona — so it is registered in `i18n._PUBLIC` and travels through
+#: `tr_public` like every other sentence this platform says to a person, rather
+#: than being generated in whatever language the model happened to be using.
+CONTINUES = "— cut off here, not finished. Ask me to continue."
+
+
+def _capped(text: str, ran_out: bool) -> str:
+    """One place, so five providers cannot disagree about the wording."""
+    text = (text or "").strip()
+    if not ran_out:
+        return text
+    return f"{text}\n\n{CONTINUES}" if text else CONTINUES
+
+
 def set_request_key(key: str | None):
     """Install a caller-supplied API key for the current request; returns the
     reset token. Middleware owns the set/reset pairing."""
@@ -183,12 +212,13 @@ class AnthropicProvider:
     def generate(self, system: str, messages: list[dict]) -> str:
         response = self._client.messages.create(
             model=MODEL,
-            max_tokens=1024,  # chat replies are deliberately short
+            max_tokens=MAX_REPLY_TOKENS,
             thinking={"type": "adaptive"},
             system=system,
             messages=messages,
         )
-        return "".join(b.text for b in response.content if b.type == "text").strip()
+        text = "".join(b.text for b in response.content if b.type == "text")
+        return _capped(text, response.stop_reason == "max_tokens")
 
 
 class OpenAICompatibleProvider:
@@ -205,7 +235,7 @@ class OpenAICompatibleProvider:
     def generate(self, system: str, messages: list[dict]) -> str:
         payload = {
             "model": self._model,
-            "max_tokens": 1024,
+            "max_tokens": MAX_REPLY_TOKENS,
             "messages": [{"role": "system", "content": system}, *messages],
         }
         body = _post_json(
@@ -214,7 +244,9 @@ class OpenAICompatibleProvider:
             {"Authorization": f"Bearer {self._key}"},
         )
         try:
-            return body["choices"][0]["message"]["content"].strip()
+            choice = body["choices"][0]
+            return _capped(choice["message"]["content"],
+                           choice.get("finish_reason") == "length")
         except (KeyError, IndexError, TypeError) as exc:
             raise RuntimeError(f"{self.name}: unexpected response shape") from exc
 
@@ -238,6 +270,7 @@ class GeminiProvider:
         payload = {
             "systemInstruction": {"parts": [{"text": system}]},
             "contents": contents,
+            "generationConfig": {"maxOutputTokens": MAX_REPLY_TOKENS},
         }
         url = (
             "https://generativelanguage.googleapis.com/v1beta/models/"
@@ -245,8 +278,10 @@ class GeminiProvider:
         )
         body = _post_json(url, payload, {})
         try:
-            parts = body["candidates"][0]["content"]["parts"]
-            return "".join(p.get("text", "") for p in parts).strip()
+            candidate = body["candidates"][0]
+            parts = candidate["content"]["parts"]
+            return _capped("".join(p.get("text", "") for p in parts),
+                           candidate.get("finishReason") == "MAX_TOKENS")
         except (KeyError, IndexError, TypeError) as exc:
             raise RuntimeError("gemini: unexpected response shape") from exc
 

@@ -406,6 +406,19 @@ _PUBLIC: dict[str, dict[str, str]] = {
 }
 
 
+_PUBLIC['\u2014 cut off here, not finished. Ask me to continue.'] = {
+    'es': '\u2014 cortado aqu\u00ed, no terminado. P\u00eddeme que siga.',
+    'fr': "\u2014 coup\u00e9 ici, pas fini. Demandez-moi de continuer.",
+    'de': '\u2014 hier abgeschnitten, nicht fertig. Bitte mich weiterzumachen.',
+    'pt': '\u2014 cortado aqui, n\u00e3o terminado. Pe\u00e7a-me para continuar.',
+    'it': '\u2014 troncato qui, non finito. Chiedimi di continuare.',
+    'ja': '\u2014 ここで切れています。終わったのではありません。続きを求めてください。',
+    'zh': '\u2014 到这里被截断了，不是说完了。让我继续。',
+    'hi': '\u2014 यहाँ कट गया, समाप्त नहीं हुआ। मुझसे जारी रखने को कहें।',
+    'ar': '\u2014 انقطع هنا ولم ينتهِ. اطلب مني المتابعة.',
+}
+
+
 def tr_public(text: str, language: str) -> str:
     """Translate one of the sentences the accountless surface shows."""
     if language == DEFAULT:
