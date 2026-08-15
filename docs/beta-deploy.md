@@ -199,14 +199,31 @@ Then check what actually answers, from your own machine rather than the
 host — `/health` carries the version for exactly this:
 
 ```bash
-for h in sntheticprofiles.com jim-mini.com pdisystems.net; do
-  printf '%-22s ' "$h"; curl -s "https://$h/health" | jq -r .version
-done
+curl -s https://sntheticprofiles.com/health; echo
+curl -s https://jim-mini.com/health; echo
+curl -s https://pdisystems.net/health; echo
 ```
 
-Three lines, all reading the version you just deployed. A name still
-reporting the old one is a container that did not rebuild, not a slow
-rollout — there is one host and nothing behind it to lag.
+Three self-contained lines rather than a loop, and that is the whole
+reason they look like this. The loop this replaces was three lines of
+`for … do … done`, which is correct in a terminal and *breaks* when it is
+pasted into a phone: the client wraps it, bash sees an incomplete
+pipeline, and you get `syntax error near unexpected token` twice with no
+hint that the deploy above it went perfectly. It happened on the first
+deploy after this page was written. Each line here survives being pasted
+one at a time, on a keyboard held in one hand, which is where a deploy
+actually gets checked.
+
+Each prints that product's whole health object; the field to read is
+`"version":"…"`, and all three should carry the version you just
+deployed. A name still reporting the old one is a container that did not
+rebuild, not a slow rollout — there is one host and nothing behind it to
+lag.
+
+`jq -r .version` will trim it to the number alone if the host has `jq`,
+but it is not worth a second line in this file: the object is short, and
+the other fields in it — `console`, `pdi`, `tandem`, `signup_key` — are
+worth a glance while you are looking anyway.
 
 ---
 
