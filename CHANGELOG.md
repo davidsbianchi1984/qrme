@@ -6,6 +6,60 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Signing in reaches what you own.** An owner token is minted once, in the
+  create response, and handed to whichever client did the creating. There was
+  no second place to get one.
+
+      asked     where do I find my owner token
+      mattered  the only route that lists a person's profiles asked for one
+                first
+
+  `GET /profiles/{id}/siblings` — the roster — refuses to be keyed on
+  `owner_id`, and says why in a sentence worth keeping: *an id in a path is a
+  string somebody chooses, not a secret.* Right, and it closes the loop on
+  itself. Somebody who reinstalled, or who made the profile in the phone app
+  and is now at the console, could not enumerate their own profiles and could
+  not open one.
+
+  Two doors, and the separation between them is the design.
+
+  **`GET /accounts/{account_id}/profiles`** is that same roster reached
+  through the credential such a person does have — the account token behind an
+  email and a password. The objection to keying on the account is answered by
+  what proves the caller, not by what is in the path. It carries no tokens:
+  a roster is a read, and `qrme/dock.py` already states the rule in one line —
+  *nothing that authorises anything belongs on a surface.*
+
+  **`POST /accounts/{account_id}/profiles/{profile_id}/owner-token`** is the
+  grant, on request, shown once. Additive rather than a rotation: every owner
+  token already out there keeps working, because recovering access on a laptop
+  says nothing about the phone that has been holding one for a year — and
+  conflating the two would make this the button that silently unlinks
+  somebody's Guardian. Revoking is a different intent with its own door.
+
+  A profile on another account answers exactly as one that does not exist, or
+  the route is a directory of which ids are real on a deployment. The account
+  token dies with a password reset, which is what keeps this pair from being
+  the one session a reset leaves standing.
+
+### Changed
+
+- **Signing in opens something, on all four clients.** Every client had the
+  same shape: a signed-in account whose only offer was to *make* a profile.
+  The console now leads with the roster and puts the create form behind *Or
+  make another one* — a person whose profiles already exist is not here to
+  make another, and offering that first is how the second one got made. The
+  three shells held the account for the life of the screen, never in
+  `UserDefaults`, prefs or `session.json` — an account token reaches every
+  profile and the billing, which is more than any owner token it mints — list
+  what the account holds, and hand the minted pair to the same state the
+  create path writes.
+
+  The per-shell door guard is what said this was unfinished: the union read
+  zero while iOS, Android and Windows each could not reach either route.
+
 ## [0.75.0] - 2026-08-15
 
 ### Changed
