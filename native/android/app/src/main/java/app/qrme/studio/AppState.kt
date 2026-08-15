@@ -95,6 +95,36 @@ class StudioViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /**
+     * Open a profile this account already holds.
+     *
+     * The other two entrances to a signed-in session — [createProfile] and
+     * [importCard] — both *make* something. This is the third and it was
+     * missing: an owner token is minted once, in the create response, and a
+     * reinstalled phone had no way to ask for another. So the only route back
+     * into a profile made on another device was to make a second one.
+     *
+     * The account token stays with the caller and is never persisted; what
+     * lands in prefs is the same (pid, owner token) pair the other two write.
+     */
+    fun openHeldProfile(
+        accountId: String, accountToken: String, profileId: String,
+        shownAs: String,
+        onError: (String) -> Unit, onBusy: (Boolean) -> Unit,
+    ) {
+        onBusy(true)
+        viewModelScope.launch {
+            runCatching {
+                ApiClient.mintOwnerToken(accountId, profileId, accountToken)
+            }.onSuccess { (id, owner) ->
+                pid = id; token = owner; displayName = shownAs
+                prefs.edit().putString("pid", id).putString("token", owner)
+                    .putString("name", shownAs).apply()
+            }.onFailure { onError(it.message ?: "") }
+            onBusy(false)
+        }
+    }
+
     fun signOut() {
         pid = null; token = null; displayName = ""
         interactorId = null; interactorToken = null; interactorVerified = false

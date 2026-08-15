@@ -84,6 +84,23 @@ public sealed class AppState
         Save();
     }
 
+    /// <summary>Open a profile this account already holds.</summary>
+    /// <remarks>
+    /// <para><see cref="SignIn"/> above lands here from a profile that was
+    /// just <em>made</em>. This is the other way in, and it was missing: an
+    /// owner token is minted once, in the create response, and a reinstalled
+    /// machine had no way to ask for another — so the only route back into a
+    /// profile made elsewhere was to make a second one.</para>
+    /// <para>The account token that authorised the mint stays with the caller
+    /// and is never saved; what lands on disk is the same (id, owner token)
+    /// pair <see cref="SignIn"/> writes.</para>
+    /// </remarks>
+    public void OpenHeld(string profileId, string ownerToken, string name)
+    {
+        Pid = profileId; Token = ownerToken; DisplayName = name;
+        Save();
+    }
+
     public void SignOut()
     {
         Pid = null; Token = null; DisplayName = ""; InteractorId = null;

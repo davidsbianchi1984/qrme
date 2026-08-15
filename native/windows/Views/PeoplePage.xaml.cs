@@ -415,6 +415,9 @@ public sealed partial class PeoplePage : Page
         AcctNameBox.Header = L10n.T("acct.name");
         AcctSignupButton.Content = L10n.T("acct.signup");
         AcctSigninButton.Content = L10n.T("acct.signin");
+        AcctHeldTitle.Text = L10n.T("onb.held.title");
+        AcctHeldPitch.Text = L10n.T("onb.held.pitch");
+        AcctHeldOpenButton.Content = L10n.T("onb.held.open");
         AcctCodeBox.Header = L10n.T("acct.code");
         AcctVerifyButton.Content = L10n.T("acct.verify");
         AcctResendButton.Content = L10n.T("acct.resend");
@@ -2662,12 +2665,54 @@ public sealed partial class PeoplePage : Page
             StatusText.Text = outp.CodeDelivery ?? "";
         });
 
+    /// <summary>The account token from the last sign-in, and what it holds.
+    /// </summary>
+    /// <remarks>
+    /// Held in memory for the life of the page and never written to settings.
+    /// An account token is broader than any owner token — it reaches every
+    /// profile on the account and the billing — so it does not outlive the
+    /// window.
+    /// </remarks>
+    private (string? Id, string? Token) _account;
+    private HeldProfile[] _held = System.Array.Empty<HeldProfile>();
+
     private async void OnAcctSignin(object sender, RoutedEventArgs e) =>
         await Try(async () =>
         {
             var outp = await ApiClient.Shared.Signin(
                 AcctEmailBox.Text.Trim(), AcctPasswordBox.Password);
             StatusText.Text = outp.DisplayName ?? outp.Email ?? "";
+            // Signing in used to end at the name. The token it mints is the
+            // only way back into a profile whose owner token was handed out
+            // once, at creation, to whichever machine did the creating.
+            _account = (outp.AccountId, outp.AccountToken);
+            var held = await ApiClient.Shared.HeldProfiles(
+                outp.AccountId ?? "", outp.AccountToken ?? "");
+            _held = held.Profiles ?? System.Array.Empty<HeldProfile>();
+            AcctHeldBox.Items.Clear();
+            foreach (var row in _held)
+            {
+                AcctHeldBox.Items.Add(
+                    (row.ShownAs ?? row.DisplayName ?? "—")
+                    + " · " + (row.Kind ?? ""));
+            }
+            if (_held.Length > 0) AcctHeldBox.SelectedIndex = 0;
+            else StatusText.Text = L10n.T("onb.held.none");
+        });
+
+    /// <summary>Open a profile this account holds: mint its owner token and
+    /// hand it to the app. Additive — the tokens on other machines keep
+    /// working.</summary>
+    private async void OnAcctOpenHeld(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var i = AcctHeldBox.SelectedIndex;
+            if (i < 0 || i >= _held.Length) return;
+            var minted = await ApiClient.Shared.MintOwnerToken(
+                _account.Id ?? "", _held[i].ProfileId, _account.Token ?? "");
+            AppState.Current.OpenHeld(minted.ProfileId, minted.OwnerToken,
+                _held[i].ShownAs ?? _held[i].DisplayName ?? "");
+            StatusText.Text = minted.ProfileId;
         });
 
     private async void OnAcctVerify(object sender, RoutedEventArgs e) =>

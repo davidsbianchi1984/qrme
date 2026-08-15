@@ -4473,6 +4473,28 @@ extension ApiClient {
                           body: ["email": email, "password": password])
     }
 
+    /// What this account already holds.
+    ///
+    /// `siblings` above answers the same question and asks for an owner
+    /// token first — which is exactly what somebody reinstalling no longer
+    /// has, because the token is minted once in the create response. This
+    /// reaches the roster through the account token instead.
+    ///
+    /// Carries no credential of its own. Opening one is the call below.
+    func heldProfiles(accountId: String,
+                      token: String) async throws -> HeldProfilesOut {
+        try await request("/accounts/\(accountId)/profiles", token: token)
+    }
+
+    /// A fresh owner capability for a profile this account holds, shown once.
+    /// Additive — the tokens already on other devices keep working.
+    func mintOwnerToken(accountId: String, profileId: String,
+                        token: String) async throws -> MintedOwnerToken {
+        try await request(
+            "/accounts/\(accountId)/profiles/\(profileId)/owner-token",
+            method: "POST", body: [:], token: token)
+    }
+
     func verifyEmail(email: String, code: String) async throws -> SessionOut {
         try await request("/verify-email", method: "POST",
                           body: ["email": email, "code": code])
@@ -5338,6 +5360,29 @@ struct SessionOut: Decodable {
     let email: String?
     let display_name: String?
     let account_token: String?
+}
+
+/// The roster reached through the account token. `profile_id`, not `id` —
+/// the route is `identity.roster`, which keys every row that way.
+struct HeldProfilesOut: Decodable {
+    struct Held: Decodable {
+        let profile_id: String
+        let kind: String?
+        /// The name to print. An anonymous profile is anonymous on its
+        /// owner's own screen too, so the server hands back both and the
+        /// client picks — `display_name` is the real one.
+        let shown_as: String?
+        let display_name: String?
+        let anonymous: Bool?
+    }
+    let profiles: [Held]
+    let count: Int?
+}
+
+struct MintedOwnerToken: Decodable {
+    let profile_id: String
+    let owner_token: String
+    let shown_once: Bool?
 }
 
 struct CodeDelivery: Decodable {

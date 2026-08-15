@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { accountApi, api, getSignupKey, setSignupKey } from "../api";
+import { accountApi, api, getSignupKey, setSignupKey,
+         type Sibling } from "../api";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 import { t as tr, visitorLang } from "../l10n";
@@ -303,6 +304,87 @@ function AccountGate() {
 // Stage 2: create-profile flow — POST /profiles under the account, then
 // register an interactor ("You") and set the owner relationship, so the app
 // can chat straight away.
+/**
+ * The way back into a profile you already have.
+ *
+ * This screen used to offer exactly one thing to a signed-in account: make a
+ * profile. That is the right offer once. It was also the only offer to
+ * somebody who already had three — because an owner token is minted once, in
+ * the create response, and the roster route that lists a person's profiles
+ * asks for one before it will list them. Reinstall the app, or make the
+ * profile on a phone and open the console, and the product's answer was to
+ * make another.
+ *
+ *     asked     where do I find my owner token
+ *     mattered  nowhere, and the screen that should have said so offered a
+ *               second profile instead
+ *
+ * The listing carries no credential. Opening one is a press, and the press is
+ * what mints the token — so a screen showing somebody their own profiles is
+ * not also a screen handing out control of them.
+ */
+function HeldProfiles({ onNew }: { onNew: () => void }) {
+  const { session, setSession } = useSession();
+  const [held, setHeld] = useState<Sibling[] | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
+  const accountId = session.accountId || "";
+  const accountToken = session.accountToken || "";
+
+  useEffect(() => {
+    if (!accountId || !accountToken) return;
+    accountApi.heldProfiles(accountId, accountToken)
+      .then((r: { profiles: Sibling[] }) => setHeld(r.profiles))
+      .catch(setError);
+  }, [accountId, accountToken]);
+
+  async function open(profileId: string) {
+    setBusy(profileId);
+    setError(null);
+    try {
+      const minted = await accountApi.mintOwnerToken(
+        accountId, profileId, accountToken);
+      const profile = await api.getProfile(profileId);
+      setSession({ profileId, ownerToken: minted.owner_token, profile });
+    } catch (e) {
+      setError(e);
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  if (held === null && !error) return null;
+
+  return (
+    <div className="held-profiles">
+      <h3>{tr("onb.held.title", visitorLang())}</h3>
+      <p className="muted small">{tr("onb.held.pitch", visitorLang())}</p>
+      {error != null && <Refusal error={error} />}
+      {held?.length === 0 && (
+        <p className="muted small">{tr("onb.held.none", visitorLang())}</p>
+      )}
+      {(held ?? []).map((p) => (
+        <div key={p.profile_id} className="held-row">
+          <div>
+            {/* `shown_as` rather than `display_name`: an anonymous profile is
+                anonymous on its owner's own screen too, and the roster hands
+                back both so this choice is the client's to make. */}
+            <b>{p.shown_as}</b>
+            <div className="muted small">{p.kind}</div>
+          </div>
+          <button disabled={busy !== null}
+                  onClick={() => open(p.profile_id)}>
+            {tr("onb.held.open", visitorLang())}
+          </button>
+        </div>
+      ))}
+      <button className="linkish" onClick={onNew}>
+        {tr("onb.held.new", visitorLang())}
+      </button>
+    </div>
+  );
+}
+
 function ProfileCreate() {
   const { session, setSession } = useSession();
   const [name, setName] = useState("");
@@ -445,6 +527,10 @@ export function Onboarding({ onPublic }: {
 }) {
   const { session } = useSession();
   const accountReady = Boolean(session.accountToken);
+  // The roster comes first for somebody signing back in, and the create form
+  // is behind one press. A person whose profiles already exist is not here to
+  // make another, and offering that first is what produced the second one.
+  const [creating, setCreating] = useState(false);
   return (
     <div className="onboarding">
       <div className="onboard-card">
@@ -453,7 +539,11 @@ export function Onboarding({ onPublic }: {
         <p className="muted">
           {tr("onb.pitch", visitorLang())}
         </p>
-        {accountReady ? <ProfileCreate /> : <AccountGate />}
+        {!accountReady && <AccountGate />}
+        {accountReady && !creating && (
+          <HeldProfiles onNew={() => setCreating(true)} />
+        )}
+        {accountReady && creating && <ProfileCreate />}
 
         {/* Not everybody arriving here wants a profile. Some are here
             *because* of one — somebody who has found a synthetic profile of

@@ -2367,6 +2367,27 @@ public sealed class ApiClient
     public Task<SessionOut> Signin(string email, string password) =>
         Send<SessionOut>(Post("/signin", new { email, password }));
 
+    /// <summary>What this account holds — the roster, reached through the
+    /// account token rather than an owner token nobody kept.</summary>
+    /// <remarks>
+    /// <c>Siblings</c> answers the same question and asks for an owner token
+    /// first, which is exactly what a reinstalled machine no longer has: the
+    /// token is minted once, in the create response. Carries no credential of
+    /// its own — opening one is <see cref="MintOwnerToken"/>.
+    /// </remarks>
+    public Task<HeldProfilesOut> HeldProfiles(string accountId, string token)
+        => Send<HeldProfilesOut>(Get($"/accounts/{accountId}/profiles",
+                                     token));
+
+    /// <summary>A fresh owner capability for a profile this account holds,
+    /// shown once. Additive — tokens already on other devices keep
+    /// working.</summary>
+    public Task<MintedOwnerTokenOut> MintOwnerToken(string accountId,
+        string profileId, string token) =>
+        Send<MintedOwnerTokenOut>(Post(
+            $"/accounts/{accountId}/profiles/{profileId}/owner-token",
+            new { }, token));
+
     public Task<SessionOut> VerifyEmail(string email, string code) =>
         Send<SessionOut>(Post("/verify-email", new { email, code }));
 
@@ -4842,6 +4863,27 @@ public record SessionOut(
     [property: JsonPropertyName("email")] string? Email,
     [property: JsonPropertyName("display_name")] string? DisplayName,
     [property: JsonPropertyName("account_token")] string? AccountToken);
+
+/// <summary>One row of the roster reached through the account token.</summary>
+/// <remarks><c>profile_id</c>, not <c>id</c> — the route is
+/// <c>identity.roster</c>, which keys every row that way. An anonymous
+/// profile is anonymous on its owner's own screen too, so both the shown
+/// name and the real one arrive and the caller picks.</remarks>
+public record HeldProfile(
+    [property: JsonPropertyName("profile_id")] string ProfileId,
+    [property: JsonPropertyName("kind")] string? Kind,
+    [property: JsonPropertyName("shown_as")] string? ShownAs,
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("anonymous")] bool? Anonymous);
+
+public record HeldProfilesOut(
+    [property: JsonPropertyName("profiles")] HeldProfile[] Profiles,
+    [property: JsonPropertyName("count")] int? Count);
+
+public record MintedOwnerTokenOut(
+    [property: JsonPropertyName("profile_id")] string ProfileId,
+    [property: JsonPropertyName("owner_token")] string OwnerToken,
+    [property: JsonPropertyName("shown_once")] bool? ShownOnce);
 
 public record CodeDeliveryOut(
     [property: JsonPropertyName("email")] string? Email,

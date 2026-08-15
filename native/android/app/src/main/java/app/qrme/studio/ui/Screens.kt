@@ -5643,6 +5643,13 @@ private fun AcctBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
     var code by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var oauthState by remember { mutableStateOf("") }
+    // Held for as long as this screen is on, never written to prefs. The
+    // account token is broader than any owner token — it reaches every
+    // profile and the billing — so it does not outlive the composition.
+    var account by remember {
+        mutableStateOf<ApiClient.AccountSession?>(null) }
+    var held by remember {
+        mutableStateOf<List<ApiClient.HeldProfile>?>(null) }
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(L10n.t("acct.title", lang), color = Qrme.Txt, fontSize = 16.sp,
             fontWeight = FontWeight.Bold)
@@ -5658,7 +5665,55 @@ private fun AcctBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
         BrandButton(L10n.t("acct.signin", lang),
             enabled = email.isNotBlank() && password.isNotBlank()) {
             vm.call({ ApiClient.signin(email, password) }) { r ->
-                onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
+                onNote(r.getOrNull()?.name ?: r.exceptionOrNull()?.message)
+                // Signing in used to end at the name. The token it mints is
+                // the only way back into a profile whose owner token was
+                // handed out once, at creation, to whichever device made it.
+                val s = r.getOrNull()
+                if (s != null) {
+                    account = s
+                    vm.call({ ApiClient.heldProfiles(s.accountId,
+                                                     s.accountToken) }) { h ->
+                        held = h.getOrNull() ?: emptyList()
+                    }
+                }
+            }
+        }
+
+        // What this account holds, and the press that opens one.
+        //
+        //     asked     where do I find my owner token
+        //     mattered  nowhere — so a reinstalled phone could sign in and
+        //               still reach none of its own profiles
+        //
+        // The list carries no credential; the press is what mints one.
+        val rows = held
+        if (rows != null) {
+            Text(L10n.t("onb.held.title", lang), color = Qrme.T2,
+                fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            Text(L10n.t("onb.held.pitch", lang), color = Qrme.T3,
+                fontSize = 11.sp)
+            if (rows.isEmpty()) {
+                Text(L10n.t("onb.held.none", lang), color = Qrme.T3,
+                    fontSize = 11.sp)
+            }
+            rows.forEach { row ->
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Column(Modifier.weight(1f)) {
+                        Text(row.shownAs, color = Qrme.Txt, fontSize = 13.sp)
+                        Text(row.kind, color = Qrme.T3, fontSize = 11.sp)
+                    }
+                    BrandButton(L10n.t("onb.held.open", lang)) {
+                        val a = account
+                        if (a != null) {
+                            vm.openHeldProfile(
+                                a.accountId, a.accountToken, row.profileId,
+                                row.shownAs, { onNote(it) }, { })
+                        }
+                    }
+                }
+            }
         }
         labeledField(L10n.t("acct.code", lang), code, "") { code = it }
         BrandButton(L10n.t("acct.verify", lang),

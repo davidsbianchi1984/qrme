@@ -3878,10 +3878,59 @@ object ApiClient {
 
     /** Unknown address and wrong password get the same answer; an
      *  unverified address cannot sign in at all. */
-    suspend fun signin(email: String, password: String): String {
+    /**
+     * The account *and* its token.
+     *
+     * This returned only a display name until the roster below existed, and
+     * threw the token away — which was fine while nothing could be done with
+     * it, and is exactly what left somebody able to sign in and reach none of
+     * their own profiles.
+     */
+    data class AccountSession(val accountId: String, val accountToken: String,
+                              val name: String)
+
+    suspend fun signin(email: String, password: String): AccountSession {
         val o = JSONObject(request("/signin", "POST",
             JSONObject().put("email", email).put("password", password)))
-        return o.optString("display_name", o.optString("email"))
+        return AccountSession(
+            o.optString("account_id"), o.optString("account_token"),
+            o.optString("display_name", o.optString("email")))
+    }
+
+    /** One row of the roster reached through the account token. */
+    data class HeldProfile(val profileId: String, val kind: String,
+                           val shownAs: String)
+
+    /**
+     * What this account holds. `siblings` above answers the same question and
+     * asks for an owner token first — the thing a reinstalled phone no longer
+     * has, because it is minted once in the create response.
+     *
+     * Carries no credential. Opening one is [mintOwnerToken].
+     */
+    suspend fun heldProfiles(accountId: String,
+                             token: String): List<HeldProfile> {
+        val arr = JSONObject(request("/accounts/$accountId/profiles",
+            token = token)).optJSONArray("profiles")
+        return (0 until (arr?.length() ?: 0)).map {
+            val o = arr!!.getJSONObject(it)
+            HeldProfile(o.optString("profile_id"), o.optString("kind"),
+                // An anonymous profile is anonymous on its owner's own
+                // screen too, so the server sends both and this picks.
+                o.optString("shown_as", o.optString("display_name")))
+        }
+    }
+
+    /**
+     * A fresh owner capability for a profile this account holds, shown once.
+     * Additive — the tokens already on other devices keep working.
+     */
+    suspend fun mintOwnerToken(accountId: String, profileId: String,
+                               token: String): Pair<String, String> {
+        val o = JSONObject(request(
+            "/accounts/$accountId/profiles/$profileId/owner-token",
+            "POST", JSONObject(), token))
+        return Pair(o.optString("profile_id"), o.optString("owner_token"))
     }
 
     suspend fun verifyEmail(email: String, code: String): String {

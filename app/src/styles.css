@@ -561,6 +561,13 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   background: var(--card2); color: var(--txt);
   border: 1px solid var(--line); border-radius: 10px; padding: 10px;
 }
+/* Coming back to an account that already holds profiles: one row each, the
+   name and what kind of profile it is on the left, the press on the right. */
+.held-profiles { text-align: left; margin-top: 4px; }
+.held-row { display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.held-row:last-of-type { border-bottom: none; }
+
 .public-links { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
 .public-links button.linkish { display: block; margin: 6px auto 0; }
 

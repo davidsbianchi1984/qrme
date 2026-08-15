@@ -29,6 +29,11 @@ struct KeysSection: View {
     @State private var oauthState = ""
     @State private var line: String?
     @State private var busy = false
+    /// Held for this session only, never written to `UserDefaults`. The
+    /// account token is broader than any owner token — it reaches every
+    /// profile and the billing — so it lives no longer than the screen.
+    @State private var account: (String?, String?) = (nil, nil)
+    @State private var held: [HeldProfilesOut.Held]?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -56,9 +61,50 @@ struct KeysSection: View {
                         let s = try await ApiClient.shared.signin(
                             email: email, password: password)
                         line = s.display_name ?? s.email ?? "—"
+                        // Signing in used to end here, with the account's
+                        // name printed and nothing opened. The token it
+                        // mints is the only way back into a profile whose
+                        // owner token was handed out once, at creation, to
+                        // whichever device did the creating.
+                        account = (s.account_id, s.account_token)
+                        held = try await ApiClient.shared.heldProfiles(
+                            accountId: s.account_id ?? "",
+                            token: s.account_token ?? "").profiles
                     }
                 }.font(.caption).disabled(busy || email.isEmpty
                                           || password.isEmpty)
+            }
+
+            // What this account holds, and the press that opens one.
+            //
+            //     asked     where do I find my owner token
+            //     mattered  nowhere — so a reinstalled phone could sign in
+            //               and still reach none of its own profiles
+            //
+            // The list carries no credential; the press is what mints one.
+            if let held, !held.isEmpty {
+                Divider().background(Theme.line)
+                Text(L10n.t("onb.held.title", state.language))
+                    .font(.caption.bold()).foregroundStyle(Theme.t2)
+                Text(L10n.t("onb.held.pitch", state.language))
+                    .font(.caption2).foregroundStyle(Theme.t3)
+                ForEach(held, id: \.profile_id) { row in
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(row.shown_as ?? row.display_name ?? "—")
+                                .font(.caption).foregroundStyle(Theme.txt)
+                            Text(row.kind ?? "")
+                                .font(.caption2).foregroundStyle(Theme.t3)
+                        }
+                        Spacer()
+                        Button(L10n.t("onb.held.open", state.language)) {
+                            open(row.profile_id)
+                        }.font(.caption2).disabled(busy)
+                    }
+                }
+            } else if held != nil {
+                Text(L10n.t("onb.held.none", state.language))
+                    .font(.caption2).foregroundStyle(Theme.t3)
             }
             HStack {
                 TextField(L10n.t("acct.code", state.language), text: $code)
@@ -132,6 +178,23 @@ struct KeysSection: View {
                 Text(line).font(.caption2).foregroundStyle(Theme.t2)
             }
         }.card()
+    }
+
+    /// Open one: mint its owner token and hand it to the app.
+    ///
+    /// This is where the phone becomes signed in *to a profile* rather than
+    /// to an account. `AppState` persists the pair, so the next launch
+    /// resumes without asking again — which was already true and simply had
+    /// no way of being reached a second time.
+    private func open(_ profileId: String) {
+        run {
+            let minted = try await ApiClient.shared.mintOwnerToken(
+                accountId: account.0 ?? "", profileId: profileId,
+                token: account.1 ?? "")
+            state.pid = minted.profile_id
+            state.token = minted.owner_token
+            line = minted.profile_id
+        }
     }
 
     private func run(_ op: @escaping () async throws -> Void) {

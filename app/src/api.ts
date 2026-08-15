@@ -111,6 +111,24 @@ export const accountApi = {
           account_token: string; interactor_id: string;
           interactor_token: string }>(
       "/signin", { method: "POST", body }),
+  // What this account already holds, and the way back into it.
+  //
+  // `siblings` above answers the same question and asks for an owner token
+  // first — which is exactly what somebody who reinstalled no longer has. A
+  // token is minted once, in the create response, and there was no second
+  // place to get one, so signing in proved who you were and opened nothing
+  // you owned. These two reach it through the account token instead.
+  //
+  // Split on purpose: the listing carries no credential, and the mint is a
+  // press. A roster that arrived with tokens attached would make every screen
+  // showing a person their profiles a screen handing out control of them.
+  heldProfiles: (accountId: string, token: string) =>
+    req<{ owner_id: string; profiles: Sibling[]; count: number }>(
+      `/accounts/${accountId}/profiles`, { token }),
+  mintOwnerToken: (accountId: string, profileId: string, token: string) =>
+    req<{ profile_id: string; owner_token: string; shown_once: boolean }>(
+      `/accounts/${accountId}/profiles/${profileId}/owner-token`,
+      { method: "POST", body: {}, token }),
   // Which model answers, as a picker rather than a config file.
   listModels: () =>
     req<{ providers: { name: string; label: string; configured: boolean;
