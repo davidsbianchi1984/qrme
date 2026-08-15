@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import html
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
@@ -159,6 +159,50 @@ def reset_password(body: ResetPassword) -> dict:
     try:
         return accounts.reset_password(body.email, body.code,
                                        body.new_password)
+    except accounts.AccountError as exc:
+        raise HTTPException(exc.status, exc.detail)
+
+
+# ---- what this account holds --------------------------------------------
+#
+# The two doors that close the loop between signing in and owning something.
+# Before these, an account token proved who you were and unlocked nothing you
+# owned: owner tokens were minted once at profile creation and handed to
+# whichever client did the creating, and `GET /profiles/{id}/siblings` — the
+# roster — asks for one before it will list them. A person who had lost theirs
+# could not find out what they owned, let alone open it.
+
+@router.get("/accounts/{account_id}/profiles")
+def account_profiles(account_id: str, request: Request) -> dict:
+    """Every profile this account holds. The account's own token, nothing else.
+
+    The same answer `GET /profiles/{id}/siblings` gives, reached through the
+    credential somebody has after signing in rather than one they may no
+    longer hold. That route refuses to be keyed on `owner_id` and is right to:
+    an id in a path is a string somebody chooses. What authorises this is the
+    account token behind an email and a password.
+
+    Carries no tokens. Minting is the route below, and the separation is the
+    point — see `accounts.owner_token_for`.
+    """
+    auth.require(request, "account", account_id)
+    return accounts.held_profiles(account_id)
+
+
+@router.post("/accounts/{account_id}/profiles/{profile_id}/owner-token",
+             status_code=201)
+def mint_owner_token(account_id: str, profile_id: str,
+                     request: Request) -> dict:
+    """A fresh owner capability for a profile this account holds, shown once.
+
+    Additive: every owner token already out there keeps working. Recovering
+    access on one device says nothing about the devices that already have it,
+    and silently signing them out would make this the button that unlinks
+    somebody's Guardian.
+    """
+    auth.require(request, "account", account_id)
+    try:
+        return accounts.owner_token_for(account_id, profile_id)
     except accounts.AccountError as exc:
         raise HTTPException(exc.status, exc.detail)
 

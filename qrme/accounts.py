@@ -399,3 +399,64 @@ def reset_password(email: str, code: str, new_password: str) -> dict:
     from . import auth
     auth.revoke_subject(account["id"])
     return {"email": email, "reset": True}
+
+
+def held_profiles(account_id: str) -> dict:
+    """Every profile this account holds — the roster, reached by signing in.
+
+    ``identity.roster`` already answers this question and is already the most
+    sensitive read in that module: one call that links a person's profiles to
+    each other is the whole of what anonymity between them protects. Its route
+    therefore refuses to be keyed on ``owner_id``, and says why — *`owner_id`
+    is a string somebody chooses, not a secret* — so it asks for a profile
+    whose owner token the caller already holds and derives the account from
+    that.
+
+    Which leaves the person who holds none. Owner tokens are minted once, at
+    profile creation, and handed to whichever client did the creating; there
+    was no way to ask for another. Somebody who reinstalled, or who created
+    the profile in the phone app and is now standing in front of the console,
+    could not enumerate their own profiles and could not open a single one.
+
+        asked     where do I find my owner token
+        mattered  the roster was reachable only by holding one already
+
+    This is the same read through the credential such a person *does* have.
+    The account token is minted by signing in with an email and a password —
+    a secret, unlike ``owner_id`` — so the objection to keying on the account
+    is answered by what proves the caller, not by what is in the path.
+    """
+    from . import identity
+    return identity.roster(account_id)
+
+
+def owner_token_for(account_id: str, profile_id: str) -> dict:
+    """Mint a fresh owner capability for a profile this account holds.
+
+    Deliberately not part of the listing above. A roster is a read and this is
+    a grant, and the moment they travel together every screen that shows a
+    person their own profiles is also handing out the capability to control
+    them — which is the shape ``qrme/dock.py`` already refuses in one line:
+    *nothing that authorises anything belongs on a surface*.
+
+    Additive, never a rotation. The tokens already out there — in the phone
+    that created the profile, in a Guardian that was linked last year — keep
+    working, because a person recovering access to a profile has not said
+    anything about the devices already holding it. Revoking everything is a
+    different intent with a different door (``auth.revoke_subject``), and
+    conflating the two would mean recovering access on a laptop silently
+    unlinked their Guardian.
+    """
+    from . import auth
+    row = db.connect().execute(
+        "SELECT owner_id FROM profiles WHERE id=?", (profile_id,)).fetchone()
+    if row is None:
+        raise AccountError(404, "no such profile")
+    if row["owner_id"] != account_id:
+        # Same answer as a missing profile, and for the usual reason: a
+        # distinguishable 403 turns this into an oracle for which profile ids
+        # exist on a deployment.
+        raise AccountError(404, "no such profile")
+    return {"profile_id": profile_id,
+            "owner_token": auth.issue("owner", profile_id),
+            "shown_once": True}
