@@ -208,3 +208,42 @@ def test_the_form_and_the_refusal_use_the_same_words():
         assert i18n.field_label(field, "en") == en, (
             f"the form says {en!r} and the refusal says "
             f"{i18n.field_label(field, 'en')!r} for {field}")
+
+
+def test_the_shared_vocabulary_matches_the_sibling_products():
+    """One wording across three products.
+
+    Carried by JIM-mini and PDI and not by this one — a row
+    `guard_divergences.txt` held against QRME, paid here. Its absence was not
+    harmless: this product is where most of the shared vocabulary was written,
+    so it was the one repo free to edit a label and have nobody notice until
+    a sibling's suite failed for a reason that looked like the sibling's fault.
+
+        asked     is every field here labelled
+        mattered  does a field shared with another product read the same in it
+
+    That is not hypothetical either. `inputs` was about to be given a second,
+    longer wording in JIM-mini this round; the sibling's copy of this guard
+    caught it and the two now read alike.
+    """
+    sibling = next(
+        (p for p in (REPO.parent / "jim-mini" / "jim" / "i18n.py",
+                     Path("/workspace/jim-mini/jim/i18n.py"),
+                     REPO.parent / "JIM-mini" / "jim" / "i18n.py")
+         if p.exists()), None)
+    if sibling is None:
+        pytest.skip("JIM-mini is not checked out beside this product")
+    text = sibling.read_text(encoding="utf-8")
+    drifted = []
+    for field, row in sorted(i18n._FIELD_LABELS.items()):
+        m = re.search(rf"^    {re.escape(repr(field))}: \{{(.*)\}},$", text, re.M)
+        if not m:
+            continue                      # this product's own field
+        theirs = dict(re.findall(r"'(\w+)': '((?:[^'\\]|\\.)*)'", m.group(1)))
+        for lang, ours in row.items():
+            if lang in theirs and theirs[lang] != ours:
+                drifted.append(
+                    f"{field}[{lang}]: {ours!r} here, {theirs[lang]!r} there")
+    assert not drifted, (
+        "the shared field vocabulary has drifted between products:\n    "
+        + "\n    ".join(drifted))

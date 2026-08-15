@@ -85,10 +85,11 @@ def test_the_page_says_something(handle):
     assert len(doc["headline"]) <= 120, (
         f"{handle}'s headline is longer than the field holds and would be "
         "silently truncated by set_homepage")
-    # Not "non-empty" — long enough to be the two texts, so a future edit
-    # that drops one of them is caught here rather than read as prose.
-    assert len(doc["about"]) > 400, (
-        f"{handle}'s about is too short to be expertise and services both")
+    # No length floor here. The first draft asserted `len(about) > 400`, which
+    # is a number nothing compares against what it measures — and the two
+    # containment checks below say the same thing exactly: the about is the
+    # two dossier texts, so it is as long as they are. A magic number beside
+    # a direct check is the weaker of the two pretending to add something.
     for text in (dossiers.DOSSIERS[handle]["expertise"],
                  dossiers.DOSSIERS[handle]["services"]):
         assert text in doc["about"], (
