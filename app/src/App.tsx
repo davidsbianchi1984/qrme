@@ -261,7 +261,7 @@ export function App() {
         {tab === "wall" && <Wall onPlans={toPlans} />}
         {tab === "feed" && <Feed onPlans={() => setTab("plans")}
           onParty={(id) => { setOpenParty(id); setTab("party"); }} />}
-        {tab === "friends" && <Friends onPlans={toPlans} />}
+        {tab === "friends" && <Friends onPlans={toPlans} onVisit={visitProfile} />}
         {tab === "rooms" && <Rooms onPlans={toPlans} onInside={(id) => { setInsideRoom(id); setTab("inside"); }} />}
         {tab === "blend" && <Blend onPlans={toPlans} />}
         {tab === "solitude" && <Solitude />}

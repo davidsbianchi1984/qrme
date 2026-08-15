@@ -358,6 +358,14 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .friend-row.founder { background: rgba(126,231,135,0.05); border-radius: 8px; padding-left: 8px; }
 .friend-rank { width: 22px; color: var(--t3); font-size: 12px; }
 .friend-row button { margin-left: auto; font-size: 12px; padding: 5px 12px; }
+/* The name is a button now — it opens their profile — and must not inherit
+   the rule above. `margin-left: auto` is what pushes Remove to the right-hand
+   end of the row; applied to the name it would swap the two and leave the row
+   reading "1  [Remove]  David Bianchi". It is the name, where the name was,
+   looking like a name and not like a link. */
+.friend-row button.friend-name { margin-left: 0; margin-top: 0; padding: 0;
+  font-size: 14px; font-weight: 700; color: var(--txt); text-decoration: none; }
+.friend-row button.friend-name:hover { text-decoration: underline; }
 .room-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13.5px; }
 .room-row:first-child { border-top: none; }
 .convo-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }

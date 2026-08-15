@@ -7,10 +7,23 @@ import { useSession } from "../store";
 // The friends list, founder first — the backend pins David Bianchi and his
 // synthetic profile at positions one and two on every list, by design; the
 // console finally shows it.
-export function Friends({ onPlans }: {
+export function Friends({ onPlans, onVisit }: {
   /** Where a plan refusal sends somebody. Threaded in from the shell
    *  rather than looked up here, so the tab id stays in one place. */
   onPlans: () => void;
+  /** Open somebody's profile — their page, their homepage, their own
+   *  friends. `Profile.tsx` calls itself "the place you land when you press
+   *  their face", and until now this screen was the one list of faces that
+   *  could not send anybody there: `Home` and `Profile` were both handed
+   *  `visitProfile` and this was mounted without it.
+   *
+   *      asked     the friends picture should open their profile homepage
+   *      mattered  the screen whose whole subject is friends could not
+   *
+   *  It matters more now than it did: every starter's homepage used to be
+   *  the same blank page, so the missing link cost nothing. They carry
+   *  their own pages this release. */
+  onVisit: (profileId: string) => void;
 }) {
   const { session } = useSession();
   const lang = visitorLang();
@@ -119,7 +132,13 @@ export function Friends({ onPlans }: {
           return (
             <div key={f.profile_id} className={"friend-row" + (isFounder ? " founder" : "")}>
               <span className="friend-rank">{i + 1}</span>
-              <b>{f.display_name}</b>
+              {/* The name is the door. A row that carries somebody's name,
+                  their handle and a Remove button, and no way to look at
+                  them, is a list about people you cannot visit. */}
+              <button className="linkish friend-name"
+                      onClick={() => onVisit(f.profile_id)}>
+                {f.display_name}
+              </button>
               {isFounder && (
                 <span className="tag founder-tag">{tr("frn.founder", lang)}</span>
               )}
