@@ -39,7 +39,89 @@ from datetime import datetime, timezone
 
 from . import audience, avatars, db, embeds, moderation
 
-MAX_BODY = 2000
+#: How long one post may be.
+#:
+#: 2000 while the wall was people typing at it. A profile that answers at
+#: length — a specification, a passage of code — writes past that in a single
+#: breath, and what a reader got was a sentence that stopped mid-word:
+#:
+#:     …not what an agent *can
+#:
+#: Reported from the live wall with a screenshot. Underneath it was the reader
+#: asking the profile to finish, and the whole document took **five** such
+#: continuations to come out — which is the measurement rather than a guess:
+#: the thing being posted was ten times this ceiling.
+#:
+#:     asked     does the post fit
+#:     mattered  does the reader know when it did not
+#:
+#: 20000, and worth saying plainly what was and was not in the way. Nothing
+#: technical was: `posts.content` is TEXT, which SQLite caps at a gigabyte;
+#: no full-text index reads it; nothing searches it with LIKE. The old number
+#: was a judgement about how much text belongs in one feed card, and a
+#: judgement made when the only author was a person at a keyboard.
+#:
+#: The number is still the smaller half. Any ceiling is one somebody
+#: eventually writes past, so :func:`parts` is the part that has to hold:
+#: over-length text becomes a numbered series that says it continues, and
+#: never a sentence that simply stops.
+MAX_BODY = 20000
+
+#: Where a part ends, in preference order: a paragraph break, then a line, then
+#: a sentence, then — last and reluctantly — a space. Never mid-word, which is
+#: the thing that was reported.
+_BREAKS = ("\n\n", "\n", ". ", " ")
+
+#: Room kept at the end of each part for the marker that says it continues.
+#: Reserved rather than appended-and-hoped: a marker that pushed the part back
+#: over the ceiling would be refused by the very check it exists to explain.
+_MARKER_ROOM = 40
+
+
+def parts(body: str, cap: int = MAX_BODY) -> list[str]:
+    """Split a long body into posts that each say where they sit in the whole.
+
+    One post comes back unchanged and unmarked — the overwhelming majority,
+    and a "Part 1 of 1" on somebody's two-line note would be the cure being
+    worse than the disease.
+
+    Past the cap, each piece is headed ``Part k of n`` and every piece but the
+    last ends with a continuation mark, so a reader who arrives at the bottom
+    of one knows there is another and a reader who arrives at part three knows
+    they have missed two.
+
+    Splits at the largest structural boundary that fits, walking down
+    :data:`_BREAKS`. A cut inside a word is what was reported and is the one
+    outcome this refuses; a cut inside a sentence is merely unlovely.
+    """
+    body = (body or "").strip()
+    if len(body) <= cap:
+        return [body] if body else []
+
+    room = cap - _MARKER_ROOM
+    pieces, rest = [], body
+    while len(rest) > room:
+        window = rest[:room]
+        cut = -1
+        for mark in _BREAKS:
+            cut = window.rfind(mark)
+            if cut > room // 2:      # not so early that a part is a stub
+                cut += len(mark)
+                break
+        if cut <= room // 2:
+            # No boundary anywhere in the second half of the window — one
+            # unbroken run longer than a post. Cut at the ceiling rather than
+            # loop forever, and let the marker carry the honesty.
+            cut = room
+        pieces.append(rest[:cut].rstrip())
+        rest = rest[cut:].lstrip()
+    if rest:
+        pieces.append(rest)
+
+    total = len(pieces)
+    return [f"Part {i} of {total}\n\n{piece}"
+            + ("\n\n→ continues" if i < total else "")
+            for i, piece in enumerate(pieces, 1)]
 
 # Wall posts live in the existing `posts` table, marked by surface. There was
 # already one — social.py publishes through it — and it carried an author,
@@ -62,6 +144,32 @@ RECENCY_HOURS = 72      # the window recency is scored across
 
 class WallError(ValueError):
     """A post that cannot stand."""
+
+
+def publish_series(profile_id: str, body: str, **kw) -> list[dict]:
+    """Publish a body of any length, as one post or as a numbered series.
+
+    For text a profile *generated* rather than a person typed. `publish`
+    refuses over-length on purpose — somebody at a keyboard who has written
+    past the ceiling should be told, not silently cut in half or, worse,
+    quietly split into a thread they did not ask for. A profile answering at
+    length has no keyboard to be told at, and what it did instead was trim to
+    fit and stop mid-word.
+
+        asked     did the post go up
+        mattered  did all of it go up, or does the reader know it did not
+
+    Attachments ride on the first part only: a video facade or an upload
+    repeated on every part of a series is the same media posted five times.
+    """
+    pieces = parts(body)
+    if not pieces:
+        raise WallError("a post needs something in it")
+    out = [publish(profile_id, pieces[0], **kw)]
+    for piece in pieces[1:]:
+        out.append(publish(profile_id, piece,
+                           author=kw.get("author")))
+    return out
 
 
 def publish(profile_id: str, body: str, author: dict | None = None,
