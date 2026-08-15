@@ -97,7 +97,7 @@ struct KeysSection: View {
                                 .font(.caption2).foregroundStyle(Theme.t3)
                         }
                         Spacer()
-                        Button(L10n.t("onb.held.open", state.language)) {
+                        Button(L10n.t("corner.open", state.language)) {
                             open(row.profile_id)
                         }.font(.caption2).disabled(busy)
                     }

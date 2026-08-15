@@ -5704,7 +5704,7 @@ private fun AcctBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
                         Text(row.shownAs, color = Qrme.Txt, fontSize = 13.sp)
                         Text(row.kind, color = Qrme.T3, fontSize = 11.sp)
                     }
-                    BrandButton(L10n.t("onb.held.open", lang)) {
+                    BrandButton(L10n.t("corner.open", lang)) {
                         val a = account
                         if (a != null) {
                             vm.openHeldProfile(

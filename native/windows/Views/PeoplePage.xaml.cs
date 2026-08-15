@@ -417,7 +417,7 @@ public sealed partial class PeoplePage : Page
         AcctSigninButton.Content = L10n.T("acct.signin");
         AcctHeldTitle.Text = L10n.T("onb.held.title");
         AcctHeldPitch.Text = L10n.T("onb.held.pitch");
-        AcctHeldOpenButton.Content = L10n.T("onb.held.open");
+        AcctHeldOpenButton.Content = L10n.T("corner.open");
         AcctCodeBox.Header = L10n.T("acct.code");
         AcctVerifyButton.Content = L10n.T("acct.verify");
         AcctResendButton.Content = L10n.T("acct.resend");

@@ -374,7 +374,7 @@ function HeldProfiles({ onNew }: { onNew: () => void }) {
           </div>
           <button disabled={busy !== null}
                   onClick={() => open(p.profile_id)}>
-            {tr("onb.held.open", visitorLang())}
+            {tr("corner.open", visitorLang())}
           </button>
         </div>
       ))}

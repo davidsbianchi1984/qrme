@@ -1689,18 +1689,6 @@ const CHROME: Table = {
     hi: "फिर से शुरू करने के बजाय इनमें से एक खोलिए। साइन इन करना काफ़ी है — बनाते समय मिली कुंजी की ज़रूरत नहीं।",
     ar: "افتح واحدًا بدل أن تبدأ من جديد. تسجيل الدخول يكفي — لا تحتاج المفتاح الذي أُعطي لك عند الإنشاء.",
   },
-  "onb.held.open": {
-    en: "Open",
-    es: "Abrir",
-    fr: "Ouvrir",
-    de: "Öffnen",
-    pt: "Abrir",
-    it: "Apri",
-    ja: "開く",
-    zh: "打开",
-    hi: "खोलें",
-    ar: "فتح",
-  },
   "onb.held.none": {
     en: "Nothing on this account yet. The form below makes the first one.",
     es: "Todavía no hay nada en esta cuenta. El formulario de abajo crea el primero.",
