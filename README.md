@@ -1145,7 +1145,7 @@ in a request body.
 | Token | Minted by | Grants |
 |---|---|---|
 | **account** | `POST /verify-email` and `POST /signin` return `account_token` | Proves "I am this account" to a console. The account is what *owns* — its id is the `owner_id` profiles are created under and the `account_id` memberships bill to — but it carries none of a profile's owner powers by itself |
-| **owner** | `POST /profiles` and `POST /profiles/genesis` return `owner_token` **once** | Full control of that profile: edit, sources, surfaces, specialists, grants/tasks, fine-tune, moderation queue, stats, export, erasure, departure, and the assistant/perception endpoints |
+| **owner** | `POST /profiles` and `POST /profiles/genesis` return `owner_token` **once**; `POST /accounts/{account_id}/profiles/{profile_id}/owner-token` mints a fresh one for a profile the account already holds | Full control of that profile: edit, sources, surfaces, specialists, grants/tasks, fine-tune, moderation queue, stats, export, erasure, departure, and the assistant/perception endpoints |
 | **interactor** | `POST /interactors` returns `token` | Reading one's own conversation memory (`GET /profiles/{id}/memory/{interactor}`) |
 
 **Accounts** (`qrme/accounts.py`): `POST /signup` (email + password) creates
@@ -1157,7 +1157,20 @@ unknown-address and wrong-password identically;
 `POST /verify-email/resend` retires the old code;
 `POST /password/reset/request` + `POST /password/reset` change a forgotten
 password by the same emailed-code proof and revoke every account session
-(per-profile owner tokens are separate capabilities and survive). Passwords
+(per-profile owner tokens are separate capabilities and survive).
+
+**What an account can reach.** `GET /accounts/{account_id}/profiles` is the
+roster of everything that account holds — the same answer
+`GET /profiles/{id}/siblings` gives, reached through the account token rather
+than an owner token the person may no longer have. An owner token is minted
+once, in the create response, and handed to whichever client did the creating;
+before this pair existed, somebody who reinstalled could sign in and reach
+none of their own profiles. The listing carries **no** tokens — a roster is a
+read — and `POST /accounts/{account_id}/profiles/{profile_id}/owner-token` is
+the separate grant, shown once and **additive**: every owner token already out
+there keeps working, because recovering access on a laptop says nothing about
+the phone that has been holding one for a year. A profile on another account
+answers exactly as one that does not exist. Passwords
 are PBKDF2-hashed with per-account salts; codes are hashed at rest,
 single-use, and expire in 15 minutes.
 

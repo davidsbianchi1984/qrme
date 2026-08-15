@@ -46,6 +46,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
+- **The tandem contract and the README caught up.** `docs/tandem.md` —
+  byte-identical in all three repositories — described JIM's self-link as
+  *the user pastes their own QRME owner token*, which is the mechanism these
+  two routes exist to replace; a contract describing a mechanism the product
+  no longer has is worse than one that says nothing. The README's capability
+  table said an owner token is minted once, in the create response, and that
+  is no longer the only place it comes from.
+
 - **Signing in opens something, on all four clients.** Every client had the
   same shape: a signed-in account whose only offer was to *make* a profile.
   The console now leads with the roster and puts the create form behind *Or
