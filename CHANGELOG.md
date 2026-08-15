@@ -6,6 +6,38 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.74.0] - 2026-08-15
+
+### Changed
+
+- **A post no longer stops inside a word.** Reported from the live wall with a
+  screenshot: a profile had been asked for a specification and answered at
+  length, the wall took the first two thousand characters, and the reader got
+  a sentence that ended mid-word — with the reader underneath, in the thread,
+  asking it to finish. The whole document took **five** of those continuations
+  to come out.
+
+      asked     does the post fit
+      mattered  does the reader know when it did not
+
+  Two things were wrong and only one of them was the number. The cap was set
+  when the only author was a person at a keyboard, and nothing technical held
+  it there — `posts.content` is TEXT, no full-text index reads it, nothing
+  searches it with LIKE. Five continuations is a measurement rather than a
+  guess: the thing being posted was ten times the ceiling. It is 20000 now.
+
+  The honesty is the half that lasts. A raised ceiling is one somebody writes
+  past later, so `parts()` turns anything over the cap into a numbered series
+  where every piece says where it sits and every piece but the last says it
+  continues — a reader who lands on part three knows they have missed two.
+  `publish` still refuses over-length and `publish_series` splits: somebody at
+  a keyboard who has written past the ceiling should be told, not silently cut
+  in half, and a profile answering at length has no keyboard to be told at.
+
+  A cut is allowed. A silent one is not — the same answer this estate gives to
+  the refusal that names its cause and the renderer that says it cannot draw a
+  model rather than drawing a poster.
+
 ### Fixed
 
 - **Every face imported from a phone was filed under "somewhere else".** The
@@ -11375,7 +11407,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.73.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.74.0...HEAD
+[0.74.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.74.0
 [0.73.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.73.0
 [0.72.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.72.0
 [0.71.1]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.71.1
