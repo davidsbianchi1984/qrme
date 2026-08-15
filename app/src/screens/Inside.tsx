@@ -215,14 +215,24 @@ export function Inside({ onPlans, start = "" }: {
                   </span>
                 )}
                 <span className="rs-name">{s.display}</span>
-                <span className="muted small">
-                  {/* The seat kind the backend actually sends is `user`, and
-                      this read `person` — so every human in the room was
-                      captioned as a profile, on the one screen where telling
-                      the two apart is the whole point. */}
-                  {s.kind === "user"
-                    ? tr("ins.seat.person", lang) : tr("ins.seat.profile", lang)}
-                </span>
+                {/* The mark, top left, on the synthetic seats and no others —
+                    the way the screen this is drawn from does it, and the way
+                    the rest of the platform does it.
+
+                    It replaces a caption underneath that read `person` against
+                    a field the backend spells `user`, so the ternary never
+                    matched and every human in the room was labelled a profile
+                    — on the one screen where telling the two apart is the
+                    entire point. The word is kept as the title so it is still
+                    readable, and so the person's own word is still spoken to
+                    a screen reader. */}
+                {s.kind === "user" ? (
+                  <span className="sr-only">{tr("ins.seat.person", lang)}</span>
+                ) : (
+                  <span className="rs-ai" title={tr("ins.seat.profile", lang)}>
+                    {tr("ins.seat.aimark", lang)}
+                  </span>
+                )}
                 {/* The mask disclosure, on the face it is about. It rides with
                     the scene rather than sitting in a settings screen nobody
                     opens — the sentence is addressed to the other people. */}

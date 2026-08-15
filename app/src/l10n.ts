@@ -7757,6 +7757,12 @@ const CHROME: Table = {
   "ins.face.camicon": {
     en: "ON AIR", es: "EN VIVO", fr: "EN DIRECT", de: "LIVE", pt: "NO AR", it: "IN ONDA", ja: "ライブ", zh: "直播中", hi: "लाइव", ar: "على الهواء",
   },
+  // The mark itself. "AI" reads as AI in every one of these languages on
+  // every other surface of this platform, so it is not translated into a
+  // local word that a viewer would then have to learn.
+  "ins.seat.aimark": {
+    en: "AI", es: "AI", fr: "AI", de: "AI", pt: "AI", it: "AI", ja: "AI", zh: "AI", hi: "AI", ar: "AI",
+  },
   "ins.seat.person": {
     en: "person", es: "persona", fr: "personne", de: "Person", pt: "pessoa", it: "persona", ja: "人", zh: "真人", hi: "व्यक्ति", ar: "شخص",
   },
