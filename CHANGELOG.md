@@ -6,7 +6,30 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.76.0] - 2026-08-15
+
 ### Added
+
+- **Thirty-four friends pictures, one blank page behind all of them.** A face
+  in a friends grid is a link: it opens that friend's homepage. The Starter
+  Collection is the one place on a fresh deployment where the grid is full,
+  because the dossiers install colleague friendships in both directions.
+  Every one of those faces opened the same page — no headline, no about, no
+  links, no top friends, one purple.
+
+      asked     the friends picture should open their profile homepage
+      mattered  it did, and there was nothing on the other side
+
+  `dossiers.homepage_doc` composes the page from the dossier each starter is
+  already grounded in: expertise and services as the about, the first three
+  skill chips as the headline, a palette by family of trade. Not written
+  beside it — a hand-written page next to a dossier is two statements about
+  one profile, and the way a page ends up claiming something its persona has
+  never heard of. Two absences are deliberate and guarded as absences: no
+  links, because a fictional physician has no website and an invented URL
+  either goes nowhere or somewhere real that is not hers; and seven palettes
+  by trade rather than thirty-four opinions. Installed and repaired by the
+  same blank-only seed call, reported as its own `homed` count.
 
 - **Signing in reaches what you own.** An owner token is minted once, in the
   create response, and handed to whichever client did the creating. There was
@@ -67,6 +90,32 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
   The per-shell door guard is what said this was unfinished: the union read
   zero while iOS, Android and Windows each could not reach either route.
+
+### Fixed
+
+- **The Studio's run button answered a 500, and the suite proved the walls.**
+  `widgets.run` loaded a widget through `read`, which renames the `version`
+  column to `revision` on the way out — and then asked the returned dict for
+  `["version"]`. `KeyError`, before the widget ever started, on every press
+  since the Studio shipped.
+
+      asked     does a widget run inside all four walls
+      mattered  does the button that runs one work at all
+
+  `test_the_widget_cannot_leave_its_box.py` is nineteen cases deep on the
+  sandbox and every one of them calls `run_source` with a source string. Not
+  one ran a *stored* widget. The half that was hard to get right was covered
+  exhaustively; the half that was one line was covered by nothing. Two cases
+  now drive the stored path through the API the way a person does.
+
+- **The guard that catches vocabulary drift was the one this product did not
+  have.** `test_the_shared_vocabulary_matches_the_sibling_products` was
+  carried by JIM-mini and PDI and recorded against QRME. Most of the shared
+  field vocabulary was written here, so this was the one repository free to
+  edit a label and have nobody notice until a sibling's suite failed for what
+  looked like the sibling's fault. Ported, and it fired on arrival: `what`
+  read 内容 here and 事项 in JIM-mini, with nine languages — Japanese
+  included — agreeing on 内容.
 
 ## [0.75.0] - 2026-08-15
 
@@ -11505,7 +11554,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.75.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.76.0...HEAD
+[0.76.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.76.0
 [0.75.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.75.0
 [0.74.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.74.0
 [0.73.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.73.0
