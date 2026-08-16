@@ -175,6 +175,26 @@ was missing from this page long enough that the four commands lived only in
 a chat message — which is the shape of every other drift this estate keeps
 finding in itself.
 
+**On the host.** Sections 0–6 are written for somebody already standing on
+the box, and say so in their own way. This section was added later, lifted
+out of that chat message, and arrived without the sentence that had been
+implicit around it — so it opens on `cd /srv/qrme` with nothing saying whose
+machine that is.
+
+    asked     does the page have the commands
+    mattered  does it say where to type them
+
+`/srv/qrme` does not exist on a laptop and `docker` is usually not installed
+there either, so the first attempt fails twice over with two errors that
+each look like a broken deploy rather than a wrong room. It has happened.
+Get in first:
+
+```bash
+ssh root@your-host
+```
+
+Then all of it:
+
 ```bash
 cd /srv/qrme     && git pull --ff-only
 cd /srv/jim-mini && git pull --ff-only
@@ -195,14 +215,26 @@ added to tables somebody already has are applied there too, so a table
 added in a release appears the first time the new code opens the file. The
 databases live in named volumes and the rebuild does not touch them.
 
-Then check what actually answers, from your own machine rather than the
-host — `/health` carries the version for exactly this:
+Then `exit`, and check what actually answers **from your own machine** rather
+than the host — that is the path a visitor takes, and `/health` carries the
+version for exactly this:
 
 ```bash
 curl -s https://sntheticprofiles.com/health; echo
 curl -s https://jim-mini.com/health; echo
 curl -s https://pdisystems.net/health; echo
 ```
+
+The `exit` is part of the step. This is the one place in the section where
+the machine changes, and the deploy above it ends with a prompt still on the
+host — so the natural thing is to keep typing, which runs the check from
+inside the network it is meant to be testing from outside.
+
+On Windows the name is `curl.exe`. PowerShell aliases bare `curl` to
+`Invoke-WebRequest`, which takes different flags and prints a table rather
+than the body — a person reading that sees noise where the version should
+be. The three lines above are for the Linux host and for a Mac; on
+PowerShell, add `.exe` to each.
 
 Three self-contained lines rather than a loop, and that is the whole
 reason they look like this. The loop this replaces was three lines of
