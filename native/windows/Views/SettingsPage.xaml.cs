@@ -775,6 +775,16 @@ public sealed partial class SettingsPage : Page
                 : string.Join("\n", r.Rows.Select(row =>
                     $"{row.Op}  {row.StatusCode}  ×{row.Count}  " +
                     $"{row.Source} {row.AppVersion} · {row.Platform} · {row.Day}"));
+            // The other aggregate the same key opens: not what broke, but
+            // where this address has been seen going. Hosts and counts,
+            // never a profile.
+            var been = await ApiClient.Shared.VisitsAcross(ProblemsKeyBox.Password);
+            VisitsAcrossRows.Text = been.Length == 0 ? "" :
+                L10n.T("prob.been") + "\n" + L10n.T("prob.been.pitch") + "\n"
+                + string.Join("\n", been.Select(v =>
+                    $"{v.Host}  ×{v.Times}  " + string.Join(", ", v.Reasons)));
+            VisitsAcrossRows.Visibility = been.Length == 0
+                ? Visibility.Collapsed : Visibility.Visible;
         }
         catch (Exception ex) { ProblemsServerRows.Text = ex.Message; }
         ProblemsServerRows.Visibility = Visibility.Visible;

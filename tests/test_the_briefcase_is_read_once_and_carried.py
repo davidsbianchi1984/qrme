@@ -299,7 +299,8 @@ def test_an_imported_link_is_not_also_fetched_inline_on_the_same_turn(
     """Pasting the link you just imported must not pay for the page twice."""
     url = "https://example.test/patents"
     monkeypatch.setattr(briefcase, "read_link",
-                        lambda u: ("A page about two patents.", True, "Patents"))
+                        lambda u, on_behalf_of=None:
+                            ("A page about two patents.", True, "Patents"))
     made = client.post(f"/profiles/{profile_id}/briefcase/link",
                        json={"interactor_id": interactor_id, "url": url})
     assert made.status_code == 201, made.text

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { api, CONSOLE_VERSION, getBase } from "./api";
+import { api, CONSOLE_VERSION, getBase, type Visited } from "./api";
 import {
   clearProblems, collectorUrl, markReported, problemReport, problems,
   sendProblems, sendingEnabled, setSending, type Problem, type SendOutcome,
@@ -44,6 +44,10 @@ export function Problems() {
   const [serverRows, setServerRows] = useState<Awaited<
     ReturnType<typeof api.problemRows>>["rows"] | null>(null);
   const [readError, setReadError] = useState("");
+  // Where this address has been seen going. Same key, same press: an
+  // operator holding two keys for two aggregates is an operator who will
+  // set one of them.
+  const [acrossRows, setAcrossRows] = useState<Visited[] | null>(null);
 
   // An external collector wins where a release stamps one in; the fallback
   // is this deployment's own backend, which serves the same intake.
@@ -184,8 +188,11 @@ export function Problems() {
           try {
             setServerRows((await api.problemRows(
               readerKey.trim() || undefined)).rows);
+            setAcrossRows(await api.visitsAcross(
+              readerKey.trim() || undefined));
           } catch (e) {
             setServerRows(null);
+            setAcrossRows(null);
             setReadError(e instanceof Error ? e.message : String(e));
           }
         }}>{tr("prob.fetch", lang)}</button>
@@ -193,6 +200,22 @@ export function Problems() {
       {readError && <p className="small">⚠ {readError}</p>}
       {serverRows && serverRows.length === 0 && (
         <p className="muted small">{tr("prob.none", lang)}</p>
+      )}
+      {/* The other aggregate the same key opens: not what broke, but where
+          this address has been seen going. Hosts and counts, never a
+          profile — see qrme/routers/visits.py. */}
+      {acrossRows && (
+        <>
+          <h4>{tr("prob.been", lang)}</h4>
+          <p className="muted small">{tr("prob.been.pitch", lang)}</p>
+          {acrossRows.map((v) => (
+            <div className="row" key={v.host}>
+              <code>{v.host}</code>
+              <span className="muted">×{v.times}</span>
+              <span className="muted">{v.reasons.join(", ")}</span>
+            </div>
+          ))}
+        </>
       )}
       {serverRows && serverRows.map((r, i) => (
         <div className="row" key={i}>

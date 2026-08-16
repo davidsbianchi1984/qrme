@@ -623,6 +623,18 @@ public record OpenAnswer(
     [property: JsonPropertyName("body")] string Body,
     [property: JsonPropertyName("points_to")] string PointsTo);
 
+/// <summary>One far host, and how often it has watched this profile leave.
+/// A count, never a list of visits. <c>StoodDown</c> is null on the
+/// deployment-wide view, where there is no profile to have decided.</summary>
+public record Visited(
+    [property: JsonPropertyName("host")] string Host,
+    [property: JsonPropertyName("times")] int Times,
+    [property: JsonPropertyName("first_seen")] string FirstSeen,
+    [property: JsonPropertyName("last_seen")] string LastSeen,
+    [property: JsonPropertyName("reasons")] string[] Reasons,
+    [property: JsonPropertyName("persistent")] bool Persistent,
+    [property: JsonPropertyName("stood_down")] bool? StoodDown);
+
 public record AnswerReceipt(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("held")] bool Held,
@@ -1661,6 +1673,30 @@ public sealed class ApiClient
                                                   string alias, string pointsTo) =>
         Send<AnswerReceipt>(Post($"/open-questions/{iid}/answers",
             new { body, alias, points_to = pointsTo }));
+
+    // -- where it keeps going back to --
+
+    public Task<Visited[]> Visits(string id, string token) =>
+        Send<Visited[]>(Get($"/profiles/{id}/visits", token));
+
+    public async Task StandDownFromHost(string id, string host, string token)
+    {
+        var req = Post($"/profiles/{id}/visits/stand-down", new { host }, token);
+        var res = await Dispatch(req);
+        res.EnsureSuccessStatusCode();
+    }
+
+    public async Task VisitHostAgain(string id, string host, string token)
+    {
+        var req = Post($"/profiles/{id}/visits/lift", new { host }, token);
+        var res = await Dispatch(req);
+        res.EnsureSuccessStatusCode();
+    }
+
+    /// <summary>Hosts and counts and no profile at any depth. Same key as the
+    /// failure aggregate, deliberately.</summary>
+    public Task<Visited[]> VisitsAcross(string key) =>
+        Send<Visited[]>(Get("/visits/across", key));
 
     // MARK: Live desks
 

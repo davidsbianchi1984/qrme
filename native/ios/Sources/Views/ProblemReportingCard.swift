@@ -33,6 +33,9 @@ struct ProblemReportingCard: View {
     @State private var readerKey = ""
     @State private var serverRows: [ApiClient.ProblemRow]? = nil
     @State private var serverText = ""
+    /// The other aggregate the same key opens: not what broke, but where this
+    /// address has been seen going. Hosts and counts, never a profile.
+    @State private var acrossText = ""
 
     private func fetchRows() {
         Task {
@@ -43,9 +46,15 @@ struct ProblemReportingCard: View {
                     "\($0.op)  \($0.status_code)  ×\($0.count)  " +
                     "\($0.source) \($0.app_version) · \($0.platform) · \($0.day)"
                 }.joined(separator: "\n")
+                acrossText = (try await ApiClient.shared
+                    .visitsAcross(key: readerKey))
+                    .map { "\($0.host)  ×\($0.times)  "
+                           + $0.reasons.joined(separator: ", ") }
+                    .joined(separator: "\n")
             } catch {
                 serverRows = []
                 serverText = ""
+                acrossText = ""
             }
         }
     }
@@ -122,6 +131,14 @@ struct ProblemReportingCard: View {
                 Text(serverRows.isEmpty
                      ? L10n.t("prob.none", state.language) : serverText)
                     .font(.caption2.monospaced()).foregroundStyle(Theme.t2)
+                if !acrossText.isEmpty {
+                    Text(L10n.t("prob.been", state.language))
+                        .font(.footnote.bold()).foregroundStyle(Theme.txt)
+                    Text(L10n.t("prob.been.pitch", state.language))
+                        .font(.caption2).foregroundStyle(Theme.t2)
+                    Text(acrossText)
+                        .font(.caption2.monospaced()).foregroundStyle(Theme.t2)
+                }
             }
 
         }

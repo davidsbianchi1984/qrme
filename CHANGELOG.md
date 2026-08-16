@@ -8,6 +8,59 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The far end that sees you twice.** Offline mode answered *did anything
+  leave this host*. Nothing answered *who has watched us leave, and how
+  often*. `offline.allow` is the one function in the package that sees every
+  outbound host before it is reached — a structural guard has held every
+  socket site to consulting it since the offline round — and it saw the host,
+  decided, and forgot.
+
+      asked     did anything leave the host
+      mattered  who has watched us leave, and how often
+
+  That is the case a scrubber does not cover. Strip every field from a single
+  request and it tells the far end nothing. Send the stripped request every
+  Tuesday for a year from the same address and the far end has a subject: not
+  a name, but a rhythm, a set of interests and a count, whose fifteenth visit
+  is read against the previous fourteen rather than on its own.
+
+  So the chokepoint now witnesses as well as decides. The **host** is
+  recorded and the path after it never is — in a profile fetch that tail is
+  the subject's own handle, and a ledger keeping it would be a second copy of
+  the private thing in a table nobody thinks of as private. Local is not far:
+  loopback, the LAN and the on-prem vault are on this side of the wire and
+  are not watching anybody. A visit belongs to the profile whose errand it
+  was, and the paths that legitimately have no profile — the vault, the mail
+  relay, the gateway — are written down in `visits.UNATTRIBUTED` with a
+  reason, so a new socket either says whose errand it is or says why there
+  is not one.
+
+  The owner reads their own far hosts with a count each, never a list of
+  individual visits, because a list of times is the movement log this feature
+  exists to warn about. `persistent` is the sentence worth reading: not *you
+  visited this*, but *this one has seen you enough times to know you*.
+
+  The lever is real rather than a picture. Standing a host down refuses
+  **where the socket opens**, not at the route above it, so it binds the chat
+  links, the briefcase and any caller added later — not merely the screen
+  that listed it. Lifting it starts again and keeps the record: unstanding a
+  decision is not unremembering the visits that led to it.
+
+  The deployment-wide totals — which is what correlation exposure actually
+  looks like, one address serving several households — sit behind the same
+  operator key the failure map uses and carry **no profile at any depth**. A
+  tool built to measure correlation must not become the way one owner learns
+  what another owner's agent reads.
+
+  Detail past a ninety-day horizon stops existing, enforced on write rather
+  than on read: a horizon that only holds when somebody looks would leave the
+  detail sitting there on exactly the deployment where it matters. The counts
+  survive; the beat of them does not.
+
+  On the console, on iOS, on Android and on Windows — the owner's list and
+  lever on each, and the deployment-wide view beside the failure aggregate
+  each shell already reads.
+
 - **The agent can ask people, not just pages.** A knowledge excursion sends a
   sanitized brief to a model and brings general knowledge back. That covers
   what is already written down. It does not cover what a person two streets

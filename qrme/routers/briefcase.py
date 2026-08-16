@@ -73,7 +73,7 @@ def import_link(profile_id: str, body: LinkImport,
     url = body.url.strip()
     if not url.lower().startswith(("http://", "https://")):
         raise HTTPException(422, "a link starts with http:// or https://")
-    text, was_read, page_title = briefcase.read_link(url)
+    text, was_read, page_title = briefcase.read_link(url, profile_id)
     title = (body.title or "").strip() or page_title or url
     try:
         return briefcase.add(

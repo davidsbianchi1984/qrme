@@ -726,6 +726,12 @@ class ExcursionStart(BaseModel):
     private: list[str] = Field(default_factory=list)  # extra caller-marked private terms
 
 
+class StandDown(BaseModel):
+    # A whole URL is accepted and reduced to its host, because the thing a
+    # person has in their hand is the address they were shown.
+    host: str
+
+
 class InquiryOpen(BaseModel):
     topic: str
     question: str

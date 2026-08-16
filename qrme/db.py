@@ -626,6 +626,32 @@ CREATE TABLE IF NOT EXISTS inquiry_answers (
     created_at   TEXT NOT NULL
 );
 
+-- Outbound visits. One row each time this deployment was about to open a
+-- connection to a host that is NOT on this side of the wire. The HOST only,
+-- never the path — in the scrape case the path is the subject's handle, and a
+-- ledger holding it would be a second copy of the private thing. ``profile_id``
+-- is NULL for the deployment's own plumbing (the vault, the mail relay, the
+-- gateway); see qrme/visits.UNATTRIBUTED for which and why.
+CREATE TABLE IF NOT EXISTS outbound_visits (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT REFERENCES profiles(id),
+    host       TEXT NOT NULL,
+    what       TEXT NOT NULL,       -- the caller's short name for the errand
+    at         TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_visits_host ON outbound_visits (host);
+CREATE INDEX IF NOT EXISTS idx_visits_profile ON outbound_visits (profile_id);
+
+-- A host a profile has said it no longer visits. Enforced where the socket
+-- opens rather than at the route above it, so a caller added tomorrow
+-- inherits the refusal instead of remembering it.
+CREATE TABLE IF NOT EXISTS visit_standdowns (
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    host       TEXT NOT NULL,
+    at         TEXT NOT NULL,
+    PRIMARY KEY (profile_id, host)
+);
+
 -- Connected-app connectors. Each links a profile to an AI-integrated app from
 -- the catalog (Apple Photos, Google Calendar, Microsoft 365, Canva, …). Its
 -- agents then use it: collect context in, act on the app, or produce media.

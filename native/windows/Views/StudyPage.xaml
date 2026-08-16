@@ -115,6 +115,33 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
+            <!-- where it keeps going back to -->
+            <TextBlock x:Name="BeenTitle" FontSize="18" FontWeight="Bold"
+                       Foreground="{StaticResource QrmeTxtBrush}" />
+            <TextBlock x:Name="BeenSub" Foreground="{StaticResource QrmeT2Brush}"
+                       FontSize="13" TextWrapping="Wrap" />
+            <ItemsControl x:Name="BeenList">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                                BorderThickness="1" CornerRadius="14" Padding="14" Margin="0,0,0,8">
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="{Binding Host}" FontWeight="Bold"
+                                           Foreground="{StaticResource QrmeTxtBrush}" />
+                                <TextBlock Text="{Binding Times}" FontSize="12"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                                <TextBlock Text="{Binding Note}" FontSize="12" TextWrapping="Wrap"
+                                           Visibility="{Binding NoteVisibility}"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                                <Button Content="{Binding ActionLabel}" Tag="{Binding Host}"
+                                        Click="OnToggleHost"
+                                        Background="Transparent" Foreground="{StaticResource QrmeBrandABrush}" />
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
             <!-- and the other side: answering somebody else's question -->
             <TextBlock x:Name="BoardTitle" FontSize="18" FontWeight="Bold"
                        Foreground="{StaticResource QrmeTxtBrush}" />

@@ -47,7 +47,7 @@ _PAGE = """
 def test_the_handed_page_reaches_the_prompt(client, profile_id,
                                             interactor_id, monkeypatch):
     provider = _wire(monkeypatch)
-    monkeypatch.setattr(scrape, "fetch", lambda url: _PAGE)
+    monkeypatch.setattr(scrape, "fetch", lambda url, on_behalf_of=None: _PAGE)
     r = client.post(f"/profiles/{profile_id}/chat", json={
         "interactor_id": interactor_id,
         "message": "What do you think of https://example.org/garden ?",
@@ -62,7 +62,7 @@ def test_offline_opens_no_socket_and_says_so(client, profile_id,
                                              interactor_id, monkeypatch):
     provider = _wire(monkeypatch)
 
-    def explode(url):
+    def explode(url, on_behalf_of=None):
         raise AssertionError("offline deployment opened a socket")
     monkeypatch.setattr(scrape, "fetch", explode)
     monkeypatch.setattr(offline, "enabled", lambda: True)
@@ -82,7 +82,7 @@ def test_a_failed_fetch_is_admitted_not_papered_over(client, profile_id,
                                                      monkeypatch):
     provider = _wire(monkeypatch)
 
-    def down(url):
+    def down(url, on_behalf_of=None):
         raise OSError("connection refused")
     monkeypatch.setattr(scrape, "fetch", down)
 
@@ -99,7 +99,7 @@ def test_a_message_without_a_link_fetches_nothing(client, profile_id,
                                                   interactor_id, monkeypatch):
     _wire(monkeypatch)
 
-    def explode(url):
+    def explode(url, on_behalf_of=None):
         raise AssertionError("fetched with no link in the message")
     monkeypatch.setattr(scrape, "fetch", explode)
 

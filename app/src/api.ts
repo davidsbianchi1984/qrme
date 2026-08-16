@@ -2642,6 +2642,22 @@ export type OpenQuestion = {
               answered_at: string }[];
 };
 
+/** One far host, and how often it has watched this profile leave.
+ *
+ *  A host with a count, never a list of individual visits: a list of times is
+ *  the movement log the feature exists to warn about. `persistent` is the
+ *  sentence worth reading — not *you visited this*, but *this one has seen
+ *  you enough times to know you*. */
+export type Visited = {
+  host: string;
+  times: number;
+  first_seen: string;
+  last_seen: string;
+  reasons: string[];
+  persistent: boolean;
+  stood_down?: boolean;      // absent on the deployment-wide view: see below
+};
+
 export type PersonGrants = {
   lending?: unknown[];
   borrowing?: unknown[];
@@ -3270,6 +3286,26 @@ export const api = {
   pair: () => req<PairInfo>("/pair"),
 
   offlineStatus: () => req<Record<string, unknown>>("/offline/status"),
+
+  // Where a profile's agent keeps going back to, and the lever for stopping.
+  // The stand-down is enforced where the socket opens, not at the route, so
+  // pressing it here binds every path that fetches — chat links, the
+  // briefcase, the collect connections.
+  visits: (profileId: string, token: string) =>
+    req<Visited[]>(`/profiles/${profileId}/visits`, { token }),
+  standDownFromHost: (profileId: string, host: string, token: string) =>
+    req<{ host: string; stood_down: boolean }>(
+      `/profiles/${profileId}/visits/stand-down`,
+      { method: "POST", body: { host }, token }),
+  visitHostAgain: (profileId: string, host: string, token: string) =>
+    req<{ host: string; stood_down: boolean }>(
+      `/profiles/${profileId}/visits/lift`,
+      { method: "POST", body: { host }, token }),
+  // The deployment-wide view, the operator's. Hosts and counts and no
+  // profile at any depth — a tool for measuring correlation must not be a
+  // way to correlate people.
+  visitsAcross: (key?: string) =>
+    req<Visited[]>("/visits/across", key ? { token: key } : {}),
   // The failure aggregate this backend keeps (qrme/routers/problems.py).
   // Reading is the operator's: QRME_PROBLEMS_KEY as the token, or nothing
   // when asking from the machine the backend runs on.

@@ -365,6 +365,10 @@
                     <TextBlock x:Name="ProblemsServerRows" FontSize="11" TextWrapping="Wrap"
                                FontFamily="Consolas" Visibility="Collapsed"
                                Foreground="{StaticResource QrmeT2Brush}" />
+                    <!-- where this address has been seen going -->
+                    <TextBlock x:Name="VisitsAcrossRows" FontSize="11" TextWrapping="Wrap"
+                               FontFamily="Consolas" Visibility="Collapsed"
+                               Foreground="{StaticResource QrmeT2Brush}" />
                 </StackPanel>
             </Border>
         </StackPanel>

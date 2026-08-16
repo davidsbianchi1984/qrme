@@ -56,14 +56,17 @@ _MAX_TEXT = 4000
 _TIMEOUT = 10.0
 
 
-def fetch(url: str) -> str:
+def fetch(url: str, on_behalf_of: str | None = None) -> str:
     """The page as a browser would receive it, capped and decoded leniently.
 
     The gate lives here, in the function that opens the socket, not only in
     the route above it — a second caller added tomorrow inherits the check
-    instead of remembering it.
+    instead of remembering it. The same argument now carries a second
+    passenger: ``on_behalf_of`` is the profile this errand belongs to, and it
+    is what lets the visit be recorded against somebody and what makes a
+    stand-down on this host bind here rather than at the route.
     """
-    offline.allow(url, "the profile-page fetch")
+    offline.allow(url, "the profile-page fetch", on_behalf_of)
     req = urllib.request.Request(
         url, headers={"User-Agent": "QRME-profile-import/1.0"})
     with urllib.request.urlopen(req, timeout=_TIMEOUT) as resp:

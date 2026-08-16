@@ -1600,6 +1600,8 @@ fun StudyScreen(vm: StudioViewModel) {
     var answerAs by remember { mutableStateOf("") }
     var pointsTo by remember { mutableStateOf("") }
     var receipt by remember { mutableStateOf<String?>(null) }
+    // The far hosts this agent keeps returning to, and the lever.
+    var been by remember { mutableStateOf<List<Visited>>(emptyList()) }
 
     fun reloadBoard() {
         vm.call({ ApiClient.openQuestions() }) { r -> board = r.getOrDefault(emptyList()) }
@@ -1608,6 +1610,7 @@ fun StudyScreen(vm: StudioViewModel) {
         vm.call({ ApiClient.excursions(vm.pid!!, vm.token!!) }) { r -> excursions = r.getOrDefault(emptyList()) }
         vm.call({ ApiClient.inquiries(vm.pid!!, vm.token!!) }) { r -> asks = r.getOrDefault(emptyList()) }
         reloadBoard()
+        vm.call({ ApiClient.visits(vm.pid!!, vm.token!!) }) { r -> been = r.getOrDefault(emptyList()) }
     }
     LaunchedEffect(Unit) { reload() }
 
@@ -1702,6 +1705,33 @@ fun StudyScreen(vm: StudioViewModel) {
                         }) { Text(L10n.t("nstu.fold", vm.language), color = Qrme.BrandA, fontSize = 13.sp) }
                     }
                 }
+            }
+        }
+
+        // ---- where it keeps going back to ----
+        Text(L10n.t("rem.been", vm.language), color = Qrme.Txt, fontSize = 18.sp,
+            fontWeight = FontWeight.Bold)
+        Text(L10n.t("rem.been.pitch", vm.language), color = Qrme.T2, fontSize = 13.sp)
+        if (been.isEmpty())
+            Text(L10n.t("rem.been.none", vm.language), color = Qrme.T2, fontSize = 13.sp)
+        been.forEach { v ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(v.host, color = Qrme.Txt, fontSize = 14.sp,
+                     fontWeight = FontWeight.Bold)
+                Text(L10n.fill("rem.been.times", vm.language, mapOf("n" to "${v.times}")),
+                     color = Qrme.T2, fontSize = 12.sp)
+                if (v.persistent && v.stoodDown != true)
+                    Text(L10n.t("rem.been.persistent", vm.language),
+                         color = Qrme.Amber, fontSize = 12.sp)
+                if (v.stoodDown == true) {
+                    Text(L10n.t("rem.been.stopped", vm.language),
+                         color = Qrme.T2, fontSize = 12.sp)
+                    TextButton(onClick = {
+                        vm.call({ ApiClient.visitHostAgain(vm.pid!!, v.host, vm.token!!) }) { reload() }
+                    }) { Text(L10n.t("rem.been.resume", vm.language), color = Qrme.BrandA, fontSize = 13.sp) }
+                } else TextButton(onClick = {
+                    vm.call({ ApiClient.standDownFromHost(vm.pid!!, v.host, vm.token!!) }) { reload() }
+                }) { Text(L10n.t("rem.been.stop", vm.language), color = Qrme.BrandA, fontSize = 13.sp) }
             }
         }
 
@@ -7370,6 +7400,7 @@ fun ProblemReportingCard(lang: String) {
     var readerKey by remember { mutableStateOf("") }
     var serverRows by remember {
         mutableStateOf<List<ApiClient.ProblemRow>?>(null) }
+    var acrossRows by remember { mutableStateOf<List<Visited>?>(null) }
     val owed = remember(showing, answered, sending) {
         val arr = Problems.report().optJSONArray("problems")
         (0 until (arr?.length() ?: 0)).mapNotNull { arr?.optJSONObject(it) }
@@ -7448,6 +7479,10 @@ fun ProblemReportingCard(lang: String) {
                     scope.launch(Dispatchers.IO) {
                         serverRows = try { ApiClient.problemRows(readerKey) }
                                      catch (e: Exception) { emptyList() }
+                        // The other aggregate the same key opens: not what
+                        // broke, but where this address has been seen going.
+                        acrossRows = try { ApiClient.visitsAcross(readerKey) }
+                                     catch (e: Exception) { emptyList() }
                     }
                 }) { Text(L10n.t("prob.fetch", lang)) }
             }
@@ -7458,6 +7493,16 @@ fun ProblemReportingCard(lang: String) {
                 } else rows.forEach { r ->
                     Text("${r.op}  ${r.statusCode}  ×${r.count}  " +
                          "${r.source} ${r.appVersion} · ${r.platform} · ${r.day}",
+                         style = MaterialTheme.typography.bodySmall)
+                }
+            }
+            acrossRows?.takeIf { it.isNotEmpty() }?.let { hosts ->
+                Text(L10n.t("prob.been", lang),
+                     style = MaterialTheme.typography.titleSmall)
+                Text(L10n.t("prob.been.pitch", lang),
+                     style = MaterialTheme.typography.bodySmall)
+                hosts.forEach { v ->
+                    Text("${v.host}  ×${v.times}  " + v.reasons.joinToString(", "),
                          style = MaterialTheme.typography.bodySmall)
                 }
             }

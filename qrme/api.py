@@ -49,6 +49,7 @@ from .routers import (accounts as account_routes,
                       socialdm,
                       social, steering,
                       summon, tiers as tier_routes, tutorial,
+                      visits as visit_routes,
                       viewfinder as viewfinder_routes, wall,
                       watch, watchparty, watermarks)
 
@@ -178,6 +179,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(apps.router)
     app.include_router(research.router)
     app.include_router(inquiry_routes.router)
+    app.include_router(visit_routes.router)
     app.include_router(summon.router)
     app.include_router(community.router)
     app.include_router(assistant.router)

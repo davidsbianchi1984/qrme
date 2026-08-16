@@ -191,13 +191,18 @@ def read_file(data: bytes, name: str | None) -> tuple[str, str, bool]:
     return "document", text, bool(text)
 
 
-def read_link(url: str) -> tuple[str, bool, str | None]:
+def read_link(url: str, on_behalf_of: str | None = None) -> tuple[str, bool, str | None]:
     """``(text, read, title)`` for a page, through the same offline gate and
     the same fetcher the collect connections use."""
     if offline.enabled():
         return "", False, None
     try:
-        page = scrape.extract(scrape.fetch(url))
+        page = scrape.extract(scrape.fetch(url, on_behalf_of))
+    except offline.StoodDown:
+        # Not a failure to reach the page — a decision not to. Reported the
+        # same way here because this caller has no channel for the
+        # difference; the route that owns the decision says so in words.
+        return "", False, None
     except Exception:
         return "", False, None
     parts = [p for p in (page.get("description"), page.get("text")) if p]

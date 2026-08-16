@@ -258,7 +258,15 @@ def scrape_page(cid: str, request: Request) -> dict:
                  "with the account's handle, or paste content into collect")
     url = _PLATFORM_URL[row["platform"]].format(h=row["handle"])
     try:
-        page = scrape.extract(scrape.fetch(url))
+        page = scrape.extract(scrape.fetch(url, row["profile_id"]))
+    except offline.StoodDown:
+        # A stand-down is a decision, not a failure, and reporting it as a
+        # 502 would tell the owner their own choice was somebody else's
+        # outage.
+        raise HTTPException(
+            409, "this profile does not visit that host any more — lift the "
+                 "stand-down on it if this connection should start fetching "
+                 "again")
     except Exception as e:                                     # noqa: BLE001
         raise HTTPException(
             502, f"could not fetch {url} — {e.__class__.__name__}: {e}")

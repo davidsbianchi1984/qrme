@@ -41,7 +41,7 @@ def test_scrape_builds_the_profile_from_the_public_page(client, profile_id,
                     direction="collect", handle="dana.grows")
     seen = {}
 
-    def fake_fetch(url):
+    def fake_fetch(url, on_behalf_of=None):
         seen["url"] = url
         return _PAGE
     monkeypatch.setattr(scrape, "fetch", fake_fetch)
@@ -73,7 +73,7 @@ def test_offline_refuses_before_any_socket(client, profile_id, monkeypatch):
     conn = _connect(client, profile_id, platform="x",
                     direction="collect", handle="dana")
 
-    def explode(url):
+    def explode(url, on_behalf_of=None):
         raise AssertionError("offline deployment opened a socket")
     monkeypatch.setattr(scrape, "fetch", explode)
     monkeypatch.setattr(offline, "enabled", lambda: True)
@@ -118,7 +118,8 @@ def test_a_login_wall_is_a_refusal_not_a_source(client, profile_id,
     """
     conn = _connect(client, profile_id, platform="facebook",
                     direction="collect", handle="dana.grows")
-    monkeypatch.setattr(scrape, "fetch", lambda url: _WALL_PAGE)
+    monkeypatch.setattr(scrape, "fetch",
+                        lambda url, on_behalf_of=None: _WALL_PAGE)
     r = client.post(f"/social/{conn['id']}/scrape")
     assert r.status_code == 422
     assert "login wall" in r.json()["detail"]
@@ -139,7 +140,8 @@ def test_a_page_with_nothing_readable_is_a_failure_not_a_source(client,
     conn = _connect(client, profile_id, platform="instagram",
                     direction="collect", handle="dana.grows")
     monkeypatch.setattr(scrape, "fetch",
-                        lambda url: "<html><body><script>x</script></body></html>")
+                        lambda url, on_behalf_of=None:
+                            "<html><body><script>x</script></body></html>")
     r = client.post(f"/social/{conn['id']}/scrape")
     assert r.status_code == 502
     sources = client.get(f"/profiles/{profile_id}/sources").json()

@@ -38,6 +38,18 @@ class LeftTheHost(RuntimeError):
     """
 
 
+class StoodDown(RuntimeError):
+    """Refused: this profile has said it no longer visits that host.
+
+    A separate exception from :class:`LeftTheHost` because it is a separate
+    sentence to a separate person. Offline mode is the deployment's posture
+    and the refusal explains a setting; a stand-down is one owner's decision
+    about one far end, and the refusal has to name the host they chose and the
+    way back. Folding the two together would have produced a message about
+    ``QRME_OFFLINE`` for somebody who never set it.
+    """
+
+
 def is_local(host: str | None) -> bool:
     """Is this host the machine we are running on, or its own network?
 
@@ -65,7 +77,7 @@ def is_local(host: str | None) -> bool:
         a.is_loopback or a.is_private or a.is_link_local for a in addresses)
 
 
-def allow(url: str | None, what: str) -> None:
+def allow(url: str | None, what: str, on_behalf_of: str | None = None) -> None:
     """Refuse a URL that would leave this host while offline mode is on.
 
     ## Why this is a host check and not a blanket refusal
@@ -88,7 +100,22 @@ def allow(url: str | None, what: str) -> None:
 
     Callers pass the URL they are about to open and a short name for what it
     is; the name is what a person reads in the refusal.
+
+    ## And the second question, added later
+
+    This function was the only place in the package that sees every host
+    before it is reached — the AST guard in ``test_nothing_leaves_the_host.py``
+    is what keeps that true — and it used to answer one question and forget
+    the host. It now also *witnesses*: the visit is recorded, and a host this
+    profile has stood down from is refused. See ``qrme/visits.py`` for why the
+    fourteenth sanitized request is a different thing from the first.
+
+    ``on_behalf_of`` is the profile the errand belongs to, where there is one.
+    The deployment's own plumbing has none and passes nothing; which paths
+    those are is written down in ``visits.UNATTRIBUTED`` rather than left to
+    be inferred from a missing argument.
     """
+    _witness(urllib.parse.urlsplit(url or "").hostname, what, on_behalf_of)
     if not enabled():
         return
     host = urllib.parse.urlsplit(url or "").hostname
@@ -101,8 +128,10 @@ def allow(url: str | None, what: str) -> None:
         "network, or turn offline mode off.")
 
 
-def allow_host(host: str | None, what: str) -> None:
+def allow_host(host: str | None, what: str,
+               on_behalf_of: str | None = None) -> None:
     """`allow` for the things that are not URLs. SMTP is a host and a port."""
+    _witness(host, what, on_behalf_of)
     if not enabled():
         return
     if is_local(host):
@@ -111,6 +140,27 @@ def allow_host(host: str | None, what: str) -> None:
     raise LeftTheHost(
         f"offline mode is on, so {what} cannot reach {where}. Nothing leaves "
         "this machine while QRME_OFFLINE is set.")
+
+
+def _witness(host: str | None, what: str, on_behalf_of: str | None) -> None:
+    """Record the visit, and refuse a host this profile has stood down from.
+
+    Imported here rather than at module scope: ``offline`` is pulled in very
+    early and by nearly everything, and a top-level import of a module that
+    opens the database would tie the two together for no reason.
+
+    Local hosts are not recorded at all. The ledger is about *the far end*,
+    and the loopback daemon is not watching anybody — the same line
+    :func:`is_local` already draws for the refusal.
+    """
+    if not host or is_local(host):
+        return
+    from . import visits
+    if visits.stood_down(on_behalf_of, host):
+        raise StoodDown(
+            f"this profile does not visit {host.lower()} any more. Lift the "
+            "stand-down on that host if it should start again.")
+    visits.record(host, what, on_behalf_of)
 
 
 def status(app=None) -> dict:

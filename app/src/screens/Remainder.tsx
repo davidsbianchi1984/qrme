@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, uploadMedia, type AppConnector, type ConnectorCatalogue,
          type Excursion, type FeedbackBoard, type GameSession, type Inquiry,
-         type PackDetail,
+         type PackDetail, type Visited,
          type PackRegistry, type SocialPublished, type SteeringHub } from "../api";
 import { Refusal } from "../Refusal";
 import { fill, t as tr, visitorLang } from "../l10n";
@@ -71,6 +71,10 @@ export function Remainder() {
   // back on the single-question route.
   const [asks, setAsks] = useState<Inquiry[]>([]);
   const [opened, setOpened] = useState<Inquiry | null>(null);
+  // The far hosts this agent keeps returning to. One row per host with a
+  // count — never a list of individual visits, which would be the movement
+  // log this card exists to warn about.
+  const [been, setBeen] = useState<Visited[]>([]);
   const [hub, setHub] = useState<SteeringHub | null>(null);
   const [games, setGames] = useState<GameSession[]>([]);
 
@@ -110,6 +114,7 @@ export function Remainder() {
     go(() => api.profileApps(me, token), setApps);
     go(() => api.excursions(me, token), setTrips);
     go(() => api.inquiries(me, token), setAsks);
+    go(() => api.visits(me, token), setBeen);
     go(() => api.steeringHub(me, token), setHub);
     go(() => api.gameSessions(me, token), setGames);
   };
@@ -451,6 +456,40 @@ export function Remainder() {
                     </div>
                   ))
             )}
+          </div>
+        ))}
+      </div>
+
+      {/* --- where it keeps going back to ---------------------------------- */}
+      <div className="card">
+        <h3>{tr("rem.been", lang)}</h3>
+        <p className="muted small">{tr("rem.been.pitch", lang)}</p>
+        {been.length === 0 && (
+          <p className="muted small">{tr("rem.been.none", lang)}</p>
+        )}
+        {been.map((v) => (
+          <div key={v.host}>
+            <p className="small">
+              <code>{v.host}</code>{" · "}
+              {fill(tr("rem.been.times", lang), { n: v.times })}
+            </p>
+            {v.persistent && !v.stood_down && (
+              <p className="muted small">{tr("rem.been.persistent", lang)}</p>
+            )}
+            {v.stood_down
+              ? (<>
+                  <p className="muted small">{tr("rem.been.stopped", lang)}</p>
+                  <button className="ghost" onClick={() => go(
+                    () => api.visitHostAgain(me, v.host, token),
+                    () => reload())}>
+                    {tr("rem.been.resume", lang)}
+                  </button>
+                </>)
+              : (<button className="ghost" onClick={() => go(
+                  () => api.standDownFromHost(me, v.host, token),
+                  () => reload())}>
+                  {tr("rem.been.stop", lang)}
+                </button>)}
           </div>
         ))}
       </div>

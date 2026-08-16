@@ -58,7 +58,8 @@ def remembered_environment(profile_id: str,
     return json.loads(row["data"])
 
 
-def _handed_link_block(message: str) -> str | None:
+def _handed_link_block(message: str,
+                       profile_id: str | None = None) -> str | None:
     """A prompt block for the first link in the person's message.
 
     The profile either read the page — through the same offline-gated
@@ -75,7 +76,7 @@ def _handed_link_block(message: str) -> str | None:
                 "about its contents, say you could not open it; never guess "
                 "at what it says.")
     try:
-        page = scrape.extract(scrape.fetch(url))
+        page = scrape.extract(scrape.fetch(url, profile_id))
     except Exception:
         return (f"The person's message includes a link ({url}) that could "
                 "not be reached just now. If asked about its contents, say "
@@ -327,7 +328,7 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     # already imported — a briefcase item is the same page, read once and
     # kept, and carrying both would pay for it twice in the same prompt.
     if not briefcase.holds_link(profile_id, body.interactor_id, body.message):
-        page_block = _handed_link_block(body.message)
+        page_block = _handed_link_block(body.message, profile_id)
         if page_block:
             system += "\n\n" + page_block
     # The briefcase: everything this person has handed this profile, as

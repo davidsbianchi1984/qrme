@@ -791,6 +791,20 @@ struct OpenAnswer: Decodable {
     let points_to: String
 }
 
+/// One far host, and how often it has watched this profile leave. A count,
+/// never a list of individual visits — a list of times is the movement log
+/// this feature exists to warn about. `stood_down` is absent on the
+/// deployment-wide view, where there is no profile to have decided.
+struct Visited: Decodable {
+    let host: String
+    let times: Int
+    let first_seen: String
+    let last_seen: String
+    let reasons: [String]
+    let persistent: Bool
+    let stood_down: Bool?
+}
+
 struct AnswerReceipt: Decodable {
     let id: String
     let held: Bool
@@ -1671,6 +1685,35 @@ actor ApiClient {
         try await request("/open-questions/\(iid)/answers", method: "POST",
                           body: ["body": body, "alias": alias,
                                  "points_to": pointsTo])
+    }
+
+    // MARK: Where it keeps going back to
+
+    func visits(id: String, token: String) async throws -> [Visited] {
+        try await request("/profiles/\(id)/visits", token: token)
+    }
+
+    /// Stop visiting a host. Enforced where the socket opens rather than at
+    /// the route, so this binds every path that fetches.
+    func standDownFromHost(id: String, host: String,
+                           token: String) async throws {
+        struct Ok: Decodable {}
+        let _: Ok = try await request("/profiles/\(id)/visits/stand-down",
+                                      method: "POST", body: ["host": host],
+                                      token: token)
+    }
+
+    func visitHostAgain(id: String, host: String, token: String) async throws {
+        struct Ok: Decodable {}
+        let _: Ok = try await request("/profiles/\(id)/visits/lift",
+                                      method: "POST", body: ["host": host],
+                                      token: token)
+    }
+
+    /// The deployment-wide view — hosts and counts and no profile at any
+    /// depth. Same key as the failure aggregate, deliberately.
+    func visitsAcross(key: String) async throws -> [Visited] {
+        try await request("/visits/across", token: key)
     }
 
     // MARK: Live desks

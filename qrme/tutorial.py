@@ -489,6 +489,32 @@ LESSONS: tuple[dict, ...] = (
          screens=(172,),
          try_it="Read a campaign with no token at all, and find who the "
                 "money goes to written on the same card."),
+    dict(key="goingback", chapter="Out in the world",
+         title="The far end that sees you twice",
+         what="Offline mode answers whether anything left this machine. It "
+              "never answered who kept watching. One sanitised question "
+              "tells a far host nothing; the same one every week, from the "
+              "same address, tells it a rhythm and a set of interests — a "
+              "subject, with no name on it, whose fifteenth visit is read "
+              "against the previous fourteen. So every outbound connection "
+              "is now witnessed at the one function every socket in the "
+              "product already passes through, and the far hosts an agent "
+              "keeps returning to are a list the owner can read. The host "
+              "is kept and the address after it never is: in a profile "
+              "fetch that tail is the subject's own handle, and a ledger "
+              "holding it would be a second copy of the private thing in a "
+              "table nobody audits. The lever is real rather than a "
+              "picture — standing a host down refuses at the socket, so it "
+              "binds the chat links, the briefcase and any path added "
+              "later, not merely the screen that listed it. And the "
+              "deployment-wide totals, which are what correlation exposure "
+              "actually looks like, carry no profile at any depth: a tool "
+              "for measuring correlation must not become a way to "
+              "correlate people.",
+         screens=(172,),
+         try_it="Stand a host down, then try to fetch it from a different "
+                "door — the chat box, by pasting a link — and watch the "
+                "refusal arrive there too."),
     dict(key="asking", chapter="Out in the world",
          title="Asking people, not pages",
          what="An excursion asks a model, which can only return what "

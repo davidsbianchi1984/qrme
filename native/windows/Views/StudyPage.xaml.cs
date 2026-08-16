@@ -60,6 +60,21 @@ public sealed partial class StudyPage : Page
         public string ReadLabel => L10n.T("nask.send");
     }
 
+    /// <summary>One far host this profile keeps returning to. The count is
+    /// the answer; a list of individual visits would be the movement log this
+    /// card exists to warn about.</summary>
+    public sealed class BeenRow
+    {
+        public string Host { get; init; } = "";
+        public string Times { get; init; } = "";
+        public string Note { get; init; } = "";
+        public bool StoodDown { get; init; }
+        public Visibility NoteVisibility =>
+            Note.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        public string ActionLabel =>
+            StoodDown ? L10n.T("rem.been.resume") : L10n.T("rem.been.stop");
+    }
+
     private string _openedAsk = "";
     private string _answeringId = "";
 
@@ -95,6 +110,8 @@ public sealed partial class StudyPage : Page
         PointsBox.Header = L10n.T("nask.points", lang);
         PointsBox.PlaceholderText = L10n.T("nask.points.ph", lang);
         SendAnswerButton.Content = L10n.T("nask.send", lang);
+        BeenTitle.Text = L10n.T("rem.been", lang);
+        BeenSub.Text = L10n.T("rem.been.pitch", lang);
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e) => await Reload();
@@ -123,6 +140,47 @@ public sealed partial class StudyPage : Page
         catch (Exception ex) { ShowError(ex.Message); }
         await ReloadAsks();
         await ReloadBoard();
+        await ReloadBeen();
+    }
+
+    private async System.Threading.Tasks.Task ReloadBeen()
+    {
+        var s = AppState.Current;
+        try
+        {
+            var been = await ApiClient.Shared.Visits(s.Pid!, s.Token!);
+            BeenList.ItemsSource = been.Select(v => new BeenRow
+            {
+                Host = v.Host,
+                Times = L10n.Fill("rem.been.times", AppState.Current.Language,
+                                  ("n", v.Times.ToString())),
+                Note = (v.StoodDown ?? false) ? L10n.T("rem.been.stopped")
+                       : v.Persistent ? L10n.T("rem.been.persistent") : "",
+                StoodDown = v.StoodDown ?? false,
+            }).ToList();
+            if (been.Length == 0) BeenSub.Text = L10n.T("rem.been.none");
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    /// <summary>Stop visiting a host, or start again. The refusal itself
+    /// lives where the socket opens, so pressing this binds every path that
+    /// fetches — not only the one that listed it.</summary>
+    private async void OnToggleHost(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string host) return;
+        var s = AppState.Current;
+        var row = (BeenList.ItemsSource as System.Collections.Generic.List<BeenRow>)
+            ?.FirstOrDefault(r => r.Host == host);
+        try
+        {
+            if (row?.StoodDown == true)
+                await ApiClient.Shared.VisitHostAgain(s.Pid!, host, s.Token!);
+            else
+                await ApiClient.Shared.StandDownFromHost(s.Pid!, host, s.Token!);
+            await ReloadBeen();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
     }
 
     private async System.Threading.Tasks.Task ReloadAsks()

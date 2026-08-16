@@ -52,6 +52,9 @@ struct StudyView: View {
     @State private var pointsTo = ""
     @State private var receipt: String?
 
+    // The far hosts this agent keeps returning to, and the lever.
+    @State private var been: [Visited] = []
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -170,6 +173,40 @@ struct StudyView: View {
                     }.card()
                 }
 
+                // --- where it keeps going back to --------------------------
+                Text(L10n.t("rem.been", state.language)).font(.title3.bold())
+                    .foregroundStyle(Theme.txt)
+                Text(L10n.t("rem.been.pitch", state.language))
+                    .font(.footnote).foregroundStyle(Theme.t2)
+                if been.isEmpty {
+                    Text(L10n.t("rem.been.none", state.language))
+                        .font(.footnote).foregroundStyle(Theme.t2)
+                }
+                ForEach(been, id: \.host) { v in
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(v.host).font(.subheadline.bold())
+                            .foregroundStyle(Theme.txt)
+                        Text(L10n.fill("rem.been.times", state.language,
+                                       ["n": "\(v.times)"]))
+                            .font(.caption).foregroundStyle(Theme.t2)
+                        if v.persistent && !(v.stood_down ?? false) {
+                            Text(L10n.t("rem.been.persistent", state.language))
+                                .font(.caption).foregroundStyle(Theme.amber)
+                        }
+                        if v.stood_down ?? false {
+                            Text(L10n.t("rem.been.stopped", state.language))
+                                .font(.caption).foregroundStyle(Theme.t2)
+                            Button(L10n.t("rem.been.resume", state.language)) {
+                                visitAgain(v)
+                            }.font(.caption.bold()).foregroundStyle(Theme.brandA)
+                        } else {
+                            Button(L10n.t("rem.been.stop", state.language)) {
+                                standDown(v)
+                            }.font(.caption.bold()).foregroundStyle(Theme.brandA)
+                        }
+                    }.card()
+                }
+
                 // --- and the other side of it: answering somebody else -----
                 Text(L10n.t("nask.board", state.language)).font(.title3.bold())
                     .foregroundStyle(Theme.txt)
@@ -228,6 +265,25 @@ struct StudyView: View {
         // The board needs no credential, so it loads for anybody who reaches
         // this screen — including a signed-out one.
         board = (try? await ApiClient.shared.openQuestions()) ?? []
+        been = (try? await ApiClient.shared.visits(id: pid, token: token)) ?? []
+    }
+
+    private func standDown(_ v: Visited) {
+        guard let pid = state.pid, let token = state.token else { return }
+        Task {
+            try? await ApiClient.shared.standDownFromHost(
+                id: pid, host: v.host, token: token)
+            await load()
+        }
+    }
+
+    private func visitAgain(_ v: Visited) {
+        guard let pid = state.pid, let token = state.token else { return }
+        Task {
+            try? await ApiClient.shared.visitHostAgain(
+                id: pid, host: v.host, token: token)
+            await load()
+        }
     }
 
     private func start() {

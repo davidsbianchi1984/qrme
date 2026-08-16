@@ -1080,6 +1080,91 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'name the host to stop visiting': {
+        'es': 'nombra el host que dejará de visitarse',
+        'fr': 'nommez l\'hôte à ne plus visiter',
+        'de': 'nenne den Host, der nicht mehr besucht werden soll',
+        'pt': 'indique o host que deixará de ser visitado',
+        'it': "indica l'host da non visitare più",
+        'ja': '訪問をやめるホストを指定してください',
+        'zh': '指明要停止访问的主机',
+        'hi': 'बताइए किस होस्ट पर जाना बंद करना है',
+        'ar': 'سمِّ المضيف الذي يجب التوقف عن زيارته',
+    },
+    'name the host to visit again': {
+        'es': 'nombra el host que volverá a visitarse',
+        'fr': 'nommez l\'hôte à visiter de nouveau',
+        'de': 'nenne den Host, der wieder besucht werden soll',
+        'pt': 'indique o host que voltará a ser visitado',
+        'it': "indica l'host da visitare di nuovo",
+        'ja': 'ふたたび訪問するホストを指定してください',
+        'zh': '指明要重新访问的主机',
+        'hi': 'बताइए किस होस्ट पर फिर से जाना है',
+        'ar': 'سمِّ المضيف الذي ستُستأنف زيارته',
+    },
+    'this profile does not visit that host any more — lift the stand-down on '
+    'it if this connection should start fetching again': {
+        'es': 'este perfil ya no visita ese host — levanta la suspensión '
+              'sobre él si esta conexión debe volver a traer contenido',
+        'fr': "ce profil ne visite plus cet hôte — levez la suspension le "
+              'concernant si cette connexion doit recommencer à récupérer',
+        'de': 'dieses Profil besucht diesen Host nicht mehr — hebe die '
+              'Aussetzung auf, wenn diese Verbindung wieder abrufen soll',
+        'pt': 'este perfil já não visita esse host — levante a suspensão '
+              'sobre ele se esta ligação deve voltar a buscar conteúdo',
+        'it': "questo profilo non visita più quell'host — revoca la "
+              'sospensione se questa connessione deve tornare a recuperare',
+        'ja': 'このプロフィールはそのホストをもう訪問しません。この接続で再び取得するなら、'
+              '訪問停止を解除してください',
+        'zh': '此资料不再访问该主机——若这条连接应恢复抓取，请解除对它的暂停',
+        'hi': 'यह प्रोफ़ाइल अब उस होस्ट पर नहीं जाती — यदि यह कनेक्शन फिर से '
+              'सामग्री लाए, तो उस पर लगी रोक हटाइए',
+        'ar': 'لم يعد هذا الملف يزور ذلك المضيف — ارفع الإيقاف عنه إن كان على '
+              'هذا الاتصال أن يعود إلى الجلب',
+    },
+    'reading where this deployment has been requires the QRME_PROBLEMS_KEY '
+    'bearer token': {
+        'es': 'leer dónde ha estado esta instalación requiere el token '
+              'portador QRME_PROBLEMS_KEY',
+        'fr': 'lire où ce déploiement est allé exige le jeton porteur '
+              'QRME_PROBLEMS_KEY',
+        'de': 'zu lesen, wo diese Installation war, erfordert das '
+              'QRME_PROBLEMS_KEY-Bearer-Token',
+        'pt': 'ler onde esta instalação esteve requer o token portador '
+              'QRME_PROBLEMS_KEY',
+        'it': 'leggere dove è stata questa installazione richiede il token '
+              'bearer QRME_PROBLEMS_KEY',
+        'ja': 'この配備がどこへ行ったかの閲覧には QRME_PROBLEMS_KEY のベアラートークンが必要です',
+        'zh': '读取此部署去过哪里需要 QRME_PROBLEMS_KEY 持有者令牌',
+        'hi': 'यह परिनियोजन कहाँ-कहाँ गया है, पढ़ने के लिए QRME_PROBLEMS_KEY '
+              'बियरर टोकन चाहिए',
+        'ar': 'قراءة أين ذهب هذا النشر تتطلب رمز QRME_PROBLEMS_KEY الحامل',
+    },
+    'where this deployment has been is readable from this machine only until '
+    'QRME_PROBLEMS_KEY is set — behind a proxy, set it': {
+        'es': 'dónde ha estado esta instalación solo se puede leer desde esta '
+              'máquina hasta que se fije QRME_PROBLEMS_KEY — tras un proxy, '
+              'fíjala',
+        'fr': "où ce déploiement est allé n'est lisible que depuis cette "
+              "machine tant que QRME_PROBLEMS_KEY n'est pas définie — "
+              'derrière un proxy, définissez-la',
+        'de': 'wo diese Installation war, ist nur von dieser Maschine lesbar, '
+              'bis QRME_PROBLEMS_KEY gesetzt ist — hinter einem Proxy: setzen',
+        'pt': 'onde esta instalação esteve só pode ser lido a partir desta '
+              'máquina até QRME_PROBLEMS_KEY estar definida — atrás de um '
+              'proxy, defina-a',
+        'it': 'dove è stata questa installazione è leggibile solo da questa '
+              'macchina finché QRME_PROBLEMS_KEY non è impostata — dietro un '
+              'proxy, impostala',
+        'ja': 'この配備がどこへ行ったかは、QRME_PROBLEMS_KEY が設定されるまで'
+              'この機械からのみ読めます。プロキシの背後では設定してください',
+        'zh': '在设置 QRME_PROBLEMS_KEY 之前，此部署去过哪里只能从本机读取——'
+              '若在代理之后，请设置它',
+        'hi': 'QRME_PROBLEMS_KEY सेट होने तक यह परिनियोजन कहाँ-कहाँ गया है, '
+              'केवल इसी मशीन से पढ़ा जा सकता है — प्रॉक्सी के पीछे हो तो इसे सेट कीजिए',
+        'ar': 'أين ذهب هذا النشر يمكن قراءته من هذا الجهاز فقط إلى أن يُضبط '
+              'QRME_PROBLEMS_KEY — خلف وسيط، اضبطه',
+    },
     'an empty answer answers nothing': {
         'es': 'una respuesta vacía no responde nada',
         'fr': 'une réponse vide ne répond à rien',

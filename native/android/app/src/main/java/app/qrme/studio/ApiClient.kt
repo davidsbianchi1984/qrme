@@ -118,6 +118,12 @@ data class OpenQuestion(val id: String, val brief: String,
                         val answerCount: Int, val closed: Boolean,
                         val replies: List<OpenAnswer>)
 data class OpenAnswer(val alias: String, val body: String, val pointsTo: String)
+/** One far host, and how often it has watched this profile leave. A count,
+ *  never a list of visits. `stoodDown` is null on the deployment-wide view,
+ *  where there is no profile to have decided. */
+data class Visited(val host: String, val times: Int, val firstSeen: String,
+                   val lastSeen: String, val reasons: List<String>,
+                   val persistent: Boolean, val stoodDown: Boolean?)
 data class SocialConn(val id: String, val platform: String, val direction: String,
                       val handle: String?, val status: String?, val collected: Int,
                       val published: Int)
@@ -928,6 +934,40 @@ object ApiClient {
             JSONObject().put("body", body).put("alias", alias)
                 .put("points_to", pointsTo)))
         return o.optString("note", "")
+    }
+
+    // ---- where it keeps going back to ----
+
+    private fun visitedOf(o: JSONObject): Visited {
+        val arr = o.optJSONArray("reasons")
+        val reasons = if (arr == null) emptyList() else
+            (0 until arr.length()).map { arr.getString(it) }
+        return Visited(o.getString("host"), o.optInt("times"),
+            o.optString("first_seen", ""), o.optString("last_seen", ""),
+            reasons, o.optBoolean("persistent"),
+            if (o.has("stood_down")) o.optBoolean("stood_down") else null)
+    }
+
+    suspend fun visits(id: String, token: String): List<Visited> {
+        val arr = JSONArray(request("/profiles/$id/visits", token = token))
+        return (0 until arr.length()).map { visitedOf(arr.getJSONObject(it)) }
+    }
+
+    suspend fun standDownFromHost(id: String, host: String, token: String) {
+        request("/profiles/$id/visits/stand-down", "POST",
+            JSONObject().put("host", host), token)
+    }
+
+    suspend fun visitHostAgain(id: String, host: String, token: String) {
+        request("/profiles/$id/visits/lift", "POST",
+            JSONObject().put("host", host), token)
+    }
+
+    /** Hosts and counts and no profile at any depth. Same key as the
+     *  failure aggregate, deliberately. */
+    suspend fun visitsAcross(key: String): List<Visited> {
+        val arr = JSONArray(request("/visits/across", token = key))
+        return (0 until arr.length()).map { visitedOf(arr.getJSONObject(it)) }
     }
 
     // ---- Community: stranger connections & multiparty rooms ----
