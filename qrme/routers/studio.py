@@ -138,6 +138,52 @@ def authoring_turn(profile_id: str, body: AgentTurn, request: Request) -> dict:
     return turn
 
 
+class AgentAct(BaseModel):
+    tool: str = Field(..., max_length=40,
+                      description="The tool the agent proposed.")
+    arguments: dict = Field(default_factory=dict, description=(
+        "The arguments it proposed, handed back unchanged."))
+
+
+@router.post("/profiles/{profile_id}/authoring/act")
+def authoring_act(profile_id: str, body: AgentAct, request: Request) -> dict:
+    """Do the thing the agent asked about. The press, not the sentence.
+
+    Most of the roster runs inside a turn, because most of it is a mistake a
+    person can undo — a tagline goes back, a widget keeps its versions, a post
+    comes down. The rows marked `confirm` cannot be undone: a sunset, a
+    message somebody else has now read, a payout, a grant of authority handed
+    to a third party. Those stop mid-turn and come back as a proposal.
+
+        asked     may this person do this
+        mattered  did this person mean this
+
+    The token answers the first question and has answered it since the Studio
+    shipped. This route is the second one. It takes no prose and asks no
+    model — the arguments arrive exactly as the turn showed them, which is
+    what makes the sentence on the screen the thing being agreed to rather
+    than a summary of it.
+    """
+    profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    require_may_publish(profile)
+    if not authoring.is_a_tool(body.tool):
+        raise _agent_refusal(authoring.AgentError("agent.unknown_tool"))
+    # A row that runs inside a turn has no business arriving here: it would
+    # mean a client had learned to drive the roster directly, which is a
+    # second, unguarded copy of `converse`.
+    if not authoring.needs_a_press(body.tool):
+        raise _agent_refusal(authoring.AgentError("agent.not_asked"))
+    try:
+        did = authoring.call(
+            body.tool, body.arguments, app=request.app, profile_id=profile_id,
+            authorization=request.headers.get("authorization"))
+    except authoring.AgentError as exc:
+        raise _agent_refusal(exc) from None
+    return {"tool": did["tool"], "answered": did["status"],
+            "says": authoring.what_it_would_do(body.tool)}
+
+
 def _agent_refusal(exc: authoring.AgentError) -> HTTPException:
     return HTTPException(422, i18n.STUDIO_REFUSALS[str(exc)])
 

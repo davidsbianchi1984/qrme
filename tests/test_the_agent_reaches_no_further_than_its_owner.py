@@ -38,6 +38,34 @@ from qrme.api import app
 from . import clientpaths
 
 
+def _guarded_source(endpoint) -> str:
+    """The handler's own source, plus one level of the helpers it calls.
+
+    `request_payout` reads `owner = _owner_of(profile_id, request)`, and
+    `_owner_of` is three lines whose middle one is `require_owner`. A checker
+    reading only the endpoint sees a *payout* route with no owner check at
+    all, reports a hole that is not there, and the obvious way to make it pass
+    is to loosen the pattern — which would then also pass on a route that
+    really had lost its check.
+
+        asked     does this function say require_owner
+        mattered  does this request go through require_owner
+
+    One level, and same-module only. Deep enough for the helper idiom this
+    estate actually uses, shallow enough that it stays a check rather than a
+    reachability analysis.
+    """
+    source = inspect.getsource(endpoint)
+    module = inspect.getmodule(endpoint)
+    for name in set(re.findall(r"\b([a-z_][a-z_0-9]*)\s*\(", source)):
+        helper = getattr(module, name, None)
+        if (inspect.isfunction(helper)
+                and inspect.getmodule(helper) is module
+                and helper is not endpoint):
+            source += "\n" + inspect.getsource(helper)
+    return source
+
+
 def _routes() -> dict[tuple[str, str], object]:
     """Every route the app actually serves, by (method, path).
 
@@ -97,13 +125,22 @@ def test_every_tool_that_changes_something_goes_through_the_owner_s_door():
     served = _routes()
     astray = []
     demands = re.compile(r'\brequire_owner\b|"owner"')
+    shared = re.compile(r"\brequire_owner_or_interactor\b")
     for tool in authoring.TOOLS:
         if not tool["writes"]:
             continue
-        source = inspect.getsource(served[tuple(tool["route"])].endpoint)
-        if not demands.search(source):
-            astray.append(f"{tool['name']} -> {tool['route'][0]} "
-                          f"{tool['route'][1]}")
+        source = _guarded_source(served[tuple(tool["route"])].endpoint)
+        if demands.search(source):
+            continue
+        # A handful of doors admit the other person as well as the owner —
+        # a message is edited by whoever wrote it, a conversation is erased
+        # by either side. A row through one of those must say so, and
+        # `test_a_shared_door_is_still_only_reached_as_the_owner` is what
+        # makes the declaration mean something.
+        if shared.search(source) and tool.get("shared_door"):
+            continue
+        astray.append(f"{tool['name']} -> {tool['route'][0]} "
+                      f"{tool['route'][1]}")
     assert not astray, (
         "these tools change something through a route that does not require "
         "the owner of that profile:\n    " + "\n    ".join(astray)
@@ -200,6 +237,36 @@ def test_the_lesson_names_the_number_of_tools_there_actually_are():
     assert count == len(authoring.TOOLS), (
         f"the lesson says {count} tools and the roster holds "
         f"{len(authoring.TOOLS)}")
+
+
+def test_a_shared_door_is_still_only_reached_as_the_owner():
+    """What makes `shared_door` a declaration rather than an excuse.
+
+    Four rows go through `require_owner_or_interactor` — editing a message,
+    unsending one, forgetting a person, erasing them. Those doors admit
+    whoever wrote the message or was in the conversation, which is right for
+    the door and would be wrong for this list if the agent could be driven by
+    that person.
+
+    It cannot. Both ways in demand the owner, so a shared door reached through
+    the agent is always reached as the owner. That is the whole argument, and
+    it lives or dies on those two routes, so those two routes are what this
+    reads.
+    """
+    from qrme.routers import studio
+
+    for way_in in (studio.authoring_turn, studio.authoring_act):
+        source = inspect.getsource(way_in)
+        assert re.search(r"\brequire_owner\b", source), (
+            f"{way_in.__name__} no longer demands the owner — every "
+            "`shared_door` row in the roster rests on it doing so, and an "
+            "interactor could now drive them")
+
+    declared = {t["name"] for t in authoring.TOOLS if t.get("shared_door")}
+    assert declared, (
+        "no row declares `shared_door` any more — if the last one went, "
+        "delete the escape in the guard above rather than leaving a hole "
+        "nothing walks through yet")
 
 
 def test_the_guard_on_the_owner_door_can_tell_two_doors_apart():
@@ -326,20 +393,88 @@ def test_the_tools_are_scoped_to_one_profile():
         "not a thing the path can express")
 
 
-def test_nothing_that_ends_or_bills_or_unlocks_is_in_reach():
-    """Refused by absence rather than by a check, and named here so the
-    absence is deliberate rather than an oversight nobody noticed."""
+#: Paths whose writes cannot be taken back. A row through one of these is
+#: allowed — they are this person's own — but it is proposed and pressed
+#: rather than done inside a turn.
+#:
+#: This list used to be the *forbidden* list, and the entry above it said
+#: those things "are not what 'edit my own app' means". That was the wrong
+#: shape of answer. They are exactly what somebody means when they open a tab
+#: called Agent and ask it to wind a profile down; refusing by absence just
+#: made the tab weaker than the person's own hands and told them nothing.
+#:
+#:     asked     may this person do this
+#:     mattered  did this person mean this
+#:
+#: The token has always answered the first. The press answers the second, and
+#: a press is a better answer than an absence because it survives the person
+#: actually wanting the thing.
+CANNOT_BE_UNDONE = (
+    "/sunset", "/succeed", "/export/ticket", "/payout", "/derive",
+    "/messages", "/friends", "/grants", "/delegation", "/attest",
+    "/forget", "/proactive",
+    "/memory/{interactor_id}",       # the DELETE; the GET beside it is a read
+)
+
+#: Still absent, and these ones by absence. Billing and key material are not
+#: the person's own record in the way a wall post is — they are the contract
+#: with this platform and the material that authenticates them — and neither
+#: has a sentence a model could get right.
+NEVER = ("/memberships", "/plans", "/keys")
+
+
+def test_what_cannot_be_undone_is_never_done_inside_a_turn():
+    """The guard the confirm flag exists for.
+
+    A row here that runs mid-turn is a model deciding, on its reading of one
+    sentence, to end a profile or put a message in somebody else's inbox.
+    """
+    unpressed = []
+    for tool in authoring.TOOLS:
+        if not tool["writes"]:
+            continue
+        path = tool["route"][1]
+        if any(sharp in path for sharp in CANNOT_BE_UNDONE):
+            if not tool.get("confirm"):
+                unpressed.append(f"{tool['name']} -> {tool['route'][0]} {path}")
+    assert not unpressed, (
+        "these change something that cannot be taken back, and do it inside "
+        "the turn:\n    " + "\n    ".join(unpressed)
+        + "\n  Mark them `confirm` so the person presses rather than the "
+          "model deciding.")
+
+
+def test_the_reads_beside_them_did_not_get_swept_up():
+    """A guard on the guard above. Marking every path in that family
+    `confirm` would pass it and make reading your own messages a two-step
+    ceremony — which is how a confirmation habit stops meaning anything."""
+    reads = [t["name"] for t in authoring.TOOLS
+             if not t["writes"] and t.get("confirm")]
+    assert not reads, (
+        f"{reads} ask before reading something. A press that guards a read "
+        "teaches people to press without looking.")
+
+
+def test_billing_and_key_material_are_still_absent():
+    """Two things stay out rather than asking.
+
+    Everything else on this list is the person's own record, and a press is
+    the right answer for the sharp ones. A membership is not a record — it is
+    the contract with this platform — and key material is what authenticates
+    them. Neither has a sentence a model could get right, and neither is made
+    safer by a button.
+    """
     paths = {tool["route"][1] for tool in authoring.TOOLS}
     methods = {(tool["route"][0], tool["route"][1]) for tool in authoring.TOOLS}
-    for forbidden in ("/memberships", "/plans", "/keys", "/moderation",
-                      "/objections", "/messages", "/exit", "/erase"):
+    for forbidden in NEVER:
         touching = sorted(p for p in paths if forbidden in p)
         assert not touching, (
-            f"the agent can reach {touching} — ending, billing, key material, "
-            "moderation and messaging other people are not what 'edit my own "
-            "app' means")
+            f"the agent can reach {touching} — billing and key material are "
+            "not the person's own record in the way a wall post is")
     assert ("DELETE", "/profiles/{profile_id}") not in methods, (
-        "the agent can delete the profile it was asked to decorate")
+        "the agent can delete the profile it was asked to decorate. Ending "
+        "one has its own door — `sunset`, which is in the roster and asks "
+        "first — and that is the one somebody means.")
 
 
 def test_every_tool_says_what_it_does_in_a_sentence_a_person_reads():

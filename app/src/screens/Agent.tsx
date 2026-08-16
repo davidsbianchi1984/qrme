@@ -61,6 +61,11 @@ export function Agent({ onPlans, onStudio }: {
   const [talk, setTalk] = useState<{ role: string; content: string }[]>([]);
   const [did, setDid] = useState<AgentTurn | null>(null);
   const [error, setError] = useState<unknown>(null);
+  // What it stopped to ask about. Held here rather than inside `did`, because
+  // dropping the question must not also drop the record of what it did before
+  // it got there.
+  const [asks, setAsks] = useState<AgentTurn["asks"]>(null);
+  const [pressing, setPressing] = useState(false);
 
   useEffect(() => {
     api.studioAgent().then(setReach).catch(() => setReach(null));
@@ -74,6 +79,7 @@ export function Agent({ onPlans, onStudio }: {
       const turn = await api.authoringTurn(
         session.profileId, said, talk, session.ownerToken);
       setDid(turn);
+      setAsks(turn.asks);
       setTalk([...talk, { role: "user", content: said },
                { role: "assistant", content: turn.reply }]);
       setAsk("");
@@ -83,6 +89,24 @@ export function Agent({ onPlans, onStudio }: {
       api.studioAgent().then(setReach).catch(() => undefined);
     } catch (e) { setError(e); }
     finally { setAsking(false); }
+  }
+
+  /** The press. The arguments go back exactly as the turn handed them over —
+   *  rebuilding them here would make the sentence on the screen a summary of
+   *  what happens rather than the thing being agreed to. */
+  async function doIt() {
+    if (!session.profileId || !session.ownerToken || !asks) return;
+    setPressing(true); setError(null);
+    try {
+      const done = await api.authoringAct(
+        session.profileId, { tool: asks.tool, arguments: asks.arguments },
+        session.ownerToken);
+      setDid({ reply: "", acted: [{ tool: done.tool, answered: done.answered,
+                                    said: done.says }],
+               stopped: null, said: null, asks: null });
+      setAsks(null);
+    } catch (e) { setError(e); }
+    finally { setPressing(false); }
   }
 
   return (
@@ -110,7 +134,9 @@ export function Agent({ onPlans, onStudio }: {
           ask={ask} setAsk={setAsk} asking={asking}
           canSend={!!session.ownerToken} onSend={send}
           talk={talk} did={did}
-          onForget={() => { setTalk([]); setDid(null); }}
+          asks={asks} pressing={pressing}
+          onDoIt={doIt} onDrop={() => setAsks(null)}
+          onForget={() => { setTalk([]); setDid(null); setAsks(null); }}
           reach={reach ? reach.can_touch : null}
           showsReach={showsReach}
           onToggleReach={() => setShowsReach(!showsReach)}

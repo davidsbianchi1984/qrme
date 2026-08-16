@@ -1112,15 +1112,19 @@ LESSONS: tuple[dict, ...] = (
               "now, second in the row. Ask it in words. What it did is "
               "listed underneath what it said, because prose is the part "
               "you have to take on trust and the steps are the part you can "
-              "check. Its reach is a written list of forty-three tools — the "
-              "profile itself, what it knows, what it shows the world, your "
-              "wall, your switches, your work and your numbers — and the "
-              "screen shows you that list before you ask it for anything. An "
-              "agent whose limits you learn by watching it fail is one you "
-              "end up supervising instead of instructing. What is not on the "
-              "list is not an oversight: nothing that spends money, ends a "
-              "profile, claims an identity, settles an objection, or touches "
-              "anybody else's rows.",
+              "check. Its reach is a written list of 113 tools — the profile "
+              "itself, what it knows, the face it wears, your wall, your "
+              "money, your stickers and machines, your messages, what it "
+              "remembers of people, and how it ends — and the screen shows "
+              "you that list before you ask it for anything. An agent whose "
+              "limits you learn by watching it fail is one you end up "
+              "supervising instead of instructing. The things that cannot "
+              "be taken back — winding a profile down, handing it on, "
+              "paying out, messaging somebody, granting your authority — "
+              "stop and ask. It says what it is about to do in the same "
+              "words the list used, and you press. Two things stay out "
+              "altogether: your membership, and anything that authenticates "
+              "you.",
          screens=(200,),
          try_it="Open Agent, read what it says it can touch, then ask it "
                 "to make your page say what you actually do."),

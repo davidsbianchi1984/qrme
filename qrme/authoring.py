@@ -31,43 +31,59 @@ this thing do to my account* has an answer somebody can finish reading.
     asked     does the agent have the owner's authority
     mattered  does it have the owner's intent
 
-## What is deliberately absent
+## The press, and what an absence was standing in for
 
-The list started at eleven rows — the page, the homepage, the friends list
-and the widgets — and the screen it now sits behind implies a collaborator
-for the whole app. Eleven was not that, and a surface that implies a general
-assistant and then refuses two thirds of what is asked of it teaches people
-to stop asking. So the roster covers the profile itself, what it knows, what
-it shows the world, its wall, its switches, its work and its numbers.
+The list was eleven rows when the Agent got its own tab — the page, the
+homepage, the friends list and the widgets — against a screen that reads as
+a collaborator for the whole app. Widening it the first time, six families
+were held back with reasons written out at length: money, ending, identity,
+contest, other people, the physical world.
 
-What it still does not cover is the point of the list, and each family is
-held out for a stated reason rather than by having been forgotten:
+Most of those reasons did not survive being read back. A beacon, a watch, a
+robot, an avatar, a marketplace listing and a friends list are the person's
+own rows, reached with the person's own credential through the person's own
+door. Holding them out made this tab weaker than their own hands and told
+them nothing they could act on. Voiceprints and verification already carry
+their own consent and evidence checks at the door, and the agent inherits
+every one of them — the row added no risk those doors were not already
+answering.
 
-**Money.** Placements, earnings, payouts, proceeds, licensing, and listing
-this profile for hire. An agent that misreads *put me out there* should not
-be able to commit somebody to a price.
+What was actually underneath the caution was narrower, and it is not about
+authority at all:
 
-**Ending.** Sunset, succession, the memorial, the export ticket that hands
-the whole profile to somebody else. `successor_owner` is a field on the same
-door as the persona, which is why `edit_persona` names its two fields; see
-`only` below.
+    asked     may this person do this
+    mattered  did this person mean this
 
-**Identity.** Verification, the handle's own deletion, watermarks,
-voiceprints and the avatar. These say *this is really her*, and a thing
-driven by a sentence should not be able to say that.
+The owner's token has answered the first question since the Studio shipped.
+Nothing answers the second, and for most of the roster nothing needs to — a
+tagline goes back, a widget keeps its versions, a post comes down. For the
+rows where it does, the answer is a press rather than an absence.
 
-**Contest.** Moderation queues, objections, attestations. A profile under
-objection is being argued about by two people, and neither of them is this.
+So a row may be marked `confirm`. `converse` stops when the model reaches for
+one, and returns what it would do — the row's own sentence and the arguments
+the model chose — instead of doing it. The console shows that and asks, and
+`POST /profiles/{id}/authoring/act` is where a yes lands. *Wind it down* and
+*wind that thread down* are one word apart, and no prompt gets that to zero;
+a button does.
 
-**Other people.** Anything under `{interactor_id}` — memory, threads,
-relationships, clinical notes, engagement — plus friends, messages, and
-grants of authority. The agent acts on one person's own rows.
+`test_what_cannot_be_undone_is_never_done_inside_a_turn` reads the roster
+against the list of paths whose writes cannot be taken back, so a sharp row
+added later without the flag fails rather than ships.
 
-**The physical world.** Robots, wearables, beacons, excursions, the camera
-and the microphone. A misread sentence should not move anything that exists.
+## What is still absent, and why a press would not help
 
-Each of these is refused by absence rather than by a check: the agent cannot
-call what is not in the list.
+**Billing.** Memberships and plans. A membership is not this person's record
+in the way a wall post is — it is the contract with this platform — and the
+sentence a model would have to get right is one with a price in it.
+
+**Key material.** What authenticates them. A button in front of it does not
+make a model handling it safe.
+
+**`DELETE /profiles/{id}`.** Ending a profile has its own door — `sunset`,
+which is in the roster and asks first — and that is the one somebody means.
+
+Those three are refused by absence: the agent cannot call what is not in the
+list. Everything else on this page it can, and the sharp ones ask.
 
 ## What the agent is never told
 
@@ -276,6 +292,256 @@ TOOLS: tuple[dict, ...] = (
     {"name": "list_apps", "writes": False,
      "route": ("GET", "/profiles/{profile_id}/apps"),
      "says": "list the outside services this profile is connected to"},
+    {"name": "connect_app", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/apps"),
+     "says": "connect an outside service to this profile"},
+
+    # --- the face it wears --------------------------------------------------
+    {"name": "set_avatar", "writes": True,
+     "route": ("PUT", "/profiles/{profile_id}/avatar"),
+     "says": "set the picture this profile shows"},
+    {"name": "import_avatar", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/avatar/import"),
+     "says": "bring in a picture from somewhere you already have one"},
+    {"name": "set_emblem", "writes": True,
+     "route": ("PUT", "/profiles/{profile_id}/emblem"),
+     "says": "set the emblem that stands for this profile"},
+    {"name": "read_watermark", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/watermark"),
+     "says": "read the mark that says its answers are synthetic"},
+    {"name": "set_watermark", "writes": True,
+     "route": ("PUT", "/profiles/{profile_id}/watermark"),
+     "says": "change the mark that says its answers are synthetic"},
+    {"name": "read_anonymity", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/anonymity"),
+     "says": "read how much of you this profile shows"},
+    {"name": "set_anonymity", "writes": True,
+     "route": ("PUT", "/profiles/{profile_id}/anonymity"),
+     "says": "change how much of you this profile shows"},
+
+    # --- saying it is really you --------------------------------------------
+    #
+    # The doors here carry their own checks — a voiceprint has a consent gate
+    # and verification has its own evidence — and the agent inherits every one
+    # of them. Holding the rows back added nothing those doors were not
+    # already doing, and cost the person the ability to ask.
+    {"name": "read_verification", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/verification"),
+     "says": "read how far this profile has got with proving who it is"},
+    {"name": "start_verification", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/verification"),
+     "says": "start proving this profile is really you"},
+    {"name": "move_verification", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/verification/move"),
+     "says": "carry that proof on to its next step"},
+    {"name": "read_voiceprint", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/voiceprint"),
+     "says": "read whether this profile has a voice of its own yet"},
+    {"name": "enrol_voiceprint", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/voiceprint"),
+     "says": "begin giving this profile a voice of its own"},
+    {"name": "add_voice_samples", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/voiceprint/samples"),
+     "says": "add recordings for that voice to learn from"},
+    {"name": "set_voice_consent", "writes": True,
+     "route": ("PUT", "/profiles/{profile_id}/voiceprint/consent"),
+     "says": "say what that voice is allowed to be used for"},
+    {"name": "speak", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/voiceprint/speak"),
+     "says": "have this profile say something out loud in its own voice"},
+    {"name": "remove_voiceprint", "writes": True,
+     "route": ("DELETE", "/profiles/{profile_id}/voiceprint"),
+     "says": "take that voice away again"},
+
+    # --- money --------------------------------------------------------------
+    {"name": "read_earnings", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/earnings"),
+     "says": "read what this profile has earned"},
+    {"name": "request_payout", "writes": True, "confirm": True,
+     "route": ("POST", "/profiles/{profile_id}/earnings/payout"),
+     "says": "pay out what this profile has earned"},
+    {"name": "read_proceeds", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/proceeds"),
+     "says": "read where this profile's money is set to go"},
+    {"name": "set_proceeds", "writes": True,
+     "route": ("PUT", "/profiles/{profile_id}/proceeds"),
+     "says": "change where this profile's money goes"},
+    {"name": "list_placements", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/placements"),
+     "says": "list where this profile has been placed"},
+    {"name": "place", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/placements"),
+     "says": "place this profile somewhere it can be found"},
+    {"name": "read_placement_figures", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/placements/analytics"),
+     "says": "read how those placements are doing"},
+    {"name": "read_placement_custody", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/placements/custody"),
+     "says": "read who is holding the record of those placements"},
+    {"name": "list_on_marketplace", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/marketplace"),
+     "says": "offer this profile on the marketplace"},
+    {"name": "take_off_marketplace", "writes": True,
+     "route": ("DELETE", "/profiles/{profile_id}/marketplace"),
+     "says": "take this profile back off the marketplace"},
+    {"name": "read_licence", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/license"),
+     "says": "read the terms this profile is offered on"},
+    {"name": "set_licence", "writes": True,
+     "route": ("PUT", "/profiles/{profile_id}/license"),
+     "says": "set the terms this profile is offered on"},
+    {"name": "clear_licence", "writes": True,
+     "route": ("DELETE", "/profiles/{profile_id}/license"),
+     "says": "stop offering this profile on any terms"},
+    {"name": "list_licences", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/licenses"),
+     "says": "list who has been licensed this profile"},
+    {"name": "derive_licence", "writes": True, "confirm": True,
+     "route": ("POST", "/profiles/{profile_id}/license/{grant_id}/derive"),
+     "says": "let somebody build their own agent from this profile"},
+    {"name": "list_campaigns", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/campaigns"),
+     "says": "list the fundraising this profile is doing"},
+    {"name": "start_campaign", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/campaigns"),
+     "says": "start a fundraiser for this profile to run"},
+
+    # --- things that exist ---------------------------------------------------
+    #
+    # Your sticker, your robot, your watch. Held back once as "the physical
+    # world", which sounded like a reason and was not one — these are the same
+    # rows a person reaches through their own console, and a misread here
+    # leaves a beacon in the wrong place rather than anything that cannot be
+    # put back.
+    {"name": "list_beacons", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/beacons"),
+     "says": "list the stickers and desk beacons that point at this profile"},
+    {"name": "place_beacon", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/beacons"),
+     "says": "put a new sticker or desk beacon out"},
+    {"name": "list_robots", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/robots"),
+     "says": "list the machines this profile can speak through"},
+    {"name": "add_robot", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/robots"),
+     "says": "give this profile a machine to speak through"},
+    {"name": "list_wearables", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/wearables"),
+     "says": "list the watches and bands this profile reads from"},
+    {"name": "add_wearable", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/wearables"),
+     "says": "add a watch or band for this profile to read from"},
+    {"name": "remove_wearable", "writes": True,
+     "route": ("DELETE", "/profiles/{profile_id}/wearables/{name}"),
+     "says": "take a watch or band away again"},
+    {"name": "list_excursions", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/excursions"),
+     "says": "list the outings this profile has been sent on"},
+    {"name": "start_excursion", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/excursions"),
+     "says": "send this profile out on an outing"},
+    {"name": "list_gaming_sessions", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/gaming/sessions"),
+     "says": "list the games this profile has been playing"},
+    {"name": "start_gaming_session", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/gaming/sessions"),
+     "says": "put this profile into a game"},
+    {"name": "perceive", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/perceive"),
+     "says": "tell this profile what is in front of it right now"},
+
+    # --- ending it ----------------------------------------------------------
+    #
+    # Every write here asks. Not because the person may not — it is theirs to
+    # end — but because *wind it down* and *wind that thread down* are one
+    # word apart, and only one of them can be undone.
+    {"name": "read_export", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/export"),
+     "says": "read everything this profile holds, as one file"},
+    {"name": "read_memorial", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/memorial"),
+     "says": "read what this profile would leave behind"},
+    {"name": "make_export_ticket", "writes": True, "confirm": True,
+     "route": ("POST", "/profiles/{profile_id}/export/ticket"),
+     "says": "make a ticket that hands this whole profile to somebody"},
+    {"name": "hand_on", "writes": True, "confirm": True,
+     "route": ("POST", "/profiles/{profile_id}/succeed"),
+     "says": "hand this profile on to the person set to inherit it"},
+    {"name": "sunset", "writes": True, "confirm": True,
+     "route": ("POST", "/profiles/{profile_id}/sunset"),
+     "says": "wind this profile down for good"},
+
+    # --- being argued about --------------------------------------------------
+    {"name": "read_objections", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/objections"),
+     "says": "read the objections raised against this profile"},
+    {"name": "attest_objection", "writes": True, "confirm": True,
+     "route": ("POST", "/profiles/{profile_id}/objections/{objection_id}/attest"),
+     "says": "answer an objection on the record"},
+    {"name": "read_moderation_queue", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/moderation/queue"),
+     "says": "read what this profile has had held back"},
+
+    # --- where somebody else is -----------------------------------------------
+    #
+    # The line that matters is not *is this row about another person* — a
+    # friends list is — but *does the write land where they can see it*. Those
+    # ask. A relationship setting is this person's own note about somebody and
+    # runs inside the turn; a message is in their inbox and cannot be recalled.
+    {"name": "add_friend", "writes": True, "confirm": True,
+     "route": ("POST", "/profiles/{profile_id}/friends"),
+     "says": "add somebody to your friends"},
+    {"name": "remove_friend", "writes": True, "confirm": True,
+     "route": ("DELETE", "/profiles/{profile_id}/friends/{friend_id}"),
+     "says": "take somebody off your friends"},
+    {"name": "read_messages", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/messages"),
+     "says": "read your messages"},
+    {"name": "send_message", "writes": True, "confirm": True,
+     "route": ("POST", "/profiles/{profile_id}/messages"),
+     "says": "send somebody a message"},
+    {"name": "edit_message", "writes": True, "confirm": True,
+     "shared_door": True,
+     "route": ("PATCH", "/profiles/{profile_id}/messages/{message_id}"),
+     "says": "change a message you already sent"},
+    {"name": "unsend_message", "writes": True, "confirm": True,
+     "shared_door": True,
+     "route": ("DELETE", "/profiles/{profile_id}/messages/{message_id}"),
+     "says": "take back a message you already sent"},
+    {"name": "reach_out", "writes": True, "confirm": True,
+     "route": ("POST", "/profiles/{profile_id}/proactive/{interactor_id}"),
+     "says": "have this profile start a conversation with somebody"},
+    {"name": "grant", "writes": True, "confirm": True,
+     "route": ("POST", "/profiles/{profile_id}/grants"),
+     "says": "let somebody else act with this profile's authority"},
+    {"name": "read_delegation", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/delegation"),
+     "says": "read what this profile is allowed to do on your behalf"},
+    {"name": "set_delegation", "writes": True, "confirm": True,
+     "route": ("PUT", "/profiles/{profile_id}/delegation"),
+     "says": "change what this profile may do on your behalf"},
+
+    # --- what it remembers of people ----------------------------------------
+    {"name": "list_memories", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/memories"),
+     "says": "list the people this profile remembers"},
+    {"name": "read_memory", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/memory/{interactor_id}"),
+     "says": "read what it remembers about one person"},
+    {"name": "read_thread", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/thread/{interactor_id}"),
+     "says": "read the conversation it has had with one person"},
+    {"name": "set_relationship", "writes": True,
+     "route": ("PUT", "/profiles/{profile_id}/relationships/{interactor_id}"),
+     "says": "say who somebody is to this profile"},
+    {"name": "forget_person", "writes": True, "confirm": True,
+     "shared_door": True,
+     "route": ("POST", "/profiles/{profile_id}/memory/{interactor_id}/forget"),
+     "says": "have it forget what it knows about one person"},
+    {"name": "erase_person", "writes": True, "confirm": True,
+     "shared_door": True,
+     "route": ("DELETE", "/profiles/{profile_id}/memory/{interactor_id}"),
+     "says": "erase one person's record from this profile for good"},
 )
 
 #: Everything the agent is told about where it is running.
@@ -428,6 +694,28 @@ def _only(name: str) -> tuple[str, ...] | None:
     for tool in TOOLS:
         if tool["name"] == name:
             return tool.get("only")
+    raise KeyError(name)
+
+
+def needs_a_press(name: str) -> bool:
+    """Whether this row is proposed rather than done.
+
+    See `converse`. The short version: a model that misreads *wind it down*
+    is one word away from ending a profile instead of a thread, and no amount
+    of prompt gets that to zero.
+    """
+    for tool in TOOLS:
+        if tool["name"] == name:
+            return bool(tool.get("confirm"))
+    raise KeyError(name)
+
+
+def what_it_would_do(name: str) -> str:
+    """The sentence shown beside the button. The row's own words, because the
+    thing a person is agreeing to should be the thing the roster promised."""
+    for tool in TOOLS:
+        if tool["name"] == name:
+            return tool["says"]
     raise KeyError(name)
 
 
@@ -603,8 +891,31 @@ def converse(said: str, history: list[dict], *, app, profile_id: str,
         reply = provider.generate(system_prompt(), turns)
         wanted = wants_a_tool(reply)
         if wanted is None:
-            return {"reply": reply.strip(), "acted": steps, "stopped": None}
+            return {"reply": reply.strip(), "acted": steps,
+                    "stopped": None, "asks": None}
         name, arguments = wanted
+
+        # The rows that cannot be taken back stop here and ask.
+        #
+        # Everything in this list is the person's own, reached with their own
+        # credential through their own door, and most of it is a mistake they
+        # can simply undo — a tagline goes back, a widget has versions, a post
+        # comes down. A sunset does not. Neither does a message somebody else
+        # has now read, a payout, or a grant of authority handed to a third
+        # party.
+        #
+        #     asked     may this person do this
+        #     mattered  did this person mean this
+        #
+        # Those are different questions and only the first one has a token.
+        # The second is answered by a press, so a confirming row is returned
+        # as a proposal — the row's own sentence and the arguments the model
+        # chose, both visible — and the console asks. `authoring_act` is where
+        # it lands if the answer is yes.
+        if is_a_tool(name) and needs_a_press(name):
+            return {"reply": "", "acted": steps, "stopped": None,
+                    "asks": {"tool": name, "arguments": dict(arguments or {}),
+                             "says": what_it_would_do(name)}}
         try:
             result = call(name, arguments, app=app, profile_id=profile_id,
                           authorization=authorization)
@@ -623,4 +934,5 @@ def converse(said: str, history: list[dict], *, app, profile_id: str,
     # Out of steps with no answer. Said plainly rather than dressed as one —
     # the screen shows what it did reach, and the person decides whether to
     # ask again.
-    return {"reply": "", "acted": steps, "stopped": "agent.too_many_steps"}
+    return {"reply": "", "acted": steps, "stopped": "agent.too_many_steps",
+            "asks": None}

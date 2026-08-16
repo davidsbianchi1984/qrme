@@ -49,6 +49,10 @@ export function Studio({ onPlans }: { onPlans: () => void }) {
   const [showsReach, setShowsReach] = useState(false);
   const [talk, setTalk] = useState<{ role: string; content: string }[]>([]);
   const [did, setDid] = useState<AgentTurn | null>(null);
+  // The rows that cannot be taken back stop and ask. The Studio's agent is
+  // the same agent with the same roster, so it asks here too.
+  const [asks, setAsks] = useState<AgentTurn["asks"]>(null);
+  const [pressing, setPressing] = useState(false);
 
   const owner = session.profileId && session.ownerToken;
 
@@ -68,9 +72,11 @@ export function Studio({ onPlans }: { onPlans: () => void }) {
     const said = ask.trim();
     setAsking(true);
     setDid(null);
+    setAsks(null);
     api.authoringTurn(session.profileId!, said, talk, session.ownerToken!)
       .then((turn) => {
         setDid(turn);
+        setAsks(turn.asks);
         setTalk([...talk, { role: "user", content: said },
                  { role: "assistant", content: turn.reply }]);
         setAsk("");
@@ -83,6 +89,26 @@ export function Studio({ onPlans }: { onPlans: () => void }) {
       })
       .catch((e) => setError(e))
       .finally(() => setAsking(false));
+  }
+
+  /** The press, for the steps that stopped and asked. The arguments go back
+   *  exactly as the turn handed them over. */
+  function doIt() {
+    if (!owner || !asks) return;
+    setPressing(true);
+    api.authoringAct(session.profileId!, { tool: asks.tool, arguments: asks.arguments },
+                     session.ownerToken!)
+      .then((done) => {
+        setDid({ reply: "", acted: [{ tool: done.tool,
+                                      answered: done.answered,
+                                      said: done.says }],
+                 stopped: null, said: null, asks: null });
+        setAsks(null);
+        load();
+        if (open) edit(open);
+      })
+      .catch((e) => setError(e))
+      .finally(() => setPressing(false));
   }
 
   function edit(widget: Widget | null) {
@@ -171,7 +197,9 @@ export function Studio({ onPlans }: { onPlans: () => void }) {
         ask={ask} setAsk={setAsk} asking={asking}
         canSend={!!owner} onSend={send}
         talk={talk} did={did}
-        onForget={() => { setTalk([]); setDid(null); }}
+        asks={asks} pressing={pressing}
+        onDoIt={doIt} onDrop={() => setAsks(null)}
+        onForget={() => { setTalk([]); setDid(null); setAsks(null); }}
         reach={agent ? agent.can_touch : null}
         showsReach={showsReach} onToggleReach={() => setShowsReach(!showsReach)}
         unavailable={!!agent && !agent.available} />

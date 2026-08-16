@@ -3191,6 +3191,13 @@ export interface AgentTurn {
            said?: string }[];
   stopped: string | null;
   said: string | null;
+  /** What it stopped to ask about, when it reached for a step that cannot be
+   *  taken back — winding a profile down, paying out, messaging somebody,
+   *  granting authority. `says` is the roster's own sentence, so the thing
+   *  being agreed to is the thing the list promised, and `with` is the
+   *  arguments it chose, handed back untouched to `authoringAct`. */
+  asks: { tool: string; arguments: Record<string, unknown>;
+           says: string } | null;
 }
 
 export const api = {
@@ -3501,6 +3508,16 @@ export const api = {
                   token: string) =>
     req<AgentTurn>(`/profiles/${profileId}/authoring/turn`,
       { method: "POST", body: { said, history }, token }),
+  // The press. The arguments go back exactly as the turn showed them — a
+  // console that rebuilt them would make the sentence on screen a summary of
+  // what happens rather than the thing being agreed to.
+  authoringAct: (profileId: string,
+                 asks: { tool: string; arguments: Record<string, unknown> },
+                 token: string) =>
+    req<{ tool: string; answered: number; says: string }>(
+      `/profiles/${profileId}/authoring/act`,
+      { method: "POST", body: { tool: asks.tool, arguments: asks.arguments },
+        token }),
   listWidgets: (profileId: string, token: string) =>
     req<{ widgets: Widget[] }>(`/profiles/${profileId}/widgets`, { token }),
   readWidget: (profileId: string, widgetId: string, token: string) =>

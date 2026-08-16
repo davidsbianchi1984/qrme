@@ -30,6 +30,7 @@ import type { AgentTurn } from "./api";
 export function AgentTalk({
   lang, ask, setAsk, asking, canSend, onSend, talk, did, onForget,
   reach, showsReach, onToggleReach, unavailable, words,
+  asks, pressing, onDoIt, onDrop,
 }: {
   lang: Lang;
   ask: string;
@@ -69,6 +70,16 @@ export function AgentTalk({
    *  catches. So the lookup moved back to the screens, where the key is a
    *  literal somebody can grep for, and this component takes sentences. */
   words: { title: string; sub: string; ph: string };
+  /** What it stopped to ask about, and the two answers.
+   *
+   *  A step that cannot be taken back does not run inside the turn. It comes
+   *  back here as a sentence — the roster's own, not the model's summary of
+   *  it — and nothing happens until somebody presses. `onDoIt` sends the
+   *  arguments straight back; `onDrop` throws them away. */
+  asks: AgentTurn["asks"];
+  pressing: boolean;
+  onDoIt: () => void;
+  onDrop: () => void;
 }) {
   return (
     <div className="card">
@@ -104,6 +115,32 @@ export function AgentTalk({
           {turn.content}
         </p>
       ))}
+      {asks && (
+        <div className="card asks">
+          <p className="small">
+            {fill(tr("agent.asks", lang), { does: asks.says })}
+          </p>
+          {/* The arguments it chose, shown rather than summarised. A person
+              agreeing to *send somebody a message* should be able to see who
+              and what before they agree to it. */}
+          {Object.keys(asks.arguments).length > 0 && (
+            <ul className="muted small">
+              {Object.entries(asks.arguments).map(([field, value]) => (
+                <li key={field}>{field}: {String(value)}</li>
+              ))}
+            </ul>
+          )}
+          <div className="row">
+            <button className="primary" disabled={pressing} onClick={onDoIt}>
+              {pressing ? tr("agent.asks.doing", lang)
+                        : tr("agent.asks.doit", lang)}
+            </button>
+            <button disabled={pressing} onClick={onDrop}>
+              {tr("agent.asks.no", lang)}
+            </button>
+          </div>
+        </div>
+      )}
       {did && did.said && <p className="muted small">{did.said}</p>}
       {did && did.acted.length > 0 && (
         <ul className="muted small">

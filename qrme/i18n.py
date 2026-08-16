@@ -219,6 +219,8 @@ STUDIO_REFUSALS: dict[str, str] = {
     "agent.missing_argument": "the model left out something the step needs",
     "agent.field_not_yours": "the model tried to change something that step "
                              "does not reach",
+    "agent.not_asked": "that step runs inside a turn and was not one to "
+                       "confirm",
     "agent.tool_failed": "that step did not finish",
     "agent.too_many_steps": "this went on longer than one turn allows — ask "
                             "again for something narrower",
@@ -1198,6 +1200,17 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'zh': '模型索取了它并不具备的东西。',
         'hi': 'मॉडल ने ऐसी चीज़ माँगी जो उसके पास नहीं है।',
         'ar': 'طلب النموذج شيئًا لا يملكه.',
+    },
+    'that step runs inside a turn and was not one to confirm': {
+        'es': 'ese paso se ejecuta dentro del turno y no era de los que se confirman',
+        'fr': "cette étape s'exécute dans le tour et n'était pas de celles à confirmer",
+        'de': 'dieser Schritt läuft innerhalb des Zuges und war keiner zum Bestätigen',
+        'pt': 'esse passo corre dentro do turno e não era dos que se confirmam',
+        'it': 'quel passo viene eseguito nel turno e non era da confermare',
+        'ja': 'その手順はやり取りの中で実行されるもので、確認を求める種類ではありません。',
+        'zh': '该步骤在对话回合内执行，本就不需要确认。',
+        'hi': 'वह चरण बातचीत के भीतर ही चलता है; वह पुष्टि माँगने वालों में नहीं था।',
+        'ar': 'تلك الخطوة تُنفَّذ داخل الدور ولم تكن مما يُستأذن فيه.',
     },
     'the model tried to change something that step does not reach': {
         'es': 'el modelo intentó cambiar algo que ese paso no alcanza',
@@ -3606,6 +3619,12 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     'showing': {'en': 'What your box shows', 'es': 'Lo que muestra tu recuadro', 'fr': 'Ce que montre votre case', 'de': 'Was dein Kästchen zeigt', 'pt': 'O que o seu quadrado mostra', 'it': 'Cosa mostra il tuo riquadro', 'ja': 'あなたの枠に出るもの', 'zh': '你的方框显示什么', 'hi': 'आपका खाना क्या दिखाता है', 'ar': 'ما يعرضه مربعك'},
     'media_url': {'en': 'Picture', 'es': 'Imagen', 'fr': 'Image', 'de': 'Bild', 'pt': 'Imagem', 'it': 'Immagine', 'ja': '写真', 'zh': '图片', 'hi': 'तस्वीर', 'ar': 'الصورة'},
     'media_id': {'en': 'Upload', 'es': 'Archivo subido', 'fr': 'Fichier envoyé', 'de': 'Hochgeladene Datei', 'pt': 'Ficheiro enviado', 'it': 'File caricato', 'ja': 'アップロード', 'zh': '上传的文件', 'hi': 'अपलोड', 'ar': 'الملف المرفوع'},
+    # The agent's proposal, handed back when somebody presses. Neither is a
+    # field a person types — the console sends back what the turn showed —
+    # but a refusal that named one of them still has to read as something,
+    # and "tool" is a developer's word for it.
+    'tool': {'en': 'Step', 'es': 'Paso', 'fr': 'Étape', 'de': 'Schritt', 'pt': 'Passo', 'it': 'Passo', 'ja': '手順', 'zh': '步骤', 'hi': 'चरण', 'ar': 'الخطوة'},
+    'arguments': {'en': 'What it would use', 'es': 'Lo que usaría', 'fr': 'Ce qu’il utiliserait', 'de': 'Was es verwenden würde', 'pt': 'O que usaria', 'it': 'Cosa userebbe', 'ja': '使うもの', 'zh': '它会用到的内容', 'hi': 'यह क्या इस्तेमाल करेगा', 'ar': 'ما سيستخدمه'},
     'lang': {'en': 'Language', 'es': 'Idioma', 'fr': 'Langue', 'de': 'Sprache', 'pt': 'Idioma', 'it': 'Lingua', 'ja': '言語', 'zh': '语言', 'hi': 'भाषा', 'ar': 'اللغة'},
     'beneficiary': {'en': 'Beneficiary', 'es': 'Beneficiario', 'fr': 'Bénéficiaire', 'de': 'Begünstigter', 'pt': 'Beneficiário', 'it': 'Beneficiario', 'ja': '受取人', 'zh': '受益人', 'hi': 'लाभार्थी', 'ar': 'المستفيد'},
     'designees': {'en': 'Designees', 'es': 'Designados', 'fr': 'Désignataires', 'de': 'Benannte', 'pt': 'Designados', 'it': 'Designati', 'ja': '指定先', 'zh': '指定人', 'hi': 'नामित', 'ar': 'المعيَّنون'},

@@ -127,6 +127,21 @@ const CHROME: Table = {
   "agent.signin": {
     en: "Sign in with a profile of your own — it works on your app, so it needs to know whose.", es: "Entra con un perfil tuyo: trabaja sobre tu app, así que necesita saber de quién es.", fr: "Connectez-vous avec un profil à vous — il agit sur votre app, il doit savoir laquelle.", de: "Melde dich mit einem eigenen Profil an — es arbeitet an deiner App und muss wissen, wessen.", pt: "Entre com um perfil seu — ele trabalha na sua app, por isso precisa saber de quem é.", it: "Accedi con un profilo tuo: lavora sulla tua app, quindi deve sapere di chi è.", ja: "ご自身のプロフィールでサインインしてください。あなたのアプリに手を入れるので、誰のものかを知る必要があります。", zh: "用你自己的档案登录——它动的是你的应用，所以得知道是谁的。", hi: "अपनी प्रोफ़ाइल से साइन इन करें — यह आपके ऐप पर काम करता है, तो जानना ज़रूरी है कि किसका।", ar: "سجّل الدخول بملف يخصّك — فهو يعمل على تطبيقك ويحتاج أن يعرف لمن.",
   },
+  // The press. `does` is the roster's own sentence, in the platform's ten
+  // languages already — so the thing being agreed to reads the same here as
+  // it did in the list of what this agent can touch.
+  "agent.asks": {
+    en: "It wants to {does}. Nothing has happened yet.", es: "Quiere {does}. Todavía no ha pasado nada.", fr: "Il veut {does}. Rien n'a encore été fait.", de: "Es möchte {does}. Bisher ist nichts geschehen.", pt: "Quer {does}. Ainda não aconteceu nada.", it: "Vuole {does}. Non è ancora successo nulla.", ja: "「{does}」をしようとしています。まだ何も起きていません。", zh: "它想{does}。目前还什么都没发生。", hi: "यह {does} चाहता है। अभी कुछ भी नहीं हुआ है।", ar: "يريد أن {does}. لم يحدث شيء بعد.",
+  },
+  "agent.asks.doit": {
+    en: "Do it", es: "Hazlo", fr: "Faites-le", de: "Tu es", pt: "Faça", it: "Fallo", ja: "実行する", zh: "去做", hi: "कर दीजिए", ar: "نفّذ",
+  },
+  "agent.asks.doing": {
+    en: "Doing it…", es: "Haciéndolo…", fr: "En cours…", de: "Wird getan…", pt: "A fazer…", it: "In corso…", ja: "実行中…", zh: "正在执行…", hi: "किया जा रहा है…", ar: "جارٍ التنفيذ…",
+  },
+  "agent.asks.no": {
+    en: "No", es: "No", fr: "Non", de: "Nein", pt: "Não", it: "No", ja: "やめる", zh: "不要", hi: "नहीं", ar: "لا",
+  },
   "agent.ask.title": {
     en: "Ask for it in words", es: "Pídelo con palabras", fr: "Demandez-le avec des mots", de: "Sagen Sie es einfach", pt: "Peça por palavras", it: "Chiedilo a parole", ja: "言葉で頼む", zh: "用一句话说出来", hi: "शब्दों में कहिए", ar: "اطلبه بالكلمات",
   },

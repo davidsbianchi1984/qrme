@@ -216,6 +216,108 @@ def test_prose_that_merely_mentions_a_call_is_prose(
     assert answer.json()["acted"] == []
 
 
+# --- the ones that stop and ask ---------------------------------------------
+
+def _asking(client, profile_id, owner_token, driving, said="wind it down"):
+    driving(Scripted('CALL sunset {"reason": "done with it"}',
+                     "I've wound it down."))
+    return _turn(client, profile_id, owner_token, None, said=said)
+
+
+def test_a_step_that_cannot_be_undone_stops_and_asks(
+        client, profile_id, owner_token, driving):
+    """The whole of the confirm mechanism, from the outside.
+
+    The model asked to sunset a profile. The person may sunset it — the token
+    says so, and it is theirs. What the token cannot say is whether *wind it
+    down* meant the profile or the conversation, so the turn ends holding the
+    question rather than the answer.
+
+        asked     may this person do this
+        mattered  did this person mean this
+    """
+    answer = _asking(client, profile_id, owner_token, driving)
+    assert answer.status_code == 200, answer.text
+    body = answer.json()
+    assert body["asks"], "a sunset went through inside the turn"
+    assert body["asks"]["tool"] == "sunset"
+    assert body["asks"]["arguments"] == {"reason": "done with it"}
+    assert body["asks"]["says"] == authoring.what_it_would_do("sunset"), (
+        "the sentence beside the button is not the sentence the roster "
+        "promised — a person agreeing to one is agreeing to the other")
+    assert body["acted"] == []
+
+    # And the profile is untouched. The reply above is the model's word for
+    # it; this is the record.
+    profile = client.get(f"/profiles/{profile_id}").json()
+    assert profile["status"] != "departed", (
+        "it asked and did it anyway, which is worse than doing it quietly")
+
+
+def test_the_press_is_what_does_it(client, profile_id, owner_token, driving):
+    """The other half. A question with no way to say yes is a refusal wearing
+    a button."""
+    asks = _asking(client, profile_id, owner_token, driving).json()["asks"]
+    done = client.post(
+        f"/profiles/{profile_id}/authoring/act",
+        json={"tool": asks["tool"], "arguments": asks["arguments"]},
+        headers={"Authorization": f"Bearer {owner_token}"})
+    assert done.status_code == 200, done.text
+    assert done.json()["tool"] == "sunset"
+    assert done.json()["answered"] in (200, 201, 204), done.json()
+
+    profile = client.get(f"/profiles/{profile_id}").json()
+    assert profile["status"] == "departed", (
+        "the person pressed and nothing happened")
+
+
+def test_the_press_does_not_ask_a_model_anything(
+        client, profile_id, owner_token, driving):
+    """No prose reaches this route and no model is asked. What runs is the
+    arguments the turn already showed — which is what makes the sentence on
+    the screen the thing agreed to rather than a summary of it."""
+    model = Scripted('CALL sunset {}', "done")
+    driving(model)
+    _turn(client, profile_id, owner_token, None, said="wind it down")
+    before = len(model.seen)
+    client.post(f"/profiles/{profile_id}/authoring/act",
+                json={"tool": "sunset", "arguments": {}},
+                headers={"Authorization": f"Bearer {owner_token}"})
+    assert len(model.seen) == before, "the press went back to the provider"
+
+
+def test_a_step_that_runs_inside_a_turn_is_not_pressable(
+        client, profile_id, owner_token):
+    """The route is the second half of a mechanism, not a second way to drive
+    the roster. A client that learned to call it directly for everything would
+    be an unguarded copy of `converse`."""
+    refused = client.post(
+        f"/profiles/{profile_id}/authoring/act",
+        json={"tool": "edit_page", "arguments": {"tagline": "mine now"}},
+        headers={"Authorization": f"Bearer {owner_token}"})
+    assert refused.status_code == 422, refused.text
+    page = client.get(f"/profiles/{profile_id}/page").json()
+    assert page["tagline"] != "mine now"
+
+
+def test_the_press_cannot_be_made_by_somebody_else(client, profile_id):
+    """The same door the turn has. A confirmation anybody can send is not a
+    confirmation."""
+    del client.headers["authorization"]
+    assert client.post(f"/profiles/{profile_id}/authoring/act",
+                       json={"tool": "sunset", "arguments": {}}
+                       ).status_code == 401
+
+
+def test_a_name_the_press_invented_is_not_a_tool(client, profile_id,
+                                                 owner_token):
+    refused = client.post(
+        f"/profiles/{profile_id}/authoring/act",
+        json={"tool": "delete_profile", "arguments": {}},
+        headers={"Authorization": f"Bearer {owner_token}"})
+    assert refused.status_code == 422, refused.text
+
+
 def test_what_it_can_touch_is_readable_without_signing_in(client):
     """Somebody deciding whether to use this should be able to read what it
     reaches first. The list is the registry's, not a second copy."""
