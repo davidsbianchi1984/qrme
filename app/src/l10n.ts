@@ -140,7 +140,7 @@ const CHROME: Table = {
     en: "Doing it…", es: "Haciéndolo…", fr: "En cours…", de: "Wird getan…", pt: "A fazer…", it: "In corso…", ja: "実行中…", zh: "正在执行…", hi: "किया जा रहा है…", ar: "جارٍ التنفيذ…",
   },
   "agent.asks.no": {
-    en: "No", es: "No", fr: "Non", de: "Nein", pt: "Não", it: "No", ja: "やめる", zh: "不要", hi: "नहीं", ar: "لا",
+    en: "No", es: "No", fr: "Non", de: "Nein", pt: "Não", it: "No", ja: "いいえ", zh: "不", hi: "नहीं", ar: "لا",
   },
   "agent.ask.title": {
     en: "Ask for it in words", es: "Pídelo con palabras", fr: "Demandez-le avec des mots", de: "Sagen Sie es einfach", pt: "Peça por palavras", it: "Chiedilo a parole", ja: "言葉で頼む", zh: "用一句话说出来", hi: "शब्दों में कहिए", ar: "اطلبه بالكلمات",
