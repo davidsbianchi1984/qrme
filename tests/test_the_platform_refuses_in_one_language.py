@@ -400,6 +400,13 @@ def _recorded_templates() -> set[str]:
             if line.strip() and not line.startswith("#")}
 
 
+def _refusal_floor() -> int:
+    """The registered floor, so the number lives in `ratchets.py` where
+    something audits it against what it measures every run."""
+    from .ratchets import RATCHETS
+    return next(r.floor for r in RATCHETS if r.name == "refusals.literal")
+
+
 def test_no_refusal_shape_goes_unclassified():
     """The finding this round is about, as a standing check.
 
@@ -425,7 +432,7 @@ def test_no_refusal_shape_goes_unclassified():
           "or the sentences it carries are invisible.")
     # And the classifier must still be finding the bulk of them: a refactor
     # that broke `_refusals` would report zero unknown on zero refusals.
-    assert len(found["literal"]) >= 200, (
+    assert len(found["literal"]) >= _refusal_floor(), (
         f"only {len(found['literal'])} literal refusals found — the walk has "
         "stopped matching, so every check built on it is passing on nothing")
 
