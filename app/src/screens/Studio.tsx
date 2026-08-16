@@ -164,7 +164,10 @@ export function Studio({ onPlans }: { onPlans: () => void }) {
           screen re-reads the widget it was editing afterwards, which is its
           business and not the component's. */}
       <AgentTalk
-        lang={lang} labels="studio.ask"
+        lang={lang}
+        words={{ title: tr("studio.ask.title", lang),
+                 sub: tr("studio.ask.sub", lang),
+                 ph: tr("studio.ask.ph", lang) }}
         ask={ask} setAsk={setAsk} asking={asking}
         canSend={!!owner} onSend={send}
         talk={talk} did={did}

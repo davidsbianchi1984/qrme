@@ -217,8 +217,14 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
                "live rooms", "browse desks", "what is playing"),
     "widgets": ("write my own tool", "write code", "a widget", "my widgets",
                 "make it do something", "run my own code", "script",
-                "the studio", "ask it to change my page",
-                "change my page for me", "what can the agent do"),
+                "the studio"),
+    # The last three of these sat on `widgets` for as long as the Studio was
+    # the only door to the agent. It has its own tab now, and somebody who
+    # types *change my page for me* is asking in plain words — sending them to
+    # the code editor would land them in the one room they were avoiding.
+    "agent": ("the agent", "what can the agent do", "ask it to change my page",
+              "change my page for me", "do it for me", "build it for me",
+              "make my page say", "have it write something"),
     "corner": ("my homepage", "my page", "edit my page", "top friends",
                "send a message", "message a friend", "my messages",
                "turn off messaging", "my switches"),

@@ -95,7 +95,10 @@ export function Agent({ onPlans, onStudio }: {
         </p></div>
       ) : (
         <AgentTalk
-          lang={lang} labels="agent.ask"
+          lang={lang}
+          words={{ title: tr("agent.ask.title", lang),
+                   sub: tr("agent.ask.sub", lang),
+                   ph: tr("agent.ask.ph", lang) }}
           ask={ask} setAsk={setAsk} asking={asking}
           canSend={!!session.ownerToken} onSend={send}
           talk={talk} did={did}
