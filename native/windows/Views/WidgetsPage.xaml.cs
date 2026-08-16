@@ -26,6 +26,10 @@ public sealed partial class WidgetsPage : Page
     // The agent. Its conversation lives here rather than on the server: it
     // has no memory of its own, so leaving this page is all of forgetting.
     private AgentReach? _reach;
+    // The rows that cannot be taken back stop and ask rather than running
+    // inside the turn. Held apart from the step list so dropping the question
+    // does not also drop the record of what it did before it got there.
+    private AgentAsks? _asks;
     private readonly System.Collections.Generic.List<AgentSaid> _talk = new();
     private bool _showsReach;
 
@@ -53,6 +57,8 @@ public sealed partial class WidgetsPage : Page
         AskSub.Text = L10n.T("wdg.ask.sub", lang);
         AskButton.Content = L10n.T("wdg.ask.go", lang);
         ForgetButton.Content = L10n.T("wdg.ask.forget", lang);
+        DoItButton.Content = L10n.T("wdg.asks.doit", lang);
+        DropAskButton.Content = L10n.T("wdg.asks.no", lang);
         NoModel.Text = L10n.T("wdg.ask.nomodel", lang);
         ReachButton.Content = L10n.T(
             _showsReach ? "wdg.reach.hide" : "wdg.reach.show", lang);
@@ -98,15 +104,71 @@ public sealed partial class WidgetsPage : Page
                     .Where(line => line.Length > 0));
             StepsText.Visibility = StepsText.Text.Length == 0
                 ? Visibility.Collapsed : Visibility.Visible;
+            ShowAsks(turn.Asks);
             await LoadAsync();
         }
         catch (Exception ex) { ShowError(ex.Message); }
         finally { AskButton.IsEnabled = true; }
     }
 
+    /// <summary>Render the question, or take it away. The arguments are
+    /// listed rather than summarised: somebody agreeing to <em>send somebody
+    /// a message</em> should be able to see who and what first.</summary>
+    private void ShowAsks(AgentAsks? asks)
+    {
+        _asks = asks;
+        if (asks is null)
+        {
+            AsksPanel.Visibility = Visibility.Collapsed;
+            return;
+        }
+        var lang = AppState.Current.Language;
+        AsksText.Text = L10n.Fill("wdg.asks", lang,
+            new System.Collections.Generic.Dictionary<string, string>
+                { ["does"] = asks.Says });
+        AsksArgs.Text = asks.Arguments.ValueKind
+                == System.Text.Json.JsonValueKind.Object
+            ? string.Join("\n", asks.Arguments.EnumerateObject()
+                .OrderBy(field => field.Name)
+                .Select(field => $"{field.Name}: {field.Value}"))
+            : "";
+        AsksArgs.Visibility = AsksArgs.Text.Length == 0
+            ? Visibility.Collapsed : Visibility.Visible;
+        AsksPanel.Visibility = Visibility.Visible;
+    }
+
+    /// <summary>The press. The arguments go back exactly as the turn handed
+    /// them over — rebuilding them here would make the sentence on the screen
+    /// a summary of what happens rather than the thing agreed to.</summary>
+    private async void OnDoIt(object sender, RoutedEventArgs e)
+    {
+        var state = AppState.Current;
+        if (state.Pid is null || state.Token is null || _asks is null) return;
+        DoItButton.IsEnabled = false;
+        DoItButton.Content = L10n.T("wdg.asks.doing", state.Language);
+        try
+        {
+            var did = await ApiClient.Shared.AuthoringAct(
+                state.Pid, _asks.Tool, _asks.Arguments, state.Token);
+            StepsText.Text = did.Says;
+            StepsText.Visibility = Visibility.Visible;
+            ShowAsks(null);
+            await LoadAsync();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+        finally
+        {
+            DoItButton.IsEnabled = true;
+            DoItButton.Content = L10n.T("wdg.asks.doit", state.Language);
+        }
+    }
+
+    private void OnDropAsk(object sender, RoutedEventArgs e) => ShowAsks(null);
+
     private void OnForget(object sender, RoutedEventArgs e)
     {
         _talk.Clear();
+        ShowAsks(null);
         TalkText.Visibility = Visibility.Collapsed;
         StepsText.Visibility = Visibility.Collapsed;
         ForgetButton.Visibility = Visibility.Collapsed;

@@ -191,6 +191,9 @@ object L10n {
             "en" to "Save", "es" to "Guardar", "fr" to "Enregistrer", "de" to "Speichern", "pt" to "Guardar", "it" to "Salva", "ja" to "保存", "zh" to "保存", "hi" to "सहेजें", "ar" to "حفظ"),
         "wdg.run" to mapOf(
             "en" to "Run", "es" to "Ejecutar", "fr" to "Exécuter", "de" to "Ausführen", "pt" to "Executar", "it" to "Esegui", "ja" to "実行", "zh" to "运行", "hi" to "चलाएँ", "ar" to "تشغيل"),
+        "wdg.asks" to mapOf("en" to "It wants to {does}. Nothing has happened yet.", "es" to "Quiere {does}. Todavía no ha pasado nada.", "fr" to "Il veut {does}. Rien n'a encore été fait.", "de" to "Es möchte {does}. Bisher ist nichts geschehen.", "pt" to "Quer {does}. Ainda não aconteceu nada.", "it" to "Vuole {does}. Non è ancora successo nulla.", "ja" to "「{does}」をしようとしています。まだ何も起きていません。", "zh" to "它想{does}。目前还什么都没发生。", "hi" to "यह {does} चाहता है। अभी कुछ भी नहीं हुआ है।", "ar" to "يريد أن {does}. لم يحدث شيء بعد."),
+        "wdg.asks.doit" to mapOf("en" to "Do it", "es" to "Hazlo", "fr" to "Faites-le", "de" to "Tu es", "pt" to "Faça", "it" to "Fallo", "ja" to "実行する", "zh" to "去做", "hi" to "कर दीजिए", "ar" to "نفّذ"),
+        "wdg.asks.no" to mapOf("en" to "No", "es" to "No", "fr" to "Non", "de" to "Nein", "pt" to "Não", "it" to "No", "ja" to "やめる", "zh" to "不要", "hi" to "नहीं", "ar" to "لا"),
         "wdg.ask.title" to mapOf(
             "en" to "Ask for it in words",
             "es" to "Pídelo con palabras",

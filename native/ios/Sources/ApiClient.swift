@@ -5985,20 +5985,51 @@ struct WidgetRow: Decodable, Identifiable {
 /// displaying somebody's own result, not interpreting it.
 struct AnyDecodable: Decodable {
     let shown: String
+    /// The value itself, not its rendering.
+    ///
+    /// `shown` was the whole of this for a long time, because everything that
+    /// decoded one only ever displayed it. The agent's press sends the
+    /// arguments *back* — a number that made the round trip as the string
+    /// "3" is a different request from the one the person read and agreed
+    /// to, so the value has to survive as well as the wording.
+    ///
+    ///     asked     can this be shown
+    ///     mattered  can this be sent back unchanged
+    ///
+    /// A shape neither can represent decodes to `NSNull`, which is what
+    /// `faithful` reads. Computed rather than stored: a `let` beside `shown`
+    /// in a `Decodable` is a field off the wire as far as
+    /// `test_every_key_a_shell_reads_is_one_the_server_can_send` is
+    /// concerned, and this one is worked out here. A caller sending
+    /// arguments back must not offer to when it is false.
+    let raw: Any
+    var faithful: Bool { !(raw is NSNull) }
 
     init(from decoder: Decoder) throws {
         let single = try decoder.singleValueContainer()
-        if let text = try? single.decode(String.self) { shown = text }
-        else if let number = try? single.decode(Double.self) {
-            shown = number == number.rounded()
-                ? String(Int(number)) : String(number)
+        if let text = try? single.decode(String.self) {
+            shown = text; raw = text
+        } else if let number = try? single.decode(Double.self) {
+            let whole = number == number.rounded()
+            shown = whole ? String(Int(number)) : String(number)
+            raw = whole ? Int(number) as Any : number as Any
+        } else if let flag = try? single.decode(Bool.self) {
+            shown = String(flag); raw = flag
+        } else if let nested = try? single.decode([String: AnyDecodable].self) {
+            shown = nested.map { "\($0.key): \($0.value.shown)" }
+                          .sorted().joined(separator: "\n")
+            // One unrepresentable member makes the whole container
+            // unrepresentable — half a dictionary sent back is not the
+            // request anybody read.
+            raw = nested.values.allSatisfy { $0.faithful }
+                ? nested.mapValues { $0.raw } : NSNull()
+        } else if let list = try? single.decode([AnyDecodable].self) {
+            shown = list.map { $0.shown }.joined(separator: ", ")
+            raw = list.allSatisfy { $0.faithful }
+                ? list.map { $0.raw } : NSNull()
+        } else {
+            shown = ""; raw = NSNull()
         }
-        else if let flag = try? single.decode(Bool.self) { shown = String(flag) }
-        else if let raw = try? single.decode([String: String].self) {
-            shown = raw.map { "\($0.key): \($0.value)" }
-                       .sorted().joined(separator: "\n")
-        }
-        else { shown = "" }
     }
 }
 
@@ -6030,6 +6061,18 @@ extension ApiClient {
         try await request("/profiles/\(profileId)/authoring/turn",
                           method: "POST",
                           body: ["said": said, "history": history],
+                          token: token)
+    }
+
+    /// The press. No prose and no model — the arguments go back exactly as
+    /// the turn handed them over, which is what makes the sentence on the
+    /// screen the thing agreed to rather than a summary of it.
+    func authoringAct(profileId: String, tool: String,
+                      arguments: [String: Any],
+                      token: String) async throws -> AgentDid {
+        try await request("/profiles/\(profileId)/authoring/act",
+                          method: "POST",
+                          body: ["tool": tool, "arguments": arguments],
                           token: token)
     }
 
@@ -6092,6 +6135,20 @@ struct AgentTurn: Decodable {
     let acted: [AgentStep]
     let stopped: String?
     let said: String?
+    /// What it stopped to ask about, when it reached for a step that cannot
+    /// be taken back. `says` is the roster's own sentence, so the thing being
+    /// agreed to is the thing the list promised.
+    let asks: AgentAsks?
+}
+struct AgentAsks: Decodable {
+    let tool: String
+    let arguments: [String: AnyDecodable]
+    let says: String
+}
+struct AgentDid: Decodable {
+    let tool: String
+    let answered: Int
+    let says: String
 }
 struct WidgetRemoved: Decodable { let removed: Bool; let widget_id: String }
 struct WidgetLimits: Decodable {

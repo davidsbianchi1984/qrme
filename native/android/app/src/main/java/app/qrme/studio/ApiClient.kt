@@ -4738,8 +4738,27 @@ object ApiClient {
             AgentStep(step.optString("tool"), step.optInt("answered"),
                 step.optString("said").ifEmpty { null })
         }
+        val asking = o.optJSONObject("asks")
         return AgentTurn(o.optString("reply"), steps,
-            o.optString("said").ifEmpty { null })
+            o.optString("said").ifEmpty { null },
+            asking?.let {
+                AgentAsks(it.optString("tool"),
+                    it.optJSONObject("arguments") ?: JSONObject(),
+                    it.optString("says"))
+            })
+    }
+
+    /** The press. No prose and no model — the arguments go back as the JSON
+     *  the turn handed over, which is what makes the sentence on the screen
+     *  the thing agreed to rather than a summary of it. */
+    suspend fun authoringAct(profileId: String, tool: String,
+                             arguments: JSONObject,
+                             token: String): AgentStep {
+        val body = JSONObject().put("tool", tool).put("arguments", arguments)
+        val o = JSONObject(request("/profiles/$profileId/authoring/act",
+            "POST", body, token))
+        return AgentStep(o.optString("tool"), o.optInt("answered"),
+            o.optString("says").ifEmpty { null })
     }
 
     private fun widgetOf(o: JSONObject) = WidgetRow(
@@ -4946,5 +4965,13 @@ data class AgentReach(val canTouch: List<String>, val available: Boolean)
 data class AgentStep(val tool: String, val answered: Int, val said: String?)
 
 data class AgentTurn(val reply: String, val acted: List<AgentStep>,
-                     val said: String?)
+                     val said: String?, val asks: AgentAsks?)
+
+/** What it stopped to ask about, when it reached for a step that cannot be
+ *  taken back. `says` is the roster's own sentence — the same words the list
+ *  of what it can touch used — so the thing being agreed to is the thing that
+ *  was promised. `arguments` is what it chose, carried as the JSON that
+ *  arrived so the press sends back exactly what the screen showed. */
+data class AgentAsks(val tool: String, val arguments: JSONObject,
+                     val says: String)
 

@@ -3979,6 +3979,15 @@ public sealed class ApiClient
         Send<AgentTurn>(Post($"/profiles/{profileId}/authoring/turn",
                              new { said, history }, token));
 
+    /// <summary>The press. No prose and no model — the arguments go back as
+    /// the JSON the turn handed over, which is what makes the sentence on the
+    /// screen the thing agreed to rather than a summary of it.</summary>
+    public Task<AgentDid> AuthoringAct(string profileId, string tool,
+                                       System.Text.Json.JsonElement arguments,
+                                       string token) =>
+        Send<AgentDid>(Post($"/profiles/{profileId}/authoring/act",
+                            new { tool, arguments }, token));
+
     public async Task<WidgetRow[]> Widgets(string profileId, string token)
     {
         var box = await Send<WidgetBox>(Get($"/profiles/{profileId}/widgets",
@@ -5450,7 +5459,25 @@ public sealed record AgentStep(
 public sealed record AgentTurn(
     [property: JsonPropertyName("reply")] string Reply,
     [property: JsonPropertyName("acted")] AgentStep[] Acted,
-    [property: JsonPropertyName("said")] string? Said);
+    [property: JsonPropertyName("said")] string? Said,
+    [property: JsonPropertyName("asks")] AgentAsks? Asks);
+
+/// <summary>What it stopped to ask about, when it reached for a step that
+/// cannot be taken back. <c>Says</c> is the roster's own sentence — the same
+/// words the list of what it can touch used — so the thing being agreed to is
+/// the thing that was promised. <c>Arguments</c> is what it chose, carried as
+/// the JSON that arrived so the press sends back what the screen showed.
+/// </summary>
+public sealed record AgentAsks(
+    [property: JsonPropertyName("tool")] string Tool,
+    [property: JsonPropertyName("arguments")]
+        System.Text.Json.JsonElement Arguments,
+    [property: JsonPropertyName("says")] string Says);
+
+public sealed record AgentDid(
+    [property: JsonPropertyName("tool")] string Tool,
+    [property: JsonPropertyName("answered")] int Answered,
+    [property: JsonPropertyName("says")] string Says);
 
 public sealed record WidgetCapNumbers(
     [property: JsonPropertyName("wall_seconds")] int WallSeconds,

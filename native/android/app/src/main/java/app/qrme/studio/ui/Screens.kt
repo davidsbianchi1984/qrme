@@ -25,6 +25,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.qrme.studio.AccessReportRow
+import app.qrme.studio.AgentAsks
+import app.qrme.studio.AgentReach
+import app.qrme.studio.AgentStep
+import app.qrme.studio.AgentTurn
 import app.qrme.studio.ApiClient
 import app.qrme.studio.AudienceCounts
 import app.qrme.studio.CommentRow
@@ -7443,6 +7447,11 @@ fun WidgetsScreen(state: AppState) {
     var showsReach by remember { mutableStateOf(false) }
     var talk by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
     var did by remember { mutableStateOf<AgentTurn?>(null) }
+    // The rows that cannot be taken back stop and ask rather than running
+    // inside the turn. Kept apart from `did` so dropping the question does
+    // not also drop the record of what it did before it got there.
+    var asks by remember { mutableStateOf<AgentAsks?>(null) }
+    var pressing by remember { mutableStateOf(false) }
     val lang = state.language
     val pid = state.profileId
     val token = state.ownerToken
@@ -7486,12 +7495,13 @@ fun WidgetsScreen(state: AppState) {
         BrandButton(L10n.t("wdg.ask.go", lang), enabled = ask.isNotBlank(),
             busy = asking) {
             scope.launch {
-                asking = true; did = null
+                asking = true; did = null; asks = null
                 val id = pid; val bearer = token
                 if (id != null && bearer != null) {
                     runCatching { state.api.authoringTurn(id, ask.trim(), talk, bearer) }
                         .onSuccess { turn ->
                             did = turn
+                            asks = turn.asks
                             talk = talk + ("user" to ask.trim()) +
                                 ("assistant" to turn.reply)
                             ask = ""
@@ -7505,11 +7515,44 @@ fun WidgetsScreen(state: AppState) {
         }
         if (talk.isNotEmpty()) {
             Text(L10n.t("wdg.ask.forget", lang), color = Qrme.T2, fontSize = 12.sp,
-                modifier = Modifier.clickable { talk = emptyList(); did = null })
+                modifier = Modifier.clickable {
+                    talk = emptyList(); did = null; asks = null
+                })
         }
         talk.forEach { (who, line) ->
             Text(line, color = if (who == "user") Qrme.Txt else Qrme.T2,
                 fontSize = 12.sp)
+        }
+        // It stopped and asked. The sentence is the roster's own — the same
+        // words the list of what it can touch used — so the thing being
+        // agreed to is the thing that was promised, and the arguments it
+        // chose are shown rather than summarised.
+        asks?.let { question ->
+            Text(L10n.fill("wdg.asks", lang, mapOf("does" to question.says)),
+                color = Qrme.Txt, fontSize = 12.sp)
+            question.arguments.keys().asSequence().sorted().forEach { field ->
+                Text("$field: ${question.arguments.opt(field)}",
+                    color = Qrme.T2, fontSize = 12.sp)
+            }
+            BrandButton(L10n.t("wdg.asks.doit", lang), busy = pressing) {
+                scope.launch {
+                    pressing = true
+                    val id = pid; val bearer = token
+                    if (id != null && bearer != null) {
+                        runCatching {
+                            state.api.authoringAct(id, question.tool,
+                                question.arguments, bearer)
+                        }.onSuccess { step ->
+                            did = AgentTurn("", listOf(step), null, null)
+                            asks = null
+                            reload()
+                        }.onFailure { error = it.message }
+                    }
+                    pressing = false
+                }
+            }
+            Text(L10n.t("wdg.asks.no", lang), color = Qrme.T2, fontSize = 12.sp,
+                modifier = Modifier.clickable { asks = null })
         }
         did?.let { turn ->
             turn.said?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }

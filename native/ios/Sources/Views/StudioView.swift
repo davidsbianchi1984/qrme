@@ -159,6 +159,11 @@ struct WidgetsView: View {
     @State private var showsReach = false
     @State private var talk: [[String: String]] = []
     @State private var did: AgentTurn?
+    // The rows that cannot be taken back stop and ask rather than running
+    // inside the turn. Held apart from `did` so dropping the question does
+    // not also drop the record of what it did before it got there.
+    @State private var asks: AgentAsks?
+    @State private var pressing = false
 
     var body: some View {
         ScrollView {
@@ -191,7 +196,7 @@ struct WidgetsView: View {
                             in: .whitespacesAndNewlines).isEmpty)
                     if !talk.isEmpty {
                         Button(L10n.t("wdg.ask.forget", state.language)) {
-                            talk = []; did = nil
+                            talk = []; did = nil; asks = nil
                         }.font(.footnote)
                     }
                 }
@@ -199,6 +204,38 @@ struct WidgetsView: View {
                     Text(turn["content"] ?? "").font(.footnote)
                         .foregroundColor(turn["role"] == "user" ? .primary
                                                                 : .secondary)
+                }
+                // It stopped and asked. The sentence is the roster's own —
+                // the same words the list of what it can touch used — so the
+                // thing being agreed to is the thing that was promised.
+                if let asks {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(L10n.fill("wdg.asks", state.language,
+                                       ["does": asks.says]))
+                            .font(.footnote)
+                        ForEach(asks.arguments.keys.sorted(), id: \.self) { key in
+                            Text("\(key): \(asks.arguments[key]?.shown ?? "")")
+                                .font(.footnote).foregroundColor(.secondary)
+                        }
+                        HStack {
+                            // Offered only when every argument survives the
+                            // round trip. A press that sent back something
+                            // other than what is on the screen would make
+                            // this card a decoration.
+                            Button(pressing
+                                   ? L10n.t("wdg.asks.doing", state.language)
+                                   : L10n.t("wdg.asks.doit", state.language)) {
+                                doIt()
+                            }.disabled(pressing || !asks.arguments.values
+                                .allSatisfy { $0.faithful })
+                            Button(L10n.t("wdg.asks.no", state.language)) {
+                                asks = nil
+                            }.disabled(pressing).font(.footnote)
+                        }
+                    }
+                    .padding(10)
+                    .overlay(RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.orange.opacity(0.6)))
                 }
                 if let did {
                     if let said = did.said {
@@ -279,15 +316,44 @@ struct WidgetsView: View {
         guard !said.isEmpty else { return }
         asking = true
         did = nil
+        asks = nil
         Task {
             defer { asking = false }
             do {
                 let turn = try await ApiClient.shared.authoringTurn(
                     profileId: pid, said: said, history: talk, token: token)
                 did = turn
+                asks = turn.asks
                 talk.append(["role": "user", "content": said])
                 talk.append(["role": "assistant", "content": turn.reply])
                 ask = ""
+                await load()
+                if let open { openOne(open) }
+            } catch { self.error = error.localizedDescription }
+        }
+    }
+
+    /// The press. The arguments go back exactly as the turn handed them
+    /// over — rebuilding them here would make the sentence on the screen a
+    /// summary of what happens rather than the thing agreed to.
+    private func doIt() {
+        guard let pid = state.pid, let token = state.token,
+              let asks else { return }
+        pressing = true
+        Task {
+            defer { pressing = false }
+            do {
+                let done = try await ApiClient.shared.authoringAct(
+                    profileId: pid, tool: asks.tool,
+                    arguments: asks.arguments.mapValues { $0.raw },
+                    token: token)
+                did = AgentTurn(reply: "",
+                                acted: [AgentStep(tool: done.tool,
+                                                  answered: done.answered,
+                                                  refused: nil,
+                                                  said: done.says)],
+                                stopped: nil, said: nil, asks: nil)
+                self.asks = nil
                 await load()
                 if let open { openOne(open) }
             } catch { self.error = error.localizedDescription }
