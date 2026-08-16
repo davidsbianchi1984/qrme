@@ -40,7 +40,16 @@ def test_connect_capture_and_render_through_glasses(client):
          "content": "walking through the farmers market, POV video"}]})
     assert r.status_code == 201, r.text
 
-    # Render: produce a heads-up overlay back to the lens.
+    # Render: produce a heads-up overlay back to the lens. Glasses are the
+    # wearer's own account on the far side, so the connector has to have been
+    # signed in to before it reaches anything — see `routers/apps.py`.
+    class _Vault:
+        def put(self, key, value):
+            pass
+
+    client.app.state.pdi = _Vault()
+    assert client.post(f"/apps/{cid}/authorize",
+                       json={"secret": "s3cr3t"}).status_code == 200
     r = client.post(f"/apps/{cid}/invoke",
                     json={"capability": "hud-overlay",
                           "input": "label the stalls I look at"})

@@ -56,6 +56,7 @@ import { Relationships } from "./screens/Relationships";
 import { Memory } from "./screens/Memory";
 import { Agent } from "./screens/Agent";
 import { Studio } from "./screens/Studio";
+import { Plugins } from "./screens/Plugins";
 import { Settings } from "./screens/Settings";
 import { Access } from "./screens/Access";
 import { Help } from "./Help";
@@ -67,7 +68,7 @@ import { WatchLights } from "./WatchLights";
 // `profile` is deliberately not in NAV: somebody else's homepage is a place
 // you are taken to by pressing their face, not a standing destination — the
 // same reason `passing` is reachable and unlisted.
-type Tab = "profile" | "home" | "agent" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "remainder" | "named" | "passing" | "robots" | "placements" | "plans" | "access" | "settings";
+type Tab = "profile" | "home" | "agent" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "remainder" | "plugins" | "named" | "passing" | "robots" | "placements" | "plans" | "access" | "settings";
 
 // `art` is the one tab whose mark is a picture rather than a glyph. Kept as a
 // second, optional field rather than widening `icon` to a node: the nav guards
@@ -123,6 +124,7 @@ const NAV: { id: Tab; label: string; icon: string; art?: string }[] = [
   { id: "themark", label: "The mark", icon: "✦" },
   { id: "inwords", label: "In its words", icon: "🗣" },
   { id: "remainder", label: "Miscellaneous", icon: "🧩" },
+  { id: "plugins", label: "Plug-ins", icon: "🔌" },
   { id: "named", label: "Look one thing up", icon: "🔎" },
   { id: "robots", label: "Bodies", icon: "🤖" },
   { id: "placements", label: "Where it is marketed", icon: "📌" },
@@ -314,6 +316,7 @@ export function App() {
         {tab === "themark" && <TheMark />}
         {tab === "inwords" && <InWords />}
         {tab === "remainder" && <Remainder />}
+        {tab === "plugins" && <Plugins onPlans={toPlans} />}
         {tab === "named" && <Named onPlans={toPlans} />}
         {tab === "passing" && <Passing onPlans={toPlans} />}
         {tab === "robots" && <Robots onPlans={toPlans} />}

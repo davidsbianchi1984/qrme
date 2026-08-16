@@ -1769,6 +1769,12 @@ private fun AppsPanel(vm: StudioViewModel) {
     var conns by remember { mutableStateOf<List<AppConn>>(emptyList()) }
     var status by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
+    var find by remember { mutableStateOf("") }
+    // Which connector is having its credential typed, and into what. The
+    // secret is held only while the field is open: it goes to the vault and
+    // is never stored on this device.
+    var signing by remember { mutableStateOf<String?>(null) }
+    var secret by remember { mutableStateOf("") }
     fun reload() {
         vm.call({ ApiClient.appsCatalog() }) { r -> catalog = r.getOrDefault(emptyList()) }
         vm.call({ ApiClient.appConnections(vm.pid!!, vm.token!!) }) { r -> conns = r.getOrDefault(emptyList()) }
@@ -1780,11 +1786,27 @@ private fun AppsPanel(vm: StudioViewModel) {
             Text(L10n.t("ncon.apps", vm.language), color = Qrme.Txt, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             Text(L10n.t("ncon.apps.sub", vm.language),
                 color = Qrme.T2, fontSize = 12.sp)
-            catalog.take(12).forEach { entry ->
+            // The whole board, searchable. It used to be `take(12)` against
+            // a catalogue of a hundred and three — a shop showing a twelfth
+            // of its shelves with no way to ask for the rest.
+            labeledField(L10n.t("ncon.apps.find", vm.language), find,
+                L10n.t("ncon.apps.find", vm.language)) { find = it }
+            val needle = find.trim().lowercase()
+            val shown = if (needle.isEmpty()) catalog.take(24)
+                        else catalog.filter {
+                            it.label.lowercase().contains(needle)
+                                || it.app.lowercase().contains(needle)
+                                || it.provider.lowercase().contains(needle)
+                        }
+            shown.forEach { entry ->
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(entry.label, color = Qrme.Txt, fontSize = 14.sp)
                         Text(entry.provider, color = Qrme.T3, fontSize = 11.sp)
+                    }
+                    if (entry.needs != "nothing") {
+                        Text(if (entry.needs == "key") "\uD83D\uDD11" else "\uD83D\uDD12",
+                            fontSize = 12.sp)
                     }
                     TextButton(onClick = {
                         error = null
@@ -1810,6 +1832,9 @@ private fun AppsPanel(vm: StudioViewModel) {
                 if (c.status == "revoked") {
                     Text(L10n.t("nmg.revoked", vm.language), color = Qrme.Red, fontSize = 12.sp)
                 } else {
+                    Text(if (c.authorized) L10n.t("ncon.on", vm.language)
+                         else L10n.t("ncon.needs.${c.needs}", vm.language),
+                        color = if (c.authorized) Qrme.Green else Qrme.T3, fontSize = 12.sp)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         SmallAction(L10n.t("ncon.collect", vm.language)) {
                             vm.call({ ApiClient.appCollect(c.id, vm.token!!,
@@ -1824,6 +1849,30 @@ private fun AppsPanel(vm: StudioViewModel) {
                                     r.onSuccess { status = it.result }
                                         .onFailure { error = it.message }
                                 }
+                            }
+                        }
+                        if (!c.authorized && c.needs != "nothing") {
+                            SmallAction(L10n.t("ncon.signin", vm.language)) {
+                                signing = c.id; secret = ""
+                            }
+                        }
+                        // Uninstall. Until this round no shell had it at all.
+                        SmallAction(L10n.t("ncon.remove", vm.language)) {
+                            vm.call({ ApiClient.appRevoke(c.id, vm.token!!) }) { r ->
+                                r.onFailure { error = it.message }
+                                reload()
+                            }
+                        }
+                    }
+                    if (signing == c.id) {
+                        labeledField(L10n.t("ncon.signin", vm.language), secret,
+                            L10n.t("ncon.secret", vm.language)) { secret = it }
+                        SmallAction(L10n.t("ncon.signin", vm.language),
+                                    enabled = secret.isNotBlank()) {
+                            vm.call({ ApiClient.appAuthorize(c.id, vm.token!!, secret) }) { r ->
+                                r.onFailure { error = it.message }
+                                signing = null; secret = ""
+                                reload()
                             }
                         }
                     }

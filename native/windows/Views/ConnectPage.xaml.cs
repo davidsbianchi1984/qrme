@@ -36,8 +36,17 @@ public sealed partial class ConnectPage : Page
         public string Provider { get; init; } = "";
         public string App { get; init; } = "";
         public string Label { get; init; } = "";
+        /// <summary>What this connector must be given before it can reach
+        /// the far side: "nothing", "sign-in" or "key".</summary>
+        public string Needs { get; init; } = "";
         public string Key => $"{Provider}|{App}";
         public string ConnectLabel => L10n.T("tab.connect");
+        public string Lock => Needs switch
+        {
+            "key" => "\U0001F511",
+            "nothing" => "",
+            _ => "\U0001F512",
+        };
     }
 
     public sealed class AppConnVm
@@ -47,10 +56,21 @@ public sealed partial class ConnectPage : Page
         public string Provider { get; init; } = "";
         public string Capability { get; init; } = "";
         public bool Active { get; init; }
+        public string Needs { get; init; } = "";
+        public bool Authorized { get; init; }
         public Visibility ActiveVisibility =>
             Active ? Visibility.Visible : Visibility.Collapsed;
         public string InvokeLabel => $"Invoke {Capability}";
         public string AppCollectLabel => L10n.T("ncon.collect");
+        public string RemoveLabel => L10n.T("ncon.remove");
+        public string SignInLabel => L10n.T("ncon.signin");
+        public string SecretLabel => L10n.T("ncon.secret");
+        /// <summary>The lock, said in full: either it is signed in, or this
+        /// is what it is still waiting for.</summary>
+        public string Posture => Authorized
+            ? L10n.T("ncon.on") : L10n.T($"ncon.needs.{Needs}");
+        public Visibility SignInVisibility =>
+            !Authorized && Needs != "nothing" ? Visibility.Visible : Visibility.Collapsed;
         public Visibility InvokeVisibility =>
             Capability.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
@@ -64,6 +84,7 @@ public sealed partial class ConnectPage : Page
 
     private SocialConn[] _social = Array.Empty<SocialConn>();
     private AppConn[] _appConns = Array.Empty<AppConn>();
+    private CatalogVm[] _catalog = Array.Empty<CatalogVm>();
 
     public ConnectPage()
     {
@@ -203,14 +224,16 @@ public sealed partial class ConnectPage : Page
         try
         {
             var cat = await ApiClient.Shared.ConnectorCatalog();
-            CatalogList.ItemsSource = cat.Providers
+            _catalog = cat.Providers
                 .SelectMany(p => p.Apps.Select(a => new CatalogVm
                 {
                     Provider = p.Provider,
                     App = a.App,
                     Label = a.Label,
+                    Needs = a.Needs,
                 }))
-                .Take(12).ToList();
+                .ToArray();
+            ShowCatalog();
             _appConns = await ApiClient.Shared.AppConnections(s.Pid!, s.Token!);
             AppConnList.ItemsSource = _appConns.Select(c => new AppConnVm
             {
@@ -219,9 +242,66 @@ public sealed partial class ConnectPage : Page
                 Provider = c.Provider,
                 Capability = c.Capabilities.FirstOrDefault() ?? "",
                 Active = c.Status != "revoked",
+                Needs = c.Needs,
+                Authorized = c.Authorized,
             }).ToList();
         }
         catch (Exception ex) { ShowAppsError(ex.Message); }
+    }
+
+    /// <summary>The board, filtered. No Take(12) — a search that hides the
+    /// answer below row twelve is not a search.</summary>
+    private void ShowCatalog()
+    {
+        var needle = (AppFind.Text ?? "").Trim().ToLowerInvariant();
+        CatalogList.ItemsSource = (needle.Length == 0
+            ? _catalog.Take(24)
+            : _catalog.Where(c => c.Label.ToLowerInvariant().Contains(needle)
+                                  || c.App.ToLowerInvariant().Contains(needle)
+                                  || c.Provider.ToLowerInvariant().Contains(needle)))
+            .ToList();
+    }
+
+    private void OnAppFind(object sender, TextChangedEventArgs e) => ShowCatalog();
+
+    private async void OnAppRevoke(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string cid) return;
+        var s = AppState.Current;
+        try
+        {
+            await ApiClient.Shared.AppRevoke(cid, s.Token!);
+            await ReloadApps();
+        }
+        catch (Exception ex) { ShowAppsError(ex.Message); }
+    }
+
+    private async void OnAppAuthorize(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string cid) return;
+        // The field beside this button, found by the same connector id.
+        var box = FindSecretBox(sender as Button);
+        var secret = box?.Text ?? "";
+        if (secret.Length == 0) return;
+        var s = AppState.Current;
+        try
+        {
+            await ApiClient.Shared.AppAuthorize(cid, s.Token!, secret);
+            if (box is not null) box.Text = "";
+            await ReloadApps();
+        }
+        catch (Exception ex) { ShowAppsError(ex.Message); }
+    }
+
+    /// <summary>The secret box sharing this button's row. Walks up to the
+    /// row's panel rather than naming the element, because the template is
+    /// repeated once per connector and the names repeat with it.</summary>
+    private static TextBox? FindSecretBox(Button? button)
+    {
+        if (button?.Parent is not Panel row) return null;
+        foreach (var child in row.Children)
+            if (child is TextBox box) return box;
+        return null;
     }
 
     private async void OnAppConnect(object sender, RoutedEventArgs e)

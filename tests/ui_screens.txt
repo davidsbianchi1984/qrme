@@ -1,4 +1,4 @@
-# status: floor — 65 rows
+# status: floor — 66 rows
 #
 # Which console surface each screen drawing depicts.
 #
@@ -115,6 +115,7 @@ Profile         197
 ProviderTiles   22
 
 Agent           200
+Plugins         201
 
 Problems        150
 ProblemNotice   151

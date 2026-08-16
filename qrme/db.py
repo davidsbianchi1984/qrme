@@ -607,6 +607,13 @@ CREATE TABLE IF NOT EXISTS app_connectors (
     status       TEXT NOT NULL DEFAULT 'active',  -- active | revoked
     collected    INTEGER NOT NULL DEFAULT 0,   -- context items pulled in
     actions      INTEGER NOT NULL DEFAULT 0,   -- capabilities invoked
+    -- When the credential this connector needs was given, and where it was
+    -- sealed. NULL means installed and unable to reach the service — the lock
+    -- the storefront draws. A row the catalog says needs nothing is authorized
+    -- the moment it is installed. The secret itself is never in this file:
+    -- secret_ref is a PDI vault key, and no vault means no authorizing.
+    authorized_at TEXT,
+    secret_ref    TEXT,
     created_at   TEXT NOT NULL
 );
 
@@ -2389,6 +2396,8 @@ def db_path() -> str:
 #: every connection.
 _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     ("interactors", "account_id", "TEXT REFERENCES accounts(id)"),
+    ("app_connectors", "authorized_at", "TEXT"),
+    ("app_connectors", "secret_ref", "TEXT"),
 )
 
 

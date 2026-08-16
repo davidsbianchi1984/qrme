@@ -2072,7 +2072,7 @@ export type RobotCatalogue = {
 export type ConnectorCatalogue = {
   providers: { provider: string; label: string;
                apps: { app: string; label: string; capabilities: string[];
-                       directions: string[] }[] }[];
+                       directions: string[]; needs: string }[] }[];
   app_count: number; provider_count: number;
 };
 
@@ -3018,11 +3018,19 @@ export type PackRegistry = {
 };
 
 /** An app this profile is connected to. `directions` is what the connection
- *  is *for*: `collect` reads into the profile, `act` lets it do something. */
+ *  is *for*: `collect` reads into the profile, `act` lets it do something.
+ *
+ *  `needs` and `authorized` are the storefront's lock. `needs` is what the
+ *  connector must be given before it can reach the far side — `nothing`,
+ *  `sign-in`, or `key` — and `authorized` is whether it has been. An
+ *  unauthorized connector is installed and inert: `invoke` refuses it with a
+ *  sentence naming what is missing, rather than answering *performed* having
+ *  reached nothing, which is what it used to do. */
 export type AppConnector = {
   id: string; profile_id: string; provider: string; app: string;
   label: string; capabilities: string[]; directions: string[];
   status: string; collected: number; actions: number;
+  needs: string; authorized: boolean;
 };
 
 export type ExcursionLearned = {
@@ -5365,6 +5373,29 @@ export const api = {
                        capabilities?: string[] }, token: string) =>
     req<AppConnector>(`/profiles/${profileId}/apps`,
       { method: "POST", body, token }),
+  // Uninstall. This route has existed since connectors shipped and no client
+  // of the four has ever called it — the door guard could not see it, because
+  // its skip list held the prefix `/app` for the console bundle and `/apps`
+  // starts with it. Somebody could connect their inbox and not disconnect it.
+  revokeApp: (cid: string, token: string) =>
+    req<{ id: string; status: string }>(`/apps/${cid}`,
+      { method: "DELETE", token }),
+  // The credential the lock is about. It goes straight into the vault; this
+  // console never holds it and never reads it back.
+  authorizeApp: (cid: string, body: { secret: string; account?: string },
+                 token: string) =>
+    req<AppConnector>(`/apps/${cid}/authorize`,
+      { method: "POST", body, token }),
+  collectFromApp: (cid: string,
+                   body: { items: { content: string; title?: string }[] },
+                   token: string) =>
+    req<{ connector: string; app: string; ingested: number; note: string }>(
+      `/apps/${cid}/collect`, { method: "POST", body, token }),
+  invokeApp: (cid: string, body: { capability: string; input?: string },
+              token: string) =>
+    req<{ connector: string; app: string; capability: string;
+          status: string; result: string }>(
+      `/apps/${cid}/invoke`, { method: "POST", body, token }),
 
   excursions: (profileId: string, token: string) =>
     req<Excursion[]>(`/profiles/${profileId}/excursions`, { token }),

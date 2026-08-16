@@ -38,8 +38,27 @@ def test_collect_builds_the_profile(client, profile_id):
     assert client.get(f"/profiles/{profile_id}/apps").json()[0]["collected"] == 2
 
 
+class _Vault:
+    """Enough of a PDI client to hold a credential."""
+
+    def __init__(self):
+        self.kept = {}
+
+    def put(self, key, value):
+        self.kept[key] = value
+
+
+def _authorized(client, profile_id, **body):
+    """A connector with its credential given, ready to reach the far side."""
+    client.app.state.pdi = _Vault()
+    conn = _connect(client, profile_id, **body)
+    r = client.post(f"/apps/{conn['id']}/authorize", json={"secret": "s3cr3t"})
+    assert r.status_code == 200, r.text
+    return r.json()
+
+
 def test_invoke_a_granted_capability(client, profile_id):
-    conn = _connect(client, profile_id, provider="canva", app="magic_studio")
+    conn = _authorized(client, profile_id, provider="canva", app="magic_studio")
     r = client.post(f"/apps/{conn['id']}/invoke",
                     json={"capability": "magic-design", "input": "a birthday poster"})
     assert r.status_code == 201, r.text
@@ -53,6 +72,65 @@ def test_invoke_a_granted_capability(client, profile_id):
                      capabilities=["intelligent-actions"])
     assert client.post(f"/apps/{conn2['id']}/invoke",
                        json={"capability": "on-device-model"}).status_code == 422
+
+
+# -- the lock is a posture, not a picture -------------------------------------
+
+def test_invoking_a_connector_nobody_signed_in_to_is_refused(client, profile_id):
+    """The correction this round is about.
+
+    `invoke` used to answer `performed` for every row on the board, having
+    reached nothing at all — a Gmail connector with no Google account behind
+    it reported that it had summarised the inbox.
+
+        asked     did the call succeed
+        mattered  did anything happen on the other end
+    """
+    conn = _connect(client, profile_id, provider="work", app="gmail")
+    assert conn["needs"] == "sign-in"
+    assert conn["authorized"] is False
+    r = client.post(f"/apps/{conn['id']}/invoke", json={"capability": "send"})
+    assert r.status_code == 409
+    # And it says what to go and do, naming the app the way the person sees it.
+    assert "Gmail" in r.json()["detail"]
+
+
+def test_a_public_connector_needs_nothing_and_says_so(client, profile_id):
+    """Half the point of the posture: a lock on every row is not a signal."""
+    conn = _connect(client, profile_id, provider="scrape", app="instagram")
+    assert conn["needs"] == "nothing"
+    assert conn["authorized"] is True
+    # There is nothing to sign in to, so offering the door would be the lie.
+    assert client.post(f"/apps/{conn['id']}/authorize",
+                       json={"secret": "x"}).status_code == 409
+
+
+def test_a_credential_is_sealed_and_never_lands_in_this_database(client,
+                                                                 profile_id):
+    vault = _Vault()
+    client.app.state.pdi = vault
+    conn = _connect(client, profile_id, provider="work", app="slack")
+    r = client.post(f"/apps/{conn['id']}/authorize",
+                    json={"secret": "xoxb-hunter2", "account": "dana"})
+    assert r.status_code == 200, r.text
+    assert r.json()["authorized"] is True
+    assert list(vault.kept) == [f"qrme/{profile_id}/connectors/{conn['id']}"]
+
+    from qrme import db
+    rows = db.connect().execute(
+        "SELECT * FROM app_connectors WHERE id=?", (conn["id"],)).fetchone()
+    assert "hunter2" not in " ".join(str(v) for v in tuple(rows))
+
+
+def test_no_vault_means_the_credential_is_not_kept_at_all(client, profile_id):
+    """Free is platform custody over plain HTTPS, which is a fine posture for
+    a wall post and not one for somebody's account credential."""
+    client.app.state.pdi = None
+    conn = _connect(client, profile_id, provider="work", app="slack")
+    r = client.post(f"/apps/{conn['id']}/authorize", json={"secret": "x"})
+    assert r.status_code == 409
+    assert client.get(f"/profiles/{profile_id}/apps").json()[-1][
+        "authorized"] is False
 
 
 def test_collect_requires_collect_direction(client, profile_id):

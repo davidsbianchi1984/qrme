@@ -260,8 +260,60 @@ _PROVIDER_LABEL = {
     "scrape": "Social, read not posted to",
 }
 
+# ---------------------------------------------------------------------------
+# What a connector needs before it can reach the far side
+#
+# A storefront draws a lock beside some rows and a plus beside others, and the
+# lock has to mean something. Here it means exactly one thing: **this
+# connector cannot reach the service until somebody gives it a credential.**
+#
+#     asked     which apps can this profile connect
+#     mattered  which of them can actually reach anything once connected
+#
+# Three postures, and the third is the honest one for most of the board:
+#
+#   nothing   Public. Anyone with a browser could read it, so the connector
+#             needs no account and holds no secret — the scrape rows, reading
+#             a page, and the open reference sources.
+#   sign-in   The person's own account on the far side. A Gmail connector
+#             without the person's Google account is a name and no inbox.
+#   key       An operator credential — a search API, an SMS gateway. Not the
+#             person's to give; the deployment either holds it or does not.
+#
+# This is declared per provider with per-app exceptions, because the credential
+# is a property of who is on the other end rather than of the individual app,
+# and a per-row sixth field would be a hundred more places for the answer to
+# drift. `routers/apps.py` turns it into the refusal a person actually meets.
+_NEEDS_PROVIDER = {
+    "apple": "sign-in", "google": "sign-in", "microsoft": "sign-in",
+    "canva": "sign-in", "glasses": "sign-in", "gaming": "sign-in",
+    "work": "sign-in", "search": "key", "scrape": "nothing",
+}
+
+#: Rows whose posture is not their provider's. All of them are public sources
+#: that happen to sit in a family of private ones, or gateways that take an
+#: operator key inside a family of personal accounts.
+_NEEDS_APP = {
+    ("search", "fetch"): "nothing",       # reading a page anyone can read
+    ("work", "wikipedia"): "nothing",
+    ("work", "arxiv"): "nothing",
+    ("work", "pubmed"): "nothing",
+    ("work", "twilio"): "key",            # the operator's gateway, not yours
+    ("work", "sendgrid"): "key",
+}
+
+NEEDS = ("nothing", "sign-in", "key")
+
+
+def needs(provider: str, app: str) -> str:
+    """What this connector must be given before it can reach anything."""
+    return _NEEDS_APP.get((provider, app),
+                          _NEEDS_PROVIDER.get(provider, "sign-in"))
+
+
 CONNECTORS = [
-    {"provider": p, "app": a, "label": lbl, "capabilities": caps, "directions": dirs}
+    {"provider": p, "app": a, "label": lbl, "capabilities": caps,
+     "directions": dirs, "needs": needs(p, a)}
     for (p, a, lbl, caps, dirs) in _ROWS
 ]
 
@@ -279,7 +331,8 @@ def catalog() -> dict:
             "apps": [],
         })
         g["apps"].append({"app": c["app"], "label": c["label"],
-                          "capabilities": c["capabilities"], "directions": c["directions"]})
+                          "capabilities": c["capabilities"],
+                          "directions": c["directions"], "needs": c["needs"]})
     return {"providers": list(groups.values()),
             "app_count": len(CONNECTORS),
             "provider_count": len(groups)}

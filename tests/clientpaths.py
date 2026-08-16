@@ -682,6 +682,34 @@ def all_routes(app) -> list:
     return out
 
 
+#: Paths that are the API's own documentation, or the console bundle the
+#: browser fetches — neither is a capability with a door.
+_NOT_A_CAPABILITY = ("/openapi.json", "/docs", "/redoc", "/app")
+
+
+def _is_documentation_or_the_bundle(path: str) -> bool:
+    """Whether this route is documentation or the served console, not a door.
+
+    This used to be one `path.startswith(("/openapi", "/docs", "/redoc",
+    "/app"))`, and the last entry meant *the console bundle mounted at
+    `/app`*. `startswith` does not know that: `/apps/{cid}/collect` starts
+    with `/app` too, so the whole connected-apps block — connect, revoke,
+    collect, invoke — was skipped before the guard ever looked at it, on
+    every surface, for as long as the guard has existed.
+
+        asked     is this route the documentation or the bundle
+        mattered  is `/apps` a prefix of `/app`
+
+    The doorless backlogs have been pinned at zero through a dozen rounds
+    with four routes never once counted. A prefix test needs the separator
+    to mean a path boundary, so it is written out here rather than fixed in
+    place — the tuple above reads as a list of prefixes, and the next person
+    adding `/api` to it should not have to notice this.
+    """
+    return any(path == p or path.startswith(p + "/")
+               for p in _NOT_A_CAPABILITY)
+
+
 def doorless(app, surfaces=None) -> list[str]:
     """Every route+method the backend serves that no client ever calls.
 
@@ -723,7 +751,7 @@ def doorless(app, surfaces=None) -> list[str]:
     for route in all_routes(app):
         path = route.path
         methods = route.methods
-        if path.startswith(("/openapi", "/docs", "/redoc", "/app")):
+        if _is_documentation_or_the_bundle(path):
             continue
         if path in NOT_A_CLIENT_CALL:
             continue

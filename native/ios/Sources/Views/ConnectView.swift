@@ -184,10 +184,17 @@ private struct SocialSection: View {
 
 private struct AppsSection: View {
     @EnvironmentObject var state: AppState
-    @State private var flat: [(key: String, provider: String, app: String, label: String)] = []
+    @State private var flat: [(key: String, provider: String, app: String,
+                               label: String, needs: String)] = []
     @State private var conns: [AppConn] = []
     @State private var status: String?
     @State private var error: String?
+    @State private var find = ""
+    /// Which connector is having its credential typed, and into what. The
+    /// secret is held only as long as the field is open — it goes to the
+    /// vault through `appAuthorize` and is never stored on this device.
+    @State private var signing: String?
+    @State private var secret = ""
 
     var body: some View {
         ScrollView {
@@ -196,10 +203,19 @@ private struct AppsSection: View {
                     Text(L10n.t("ncon.apps", state.language)).font(.headline).foregroundStyle(Theme.txt)
                     Text(L10n.t("ncon.apps.sub", state.language))
                         .font(.caption).foregroundStyle(Theme.t2)
-                    ForEach(flat.prefix(12), id: \.key) { entry in
+                    // The whole board, searchable. It used to be
+                    // `flat.prefix(12)` against a catalogue of a hundred and
+                    // three — a shop that shows a twelfth of its shelves and
+                    // gives you no way to ask for the rest.
+                    TextField(L10n.t("ncon.apps.find", state.language), text: $find)
+                        .textFieldStyle(.roundedBorder)
+                    ForEach(shown, id: \.key) { entry in
                         HStack {
                             Text(entry.label).font(.subheadline).foregroundStyle(Theme.txt)
                             Text(entry.provider).font(.caption).foregroundStyle(Theme.t3)
+                            if entry.needs != "nothing" {
+                                Text(entry.needs == "key" ? "🔑" : "🔒").font(.caption)
+                            }
                             Spacer()
                             Button(L10n.t("tab.connect", state.language)) { connect(entry.provider, entry.app) }
                                 .font(.caption.bold()).foregroundStyle(Theme.brandA)
@@ -220,11 +236,28 @@ private struct AppsSection: View {
                         if c.status == "revoked" {
                             Text(L10n.t("nmg.revoked", state.language)).font(.caption).foregroundStyle(Theme.red)
                         } else {
+                            Text(c.authorized
+                                 ? L10n.t("ncon.on", state.language)
+                                 : L10n.t("ncon.needs.\(c.needs)", state.language))
+                                .font(.caption)
+                                .foregroundStyle(c.authorized ? Theme.green : Theme.t3)
                             HStack(spacing: 8) {
                                 smallButton(L10n.t("ncon.collect", state.language)) { collect(c) }
                                 if let cap = c.capabilities.first {
                                     smallButton("Invoke \(cap)") { invoke(c, cap) }
                                 }
+                                if !c.authorized && c.needs != "nothing" {
+                                    smallButton(L10n.t("ncon.signin", state.language)) {
+                                        signing = c.id; secret = ""
+                                    }
+                                }
+                                // Uninstall. Until this round no shell had it.
+                                smallButton(L10n.t("ncon.remove", state.language)) { revoke(c) }
+                            }
+                            if signing == c.id {
+                                SecureField(L10n.t("ncon.secret", state.language), text: $secret)
+                                    .textFieldStyle(.roundedBorder)
+                                smallButton(L10n.t("ncon.signin", state.language)) { authorize(c) }
                             }
                         }
                     }.card()
@@ -239,7 +272,7 @@ private struct AppsSection: View {
         if let cat = try? await ApiClient.shared.appsCatalog() {
             flat = cat.providers.flatMap { p in
                 p.apps.map { (key: "\(p.provider)/\($0.app)", provider: p.provider,
-                              app: $0.app, label: $0.label) }
+                              app: $0.app, label: $0.label, needs: $0.needs) }
             }
         }
         conns = (try? await ApiClient.shared.appConnections(id: pid, token: token)) ?? []
@@ -266,6 +299,40 @@ private struct AppsSection: View {
                     cid: c.id, token: token, content: "sample context from \(c.app)")
                 status = "collected from \(c.label) — it now feeds training"
             } catch { self.error = error.localizedDescription }
+        }
+    }
+
+    /// The board, filtered. No `prefix` — a search that hides the answer
+    /// below row twelve is not a search.
+    private var shown: [(key: String, provider: String, app: String,
+                         label: String, needs: String)] {
+        let needle = find.trimmingCharacters(in: .whitespaces).lowercased()
+        if needle.isEmpty { return Array(flat.prefix(24)) }
+        return flat.filter {
+            $0.label.lowercased().contains(needle)
+                || $0.app.lowercased().contains(needle)
+                || $0.provider.lowercased().contains(needle)
+        }
+    }
+
+    private func revoke(_ c: AppConn) {
+        guard let token = state.token else { return }
+        Task {
+            do { try await ApiClient.shared.appRevoke(cid: c.id, token: token) }
+            catch { self.error = error.localizedDescription }
+            await load()
+        }
+    }
+
+    private func authorize(_ c: AppConn) {
+        guard let token = state.token, !secret.isEmpty else { return }
+        Task {
+            do {
+                _ = try await ApiClient.shared.appAuthorize(
+                    cid: c.id, token: token, secret: secret)
+                signing = nil; secret = ""
+            } catch { self.error = error.localizedDescription }
+            await load()
         }
     }
 

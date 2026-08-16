@@ -87,6 +87,11 @@
                             <TextBlock x:Name="AppsSub"
                                        FontSize="12" TextWrapping="Wrap"
                                        Foreground="{StaticResource QrmeT2Brush}" />
+                            <!-- The whole board, searchable. It used to be
+                                 Take(12) against a catalogue of a hundred and
+                                 three — a shop showing a twelfth of its
+                                 shelves with no way to ask for the rest. -->
+                            <TextBox x:Name="AppFind" TextChanged="OnAppFind" />
                             <ItemsControl x:Name="CatalogList">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -101,10 +106,16 @@
                                                 <TextBlock Text="{Binding Provider}" FontSize="11"
                                                            Foreground="{StaticResource QrmeT2Brush}" />
                                             </StackPanel>
-                                            <Button Grid.Column="1" Content="{Binding ConnectLabel}" Tag="{Binding Key}"
-                                                    Click="OnAppConnect" VerticalAlignment="Center"
-                                                    Background="Transparent" FontSize="12"
-                                                    Foreground="{StaticResource QrmeBrandABrush}" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal"
+                                                        Spacing="6" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Lock}" FontSize="12"
+                                                           VerticalAlignment="Center"
+                                                           Foreground="{StaticResource QrmeT2Brush}" />
+                                                <Button Content="{Binding ConnectLabel}" Tag="{Binding Key}"
+                                                        Click="OnAppConnect"
+                                                        Background="Transparent" FontSize="12"
+                                                        Foreground="{StaticResource QrmeBrandABrush}" />
+                                            </StackPanel>
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
@@ -131,6 +142,10 @@
                                             <TextBlock Grid.Column="1" Text="{Binding Provider}" FontSize="12"
                                                        Foreground="{StaticResource QrmeT2Brush}" />
                                         </Grid>
+                                        <TextBlock Text="{Binding Posture}" FontSize="12"
+                                                   TextWrapping="Wrap"
+                                                   Visibility="{Binding ActiveVisibility}"
+                                                   Foreground="{StaticResource QrmeT2Brush}" />
                                         <StackPanel Orientation="Horizontal" Spacing="8"
                                                     Visibility="{Binding ActiveVisibility}">
                                             <Button Content="{Binding AppCollectLabel}" Tag="{Binding Id}" Click="OnAppCollect"
@@ -138,6 +153,18 @@
                                             <Button Content="{Binding InvokeLabel}" Tag="{Binding Id}" Click="OnAppInvoke"
                                                     Visibility="{Binding InvokeVisibility}"
                                                     Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
+                                            <!-- The credential the lock is about. It goes to the
+                                                 vault; this shell keeps nothing. -->
+                                            <TextBox x:Name="AppSecret" Tag="{Binding Id}" MinWidth="140"
+                                                     PlaceholderText="{Binding SecretLabel}"
+                                                     Visibility="{Binding SignInVisibility}" />
+                                            <Button Content="{Binding SignInLabel}" Tag="{Binding Id}" Click="OnAppAuthorize"
+                                                    Visibility="{Binding SignInVisibility}"
+                                                    Background="{StaticResource QrmeBrandABrush}" Foreground="White" FontSize="12" />
+                                            <!-- Uninstall. Until this round no shell had it. -->
+                                            <Button Content="{Binding RemoveLabel}" Tag="{Binding Id}" Click="OnAppRevoke"
+                                                    Background="Transparent" FontSize="12"
+                                                    Foreground="{StaticResource QrmeRedBrush}" />
                                         </StackPanel>
                                     </StackPanel>
                                 </Border>

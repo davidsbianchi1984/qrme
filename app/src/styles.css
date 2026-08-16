@@ -983,3 +983,21 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .pp-gallery img, .pp-gallery video {
   width: 100%; border-radius: 12px; background: #05070d;
 }
+
+/* ---- The plug-in storefront ------------------------------------------- */
+/* A row is a shelf label: glyph, name over what it does, then the lock if
+   there is one, then the buttons. The lock sits before the buttons rather
+   than replacing them — an add press on a locked row still works, because
+   installing is allowed and reaching is what needs the credential. */
+.plug-list { list-style: none; margin: 8px 0 0; padding: 0;
+             display: flex; flex-direction: column; gap: 6px; }
+.plug-row { display: flex; align-items: center; gap: 10px;
+            padding: 6px 0; border-top: 1px solid rgba(255,255,255,0.06); }
+.plug-row:first-child { border-top: 0; }
+.plug-icon { flex: 0 0 auto; font-size: 18px; width: 24px; text-align: center; }
+.plug-what { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.plug-what > span { overflow: hidden; text-overflow: ellipsis;
+                    white-space: nowrap; }
+.plug-lock { flex: 0 0 auto; font-size: 14px; opacity: 0.8; }
+.plug-on { flex: 0 0 auto; color: #7fd18c; }
+.plug-find { width: 100%; }

@@ -509,7 +509,12 @@ struct SocialConn: Decodable {
     let published: Int
 }
 
-struct CatalogApp: Decodable { let app: String; let label: String; let capabilities: [String] }
+/// `needs` is the storefront's lock: `nothing`, `sign-in` or `key` — what
+/// this connector must be given before it can reach the far side.
+struct CatalogApp: Decodable {
+    let app: String; let label: String; let capabilities: [String]
+    let needs: String
+}
 struct CatalogProvider: Decodable { let provider: String; let label: String; let apps: [CatalogApp] }
 struct AppsCatalog: Decodable { let providers: [CatalogProvider] }
 
@@ -520,6 +525,11 @@ struct AppConn: Decodable {
     let label: String
     let capabilities: [String]
     let status: String?
+    let needs: String
+    /// Whether the credential `needs` names has been given. An unauthorized
+    /// connector is installed and inert — `invoke` refuses it by name rather
+    /// than answering *performed* having reached nothing.
+    let authorized: Bool
 }
 
 struct InvokeResult: Decodable {
@@ -1127,6 +1137,24 @@ actor ApiClient {
                     app: String) async throws -> AppConn {
         try await request("/profiles/\(id)/apps", method: "POST",
                           body: ["provider": provider, "app": app], token: token)
+    }
+
+    /// Uninstall. This route has existed as long as connectors have and no
+    /// shell ever called it — the door guard's skip list held `/app` for the
+    /// console bundle, and `/apps` starts with it, so the whole block was
+    /// invisible. Somebody could connect their inbox and not disconnect it.
+    func appRevoke(cid: String, token: String) async throws {
+        struct Ok: Decodable {}
+        let _: Ok = try await request("/apps/\(cid)", method: "DELETE",
+                                      token: token)
+    }
+
+    /// Give a connector the credential it is waiting for. It goes to the
+    /// vault; this shell keeps nothing and cannot read it back.
+    func appAuthorize(cid: String, token: String,
+                      secret: String) async throws -> AppConn {
+        try await request("/apps/\(cid)/authorize", method: "POST",
+                          body: ["secret": secret], token: token)
     }
 
     func appCollect(cid: String, token: String, content: String) async throws {

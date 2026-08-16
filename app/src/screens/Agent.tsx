@@ -51,6 +51,7 @@ const RAIL: { id: string; icon: string }[] = [
   { id: "corner", icon: "🏠" },
   { id: "wall", icon: "🧱" },
   { id: "workshop", icon: "🧩" },
+  { id: "plugins", icon: "🔌" },
   { id: "assist", icon: "🛠" },
   { id: "market", icon: "🏷" },
   { id: "shop", icon: "🛒" },
@@ -68,19 +69,23 @@ const RAIL: { id: string; icon: string }[] = [
   { id: "remainder", icon: "🧩" },
 ];
 
-/** The composer's `+`. Four entries, each opening a screen that exists.
+/** The composer's `+`. Five entries, each opening a screen that exists.
  *
- *  The shape asked for was Camera, Photos, Files and Plugins, and all four
+ *  The shape asked for was Camera, Photos, Files and Plugins, and all of them
  *  have somewhere real to land here: the camera is what is live in a place,
  *  photos are what the wall takes, files are the source material a profile
  *  answers from, and the plug-ins are the outside services it connects to.
  *  Nothing in this menu is a placeholder — a control that opens nothing is
- *  the thing this estate keeps finding and removing. */
+ *  the thing this estate keeps finding and removing.
+ *
+ *  Plug-ins pointed at `remainder` when this menu shipped, because the
+ *  storefront did not exist yet and the miscellany screen was the nearest
+ *  true thing. It exists now. */
 const PLUS: { id: string; icon: string }[] = [
   { id: "live", icon: "📷" },
   { id: "wall", icon: "🖼" },
   { id: "workshop", icon: "📎" },
-  { id: "remainder", icon: "🔌" },
+  { id: "plugins", icon: "🔌" },
   { id: "assist", icon: "✏️" },
 ];
 

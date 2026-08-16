@@ -395,10 +395,14 @@ public record SocialConn(
     [property: JsonPropertyName("collected")] int Collected,
     [property: JsonPropertyName("published")] int Published);
 
+/// <summary>A row on the storefront. <c>Needs</c> is the lock — "nothing",
+/// "sign-in" or "key" — what this connector must be given before it can
+/// reach the far side.</summary>
 public record CatalogApp(
     [property: JsonPropertyName("app")] string App,
     [property: JsonPropertyName("label")] string Label,
-    [property: JsonPropertyName("capabilities")] string[] Capabilities);
+    [property: JsonPropertyName("capabilities")] string[] Capabilities,
+    [property: JsonPropertyName("needs")] string Needs);
 
 public record CatalogProvider(
     [property: JsonPropertyName("provider")] string Provider,
@@ -414,7 +418,12 @@ public record AppConn(
     [property: JsonPropertyName("app")] string App,
     [property: JsonPropertyName("label")] string Label,
     [property: JsonPropertyName("capabilities")] string[] Capabilities,
-    [property: JsonPropertyName("status")] string? Status);
+    [property: JsonPropertyName("status")] string? Status,
+    [property: JsonPropertyName("needs")] string Needs,
+    // Whether the credential Needs names has been given. An unauthorized
+    // connector is installed and inert: Invoke refuses it by name rather
+    // than answering "performed" having reached nothing.
+    [property: JsonPropertyName("authorized")] bool Authorized);
 
 public record InvokeResult(
     [property: JsonPropertyName("capability")] string Capability,
@@ -1348,6 +1357,23 @@ public sealed class ApiClient
 
     public Task<AppConn> AppConnect(string id, string token, string provider, string app) =>
         Send<AppConn>(Post($"/profiles/{id}/apps", new { provider, app }, token));
+
+    /// <summary>Uninstall. This route has existed as long as connectors
+    /// have and no shell ever called it — the door guard skipped every path
+    /// starting "/app", meaning the console bundle, and "/apps" starts with
+    /// it. Somebody could connect their inbox and not disconnect it.</summary>
+    public async Task AppRevoke(string cid, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete, $"/apps/{cid}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        var res = await Dispatch(req);
+        res.EnsureSuccessStatusCode();
+    }
+
+    /// <summary>Give a connector its credential. It goes to the vault; this
+    /// shell keeps nothing and cannot read it back.</summary>
+    public Task<AppConn> AppAuthorize(string cid, string token, string secret) =>
+        Send<AppConn>(Post($"/apps/{cid}/authorize", new { secret }, token));
 
     public async Task AppCollect(string cid, string token, string content)
     {

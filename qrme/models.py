@@ -684,6 +684,17 @@ class AppInvoke(BaseModel):
     input: str | None = None
 
 
+class AppAuthorize(BaseModel):
+    """The credential a connector needs, on its way to the vault.
+
+    ``secret`` never lands in this deployment's own database — the route
+    seals it into PDI and keeps the key. A deployment with no vault has
+    nowhere safe to put it and refuses rather than storing it in the clear.
+    """
+    secret: str
+    account: str | None = None         # which account on the far side, if named
+
+
 class FeedbackSubmit(BaseModel):
     category: str = "idea"             # idea | improvement | bug | praise | other
     message: str

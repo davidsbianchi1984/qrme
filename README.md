@@ -639,6 +639,10 @@ is exactly how the old card came to be showing yours in place of theirs.
     <td align="center" width="25%"><a href="docs/screens/199-what-it-is-doing.svg"><img src="docs/screens/199-what-it-is-doing.svg" width="210" alt="What it is doing"></a><br><sub><b>199</b> · What it is doing · bars that mean it</sub></td>
     <td align="center" width="25%"><a href="docs/screens/200-agent.svg"><img src="docs/screens/200-agent.svg" width="210" alt="Agent"></a><br><sub><b>200</b> · Agent · say what you want changed</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="25%"><a href="docs/screens/201-plug-ins.svg"><img src="docs/screens/201-plug-ins.svg" width="210" alt="Plug-ins"></a><br><sub><b>201</b> · Plug-ins · what it can reach, and what it needs first</sub></td>
+    <td></td><td></td><td></td>
+  </tr>
 </table>
 
 The strip changes with the room and only with the room. An audio room has no

@@ -964,6 +964,84 @@ const CHROME: Table = {
     de: "Verschiedenes", pt: "Diversos", it: "Varie",
     ja: "その他いろいろ", zh: "杂项", hi: "विविध", ar: "متفرقات",
   },
+  // The storefront. `nav.plugins` has to read the same as NAV's own label,
+  // which the nav guard checks — the tab is named once.
+  "nav.plugins": {
+    en: "Plug-ins", es: "Complementos", fr: "Modules",
+    de: "Plug-ins", pt: "Extensões", it: "Plug-in",
+    ja: "プラグイン", zh: "插件", hi: "प्लग-इन", ar: "الإضافات",
+  },
+  "plugins.pitch": {
+    en: "Services your profile can reach, and what each one needs first.", es: "Servicios a los que tu perfil puede llegar, y qué necesita cada uno primero.", fr: "Les services que votre profil peut atteindre, et ce qu'il faut d'abord.", de: "Dienste, die dein Profil erreichen kann — und was jeder zuerst braucht.", pt: "Serviços que o seu perfil consegue alcançar, e o que cada um precisa primeiro.", it: "Servizi che il tuo profilo può raggiungere, e cosa serve prima a ciascuno.", ja: "プロフィールがつながれるサービスと、それぞれに先に必要なもの。", zh: "你的档案能连到的服务，以及每一个先需要什么。", hi: "वे सेवाएँ जिन तक आपकी प्रोफ़ाइल पहुँच सकती है, और हर एक को पहले क्या चाहिए।", ar: "الخدمات التي يمكن لملفك الوصول إليها، وما يحتاجه كل منها أولًا.",
+  },
+  "plugins.search": {
+    en: "Search plug-ins", es: "Buscar complementos", fr: "Rechercher un module", de: "Plug-ins suchen", pt: "Procurar extensões", it: "Cerca plug-in", ja: "プラグインを検索", zh: "搜索插件", hi: "प्लग-इन खोजें", ar: "ابحث في الإضافات",
+  },
+  "plugins.count": {
+    en: "{apps} plug-ins, in {families} families.", es: "{apps} complementos, en {families} familias.", fr: "{apps} modules, en {families} familles.", de: "{apps} Plug-ins in {families} Familien.", pt: "{apps} extensões, em {families} famílias.", it: "{apps} plug-in, in {families} famiglie.", ja: "{families} 系統、{apps} 個のプラグイン。", zh: "{families} 类，共 {apps} 个插件。", hi: "{families} परिवारों में {apps} प्लग-इन।", ar: "{apps} إضافة، في {families} عائلات.",
+  },
+  "plugins.installed": {
+    en: "Added", es: "Añadidos", fr: "Ajoutés", de: "Hinzugefügt", pt: "Adicionados", it: "Aggiunti", ja: "追加済み", zh: "已添加", hi: "जोड़े गए", ar: "المُضافة",
+  },
+  "plugins.none": {
+    en: "Nothing added yet.", es: "Todavía no has añadido nada.", fr: "Rien d'ajouté pour l'instant.", de: "Noch nichts hinzugefügt.", pt: "Ainda nada adicionado.", it: "Non hai ancora aggiunto nulla.", ja: "まだ何も追加されていません。", zh: "还没有添加任何插件。", hi: "अभी कुछ नहीं जोड़ा गया।", ar: "لم تُضِف شيئًا بعد.",
+  },
+  "plugins.add": {
+    en: "Add", es: "Añadir", fr: "Ajouter", de: "Hinzufügen", pt: "Adicionar", it: "Aggiungi", ja: "追加", zh: "添加", hi: "जोड़ें", ar: "أضف",
+  },
+  "plugins.remove": {
+    en: "Remove", es: "Quitar", fr: "Retirer", de: "Entfernen", pt: "Remover", it: "Rimuovi", ja: "削除", zh: "移除", hi: "हटाएँ", ar: "أزل",
+  },
+  "plugins.use": {
+    en: "Use", es: "Usar", fr: "Utiliser", de: "Verwenden", pt: "Usar", it: "Usa", ja: "使う", zh: "使用", hi: "इस्तेमाल करें", ar: "استخدم",
+  },
+  "plugins.on": {
+    en: "Signed in", es: "Sesión iniciada", fr: "Connecté", de: "Angemeldet", pt: "Sessão iniciada", it: "Accesso effettuato", ja: "サインイン済み", zh: "已登录", hi: "साइन इन है", ar: "تم تسجيل الدخول",
+  },
+  // The lock, said in full. Two postures, because they are somebody else's
+  // job to fix: one is yours, one belongs to whoever runs the deployment.
+  "plugins.needs.sign-in": {
+    en: "Needs your account there before it can reach anything.", es: "Necesita tu cuenta allí antes de poder llegar a nada.", fr: "A besoin de votre compte là-bas avant de pouvoir atteindre quoi que ce soit.", de: "Braucht dein dortiges Konto, bevor es überhaupt etwas erreichen kann.", pt: "Precisa da sua conta lá antes de conseguir alcançar seja o que for.", it: "Serve il tuo account là prima che possa raggiungere qualcosa.", ja: "先方のあなたのアカウントがないと、何にも届きません。", zh: "得先有你在那边的账号，它才能连上任何东西。", hi: "वहाँ आपके खाते के बिना यह कुछ भी नहीं छू सकता।", ar: "يحتاج حسابك هناك قبل أن يصل إلى أي شيء.",
+  },
+  "plugins.needs.key": {
+    en: "Needs a key from whoever runs this deployment.", es: "Necesita una clave de quien gestiona esta instalación.", fr: "A besoin d'une clé de la personne qui exploite ce déploiement.", de: "Braucht einen Schlüssel von der Person, die diese Installation betreibt.", pt: "Precisa de uma chave de quem gere esta instalação.", it: "Serve una chiave da chi gestisce questa installazione.", ja: "この環境の運用者から鍵をもらう必要があります。", zh: "需要运维这套部署的人提供密钥。", hi: "इस तैनाती को चलाने वाले से एक कुंजी चाहिए।", ar: "يحتاج مفتاحًا ممّن يُشغّل هذا النشر.",
+  },
+  "plugins.needs.nothing": {
+    en: "Public — nothing to sign in to.", es: "Público: no hay dónde iniciar sesión.", fr: "Public — rien où se connecter.", de: "Öffentlich — es gibt nichts, wo man sich anmelden müsste.", pt: "Público — não há onde iniciar sessão.", it: "Pubblico: non c'è niente a cui accedere.", ja: "公開情報です。サインインする先はありません。", zh: "公开内容——没有需要登录的地方。", hi: "सार्वजनिक — साइन इन करने को कुछ नहीं।", ar: "عام — لا شيء لتسجيل الدخول إليه.",
+  },
+  "plugins.signin": {
+    en: "Sign in", es: "Iniciar sesión", fr: "Se connecter", de: "Anmelden", pt: "Iniciar sessão", it: "Accedi", ja: "サインイン", zh: "登录", hi: "साइन इन", ar: "تسجيل الدخول",
+  },
+  "plugins.signin.sub": {
+    en: "This goes straight into the vault. Nothing here reads it back.", es: "Esto va directo a la bóveda. Aquí nada vuelve a leerlo.", fr: "Cela va droit au coffre. Rien ici ne le relit.", de: "Das geht direkt in den Tresor. Hier liest es nichts wieder aus.", pt: "Isto vai direto para o cofre. Nada aqui volta a lê-lo.", it: "Va dritto nella cassaforte. Qui nulla lo rilegge.", ja: "これは金庫へ直行します。ここから読み戻すものはありません。", zh: "它直接进保险库。这里没有任何东西会再读它。", hi: "यह सीधे तिजोरी में जाता है। यहाँ कुछ भी इसे वापस नहीं पढ़ता।", ar: "يذهب مباشرة إلى الخزنة. لا شيء هنا يقرأه مجددًا.",
+  },
+  "plugins.signin.go": {
+    en: "Keep it", es: "Guardarlo", fr: "Le garder", de: "Behalten", pt: "Guardar", it: "Conservalo", ja: "保管する", zh: "保存", hi: "रख लें", ar: "احفظه",
+  },
+  "plugins.secret": {
+    en: "The key or password it needs", es: "La clave o contraseña que necesita", fr: "La clé ou le mot de passe requis", de: "Der Schlüssel oder das Passwort, das es braucht", pt: "A chave ou palavra-passe de que precisa", it: "La chiave o password che serve", ja: "必要な鍵またはパスワード", zh: "它需要的密钥或密码", hi: "जो कुंजी या पासवर्ड चाहिए", ar: "المفتاح أو كلمة المرور المطلوبة",
+  },
+  "plugins.account": {
+    en: "Which account there (optional)", es: "Qué cuenta allí (opcional)", fr: "Quel compte là-bas (facultatif)", de: "Welches Konto dort (optional)", pt: "Que conta lá (opcional)", it: "Quale account là (facoltativo)", ja: "先方のどのアカウントか（任意）", zh: "那边的哪个账号（可选）", hi: "वहाँ कौन-सा खाता (वैकल्पिक)", ar: "أي حساب هناك (اختياري)",
+  },
+  "plugins.words": {
+    en: "What to pull in, or what to ask it for", es: "Qué traer, o qué pedirle", fr: "Ce qu'il faut importer, ou lui demander", de: "Was hereingeholt oder verlangt werden soll", pt: "O que trazer, ou o que lhe pedir", it: "Cosa importare, o cosa chiedergli", ja: "取り込む内容、または頼みたいこと", zh: "要拉进来的内容，或要它做的事", hi: "क्या लाना है, या इससे क्या माँगना है", ar: "ما الذي تريد سحبه، أو ما تطلبه منه",
+  },
+  "plugins.pull": {
+    en: "Pull it in", es: "Traerlo", fr: "L'importer", de: "Hereinholen", pt: "Trazer", it: "Importalo", ja: "取り込む", zh: "拉进来", hi: "अंदर लाएँ", ar: "اسحبه",
+  },
+  "plugins.do": {
+    en: "Ask it", es: "Pedírselo", fr: "Lui demander", de: "Beauftragen", pt: "Pedir-lhe", it: "Chiediglielo", ja: "頼む", zh: "让它做", hi: "इससे कहें", ar: "اطلب منه",
+  },
+  "plugins.ready": {
+    en: "Works the moment you add it", es: "Funciona en cuanto lo añades", fr: "Fonctionne dès que vous l'ajoutez", de: "Funktioniert, sobald du es hinzufügst", pt: "Funciona assim que o adicionar", it: "Funziona appena lo aggiungi", ja: "追加したその場で動きます", zh: "一添加就能用", hi: "जोड़ते ही काम करता है", ar: "يعمل فور إضافته",
+  },
+  "plugins.ready.sub": {
+    en: "These read what anybody could read, so there is no account to give them.", es: "Estos leen lo que cualquiera podría leer, así que no hay cuenta que darles.", fr: "Ceux-ci lisent ce que n'importe qui pourrait lire : aucun compte à fournir.", de: "Diese lesen, was jeder lesen könnte — es gibt kein Konto zu geben.", pt: "Estes leem o que qualquer pessoa poderia ler, por isso não há conta a dar.", it: "Questi leggono ciò che chiunque potrebbe leggere: non c'è nessun account da dare.", ja: "誰でも読めるものを読むだけなので、渡すアカウントがありません。", zh: "它们读的是任何人都能读到的内容，所以没有账号要交给它们。", hi: "ये वही पढ़ते हैं जो कोई भी पढ़ सकता है, इसलिए इन्हें कोई खाता देना नहीं है।", ar: "هذه تقرأ ما يستطيع أي شخص قراءته، فلا حساب تعطيه لها.",
+  },
+  "plugins.signedout": {
+    en: "Sign in with a profile of your own — plug-ins connect to it, so it needs to know whose.", es: "Entra con un perfil tuyo: los complementos se conectan a él, así que necesita saber de quién es.", fr: "Connectez-vous avec un profil à vous — les modules s'y rattachent, il faut savoir lequel.", de: "Melde dich mit einem eigenen Profil an — Plug-ins hängen daran und müssen wissen, an welchem.", pt: "Entre com um perfil seu — as extensões ligam-se a ele, por isso precisa de saber de quem é.", it: "Accedi con un profilo tuo: i plug-in si collegano a quello, quindi deve sapere quale.", ja: "ご自身のプロフィールでサインインしてください。プラグインはそこにつながるので、誰のものかを知る必要があります。", zh: "用你自己的档案登录——插件连的是它，所以得知道是谁的。", hi: "अपनी प्रोफ़ाइल से साइन इन करें — प्लग-इन उसी से जुड़ते हैं, तो जानना ज़रूरी है कि किसकी।", ar: "سجّل الدخول بملف يخصّك — فالإضافات ترتبط به ويجب أن يعرف لمن.",
+  },
   "nav.named": {
     en: "Look one thing up", es: "Consulta una cosa",
     fr: "Consulter une chose", de: "Eine Sache nachschlagen",

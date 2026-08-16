@@ -1128,6 +1128,31 @@ LESSONS: tuple[dict, ...] = (
          screens=(200,),
          try_it="Open Agent, read what it says it can touch, then ask it "
                 "to make your page say what you actually do."),
+    dict(key="plugins", chapter="Making things",
+         title="Plug-ins",
+         what="The outside services your profile can reach, in one place, "
+              "with the honest thing said on every row. There are 103 of "
+              "them across nine families — your inbox and calendar, the "
+              "drive, the issue tracker, the payment processor, the design "
+              "tool, the console, the open web, and the public social pages "
+              "it reads without ever posting to them. Adding one is a "
+              "press. What each row also tells you is what it needs before "
+              "it can reach anything at all: nothing, if it only reads what "
+              "anybody could read; your own account on the far side; or a "
+              "key that belongs to whoever runs this deployment. That is "
+              "the lock beside the name, and it is a posture rather than a "
+              "picture — a connector nobody has signed in to is refused "
+              "when you try to use it, by name, instead of reporting that "
+              "it did something it could not have done. The credential you "
+              "give goes into the vault and this app keeps only the key to "
+              "it; on a plan without a vault there is nowhere safe to put "
+              "it, so it is not taken at all. Removing one is on the same "
+              "screen, which is newer than it sounds: the route to "
+              "disconnect a connector has existed since connectors did, "
+              "and no screen anywhere had ever offered it.",
+         screens=(201,),
+         try_it="Open Plug-ins, search for something your day already runs "
+                "through, and read what it says it needs before you add it."),
 )
 
 CHAPTERS = tuple(dict.fromkeys(lesson["chapter"] for lesson in LESSONS))

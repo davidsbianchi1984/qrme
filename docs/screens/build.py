@@ -3796,6 +3796,25 @@ SCREENS = [
         dict(icon="lock", color="amber", k="And no further",
              s="eleven tools, each with a door"),
     ], button=("What it did, under what it said", "brand")),
+    # 201: the plug-in storefront. The connector catalogue existed from the
+    # connected-apps round and the only way to see it was a `<select>` of
+    # providers inside another screen — chosen before you knew what any of
+    # them were. The cards are what the shop is actually made of: the board,
+    # the lock and what it means, the two halves of what a connector may do,
+    # and uninstall, which is on this screen because it was on no screen at
+    # all until now.
+    dict(num=201, title="Plug-ins", sub="What it can reach, and what it needs first",
+         accent="cyan", tab=0, cards=[
+        dict(icon="link", color="cyan", k="The whole board",
+             s="inbox, drive, issues, open web",
+             pill=("103", "good")),
+        dict(icon="lock", color="amber", k="The lock is a posture",
+             s="not signed in, so it refuses"),
+        dict(icon="page", color="green", k="Read what anyone can",
+             s="public pages, no account"),
+        dict(icon="code", color="brand", k="Remove it",
+             s="the button no client ever had"),
+    ], button=("Added is not the same as able", "brand")),
     dict(num=199, title="What It Is Doing", sub="Seven states, and bars that mean them",
          accent="cyan", tab=0, cards=[
         dict(icon="mic", color="green", k="Listening",
