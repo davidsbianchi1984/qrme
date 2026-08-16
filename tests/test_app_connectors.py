@@ -87,7 +87,7 @@ def test_invoking_a_connector_nobody_signed_in_to_is_refused(client, profile_id)
         mattered  did anything happen on the other end
     """
     conn = _connect(client, profile_id, provider="work", app="gmail")
-    assert conn["needs"] == "sign-in"
+    assert conn["needs_first"] == "sign-in"
     assert conn["authorized"] is False
     r = client.post(f"/apps/{conn['id']}/invoke", json={"capability": "send"})
     assert r.status_code == 409
@@ -98,7 +98,7 @@ def test_invoking_a_connector_nobody_signed_in_to_is_refused(client, profile_id)
 def test_a_public_connector_needs_nothing_and_says_so(client, profile_id):
     """Half the point of the posture: a lock on every row is not a signal."""
     conn = _connect(client, profile_id, provider="scrape", app="instagram")
-    assert conn["needs"] == "nothing"
+    assert conn["needs_first"] == "nothing"
     assert conn["authorized"] is True
     # There is nothing to sign in to, so offering the door would be the lie.
     assert client.post(f"/apps/{conn['id']}/authorize",

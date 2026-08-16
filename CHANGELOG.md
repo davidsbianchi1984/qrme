@@ -6,6 +6,83 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.79.0] - 2026-08-16
+
+### Added
+
+- **A plug-in storefront, and the whole board on it.** The connector
+  catalogue has existed since the connected-apps round and the only way to
+  see it was a `<select>` of providers inside another screen — chosen before
+  you knew what any of them were. A person who wants their inbox read does
+  not go looking for a dropdown labelled *provider*; they look for a shop.
+
+      asked     can a profile connect to an outside service
+      mattered  can a person find out which ones, and what happens then
+
+  The catalogue was also forty-two rows of device AI — Apple Intelligence,
+  Gemini, Copilot, Canva, glasses, consoles. That is a real list and it is
+  not the list a person expects behind a control called plug-ins. It is a
+  hundred and three now, across nine families: the inbox, the calendar, the
+  drive, the docs, the chat, the issue tracker, the CRM, the payment
+  processor, the design tool, the meeting notes, the papers; the open web;
+  and the public social pages a profile reads without ever posting to them.
+
+  The storefront itself is a new tab on the console and the same board on
+  all three phones — search, what is added, the rows that work the moment
+  you add them, then a section per family.
+
+### Fixed
+
+- **The lock is a posture now, not a picture.** `invoke` answered
+  `performed` for every connector on the board, whatever credential it did
+  or did not have. A Gmail connector with no Google account behind it
+  reported that it had summarised the inbox.
+
+      asked     did the call succeed
+      mattered  did anything happen on the other end
+
+  Every catalogue row declares what it must be given first — nothing, your
+  own sign-in, or an operator key — and that is the lock the storefront
+  draws. A row that needs nothing is authorized the moment it is installed;
+  everything else is installed and inert until `POST /apps/{cid}/authorize`
+  is given the credential, and `invoke` refuses it by name until then. The
+  credential is sealed into the vault and this database keeps only the key;
+  on a plan with no vault there is nowhere safe to put it, so it is refused
+  rather than held in the clear. `collect` is deliberately not gated — it
+  stores what the owner pasted, which reaches nothing and never did.
+
+  Connectors on a running deployment become unauthorized by this change and
+  refuse `invoke` until signed in. That is the correction, not a
+  regression: they were never reaching anything.
+
+- **`/apps` starts with `/app`.** The door guard skipped every route whose
+  path began with `/openapi`, `/docs`, `/redoc` or `/app`. The last one
+  meant *the console bundle mounted at /app*, and `startswith` does not know
+  that.
+
+      asked     is this route the documentation or the bundle
+      mattered  is `/apps` a prefix of `/app`
+
+  So the whole connected-apps block was skipped before the guard ever
+  looked at it, on every surface, for as long as the guard has existed —
+  the doorless backlogs have been pinned at zero through a dozen rounds
+  with four routes never once counted. What it hid: **uninstalling a
+  connector has never had a door on any client.** Somebody could connect
+  their inbox to a profile and had no way at all to disconnect it. The
+  console could also neither collect from a connector nor use one; both
+  were phone-only, and nothing said so. All four are on the storefront now,
+  and the prefix test requires a path boundary.
+
+- **A `needs` that meant two things.** Voiceprint enrollment already puts a
+  `needs` on the wire and it is a list of what is still missing. The
+  storefront's is `needs_first`, because a field name is the one piece of an
+  API a reader carries from route to route.
+
+- **Three sentences the estate already had a wording for.** "Sign in"
+  disagreed with `acct.signin` in Hindi, "Remove" with `nmg.remove` in
+  Arabic, and "Keep it" with the phones' `nsig.keep` in eight languages.
+  The existing wordings win.
+
 ## [0.78.0] - 2026-08-16
 
 ### Changed
@@ -11705,7 +11782,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.78.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.79.0...HEAD
+[0.79.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.79.0
 [0.78.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.78.0
 [0.77.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.77.0
 [0.76.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.76.0
