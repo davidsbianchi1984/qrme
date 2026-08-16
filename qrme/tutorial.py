@@ -489,6 +489,28 @@ LESSONS: tuple[dict, ...] = (
          screens=(172,),
          try_it="Read a campaign with no token at all, and find who the "
                 "money goes to written on the same card."),
+    dict(key="asking", chapter="Out in the world",
+         title="Asking people, not pages",
+         what="An excursion asks a model, which can only return what "
+              "somebody already wrote down. An inquiry asks people. The "
+              "question goes onto an open board that anybody can answer "
+              "with no account and no name, and an accepted answer folds "
+              "into the profile as a knowledge source — so the offline "
+              "model ends up knowing something that was never published, "
+              "and the person who knew it never learns whose question it "
+              "was. Three things are hardcoded rather than configured: the "
+              "question is sanitised on the way out and there is no "
+              "argument that skips it; the board carries the sanitised "
+              "line and nothing else, not the profile, not the typed "
+              "question, not even the count of what was taken out, because "
+              "two questions with the same unusual count are a thread to "
+              "pull; and an answer is a stranger\'s text, moderated on "
+              "arrival and never folded in without the owner saying so. "
+              "Being pointed in a direction is not the same as being "
+              "steered, and the difference is a person choosing.",
+         screens=(172,),
+         try_it="Put a question out, then read the board with no token at "
+                "all and check that nothing on it says whose it is."),
     dict(key="leaving", chapter="Out in the world",
          title="What leaves, and on what terms",
          what="Two different kinds of leaving, and conflating them is how "

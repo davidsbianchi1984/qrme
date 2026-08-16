@@ -26,6 +26,43 @@ public sealed partial class StudyPage : Page
         public string FoldLabel => L10n.T("nstu.fold");
     }
 
+    /// <summary>One of the owner's own questions. <c>Brief</c> is what went on
+    /// the board — the typed question is deliberately not shown here, because
+    /// the line worth checking is the line that left.</summary>
+    public sealed class AskRow
+    {
+        public string Id { get; init; } = "";
+        public string Brief { get; init; } = "";
+        public string Count { get; init; } = "";
+        public string AnswersText { get; init; } = "";
+        public string FoldTag { get; init; } = "";
+        public bool Closed { get; init; }
+        public Visibility AnswersVisibility =>
+            AnswersText.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility CloseVisibility =>
+            Closed ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility FoldVisibility =>
+            FoldTag.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        public string ReadLabel => L10n.T("nask.read");
+        public string CloseLabel => L10n.T("nask.close");
+        public string FoldLabel => L10n.T("nstu.fold");
+    }
+
+    /// <summary>A question on the open board. No owner, no redaction count —
+    /// see <c>OpenQuestion</c>.</summary>
+    public sealed class BoardRow
+    {
+        public string Id { get; init; } = "";
+        public string Brief { get; init; } = "";
+        public string AnswersText { get; init; } = "";
+        public Visibility AnswersVisibility =>
+            AnswersText.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        public string ReadLabel => L10n.T("nask.send");
+    }
+
+    private string _openedAsk = "";
+    private string _answeringId = "";
+
     public StudyPage()
     {
         InitializeComponent();
@@ -42,6 +79,22 @@ public sealed partial class StudyPage : Page
         QuestionBox.Header = L10n.T("nstu.question", lang);
         QuestionBox.PlaceholderText = L10n.T("nstu.question.ph", lang);
         StudyButton.Content = L10n.T("nstu.go", lang);
+        AskTitle.Text = L10n.T("nask", lang);
+        AskSub.Text = L10n.T("nask.sub", lang);
+        AskTopicBox.Header = L10n.T("ncmp.topic", lang);
+        AskTopicBox.PlaceholderText = L10n.T("nstu.topic.ph", lang);
+        AskQuestionBox.Header = L10n.T("nstu.question", lang);
+        AskQuestionBox.PlaceholderText = L10n.T("nask.q.ph", lang);
+        AskButton.Content = L10n.T("nask.go", lang);
+        BoardTitle.Text = L10n.T("nask.board", lang);
+        BoardSub.Text = L10n.T("nask.board.sub", lang);
+        AnswerText.Header = L10n.T("nask.your", lang);
+        AnswerText.PlaceholderText = L10n.T("nask.your.ph", lang);
+        AliasBox.Header = L10n.T("nask.alias", lang);
+        AliasBox.PlaceholderText = L10n.T("nask.alias.ph", lang);
+        PointsBox.Header = L10n.T("nask.points", lang);
+        PointsBox.PlaceholderText = L10n.T("nask.points.ph", lang);
+        SendAnswerButton.Content = L10n.T("nask.send", lang);
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e) => await Reload();
@@ -66,6 +119,155 @@ public sealed partial class StudyPage : Page
                 Findings = x.Findings,
                 Learned = x.Learned,
             }).ToList();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+        await ReloadAsks();
+        await ReloadBoard();
+    }
+
+    private async System.Threading.Tasks.Task ReloadAsks()
+    {
+        var s = AppState.Current;
+        try
+        {
+            var asks = await ApiClient.Shared.Inquiries(s.Pid!, s.Token!);
+            AsksList.ItemsSource = Enumerable.Reverse(asks).Select(a => new AskRow
+            {
+                Id = a.Id,
+                Brief = a.Brief,
+                Count = L10n.Fill("nask.count", AppState.Current.Language,
+                                  ("n", a.AnswerCount.ToString())),
+                AnswersText = a.Id == _openedAsk ? AnswersOf(a) : "",
+                FoldTag = a.Id == _openedAsk ? FoldableAnswer(a) : "",
+                Closed = a.Closed,
+            }).ToList();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private static string AnswersOf(Inquiry a)
+    {
+        if (a.Answers is null || a.Answers.Length == 0)
+            return L10n.T("nask.anon");
+        return string.Join("\n", a.Answers.Select(x =>
+        {
+            var who = x.Alias.Length > 0 ? x.Alias : L10n.T("nask.anon");
+            var held = x.Blocked ? " — " + L10n.T("nask.held") : "";
+            var points = x.PointsTo.Length > 0 ? " (" + x.PointsTo + ")" : "";
+            return who + ": " + x.Body + points + held;
+        }));
+    }
+
+    /// <summary>The first answer that could still be folded in, as
+    /// "inquiry/answer". Empty when there is none, which collapses the
+    /// button — a control that would refuse is not offered.</summary>
+    private static string FoldableAnswer(Inquiry a)
+    {
+        var first = a.Answers?.FirstOrDefault(x => !x.Blocked && !x.Folded);
+        return first is null ? "" : a.Id + "/" + first.Id;
+    }
+
+    /// <summary>The board. No token: this loads for a signed-out window too.
+    /// </summary>
+    private async System.Threading.Tasks.Task ReloadBoard()
+    {
+        try
+        {
+            var board = await ApiClient.Shared.OpenQuestions();
+            BoardList.ItemsSource = board.Select(q => new BoardRow
+            {
+                Id = q.Id,
+                Brief = q.Brief,
+                AnswersText = q.Id == _answeringId && q.Replies is not null
+                    ? string.Join("\n", q.Replies.Select(x => x.Body)) : "",
+            }).ToList();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnAsk(object sender, RoutedEventArgs e)
+    {
+        var topic = AskTopicBox.Text.Trim();
+        var question = AskQuestionBox.Text.Trim();
+        if (topic.Length == 0 || question.Length == 0) return;
+        var s = AppState.Current;
+        AskButton.IsEnabled = false;
+        try
+        {
+            await ApiClient.Shared.OpenInquiry(s.Pid!, s.Token!, topic, question);
+            AskTopicBox.Text = ""; AskQuestionBox.Text = "";
+            await ReloadAsks();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+        finally { AskButton.IsEnabled = true; }
+    }
+
+    private async void OnReadAnswers(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string iid) return;
+        try
+        {
+            // The single-question route is the one that carries the answers.
+            await ApiClient.Shared.Inquiry(iid, AppState.Current.Token!);
+            _openedAsk = iid;
+            await ReloadAsks();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnCloseAsk(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string iid) return;
+        try
+        {
+            await ApiClient.Shared.CloseInquiry(iid, AppState.Current.Token!);
+            await ReloadAsks();
+            await ReloadBoard();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnFoldAnswer(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string tag) return;
+        var parts = tag.Split('/');
+        if (parts.Length != 2) return;
+        try
+        {
+            await ApiClient.Shared.LearnFromAnswer(parts[0], parts[1],
+                                                  AppState.Current.Token!);
+            await ReloadAsks();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnPickQuestion(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string iid) return;
+        try
+        {
+            await ApiClient.Shared.OpenQuestion(iid);
+            _answeringId = iid;
+            ReceiptText.Text = "";
+            AnswerBox.Visibility = Visibility.Visible;
+            await ReloadBoard();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnSendAnswer(object sender, RoutedEventArgs e)
+    {
+        if (_answeringId.Length == 0 || AnswerText.Text.Trim().Length == 0) return;
+        try
+        {
+            // No token, deliberately — see ApiClient.AnswerOpenQuestion.
+            var receipt = await ApiClient.Shared.AnswerOpenQuestion(
+                _answeringId, AnswerText.Text.Trim(), AliasBox.Text.Trim(),
+                PointsBox.Text.Trim());
+            // Held or not, the server's own note says which.
+            ReceiptText.Text = receipt.Note;
+            AnswerText.Text = ""; AliasBox.Text = ""; PointsBox.Text = "";
+            await ReloadBoard();
         }
         catch (Exception ex) { ShowError(ex.Message); }
     }

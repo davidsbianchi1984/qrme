@@ -6,6 +6,49 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The agent can ask people, not just pages.** A knowledge excursion sends a
+  sanitized brief to a model and brings general knowledge back. That covers
+  what is already written down. It does not cover what a person two streets
+  over knows and nobody ever published — which shop still repairs this, what
+  the part is actually called, why the obvious answer is wrong in an old
+  house.
+
+      asked     can the agent look it up
+      mattered  can the agent ask somebody who knows, without telling them who
+
+  An **inquiry** is that question, put where people can answer it. Anyone on
+  the internet can answer one and nobody needs an account to; no name is
+  asked for, and an answer from nobody in particular is still an answer. An
+  answer the owner accepts folds into the profile as a learned `knowledge`
+  source — the same fold the excursion findings get — so the offline model
+  ends up knowing something it could not have looked up, and the people who
+  answered end up knowing nothing.
+
+  Three things are hardcoded rather than configured, because a privacy
+  posture with a switch on it is a privacy posture somebody will switch.
+  `inquiries.compose` is the only way to build the text of an inquiry, it
+  always runs the excursion sanitizer, and it takes no argument that skips
+  it — a guard fails on any boolean parameter and on any branch inside it,
+  because the argument for adding one always sounds reasonable. The board
+  carries the sanitized line and nothing else: not the profile, not the
+  owner's typed question, and not the redaction count, since a count is a
+  fact about a person and two questions carrying the same unusual count are
+  a thread to pull. And an answer is a stranger's text — moderated on
+  arrival under the strictest filter, never followed automatically, never
+  folded without the owner saying so. Being pointed in a direction is not
+  the same as being steered, and the difference is a person choosing.
+
+  A held answer is told it was held rather than silently dropped, and the
+  owner can read what the filter stopped: an owner who cannot is taking the
+  filter's word for it. The two audiences are two route prefixes rather than
+  two branches in one handler, because a handler serving both is a handler
+  where one missed branch shows a stranger somebody's private words.
+
+  On the console, on iOS, on Android and on Windows — both halves on each:
+  putting a question out, and answering somebody else's.
+
 ## [0.79.0] - 2026-08-16
 
 ### Added

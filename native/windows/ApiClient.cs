@@ -585,6 +585,49 @@ public record LicenseGrant(
     [property: JsonPropertyName("revoked")] bool Revoked,
     [property: JsonPropertyName("manifest")] LicenseManifest? Manifest);
 
+/// <summary>A question put to people rather than to a model — the owner's
+/// view. <c>Topic</c> and <c>Question</c> are their own words and stay local;
+/// <c>Brief</c> is the sanitized line that went onto the board.</summary>
+public record Inquiry(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("topic")] string Topic,
+    [property: JsonPropertyName("question")] string Question,
+    [property: JsonPropertyName("brief")] string Brief,
+    [property: JsonPropertyName("redactions")] int Redactions,
+    [property: JsonPropertyName("closed")] bool Closed,
+    [property: JsonPropertyName("answer_count")] int AnswerCount,
+    [property: JsonPropertyName("answers")] InquiryAnswer[]? Answers);
+
+public record InquiryAnswer(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("alias")] string Alias,
+    [property: JsonPropertyName("body")] string Body,
+    [property: JsonPropertyName("points_to")] string PointsTo,
+    [property: JsonPropertyName("blocked")] bool Blocked,
+    [property: JsonPropertyName("folded")] bool Folded);
+
+/// <summary>The same question as somebody with no account sees it. A separate
+/// record on purpose: no profile, no typed question, no redaction count.
+/// </summary>
+public record OpenQuestion(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("brief")] string Brief,
+    [property: JsonPropertyName("answer_count")] int AnswerCount,
+    [property: JsonPropertyName("closed")] bool Closed,
+    // `replies`, not `answers`: Inquiry already carries an `answers` with the
+    // blocked flag and the fold state on it. One name, one shape.
+    [property: JsonPropertyName("replies")] OpenAnswer[]? Replies);
+
+public record OpenAnswer(
+    [property: JsonPropertyName("alias")] string Alias,
+    [property: JsonPropertyName("body")] string Body,
+    [property: JsonPropertyName("points_to")] string PointsTo);
+
+public record AnswerReceipt(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("held")] bool Held,
+    [property: JsonPropertyName("note")] string Note);
+
 public record Excursion(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("topic")] string Topic,
@@ -1576,6 +1619,48 @@ public sealed class ApiClient
         var res = await Dispatch(req);
         res.EnsureSuccessStatusCode();
     }
+
+    // -- inquiries: ask people, not pages --
+
+    public Task<Inquiry[]> Inquiries(string id, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, $"/profiles/{id}/inquiries");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<Inquiry[]>(req);
+    }
+
+    public Task<Inquiry> OpenInquiry(string id, string token, string topic,
+                                     string question) =>
+        Send<Inquiry>(Post($"/profiles/{id}/inquiries",
+            new { topic, question }, token));
+
+    public Task<Inquiry> Inquiry(string iid, string token) =>
+        Send<Inquiry>(Get($"/inquiries/{iid}", token));
+
+    public Task<Inquiry> CloseInquiry(string iid, string token) =>
+        Send<Inquiry>(Post($"/inquiries/{iid}/close", new { }, token));
+
+    public async Task LearnFromAnswer(string iid, string aid, string token)
+    {
+        var req = Post($"/inquiries/{iid}/answers/{aid}/learn", new { }, token);
+        var res = await Dispatch(req);
+        res.EnsureSuccessStatusCode();
+    }
+
+    // The board, and answering one. **No token on any of these three** — the
+    // person answering has no account and is not asked for a name, and a
+    // credential here would be one the board could log against them.
+
+    public Task<OpenQuestion[]> OpenQuestions() =>
+        Send<OpenQuestion[]>(Get("/open-questions"));
+
+    public Task<OpenQuestion> OpenQuestion(string iid) =>
+        Send<OpenQuestion>(Get($"/open-questions/{iid}"));
+
+    public Task<AnswerReceipt> AnswerOpenQuestion(string iid, string body,
+                                                  string alias, string pointsTo) =>
+        Send<AnswerReceipt>(Post($"/open-questions/{iid}/answers",
+            new { body, alias, points_to = pointsTo }));
 
     // MARK: Live desks
 

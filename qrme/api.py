@@ -39,6 +39,7 @@ from .routers import (accounts as account_routes,
                       gamelobby, gaming,
                       governance,
                       identity, inbox as inbox_routes,
+                      inquiries as inquiry_routes,
                       intelligence, interaction, licensing, models,
                       organizations as organization_routes,
                       overlays as overlay_routes, packs, pages, placemic,
@@ -176,6 +177,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(social.router)
     app.include_router(apps.router)
     app.include_router(research.router)
+    app.include_router(inquiry_routes.router)
     app.include_router(summon.router)
     app.include_router(community.router)
     app.include_router(assistant.router)

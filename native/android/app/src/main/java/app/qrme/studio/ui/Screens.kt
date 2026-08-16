@@ -1588,7 +1588,27 @@ fun StudyScreen(vm: StudioViewModel) {
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
 
-    fun reload() { vm.call({ ApiClient.excursions(vm.pid!!, vm.token!!) }) { r -> excursions = r.getOrDefault(emptyList()) } }
+    // Asking people rather than a model. The board below takes no token: the
+    // person answering has no account and is never asked for a name.
+    var askTopic by remember { mutableStateOf("") }
+    var askQuestion by remember { mutableStateOf("") }
+    var asks by remember { mutableStateOf<List<Inquiry>>(emptyList()) }
+    var opened by remember { mutableStateOf<Inquiry?>(null) }
+    var board by remember { mutableStateOf<List<OpenQuestion>>(emptyList()) }
+    var answering by remember { mutableStateOf<OpenQuestion?>(null) }
+    var answer by remember { mutableStateOf("") }
+    var answerAs by remember { mutableStateOf("") }
+    var pointsTo by remember { mutableStateOf("") }
+    var receipt by remember { mutableStateOf<String?>(null) }
+
+    fun reloadBoard() {
+        vm.call({ ApiClient.openQuestions() }) { r -> board = r.getOrDefault(emptyList()) }
+    }
+    fun reload() {
+        vm.call({ ApiClient.excursions(vm.pid!!, vm.token!!) }) { r -> excursions = r.getOrDefault(emptyList()) }
+        vm.call({ ApiClient.inquiries(vm.pid!!, vm.token!!) }) { r -> asks = r.getOrDefault(emptyList()) }
+        reloadBoard()
+    }
     LaunchedEffect(Unit) { reload() }
 
     screenScroll {
@@ -1630,6 +1650,94 @@ fun StudyScreen(vm: StudioViewModel) {
                     TextButton(onClick = {
                         vm.call({ ApiClient.learn(e.id, vm.token!!) }) { reload() }
                     }) { Text(L10n.t("nstu.fold", vm.language), color = Qrme.BrandA, fontSize = 13.sp) }
+            }
+        }
+
+        // ---- ask people, not pages ----
+        Text(L10n.t("nask", vm.language), color = Qrme.Txt, fontSize = 18.sp,
+            fontWeight = FontWeight.Bold)
+        Text(L10n.t("nask.sub", vm.language), color = Qrme.T2, fontSize = 13.sp)
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            labeledField(L10n.t("ncmp.topic", vm.language), askTopic,
+                         L10n.t("nstu.topic.ph", vm.language)) { askTopic = it }
+            labeledField(L10n.t("nstu.question", vm.language), askQuestion,
+                         L10n.t("nask.q.ph", vm.language)) { askQuestion = it }
+            BrandButton(L10n.t("nask.go", vm.language),
+                enabled = askTopic.isNotBlank() && askQuestion.isNotBlank()) {
+                vm.call({ ApiClient.openInquiry(vm.pid!!, vm.token!!, askTopic, askQuestion) }) { r ->
+                    r.onSuccess { askTopic = ""; askQuestion = "" }
+                     .onFailure { error = it.message }
+                    reload()
+                }
+            }
+        }
+        asks.asReversed().forEach { a ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                // The brief, not the typed question: this is what went out.
+                Text(a.brief, color = Qrme.Txt, fontSize = 13.sp)
+                Text(L10n.fill("nask.count", vm.language, mapOf("n" to "${a.answerCount}")),
+                    color = Qrme.T2, fontSize = 12.sp)
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    TextButton(onClick = {
+                        vm.call({ ApiClient.inquiry(a.id, vm.token!!) }) { r -> opened = r.getOrNull() }
+                    }) { Text(L10n.t("nask.read", vm.language), color = Qrme.BrandA, fontSize = 13.sp) }
+                    if (!a.closed) TextButton(onClick = {
+                        vm.call({ ApiClient.closeInquiry(a.id, vm.token!!) }) { opened = null; reload() }
+                    }) { Text(L10n.t("nask.close", vm.language), color = Qrme.T2, fontSize = 13.sp) }
+                }
+                if (opened?.id == a.id) opened!!.answers.forEach { ans ->
+                    Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                        Text(ans.alias.ifBlank { L10n.t("nask.anon", vm.language) },
+                            color = Qrme.Txt, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text(ans.body, color = Qrme.Txt, fontSize = 13.sp)
+                        if (ans.pointsTo.isNotBlank())
+                            Text(ans.pointsTo, color = Qrme.T2, fontSize = 12.sp)
+                        if (ans.blocked)
+                            Text(L10n.t("nask.held", vm.language), color = Qrme.Amber, fontSize = 12.sp)
+                        else if (!ans.folded) TextButton(onClick = {
+                            vm.call({ ApiClient.learnFromAnswer(a.id, ans.id, vm.token!!) }) {
+                                vm.call({ ApiClient.inquiry(a.id, vm.token!!) }) { r -> opened = r.getOrNull() }
+                                reload()
+                            }
+                        }) { Text(L10n.t("nstu.fold", vm.language), color = Qrme.BrandA, fontSize = 13.sp) }
+                    }
+                }
+            }
+        }
+
+        // ---- and the other side: answering somebody else's ----
+        Text(L10n.t("nask.board", vm.language), color = Qrme.Txt, fontSize = 18.sp,
+            fontWeight = FontWeight.Bold)
+        Text(L10n.t("nask.board.sub", vm.language), color = Qrme.T2, fontSize = 13.sp)
+        board.forEach { q ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(q.brief, color = Qrme.Txt, fontSize = 13.sp)
+                if (answering?.id == q.id) {
+                    answering!!.replies.forEach { a ->
+                        Text(a.body, color = Qrme.T2, fontSize = 12.sp)
+                    }
+                    labeledField(L10n.t("nask.your", vm.language), answer,
+                                 L10n.t("nask.your.ph", vm.language)) { answer = it }
+                    labeledField(L10n.t("nask.alias", vm.language), answerAs,
+                                 L10n.t("nask.alias.ph", vm.language)) { answerAs = it }
+                    labeledField(L10n.t("nask.points", vm.language), pointsTo,
+                                 L10n.t("nask.points.ph", vm.language)) { pointsTo = it }
+                    BrandButton(L10n.t("nask.send", vm.language), enabled = answer.isNotBlank()) {
+                        vm.call({ ApiClient.answerOpenQuestion(q.id, answer, answerAs, pointsTo) }) { r ->
+                            // Held or not, the note is the server's own and
+                            // says which — somebody who wrote in good faith is
+                            // told when it did not go through.
+                            receipt = r.getOrNull()
+                            answer = ""; answerAs = ""; pointsTo = ""
+                            vm.call({ ApiClient.openQuestion(q.id) }) { o -> answering = o.getOrNull() }
+                            reloadBoard()
+                        }
+                    }
+                    receipt?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+                } else TextButton(onClick = {
+                    receipt = null
+                    vm.call({ ApiClient.openQuestion(q.id) }) { r -> answering = r.getOrNull() }
+                }) { Text(L10n.t("nask.send", vm.language), color = Qrme.BrandA, fontSize = 13.sp) }
             }
         }
     }

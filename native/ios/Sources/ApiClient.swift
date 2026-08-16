@@ -749,6 +749,54 @@ struct Excursion: Decodable {
     let learned: Bool
 }
 
+/// A question put to people rather than to a model — the owner's view of one.
+/// `topic` and `question` are their own words; `brief` is the sanitized line
+/// that actually went onto the board.
+struct Inquiry: Decodable {
+    let id: String
+    let topic: String
+    let question: String
+    let brief: String
+    let redactions: Int
+    let closed: Bool
+    let answer_count: Int
+    let answers: [InquiryAnswer]?
+}
+
+struct InquiryAnswer: Decodable {
+    let id: String
+    let alias: String
+    let body: String
+    let points_to: String
+    let blocked: Bool
+    let folded: Bool
+}
+
+/// The same question as somebody with no account sees it. Deliberately a
+/// different type from `Inquiry`: it has no profile, no typed question and no
+/// redaction count, and nothing should be able to decode one into the other.
+struct OpenQuestion: Decodable {
+    let id: String
+    let brief: String
+    let answer_count: Int
+    let closed: Bool
+    /// `replies`, not `answers`: `Inquiry` already carries an `answers` with
+    /// the blocked flag and the fold state on it. One name, one shape.
+    let replies: [OpenAnswer]?
+}
+
+struct OpenAnswer: Decodable {
+    let alias: String
+    let body: String
+    let points_to: String
+}
+
+struct AnswerReceipt: Decodable {
+    let id: String
+    let held: Bool
+    let note: String
+}
+
 // MARK: - Client
 
 enum ApiError: LocalizedError {
@@ -1573,6 +1621,56 @@ actor ApiClient {
         struct Ok: Decodable {}
         let _: Ok = try await request("/excursions/\(cid)/learn",
                                       method: "POST", token: token)
+    }
+
+    // MARK: Inquiries (ask people, not pages)
+
+    func inquiries(id: String, token: String) async throws -> [Inquiry] {
+        try await request("/profiles/\(id)/inquiries", token: token)
+    }
+
+    func openInquiry(id: String, token: String, topic: String,
+                     question: String) async throws -> Inquiry {
+        try await request("/profiles/\(id)/inquiries", method: "POST",
+                          body: ["topic": topic, "question": question],
+                          token: token)
+    }
+
+    func inquiry(_ iid: String, token: String) async throws -> Inquiry {
+        try await request("/inquiries/\(iid)", token: token)
+    }
+
+    func closeInquiry(_ iid: String, token: String) async throws -> Inquiry {
+        try await request("/inquiries/\(iid)/close", method: "POST",
+                          token: token)
+    }
+
+    func learnFromAnswer(_ iid: String, answer aid: String,
+                         token: String) async throws {
+        struct Ok: Decodable {}
+        let _: Ok = try await request(
+            "/inquiries/\(iid)/answers/\(aid)/learn", method: "POST",
+            token: token)
+    }
+
+    /// The board, and answering one. **No token on any of these three**, and
+    /// that is the feature rather than an omission: the person answering has
+    /// no account, is not asked for a name, and a credential attached here
+    /// would be a credential the board could log against them.
+
+    func openQuestions() async throws -> [OpenQuestion] {
+        try await request("/open-questions")
+    }
+
+    func openQuestion(_ iid: String) async throws -> OpenQuestion {
+        try await request("/open-questions/\(iid)")
+    }
+
+    func answerOpenQuestion(_ iid: String, body: String, alias: String,
+                            pointsTo: String) async throws -> AnswerReceipt {
+        try await request("/open-questions/\(iid)/answers", method: "POST",
+                          body: ["body": body, "alias": alias,
+                                 "points_to": pointsTo])
     }
 
     // MARK: Live desks

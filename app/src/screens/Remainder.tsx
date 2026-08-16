@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, uploadMedia, type AppConnector, type ConnectorCatalogue,
-         type Excursion, type FeedbackBoard, type GameSession, type PackDetail,
+         type Excursion, type FeedbackBoard, type GameSession, type Inquiry,
+         type PackDetail,
          type PackRegistry, type SocialPublished, type SteeringHub } from "../api";
 import { Refusal } from "../Refusal";
 import { fill, t as tr, visitorLang } from "../l10n";
@@ -65,11 +66,18 @@ export function Remainder() {
   const [connProvider, setConnProvider] = useState("");
   const [connApp, setConnApp] = useState("");
   const [trips, setTrips] = useState<Excursion[]>([]);
+  // Questions put to people rather than to a model. `asks` is the list;
+  // `opened` is whichever one is expanded, because the answers only come
+  // back on the single-question route.
+  const [asks, setAsks] = useState<Inquiry[]>([]);
+  const [opened, setOpened] = useState<Inquiry | null>(null);
   const [hub, setHub] = useState<SteeringHub | null>(null);
   const [games, setGames] = useState<GameSession[]>([]);
 
   const [topic, setTopic] = useState("");
   const [question, setQuestion] = useState("");
+  const [askTopic, setAskTopic] = useState("");
+  const [askQuestion, setAskQuestion] = useState("");
   const [platform, setPlatform] = useState("steam");
   const [game, setGame] = useState("");
 
@@ -101,6 +109,7 @@ export function Remainder() {
     go(() => api.packRegistries(token), setRegistries);
     go(() => api.profileApps(me, token), setApps);
     go(() => api.excursions(me, token), setTrips);
+    go(() => api.inquiries(me, token), setAsks);
     go(() => api.steeringHub(me, token), setHub);
     go(() => api.gameSessions(me, token), setGames);
   };
@@ -361,6 +370,86 @@ export function Remainder() {
                 (r) => { setSaid(r.note); reload(); })}>
                 {tr("rem.trip.fold", lang)}
               </button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* --- asking people ------------------------------------------------ */}
+      <div className="card">
+        <h3>{tr("rem.ask", lang)}</h3>
+        <p className="muted small">{tr("rem.ask.pitch", lang)}</p>
+        <input value={askTopic} onChange={(e) => setAskTopic(e.target.value)}
+               placeholder={tr("rem.trip.topic.ph", lang)} />
+        <input value={askQuestion}
+               onChange={(e) => setAskQuestion(e.target.value)}
+               placeholder={tr("rem.ask.q.ph", lang)} />
+        <button disabled={!me || !token || !askTopic || !askQuestion}
+                onClick={() => go(
+                  () => api.openInquiry(
+                    me, { topic: askTopic, question: askQuestion }, token),
+                  (fresh) => {
+                    setAsks((old) => [fresh,
+                                      ...old.filter((a) => a.id !== fresh.id)]);
+                    setAskTopic(""); setAskQuestion("");
+                    setSaid(tr("rem.ask.out", lang));
+                  })}>
+          {tr("rem.ask.go", lang)}
+        </button>
+        {asks.map((a) => (
+          <div key={a.id}>
+            {/* The brief, not the typed question: this is the line that went
+                out, so it is the line worth showing. */}
+            <p className="small">{a.brief}</p>
+            <p className="muted small">
+              {a.topic} · {fill(tr("rem.ask.count", lang), { n: a.answer_count })}
+              {a.closed ? ` · ${tr("rem.ask.closed", lang)}` : ""}
+              {" · "}
+              {a.redactions === 0
+                ? tr("rem.exc.nostrip", lang)
+                : tr("rem.exc.stripped", lang).replace("{n}",
+                    a.redactions === 1
+                      ? tr("rem.exc.thing.one", lang)
+                      : tr("rem.exc.thing.many", lang)
+                          .replace("{n}", String(a.redactions)))}
+            </p>
+            <button className="ghost" onClick={() => go(
+              () => api.inquiry(a.id, token), setOpened)}>
+              {fill(tr("rem.ask.count", lang), { n: a.answer_count })}
+            </button>
+            {!a.closed && (
+              <button className="ghost" onClick={() => go(
+                () => api.closeInquiry(a.id, token),
+                () => { setOpened(null); reload(); })}>
+                {tr("rem.ask.close", lang)}
+              </button>
+            )}
+            {opened?.id === a.id && (
+              (opened.answers || []).length === 0
+                ? <p className="muted small">{tr("rem.ask.none", lang)}</p>
+                : (opened.answers || []).map((ans) => (
+                    <div key={ans.id}>
+                      <p className="small">
+                        <b>{ans.alias || tr("rem.ask.anon", lang)}</b>
+                        {" — "}{ans.body}
+                      </p>
+                      {ans.points_to && (
+                        <p className="muted small">
+                          {tr("rem.ask.points", lang)} {ans.points_to}
+                        </p>
+                      )}
+                      {ans.blocked
+                        ? <p className="muted small">{tr("rem.ask.held", lang)}</p>
+                        : !ans.folded && (
+                            <button className="ghost" onClick={() => go(
+                              () => api.learnFromAnswer(a.id, ans.id, token),
+                              (r) => { setSaid(r.note); reload();
+                                       go(() => api.inquiry(a.id, token),
+                                          setOpened); })}>
+                              {tr("rem.trip.fold", lang)}
+                            </button>)}
+                    </div>
+                  ))
             )}
           </div>
         ))}

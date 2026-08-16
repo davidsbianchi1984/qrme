@@ -726,6 +726,20 @@ class ExcursionStart(BaseModel):
     private: list[str] = Field(default_factory=list)  # extra caller-marked private terms
 
 
+class InquiryOpen(BaseModel):
+    topic: str
+    question: str
+    # More can be withheld. Nothing here can withhold less — the sanitizer is
+    # not reachable from the wire. See qrme.inquiries.compose.
+    private: list[str] = Field(default_factory=list)
+
+
+class InquiryAnswer(BaseModel):
+    body: str
+    alias: str = ""          # what the answerer chose to be called; may be empty
+    points_to: str = ""      # a direction to look, never followed automatically
+
+
 class ComposeRequest(BaseModel):
     topic: str
     surface: str | None = None

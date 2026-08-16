@@ -2596,6 +2596,52 @@ export type Excursion = {
   learned: boolean;
 };
 
+/** A question the agent put where people can answer it.
+ *
+ *  Two shapes on purpose, and they are not the same type. The owner's view
+ *  carries `topic`, `question` and `redactions` — their own words and what
+ *  was taken out of them. `OpenQuestion` is what the board hands somebody
+ *  with no account, and it carries none of those: not the profile, not the
+ *  typed question, and not the redaction count, because a count is a fact
+ *  about a person and two matching counts are a thread to pull. */
+export type Inquiry = {
+  id: string;
+  profile_id: string;
+  topic: string;
+  question: string;
+  brief: string;
+  redactions: number;
+  closed: boolean;
+  asked_at: string;
+  answer_count: number;
+  answers?: InquiryAnswer[];
+};
+
+export type InquiryAnswer = {
+  id: string;
+  inquiry_id: string;
+  alias: string;
+  body: string;
+  points_to: string;
+  answered_at: string;
+  blocked: boolean;
+  folded: boolean;
+};
+
+/** The same question, as a stranger sees it. */
+export type OpenQuestion = {
+  id: string;
+  brief: string;
+  asked_at: string;
+  answer_count: number;
+  closed: boolean;
+  // `replies`, not `answers`: the owner's Inquiry already puts an `answers`
+  // on the wire carrying the blocked flag and the fold state. One name, one
+  // shape.
+  replies?: { alias: string; body: string; points_to: string;
+              answered_at: string }[];
+};
+
 export type PersonGrants = {
   lending?: unknown[];
   borrowing?: unknown[];
@@ -5409,6 +5455,33 @@ export const api = {
   learnFromExcursion: (excursionId: string, token: string) =>
     req<ExcursionLearned>(`/excursions/${excursionId}/learn`,
       { method: "POST", token }),
+
+  // Asking people rather than a model. The owner's four, then the three a
+  // person with no account uses — those take no token, and must not be given
+  // one: a credential on the board is a credential the board could log.
+  inquiries: (profileId: string, token: string) =>
+    req<Inquiry[]>(`/profiles/${profileId}/inquiries`, { token }),
+  openInquiry: (profileId: string,
+                body: { topic: string; question: string; private?: string[] },
+                token: string) =>
+    req<Inquiry>(`/profiles/${profileId}/inquiries`,
+      { method: "POST", body, token }),
+  inquiry: (inquiryId: string, token: string) =>
+    req<Inquiry>(`/inquiries/${inquiryId}`, { token }),
+  closeInquiry: (inquiryId: string, token: string) =>
+    req<Inquiry>(`/inquiries/${inquiryId}/close`, { method: "POST", token }),
+  learnFromAnswer: (inquiryId: string, answerId: string, token: string) =>
+    req<ExcursionLearned>(`/inquiries/${inquiryId}/answers/${answerId}/learn`,
+      { method: "POST", token }),
+
+  openQuestions: () => req<OpenQuestion[]>("/open-questions"),
+  openQuestion: (inquiryId: string) =>
+    req<OpenQuestion>(`/open-questions/${inquiryId}`),
+  answerOpenQuestion: (inquiryId: string,
+                       body: { body: string; alias?: string;
+                               points_to?: string }) =>
+    req<{ id: string; held: boolean; note: string }>(
+      `/open-questions/${inquiryId}/answers`, { method: "POST", body }),
 
   steeringHub: (profileId: string, token: string) =>
     req<SteeringHub>(`/profiles/${profileId}/steering/hub`, { token }),

@@ -3785,6 +3785,42 @@ const CHROME: Table = {
   "rem.trip.fold": {
     en: "Fold it in", es: "Incorporarlo", fr: "L'intégrer", de: "Einarbeiten", pt: "Incorporá-lo", it: "Integralo", ja: "取り込む", zh: "并入", hi: "इसे समेट लें", ar: "أدمجه",
   },
+  "rem.ask": {
+    en: "Ask people, not pages", es: "Pregunta a personas, no a páginas", fr: "Demandez à des gens, pas à des pages", de: "Menschen fragen, nicht Seiten", pt: "Pergunte a pessoas, não a páginas", it: "Chiedi alle persone, non alle pagine", ja: "ページではなく、人に聞く", zh: "问人，而不是问网页", hi: "पन्नों से नहीं, लोगों से पूछें", ar: "اسأل الناس، لا الصفحات",
+  },
+  "rem.ask.pitch": {
+    en: "Some things were never written down anywhere. Put the question on the open board and anyone can answer it — no account, no name required. Your own names are stripped out before it goes up, and what comes back is yours to keep or ignore.", es: "Hay cosas que nunca se escribieron en ninguna parte. Pon la pregunta en el tablón abierto y cualquiera puede responderla: sin cuenta, sin nombre. Tus nombres se quitan antes de que suba, y lo que vuelva es tuyo: guárdalo o ignóralo.", fr: "Certaines choses n'ont jamais été écrites nulle part. Mettez la question sur le tableau ouvert et n'importe qui peut y répondre — sans compte, sans nom. Vos noms sont retirés avant la mise en ligne, et ce qui revient est à vous : à garder ou à ignorer.", de: "Manches wurde nirgends je aufgeschrieben. Stellen Sie die Frage aufs offene Brett, und jeder kann antworten — ohne Konto, ohne Namen. Ihre Namen werden vorher entfernt, und was zurückkommt, ist Ihres: behalten oder verwerfen.", pt: "Há coisas que nunca foram escritas em lado nenhum. Ponha a pergunta no quadro aberto e qualquer pessoa pode responder — sem conta, sem nome. Os seus nomes são retirados antes de subir, e o que vier é seu: guarde ou ignore.", it: "Certe cose non sono mai state scritte da nessuna parte. Metti la domanda sulla bacheca aperta e chiunque può rispondere — senza account, senza nome. I tuoi nomi vengono tolti prima che salga, e quel che torna è tuo: tienilo o lascialo.", ja: "どこにも書かれなかったことがあります。公開の掲示板に質問を出せば、誰でも答えられます — アカウントも名前も要りません。あなたの名前は出る前に取り除かれ、返ってきたものを残すか捨てるかはあなたが決めます。", zh: "有些事从没被写下来过。把问题贴到公开板上，任何人都能回答——不需要账号，也不需要留名。你的名字在贴出前会被剥除，回来的东西留不留由你。", hi: "कुछ बातें कहीं लिखी ही नहीं गईं। प्रश्न को खुले बोर्ड पर रखिए और कोई भी उत्तर दे सकता है — न खाता चाहिए, न नाम। आपके नाम जाने से पहले हटा दिए जाते हैं, और जो लौटे उसे रखना या छोड़ना आपका है।", ar: "بعض الأمور لم تُكتب في أي مكان قط. ضع السؤال على اللوحة المفتوحة فيستطيع أي أحد أن يجيب — بلا حساب وبلا اسم. تُحذف أسماؤك قبل أن يُنشر، وما يعود لك: تحتفظ به أو تتركه.",
+  },
+  "rem.ask.q.ph": {
+    en: "what you want to know", es: "qué quieres saber", fr: "ce que vous voulez savoir", de: "was Sie wissen möchten", pt: "o que quer saber", it: "che cosa vuoi sapere", ja: "知りたいこと", zh: "你想知道什么", hi: "आप क्या जानना चाहते हैं", ar: "ما تريد معرفته",
+  },
+  "rem.ask.go": {
+    en: "Put the question out", es: "Publicar la pregunta", fr: "Publier la question", de: "Die Frage aushängen", pt: "Publicar a pergunta", it: "Pubblica la domanda", ja: "質問を出す", zh: "把问题贴出去", hi: "प्रश्न सामने रखें", ar: "انشر السؤال",
+  },
+  "rem.ask.out": {
+    en: "It is on the board — answers appear here.", es: "Ya está en el tablón: las respuestas aparecen aquí.", fr: "Elle est sur le tableau — les réponses apparaissent ici.", de: "Sie hängt am Brett — Antworten erscheinen hier.", pt: "Já está no quadro — as respostas aparecem aqui.", it: "È in bacheca: le risposte compaiono qui.", ja: "掲示板に出ました — 回答はここに現れます。", zh: "已贴到板上——回答会显示在这里。", hi: "यह बोर्ड पर है — उत्तर यहीं दिखेंगे।", ar: "صار على اللوحة — تظهر الإجابات هنا.",
+  },
+  "rem.ask.close": {
+    en: "Stop taking answers", es: "Dejar de admitir respuestas", fr: "Ne plus accepter de réponses", de: "Keine Antworten mehr annehmen", pt: "Deixar de aceitar respostas", it: "Non accettare più risposte", ja: "回答の受付を終える", zh: "停止接收回答", hi: "उत्तर लेना बंद करें", ar: "أوقف قبول الإجابات",
+  },
+  "rem.ask.closed": {
+    en: "closed", es: "cerrada", fr: "close", de: "geschlossen", pt: "encerrada", it: "chiusa", ja: "締め切り済み", zh: "已关闭", hi: "बंद", ar: "مغلق",
+  },
+  "rem.ask.count": {
+    en: "{n} answers", es: "{n} respuestas", fr: "{n} réponses", de: "{n} Antworten", pt: "{n} respostas", it: "{n} risposte", ja: "回答{n}件", zh: "{n}条回答", hi: "{n} उत्तर", ar: "{n} إجابات",
+  },
+  "rem.ask.none": {
+    en: "Nobody has answered this one yet.", es: "Todavía nadie ha respondido a esta.", fr: "Personne n'y a encore répondu.", de: "Darauf hat noch niemand geantwortet.", pt: "Ainda ninguém respondeu a esta.", it: "A questa non ha ancora risposto nessuno.", ja: "これにはまだ誰も答えていません。", zh: "还没有人回答这一条。", hi: "इसका अभी किसी ने उत्तर नहीं दिया।", ar: "لم يجب أحد عن هذا بعد.",
+  },
+  "rem.ask.anon": {
+    en: "Somebody", es: "Alguien", fr: "Quelqu'un", de: "Jemand", pt: "Alguém", it: "Qualcuno", ja: "どなたか", zh: "某人", hi: "कोई", ar: "أحدهم",
+  },
+  "rem.ask.points": {
+    en: "Pointed at:", es: "Apunta a:", fr: "Renvoie vers :", de: "Verweist auf:", pt: "Aponta para:", it: "Rimanda a:", ja: "示された先:", zh: "指向：", hi: "इस ओर इशारा:", ar: "يشير إلى:",
+  },
+  "rem.ask.held": {
+    en: "the filter held this one — it was shown to nobody", es: "el filtro retuvo esta — no se mostró a nadie", fr: "le filtre a retenu celle-ci — elle n'a été montrée à personne", de: "der Filter hat diese zurückgehalten — sie wurde niemandem gezeigt", pt: "o filtro reteve esta — não foi mostrada a ninguém", it: "il filtro ha trattenuto questa: non è stata mostrata a nessuno", ja: "これはフィルターで止められ、誰にも表示されていません", zh: "这条被过滤器扣下了——没有展示给任何人", hi: "इसे फ़िल्टर ने रोक लिया — यह किसी को नहीं दिखाई गई", ar: "حجب المرشِّح هذه — لم تُعرض على أحد",
+  },
   "rem.hub": {
     en: "Every dial in one place", es: "Todos los diales en un sitio", fr: "Tous les réglages au même endroit", de: "Alle Regler an einem Ort", pt: "Todos os botões num só lugar", it: "Tutte le manopole in un posto", ja: "すべてのつまみを一箇所に", zh: "所有旋钮集于一处", hi: "सारे डायल एक जगह", ar: "كل الأقراص في مكان واحد",
   },
@@ -6607,6 +6643,30 @@ const CHROME: Table = {
   },
   "str.title": {
     en: "Arriving, and strangers", es: "Llegar, y los desconocidos", fr: "Arriver, et les inconnus", de: "Ankommen, und Fremde", pt: "Chegar, e desconhecidos", it: "Arrivare, e sconosciuti", ja: "たどり着くこと、そして見知らぬ人", zh: "抵达，以及陌生人", hi: "आना, और अजनबी", ar: "الوصول، والغرباء",
+  },
+  "str.q.hdr": {
+    en: "Questions people have put out", es: "Preguntas que la gente ha publicado", fr: "Des questions que des gens ont posées", de: "Fragen, die Leute ausgehängt haben", pt: "Perguntas que as pessoas publicaram", it: "Domande che la gente ha messo in bacheca", ja: "誰かが出している質問", zh: "别人贴出的问题", hi: "लोगों ने जो प्रश्न रखे हैं", ar: "أسئلة طرحها الناس",
+  },
+  "str.q.pitch": {
+    en: "Somebody's assistant is trying to learn something and could not find it written down. You do not need an account, and you are not asked for a name. Nothing here tells you whose question it is — that is deliberate.", es: "El asistente de alguien intenta aprender algo y no lo ha encontrado escrito. No necesitas cuenta y no se te pide nombre. Nada aquí te dice de quién es la pregunta: es a propósito.", fr: "L'assistant de quelqu'un cherche à apprendre quelque chose qu'il n'a trouvé écrit nulle part. Aucun compte n'est nécessaire et aucun nom n'est demandé. Rien ici ne vous dit de qui vient la question — c'est voulu.", de: "Jemandes Assistent versucht etwas zu lernen und fand es nirgends aufgeschrieben. Sie brauchen kein Konto, und nach einem Namen wird nicht gefragt. Nichts hier verrät, wessen Frage es ist — das ist Absicht.", pt: "O assistente de alguém está a tentar aprender algo que não encontrou escrito. Não precisa de conta nem lhe pedem o nome. Nada aqui lhe diz de quem é a pergunta — é de propósito.", it: "L'assistente di qualcuno sta cercando di imparare qualcosa che non ha trovato scritto. Non serve un account e non ti viene chiesto un nome. Qui nulla dice di chi sia la domanda: è voluto.", ja: "誰かの助手が、どこにも書かれていないことを学ぼうとしています。アカウントは要らず、名前も聞かれません。誰の質問かはどこにも書かれていません — わざとです。", zh: "有人的助手想学点什么，却查不到有人写下来过。你不需要账号，也不会被问名字。这里不会告诉你问题是谁的——这是有意的。", hi: "किसी का सहायक कुछ सीखना चाह रहा है और उसे कहीं लिखा नहीं मिला। न खाता चाहिए, न आपका नाम पूछा जाता है। यह किसका प्रश्न है, यहाँ कुछ नहीं बताता — यह जान-बूझकर है।", ar: "مساعد أحدهم يحاول أن يتعلم شيئًا لم يجده مكتوبًا. لا تحتاج حسابًا ولا يُطلب منك اسم. لا شيء هنا يخبرك لمن السؤال — وهذا مقصود.",
+  },
+  "str.q.none": {
+    en: "Nobody is asking anything right now.", es: "Ahora mismo nadie está preguntando nada.", fr: "Personne ne demande quoi que ce soit en ce moment.", de: "Gerade fragt niemand etwas.", pt: "Neste momento ninguém está a perguntar nada.", it: "In questo momento nessuno sta chiedendo nulla.", ja: "いまは誰も何も尋ねていません。", zh: "现在没有人在问什么。", hi: "अभी कोई कुछ नहीं पूछ रहा।", ar: "لا أحد يسأل شيئًا الآن.",
+  },
+  "str.q.count": {
+    en: "{n} answers so far", es: "{n} respuestas hasta ahora", fr: "{n} réponses jusqu'ici", de: "bisher {n} Antworten", pt: "{n} respostas até agora", it: "{n} risposte finora", ja: "これまでに回答{n}件", zh: "目前{n}条回答", hi: "अब तक {n} उत्तर", ar: "{n} إجابات حتى الآن",
+  },
+  "str.q.body.ph": {
+    en: "what you know about this", es: "lo que sabes de esto", fr: "ce que vous savez là-dessus", de: "was Sie darüber wissen", pt: "o que sabe sobre isto", it: "quello che sai in proposito", ja: "これについて知っていること", zh: "你对此了解什么", hi: "आप इस बारे में क्या जानते हैं", ar: "ما تعرفه عن هذا",
+  },
+  "str.q.alias.ph": {
+    en: "what to call you (optional)", es: "cómo llamarte (opcional)", fr: "comment vous appeler (facultatif)", de: "wie man Sie nennen soll (optional)", pt: "como o chamar (opcional)", it: "come chiamarti (facoltativo)", ja: "呼び名（任意）", zh: "怎么称呼你（可选）", hi: "आपको क्या कहें (वैकल्पिक)", ar: "بماذا نناديك (اختياري)",
+  },
+  "str.q.points.ph": {
+    en: "somewhere to look, if you know one (optional)", es: "dónde mirar, si conoces algún sitio (opcional)", fr: "où chercher, si vous avez une piste (facultatif)", de: "wo man nachsehen kann, falls Sie etwas wissen (optional)", pt: "onde procurar, se souber de algum sítio (opcional)", it: "dove guardare, se ne conosci un posto (facoltativo)", ja: "調べ先に心当たりがあれば（任意）", zh: "可以去哪里找，如果你知道的话（可选）", hi: "कहाँ देखें, अगर आप जानते हों (वैकल्पिक)", ar: "أين يمكن البحث، إن كنت تعرف (اختياري)",
+  },
+  "str.q.send": {
+    en: "Answer this", es: "Responder a esto", fr: "Répondre", de: "Darauf antworten", pt: "Responder a isto", it: "Rispondi a questa", ja: "これに答える", zh: "回答这个", hi: "इसका उत्तर दें", ar: "أجب عن هذا",
   },
   "str.follow.hdr": {
     en: "Follow a reference", es: "Seguir una referencia", fr: "Suivre une référence", de: "Einer Referenz folgen", pt: "Seguir uma referência", it: "Segui un riferimento", ja: "参照をたどる", zh: "跟随一个引用", hi: "किसी संदर्भ का अनुसरण करें", ar: "اتبع مرجعًا",

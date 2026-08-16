@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, type ConnJoined, type ConnMessage,
+import { api, type ConnJoined, type ConnMessage, type OpenQuestion,
          type Summoned } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
@@ -61,6 +61,16 @@ export function Stranger() {
   const [messages, setMessages] = useState<ConnMessage[]>([]);
   const [draft, setDraft] = useState("");
 
+  // Answering somebody's open question. Nothing in this block takes a token,
+  // and it must stay that way: a credential attached to an answer is a
+  // credential the board could log against the answerer.
+  const [questions, setQuestions] = useState<OpenQuestion[]>([]);
+  const [answering, setAnswering] = useState<OpenQuestion | null>(null);
+  const [answer, setAnswer] = useState("");
+  const [answerAs, setAnswerAs] = useState("");
+  const [pointsTo, setPointsTo] = useState("");
+  const [thanks, setThanks] = useState("");
+
   const cid = joined?.connection_id || "";
 
   async function go<T>(work: () => Promise<T>, then: (v: T) => void) {
@@ -97,6 +107,8 @@ export function Stranger() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cid]);
 
+  useEffect(() => { go(() => api.openQuestions(), setQuestions); }, []);
+
   const cards = found
     ? (found.profiles ?? (found.profile ? [found.profile] : []))
     : [];
@@ -105,6 +117,62 @@ export function Stranger() {
     <div className="screen">
       <h2>{tr("str.title", lang)}</h2>
       <Refusal error={error} />
+
+      {/* --- questions anybody can answer ------------------------------ */}
+      <div className="card">
+        <h3>{tr("str.q.hdr", lang)}</h3>
+        <p className="muted small">{tr("str.q.pitch", lang)}</p>
+        {questions.length === 0 && (
+          <p className="muted small">{tr("str.q.none", lang)}</p>
+        )}
+        {questions.map((q) => (
+          <div key={q.id}>
+            <p className="small">{q.brief}</p>
+            <p className="muted small">
+              {fill(tr("str.q.count", lang), { n: q.answer_count })}
+            </p>
+            {answering?.id === q.id ? (
+              <>
+                {(answering.replies || []).map((a, i) => (
+                  <p className="muted small" key={i}>
+                    <b>{a.alias || tr("rem.ask.anon", lang)}</b> — {a.body}
+                  </p>
+                ))}
+                <input value={answer} onChange={(e) => setAnswer(e.target.value)}
+                       placeholder={tr("str.q.body.ph", lang)} />
+                <input value={answerAs}
+                       onChange={(e) => setAnswerAs(e.target.value)}
+                       placeholder={tr("str.q.alias.ph", lang)} />
+                <input value={pointsTo}
+                       onChange={(e) => setPointsTo(e.target.value)}
+                       placeholder={tr("str.q.points.ph", lang)} />
+                <button disabled={!answer} onClick={() => go(
+                  () => api.answerOpenQuestion(q.id, {
+                    body: answer, alias: answerAs, points_to: pointsTo }),
+                  (r) => {
+                    // Held or not, the note comes from the server and says
+                    // which it was — a person who wrote in good faith is told
+                    // when their answer did not go through.
+                    setThanks(r.note);
+                    setAnswer(""); setAnswerAs(""); setPointsTo("");
+                    go(() => api.openQuestions(), setQuestions);
+                    go(() => api.openQuestion(q.id), setAnswering);
+                  })}>
+                  {tr("str.q.send", lang)}
+                </button>
+                {thanks && <p className="muted small">{thanks}</p>}
+              </>
+            ) : (
+              <button className="ghost" onClick={() => {
+                setThanks("");
+                go(() => api.openQuestion(q.id), setAnswering);
+              }}>
+                {tr("str.q.send", lang)}
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
 
       {/* --- what a reference resolves to ------------------------------ */}
       <div className="card">

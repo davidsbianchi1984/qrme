@@ -593,6 +593,39 @@ CREATE TABLE IF NOT EXISTS excursions (
     created_at   TEXT NOT NULL
 );
 
+-- Inquiries. An excursion asks a model; an inquiry asks people. The question
+-- goes onto a public board that anybody can answer WITHOUT an account, and
+-- what comes back can be folded into the profile the same way findings are.
+-- ``brief`` is the sanitized question and the ONLY column an outsider ever
+-- sees — see qrme/inquiries.PUBLIC_FIELDS. ``topic`` and ``question`` are the
+-- owner's own words and stay local, as they do for excursions.
+CREATE TABLE IF NOT EXISTS inquiries (
+    id           TEXT PRIMARY KEY,
+    profile_id   TEXT NOT NULL REFERENCES profiles(id),
+    topic        TEXT NOT NULL,       -- stays local (owner's data)
+    question     TEXT NOT NULL,       -- stays local (owner's data)
+    brief        TEXT NOT NULL,       -- sanitized; exactly what is on the board
+    redactions   INTEGER NOT NULL DEFAULT 0,
+    closed_at    TEXT,                -- the owner stopped taking answers
+    created_at   TEXT NOT NULL
+);
+
+-- An answer from somebody with no account. ``alias`` is whatever they chose to
+-- be called and may be empty. ``points_to`` is the direction they pointed at —
+-- a source, a name for the thing, a place to look — never followed
+-- automatically. ``blocked`` marks one the moderation filter stopped: kept for
+-- the record, shown to nobody, counted in nothing.
+CREATE TABLE IF NOT EXISTS inquiry_answers (
+    id           TEXT PRIMARY KEY,
+    inquiry_id   TEXT NOT NULL REFERENCES inquiries(id),
+    alias        TEXT,
+    body         TEXT NOT NULL,
+    points_to    TEXT,
+    blocked      INTEGER NOT NULL DEFAULT 0,
+    folded_src   TEXT,                -- source_item id once the owner took it
+    created_at   TEXT NOT NULL
+);
+
 -- Connected-app connectors. Each links a profile to an AI-integrated app from
 -- the catalog (Apple Photos, Google Calendar, Microsoft 365, Canva, …). Its
 -- agents then use it: collect context in, act on the app, or produce media.

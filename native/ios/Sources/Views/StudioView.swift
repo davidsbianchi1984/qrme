@@ -38,6 +38,20 @@ struct StudyView: View {
     @State private var busy = false
     @State private var error: String?
 
+    // Asking people rather than a model. `asks` is the owner's own board;
+    // `board` is what anybody can answer, and the answer form below sends no
+    // token — the person answering has no account and is not asked for one.
+    @State private var askTopic = ""
+    @State private var askQuestion = ""
+    @State private var asks: [Inquiry] = []
+    @State private var opened: Inquiry?
+    @State private var board: [OpenQuestion] = []
+    @State private var answering: OpenQuestion?
+    @State private var answer = ""
+    @State private var answerAs = ""
+    @State private var pointsTo = ""
+    @State private var receipt: String?
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -89,6 +103,109 @@ struct StudyView: View {
                         }
                     }.card()
                 }
+
+                // --- ask people, not pages --------------------------------
+                Text(L10n.t("nask", state.language)).font(.title3.bold())
+                    .foregroundStyle(Theme.txt)
+                Text(L10n.t("nask.sub", state.language))
+                    .font(.footnote).foregroundStyle(Theme.t2)
+                VStack(alignment: .leading, spacing: 10) {
+                    field(L10n.t("ncmp.topic", state.language)) {
+                        TextField(L10n.t("nstu.topic.ph", state.language),
+                                  text: $askTopic).foregroundStyle(Theme.txt) }
+                    field(L10n.t("nstu.question", state.language)) {
+                        TextField(L10n.t("nask.q.ph", state.language),
+                                  text: $askQuestion, axis: .vertical)
+                            .lineLimit(1...3).foregroundStyle(Theme.txt) }
+                    Button(action: ask) {
+                        Text(L10n.t("nask.go", state.language)).bold()
+                            .frame(maxWidth: .infinity).padding(.vertical, 12)
+                            .background(Theme.brand).foregroundStyle(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }.disabled(askTopic.isEmpty || askQuestion.isEmpty || busy)
+                }.card()
+
+                ForEach(asks.reversed(), id: \.id) { a in
+                    VStack(alignment: .leading, spacing: 8) {
+                        // The brief, not the typed question: this is the line
+                        // that actually went onto the board.
+                        Text(a.brief).font(.footnote).foregroundStyle(Theme.txt)
+                        Text(L10n.fill("nask.count", state.language,
+                                       ["n": "\(a.answer_count)"]))
+                            .font(.caption).foregroundStyle(Theme.t2)
+                        HStack {
+                            Button(L10n.t("nask.read", state.language)) { read(a) }
+                                .font(.caption.bold()).foregroundStyle(Theme.brandA)
+                            if !a.closed {
+                                Button(L10n.t("nask.close", state.language)) { close(a) }
+                                    .font(.caption).foregroundStyle(Theme.t2)
+                            }
+                        }
+                        if opened?.id == a.id {
+                            ForEach(opened?.answers ?? [], id: \.id) { ans in
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(ans.alias.isEmpty
+                                         ? L10n.t("nask.anon", state.language)
+                                         : ans.alias)
+                                        .font(.caption.bold()).foregroundStyle(Theme.txt)
+                                    Text(ans.body).font(.footnote)
+                                        .foregroundStyle(Theme.txt)
+                                    if !ans.points_to.isEmpty {
+                                        Text(ans.points_to).font(.caption)
+                                            .foregroundStyle(Theme.t2)
+                                    }
+                                    if ans.blocked {
+                                        Text(L10n.t("nask.held", state.language))
+                                            .font(.caption).foregroundStyle(Theme.amber)
+                                    } else if !ans.folded {
+                                        Button(L10n.t("nstu.fold", state.language)) {
+                                            fold(a, ans)
+                                        }.font(.caption.bold()).foregroundStyle(.white)
+                                            .padding(.horizontal, 12).padding(.vertical, 7)
+                                            .background(Theme.brandA).clipShape(Capsule())
+                                    }
+                                }
+                            }
+                        }
+                    }.card()
+                }
+
+                // --- and the other side of it: answering somebody else -----
+                Text(L10n.t("nask.board", state.language)).font(.title3.bold())
+                    .foregroundStyle(Theme.txt)
+                Text(L10n.t("nask.board.sub", state.language))
+                    .font(.footnote).foregroundStyle(Theme.t2)
+                ForEach(board, id: \.id) { q in
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(q.brief).font(.footnote).foregroundStyle(Theme.txt)
+                        if answering?.id == q.id {
+                            ForEach(answering?.replies ?? [], id: \.body) { a in
+                                Text(a.body).font(.caption).foregroundStyle(Theme.t2)
+                            }
+                            field(L10n.t("nask.your", state.language)) {
+                                TextField(L10n.t("nask.your.ph", state.language),
+                                          text: $answer, axis: .vertical)
+                                    .lineLimit(1...4).foregroundStyle(Theme.txt) }
+                            field(L10n.t("nask.alias", state.language)) {
+                                TextField(L10n.t("nask.alias.ph", state.language),
+                                          text: $answerAs).foregroundStyle(Theme.txt) }
+                            field(L10n.t("nask.points", state.language)) {
+                                TextField(L10n.t("nask.points.ph", state.language),
+                                          text: $pointsTo).foregroundStyle(Theme.txt) }
+                            Button(L10n.t("nask.send", state.language)) { send(q) }
+                                .font(.caption.bold()).foregroundStyle(.white)
+                                .padding(.horizontal, 12).padding(.vertical, 7)
+                                .background(Theme.brand).clipShape(Capsule())
+                                .disabled(answer.isEmpty)
+                            if let receipt {
+                                Text(receipt).font(.caption).foregroundStyle(Theme.t2)
+                            }
+                        } else {
+                            Button(L10n.t("nask.send", state.language)) { open(q) }
+                                .font(.caption.bold()).foregroundStyle(Theme.brandA)
+                        }
+                    }.card()
+                }
             }.padding(20)
         }
         .task { await load() }
@@ -107,6 +224,10 @@ struct StudyView: View {
     private func load() async {
         guard let pid = state.pid, let token = state.token else { return }
         excursions = (try? await ApiClient.shared.excursions(id: pid, token: token)) ?? []
+        asks = (try? await ApiClient.shared.inquiries(id: pid, token: token)) ?? []
+        // The board needs no credential, so it loads for anybody who reaches
+        // this screen — including a signed-out one.
+        board = (try? await ApiClient.shared.openQuestions()) ?? []
     }
 
     private func start() {
@@ -127,6 +248,66 @@ struct StudyView: View {
         Task {
             try? await ApiClient.shared.learn(cid: excursion.id, token: token)
             await load()
+        }
+    }
+
+    private func ask() {
+        guard let pid = state.pid, let token = state.token else { return }
+        busy = true; error = nil
+        Task {
+            do {
+                _ = try await ApiClient.shared.openInquiry(
+                    id: pid, token: token, topic: askTopic,
+                    question: askQuestion)
+                askTopic = ""; askQuestion = ""
+            } catch { self.error = error.localizedDescription }
+            await load(); busy = false
+        }
+    }
+
+    private func read(_ inquiry: Inquiry) {
+        guard let token = state.token else { return }
+        Task { opened = try? await ApiClient.shared.inquiry(inquiry.id,
+                                                            token: token) }
+    }
+
+    private func close(_ inquiry: Inquiry) {
+        guard let token = state.token else { return }
+        Task {
+            _ = try? await ApiClient.shared.closeInquiry(inquiry.id,
+                                                         token: token)
+            opened = nil
+            await load()
+        }
+    }
+
+    private func fold(_ inquiry: Inquiry, _ ans: InquiryAnswer) {
+        guard let token = state.token else { return }
+        Task {
+            try? await ApiClient.shared.learnFromAnswer(inquiry.id,
+                                                        answer: ans.id,
+                                                        token: token)
+            read(inquiry)
+            await load()
+        }
+    }
+
+    private func open(_ question: OpenQuestion) {
+        receipt = nil
+        Task { answering = try? await ApiClient.shared.openQuestion(question.id) }
+    }
+
+    private func send(_ question: OpenQuestion) {
+        Task {
+            // No token, deliberately — see ApiClient.answerOpenQuestion.
+            if let r = try? await ApiClient.shared.answerOpenQuestion(
+                question.id, body: answer, alias: answerAs,
+                pointsTo: pointsTo) {
+                receipt = r.note
+            }
+            answer = ""; answerAs = ""; pointsTo = ""
+            answering = try? await ApiClient.shared.openQuestion(question.id)
+            board = (try? await ApiClient.shared.openQuestions()) ?? []
         }
     }
 }

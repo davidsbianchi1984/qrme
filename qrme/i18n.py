@@ -1080,6 +1080,117 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'an empty answer answers nothing': {
+        'es': 'una respuesta vacía no responde nada',
+        'fr': 'une réponse vide ne répond à rien',
+        'de': 'eine leere Antwort beantwortet nichts',
+        'pt': 'uma resposta vazia não responde nada',
+        'it': 'una risposta vuota non risponde a nulla',
+        'ja': '空の回答は何も答えていません',
+        'zh': '空的回答什么也没回答',
+        'hi': 'खाली उत्तर कुछ नहीं बताता',
+        'ar': 'الإجابة الفارغة لا تجيب عن شيء',
+    },
+    'no such answer to this question': {
+        'es': 'no existe esa respuesta a esta pregunta',
+        'fr': 'aucune réponse de ce nom à cette question',
+        'de': 'keine solche Antwort auf diese Frage',
+        'pt': 'não existe essa resposta para esta pergunta',
+        'it': 'nessuna risposta di questo tipo a questa domanda',
+        'ja': 'この質問にそのような回答はありません',
+        'zh': '这个问题没有该回答',
+        'hi': 'इस प्रश्न का ऐसा कोई उत्तर नहीं',
+        'ar': 'لا توجد إجابة بهذا الوصف على هذا السؤال',
+    },
+    'no such question': {
+        'es': 'no existe esa pregunta',
+        'fr': 'aucune question de ce nom',
+        'de': 'keine solche Frage',
+        'pt': 'não existe essa pergunta',
+        'it': 'nessuna domanda di questo tipo',
+        'ja': 'そのような質問はありません',
+        'zh': '没有该问题',
+        'hi': 'ऐसा कोई प्रश्न नहीं',
+        'ar': 'لا يوجد سؤال بهذا الوصف',
+    },
+    'say what you want to know, in one question': {
+        'es': 'di qué quieres saber, en una sola pregunta',
+        'fr': 'dites en une seule question ce que vous voulez savoir',
+        'de': 'sag in einer Frage, was du wissen willst',
+        'pt': 'diga o que quer saber, numa única pergunta',
+        'it': "di' che cosa vuoi sapere, in una sola domanda",
+        'ja': '知りたいことを、質問一つで書いてください',
+        'zh': '用一个问题说明你想知道什么',
+        'hi': 'एक ही प्रश्न में बताइए कि आप क्या जानना चाहते हैं',
+        'ar': 'قل ما تريد معرفته، في سؤال واحد',
+    },
+    'that answer is longer than this board takes': {
+        'es': 'esa respuesta es más larga de lo que admite este tablón',
+        'fr': 'cette réponse est plus longue que ce que ce tableau accepte',
+        'de': 'diese Antwort ist länger, als dieses Brett annimmt',
+        'pt': 'essa resposta é mais longa do que este quadro aceita',
+        'it': 'questa risposta è più lunga di quanto questa bacheca accetti',
+        'ja': 'この掲示板が受け取れる長さを超えています',
+        'zh': '这条回答超过了本板块接受的长度',
+        'hi': 'यह उत्तर इस बोर्ड की सीमा से लंबा है',
+        'ar': 'هذه الإجابة أطول مما تقبله هذه اللوحة',
+    },
+    'that is a long direction to point in': {
+        'es': 'esa indicación es demasiado larga',
+        'fr': 'cette indication est trop longue',
+        'de': 'dieser Hinweis ist zu lang',
+        'pt': 'essa indicação é longa demais',
+        'it': 'questa indicazione è troppo lunga',
+        'ja': 'その案内は長すぎます',
+        'zh': '这个指引太长了',
+        'hi': 'यह संकेत बहुत लंबा है',
+        'ar': 'هذا التوجيه طويل أكثر من اللازم',
+    },
+    'that is a long name to be called by': {
+        'es': 'ese nombre es demasiado largo para llamarte así',
+        'fr': "c'est un nom bien long pour vous appeler",
+        'de': 'das ist ein langer Name, um so genannt zu werden',
+        'pt': 'esse nome é longo demais para o chamarem assim',
+        'it': 'è un nome troppo lungo per farsi chiamare così',
+        'ja': '呼び名としては長すぎます',
+        'zh': '这个称呼太长了',
+        'hi': 'यह नाम पुकारने के लिए बहुत लंबा है',
+        'ar': 'هذا اسم طويل ليُنادى به',
+    },
+    'this answer was blocked by the filter and cannot be folded in': {
+        'es': 'el filtro bloqueó esta respuesta y no puede incorporarse',
+        'fr': "le filtre a bloqué cette réponse ; elle ne peut pas être intégrée",
+        'de': 'der Filter hat diese Antwort blockiert; sie kann nicht '
+              'übernommen werden',
+        'pt': 'o filtro bloqueou esta resposta e ela não pode ser incorporada',
+        'it': 'il filtro ha bloccato questa risposta e non può essere integrata',
+        'ja': 'この回答はフィルターで止められたため、取り込めません',
+        'zh': '这条回答已被过滤器拦截，无法收录',
+        'hi': 'इस उत्तर को फ़िल्टर ने रोका है, इसे शामिल नहीं किया जा सकता',
+        'ar': 'حجب المرشِّح هذه الإجابة، فلا يمكن ضمّها',
+    },
+    'this question is already closed': {
+        'es': 'esta pregunta ya está cerrada',
+        'fr': 'cette question est déjà close',
+        'de': 'diese Frage ist bereits geschlossen',
+        'pt': 'esta pergunta já está encerrada',
+        'it': 'questa domanda è già chiusa',
+        'ja': 'この質問はすでに締め切られています',
+        'zh': '这个问题已经关闭',
+        'hi': 'यह प्रश्न पहले ही बंद हो चुका है',
+        'ar': 'هذا السؤال مغلق بالفعل',
+    },
+    'this question is closed — it is not taking answers any more': {
+        'es': 'esta pregunta está cerrada: ya no admite respuestas',
+        'fr': "cette question est close — elle n'accepte plus de réponses",
+        'de': 'diese Frage ist geschlossen — sie nimmt keine Antworten mehr an',
+        'pt': 'esta pergunta está encerrada — já não aceita respostas',
+        'it': 'questa domanda è chiusa — non accetta più risposte',
+        'ja': 'この質問は締め切られており、これ以上回答を受け付けません',
+        'zh': '这个问题已关闭，不再接受回答',
+        'hi': 'यह प्रश्न बंद है — अब उत्तर स्वीकार नहीं किए जाते',
+        'ar': 'هذا السؤال مغلق — لم يعد يقبل إجابات',
+    },
     'a fee cannot be negative': {
         'es': 'la comisión no puede ser negativa',
         'fr': 'les frais ne peuvent pas être négatifs',
@@ -3806,6 +3917,10 @@ _WHERE_MARKERS = ("body", "query", "path", "header", "cookie")
 #: A field with no row keeps its identifier, exactly as before, and is recorded
 #: in `tests/field_labels_unmapped.txt`.
 _FIELD_LABELS: dict[str, dict[str, str]] = {
+    # The open board's answer form. Somebody with no account is typing here,
+    # so a refusal naming the API's word for the field would be a refusal
+    # about a schema they have never seen.
+    'points_to': {'en': 'Somewhere to look', 'es': 'Dónde mirar', 'fr': 'Où chercher', 'de': 'Wo man nachsehen kann', 'pt': 'Onde procurar', 'it': 'Dove guardare', 'ja': '調べ先', 'zh': '可以去哪里找', 'hi': 'कहाँ देखें', 'ar': 'أين يمكن البحث'},
     # The plug-in storefront's sign-in box. Both are worded as the shop
     # asks them, because a refusal that names `secret` reads as an
     # error about the API rather than about the field somebody typed.

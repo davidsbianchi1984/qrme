@@ -102,6 +102,22 @@ data class VoiceRevocation(val samplesDeleted: Int, val note: String)
 data class TranslateResult(val translation: String, val engine: String, val note: String?)
 data class Excursion(val id: String, val topic: String, val redactions: Int,
                      val leftHost: Boolean, val findings: String, val learned: Boolean)
+/** A question put to people rather than to a model. `brief` is the sanitized
+ *  line that went onto the board; `topic` and `question` are the owner's own
+ *  words and never leave. */
+data class Inquiry(val id: String, val topic: String, val brief: String,
+                   val redactions: Int, val closed: Boolean,
+                   val answerCount: Int, val answers: List<InquiryAnswer>)
+data class InquiryAnswer(val id: String, val alias: String, val body: String,
+                         val pointsTo: String, val blocked: Boolean,
+                         val folded: Boolean)
+/** The same question as somebody with no account sees it — no profile, no
+ *  typed question, no redaction count. A separate type so the two can never
+ *  be confused for one another. */
+data class OpenQuestion(val id: String, val brief: String,
+                        val answerCount: Int, val closed: Boolean,
+                        val replies: List<OpenAnswer>)
+data class OpenAnswer(val alias: String, val body: String, val pointsTo: String)
 data class SocialConn(val id: String, val platform: String, val direction: String,
                       val handle: String?, val status: String?, val collected: Int,
                       val published: Int)
@@ -844,6 +860,74 @@ object ApiClient {
 
     suspend fun learn(cid: String, token: String) {
         request("/excursions/$cid/learn", "POST", null, token)
+    }
+
+    // ---- inquiries: ask people, not pages ----
+
+    private fun answerOf(o: JSONObject) = InquiryAnswer(
+        o.getString("id"), o.optString("alias", ""), o.optString("body", ""),
+        o.optString("points_to", ""), o.optBoolean("blocked"),
+        o.optBoolean("folded"))
+
+    private fun inquiryOf(o: JSONObject): Inquiry {
+        val arr = o.optJSONArray("answers")
+        val answers = if (arr == null) emptyList()
+                      else (0 until arr.length()).map { answerOf(arr.getJSONObject(it)) }
+        return Inquiry(o.getString("id"), o.optString("topic", ""),
+            o.optString("brief", ""), o.optInt("redactions"),
+            o.optBoolean("closed"), o.optInt("answer_count"), answers)
+    }
+
+    private fun openQuestionOf(o: JSONObject): OpenQuestion {
+        val arr = o.optJSONArray("replies")
+        val replies = if (arr == null) emptyList() else
+            (0 until arr.length()).map {
+                val a = arr.getJSONObject(it)
+                OpenAnswer(a.optString("alias", ""), a.optString("body", ""),
+                           a.optString("points_to", ""))
+            }
+        return OpenQuestion(o.getString("id"), o.optString("brief", ""),
+            o.optInt("answer_count"), o.optBoolean("closed"), replies)
+    }
+
+    suspend fun inquiries(id: String, token: String): List<Inquiry> {
+        val arr = JSONArray(request("/profiles/$id/inquiries", token = token))
+        return (0 until arr.length()).map { inquiryOf(arr.getJSONObject(it)) }
+    }
+
+    suspend fun openInquiry(id: String, token: String, topic: String,
+                            question: String): Inquiry =
+        inquiryOf(JSONObject(request("/profiles/$id/inquiries", "POST",
+            JSONObject().put("topic", topic).put("question", question), token)))
+
+    suspend fun inquiry(iid: String, token: String): Inquiry =
+        inquiryOf(JSONObject(request("/inquiries/$iid", token = token)))
+
+    suspend fun closeInquiry(iid: String, token: String): Inquiry =
+        inquiryOf(JSONObject(request("/inquiries/$iid/close", "POST", null, token)))
+
+    suspend fun learnFromAnswer(iid: String, aid: String, token: String) {
+        request("/inquiries/$iid/answers/$aid/learn", "POST", null, token)
+    }
+
+    // The board, and answering one. **No token on any of these three** — the
+    // person answering has no account and is not asked for a name, and a
+    // credential here would be a credential the board could log against them.
+
+    suspend fun openQuestions(): List<OpenQuestion> {
+        val arr = JSONArray(request("/open-questions"))
+        return (0 until arr.length()).map { openQuestionOf(arr.getJSONObject(it)) }
+    }
+
+    suspend fun openQuestion(iid: String): OpenQuestion =
+        openQuestionOf(JSONObject(request("/open-questions/$iid")))
+
+    suspend fun answerOpenQuestion(iid: String, body: String, alias: String,
+                                   pointsTo: String): String {
+        val o = JSONObject(request("/open-questions/$iid/answers", "POST",
+            JSONObject().put("body", body).put("alias", alias)
+                .put("points_to", pointsTo)))
+        return o.optString("note", "")
     }
 
     // ---- Community: stranger connections & multiparty rooms ----
