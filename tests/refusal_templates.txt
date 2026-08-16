@@ -1,0 +1,75 @@
+# ceiling: 36
+#
+# English refusals built by interpolation — the sentences this product says
+# when it says no, assembled from a template and a value at the moment of
+# refusing. Checked by test_the_platform_refuses_in_one_language.py, both
+# directions, and ratcheted.
+#
+# ## Why this file exists
+#
+# The refusal guard read `ast.Constant` and counted `ast.JoinedStr` without
+# looking at it. Every other shape fell through in silence. A round that
+# added three refusals — one from a dict of templates, one from an f-string,
+# one a plain literal — had exactly one of them noticed.
+#
+#     asked     is this refusal a string literal
+#     mattered  what does this refusal put in front of a person
+#
+# The extractor now classifies every `HTTPException` detail into one of six
+# shapes and fails on a seventh, so a shape nobody has decided about cannot
+# pass as a shape nobody can see. Two of those shapes owe a translation and
+# had none: the module constants below turned out to be translated already,
+# and these 36 templates are not.
+#
+# ## Why they are recorded rather than translated
+#
+# A template cannot be a key in `_REFUSALS` as written. `i18n.fill` is the
+# mechanism this estate already has for a refusal with a value in it —
+# `i18n.fill(i18n.MUST_BE_ONE_OF, field=..., choices=...)` — and twenty-two
+# call sites use it correctly. These 36 were written as f-strings
+# instead, which means English forever whatever language the reader chose.
+#
+# The fix for each is a conversion to `i18n.fill` plus a translated constant,
+# and doing 36 of them in the round that found them would be a bulk
+# rewrite of refusal text with no gate between the finding and the change.
+# The number here is the true one; it comes down a file at a time.
+#
+# `{}` marks where a value is interpolated. The skeleton is what a person
+# reads, which is the thing being counted.
+#
+'{}' is not permitted for a {}; allowed: {} — plus any installed task-pack modules
+@{} is already claimed
+assertion could not be read: {}
+basis '{}' cannot be revoked; use the review path
+could not fetch {} — {}: {}
+creative work blocked: {}
+no portrait brief for @{}
+no profile answers to {}
+no such {}
+no surface {}
+nothing accrued in {} — this account holds a balance in {}
+nothing at /{} to gift
+nothing at /{} to gift; a gift goes to a person, so it applies to profiles and desks
+nothing at /{} to react to; expected one of {}
+profile is not live on surface '{}'
+profile {} has departed
+registration could not be read: {}
+task '{}' is already installed from another pack
+task '{}' shadows a built-in command
+the mail server refused it: {}
+this action applies only to {} profiles; this profile's basis is '{}'
+this does not look like an evidence package: {}
+this pack costs {} {} — set accept_price to buy it
+this {} connector was not granted '{}'
+this {} lacks {} — '{}' cannot run on it
+unknown connector: {}/{}
+unknown gaming platform '{}'; see /connectors/catalog
+unknown robot model '{}'
+{label} is installed and has not been signed in to yet, so it cannot reach your account there. Sign in to it from this connector and try again.
+{label} needs a key this deployment has not been given, so it cannot reach the service. Whoever runs this deployment adds it.
+{} answered with nothing readable — no title, no description, no text
+{} cannot run an onboard LLM
+{} does not offer: {}
+{} does not support collecting context
+{} is {}, not shipping — it is in the catalogue so you can see it coming, and there is no body to bind a profile to yet
+{} reads what anybody can read — it has no account to sign in to and nothing to keep for it

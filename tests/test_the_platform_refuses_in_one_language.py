@@ -67,20 +67,186 @@ REPO = _repo_root()
 SNAPSHOT = Path(__file__).resolve().parent / "refusals_untranslated.txt"
 
 
-def _details(root: Path) -> tuple[set[str], int]:
-    """Every literal `HTTPException` detail in the package, and how many are
-    built by interpolation instead.
+#: Every shape an `HTTPException` detail is written in, and what this suite
+#: does about each. A shape that is in none of these is the defect the
+#: classifier exists to report — see `_classify`.
+#:
+#:   literal      a plain string. Checked against the translation table.
+#:   named        a module-level constant holding a plain string. Resolved,
+#:                then checked exactly like a literal.
+#:   template     an f-string, a `.format()`, or a concatenation. The English
+#:                skeleton is recovered and checked against its own record —
+#:                it cannot be a table key as written, which is the finding.
+#:   translated   already goes through `i18n` at the raise: `i18n.fill(...)`
+#:                or a lookup into one of the translation tables. Nothing owed.
+#:   passthrough  carries a sentence raised somewhere else — `exc.detail`, a
+#:                local rebound from an earlier raise. Owed at that raise.
+#:   domain       `str(exc)` on a domain exception. The sentence lives at the
+#:                `raise SomeError("…")` in a module, not here. **Not yet
+#:                followed** — see `refusal_templates.txt` for the count and
+#:                why it is its own round.
+SHAPES = ("literal", "named", "template", "translated", "passthrough", "domain")
 
-    From Python's own parser. A regex over the source is how the language
-    audit in this repository missed real text three separate times — the long
-    version is in `test_the_stranger_has_a_language_too.py` — and refusals are
-    worse than most: they wrap across source lines by construction, because
-    they are long sentences inside an indented `raise`.
+#: What must be translated or written down. The other three shapes are
+#: accounted for elsewhere, and saying which is the point of the split.
+OWED = ("literal", "named", "template")
+
+
+def _module_strings(tree: ast.Module) -> dict[str, str]:
+    """Module-level `NAME = "a sentence"`, so a refusal raised as a constant
+    can be read. Two of them were invisible for as long as this guard has
+    existed: `common.RESTRICTED_WHILE_CONTESTED` and
+    `access.NEEDS_ITS_WORDS`."""
+    out: dict[str, str] = {}
+    for node in tree.body:
+        if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+            continue
+        target = node.targets[0]
+        if isinstance(target, ast.Name) and isinstance(node.value, ast.Constant) \
+                and isinstance(node.value.value, str):
+            out[target.id] = node.value.value
+    return out
+
+
+def _module_tables(tree: ast.Module) -> dict[str, list[str]]:
+    """Module-level `NAME = {...}` whose values are plain strings.
+
+    A refusal picked out of one of these — `_MISSING[posture].format(label=…)`
+    in `routers/apps.py` — is every one of its values, because which sentence
+    a reader meets depends on a key chosen at runtime. Recovering only the
+    subscript would find nothing; recovering the table finds all of them.
     """
-    literals: set[str] = set()
-    interpolated = 0
+    out: dict[str, list[str]] = {}
+    for node in tree.body:
+        if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+            continue
+        target = node.targets[0]
+        if not isinstance(target, ast.Name) or not isinstance(node.value, ast.Dict):
+            continue
+        values = [v.value for v in node.value.values
+                  if isinstance(v, ast.Constant) and isinstance(v.value, str)]
+        if values and len(values) == len(node.value.values):
+            out[target.id] = values
+    return out
+
+
+def _skeleton(node: ast.AST) -> str | None:
+    """The English of a sentence built by interpolation, with `{}` where each
+    filled-in piece goes.
+
+    This is what makes an f-string refusal visible. It is deliberately not a
+    translation key: `i18n.fill` uses *named* placeholders, and an f-string
+    does not carry names a reader could rely on. The skeleton says what a
+    person will actually read, which is the thing the record is about.
+    """
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    if isinstance(node, ast.JoinedStr):
+        return "".join(
+            v.value if isinstance(v, ast.Constant) and isinstance(v.value, str)
+            else "{}" for v in node.values)
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+        left, right = _skeleton(node.left), _skeleton(node.right)
+        return None if left is None or right is None else left + right
+    return None
+
+
+def _is_i18n(node: ast.AST) -> bool:
+    """Whether this detail already went through the translation layer.
+
+    `i18n.fill(i18n.MUST_BE_ONE_OF, field=…)` and
+    `i18n.STUDIO_REFUSALS[str(exc)]` are the two shapes in use. Both are
+    refusals-as-keys, which is the pattern the rest of this suite asks for,
+    so they are owed nothing here — but they must be *recognised* rather
+    than unseen, or the guard cannot tell them from an English f-string.
+    """
+    for sub in ast.walk(node):
+        if isinstance(sub, ast.Attribute) \
+                and getattr(sub.value, "id", "") == "i18n":
+            return True
+    return False
+
+
+def _classify(detail: ast.AST | None, consts: dict[str, str],
+              tables: dict[str, list[str]]) -> tuple[str, list[str]]:
+    """One detail node, into exactly one of :data:`SHAPES`.
+
+    The old extractor read `ast.Constant` and counted `ast.JoinedStr`. Every
+    other shape fell through in silence — 145 refusals, including two module
+    constants and thirty-eight f-strings that reach a reader in English
+    whatever language they chose.
+
+        asked     is this refusal a string literal
+        mattered  what does this refusal put in front of a person
+    """
+    def table_of(node: ast.AST) -> list[str] | None:
+        """The sentences behind `SOME_TABLE[whatever]`."""
+        if isinstance(node, ast.Subscript) and isinstance(node.value, ast.Name):
+            return tables.get(node.value.id)
+        return None
+
+    if detail is None:
+        return "passthrough", []
+    if _is_i18n(detail):
+        return "translated", []
+    if isinstance(detail, ast.Constant) and isinstance(detail.value, str):
+        return "literal", [detail.value]
+    if isinstance(detail, ast.Name):
+        if detail.id in consts:
+            return "named", [consts[detail.id]]
+        return "passthrough", []            # a local, rebound from a raise
+    if isinstance(detail, ast.Attribute):
+        return "passthrough", []            # exc.detail, exc.message
+    if isinstance(detail, (ast.JoinedStr, ast.BinOp)):
+        skeleton = _skeleton(detail)
+        return ("template", [skeleton]) if skeleton else ("passthrough", [])
+    if isinstance(detail, ast.Call):
+        fn = detail.func
+        # `str(exc)` — the sentence is at the `raise` in a domain module.
+        if getattr(fn, "id", "") == "str":
+            return "domain", []
+        # `SOMETHING.format(...)` — the receiver carries the English, whether
+        # that is a literal or a row of a table picked at runtime.
+        if getattr(fn, "attr", "") == "format":
+            receiver = getattr(fn, "value", None)
+            skeleton = _skeleton(receiver)
+            if skeleton:
+                return "template", [skeleton]
+            rows = table_of(receiver)
+            if rows:
+                return "template", rows
+            return "domain", []
+        return "domain", []
+    if isinstance(detail, ast.Dict):
+        # The plan gate. `localize_detail` translates `message` and leaves the
+        # API's own vocabulary alone — `test_a_dict_detail_…` covers it.
+        for key, value in zip(detail.keys, detail.values):
+            if getattr(key, "value", None) == "message":
+                text = _skeleton(value)
+                if text:
+                    return "literal", [text]
+        return "translated", []
+    if isinstance(detail, ast.Subscript):
+        rows = table_of(detail)
+        if rows:
+            return "named", rows
+        return "domain", []
+    return "unknown", []
+
+
+def _refusals(root: Path) -> dict[str, list[tuple[str, str | None]]]:
+    """Every `HTTPException` detail in the package, by shape.
+
+    Values are `(where, text)` so a failure can name the file and line rather
+    than only the sentence — a template appears verbatim at several call
+    sites and the sentence alone does not say which one is new.
+    """
+    found: dict[str, list[tuple[str, str | None]]] = {s: [] for s in SHAPES}
+    found["unknown"] = []
     for path in sorted(root.rglob("*.py")):
-        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        consts, tables = _module_strings(tree), _module_tables(tree)
+        for node in ast.walk(tree):
             if not isinstance(node, ast.Call):
                 continue
             fn = node.func
@@ -91,11 +257,23 @@ def _details(root: Path) -> tuple[set[str], int]:
             for kw in node.keywords:
                 if kw.arg == "detail":
                     detail = kw.value
-            if isinstance(detail, ast.Constant) and isinstance(detail.value, str):
-                literals.add(detail.value)
-            elif isinstance(detail, ast.JoinedStr):
-                interpolated += 1
-    return literals, interpolated
+            shape, texts = _classify(detail, consts, tables)
+            where = f"{path.relative_to(root.parent)}:{node.lineno}"
+            if texts:
+                found[shape].extend((where, t) for t in texts)
+            else:
+                found[shape].append((where, None))
+    return found
+
+
+def _details(root: Path) -> tuple[set[str], int]:
+    """The literal-and-named sentences, and how many are built by
+    interpolation. Kept at this signature because the guard-on-the-guard and
+    the record's own header are both written against it."""
+    found = _refusals(root)
+    literals = {text for shape in ("literal", "named")
+                for _, text in found[shape] if text}
+    return literals, len(found["template"])
 
 
 def _translated() -> set[str]:
@@ -130,6 +308,82 @@ def test_every_refusal_is_translated_or_written_down():
             f"— strike them from {SNAPSHOT.name}:\n    "
             + "\n    ".join(s[:90] for s in stale[:30]))
     assert not problems, "\n\n".join(problems)
+
+
+TEMPLATES = Path(__file__).resolve().parent / "refusal_templates.txt"
+
+
+def _recorded_templates() -> set[str]:
+    return {line.rstrip("\n") for line in
+            TEMPLATES.read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.startswith("#")}
+
+
+def test_no_refusal_shape_goes_unclassified():
+    """The finding this round is about, as a standing check.
+
+    The extractor read `ast.Constant` and counted `ast.JoinedStr`. Everything
+    else — a module constant, a row of a table picked at runtime, a
+    `.format()`, a concatenation — fell through in silence, and a refusal
+    added in one of those shapes was a sentence nobody would ever be asked
+    about.
+
+        asked     is this refusal a string literal
+        mattered  what does this refusal put in front of a person
+
+    Every detail now lands in one of :data:`SHAPES`. A shape that lands in
+    none of them fails here rather than being skipped, because a shape nobody
+    classified is a shape nobody decided about.
+    """
+    found = _refusals(REPO / "qrme")
+    assert not found["unknown"], (
+        f"{len(found['unknown'])} refusal detail(s) in a shape this guard "
+        "does not classify:\n    "
+        + "\n    ".join(where for where, _ in found["unknown"][:20])
+        + "\n  Give the shape a row in SHAPES and a branch in _classify — "
+          "or the sentences it carries are invisible.")
+    # And the classifier must still be finding the bulk of them: a refactor
+    # that broke `_refusals` would report zero unknown on zero refusals.
+    assert len(found["literal"]) >= 200, (
+        f"only {len(found['literal'])} literal refusals found — the walk has "
+        "stopped matching, so every check built on it is passing on nothing")
+
+
+def test_every_interpolated_refusal_is_recorded():
+    """The templates, both directions.
+
+    These cannot be keys in `_REFUSALS` as written — `i18n.fill` is the
+    mechanism for a refusal with a value in it, and twenty-two call sites use
+    it correctly. The ones here were written as f-strings instead, which
+    means English whatever language the reader chose. Recorded rather than
+    translated in the round that found them; `refusal_templates.txt` says why.
+    """
+    found = _refusals(REPO / "qrme")
+    measured = {text for _, text in found["template"] if text}
+    recorded = _recorded_templates()
+    problems = []
+    new = sorted(measured - recorded)
+    if new:
+        problems.append(
+            f"{len(new)} interpolated refusal(s) not in {TEMPLATES.name}:\n    "
+            + "\n    ".join(s[:90] for s in new[:20])
+            + "\n  Convert it to i18n.fill with a translated constant, or "
+              "record it — but recording is ratcheted.")
+    gone = sorted(recorded - measured)
+    if gone:
+        problems.append(
+            f"{len(gone)} recorded template(s) are no longer raised — strike "
+            f"them from {TEMPLATES.name}:\n    "
+            + "\n    ".join(s[:90] for s in gone[:20]))
+    assert not problems, "\n\n".join(problems)
+
+
+def test_the_template_backlog_only_shrinks():
+    ceiling = int(re.search(r"# ceiling: (\d+)",
+                            TEMPLATES.read_text(encoding="utf-8")).group(1))
+    assert len(_recorded_templates()) <= ceiling, (
+        f"{len(_recorded_templates())} interpolated refusals, above the "
+        f"{ceiling} this record started at")
 
 
 def test_the_backlog_only_shrinks():
@@ -248,21 +502,48 @@ def test_the_extractor_can_still_see(tmp_path):
     fixture = tmp_path / "shapes.py"
     fixture.write_text(
         'from fastapi import HTTPException\n'
+        'A_CONSTANT = "held in a module constant"\n'
+        'A_TABLE = {"x": "one row of a table: {}", "y": "the other: {}"}\n'
         'def a(): raise HTTPException(404, "positional")\n'
         'def b(): raise HTTPException(403, detail="by keyword")\n'
         'def c(): raise HTTPException(422, "wrapped across "\n'
         '                                  "two source lines")\n'
         'def d(x): raise HTTPException(400, f"built from {x}")\n'
         'def e(): raise fastapi.HTTPException(409, "dotted call")\n'
-        'def f(): raise HTTPException(402, {"message": "a dict detail"})\n',
+        'def f(): raise HTTPException(402, {"message": "a dict detail"})\n'
+        'def g(): raise HTTPException(409, A_CONSTANT)\n'
+        'def h(k, v): raise HTTPException(409, A_TABLE[k].format(v))\n'
+        'def i(x): raise HTTPException(400, "joined " + f"with {x}")\n'
+        'def j(exc): raise HTTPException(400, str(exc))\n'
+        'def k(exc): raise HTTPException(400, exc.detail)\n'
+        'def l(x): raise HTTPException(400, i18n.fill(i18n.SOMETHING, a=x))\n',
         encoding="utf-8")
     literals, interpolated = _details(tmp_path)
     assert literals == {"positional", "by keyword",
-                        "wrapped across two source lines", "dotted call"}, (
+                        "wrapped across two source lines", "dotted call",
+                        "a dict detail", "held in a module constant"}, (
         f"the extractor no longer reads the shapes it documents:\n{literals}")
-    assert interpolated == 1, (
+    # Four templates: the f-string, both rows of the table reached through
+    # `.format()`, and the concatenation. A table row is a template rather
+    # than a literal because which row a reader meets is chosen at runtime
+    # and every one of them carries a value.
+    assert interpolated == 4, (
         "the extractor stopped counting interpolated refusals, which is how "
-        "49 of them would quietly leave the record's header")
+        "36 of them would quietly leave the record's header")
+
+    # And the classification itself, shape by shape — the half that keeps a
+    # sentence from being filed as *somebody else's problem* when it is not.
+    found = _refusals(tmp_path)
+    counted = {shape: len(rows) for shape, rows in found.items() if rows}
+    assert not found["unknown"], (
+        f"the classifier met a shape it has no branch for: {found['unknown']}")
+    assert counted["domain"] == 1, "str(exc) should be a domain sentence"
+    assert counted["passthrough"] == 1, "exc.detail carries somebody else's"
+    assert counted["translated"] == 1, "i18n.fill is already handled"
+    assert counted["named"] == 1, "the module constant"
+    assert counted["template"] == 4, (
+        "an f-string, both rows of a table reached through .format(), and a "
+        "concatenation — every shape that puts a value inside a sentence")
 
 
 def test_every_translated_refusal_has_every_language():
