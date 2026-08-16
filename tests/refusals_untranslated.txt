@@ -1,4 +1,4 @@
-# status: backlog — 149 rows
+# status: backlog — 109 rows
 #
 # English refusals — the sentences this product says when it says no.
 # Checked by test_the_platform_refuses_in_one_language.py, both directions,
@@ -109,21 +109,16 @@ CloudModelClient needs base_url or a client
 PDIClient needs base_url or an injected client
 a beacon needs a label so its owner can tell their codes apart once several are printed and stuck to different doors
 a beacon needs the whole surface — a QR on a strip is too small for a phone to read, and an unscannable code looks broken rather than missing
-a campaign needs a goal above zero
 a comment needs something in it
 a delegation policy needs at least one phase
 a desk claims a real person staffs it, so it cannot be opened without recording who attests that and on what basis
-a desk needs a name a visitor can read
 a device name is at most 60 characters
 a device needs a name you will recognise
-a donation needs an amount above zero
 a free follow has nothing to renew
-a grant needs two people
 a link label is at most 60 characters
 a link needs a label and a url
 a live view of somebody's body goes to a person, not to a synthetic profile. A profile watching a body in real time would be making judgements about it with no examination, no accountability and nobody to answer for being wrong — and unlike a still, there is no moment somebody chose to send. Invite a real person to this session, or use a still and send it to a clinician.
 a mail server host is required
-a note needs something in it
 a paid subscription has to credit someone: no beneficiary means the money would accrue to nobody
 a paid subscription needs a price above zero — a free one is the 'follow' tier
 a pane with no faces is the helper button on its own — set the state to 'handle' instead
@@ -140,43 +135,31 @@ a room lends through its own routes — POST /rooms/{id}/mic. Two storage paths 
 a sample needs a positive duration
 a screen showing nothing is a screen turned off
 a session belongs to a place — name it
-a skill lent in one place cannot be used in another — ask there
 a video link must be http or https
 a video needs a link
 a workflow needs at least one phase
 accent must be a #rrggbb colour
 an 18+ stream can only be opened by the person on it: the attestor must be the owner, attesting for themselves
-an edit needs something in it — retract instead
 an empty image is not a picture
 an experience entry needs a title
 an imported image needs the rights to use it. Bring one you hold, generate one, or use your own room
 an invented person cannot hold the badge — there is nobody to verify
 an organization needs a name
-campaign not found or already closed
 choose one — a preset emblem or your own image, not both
 coordination takes at least two departments — add another before asking them to coordinate
 delegating `research` requires a grant: without one the phase reads every source item on the profile
-every share must be above zero
 give it a name — it is what the other people are shown
 hand over a card: `card` as JSON, or `content` as a base64 PNG with one embedded
 join the party before talking in it
-name at least one loved one or organization
 name what is being connected — a machine, a program, a screen
 no campaigns on a rated profile — tips to a performer go through the age-gated gift, never an open donation page
 no character card is embedded in this image — the PNG has no chara/ccv3 text chunk
 no department has an agent able to contribute — every one of them has departed, been terminated, or is under objection
 no such caller — sessions are with a real interactor, not a free-typed name
-no such campaign
-no such clinician
 no such comment
-no such connection in this session
 no such department in this organization
 no such device
 no such game session
-no such grant
-no such message
-no such referral, or it has not been opened yet
-no such request
 no such room
 no such screen
 no such subscription
@@ -192,38 +175,23 @@ only a participant can lend a microphone
 only the holder or the viewer can end this
 only the host ends the party
 only the host moves the room's position
-only the person it was offered to can accept it
-only the person it was offered to can decline it
-only the two people involved can close this
 only your own turn can be edited — a profile's reply is not yours to rewrite
-only your own turn can be retracted
 remote control needs a written scope: what on the machine may be touched, in words the caller will be shown
 say something
-say what is being lent, in words the other reads
 say what you are trying to find, in your own words
 say where the money goes first — designate loved ones or organizations (PUT /profiles/{id}/proceeds) before asking anyone for it
 scope 'locality' needs a locality
 scope 'locality' needs a locality to be near
 scope 'region' needs a region
 shown_name needs the profile id to build an anonymous name — pass profile_id when the row does not carry one
-that grant belongs to somebody else
-that grant is closed
 that is somebody else's likeness. An anonymous profile wearing another person's face is impersonation with a layer of deniability on top
-that link is not valid
-that message belongs to somebody else
-that message was retracted
-that offer was declined — a fresh one is needed
 that post already has a video
 that post has no video to watch
 that post is not visible, so it cannot be watched together
 that profile is not yours
-that reply link is not valid
-that ring is not this desk's
 that room has closed
 that session has ended
 that signature authorises something else — a referral is released only by the signature raised for it
-that signature does not verify
-the bell was just rung — give them a moment to reach the desk
 the card carries no identity — description, personality and scenario are all empty
 the card names nobody — `data.name` is empty
 the department's agent must be a profile this organization's owner holds
@@ -231,19 +199,13 @@ the founder is a fixed friend on every profile and cannot be removed
 the image carries a card chunk that does not decode as one
 the image could not be read — it is not base64
 the same friend twice is still one friend
-the summary changed after it was signed; sign the new one
 there is nothing to refer yet — this releases your sessions with the specialist, and there are none
 this campaign has reached today's donation count — the tokenless door is rate-limited so it can never become a ledger-spam hose; give again tomorrow
-this campaign is closed
 this deployment is reachable beyond localhost but has no QRME_ADMIN_TOKEN configured — objection review and succession stay closed until it is
-this desk is closed, so the bell is off — nobody would hear it
 this profile depicts a real person, so an experience entry is a claim about them — record the rights basis that covers the persona before adding one
 this profile does not accept delegated workflows
 this profile is already the organization's own — staff it as a department; a lease is for somebody else's specialist
 this profile is not offered for license — a lease is licensed use, and there are no terms to lease under
-this referral has already been released
-this session is closed
-this stream is closed right now
 this subscription is cancelled — resubscribe instead of renewing it
 unknown avatar source — GET /avatars/market lists the import sources this deployment recognises
 unrecognized card: expected spec chara_card_v2 or chara_card_v3
@@ -251,6 +213,4 @@ upload a picture first — 'photo' is a box with a picture in it, and there is n
 voiceprint enrollment requires attesting the voice is your own — QRME will not clone a voice on somebody else's behalf
 workflow is not awaiting input
 you already have a hand up on this stream — one at a time, so a host reading the queue sees people rather than repeats
-you are not on this stream
-you have already written back on this referral
 you have no verified profile to move

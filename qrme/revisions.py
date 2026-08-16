@@ -74,7 +74,7 @@ def edit(message_id: str, new_content: str, actor_id: str,
 
     msg = _message(message_id)
     if msg is None:
-        raise RevisionError("no such message")
+        raise RevisionError("message not found")
     if msg["role"] != "interactor":
         raise RevisionError(
             "only your own turn can be edited — a profile's reply is not "
@@ -117,7 +117,7 @@ def retract(message_id: str, actor_id: str) -> dict:
     """
     msg = _message(message_id)
     if msg is None:
-        raise RevisionError("no such message")
+        raise RevisionError("message not found")
     if msg["role"] != "interactor":
         raise RevisionError("only your own turn can be retracted")
     if msg["interactor_id"] != actor_id:

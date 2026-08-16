@@ -6,6 +6,34 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **Forty more refusals stop speaking English to everyone.** The refusal-guard
+  round left 166 English sentences recorded rather than translated; the
+  exchange bite took seventeen, and this takes forty more — every sentence in
+  `sharing.py`, `desks.py`, `referral.py`, `campaigns.py` and `revisions.py`,
+  so no module is left half-translated. The backlog stands at 109.
+
+      asked     is this sentence written down somewhere
+      mattered  what does the person who is refused actually read
+
+  Two of the forty needed no translation at all, which is the more interesting
+  half. `campaigns.py` raised **no such campaign** and `routers/earnings.py`
+  raised **campaign not found** — from the same `campaigns.view()` returning
+  `None`. `revisions.py` raised **no such message** and
+  `routers/interaction.py` raised **message not found**, from the same row of
+  the same table. Two wordings for one thing, in a product that translates
+  every sentence it says: the corpus was on its way to carrying both in nine
+  languages and calling that thorough.
+
+  The already-translated wording wins in both cases, so the backlog loses two
+  rows and the corpus gains no sentence. What is left behind is a register
+  split worth its own pass — roughly twenty `no such X` against roughly twenty
+  `X not found`, most of them naming different objects and so not duplicates
+  at all. Consolidating those is a change to what people read, not a
+  translation, and it should be decided rather than done in the margin of a
+  paydown.
+
 ## [0.80.0] - 2026-08-16
 
 ### Added

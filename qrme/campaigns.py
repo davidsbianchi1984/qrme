@@ -146,7 +146,7 @@ def donate(campaign_id: str, giver_id: str | None, amount: float,
            currency: str = "USD") -> dict:
     campaign = view(campaign_id)
     if campaign is None:
-        raise CampaignError("no such campaign")
+        raise CampaignError("campaign not found")
     if campaign["status"] != "open":
         raise CampaignError("this campaign is closed")
     if amount <= 0:
