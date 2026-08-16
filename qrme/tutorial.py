@@ -1101,6 +1101,24 @@ LESSONS: tuple[dict, ...] = (
          try_it="Open Your Side after a few conversations, read the two "
                 "numbers, and press Show what went to see the whole "
                 "referral before it moves."),
+    dict(key="agent", chapter="Making things",
+         title="The Agent",
+         what="Somewhere in this app is an agent that can do the work "
+              "rather than describe it: read your page and rewrite it, "
+              "change the homepage a stranger lands on, and write, revise, "
+              "run or remove the small tools you keep against your profile. "
+              "It shipped inside the Studio, which meant the only people "
+              "who found it were already writing code. It has its own tab "
+              "now, second in the row. Ask it in words. What it did is "
+              "listed underneath what it said, because prose is the part "
+              "you have to take on trust and the steps are the part you can "
+              "check. Its reach is a written list of eleven tools and the "
+              "screen shows you that list before you ask it for anything — "
+              "an agent whose limits you learn by watching it fail is one "
+              "you end up supervising instead of instructing.",
+         screens=(200,),
+         try_it="Open Agent, read what it says it can touch, then ask it "
+                "to make your page say what you actually do."),
 )
 
 CHAPTERS = tuple(dict.fromkeys(lesson["chapter"] for lesson in LESSONS))

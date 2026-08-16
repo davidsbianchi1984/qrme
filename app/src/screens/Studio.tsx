@@ -12,6 +12,7 @@
  * number the runner does not hold is a promise the product did not make,
  * and this one has five of them to get wrong.
  */
+import { AgentTalk } from "../AgentTalk";
 import { useCallback, useEffect, useState } from "react";
 
 import { api, type AgentTurn, type Widget, type WidgetRun } from "../api";
@@ -157,57 +158,20 @@ export function Studio({ onPlans }: { onPlans: () => void }) {
         </p></div>
       )}
 
-      {/* Ask for it in words. What it did is listed under what it said,
-          because an agent that describes an edit in prose is asking to be
-          believed and the steps are the part that can be checked. */}
-      <div className="card">
-        <div className="row">
-          <strong style={{ flex: 1 }}>{tr("studio.ask.title", lang)}</strong>
-          <button onClick={() => setShowsReach(!showsReach)}>
-            {showsReach ? tr("studio.reach.hide", lang)
-                        : tr("studio.reach.show", lang)}
-          </button>
-        </div>
-        <p className="muted small">{tr("studio.ask.sub", lang)}</p>
-        {showsReach && agent && (
-          <ul className="muted small">
-            {agent.can_touch.map((line) => <li key={line}>{line}</li>)}
-          </ul>
-        )}
-        {agent && !agent.available && (
-          <p className="muted small">{tr("studio.ask.nomodel", lang)}</p>
-        )}
-        <textarea rows={3} value={ask} placeholder={tr("studio.ask.ph", lang)}
-                  onChange={(e) => setAsk(e.target.value)} />
-        <div className="row">
-          <button className="primary"
-                  disabled={asking || !owner || !ask.trim()}
-                  onClick={send}>
-            {asking ? tr("studio.ask.working", lang) : tr("studio.ask.go", lang)}
-          </button>
-          {talk.length > 0 && (
-            <button onClick={() => { setTalk([]); setDid(null); }}>
-              {tr("studio.ask.forget", lang)}
-            </button>
-          )}
-        </div>
-        {talk.map((turn, i) => (
-          <p key={i} className={turn.role === "user" ? "small" : "muted small"}>
-            {turn.content}
-          </p>
-        ))}
-        {did && did.said && <p className="muted small">{did.said}</p>}
-        {did && did.acted.length > 0 && (
-          <ul className="muted small">
-            {did.acted.map((step, i) => (
-              <li key={i}>
-                {step.said ?? fill(tr("studio.step", lang), {
-                  tool: step.tool, code: String(step.answered ?? 0) })}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      {/* Ask for it in words. The markup lives in `AgentTalk` because the
+          Agent tab needs the same conversation and duplicating it would be
+          fifty lines of JSX kept in step by hand. The state stays here: this
+          screen re-reads the widget it was editing afterwards, which is its
+          business and not the component's. */}
+      <AgentTalk
+        lang={lang} labels="studio.ask"
+        ask={ask} setAsk={setAsk} asking={asking}
+        canSend={!!owner} onSend={send}
+        talk={talk} did={did}
+        onForget={() => { setTalk([]); setDid(null); }}
+        reach={agent ? agent.can_touch : null}
+        showsReach={showsReach} onToggleReach={() => setShowsReach(!showsReach)}
+        unavailable={!!agent && !agent.available} />
 
       <div className="card">
         <div className="row">

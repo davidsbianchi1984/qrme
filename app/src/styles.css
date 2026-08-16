@@ -67,6 +67,23 @@ nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
 .nav-item:hover { color: var(--txt); background: rgba(255,255,255,0.04); }
 .nav-item.active { color: #fff; background: rgba(123,92,255,0.18); box-shadow: inset 3px 0 0 var(--brand); }
 .nav-icon { width: 18px; text-align: center; }
+/* The one tab whose mark is a picture. It is the QRME poster cropped from
+   the Q to the E with its plate, which is a 1.9:1 banner rather than a glyph,
+   so the cell is given the width instead of the art being squeezed into a
+   square. At the 17px the other icons use it renders 32px wide and the
+   lettering is unreadable — the same failure the sibling product's menu icon
+   was redrawn to fix — so it gets a taller slot, and the nav already scrolls
+   sideways when the row runs out of room.
+
+   The word under the tab is the real label and is translated; the plate in
+   the picture is decoration, which is why it may be small. */
+.nav-art { width: auto; }
+.nav-art img { height: 26px; width: auto; display: block; border-radius: 5px; }
+
+/* The same mark on the screen itself, where it has room to be the artwork. */
+.agent-mark { width: 100%; max-width: 420px; border-radius: 14px;
+  display: block; margin-bottom: 12px; }
+
 .signout { background: rgba(255,255,255,0.05); color: var(--t2); border: 1px solid var(--line); border-radius: 10px; padding: 9px; font-size: 12px; }
 
 /* min-height/min-width zero: a grid item refuses to shrink below its
@@ -257,6 +274,11 @@ button.danger { background: rgba(224,104,122,0.14) !important; color: var(--red)
   }
   .nav-item.active { box-shadow: none; }
   .nav-icon { width: auto; font-size: 17px; }
+  /* 30px rather than 17: at icon height this banner is 32px wide and reads
+     as noise. Its cell is widened to match so it does not crush the tabs
+     beside it — `nav` is already `overflow-x: auto` below. */
+  .nav-art img { height: 30px; }
+  .nav-item:has(.nav-art) { min-width: 92px; }
 
   .content {
     grid-row: 1; padding: 18px 16px 22px;

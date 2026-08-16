@@ -57,6 +57,7 @@ NOT_A_SURFACE = {
     "WatchLights",  # the always-on widget; its own gallery lives in the watch faces
     "Footsteps",   # the corner counter; fixed chrome over every screen, like the version guard
     "VersionGuard", # a failure banner, deliberately not part of the tour
+    "AgentTalk",    # the agent conversation, drawn inside Agent and Studio
 }
 
 

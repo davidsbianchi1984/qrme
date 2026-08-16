@@ -54,6 +54,7 @@ import { Campaigns } from "./screens/Campaigns";
 import { Org } from "./screens/Org";
 import { Relationships } from "./screens/Relationships";
 import { Memory } from "./screens/Memory";
+import { Agent } from "./screens/Agent";
 import { Studio } from "./screens/Studio";
 import { Settings } from "./screens/Settings";
 import { Access } from "./screens/Access";
@@ -66,10 +67,18 @@ import { WatchLights } from "./WatchLights";
 // `profile` is deliberately not in NAV: somebody else's homepage is a place
 // you are taken to by pressing their face, not a standing destination — the
 // same reason `passing` is reachable and unlisted.
-type Tab = "profile" | "home" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "remainder" | "named" | "passing" | "robots" | "placements" | "plans" | "access" | "settings";
+type Tab = "profile" | "home" | "agent" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "stranger" | "themark" | "inwords" | "remainder" | "named" | "passing" | "robots" | "placements" | "plans" | "access" | "settings";
 
-const NAV: { id: Tab; label: string; icon: string }[] = [
+// `art` is the one tab whose mark is a picture rather than a glyph. Kept as a
+// second, optional field rather than widening `icon` to a node: the nav guards
+// parse this table as text for `id:`, `label:` and the icon, and a shape they
+// cannot read is a shape that stops being checked.
+const NAV: { id: Tab; label: string; icon: string; art?: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
+  // The mark is relative, not rooted: the console is served under /app and
+  // vite builds with base "./", so a leading slash would 404 in production
+  // and work in dev, which is the worst way for this to be wrong.
+  { id: "agent", label: "Agent", icon: "✦", art: "agent.png" },
   { id: "feed", label: "Feed", icon: "▶" },
   { id: "guide", label: "Show me around", icon: "🧭" },
   { id: "chat", label: "Chat", icon: "💬" },
@@ -235,7 +244,9 @@ export function App() {
               className={"nav-item" + (tab === n.id ? " active" : "")}
               onClick={() => setTab(n.id)}
             >
-              <span className="nav-icon">{n.icon}</span>
+              <span className={"nav-icon" + (n.art ? " nav-art" : "")}>
+                {n.art ? <img src={n.art} alt="" /> : n.icon}
+              </span>
               {t(`nav.${n.id}`, lang)}
             </button>
           ))}
@@ -270,6 +281,8 @@ export function App() {
         {tab === "org" && <Org onPlans={toPlans} />}
         {tab === "relationships" && <Relationships onPlans={toPlans} />}
         {tab === "memory" && <Memory onPlans={toPlans} />}
+        {tab === "agent" && <Agent onPlans={toPlans}
+                                  onStudio={() => setTab("studio")} />}
         {tab === "studio" && <Studio onPlans={toPlans} />}
         {tab === "delegate" && <Delegate onPlans={toPlans} />}
         {tab === "desk" && <Desk onPlans={toPlans} />}

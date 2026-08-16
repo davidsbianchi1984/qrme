@@ -3777,6 +3777,25 @@ SCREENS = [
     # one boolean, and a strip of bars that reads rather than decorates — the
     # last card is why: bars that move on a closed microphone are a lie about
     # the one thing a person needs to be sure of before they speak.
+    # 200: the Agent's own tab. The agent that edits your page and writes your
+    # widgets shipped with the Studio and could be reached only from inside the
+    # widget workshop — so the person who wanted their page rewritten had to go
+    # somewhere about code to find it. The cards are its four reaches, in the
+    # backend's own grouping, and the last one is the boundary: eleven tools is
+    # not "the whole app", and saying so on the screen is cheaper than teaching
+    # people to stop asking.
+    dict(num=200, title="Agent", sub="Say what you want changed",
+         accent="brand", tab=0, cards=[
+        dict(icon="page", color="brand", k="Your page",
+             s="read it, rewrite it, in words"),
+        dict(icon="home", color="cyan", k="Your homepage",
+             s="the face a stranger lands on"),
+        dict(icon="code", color="green", k="Your widgets",
+             s="write, revise, run, remove",
+             pill=("6", "good")),
+        dict(icon="lock", color="amber", k="And no further",
+             s="eleven tools, each with a door"),
+    ], button=("What it did, under what it said", "brand")),
     dict(num=199, title="What It Is Doing", sub="Seven states, and bars that mean them",
          accent="cyan", tab=0, cards=[
         dict(icon="mic", color="green", k="Listening",

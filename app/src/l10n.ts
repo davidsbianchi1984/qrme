@@ -112,6 +112,39 @@ const CHROME: Table = {
   // `test_the_desktop_and_the_phone_say_different_things` exists to catch —
   // it caught this one. This control moves one card up a stream; it does not
   // leave anything.
+  // The Agent's tab. `en` must match NAV's `label:` exactly — a guard checks
+  // the pair, because a tab whose two spellings drift is a tab that reads one
+  // way in English and another in every other language.
+  "nav.agent": {
+    en: "Agent", es: "Agente", fr: "Agent", de: "Agent", pt: "Agente", it: "Agente", ja: "エージェント", zh: "助理", hi: "एजेंट", ar: "الوكيل",
+  },
+  "agent.title": {
+    en: "Agent", es: "Agente", fr: "Agent", de: "Agent", pt: "Agente", it: "Agente", ja: "エージェント", zh: "助理", hi: "एजेंट", ar: "الوكيل",
+  },
+  "agent.pitch": {
+    en: "Tell it what you want changed, and it does it through the same doors you would have used.", es: "Dile qué quieres cambiar y lo hace por las mismas puertas que usarías tú.", fr: "Dites-lui ce que vous voulez changer : il passe par les mêmes portes que vous.", de: "Sag ihm, was sich ändern soll — es geht durch dieselben Türen wie du.", pt: "Diga o que quer mudar e ele faz pelas mesmas portas que você usaria.", it: "Digli cosa vuoi cambiare: passa dalle stesse porte che useresti tu.", ja: "変えたいことを伝えてください。あなたが通るのと同じ扉を通って実行します。", zh: "把你想改的告诉它，它走的是你自己会走的那几道门。", hi: "जो बदलना है वह बताइए — यह उन्हीं दरवाज़ों से करेगा जिनसे आप करते।", ar: "قل له ما تريد تغييره، وسينفّذه عبر الأبواب نفسها التي كنت ستستخدمها.",
+  },
+  "agent.signin": {
+    en: "Sign in with a profile of your own — it works on your app, so it needs to know whose.", es: "Entra con un perfil tuyo: trabaja sobre tu app, así que necesita saber de quién es.", fr: "Connectez-vous avec un profil à vous — il agit sur votre app, il doit savoir laquelle.", de: "Melde dich mit einem eigenen Profil an — es arbeitet an deiner App und muss wissen, wessen.", pt: "Entre com um perfil seu — ele trabalha na sua app, por isso precisa saber de quem é.", it: "Accedi con un profilo tuo: lavora sulla tua app, quindi deve sapere di chi è.", ja: "ご自身のプロフィールでサインインしてください。あなたのアプリに手を入れるので、誰のものかを知る必要があります。", zh: "用你自己的档案登录——它动的是你的应用，所以得知道是谁的。", hi: "अपनी प्रोफ़ाइल से साइन इन करें — यह आपके ऐप पर काम करता है, तो जानना ज़रूरी है कि किसका।", ar: "سجّل الدخول بملف يخصّك — فهو يعمل على تطبيقك ويحتاج أن يعرف لمن.",
+  },
+  "agent.ask.title": {
+    en: "Ask for it in words", es: "Pídelo con palabras", fr: "Demandez-le avec des mots", de: "Sagen Sie es einfach", pt: "Peça por palavras", it: "Chiedilo a parole", ja: "言葉で頼む", zh: "用一句话说出来", hi: "शब्दों में कहिए", ar: "اطلبه بالكلمات",
+  },
+  "agent.ask.sub": {
+    en: "What it did is listed under what it said, because the steps are the part you can check.", es: "Lo que hizo aparece bajo lo que dijo: los pasos son la parte que puedes comprobar.", fr: "Ce qu'il a fait est listé sous ce qu'il a dit — les étapes sont la partie vérifiable.", de: "Was es getan hat, steht unter dem, was es gesagt hat — die Schritte sind das Prüfbare.", pt: "O que fez fica listado sob o que disse: os passos são a parte que dá para conferir.", it: "Ciò che ha fatto sta sotto ciò che ha detto: i passi sono la parte verificabile.", ja: "何をしたかは、何を言ったかの下に並びます。確かめられるのは手順のほうだからです。", zh: "它做了什么列在它说了什么的下面——能核对的是步骤那一半。", hi: "उसने क्या किया, यह उसने क्या कहा के नीचे है — जाँची जा सकने वाली चीज़ कदम हैं।", ar: "ما فعله مُدرج تحت ما قاله، لأن الخطوات هي الجزء الذي يمكنك التحقق منه.",
+  },
+  "agent.ask.ph": {
+    en: "make my page say what I actually do", es: "haz que mi página diga a qué me dedico de verdad", fr: "fais dire à ma page ce que je fais vraiment", de: "lass meine Seite sagen, was ich wirklich mache", pt: "faz a minha página dizer o que eu realmente faço", it: "fai dire alla mia pagina cosa faccio davvero", ja: "自分が本当にしていることをページに書いて", zh: "让我的主页写清楚我到底做什么", hi: "मेरे पेज पर वही लिखो जो मैं सच में करता हूँ", ar: "اجعل صفحتي تقول ما أفعله فعلًا",
+  },
+  "agent.widgets.title": {
+    en: "The tools it writes", es: "Las herramientas que escribe", fr: "Les outils qu'il écrit", de: "Die Werkzeuge, die es schreibt", pt: "As ferramentas que escreve", it: "Gli strumenti che scrive", ja: "書いた道具", zh: "它写出来的工具", hi: "जो औज़ार यह लिखता है", ar: "الأدوات التي يكتبها",
+  },
+  "agent.widgets.sub": {
+    en: "It can write one from here. Running it, and editing it by hand, live in the Studio.", es: "Puede escribir una desde aquí. Ejecutarla y editarla a mano se hace en el Estudio.", fr: "Il peut en écrire un d'ici. L'exécuter et le modifier à la main, c'est dans le Studio.", de: "Es kann eines von hier aus schreiben. Ausführen und von Hand ändern passiert im Studio.", pt: "Pode escrever uma daqui. Executá-la e editá-la à mão é no Estúdio.", it: "Può scriverne uno da qui. Eseguirlo e modificarlo a mano si fa nello Studio.", ja: "ここから書けます。動かすことと手で直すことは Studio の側です。", zh: "它可以在这里写一个。运行和手改在 Studio 那边。", hi: "यह यहीं से एक लिख सकता है। चलाना और हाथ से बदलना Studio में होता है।", ar: "يمكنه كتابة واحدة من هنا. أما تشغيلها وتحريرها يدويًا فمكانهما الاستوديو.",
+  },
+  "agent.widgets.go": {
+    en: "Open the Studio", es: "Abrir el Estudio", fr: "Ouvrir le Studio", de: "Studio öffnen", pt: "Abrir o Estúdio", it: "Apri lo Studio", ja: "Studio を開く", zh: "打开 Studio", hi: "Studio खोलें", ar: "افتح الاستوديو",
+  },
   "nav.studio": {
     en: "Widgets", es: "Widgets", fr: "Widgets", de: "Widgets", pt: "Widgets", it: "Widget", ja: "ウィジェット", zh: "小工具", hi: "विजेट", ar: "الأدوات",
   },
