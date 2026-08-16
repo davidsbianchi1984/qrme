@@ -79,10 +79,6 @@ nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
 .nav-art { width: auto; }
 .nav-art img { height: 26px; width: auto; display: block; border-radius: 5px; }
 
-/* The same mark on the screen itself, where it has room to be the artwork. */
-.agent-mark { width: 100%; max-width: 420px; border-radius: 14px;
-  display: block; margin-bottom: 12px; }
-
 .signout { background: rgba(255,255,255,0.05); color: var(--t2); border: 1px solid var(--line); border-radius: 10px; padding: 9px; font-size: 12px; }
 
 /* min-height/min-width zero: a grid item refuses to shrink below its
@@ -156,6 +152,61 @@ button.linkish { background: none; border: 0; color: var(--brand); font-weight: 
    is the one response this card must not train. */
 .asks { border: 1px solid var(--amber); border-radius: 12px; padding: 14px; }
 .asks p { margin: 0 0 10px; }
+
+/* The Agent screen is a composer, not a page of cards.
+   The conversation fills what is there, the rail and the bar sit under it,
+   and the box is on the first screen without scrolling to it — which is the
+   whole difference between a front door and one more tile. */
+.agentscreen { display: flex; flex-direction: column; height: 100%;
+               min-height: 0; gap: 10px; }
+.agent-body { flex: 1; min-height: 0; overflow-y: auto; display: flex;
+              flex-direction: column; gap: 10px; }
+.agent-pitch { margin: auto 0; }
+.agent-said { margin: 0; }
+.agent-heard { margin: 0; }
+
+/* Openings and rail both scroll sideways rather than wrapping into rows of
+   chips that push the composer off a phone. */
+.agent-openers { display: flex; flex-direction: column; gap: 6px; }
+.agent-opener { background: transparent; border: 0; color: var(--t2);
+                text-align: left; padding: 8px 4px; font-size: 13px;
+                cursor: pointer; }
+.agent-opener:hover { color: var(--txt); }
+.agent-rail { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto;
+              scroll-snap-type: x proximity; scrollbar-width: none;
+              padding-bottom: 2px; }
+.agent-rail::-webkit-scrollbar { display: none; }
+.agent-chip { flex: 0 0 auto; scroll-snap-align: start;
+              background: rgba(255,255,255,0.06); border: 0; border-radius: 999px;
+              color: var(--txt); padding: 8px 14px; font-size: 13px;
+              white-space: nowrap; cursor: pointer; }
+.agent-chip:hover { background: rgba(255,255,255,0.10); }
+
+.agent-bar { position: relative; }
+.agent-pill { display: flex; align-items: center; gap: 8px;
+              background: rgba(255,255,255,0.06); border-radius: 999px;
+              padding: 6px 6px 6px 10px; }
+.agent-pill input { margin: 0; border: 0; background: transparent;
+                    flex: 1; color: var(--txt); font-size: 14px; }
+.agent-pill input:focus { outline: none; }
+.agent-plusbtn, .agent-forget, .agent-mic, .agent-voice { flex: 0 0 auto;
+              background: rgba(255,255,255,0.06); border: 0; border-radius: 999px;
+              color: var(--txt); width: 34px; height: 34px; font-size: 17px;
+              cursor: pointer; }
+.agent-send { flex: 0 0 auto;
+              background: linear-gradient(90deg, var(--brand), var(--brand2));
+              color: #fff; border: 0; border-radius: 999px; padding: 9px 16px;
+              font-size: 13px; font-weight: 700; cursor: pointer; }
+.agent-send:disabled { opacity: 0.4; }
+.agent-plus { position: absolute; bottom: calc(100% + 8px); left: 0;
+              min-width: 200px; background: var(--scrBot, #131a2b);
+              border: 1px solid var(--line, rgba(255,255,255,0.12));
+              border-radius: 14px; padding: 6px; display: flex;
+              flex-direction: column; z-index: 5; }
+.agent-plus button { background: transparent; color: var(--txt); border: 0;
+              text-align: left; padding: 11px 12px; border-radius: 10px;
+              font-size: 14px; cursor: pointer; }
+.agent-plus button:hover { background: rgba(255,255,255,0.07); }
 
 .actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
 button.primary {

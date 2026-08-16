@@ -282,7 +282,7 @@ export function App() {
         {tab === "relationships" && <Relationships onPlans={toPlans} />}
         {tab === "memory" && <Memory onPlans={toPlans} />}
         {tab === "agent" && <Agent onPlans={toPlans}
-                                  onStudio={() => setTab("studio")} />}
+                                  go={(id) => setTab(id as Tab)} />}
         {tab === "studio" && <Studio onPlans={toPlans} />}
         {tab === "delegate" && <Delegate onPlans={toPlans} />}
         {tab === "desk" && <Desk onPlans={toPlans} />}

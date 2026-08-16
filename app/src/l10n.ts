@@ -142,6 +142,20 @@ const CHROME: Table = {
   "agent.asks.no": {
     en: "No", es: "No", fr: "Non", de: "Nein", pt: "Não", it: "No", ja: "いいえ", zh: "不", hi: "नहीं", ar: "لا",
   },
+  // Three openings for the Agent's empty screen. They fill the box rather
+  // than sending it, so what the agent does stays something a person presses.
+  "agent.try.page": {
+    en: "Make my page say what I actually do", es: "Haz que mi página diga lo que realmente hago", fr: "Fais que ma page dise ce que je fais vraiment", de: "Lass meine Seite sagen, was ich wirklich mache", pt: "Faz a minha página dizer o que eu realmente faço", it: "Fai dire alla mia pagina quello che faccio davvero", ja: "自分のページに、実際にしていることを書かせて", zh: "让我的主页写出我真正在做的事", hi: "मेरे पेज पर वही लिखवाइए जो मैं सचमुच करता हूँ", ar: "اجعل صفحتي تقول ما أفعله فعلًا",
+  },
+  "agent.try.widget": {
+    en: "Write me a small tool", es: "Escríbeme una herramienta pequeña", fr: "Écris-moi un petit outil", de: "Schreib mir ein kleines Werkzeug", pt: "Escreve-me uma ferramenta pequena", it: "Scrivimi un piccolo strumento", ja: "小さな道具をひとつ書いて", zh: "给我写一个小工具", hi: "मेरे लिए एक छोटा औज़ार लिखिए", ar: "اكتب لي أداة صغيرة",
+  },
+  "agent.try.post": {
+    en: "Put something on my wall", es: "Publica algo en mi muro", fr: "Publie quelque chose sur mon mur", de: "Stell etwas an meine Wand", pt: "Publica algo no meu mural", it: "Pubblica qualcosa sulla mia bacheca", ja: "ウォールに何か投稿して", zh: "在我的墙上发点什么", hi: "मेरी दीवार पर कुछ डालिए", ar: "انشر شيئًا على حائطي",
+  },
+  "agent.plus": {
+    en: "Attach or connect", es: "Adjuntar o conectar", fr: "Joindre ou connecter", de: "Anhängen oder verbinden", pt: "Anexar ou ligar", it: "Allega o collega", ja: "添付・接続", zh: "附加或连接", hi: "जोड़ें या कनेक्ट करें", ar: "إرفاق أو ربط",
+  },
   "agent.ask.title": {
     en: "Ask for it in words", es: "Pídelo con palabras", fr: "Demandez-le avec des mots", de: "Sagen Sie es einfach", pt: "Peça por palavras", it: "Chiedilo a parole", ja: "言葉で頼む", zh: "用一句话说出来", hi: "शब्दों में कहिए", ar: "اطلبه بالكلمات",
   },
@@ -150,15 +164,6 @@ const CHROME: Table = {
   },
   "agent.ask.ph": {
     en: "make my page say what I actually do", es: "haz que mi página diga a qué me dedico de verdad", fr: "fais dire à ma page ce que je fais vraiment", de: "lass meine Seite sagen, was ich wirklich mache", pt: "faz a minha página dizer o que eu realmente faço", it: "fai dire alla mia pagina cosa faccio davvero", ja: "自分が本当にしていることをページに書いて", zh: "让我的主页写清楚我到底做什么", hi: "मेरे पेज पर वही लिखो जो मैं सच में करता हूँ", ar: "اجعل صفحتي تقول ما أفعله فعلًا",
-  },
-  "agent.widgets.title": {
-    en: "The tools it writes", es: "Las herramientas que escribe", fr: "Les outils qu'il écrit", de: "Die Werkzeuge, die es schreibt", pt: "As ferramentas que escreve", it: "Gli strumenti che scrive", ja: "書いた道具", zh: "它写出来的工具", hi: "जो औज़ार यह लिखता है", ar: "الأدوات التي يكتبها",
-  },
-  "agent.widgets.sub": {
-    en: "It can write one from here. Running it, and editing it by hand, live in the Studio.", es: "Puede escribir una desde aquí. Ejecutarla y editarla a mano se hace en el Estudio.", fr: "Il peut en écrire un d'ici. L'exécuter et le modifier à la main, c'est dans le Studio.", de: "Es kann eines von hier aus schreiben. Ausführen und von Hand ändern passiert im Studio.", pt: "Pode escrever uma daqui. Executá-la e editá-la à mão é no Estúdio.", it: "Può scriverne uno da qui. Eseguirlo e modificarlo a mano si fa nello Studio.", ja: "ここから書けます。動かすことと手で直すことは Studio の側です。", zh: "它可以在这里写一个。运行和手改在 Studio 那边。", hi: "यह यहीं से एक लिख सकता है। चलाना और हाथ से बदलना Studio में होता है।", ar: "يمكنه كتابة واحدة من هنا. أما تشغيلها وتحريرها يدويًا فمكانهما الاستوديو.",
-  },
-  "agent.widgets.go": {
-    en: "Open the Studio", es: "Abrir el Estudio", fr: "Ouvrir le Studio", de: "Studio öffnen", pt: "Abrir o Estúdio", it: "Apri lo Studio", ja: "Studio を開く", zh: "打开 Studio", hi: "Studio खोलें", ar: "افتح الاستوديو",
   },
   "nav.studio": {
     en: "Widgets", es: "Widgets", fr: "Widgets", de: "Widgets", pt: "Widgets", it: "Widget", ja: "ウィジェット", zh: "小工具", hi: "विजेट", ar: "الأدوات",
