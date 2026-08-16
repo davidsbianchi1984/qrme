@@ -1804,8 +1804,8 @@ private fun AppsPanel(vm: StudioViewModel) {
                         Text(entry.label, color = Qrme.Txt, fontSize = 14.sp)
                         Text(entry.provider, color = Qrme.T3, fontSize = 11.sp)
                     }
-                    if (entry.needs != "nothing") {
-                        Text(if (entry.needs == "key") "\uD83D\uDD11" else "\uD83D\uDD12",
+                    if (entry.needsFirst != "nothing") {
+                        Text(if (entry.needsFirst == "key") "\uD83D\uDD11" else "\uD83D\uDD12",
                             fontSize = 12.sp)
                     }
                     TextButton(onClick = {
@@ -1833,7 +1833,7 @@ private fun AppsPanel(vm: StudioViewModel) {
                     Text(L10n.t("nmg.revoked", vm.language), color = Qrme.Red, fontSize = 12.sp)
                 } else {
                     Text(if (c.authorized) L10n.t("ncon.on", vm.language)
-                         else L10n.t("ncon.needs.${c.needs}", vm.language),
+                         else L10n.t("ncon.needs.${c.needsFirst}", vm.language),
                         color = if (c.authorized) Qrme.Green else Qrme.T3, fontSize = 12.sp)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         SmallAction(L10n.t("ncon.collect", vm.language)) {
@@ -1851,7 +1851,7 @@ private fun AppsPanel(vm: StudioViewModel) {
                                 }
                             }
                         }
-                        if (!c.authorized && c.needs != "nothing") {
+                        if (!c.authorized && c.needsFirst != "nothing") {
                             SmallAction(L10n.t("ncon.signin", vm.language)) {
                                 signing = c.id; secret = ""
                             }

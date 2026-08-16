@@ -1080,6 +1080,17 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'there is nowhere here to keep that credential sealed, so it will not be kept at all — this needs a plan with a vault behind it, on a deployment that has one': {
+        'es': 'aquí no hay dónde guardar esa credencial sellada, así que no se guardará en absoluto: hace falta un plan con bóveda detrás, en una instalación que tenga una',
+        'fr': "il n'y a ici nulle part où garder cette information scellée, elle ne sera donc pas gardée du tout — il faut un forfait avec un coffre derrière, sur un déploiement qui en possède un",
+        'de': 'hier gibt es keinen Ort, um diese Zugangsdaten versiegelt aufzubewahren, also werden sie gar nicht aufbewahrt — dafür braucht es einen Tarif mit Tresor, auf einer Installation, die einen hat',
+        'pt': 'não há aqui onde guardar essa credencial selada, por isso não será guardada de todo — isto precisa de um plano com cofre por trás, numa instalação que tenha um',
+        'it': "qui non c'è nessun posto dove tenere sigillata quella credenziale, quindi non verrà tenuta affatto: serve un piano con una cassaforte dietro, su un'installazione che ne abbia una",
+        'ja': 'その資格情報を封印して置いておける場所がここにはないので、まったく保管しません。金庫のあるプランと、金庫を備えた環境が必要です。',
+        'zh': '这里没有地方能把那份凭据封存起来，所以根本不会保存它——这需要一个背后有保险库的套餐，且部署本身也要有保险库。',
+        'hi': 'उस क्रेडेंशियल को सील करके रखने की जगह यहाँ नहीं है, इसलिए इसे रखा ही नहीं जाएगा — इसके लिए तिजोरी वाला प्लान चाहिए, और ऐसी तैनाती जिसमें तिजोरी हो।',
+        'ar': 'لا يوجد هنا مكان لحفظ تلك البيانات مختومة، لذا لن تُحفظ إطلاقًا — يحتاج هذا إلى خطة وراءها خزنة، على نشر يملك واحدة.',
+    },
     'a link starts with http:// or https://': {
         'es': 'un enlace empieza por http:// o https://',
         'fr': "un lien commence par http:// ou https://",
@@ -3608,6 +3619,11 @@ _WHERE_MARKERS = ("body", "query", "path", "header", "cookie")
 #: A field with no row keeps its identifier, exactly as before, and is recorded
 #: in `tests/field_labels_unmapped.txt`.
 _FIELD_LABELS: dict[str, dict[str, str]] = {
+    # The plug-in storefront's sign-in box. Both are worded as the shop
+    # asks them, because a refusal that names `secret` reads as an
+    # error about the API rather than about the field somebody typed.
+    'secret': {'en': 'The key or password it needs', 'es': 'La clave o contraseña que necesita', 'fr': 'La clé ou le mot de passe requis', 'de': 'Der Schlüssel oder das Passwort, das es braucht', 'pt': 'A chave ou palavra-passe de que precisa', 'it': 'La chiave o password che serve', 'ja': '必要な鍵またはパスワード', 'zh': '它需要的密钥或密码', 'hi': 'जो कुंजी या पासवर्ड चाहिए', 'ar': 'المفتاح أو كلمة المرور المطلوبة'},
+    'account': {'en': 'Which account there', 'es': 'Qué cuenta allí', 'fr': 'Quel compte là-bas', 'de': 'Welches Konto dort', 'pt': 'Que conta lá', 'it': 'Quale account là', 'ja': '先方のどのアカウントか', 'zh': '那边的哪个账号', 'hi': 'वहाँ कौन-सा खाता', 'ar': 'أي حساب هناك'},
     # The accessibility report's three questions, worded as the form asks
     # them — a refusal that names one of these should read like the form.
     'doing': {'en': 'What were you trying to do?', 'es': '¿Qué intentabas hacer?', 'fr': 'Qu’essayiez-vous de faire ?', 'de': 'Was hast du versucht zu tun?', 'pt': 'O que você estava tentando fazer?', 'it': 'Cosa stavi cercando di fare?', 'ja': '何をしようとしていましたか？', 'zh': '你当时想做什么？', 'hi': 'आप क्या करने की कोशिश कर रहे थे?', 'ar': 'ما الذي كنت تحاول فعله؟'},

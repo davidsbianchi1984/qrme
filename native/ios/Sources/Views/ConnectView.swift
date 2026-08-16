@@ -213,8 +213,8 @@ private struct AppsSection: View {
                         HStack {
                             Text(entry.label).font(.subheadline).foregroundStyle(Theme.txt)
                             Text(entry.provider).font(.caption).foregroundStyle(Theme.t3)
-                            if entry.needs != "nothing" {
-                                Text(entry.needs == "key" ? "🔑" : "🔒").font(.caption)
+                            if entry.needs_first != "nothing" {
+                                Text(entry.needs_first == "key" ? "🔑" : "🔒").font(.caption)
                             }
                             Spacer()
                             Button(L10n.t("tab.connect", state.language)) { connect(entry.provider, entry.app) }
@@ -238,7 +238,7 @@ private struct AppsSection: View {
                         } else {
                             Text(c.authorized
                                  ? L10n.t("ncon.on", state.language)
-                                 : L10n.t("ncon.needs.\(c.needs)", state.language))
+                                 : L10n.t("ncon.needs.\(c.needs_first)", state.language))
                                 .font(.caption)
                                 .foregroundStyle(c.authorized ? Theme.green : Theme.t3)
                             HStack(spacing: 8) {
@@ -246,7 +246,7 @@ private struct AppsSection: View {
                                 if let cap = c.capabilities.first {
                                     smallButton("Invoke \(cap)") { invoke(c, cap) }
                                 }
-                                if !c.authorized && c.needs != "nothing" {
+                                if !c.authorized && c.needs_first != "nothing" {
                                     smallButton(L10n.t("ncon.signin", state.language)) {
                                         signing = c.id; secret = ""
                                     }
@@ -272,7 +272,7 @@ private struct AppsSection: View {
         if let cat = try? await ApiClient.shared.appsCatalog() {
             flat = cat.providers.flatMap { p in
                 p.apps.map { (key: "\(p.provider)/\($0.app)", provider: p.provider,
-                              app: $0.app, label: $0.label, needs: $0.needs) }
+                              app: $0.app, label: $0.label, needs: $0.needs_first) }
             }
         }
         conns = (try? await ApiClient.shared.appConnections(id: pid, token: token)) ?? []

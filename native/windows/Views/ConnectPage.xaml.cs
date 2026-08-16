@@ -38,10 +38,10 @@ public sealed partial class ConnectPage : Page
         public string Label { get; init; } = "";
         /// <summary>What this connector must be given before it can reach
         /// the far side: "nothing", "sign-in" or "key".</summary>
-        public string Needs { get; init; } = "";
+        public string NeedsFirst { get; init; } = "";
         public string Key => $"{Provider}|{App}";
         public string ConnectLabel => L10n.T("tab.connect");
-        public string Lock => Needs switch
+        public string Lock => NeedsFirst switch
         {
             "key" => "\U0001F511",
             "nothing" => "",
@@ -56,7 +56,7 @@ public sealed partial class ConnectPage : Page
         public string Provider { get; init; } = "";
         public string Capability { get; init; } = "";
         public bool Active { get; init; }
-        public string Needs { get; init; } = "";
+        public string NeedsFirst { get; init; } = "";
         public bool Authorized { get; init; }
         public Visibility ActiveVisibility =>
             Active ? Visibility.Visible : Visibility.Collapsed;
@@ -68,9 +68,9 @@ public sealed partial class ConnectPage : Page
         /// <summary>The lock, said in full: either it is signed in, or this
         /// is what it is still waiting for.</summary>
         public string Posture => Authorized
-            ? L10n.T("ncon.on") : L10n.T($"ncon.needs.{Needs}");
+            ? L10n.T("ncon.on") : L10n.T($"ncon.needs.{NeedsFirst}");
         public Visibility SignInVisibility =>
-            !Authorized && Needs != "nothing" ? Visibility.Visible : Visibility.Collapsed;
+            !Authorized && NeedsFirst != "nothing" ? Visibility.Visible : Visibility.Collapsed;
         public Visibility InvokeVisibility =>
             Capability.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
@@ -85,6 +85,10 @@ public sealed partial class ConnectPage : Page
     private SocialConn[] _social = Array.Empty<SocialConn>();
     private AppConn[] _appConns = Array.Empty<AppConn>();
     private CatalogVm[] _catalog = Array.Empty<CatalogVm>();
+
+    /// <summary>The search box's own placeholder. Bound rather than set
+    /// in code so the row is asked for where it is shown.</summary>
+    public string AppFindLabel => L10n.T("ncon.apps.find");
 
     public ConnectPage()
     {
@@ -230,7 +234,7 @@ public sealed partial class ConnectPage : Page
                     Provider = p.Provider,
                     App = a.App,
                     Label = a.Label,
-                    Needs = a.Needs,
+                    NeedsFirst = a.NeedsFirst,
                 }))
                 .ToArray();
             ShowCatalog();
@@ -242,7 +246,7 @@ public sealed partial class ConnectPage : Page
                 Provider = c.Provider,
                 Capability = c.Capabilities.FirstOrDefault() ?? "",
                 Active = c.Status != "revoked",
-                Needs = c.Needs,
+                NeedsFirst = c.NeedsFirst,
                 Authorized = c.Authorized,
             }).ToList();
         }

@@ -1015,8 +1015,11 @@ const CHROME: Table = {
   "plugins.signin.sub": {
     en: "This goes straight into the vault. Nothing here reads it back.", es: "Esto va directo a la bóveda. Aquí nada vuelve a leerlo.", fr: "Cela va droit au coffre. Rien ici ne le relit.", de: "Das geht direkt in den Tresor. Hier liest es nichts wieder aus.", pt: "Isto vai direto para o cofre. Nada aqui volta a lê-lo.", it: "Va dritto nella cassaforte. Qui nulla lo rilegge.", ja: "これは金庫へ直行します。ここから読み戻すものはありません。", zh: "它直接进保险库。这里没有任何东西会再读它。", hi: "यह सीधे तिजोरी में जाता है। यहाँ कुछ भी इसे वापस नहीं पढ़ता।", ar: "يذهب مباشرة إلى الخزنة. لا شيء هنا يقرأه مجددًا.",
   },
+  // "Keep it" already has a wording in this estate — `nsig.keep` on the
+  // phones, where it is the same press about a signing credential. A second
+  // translation of one English sentence is two words for one thing.
   "plugins.signin.go": {
-    en: "Keep it", es: "Guardarlo", fr: "Le garder", de: "Behalten", pt: "Guardar", it: "Conservalo", ja: "保管する", zh: "保存", hi: "रख लें", ar: "احفظه",
+    en: "Keep it", es: "Conservarla", fr: "La conserver", de: "Behalten", pt: "Manter", it: "Tienila", ja: "残す", zh: "保留", hi: "रहने दें", ar: "أبقِها",
   },
   "plugins.secret": {
     en: "The key or password it needs", es: "La clave o contraseña que necesita", fr: "La clé ou le mot de passe requis", de: "Der Schlüssel oder das Passwort, das es braucht", pt: "A chave ou palavra-passe de que precisa", it: "La chiave o password che serve", ja: "必要な鍵またはパスワード", zh: "它需要的密钥或密码", hi: "जो कुंजी या पासवर्ड चाहिए", ar: "المفتاح أو كلمة المرور المطلوبة",

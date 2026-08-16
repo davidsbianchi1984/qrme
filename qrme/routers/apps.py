@@ -77,7 +77,7 @@ def _out(row: dict) -> dict:
         "status": row["status"],
         "collected": row["collected"],
         "actions": row["actions"],
-        "needs": catalog.needs(row["provider"], row["app"]),
+        "needs_first": catalog.needs(row["provider"], row["app"]),
         "authorized": bool(row["authorized_at"]),
     }
 
@@ -109,7 +109,7 @@ def connect_app(profile_id: str, body: AppConnect, request: Request) -> dict:
     # A connector that needs nothing is able to reach the far side the moment
     # it exists, so it is authorized here rather than making somebody press a
     # second button that asks for a credential it will never use.
-    authorized = now if entry["needs"] == "nothing" else None
+    authorized = now if entry["needs_first"] == "nothing" else None
     conn.execute(
         "INSERT INTO app_connectors (id, profile_id, provider, app, label,"
         " capabilities, directions, status, collected, actions,"

@@ -402,7 +402,7 @@ public record CatalogApp(
     [property: JsonPropertyName("app")] string App,
     [property: JsonPropertyName("label")] string Label,
     [property: JsonPropertyName("capabilities")] string[] Capabilities,
-    [property: JsonPropertyName("needs")] string Needs);
+    [property: JsonPropertyName("needs_first")] string NeedsFirst);
 
 public record CatalogProvider(
     [property: JsonPropertyName("provider")] string Provider,
@@ -419,7 +419,7 @@ public record AppConn(
     [property: JsonPropertyName("label")] string Label,
     [property: JsonPropertyName("capabilities")] string[] Capabilities,
     [property: JsonPropertyName("status")] string? Status,
-    [property: JsonPropertyName("needs")] string Needs,
+    [property: JsonPropertyName("needs_first")] string NeedsFirst,
     // Whether the credential Needs names has been given. An unauthorized
     // connector is installed and inert: Invoke refuses it by name rather
     // than answering "performed" having reached nothing.

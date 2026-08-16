@@ -108,10 +108,10 @@ data class SocialConn(val id: String, val platform: String, val direction: Strin
 /** `needs` is the storefront lock: `nothing`, `sign-in` or `key` — what this
  *  connector must be given before it can reach the far side. */
 data class CatalogApp(val provider: String, val app: String, val label: String,
-                      val needs: String)
+                      val needsFirst: String)
 data class AppConn(val id: String, val provider: String, val app: String, val label: String,
                    val capabilities: List<String>, val status: String?,
-                   val needs: String, val authorized: Boolean)
+                   val needsFirst: String, val authorized: Boolean)
 data class InvokeResult(val capability: String, val status: String, val result: String)
 data class ConnJoin(val status: String, val connectionId: String?, val matchedWith: String?)
 data class ConnMsg(val id: String, val from: String, val content: String, val status: String?)
@@ -1481,7 +1481,7 @@ object ApiClient {
             for (j in 0 until apps.length()) {
                 val a = apps.getJSONObject(j)
                 out += CatalogApp(p.getString("provider"), a.getString("app"),
-                    a.getString("label"), a.optString("needs", "sign-in"))
+                    a.getString("label"), a.optString("needs_first", "sign-in"))
             }
         }
         return out
@@ -1494,7 +1494,7 @@ object ApiClient {
             o.optString("label", ""),
             (0 until (caps?.length() ?: 0)).map { caps!!.getString(it) },
             o.optString("status", null),
-            o.optString("needs", "sign-in"), o.optBoolean("authorized", false))
+            o.optString("needs_first", "sign-in"), o.optBoolean("authorized", false))
     }
 
     suspend fun appConnections(id: String, token: String): List<AppConn> {

@@ -91,7 +91,8 @@
                                  Take(12) against a catalogue of a hundred and
                                  three — a shop showing a twelfth of its
                                  shelves with no way to ask for the rest. -->
-                            <TextBox x:Name="AppFind" TextChanged="OnAppFind" />
+                            <TextBox x:Name="AppFind" TextChanged="OnAppFind"
+                                     PlaceholderText="{x:Bind AppFindLabel}" />
                             <ItemsControl x:Name="CatalogList">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>

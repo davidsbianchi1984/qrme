@@ -2072,7 +2072,7 @@ export type RobotCatalogue = {
 export type ConnectorCatalogue = {
   providers: { provider: string; label: string;
                apps: { app: string; label: string; capabilities: string[];
-                       directions: string[]; needs: string }[] }[];
+                       directions: string[]; needs_first: string }[] }[];
   app_count: number; provider_count: number;
 };
 
@@ -3030,7 +3030,7 @@ export type AppConnector = {
   id: string; profile_id: string; provider: string; app: string;
   label: string; capabilities: string[]; directions: string[];
   status: string; collected: number; actions: number;
-  needs: string; authorized: boolean;
+  needs_first: string; authorized: boolean;
 };
 
 export type ExcursionLearned = {

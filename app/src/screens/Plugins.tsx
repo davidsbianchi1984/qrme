@@ -18,8 +18,8 @@ import { useSession } from "../store";
  *
  * ## The lock is a posture, not a picture
  *
- * Every row carries `needs` from `qrme/catalog.py` — `nothing`, `sign-in` or
- * `key` — and the row draws a plus or a lock from it. The lock is not
+ * Every row carries `needs_first` from `qrme/catalog.py` — `nothing`,
+ * `sign-in` or `key` — and the row draws a plus or a lock from it. Not
  * decoration: an installed connector that has not been given its credential
  * is refused by `invoke` with a sentence naming what is missing. Before this
  * round that call answered *performed* for every row on the board, having
@@ -231,7 +231,7 @@ export function Plugins({ onPlans }: { onPlans: () => void }) {
   }
 
   const ready = (board?.providers ?? []).flatMap((p) =>
-    p.apps.filter((a) => a.needs === "nothing")
+    p.apps.filter((a) => a.needs_first === "nothing")
       .map((a) => ({ provider: p.provider, ...a })));
 
   return (
@@ -274,10 +274,10 @@ export function Plugins({ onPlans }: { onPlans: () => void }) {
                   <strong>{c.label}</strong>
                   <span className="muted small">
                     {c.authorized ? L("plugins.on")
-                                  : L(`plugins.needs.${c.needs}`)}
+                                  : L(`plugins.needs.${c.needs_first}`)}
                   </span>
                 </span>
-                {!c.authorized && c.needs !== "nothing" && (
+                {!c.authorized && c.needs_first !== "nothing" && (
                   <button disabled={busy === c.id}
                           onClick={() => { setSigning(c.id); setSecret(""); }}>
                     {L("plugins.signin")}
@@ -375,7 +375,7 @@ export function Plugins({ onPlans }: { onPlans: () => void }) {
           <ul className="plug-list">
             {ready.filter((a) => matches(a.label, a.app, a.capabilities))
               .map((a) => row(a.provider, a.app, a.label,
-                              a.capabilities, a.needs))}
+                              a.capabilities, a.needs_first))}
           </ul>
         </div>
       )}
@@ -391,7 +391,7 @@ export function Plugins({ onPlans }: { onPlans: () => void }) {
             </strong>
             <ul className="plug-list">
               {rows.map((a) => row(p.provider, a.app, a.label,
-                                   a.capabilities, a.needs))}
+                                   a.capabilities, a.needs_first))}
             </ul>
           </div>
         );

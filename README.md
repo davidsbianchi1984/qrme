@@ -641,7 +641,6 @@ is exactly how the old card came to be showing yours in place of theirs.
   </tr>
   <tr>
     <td align="center" width="25%"><a href="docs/screens/201-plug-ins.svg"><img src="docs/screens/201-plug-ins.svg" width="210" alt="Plug-ins"></a><br><sub><b>201</b> · Plug-ins · what it can reach, and what it needs first</sub></td>
-    <td></td><td></td><td></td>
   </tr>
 </table>
 

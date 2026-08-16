@@ -313,7 +313,7 @@ def needs(provider: str, app: str) -> str:
 
 CONNECTORS = [
     {"provider": p, "app": a, "label": lbl, "capabilities": caps,
-     "directions": dirs, "needs": needs(p, a)}
+     "directions": dirs, "needs_first": needs(p, a)}
     for (p, a, lbl, caps, dirs) in _ROWS
 ]
 
@@ -332,7 +332,8 @@ def catalog() -> dict:
         })
         g["apps"].append({"app": c["app"], "label": c["label"],
                           "capabilities": c["capabilities"],
-                          "directions": c["directions"], "needs": c["needs"]})
+                          "directions": c["directions"],
+                          "needs_first": c["needs_first"]})
     return {"providers": list(groups.values()),
             "app_count": len(CONNECTORS),
             "provider_count": len(groups)}

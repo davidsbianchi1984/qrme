@@ -509,11 +509,14 @@ struct SocialConn: Decodable {
     let published: Int
 }
 
-/// `needs` is the storefront's lock: `nothing`, `sign-in` or `key` — what
-/// this connector must be given before it can reach the far side.
+/// `needs_first` is the storefront's lock: `nothing`, `sign-in` or `key` —
+/// what this connector must be given before it can reach the far side. The
+/// name is not `needs`: voiceprint enrollment already puts a `needs` on the
+/// wire and it is a list of what is still missing, which is a different
+/// thing entirely. One name, one type.
 struct CatalogApp: Decodable {
     let app: String; let label: String; let capabilities: [String]
-    let needs: String
+    let needs_first: String
 }
 struct CatalogProvider: Decodable { let provider: String; let label: String; let apps: [CatalogApp] }
 struct AppsCatalog: Decodable { let providers: [CatalogProvider] }
@@ -525,8 +528,8 @@ struct AppConn: Decodable {
     let label: String
     let capabilities: [String]
     let status: String?
-    let needs: String
-    /// Whether the credential `needs` names has been given. An unauthorized
+    let needs_first: String
+    /// Whether the credential `needs_first` names has been given. An unauthorized
     /// connector is installed and inert — `invoke` refuses it by name rather
     /// than answering *performed* having reached nothing.
     let authorized: Bool
