@@ -1112,10 +1112,15 @@ LESSONS: tuple[dict, ...] = (
               "now, second in the row. Ask it in words. What it did is "
               "listed underneath what it said, because prose is the part "
               "you have to take on trust and the steps are the part you can "
-              "check. Its reach is a written list of eleven tools and the "
-              "screen shows you that list before you ask it for anything — "
-              "an agent whose limits you learn by watching it fail is one "
-              "you end up supervising instead of instructing.",
+              "check. Its reach is a written list of forty-three tools — the "
+              "profile itself, what it knows, what it shows the world, your "
+              "wall, your switches, your work and your numbers — and the "
+              "screen shows you that list before you ask it for anything. An "
+              "agent whose limits you learn by watching it fail is one you "
+              "end up supervising instead of instructing. What is not on the "
+              "list is not an oversight: nothing that spends money, ends a "
+              "profile, claims an identity, settles an objection, or touches "
+              "anybody else's rows.",
          screens=(200,),
          try_it="Open Agent, read what it says it can touch, then ask it "
                 "to make your page say what you actually do."),

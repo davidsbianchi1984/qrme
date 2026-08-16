@@ -217,6 +217,8 @@ STUDIO_REFUSALS: dict[str, str] = {
     "agent.unreadable_call": "the model's answer could not be read as a request",
     "agent.unknown_tool": "the model asked for something it does not have",
     "agent.missing_argument": "the model left out something the step needs",
+    "agent.field_not_yours": "the model tried to change something that step "
+                             "does not reach",
     "agent.tool_failed": "that step did not finish",
     "agent.too_many_steps": "this went on longer than one turn allows — ask "
                             "again for something narrower",
@@ -1196,6 +1198,17 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'zh': '模型索取了它并不具备的东西。',
         'hi': 'मॉडल ने ऐसी चीज़ माँगी जो उसके पास नहीं है।',
         'ar': 'طلب النموذج شيئًا لا يملكه.',
+    },
+    'the model tried to change something that step does not reach': {
+        'es': 'el modelo intentó cambiar algo que ese paso no alcanza',
+        'fr': "le modèle a tenté de modifier quelque chose que cette étape n'atteint pas",
+        'de': 'das Modell wollte etwas ändern, das dieser Schritt nicht erreicht',
+        'pt': 'o modelo tentou alterar algo que esse passo não alcança',
+        'it': 'il modello ha tentato di cambiare qualcosa che quel passo non raggiunge',
+        'ja': 'モデルは、その手順が及ばないものを変更しようとしました。',
+        'zh': '模型试图更改该步骤触及不到的东西。',
+        'hi': 'मॉडल ने ऐसी चीज़ बदलने की कोशिश की जहाँ वह चरण पहुँचता ही नहीं।',
+        'ar': 'حاول النموذج تغيير شيء لا تبلغه تلك الخطوة.',
     },
     'the model left out something the step needs': {
         'es': 'el modelo omitió algo que el paso necesita',

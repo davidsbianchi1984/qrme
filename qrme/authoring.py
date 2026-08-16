@@ -33,11 +33,41 @@ this thing do to my account* has an answer somebody can finish reading.
 
 ## What is deliberately absent
 
-No deletion of the profile, no membership or billing change, no key
-material, no moderation decisions, no messaging anybody else, and nothing
-that touches another person's rows. Those are not oversights and each one
-is refused by absence rather than by a check — the agent cannot call what
-is not in the list.
+The list started at eleven rows — the page, the homepage, the friends list
+and the widgets — and the screen it now sits behind implies a collaborator
+for the whole app. Eleven was not that, and a surface that implies a general
+assistant and then refuses two thirds of what is asked of it teaches people
+to stop asking. So the roster covers the profile itself, what it knows, what
+it shows the world, its wall, its switches, its work and its numbers.
+
+What it still does not cover is the point of the list, and each family is
+held out for a stated reason rather than by having been forgotten:
+
+**Money.** Placements, earnings, payouts, proceeds, licensing, and listing
+this profile for hire. An agent that misreads *put me out there* should not
+be able to commit somebody to a price.
+
+**Ending.** Sunset, succession, the memorial, the export ticket that hands
+the whole profile to somebody else. `successor_owner` is a field on the same
+door as the persona, which is why `edit_persona` names its two fields; see
+`only` below.
+
+**Identity.** Verification, the handle's own deletion, watermarks,
+voiceprints and the avatar. These say *this is really her*, and a thing
+driven by a sentence should not be able to say that.
+
+**Contest.** Moderation queues, objections, attestations. A profile under
+objection is being argued about by two people, and neither of them is this.
+
+**Other people.** Anything under `{interactor_id}` — memory, threads,
+relationships, clinical notes, engagement — plus friends, messages, and
+grants of authority. The agent acts on one person's own rows.
+
+**The physical world.** Robots, wearables, beacons, excursions, the camera
+and the microphone. A misread sentence should not move anything that exists.
+
+Each of these is refused by absence rather than by a check: the agent cannot
+call what is not in the list.
 
 ## What the agent is never told
 
@@ -73,6 +103,15 @@ import httpx
 #: `writes` marks a row that changes something. Those must go through a door
 #: that demands the owner's token; a read need not, because the profile in the
 #: path is bound by `call` and is never the model's to name.
+#:
+#: `only`, where present, is the set of fields that row may set. A door is
+#: sometimes wider than the intent behind reaching for it: `PATCH /profiles/
+#: {id}` is how a person renames their profile and rewrites its persona, and
+#: it is also how they name a successor owner and mark the profile adult. A
+#: row without `only` would hand an agent asked to *make her sound warmer* the
+#: power to decide who inherits her. `call` refuses any argument outside the
+#: set rather than dropping it, because a dropped field means the model
+#: reports a change that did not happen.
 TOOLS: tuple[dict, ...] = (
     {"name": "read_page", "writes": False,
      "route": ("GET", "/profiles/{profile_id}/page"),
@@ -123,6 +162,120 @@ TOOLS: tuple[dict, ...] = (
     {"name": "remove_widget", "writes": True,
      "route": ("DELETE", "/profiles/{profile_id}/widgets/{widget_id}"),
      "says": "remove one of your widgets"},
+
+    # --- who the profile is -------------------------------------------------
+    {"name": "read_profile", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}"),
+     "says": "read this profile — its name, its persona and how it is set up"},
+    {"name": "edit_persona", "writes": True,
+     "route": ("PATCH", "/profiles/{profile_id}"),
+     "only": ("display_name", "persona"),
+     "says": "change the name it goes by and the persona it speaks from"},
+    {"name": "set_handle", "writes": True,
+     "route": ("PUT", "/profiles/{profile_id}/handle"),
+     "says": "claim the @name this profile answers to"},
+    {"name": "read_steering", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/steering"),
+     "says": "read the dials that steer how it answers"},
+    {"name": "set_steering", "writes": True,
+     "route": ("PUT", "/profiles/{profile_id}/steering"),
+     "says": "move the dials that steer how it answers"},
+    {"name": "set_experience", "writes": True,
+     "route": ("PUT", "/profiles/{profile_id}/experience"),
+     "says": "replace the experience this profile claims"},
+    {"name": "read_language", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/language"),
+     "says": "read which language it speaks in"},
+    {"name": "set_language", "writes": True,
+     "route": ("PUT", "/profiles/{profile_id}/language"),
+     "says": "change which language it speaks in, everywhere it appears"},
+
+    # --- what it knows ------------------------------------------------------
+    {"name": "list_sources", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/sources"),
+     "says": "list the source material it answers from"},
+    {"name": "add_source", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/sources"),
+     "says": "add a piece of source material for it to answer from"},
+    {"name": "list_packs", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/packs"),
+     "says": "list the knowledge packs it was seeded with"},
+
+    # --- what it shows the world --------------------------------------------
+    {"name": "read_front", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/front"),
+     "says": "read the front a visitor lands on"},
+    {"name": "list_displays", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/displays"),
+     "says": "list the screens this profile is placed on"},
+    {"name": "read_surfaces", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/surfaces"),
+     "says": "read which surfaces it is allowed to appear on"},
+    {"name": "set_surfaces", "writes": True,
+     "route": ("PUT", "/profiles/{profile_id}/surfaces"),
+     "says": "choose which surfaces it may appear on"},
+
+    # --- its wall -----------------------------------------------------------
+    {"name": "read_wall", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/wall"),
+     "says": "read your wall"},
+    {"name": "post_to_wall", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/wall"),
+     "says": "publish a post to your wall — moderated on the way in, the "
+             "same as one you typed"},
+    {"name": "list_posts", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/posts"),
+     "says": "list what this profile has posted"},
+
+    # --- the switches -------------------------------------------------------
+    {"name": "read_features", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/features"),
+     "says": "read which parts of the app you have turned on"},
+    {"name": "set_feature", "writes": True,
+     "route": ("PUT", "/profiles/{profile_id}/features"),
+     "says": "turn a part of the app on or off for this profile"},
+
+    # --- getting something done ---------------------------------------------
+    {"name": "list_tasks", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/tasks"),
+     "says": "list the jobs this profile has run"},
+    {"name": "run_task", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/tasks"),
+     "says": "run one of the jobs this profile knows how to do"},
+    {"name": "list_workflows", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/workflows"),
+     "says": "list the multi-step pieces of work under way"},
+    {"name": "read_workflow", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/workflows/{workflow_id}"),
+     "says": "read one piece of work and where it has got to"},
+    {"name": "start_workflow", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/workflows"),
+     "says": "start a piece of work with a goal and a plan"},
+    {"name": "advance_workflow", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/workflows/{workflow_id}/advance"),
+     "says": "carry a piece of work on to its next step"},
+    {"name": "cancel_workflow", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/workflows/{workflow_id}/cancel"),
+     "says": "stop a piece of work that is under way"},
+
+    # --- trying it before it is real ----------------------------------------
+    {"name": "simulate", "writes": True,
+     "route": ("POST", "/profiles/{profile_id}/simulate"),
+     "says": "run a scenario and see what this profile would do"},
+    {"name": "list_simulations", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/simulations"),
+     "says": "list the scenarios already run"},
+
+    # --- how it is going ----------------------------------------------------
+    {"name": "read_stats", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/stats"),
+     "says": "read the counts — how much this profile is being talked to"},
+    {"name": "read_inbox", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/inbox"),
+     "says": "read what the platform has told you about this profile"},
+    {"name": "list_apps", "writes": False,
+     "route": ("GET", "/profiles/{profile_id}/apps"),
+     "says": "list the outside services this profile is connected to"},
 )
 
 #: Everything the agent is told about where it is running.
@@ -217,7 +370,12 @@ def roster() -> str:
                  if s != "profile_id"]
         needs = f"  (needs {', '.join(slots)})" if slots else ""
         mark = "changes something" if tool["writes"] else "reads only"
-        lines.append(f"  {tool['name']} — {tool['says']} [{mark}]{needs}")
+        # A narrowed row says which fields it takes. Without this the model
+        # reaches for the door's full shape, is refused, and learns nothing it
+        # can act on — the roster is the only place it can be told first.
+        limit = (f"  (sets only: {', '.join(tool['only'])})"
+                 if tool.get("only") else "")
+        lines.append(f"  {tool['name']} — {tool['says']} [{mark}]{needs}{limit}")
     return "\n".join(lines)
 
 
@@ -261,6 +419,15 @@ def route_of(name: str) -> tuple[str, str]:
     for tool in TOOLS:
         if tool["name"] == name:
             return tool["route"]
+    raise KeyError(name)
+
+
+def _only(name: str) -> tuple[str, ...] | None:
+    """The fields this row may set, or None where the door's own shape is the
+    whole of the limit."""
+    for tool in TOOLS:
+        if tool["name"] == name:
+            return tool.get("only")
     raise KeyError(name)
 
 
@@ -357,6 +524,16 @@ def call(name: str, arguments: dict, *, app, profile_id: str,
         if not isinstance(value, str) or not value.strip():
             raise AgentError("agent.missing_argument")
         path = path.replace("{%s}" % slot, quote(value, safe=""))
+
+    # A row that names its fields may set those and no others. Refused rather
+    # than filtered: a dropped field is a change the model will report having
+    # made, and *I've marked your profile adult* over a profile that is not is
+    # worse than a step that plainly did not run.
+    only = _only(name)
+    if only is not None:
+        astray = sorted(set(args) - set(only))
+        if astray:
+            raise AgentError("agent.field_not_yours")
 
     headers = {"authorization": authorization} if authorization else {}
     body = None if method in ("GET", "DELETE") else args

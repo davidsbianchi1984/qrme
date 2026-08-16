@@ -18,19 +18,27 @@ import { useSession } from "../store";
  *
  * ## It says what it can touch before it is asked to touch anything
  *
- * `authoring.TOOLS` is a written list — eleven of them today — and the
- * backend renders it into sentences a person can read rather than tool names
- * a developer would. That roster is on this screen and open by default,
- * because an agent whose reach you discover by watching what it does is one
- * you have to supervise instead of instruct.
+ * `authoring.TOOLS` is a written list and the backend renders it into
+ * sentences a person can read rather than tool names a developer would. That
+ * roster is on this screen and open by default, because an agent whose reach
+ * you discover by watching what it does is one you have to supervise instead
+ * of instruct.
  *
- * ## What it cannot do yet, said here rather than discovered
+ * ## The boundary is drawn on the screen, not learned by being refused
  *
- * Eleven tools is your page, your homepage, your friends list and your
- * widgets — not the marketplace, not rooms, not the wall. A screen that
- * implies a general assistant and then refuses two thirds of what is asked
- * of it teaches people to stop asking, so the boundary is drawn on the screen
- * in the roster, in the words the backend itself uses.
+ * The list was eleven rows when this tab shipped — the page, the homepage,
+ * the friends list and the widgets — against a screen implying a
+ * collaborator for the whole app. A surface that implies a general assistant
+ * and then refuses two thirds of what is asked of it teaches people to stop
+ * asking, so the roster now covers the profile itself, what it knows, what
+ * it shows the world, the wall, the switches, the work and the numbers.
+ *
+ * What is still out is out for a reason `qrme/authoring.py` states in full:
+ * nothing that spends money, ends a profile, claims an identity, settles an
+ * objection, moves something in the physical world, or reaches another
+ * person's rows. The count is not written here — the screen renders the
+ * live list, so a row added in the backend appears without anybody
+ * remembering to edit this paragraph.
  */
 export function Agent({ onPlans, onStudio }: {
   onPlans: () => void;
