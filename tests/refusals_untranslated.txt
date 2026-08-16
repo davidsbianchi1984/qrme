@@ -1,4 +1,4 @@
-# status: floor — 1 row
+# status: backlog — 166 rows
 #
 # English refusals — the sentences this product says when it says no.
 # Checked by test_the_platform_refuses_in_one_language.py, both directions,
@@ -87,5 +87,187 @@
 # name of an environment variable, and no reader of a translated version could
 # do anything a reader of this one could not.
 #
-# ceiling: 1
+# ceiling: 166
+# ## 0.80.0: the sentences behind `str(exc)`
+#
+# This file said "floor — 1 row" while the guard that filled it walked
+# `HTTPException` call sites and stopped there. A hundred and five of those
+# sites forward a domain exception — `except DisplayError as exc: raise
+# HTTPException(409, str(exc))` — and the sentence a person reads is at the
+# `raise DisplayError("…")` in a module the guard never opened.
+#
+#     asked     what does this route pass to HTTPException
+#     mattered  where does the sentence it passes come from
+#
+# 165 rows below are what following those forwards found. They are not new
+# English; they are English this file has been unable to see for as long as
+# it has existed, and the honest thing is the number rather than the floor it
+# was resting on. `tr_refusal` treats them identically to a directly-raised
+# literal: it looks the sentence up, misses, and serves English.
+#
+CloudModelClient needs base_url or a client
+PDIClient needs base_url or an injected client
+a beacon needs a label so its owner can tell their codes apart once several are printed and stuck to different doors
+a beacon needs the whole surface — a QR on a strip is too small for a phone to read, and an unscannable code looks broken rather than missing
+a campaign needs a goal above zero
+a comment needs something in it
+a delegation policy needs at least one phase
+a desk claims a real person staffs it, so it cannot be opened without recording who attests that and on what basis
+a desk needs a name a visitor can read
+a device name is at most 60 characters
+a device needs a name you will recognise
+a donation needs an amount above zero
+a fee cannot be negative
+a free follow has nothing to renew
+a grant needs two people
+a link label is at most 60 characters
+a link needs a label and a url
+a live view of somebody's body goes to a person, not to a synthetic profile. A profile watching a body in real time would be making judgements about it with no examination, no accountability and nobody to answer for being wrong — and unlike a still, there is no moment somebody chose to send. Invite a real person to this session, or use a still and send it to a clinician.
+a mail server host is required
+a note needs something in it
+a paid subscription has to credit someone: no beneficiary means the money would accrue to nobody
+a paid subscription needs a price above zero — a free one is the 'follow' tier
+a pane with no faces is the helper button on its own — set the state to 'handle' instead
+a place needs a locality — 'somewhere' is what leaving it unset already means
+a position cannot be negative
+a post can only promote its own profile's listing
+a post needs something in it
+a profile cannot be its own friend
+a rated listing cannot carry a location: where a performer physically is has nothing to do with browsing them, and a place filter is a way of asking
+a rated profile can never be blended into a hybrid
+a rated profile cannot staff a department
+a review comes from somebody who actually talked to this profile — there is no interaction on record for you
+a room lends through its own routes — POST /rooms/{id}/mic. Two storage paths for one surface is how a live microphone ends up undisclosed
+a sample needs a positive duration
+a screen showing nothing is a screen turned off
+a session belongs to a place — name it
+a size cannot be negative
+a skill lent in one place cannot be used in another — ask there
+a video link must be http or https
+a video needs a link
+a workflow needs at least one phase
+accent must be a #rrggbb colour
+an 18+ stream can only be opened by the person on it: the attestor must be the owner, attesting for themselves
+an edit needs something in it — retract instead
+an empty image is not a picture
+an exchange needs two parties
+an experience entry needs a title
+an imported image needs the rights to use it. Bring one you hold, generate one, or use your own room
+an invented person cannot hold the badge — there is nobody to verify
+an organization needs a name
+campaign not found or already closed
+choose one — a preset emblem or your own image, not both
+coordination takes at least two departments — add another before asking them to coordinate
+delegating `research` requires a grant: without one the phase reads every source item on the profile
+direction is host_to_guest or guest_to_host
+every item needs a name the other side will read
+every share must be above zero
+give it a name — it is what the other people are shown
+hand over a card: `card` as JSON, or `content` as a base64 PNG with one embedded
+join the party before talking in it
+name at least one loved one or organization
+name what is being connected — a machine, a program, a screen
+no campaigns on a rated profile — tips to a performer go through the age-gated gift, never an open donation page
+no character card is embedded in this image — the PNG has no chara/ccv3 text chunk
+no department has an agent able to contribute — every one of them has departed, been terminated, or is under objection
+no such caller — sessions are with a real interactor, not a free-typed name
+no such campaign
+no such clinician
+no such comment
+no such connection in this session
+no such department in this organization
+no such device
+no such exchange
+no such game session
+no such grant
+no such item on this manifest
+no such message
+no such referral, or it has not been opened yet
+no such request
+no such room
+no such screen
+no such subscription
+no such watch party
+no voice consent on record for this profile
+no voice consent on record for this profile — grant it first (PUT /profiles/{id}/voiceprint/consent)
+no voiceprint for this profile — build one first
+not a PNG — a card image starts with the PNG signature
+not subscribed
+not your comment
+nothing can be accepted until both parties have signed this manifest
+nothing to say
+only a participant can lend a microphone
+only the holder or the viewer can end this
+only the host ends the party
+only the host moves the room's position
+only the person it was offered to can accept it
+only the person it was offered to can decline it
+only the side receiving an item can accept it — the sender cannot accept on their behalf
+only the two parties can reopen this
+only the two parties can sign this
+only the two parties can withdraw this
+only the two people involved can close this
+only your own turn can be edited — a profile's reply is not yours to rewrite
+only your own turn can be retracted
+remote control needs a written scope: what on the machine may be touched, in words the caller will be shown
+reopen the exchange to change the manifest
+say something
+say what is being lent, in words the other reads
+say what the work is, in one sentence
+say what you are trying to find, in your own words
+say where the money goes first — designate loved ones or organizations (PUT /profiles/{id}/proceeds) before asking anyone for it
+scope 'locality' needs a locality
+scope 'locality' needs a locality to be near
+scope 'region' needs a region
+shown_name needs the profile id to build an anonymous name — pass profile_id when the row does not carry one
+that grant belongs to somebody else
+that grant is closed
+that is somebody else's likeness. An anonymous profile wearing another person's face is impersonation with a layer of deniability on top
+that link is not valid
+that message belongs to somebody else
+that message was retracted
+that offer was declined — a fresh one is needed
+that post already has a video
+that post has no video to watch
+that post is not visible, so it cannot be watched together
+that profile is not yours
+that reply link is not valid
+that ring is not this desk's
+that room has closed
+that session has ended
+that signature authorises something else — a referral is released only by the signature raised for it
+that signature does not verify
+the bell was just rung — give them a moment to reach the desk
+the card carries no identity — description, personality and scenario are all empty
+the card names nobody — `data.name` is empty
+the department's agent must be a profile this organization's owner holds
+the founder is a fixed friend on every profile and cannot be removed
+the image carries a card chunk that does not decode as one
+the image could not be read — it is not base64
+the same friend twice is still one friend
+the summary changed after it was signed; sign the new one
+there is nothing on the manifest — an empty agreement agrees to nothing in particular, which is the state people sign by accident
+there is nothing to refer yet — this releases your sessions with the specialist, and there are none
+this campaign has reached today's donation count — the tokenless door is rate-limited so it can never become a ledger-spam hose; give again tomorrow
+this campaign is closed
 this deployment is reachable beyond localhost but has no QRME_ADMIN_TOKEN configured — objection review and succession stay closed until it is
+this desk is closed, so the bell is off — nobody would hear it
+this exchange is finished
+this exchange is not editable — reopen it to change the manifest, which clears both signatures
+this profile depicts a real person, so an experience entry is a claim about them — record the rights basis that covers the persona before adding one
+this profile does not accept delegated workflows
+this profile is already the organization's own — staff it as a department; a lease is for somebody else's specialist
+this profile is not offered for license — a lease is licensed use, and there are no terms to lease under
+this referral has already been released
+this session is closed
+this stream is closed right now
+this subscription is cancelled — resubscribe instead of renewing it
+unknown avatar source — GET /avatars/market lists the import sources this deployment recognises
+unrecognized card: expected spec chara_card_v2 or chara_card_v3
+upload a picture first — 'photo' is a box with a picture in it, and there is none on this room yet
+voiceprint enrollment requires attesting the voice is your own — QRME will not clone a voice on somebody else's behalf
+workflow is not awaiting input
+you already have a hand up on this stream — one at a time, so a host reading the queue sees people rather than repeats
+you are not on this stream
+you have already written back on this referral
+you have no verified profile to move

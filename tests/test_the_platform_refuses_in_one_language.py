@@ -266,6 +266,84 @@ def _refusals(root: Path) -> dict[str, list[tuple[str, str | None]]]:
     return found
 
 
+def _stringified_errors(root: Path) -> set[str]:
+    """Domain exception classes whose message becomes a refusal.
+
+    Derived rather than listed. A handler that does
+    `except displays.DisplayError as exc: raise HTTPException(409, str(exc))`
+    is turning that class's message into the sentence a person reads, and the
+    next module to invent one is covered without anybody remembering to add
+    it here.
+    """
+    out: set[str] = set()
+    for path in sorted(root.rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for handler in [n for n in ast.walk(tree)
+                        if isinstance(n, ast.ExceptHandler)]:
+            stringifies = any(
+                isinstance(call, ast.Call)
+                and (getattr(call.func, "id", "")
+                     or getattr(call.func, "attr", "")) == "HTTPException"
+                and any(isinstance(arg, ast.Call)
+                        and getattr(arg.func, "id", "") == "str"
+                        for arg in list(call.args)
+                        + [kw.value for kw in call.keywords])
+                for call in ast.walk(handler))
+            if not stringifies or handler.type is None:
+                continue
+            caught = (handler.type.elts if isinstance(handler.type, ast.Tuple)
+                      else [handler.type])
+            for node in caught:
+                name = getattr(node, "attr", "") or getattr(node, "id", "")
+                if name:
+                    out.add(name)
+    return out
+
+
+def _domain_sentences(root: Path) -> tuple[set[str], set[str]]:
+    """The English behind `str(exc)`, as (literals, templates).
+
+    `raise DisplayError("a display needs a name")` is the sentence; the route
+    that catches it only forwards. The refusal guard walked `HTTPException`
+    call sites and stopped there, so a hundred and five forwarding sites hid
+    two hundred and sixty-nine sentences nobody was ever asked about.
+
+        asked     what does this route pass to HTTPException
+        mattered  where does the sentence it passes come from
+
+    They land in the same two records as any other refusal, because
+    `tr_refusal` treats them identically at answer time: it looks the
+    sentence up and falls through to English when it is not there.
+    """
+    classes = _stringified_errors(root)
+    literals: set[str] = set()
+    templates: set[str] = set()
+    for path in sorted(root.rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        consts, tables = _module_strings(tree), _module_tables(tree)
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Raise) or not isinstance(node.exc, ast.Call):
+                continue
+            name = (getattr(node.exc.func, "id", "")
+                    or getattr(node.exc.func, "attr", ""))
+            if name not in classes or not node.exc.args:
+                continue
+            arg = node.exc.args[0]
+            if isinstance(arg, ast.Name) and arg.id in consts:
+                literals.add(consts[arg.id])
+                continue
+            if isinstance(arg, ast.Subscript) \
+                    and getattr(arg.value, "id", "") in tables:
+                templates.update(tables[arg.value.id])
+                continue
+            text = _skeleton(arg)
+            if text is None:
+                continue
+            (templates if isinstance(arg, (ast.JoinedStr, ast.BinOp))
+             else literals).add(text)
+    return literals, templates
+
+
 def _details(root: Path) -> tuple[set[str], int]:
     """The literal-and-named sentences, and how many are built by
     interpolation. Kept at this signature because the guard-on-the-guard and
@@ -293,6 +371,9 @@ def test_every_refusal_is_translated_or_written_down():
     """Both directions. A refusal that is neither is a sentence somebody will
     read in a language they did not choose, that nobody decided about."""
     literals, _ = _details(REPO / "qrme")
+    # The sentences behind `str(exc)` too. They reach `tr_refusal` exactly as
+    # a directly-raised literal does, and fall through to English the same way.
+    literals |= _domain_sentences(REPO / "qrme")[0]
     undecided = sorted(literals - _translated() - _recorded())
     stale = sorted(_recorded() - literals)
     problems = []
@@ -360,6 +441,7 @@ def test_every_interpolated_refusal_is_recorded():
     """
     found = _refusals(REPO / "qrme")
     measured = {text for _, text in found["template"] if text}
+    measured |= _domain_sentences(REPO / "qrme")[1]
     recorded = _recorded_templates()
     problems = []
     new = sorted(measured - recorded)
