@@ -1387,6 +1387,83 @@ fun ChatScreen(vm: StudioViewModel) {
     var role by remember { mutableStateOf("") }
     var rehearsal by remember { mutableStateOf<Pair<String, String>?>(null) }
     var rhScenario by remember { mutableStateOf("") }
+    // Bringing somebody real into it. Yours-first for the area asked about;
+    // the briefing is read before anybody is contacted.
+    var realOpen by remember { mutableStateOf(false) }
+    var realArea by remember { mutableStateOf("") }
+    var people by remember { mutableStateOf<List<MyPerson>>(emptyList()) }
+    var matter by remember { mutableStateOf("") }
+    var grantToken by remember { mutableStateOf("") }
+    var brief by remember { mutableStateOf<BriefingPreview?>(null) }
+
+    fun loadMine() {
+        vm.call({ ApiClient.myPeople(vm.interactorId!!, vm.interactorToken!!) }) { r ->
+            people = r.getOrDefault(emptyList())
+        }
+    }
+    fun findPeople() {
+        vm.call({ ApiClient.peopleForArea(vm.interactorId!!, realArea, vm.interactorToken!!) }) { r ->
+            people = r.getOrDefault(emptyList())
+        }
+    }
+
+    @Composable
+    fun bringSomebodyReal() {
+        Text(L10n.t("real.hdr", vm.language), color = Qrme.Txt, fontSize = 16.sp,
+             fontWeight = FontWeight.Bold)
+        Text(L10n.t("real.pitch", vm.language), color = Qrme.T2, fontSize = 12.sp)
+        if (!realOpen) {
+            TextButton(onClick = { realOpen = true; loadMine() }) {
+                Text(L10n.t("real.open", vm.language), color = Qrme.BrandA, fontSize = 13.sp)
+            }
+        } else {
+            labeledField(L10n.t("real.area.ph", vm.language), realArea,
+                         L10n.t("real.area.ph", vm.language)) { realArea = it }
+            TextButton(onClick = { findPeople() }) {
+                Text(L10n.t("real.find", vm.language), color = Qrme.BrandA, fontSize = 13.sp)
+            }
+            people.forEach { p ->
+                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                    Text(p.name, color = Qrme.Txt, fontSize = 13.sp,
+                         fontWeight = FontWeight.Bold)
+                    Text((if (p.yours) L10n.t("real.yours", vm.language)
+                          else L10n.t("real.found", vm.language))
+                         + (if (p.preferred) " · " + L10n.t("real.first", vm.language) else ""),
+                         color = Qrme.T2, fontSize = 12.sp)
+                    if (p.yours) {
+                        if (!p.preferred) TextButton(onClick = {
+                            vm.call({ ApiClient.preferPerson(vm.interactorId!!, p.providerId, vm.interactorToken!!) }) { loadMine() }
+                        }) { Text(L10n.t("real.prefer", vm.language), color = Qrme.BrandA, fontSize = 12.sp) }
+                        TextButton(onClick = {
+                            vm.call({ ApiClient.dropPerson(vm.interactorId!!, p.providerId, vm.interactorToken!!) }) { loadMine() }
+                        }) { Text(L10n.t("real.drop", vm.language), color = Qrme.T2, fontSize = 12.sp) }
+                        TextButton(onClick = {
+                            // Nothing is sent by this — the file is read first.
+                            vm.call({ ApiClient.previewBriefing(vm.interactorId!!, vm.pid!!,
+                                p.providerId, matter, grantToken, vm.interactorToken!!) }) { r ->
+                                brief = r.getOrNull()
+                            }
+                        }) { Text(L10n.fill("real.preview", vm.language, mapOf("name" to p.name)),
+                                  color = Qrme.BrandA, fontSize = 12.sp) }
+                    } else TextButton(onClick = {
+                        vm.call({ ApiClient.keepPerson(vm.interactorId!!, p.providerId, vm.interactorToken!!) }) { findPeople() }
+                    }) { Text(L10n.t("real.keep", vm.language), color = Qrme.BrandA, fontSize = 12.sp) }
+                }
+            }
+            labeledField(L10n.t("real.matter.ph", vm.language), matter,
+                         L10n.t("real.matter.ph", vm.language)) { matter = it }
+            labeledField(L10n.t("real.grant.ph", vm.language), grantToken,
+                         L10n.t("real.grant.ph", vm.language)) { grantToken = it }
+            brief?.let { b ->
+                Text(b.reads, color = Qrme.Txt, fontSize = 12.sp)
+                b.attachments.forEach { a ->
+                    Text("${a.kind} · ${a.title}"
+                         + (if (a.sealed) " · " + L10n.t("real.sealed", vm.language) else ""),
+                         color = Qrme.T2, fontSize = 12.sp)
+                }
+            }
+        }
+    }
 
     fun send() {
         val text = draft
@@ -1456,6 +1533,7 @@ fun ChatScreen(vm: StudioViewModel) {
             Text(L10n.t("tab.chat", vm.language), color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
             Text(L10n.fill("nchat.sub", vm.language, mapOf("name" to vm.displayName)),
                 color = Qrme.T2, fontSize = 13.sp)
+            bringSomebodyReal()
             messages.forEach { m ->
                 Row(Modifier.fillMaxWidth(),
                     horizontalArrangement = if (m.mine) Arrangement.End else Arrangement.Start) {

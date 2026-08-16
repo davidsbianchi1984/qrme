@@ -124,6 +124,15 @@ data class OpenAnswer(val alias: String, val body: String, val pointsTo: String)
 data class Visited(val host: String, val times: Int, val firstSeen: String,
                    val lastSeen: String, val reasons: List<String>,
                    val persistent: Boolean, val stoodDown: Boolean?)
+/** Somebody a person keeps in an area of life. `yours` separates the ones
+ *  they chose from the ones the search found for them. */
+data class MyPerson(val providerId: String, val name: String, val area: String,
+                    val location: String?, val contact: String?,
+                    val yours: Boolean, val preferred: Boolean)
+data class BriefingAttachment(val kind: String, val title: String,
+                              val sealed: Boolean)
+data class BriefingPreview(val matter: String, val reads: String,
+                           val attachments: List<BriefingAttachment>)
 data class SocialConn(val id: String, val platform: String, val direction: String,
                       val handle: String?, val status: String?, val collected: Int,
                       val published: Int)
@@ -968,6 +977,62 @@ object ApiClient {
     suspend fun visitsAcross(key: String): List<Visited> {
         val arr = JSONArray(request("/visits/across", token = key))
         return (0 until arr.length()).map { visitedOf(arr.getJSONObject(it)) }
+    }
+
+    // ---- your own people, and the briefing that arrives before them ----
+
+    private fun personOf(o: JSONObject) = MyPerson(
+        o.getString("provider_id"), o.optString("name", ""),
+        o.optString("area", ""), o.optString("location", null),
+        o.optString("contact", null), o.optBoolean("yours"),
+        o.optBoolean("preferred"))
+
+    suspend fun myPeople(interactor: String, token: String): List<MyPerson> {
+        val arr = JSONArray(request("/interactors/$interactor/people", token = token))
+        return (0 until arr.length()).map { personOf(arr.getJSONObject(it)) }
+    }
+
+    suspend fun peopleForArea(interactor: String, area: String,
+                              token: String): List<MyPerson> {
+        val q = java.net.URLEncoder.encode(area, "UTF-8")
+        val arr = JSONArray(request("/interactors/$interactor/people/for-area?area=$q",
+                                    token = token))
+        return (0 until arr.length()).map { personOf(arr.getJSONObject(it)) }
+    }
+
+    suspend fun keepPerson(interactor: String, providerId: String, token: String) {
+        request("/interactors/$interactor/people", "POST",
+            JSONObject().put("provider_id", providerId), token)
+    }
+
+    suspend fun preferPerson(interactor: String, providerId: String, token: String) {
+        request("/interactors/$interactor/people/$providerId/prefer", "POST", null, token)
+    }
+
+    suspend fun dropPerson(interactor: String, providerId: String, token: String) {
+        request("/interactors/$interactor/people/$providerId", "DELETE", null, token)
+    }
+
+    /** Nothing is sent by this — the whole file, readable before anybody is
+     *  contacted, so declining is still free. */
+    suspend fun previewBriefing(interactor: String, profile: String,
+                                providerId: String, matter: String,
+                                grantToken: String,
+                                token: String): BriefingPreview {
+        val o = JSONObject(request("/briefings/preview", "POST",
+            JSONObject().put("interactor_id", interactor)
+                .put("profile_id", profile).put("provider_id", providerId)
+                .put("matter", matter).put("grant_token", grantToken), token))
+        val pkg = o.getJSONObject("package")
+        val arr = pkg.optJSONArray("attachments")
+        val items = if (arr == null) emptyList() else
+            (0 until arr.length()).map {
+                val a = arr.getJSONObject(it)
+                BriefingAttachment(a.optString("kind", ""),
+                    a.optString("title", ""), a.optBoolean("sealed"))
+            }
+        return BriefingPreview(pkg.optString("matter", ""),
+            o.optString("reads", ""), items)
     }
 
     // ---- Community: stranger connections & multiparty rooms ----

@@ -726,6 +726,22 @@ class ExcursionStart(BaseModel):
     private: list[str] = Field(default_factory=list)  # extra caller-marked private terms
 
 
+class PersonAttach(BaseModel):
+    provider_id: str
+    note: str | None = None
+    # Their area is read off the provider row, never taken from here.
+    preferred: bool = False
+
+
+class BriefingPreview(BaseModel):
+    interactor_id: str
+    profile_id: str
+    provider_id: str
+    matter: str                # what this is about, in the user's own words
+    # The revocable grant that decides what may travel. No grant, no briefing.
+    grant_token: str
+
+
 class StandDown(BaseModel):
     # A whole URL is accepted and reduced to its host, because the thing a
     # person has in their hand is the address they were shown.

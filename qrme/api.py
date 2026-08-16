@@ -41,6 +41,7 @@ from .routers import (accounts as account_routes,
                       identity, inbox as inbox_routes,
                       inquiries as inquiry_routes,
                       intelligence, interaction, licensing, models,
+                      mypeople as mypeople_routes,
                       organizations as organization_routes,
                       overlays as overlay_routes, packs, pages, placemic,
                       problems as problem_routes,
@@ -180,6 +181,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(research.router)
     app.include_router(inquiry_routes.router)
     app.include_router(visit_routes.router)
+    app.include_router(mypeople_routes.router)
     app.include_router(summon.router)
     app.include_router(community.router)
     app.include_router(assistant.router)

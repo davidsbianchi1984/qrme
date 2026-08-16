@@ -2658,6 +2658,35 @@ export type Visited = {
   stood_down?: boolean;      // absent on the deployment-wide view: see below
 };
 
+/** Somebody a person keeps in an area of life — their butcher, their broker,
+ *  their doctor. `yours` separates the ones they chose from the ones the
+ *  search found for them: different claims, and somebody about to send their
+ *  history is entitled to know which they are looking at. */
+export type MyPerson = {
+  provider_id: string;
+  name: string;
+  area: string;
+  location: string | null;
+  contact: string | null;
+  business: boolean;
+  yours: boolean;
+  preferred?: boolean;
+  note?: string | null;
+  in_your_area?: boolean;
+};
+
+/** What a provider would receive, before anybody is contacted. */
+export type Briefing = {
+  package: {
+    user: string; provider: string; area: string; matter: string;
+    specialist: { name: string; synthetic: boolean; note: string };
+    recent_exchange: { role: string; content: string }[];
+    attachments: { kind: string; title: string; excerpt: string;
+                   truncated: boolean; sealed: boolean; filed_at: string }[];
+  };
+  reads: string;
+};
+
 export type PersonGrants = {
   lending?: unknown[];
   borrowing?: unknown[];
@@ -3286,6 +3315,34 @@ export const api = {
   pair: () => req<PairInfo>("/pair"),
 
   offlineStatus: () => req<Record<string, unknown>>("/offline/status"),
+
+  // The people a person keeps, in every area of life. Interactor-scoped, so
+  // these carry that person's own token and never the profile owner's.
+  myPeople: (interactorId: string, token: string, area?: string) =>
+    req<MyPerson[]>(`/interactors/${interactorId}/people`
+      + (area ? `?area=${encodeURIComponent(area)}` : ""), { token }),
+  peopleForArea: (interactorId: string, area: string, token: string,
+                  location?: string) =>
+    req<MyPerson[]>(`/interactors/${interactorId}/people/for-area?area=`
+      + encodeURIComponent(area) + (location ? `&location=${encodeURIComponent(location)}` : ""), { token }),
+  keepPerson: (interactorId: string,
+               body: { provider_id: string; note?: string; preferred?: boolean },
+               token: string) =>
+    req<MyPerson>(`/interactors/${interactorId}/people`,
+      { method: "POST", body, token }),
+  preferPerson: (interactorId: string, providerId: string, token: string) =>
+    req<MyPerson>(`/interactors/${interactorId}/people/${providerId}/prefer`,
+      { method: "POST", token }),
+  dropPerson: (interactorId: string, providerId: string, token: string) =>
+    req<{ provider_id: string; attached: boolean }>(
+      `/interactors/${interactorId}/people/${providerId}`,
+      { method: "DELETE", token }),
+  // Nothing is sent by this: it is the whole file, readable before anybody
+  // is contacted, so declining is still free.
+  previewBriefing: (body: { interactor_id: string; profile_id: string;
+                            provider_id: string; matter: string;
+                            grant_token: string }, token: string) =>
+    req<Briefing>("/briefings/preview", { method: "POST", body, token }),
 
   // Where a profile's agent keeps going back to, and the lever for stopping.
   // The stand-down is enforced where the socket opens, not at the route, so

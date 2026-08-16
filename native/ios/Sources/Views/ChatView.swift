@@ -24,6 +24,16 @@ struct ChatView: View {
     @State private var rehearsal: ApiClient.RehearsalRoom?
     @State private var rhScenario = ""
 
+    // Bringing somebody real into it. `people` is yours-first for whatever
+    // area was asked about; `brief` is the whole file, read before anybody is
+    // contacted, so declining is still free.
+    @State private var realOpen = false
+    @State private var realArea = ""
+    @State private var people: [MyPerson] = []
+    @State private var matter = ""
+    @State private var grantToken = ""
+    @State private var brief: BriefingPreview?
+
     var body: some View {
         VStack(spacing: 0) {
             ScrollViewReader { proxy in
@@ -32,6 +42,74 @@ struct ChatView: View {
                         Text(L10n.t("tab.chat", state.language)).font(.title2.bold()).foregroundStyle(Theme.txt)
                         Text(L10n.fill("nchat.sub", state.language, ["name": state.displayName]))
                             .font(.footnote).foregroundStyle(Theme.t2)
+
+                        // --- bring somebody real into this ---------------
+                        Text(L10n.t("real.hdr", state.language))
+                            .font(.headline).foregroundStyle(Theme.txt)
+                        Text(L10n.t("real.pitch", state.language))
+                            .font(.caption).foregroundStyle(Theme.t2)
+                        if !realOpen {
+                            Button(L10n.t("real.open", state.language)) {
+                                realOpen = true
+                                // Yours first, before any area is typed.
+                                loadMyPeople()
+                            }.font(.caption.bold()).foregroundStyle(Theme.brandA)
+                        } else {
+                            TextField(L10n.t("real.area.ph", state.language),
+                                      text: $realArea)
+                                .font(.footnote).foregroundStyle(Theme.txt)
+                            Button(L10n.t("real.find", state.language)) {
+                                findPeople()
+                            }.font(.caption.bold()).foregroundStyle(Theme.brandA)
+                            ForEach(people, id: \.provider_id) { p in
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(p.name).font(.caption.bold())
+                                        .foregroundStyle(Theme.txt)
+                                    Text((p.yours
+                                          ? L10n.t("real.yours", state.language)
+                                          : L10n.t("real.found", state.language))
+                                         + (p.preferred == true
+                                            ? " · " + L10n.t("real.first", state.language)
+                                            : ""))
+                                        .font(.caption2).foregroundStyle(Theme.t2)
+                                    if p.yours {
+                                        if p.preferred != true {
+                                            Button(L10n.t("real.prefer", state.language)) {
+                                                preferPerson(p)
+                                            }.font(.caption2).foregroundStyle(Theme.brandA)
+                                        }
+                                        Button(L10n.t("real.drop", state.language)) {
+                                            dropPerson(p)
+                                        }.font(.caption2).foregroundStyle(Theme.t2)
+                                        Button(L10n.fill("real.preview", state.language,
+                                                         ["name": p.name])) {
+                                            previewFor(p)
+                                        }.font(.caption2.bold()).foregroundStyle(Theme.brandA)
+                                    } else {
+                                        Button(L10n.t("real.keep", state.language)) {
+                                            keepPerson(p)
+                                        }.font(.caption2).foregroundStyle(Theme.brandA)
+                                    }
+                                }
+                            }
+                            TextField(L10n.t("real.matter.ph", state.language),
+                                      text: $matter)
+                                .font(.footnote).foregroundStyle(Theme.txt)
+                            SecureField(L10n.t("real.grant.ph", state.language),
+                                        text: $grantToken)
+                                .font(.footnote).foregroundStyle(Theme.txt)
+                            if let brief {
+                                Text(brief.reads).font(.caption)
+                                    .foregroundStyle(Theme.txt)
+                                ForEach(brief.package.attachments, id: \.title) { a in
+                                    Text("\(a.kind) · \(a.title)"
+                                         + (a.sealed
+                                            ? " · " + L10n.t("real.sealed", state.language)
+                                            : ""))
+                                        .font(.caption2).foregroundStyle(Theme.t2)
+                                }
+                            }
+                        }
 
                         ForEach(messages) { m in
                             HStack {
@@ -113,6 +191,61 @@ struct ChatView: View {
                 .disabled(draft.isEmpty || busy)
             }
             .padding(.horizontal, 20).padding(.bottom, 12)
+        }
+    }
+
+    private func loadMyPeople() {
+        guard let iid = state.interactorId, let tok = state.interactorToken
+        else { return }
+        Task { people = (try? await ApiClient.shared.myPeople(
+            interactor: iid, token: tok)) ?? [] }
+    }
+
+    private func findPeople() {
+        guard let iid = state.interactorId, let tok = state.interactorToken
+        else { return }
+        Task { people = (try? await ApiClient.shared.peopleForArea(
+            interactor: iid, area: realArea, token: tok)) ?? [] }
+    }
+
+    private func keepPerson(_ p: MyPerson) {
+        guard let iid = state.interactorId, let tok = state.interactorToken
+        else { return }
+        Task {
+            try? await ApiClient.shared.keepPerson(
+                interactor: iid, providerId: p.provider_id, token: tok)
+            findPeople()
+        }
+    }
+
+    private func preferPerson(_ p: MyPerson) {
+        guard let iid = state.interactorId, let tok = state.interactorToken
+        else { return }
+        Task {
+            try? await ApiClient.shared.preferPerson(
+                interactor: iid, providerId: p.provider_id, token: tok)
+            loadMyPeople()
+        }
+    }
+
+    private func dropPerson(_ p: MyPerson) {
+        guard let iid = state.interactorId, let tok = state.interactorToken
+        else { return }
+        Task {
+            try? await ApiClient.shared.dropPerson(
+                interactor: iid, providerId: p.provider_id, token: tok)
+            loadMyPeople()
+        }
+    }
+
+    /// Nothing is sent by this — see ApiClient.previewBriefing.
+    private func previewFor(_ p: MyPerson) {
+        guard let iid = state.interactorId, let tok = state.interactorToken,
+              let pid = state.pid else { return }
+        Task {
+            brief = try? await ApiClient.shared.previewBriefing(
+                interactor: iid, profile: pid, providerId: p.provider_id,
+                matter: matter, grantToken: grantToken, token: tok)
         }
     }
 

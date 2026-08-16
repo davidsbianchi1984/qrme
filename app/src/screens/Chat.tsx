@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { fill, t as tr, visitorLang } from "../l10n";
-import { api, getBase, type Avatar } from "../api";
+import { api, getBase, type Avatar, type Briefing,
+         type MyPerson } from "../api";
 import { Briefcase } from "../Briefcase";
 import { Refusal } from "../Refusal";
 import { SkinPicker } from "../SkinPicker";
@@ -20,6 +21,15 @@ export function Chat({ onPlans }: {
   onPlans: () => void;
 }) {
   const { session } = useSession();
+  // Bringing somebody real into it. `people` is yours-first for the area
+  // asked about; `brief` is the whole file, read before anybody is
+  // contacted, so declining is still free.
+  const [realOpen, setRealOpen] = useState(false);
+  const [realArea, setRealArea] = useState("");
+  const [people, setPeople] = useState<MyPerson[]>([]);
+  const [matter, setMatter] = useState("");
+  const [grantToken, setGrantToken] = useState("");
+  const [brief, setBrief] = useState<Briefing | null>(null);
   const lang = visitorLang();
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -272,6 +282,101 @@ export function Chat({ onPlans }: {
           <option value="operator">{tr("chat.role.operator", lang)}</option>
         </select>
       </label>
+
+      {/* --- bringing somebody real into it ---------------------------- */}
+      <div className="card">
+        <h3>{tr("real.hdr", lang)}</h3>
+        <p className="muted small">{tr("real.pitch", lang)}</p>
+        {!realOpen
+          ? <button className="ghost" onClick={() => {
+              setRealOpen(true);
+              // Yours first, before any area is typed: that is what keeping
+              // them was for.
+              api.myPeople(session.interactorId || "",
+                           session.interactorToken || "")
+                .then(setPeople).catch(() => setPeople([]));
+            }}>
+              {tr("real.open", lang)}
+            </button>
+          : (<>
+              <input value={realArea} placeholder={tr("real.area.ph", lang)}
+                     onChange={(e) => setRealArea(e.target.value)} />
+              <button disabled={!realArea} onClick={() => {
+                setError(null);
+                api.peopleForArea(session.interactorId || "", realArea,
+                                  session.interactorToken || "")
+                  .then(setPeople).catch(setError);
+              }}>{tr("real.find", lang)}</button>
+              {people.map((p) => (
+                <div key={p.provider_id}>
+                  <p className="small">
+                    <b>{p.name}</b>{" · "}{p.area}
+                    {p.location ? ` · ${p.location}` : ""}
+                    {" · "}
+                    {/* Yours and found-for-you are different claims. */}
+                    {p.yours ? tr("real.yours", lang) : tr("real.found", lang)}
+                    {p.preferred ? ` · ${tr("real.first", lang)}` : ""}
+                  </p>
+                  {p.yours
+                    ? (<>
+                        {!p.preferred && (
+                          <button className="ghost" onClick={() => {
+                            api.preferPerson(session.interactorId || "",
+                                             p.provider_id,
+                                             session.interactorToken || "")
+                              .then(() => setPeople([])).catch(setError);
+                          }}>{tr("real.prefer", lang)}</button>
+                        )}
+                        <button className="ghost" onClick={() => {
+                          api.dropPerson(session.interactorId || "",
+                                         p.provider_id,
+                                         session.interactorToken || "")
+                            .then(() => setPeople([])).catch(setError);
+                        }}>{tr("real.drop", lang)}</button>
+                      </>)
+                    : <button className="ghost" onClick={() => {
+                        api.keepPerson(session.interactorId || "",
+                                       { provider_id: p.provider_id },
+                                       session.interactorToken || "")
+                          .then(() => setPeople([])).catch(setError);
+                      }}>{tr("real.keep", lang)}</button>}
+                </div>
+              ))}
+              <input value={matter} placeholder={tr("real.matter.ph", lang)}
+                     onChange={(e) => setMatter(e.target.value)} />
+              <input value={grantToken} type="password"
+                     placeholder={tr("real.grant.ph", lang)}
+                     onChange={(e) => setGrantToken(e.target.value)} />
+              {people.filter((p) => p.yours).map((p) => (
+                <button key={p.provider_id} className="ghost"
+                        disabled={!matter || !grantToken}
+                        onClick={() => {
+                          setError(null); setBrief(null);
+                          api.previewBriefing({
+                            interactor_id: session.interactorId || "",
+                            profile_id: session.profileId || "",
+                            provider_id: p.provider_id, matter,
+                            grant_token: grantToken,
+                          }, session.interactorToken || "")
+                            .then(setBrief).catch(setError);
+                        }}>
+                  {fill(tr("real.preview", lang), { name: p.name })}
+                </button>
+              ))}
+              {brief && (
+                <div>
+                  {/* Read before anybody is contacted, counted out loud. */}
+                  <p className="small">{brief.reads}</p>
+                  {brief.package.attachments.map((a, i) => (
+                    <p className="muted small" key={i}>
+                      {a.kind} · {a.title}
+                      {a.sealed ? ` · ${tr("real.sealed", lang)}` : ""}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </>)}
+      </div>
 
       {whereOpen && (
         <div className="row" style={{ padding: "4px 0" }}>

@@ -635,6 +635,30 @@ public record Visited(
     [property: JsonPropertyName("persistent")] bool Persistent,
     [property: JsonPropertyName("stood_down")] bool? StoodDown);
 
+/// <summary>Somebody a person keeps in an area of life. <c>Yours</c>
+/// separates the ones they chose from the ones the search found.</summary>
+public record MyPerson(
+    [property: JsonPropertyName("provider_id")] string ProviderId,
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("area")] string Area,
+    [property: JsonPropertyName("location")] string? Location,
+    [property: JsonPropertyName("contact")] string? Contact,
+    [property: JsonPropertyName("yours")] bool Yours,
+    [property: JsonPropertyName("preferred")] bool? Preferred);
+
+public record BriefingAttachment(
+    [property: JsonPropertyName("kind")] string Kind,
+    [property: JsonPropertyName("title")] string Title,
+    [property: JsonPropertyName("sealed")] bool Sealed);
+
+public record BriefingPackage(
+    [property: JsonPropertyName("matter")] string Matter,
+    [property: JsonPropertyName("attachments")] BriefingAttachment[] Attachments);
+
+public record BriefingPreview(
+    [property: JsonPropertyName("package")] BriefingPackage Package,
+    [property: JsonPropertyName("reads")] string Reads);
+
 public record AnswerReceipt(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("held")] bool Held,
@@ -1697,6 +1721,52 @@ public sealed class ApiClient
     /// failure aggregate, deliberately.</summary>
     public Task<Visited[]> VisitsAcross(string key) =>
         Send<Visited[]>(Get("/visits/across", key));
+
+    // -- your own people, and the briefing that arrives before they do --
+
+    public Task<MyPerson[]> MyPeople(string interactor, string token) =>
+        Send<MyPerson[]>(Get($"/interactors/{interactor}/people", token));
+
+    public Task<MyPerson[]> PeopleForArea(string interactor, string area,
+                                          string token) =>
+        Send<MyPerson[]>(Get(
+            $"/interactors/{interactor}/people/for-area?area="
+            + Uri.EscapeDataString(area), token));
+
+    public async Task KeepPerson(string interactor, string providerId,
+                                 string token)
+    {
+        var req = Post($"/interactors/{interactor}/people",
+                       new { provider_id = providerId }, token);
+        (await Dispatch(req)).EnsureSuccessStatusCode();
+    }
+
+    public async Task PreferPerson(string interactor, string providerId,
+                                   string token)
+    {
+        var req = Post($"/interactors/{interactor}/people/{providerId}/prefer",
+                       new { }, token);
+        (await Dispatch(req)).EnsureSuccessStatusCode();
+    }
+
+    public async Task DropPerson(string interactor, string providerId,
+                                 string token)
+    {
+        var req = new HttpRequestMessage(
+            HttpMethod.Delete, $"/interactors/{interactor}/people/{providerId}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        (await Dispatch(req)).EnsureSuccessStatusCode();
+    }
+
+    /// <summary>Nothing is sent by this — the whole file, readable before
+    /// anybody is contacted, so declining is still free.</summary>
+    public Task<BriefingPreview> PreviewBriefing(
+            string interactor, string profile, string providerId,
+            string matter, string grantToken, string token) =>
+        Send<BriefingPreview>(Post("/briefings/preview", new {
+            interactor_id = interactor, profile_id = profile,
+            provider_id = providerId, matter, grant_token = grantToken },
+            token));
 
     // MARK: Live desks
 

@@ -6,6 +6,55 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Bringing somebody real into it, in every area of life.** A synthetic
+  profile is an AI, and some things need a person. `referral.prepare` already
+  handed a session to a clinician and did the ceremony well — the signature
+  over the exact bytes, bound to that referral, redeemable once. Two things
+  were wrong with what it carried rather than how.
+
+  It was **clinical only**, and the question is not: a cook profile handing a
+  matter to a butcher, a money profile to a broker, a coach to a
+  physiotherapist all need the same thing. And it carried **the conversation
+  and nothing else**, so a provider arrived and asked for the photographs and
+  the statements — which is the person telling their story twice, once to the
+  profile and once to the professional, which is what a handoff exists to
+  prevent.
+
+      asked     can a session be handed to a professional
+      mattered  does the professional arrive already knowing
+
+  **Your own people.** A person attaches the professionals they already
+  trust, per area, and a profile reaches for theirs before it reaches for the
+  search — which still runs underneath, so an area they have nobody in is not
+  a dead end. Every row says whether it is *yours* or *found for you*,
+  because those are different claims and somebody about to send their history
+  is entitled to know which they are looking at. Preferring one demotes the
+  others rather than dropping them: a second opinion is still somebody they
+  chose. `attach` takes no area — it reads it off the provider — because a
+  form that lets the caller say what somebody *is* eventually files a butcher
+  under cardiology, and that would defeat `referral.match`'s expertise-before-
+  geography ordering from inside the data.
+
+  **The briefing, and the grant that decides it.** Everything in it arrives
+  through `tasks.scoped_items`, now the one function in the product that
+  reads a revocable grant — the autonomous task runner was refactored onto it
+  rather than keeping its own copy. Two readings of a scope is one too many:
+  the whole value of a revocable grant is that revoking it stops
+  *everything*, and a second interpreter is a second place that can interpret
+  it generously. So the promise is exact — a briefing can carry what the user
+  granted this profile and cannot carry anything else, because it is never
+  handed anything else.
+
+  It counts its attachments out loud rather than saying *your history*, a
+  phrase somebody agrees to without knowing what it covers. The specialist is
+  named as synthetic **inside** the document, since a document travels away
+  from the screen that framed it. And nothing is sent by the preview: it
+  exists so that declining is still free.
+
+  On the console, on iOS, on Android and on Windows.
+
 ### Changed
 
 - **Forty more refusals stop speaking English to everyone.** The refusal-guard

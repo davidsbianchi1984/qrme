@@ -25,9 +25,119 @@ public sealed partial class ChatPage : Page
         ("operator", "nchat.role.operator"),
     };
 
+    /// <summary>Somebody a person keeps, or somebody the search found. The
+    /// two are different claims and the row says which.</summary>
+    public sealed class RealRow
+    {
+        public string ProviderId { get; init; } = "";
+        public string Name { get; init; } = "";
+        public bool Yours { get; init; }
+        public bool Preferred { get; init; }
+        public string Whose => (Yours ? L10n.T("real.yours") : L10n.T("real.found"))
+            + (Preferred ? " · " + L10n.T("real.first") : "");
+        public string KeepLabel => L10n.T("real.keep");
+        public string PreferLabel => L10n.T("real.prefer");
+        public string DropLabel => L10n.T("real.drop");
+        public string PreviewLabel =>
+            L10n.Fill("real.preview", AppState.Current.Language, ("name", Name));
+        public Visibility KeepVisibility =>
+            Yours ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility MineVisibility =>
+            Yours ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility PreferVisibility =>
+            Yours && !Preferred ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void ShowPeople(MyPerson[] people) =>
+        RealPeopleList.ItemsSource = people.Select(p => new RealRow
+        {
+            ProviderId = p.ProviderId, Name = p.Name, Yours = p.Yours,
+            Preferred = p.Preferred ?? false,
+        }).ToList();
+
+    private async void OnRealOpen(object sender, RoutedEventArgs e)
+    {
+        RealPanel.Visibility = Visibility.Visible;
+        var s = AppState.Current;
+        // Yours first, before any area is typed: that is what keeping them
+        // was for.
+        try { ShowPeople(await ApiClient.Shared.MyPeople(
+            s.InteractorId!, s.InteractorToken!)); }
+        catch (Exception ex) { RealBriefText.Text = ex.Message; }
+    }
+
+    private async void OnRealFind(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        try { ShowPeople(await ApiClient.Shared.PeopleForArea(
+            s.InteractorId!, RealAreaBox.Text.Trim(), s.InteractorToken!)); }
+        catch (Exception ex) { RealBriefText.Text = ex.Message; }
+    }
+
+    private async void OnRealKeep(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string pid) return;
+        var s = AppState.Current;
+        try
+        {
+            await ApiClient.Shared.KeepPerson(s.InteractorId!, pid, s.InteractorToken!);
+            OnRealFind(sender, e);
+        }
+        catch (Exception ex) { RealBriefText.Text = ex.Message; }
+    }
+
+    private async void OnRealPrefer(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string pid) return;
+        var s = AppState.Current;
+        try
+        {
+            await ApiClient.Shared.PreferPerson(s.InteractorId!, pid, s.InteractorToken!);
+            OnRealOpen(sender, e);
+        }
+        catch (Exception ex) { RealBriefText.Text = ex.Message; }
+    }
+
+    private async void OnRealDrop(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string pid) return;
+        var s = AppState.Current;
+        try
+        {
+            await ApiClient.Shared.DropPerson(s.InteractorId!, pid, s.InteractorToken!);
+            OnRealOpen(sender, e);
+        }
+        catch (Exception ex) { RealBriefText.Text = ex.Message; }
+    }
+
+    /// <summary>Nothing is sent by this — the whole file is read first, so
+    /// declining is still free.</summary>
+    private async void OnRealPreview(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string pid) return;
+        var s = AppState.Current;
+        try
+        {
+            var b = await ApiClient.Shared.PreviewBriefing(
+                s.InteractorId!, s.Pid!, pid, RealMatterBox.Text.Trim(),
+                RealGrantBox.Password, s.InteractorToken!);
+            RealBriefText.Text = b.Reads + "\n" + string.Join("\n",
+                b.Package.Attachments.Select(a => $"{a.Kind} · {a.Title}"
+                    + (a.Sealed ? " · " + L10n.T("real.sealed") : "")));
+        }
+        catch (Exception ex) { RealBriefText.Text = ex.Message; }
+    }
+
     public ChatPage()
     {
         InitializeComponent();
+        RealTitle.Text = L10n.T("real.hdr");
+        RealSub.Text = L10n.T("real.pitch");
+        RealOpenButton.Content = L10n.T("real.open");
+        RealAreaBox.PlaceholderText = L10n.T("real.area.ph");
+        RealFindButton.Content = L10n.T("real.find");
+        RealMatterBox.PlaceholderText = L10n.T("real.matter.ph");
+        RealGrantBox.PlaceholderText = L10n.T("real.grant.ph");
         var lang = AppState.Current.Language;
         Title.Text = L10n.T("tab.chat", lang);
         RoleBox.Header = L10n.T("nchat.rolepick", lang);

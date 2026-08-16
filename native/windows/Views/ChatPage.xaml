@@ -55,6 +55,49 @@
             <!-- Spec clauses 2/12 — advisor counsels, collaborator co-creates,
                  operator executes. "Read my prompt" is the honest default: the
                  profile infers from the wording and the reply says which. -->
+            <!-- bring somebody real into this -->
+            <TextBlock x:Name="RealTitle" FontSize="16" FontWeight="Bold"
+                       Foreground="{StaticResource QrmeTxtBrush}" />
+            <TextBlock x:Name="RealSub" FontSize="12" TextWrapping="Wrap"
+                       Foreground="{StaticResource QrmeT2Brush}" />
+            <Button x:Name="RealOpenButton" Click="OnRealOpen"
+                    Background="Transparent" Foreground="{StaticResource QrmeBrandABrush}" />
+            <StackPanel x:Name="RealPanel" Spacing="8" Visibility="Collapsed">
+                <TextBox x:Name="RealAreaBox" />
+                <Button x:Name="RealFindButton" Click="OnRealFind"
+                        Background="Transparent" Foreground="{StaticResource QrmeBrandABrush}" />
+                <ItemsControl x:Name="RealPeopleList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Spacing="4" Margin="0,0,0,6">
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold"
+                                           Foreground="{StaticResource QrmeTxtBrush}" />
+                                <TextBlock Text="{Binding Whose}" FontSize="11"
+                                           Foreground="{StaticResource QrmeT2Brush}" />
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Button Content="{Binding KeepLabel}" Tag="{Binding ProviderId}"
+                                            Click="OnRealKeep" Visibility="{Binding KeepVisibility}"
+                                            Background="Transparent" Foreground="{StaticResource QrmeBrandABrush}" />
+                                    <Button Content="{Binding PreferLabel}" Tag="{Binding ProviderId}"
+                                            Click="OnRealPrefer" Visibility="{Binding PreferVisibility}"
+                                            Background="Transparent" Foreground="{StaticResource QrmeBrandABrush}" />
+                                    <Button Content="{Binding DropLabel}" Tag="{Binding ProviderId}"
+                                            Click="OnRealDrop" Visibility="{Binding MineVisibility}"
+                                            Background="Transparent" Foreground="{StaticResource QrmeT2Brush}" />
+                                    <Button Content="{Binding PreviewLabel}" Tag="{Binding ProviderId}"
+                                            Click="OnRealPreview" Visibility="{Binding MineVisibility}"
+                                            Background="Transparent" Foreground="{StaticResource QrmeBrandABrush}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBox x:Name="RealMatterBox" />
+                <PasswordBox x:Name="RealGrantBox" />
+                <TextBlock x:Name="RealBriefText" FontSize="12" TextWrapping="Wrap"
+                           Foreground="{StaticResource QrmeTxtBrush}" />
+            </StackPanel>
+
             <ComboBox x:Name="RoleBox"
                       HorizontalAlignment="Stretch" SelectedIndex="0" />
             <Grid ColumnSpacing="10">

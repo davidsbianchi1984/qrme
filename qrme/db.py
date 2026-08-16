@@ -152,6 +152,24 @@ CREATE TABLE IF NOT EXISTS providers (
     created_at TEXT NOT NULL
 );
 
+-- The people a user has already chosen, in every area of life — their
+-- butcher, their broker, their doctor. `referral.match` searches the map;
+-- this is who they trust, and a handoff consults it first. `area` is copied
+-- from the provider row at attach time rather than accepted from the caller,
+-- so nobody can be filed under an expertise they do not have — see
+-- qrme/mypeople.py. Exactly one row per area carries `preferred`.
+CREATE TABLE IF NOT EXISTS known_providers (
+    interactor_id TEXT NOT NULL REFERENCES interactors(id),
+    provider_id   TEXT NOT NULL REFERENCES providers(id),
+    area          TEXT NOT NULL,
+    preferred     INTEGER NOT NULL DEFAULT 0,
+    note          TEXT,
+    attached_at   TEXT NOT NULL,
+    PRIMARY KEY (interactor_id, provider_id)
+);
+CREATE INDEX IF NOT EXISTS idx_known_area
+    ON known_providers (interactor_id, area);
+
 -- Consented session handoffs: an AI specialist's session summary packaged
 -- for a local provider, sealed (PDI when configured) behind a revocable token.
 CREATE TABLE IF NOT EXISTS handoffs (

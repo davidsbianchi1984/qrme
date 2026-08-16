@@ -45,6 +45,41 @@ def _grant_for(profile_id: str, token: str) -> dict | None:
     return dict(row) if row else None
 
 
+class NothingGranted(ValueError):
+    """The grant does not exist, or has been revoked. Carries text for a
+    person rather than a status for a caller."""
+
+
+def scoped_items(profile_id: str, grant_token: str, pdi=None) -> list[dict]:
+    """Exactly the vaulted material this grant lets a profile read.
+
+    One function decides what a grant means, and both callers go through it —
+    the autonomous task below, and the briefing a profile prepares for a real
+    provider. Two readings of a scope is one reading too many: the whole value
+    of a revocable grant is that revoking it stops *everything*, and a second
+    place interpreting `scope` is a second place that can interpret it
+    generously.
+    """
+    grant = _grant_for(profile_id, grant_token)
+    if grant is None or grant["revoked"]:
+        raise NothingGranted(
+            "that grant is unknown or has been revoked — nothing can be read "
+            "with it")
+    scope = json.loads(grant["scope"])
+    out = []
+    for row in db.connect().execute(
+            "SELECT * FROM source_items WHERE profile_id=?"
+            " ORDER BY created_at DESC, rowid DESC", (profile_id,)).fetchall():
+        item = dict(row)
+        if scope != ["*"] and item["id"] not in scope:
+            continue
+        if item["pdi_key"] and pdi is not None:
+            raw = pdi.get(item["pdi_key"])
+            item["content"] = json.loads(raw)["content"] if raw else None
+        out.append(item)
+    return out
+
+
 def run(profile: dict, kind: str, topic: str, grant_token: str,
         pdi=None, cloud=None) -> dict:
     """Execute a multi-step task under a revocable grant."""
@@ -56,23 +91,10 @@ def run(profile: dict, kind: str, topic: str, grant_token: str,
     if grant is None or grant["revoked"]:
         return {"status": "failed", "reason": "grant revoked or unknown",
                 "steps": [{"step": "grant_check", "ok": False}]}
-    scope = json.loads(grant["scope"])
     steps.append({"step": "grant_check", "ok": True, "grant_id": grant["id"]})
 
     # Step 2 — scoped vault read. Raw content is used in-memory only.
-    conn = db.connect()
-    rows = conn.execute(
-        "SELECT * FROM source_items WHERE profile_id=?"
-        " ORDER BY created_at DESC, rowid DESC", (profile_id,)).fetchall()
-    items = []
-    for row in rows:
-        item = dict(row)
-        if scope != ["*"] and item["id"] not in scope:
-            continue
-        if item["pdi_key"] and pdi is not None:
-            raw = pdi.get(item["pdi_key"])
-            item["content"] = json.loads(raw)["content"] if raw else None
-        items.append(item)
+    items = scoped_items(profile_id, grant_token, pdi)
     steps.append({"step": "vault_read", "items": len(items),
                   "vaulted": sum(1 for i in items if i["pdi_key"])})
 
@@ -95,6 +117,7 @@ def run(profile: dict, kind: str, topic: str, grant_token: str,
     credential = (watermark.stamp(profile_id, "task-output", output)
                   if verdict.approved else None)
     task_id = db.new_id("tsk")
+    conn = db.connect()
     conn.execute(
         "INSERT INTO tasks (id, profile_id, kind, grant_id, status, steps,"
         " output, watermark_id, created_at) VALUES (?,?,?,?,?,?,?,?,?)",

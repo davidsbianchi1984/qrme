@@ -805,6 +805,34 @@ struct Visited: Decodable {
     let stood_down: Bool?
 }
 
+/// Somebody a person keeps in an area of life. `yours` separates the ones
+/// they chose from the ones the search found for them — different claims, and
+/// somebody about to send their history is entitled to know which.
+struct MyPerson: Decodable {
+    let provider_id: String
+    let name: String
+    let area: String
+    let location: String?
+    let contact: String?
+    let yours: Bool
+    let preferred: Bool?
+}
+
+struct BriefingAttachment: Decodable {
+    let kind: String
+    let title: String
+    let sealed: Bool
+}
+
+struct BriefingPreview: Decodable {
+    struct Package: Decodable {
+        let matter: String
+        let attachments: [BriefingAttachment]
+    }
+    let package: Package
+    let reads: String
+}
+
 struct AnswerReceipt: Decodable {
     let id: String
     let held: Bool
@@ -1714,6 +1742,63 @@ actor ApiClient {
     /// depth. Same key as the failure aggregate, deliberately.
     func visitsAcross(key: String) async throws -> [Visited] {
         try await request("/visits/across", token: key)
+    }
+
+    // MARK: Your own people, and the briefing that arrives before they do
+
+    func myPeople(interactor: String, token: String) async throws -> [MyPerson] {
+        try await request("/interactors/\(interactor)/people", token: token)
+    }
+
+    func peopleForArea(interactor: String, area: String,
+                       token: String) async throws -> [MyPerson] {
+        try await request("/interactors/\(interactor)/people/for-area?area="
+                          + area.addingPercentEncoding(
+                              withAllowedCharacters: .urlQueryAllowed)!,
+                          token: token)
+    }
+
+    @discardableResult
+    func keepPerson(interactor: String, providerId: String,
+                    token: String) async throws -> MyPerson {
+        try await request("/interactors/\(interactor)/people",
+                          method: "POST",
+                          body: ["provider_id": providerId], token: token)
+    }
+
+    @discardableResult
+    func preferPerson(interactor: String, providerId: String,
+                      token: String) async throws -> MyPerson {
+        try await request(
+            "/interactors/\(interactor)/people/\(providerId)/prefer",
+            method: "POST", token: token)
+    }
+
+    struct PersonDropped: Decodable {
+        let provider_id: String
+        let attached: Bool
+    }
+
+    @discardableResult
+    func dropPerson(interactor: String, providerId: String,
+                    token: String) async throws -> PersonDropped {
+        try await request("/interactors/\(interactor)/people/\(providerId)",
+                          method: "DELETE", token: token)
+    }
+
+    /// Nothing is sent by this. It is the whole file, readable before anybody
+    /// is contacted, so declining is still free.
+    func previewBriefing(interactor: String, profile: String,
+                         providerId: String, matter: String,
+                         grantToken: String,
+                         token: String) async throws -> BriefingPreview {
+        try await request("/briefings/preview", method: "POST",
+                          body: ["interactor_id": interactor,
+                                 "profile_id": profile,
+                                 "provider_id": providerId,
+                                 "matter": matter,
+                                 "grant_token": grantToken],
+                          token: token)
     }
 
     // MARK: Live desks

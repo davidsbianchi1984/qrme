@@ -489,6 +489,30 @@ LESSONS: tuple[dict, ...] = (
          screens=(172,),
          try_it="Read a campaign with no token at all, and find who the "
                 "money goes to written on the same card."),
+    dict(key="bringreal", chapter="Out in the world",
+         title="Bringing somebody real into it",
+         what="A synthetic profile is an AI, and some things need a person. "
+              "Every profile can hand its matter to somebody real — a "
+              "butcher, a broker, a physiotherapist, a doctor — and catch "
+              "them up before they arrive, so nobody has to tell the story "
+              "twice. The people are yours: attach the ones you already "
+              "trust, per area of life, and a profile reaches for yours "
+              "before it reaches for the search. Every row says which it "
+              "is, because *yours* and *found for you* are different claims "
+              "and somebody about to send their history is entitled to know "
+              "which they are looking at. What travels is decided by a "
+              "revocable grant and by nothing else: one function reads that "
+              "grant and both the autonomous tasks and the briefing go "
+              "through it, so revoking it stops both. The briefing counts "
+              "its attachments out loud rather than saying *your history* — "
+              "a phrase somebody agrees to without knowing what it covers — "
+              "and the profile is named as synthetic inside the document, "
+              "because a document travels away from the screen that framed "
+              "it. Nothing is sent by the preview: it exists so declining "
+              "is still free.",
+         screens=(172,),
+         try_it="Preview a briefing, then revoke the grant and try again — "
+                "the second attempt is refused rather than quietly thinner."),
     dict(key="goingback", chapter="Out in the world",
          title="The far end that sees you twice",
          what="Offline mode answers whether anything left this machine. It "

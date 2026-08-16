@@ -260,14 +260,31 @@ def _console_calls(lang):
 
 
 def _ios_calls(lang):
+    """Every annotated Swift `request(…)`, with its **whole** body.
+
+    The body was read as `[^\n]{0,300}` — the first line of the call and no
+    more. Swift wraps: a `request(` whose path sits on one line and whose
+    `method: "POST"` sits on the next had its verb missed entirely, so
+    `_verb_in` fell through to GET and the call was compared against the GET
+    route sharing its path.
+
+    That is the defect in this file's own docstring, one line over. It said a
+    missed verb spelling "defaulted twenty-one calls to GET and reported every
+    one of them wrong", and then read only as far as the newline. So the body
+    now comes from `clientpaths._call_body`, which walks the brackets — the
+    same reader the console half already used, and the reason the console
+    half never had this.
+    """
     annotated = re.compile(
-        r"let\s+\w+\s*:\s*(?P<ret>[\w\[\]:<>,.? ]+?)\s*=\s*try await request\((?P<body>[^\n]{0,300})")
+        r"let\s+\w+\s*:\s*(?P<ret>[\w\[\]:<>,.? ]+?)\s*=\s*try await request\(")
     returned = re.compile(
-        r"->\s*(?P<ret>[\w\[\]:<>,.? ]+?)\s*\{\s*\n?\s*try await request\((?P<body>[^\n]{0,300})")
+        r"->\s*(?P<ret>[\w\[\]:<>,.? ]+?)\s*\{\s*\n?\s*try await request\(")
     for f, text in _client_sources(lang):
         for pattern in (annotated, returned):
             for m in pattern.finditer(text):
-                yield f.name, m.group("body"), m.group("ret").strip(), _swift_is_list
+                body = cp._call_body(text, m.end() - 1)
+                if body:
+                    yield f.name, body, m.group("ret").strip(), _swift_is_list
 
 
 def _windows_calls(lang):

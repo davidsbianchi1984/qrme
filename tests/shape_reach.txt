@@ -4,8 +4,15 @@
 # are honestly lopsided — a shell that discards the body on most of its calls
 # names no shape and cannot be wrong about one.
 #
+# `ios` jumped 300 -> 448 when the Swift reader stopped reading only the
+# first line of a call. Swift wraps, so a `request(` whose path sat on one
+# line and whose `method:` sat on the next had its verb missed and defaulted
+# to GET — the defect this file's own docstring describes, one line over. The
+# extra 148 calls produced no new disagreements, which is the good outcome:
+# the reader was blind to a third of the shell, not wrong about it.
+#
 # The rule is that a row does not go down. A reader that stops matching
-android: 316
-console: 422
-ios: 300
-windows: 342
+android: 371
+console: 494
+ios: 448
+windows: 396

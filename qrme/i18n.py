@@ -1080,6 +1080,61 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'no such provider': {
+        'es': 'no existe ese proveedor',
+        'fr': 'aucun prestataire de ce nom',
+        'de': 'kein solcher Anbieter',
+        'pt': 'não existe esse prestador',
+        'it': 'nessun fornitore di questo tipo',
+        'ja': 'そのような提供者はいません',
+        'zh': '没有该服务提供方',
+        'hi': 'ऐसा कोई प्रदाता नहीं',
+        'ar': 'لا يوجد مزوّد بهذا الوصف',
+    },
+    'that person is not one of yours': {
+        'es': 'esa persona no es de las tuyas',
+        'fr': 'cette personne ne fait pas partie des vôtres',
+        'de': 'diese Person gehört nicht zu deinen',
+        'pt': 'essa pessoa não é uma das suas',
+        'it': 'quella persona non è tra le tue',
+        'ja': 'その人は、あなたの人たちに入っていません',
+        'zh': '那个人不在你的人选之中',
+        'hi': 'वह व्यक्ति आपके लोगों में नहीं है',
+        'ar': 'ذلك الشخص ليس من أهل ثقتك المسجّلين',
+    },
+    'say what this is about, in one line': {
+        'es': 'di de qué se trata, en una línea',
+        'fr': "dites de quoi il s'agit, en une ligne",
+        'de': 'sag in einer Zeile, worum es geht',
+        'pt': 'diga do que se trata, numa linha',
+        'it': "di' di che cosa si tratta, in una riga",
+        'ja': '何についてか、一行で書いてください',
+        'zh': '用一行说明这是关于什么的',
+        'hi': 'एक पंक्ति में बताइए कि यह किस बारे में है',
+        'ar': 'قل ما موضوع هذا، في سطر واحد',
+    },
+    'that grant is unknown or has been revoked — nothing can be read with it': {
+        'es': 'ese permiso es desconocido o ha sido revocado: no se puede leer nada con él',
+        'fr': 'cette autorisation est inconnue ou a été révoquée — rien ne peut être lu avec elle',
+        'de': 'diese Freigabe ist unbekannt oder wurde widerrufen — damit lässt sich nichts lesen',
+        'pt': 'essa autorização é desconhecida ou foi revogada — nada pode ser lido com ela',
+        'it': 'quel permesso è sconosciuto o è stato revocato: con esso non si può leggere nulla',
+        'ja': 'その許可は不明か、取り消されています。これで読めるものはありません',
+        'zh': '该授权未知或已被撤销——用它读不到任何内容',
+        'hi': 'वह अनुमति अज्ञात है या रद्द की जा चुकी है — इससे कुछ नहीं पढ़ा जा सकता',
+        'ar': 'هذا التصريح مجهول أو أُلغي — لا يمكن قراءة شيء به',
+    },
+    'bring somebody into your people before briefing them — a file does not travel to a professional nobody chose': {
+        'es': 'añade a esa persona a las tuyas antes de informarla: un expediente no viaja a un profesional que nadie eligió',
+        'fr': "ajoutez cette personne aux vôtres avant de la briefer — un dossier ne va pas à un professionnel que personne n'a choisi",
+        'de': 'nimm diese Person zuerst zu deinen auf — eine Akte geht nicht an eine Fachkraft, die niemand gewählt hat',
+        'pt': 'junte essa pessoa às suas antes de a informar — um processo não viaja para um profissional que ninguém escolheu',
+        'it': 'aggiungi quella persona alle tue prima di informarla: un fascicolo non va a un professionista che nessuno ha scelto',
+        'ja': '先にその人をあなたの人たちに加えてください。誰も選んでいない専門家に資料は渡りません',
+        'zh': '先把这个人加入你的人选，再向其通报——档案不会送往没有人选择过的专业人士',
+        'hi': 'उन्हें जानकारी देने से पहले अपने लोगों में जोड़िए — फ़ाइल ऐसे पेशेवर तक नहीं जाती जिसे किसी ने चुना ही नहीं',
+        'ar': 'أضِف ذلك الشخص إلى أهل ثقتك قبل إحاطته — لا ينتقل ملف إلى مِهني لم يخترْه أحد',
+    },
     'a campaign needs a goal above zero': {
         'es': 'una campaña necesita una meta mayor que cero',
         'fr': "une campagne a besoin d'un objectif supérieur à zéro",
@@ -4420,6 +4475,11 @@ _WHERE_MARKERS = ("body", "query", "path", "header", "cookie")
 #: A field with no row keeps its identifier, exactly as before, and is recorded
 #: in `tests/field_labels_unmapped.txt`.
 _FIELD_LABELS: dict[str, dict[str, str]] = {
+    # The briefing form, and the one control on a kept person. Worded as the
+    # screen asks them: a refusal naming `matter` reads as an error about a
+    # schema nobody was shown.
+    'matter': {'en': 'What this is about', 'es': 'De qué se trata', 'fr': 'De quoi il s’agit', 'de': 'Worum es geht', 'pt': 'Do que se trata', 'it': 'Di che cosa si tratta', 'ja': '何についてか', 'zh': '这是关于什么的', 'hi': 'यह किस बारे में है', 'ar': 'موضوع هذا'},
+    'preferred': {'en': 'Asked first', 'es': 'Se le pregunta primero', 'fr': 'Sollicité en premier', 'de': 'Zuerst gefragt', 'pt': 'Perguntado primeiro', 'it': 'Interpellato per primo', 'ja': '最初に頼む相手', 'zh': '优先联系', 'hi': 'पहले पूछा जाएगा', 'ar': 'يُسأل أولًا'},
     # The open board's answer form. Somebody with no account is typing here,
     # so a refusal naming the API's word for the field would be a refusal
     # about a schema they have never seen.

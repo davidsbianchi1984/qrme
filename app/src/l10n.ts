@@ -3851,6 +3851,51 @@ const CHROME: Table = {
   "prob.been.pitch": {
     en: "Every far host this address has been seen leaving for, and how often — what one machine serving several households looks like from outside. Hosts and counts only: no profile appears here, because a tool for measuring correlation must not be a way to correlate people.", es: "Cada host externo hacia el que se ha visto salir esta dirección, y con qué frecuencia: el aspecto que tiene desde fuera una máquina que sirve a varios hogares. Solo hosts y recuentos: aquí no aparece ningún perfil, porque una herramienta para medir la correlación no debe ser una forma de correlacionar personas.", fr: "Chaque hôte distant vers lequel cette adresse a été vue partir, et combien de fois — l'allure, vue de l'extérieur, d'une machine qui sert plusieurs foyers. Hôtes et compteurs seulement : aucun profil n'apparaît ici, car un outil de mesure de la corrélation ne doit pas être un moyen de corréler des gens.", de: "Jeder ferne Host, zu dem diese Adresse aufbrechen gesehen wurde, und wie oft — wie eine Maschine, die mehrere Haushalte bedient, von außen aussieht. Nur Hosts und Zahlen: hier erscheint kein Profil, denn ein Werkzeug zum Messen von Korrelation darf kein Mittel sein, Menschen zu korrelieren.", pt: "Cada host distante para o qual este endereço foi visto a sair, e com que frequência — o aspeto, visto de fora, de uma máquina que serve vários lares. Apenas hosts e contagens: nenhum perfil aparece aqui, porque uma ferramenta para medir correlação não pode ser uma forma de correlacionar pessoas.", it: "Ogni host remoto verso cui questo indirizzo è stato visto partire, e quante volte — l'aspetto, visto da fuori, di una macchina che serve più famiglie. Solo host e conteggi: qui non compare alcun profilo, perché uno strumento per misurare la correlazione non deve essere un modo per correlare le persone.", ja: "このアドレスが出ていった先の遠隔ホストと、その回数 — 複数の世帯を担う一台が、外からどう見えるか。ホストと件数だけです。プロフィールはここに現れません。相関を測る道具が、人を相関づける手段になってはならないからです。", zh: "这个地址被看到前往的每一个远端主机及次数——一台服务多个家庭的机器，从外面看是什么样子。只有主机和计数：这里不出现任何资料，因为衡量关联的工具不能成为关联到人的途径。", hi: "यह पता जिन-जिन दूरस्थ होस्ट की ओर जाते देखा गया, और कितनी बार — कई घरों को सेवा देती एक मशीन बाहर से कैसी दिखती है। केवल होस्ट और गिनती: यहाँ कोई प्रोफ़ाइल नहीं आती, क्योंकि सहसंबंध मापने का औज़ार लोगों को जोड़ने का रास्ता नहीं बनना चाहिए।", ar: "كل مضيف بعيد شوهد هذا العنوان يقصده، وكم مرة — كيف تبدو من الخارج آلة واحدة تخدم عدة بيوت. مضيفات وأعداد فقط: لا يظهر هنا أي ملف، لأن أداةً لقياس الترابط يجب ألا تكون وسيلةً للربط بين الناس.",
   },
+  "real.hdr": {
+    en: "Bring somebody real into this", es: "Traer a alguien real a esto", fr: "Faire entrer quelqu'un de réel", de: "Jemanden Echten hinzuziehen", pt: "Trazer alguém real para isto", it: "Coinvolgi qualcuno di reale", ja: "誰か実在の人を呼ぶ", zh: "把真人请进来", hi: "किसी असली व्यक्ति को इसमें लाएँ", ar: "أدخِل شخصًا حقيقيًا في هذا",
+  },
+  "real.pitch": {
+    en: "This profile is an AI, and some things need a person. It can hand the matter to somebody real — your butcher, your broker, your doctor — and catch them up first, so you do not tell the story twice. Only what you have granted travels, and you read the whole file before anybody is contacted.", es: "Este perfil es una IA, y algunas cosas necesitan a una persona. Puede pasar el asunto a alguien real —tu carnicero, tu corredor, tu médico— y ponerle al día antes, para que no cuentes la historia dos veces. Solo viaja lo que hayas concedido, y lees el expediente entero antes de contactar con nadie.", fr: "Ce profil est une IA, et certaines choses demandent une personne. Il peut confier l'affaire à quelqu'un de réel — votre boucher, votre courtier, votre médecin — et le mettre au courant d'abord, pour que vous ne racontiez pas l'histoire deux fois. Seul ce que vous avez autorisé circule, et vous lisez le dossier entier avant que quiconque soit contacté.", de: "Dieses Profil ist eine KI, und manches braucht einen Menschen. Es kann die Sache an jemanden Echten übergeben — deinen Metzger, deinen Makler, deine Ärztin — und ihn vorher ins Bild setzen, damit du die Geschichte nicht zweimal erzählst. Es reist nur, was du freigegeben hast, und du liest die ganze Akte, bevor jemand kontaktiert wird.", pt: "Este perfil é uma IA, e algumas coisas precisam de uma pessoa. Pode passar o assunto a alguém real — o seu talhante, o seu corretor, o seu médico — e pô-lo a par primeiro, para não contar a história duas vezes. Só viaja o que autorizou, e lê o processo inteiro antes de alguém ser contactado.", it: "Questo profilo è un'IA, e certe cose hanno bisogno di una persona. Può passare la faccenda a qualcuno di reale — il tuo macellaio, il tuo broker, il tuo medico — e metterlo al corrente prima, così non racconti la storia due volte. Viaggia solo ciò che hai concesso, e leggi l'intero fascicolo prima che qualcuno venga contattato.", ja: "このプロフィールはAIで、人でなければならないこともあります。実在の人 — あなたの肉屋、仲介人、かかりつけ医 — に用件を引き継ぎ、先に事情を伝えておけるので、同じ話を二度しなくて済みます。渡るのは許可したものだけで、誰かに連絡が行く前に、あなたが資料の全部を読みます。", zh: "这个资料是 AI，有些事需要真人。它可以把事情交给真实的人——你的肉铺、你的经纪人、你的医生——并先让对方了解情况，这样你不必把事情讲两遍。只有你授权的内容会送出，而且在联系任何人之前，整份材料由你先读。", hi: "यह प्रोफ़ाइल एक AI है, और कुछ बातों के लिए इंसान चाहिए। यह मामला किसी असली व्यक्ति को सौंप सकती है — आपका कसाई, आपका दलाल, आपका डॉक्टर — और पहले उन्हें पूरी बात बता सकती है, ताकि आपको कहानी दो बार न सुनानी पड़े। केवल वही जाता है जिसकी आपने अनुमति दी, और किसी से संपर्क होने से पहले पूरी फ़ाइल आप पढ़ते हैं।", ar: "هذا الملف ذكاء اصطناعي، وبعض الأمور تحتاج إنسانًا. يمكنه تسليم المسألة إلى شخص حقيقي — جزّارك، وسيطك، طبيبك — وإطلاعه أولًا، فلا تروي القصة مرتين. لا ينتقل إلا ما أذنت به، وتقرأ الملف كاملًا قبل أن يُتصل بأحد.",
+  },
+  "real.open": {
+    en: "Find somebody", es: "Encuentra a alguien", fr: "Trouver quelqu'un", de: "Jemanden finden", pt: "Encontre alguém", it: "Trova qualcuno", ja: "誰かを探す", zh: "找人", hi: "किसी को खोजें", ar: "ابحث عن شخص",
+  },
+  "real.area.ph": {
+    en: "what kind of help — butchery, finance, physiotherapy", es: "qué tipo de ayuda: carnicería, finanzas, fisioterapia", fr: "quel type d'aide — boucherie, finance, kinésithérapie", de: "welche Art Hilfe — Metzgerei, Finanzen, Physiotherapie", pt: "que tipo de ajuda — talho, finanças, fisioterapia", it: "che tipo di aiuto — macelleria, finanza, fisioterapia", ja: "どんな助けか — 精肉、金融、理学療法", zh: "需要哪一类帮助——肉类、金融、理疗", hi: "किस तरह की मदद — कसाई, वित्त, फ़िज़ियोथेरेपी", ar: "أي نوع من المساعدة — جزارة، مالية، علاج طبيعي",
+  },
+  "real.find": {
+    en: "Look", es: "Buscar", fr: "Chercher", de: "Suchen", pt: "Procurar", it: "Cerca", ja: "探す", zh: "查找", hi: "देखें", ar: "ابحث",
+  },
+  "real.yours": {
+    en: "yours", es: "tuyo", fr: "le vôtre", de: "deine", pt: "seu", it: "tuo", ja: "あなたの人", zh: "你的人", hi: "आपके", ar: "خاصّتك",
+  },
+  "real.found": {
+    en: "found for you", es: "encontrado para ti", fr: "trouvé pour vous", de: "für dich gefunden", pt: "encontrado para si", it: "trovato per te", ja: "見つけた人", zh: "为你找到的", hi: "आपके लिए मिला", ar: "وُجد لك",
+  },
+  "real.first": {
+    en: "asked first", es: "se le pregunta primero", fr: "sollicité en premier", de: "zuerst gefragt", pt: "perguntado primeiro", it: "interpellato per primo", ja: "最初に頼む相手", zh: "优先联系", hi: "पहले पूछा जाएगा", ar: "يُسأل أولًا",
+  },
+  "real.keep": {
+    en: "Keep them", es: "Guardarlo", fr: "Le garder", de: "Behalten", pt: "Guardar", it: "Tienilo", ja: "この人を残す", zh: "记住这个人", hi: "इन्हें रखें", ar: "احتفظ به",
+  },
+  "real.prefer": {
+    en: "Ask this one first", es: "Preguntar a este primero", fr: "Le solliciter en premier", de: "Diesen zuerst fragen", pt: "Perguntar a este primeiro", it: "Chiedi prima a questo", ja: "この人を最初に", zh: "优先联系这个", hi: "पहले इन्हीं से पूछें", ar: "اسأل هذا أولًا",
+  },
+  "real.drop": {
+    en: "Not mine any more", es: "Ya no es mío", fr: "Plus le mien", de: "Nicht mehr meiner", pt: "Já não é meu", it: "Non più mio", ja: "もう自分の人ではない", zh: "不再是我的人", hi: "अब मेरे नहीं", ar: "لم يعد من أهلي",
+  },
+  "real.matter.ph": {
+    en: "what this is about, in one line", es: "de qué se trata, en una línea", fr: "de quoi il s'agit, en une ligne", de: "worum es geht, in einer Zeile", pt: "do que se trata, numa linha", it: "di che cosa si tratta, in una riga", ja: "何についてか、一行で", zh: "这是关于什么的，一行说明", hi: "यह किस बारे में है, एक पंक्ति में", ar: "موضوع هذا، في سطر واحد",
+  },
+  "real.grant.ph": {
+    en: "the grant that says what they may see", es: "el permiso que dice qué pueden ver", fr: "l'autorisation qui dit ce qu'ils peuvent voir", de: "die Freigabe, die sagt, was sie sehen dürfen", pt: "a autorização que diz o que podem ver", it: "il permesso che dice cosa possono vedere", ja: "相手が見てよい範囲を決める許可", zh: "决定他们可以看到什么的授权", hi: "अनुमति, जो बताती है वे क्या देख सकते हैं", ar: "التصريح الذي يحدد ما يجوز لهم رؤيته",
+  },
+  "real.preview": {
+    en: "Show me what would go to {name}", es: "Muéstrame qué le llegaría a {name}", fr: "Montrez-moi ce qui irait à {name}", de: "Zeig mir, was an {name} ginge", pt: "Mostre-me o que iria para {name}", it: "Mostrami cosa andrebbe a {name}", ja: "{name} に何が渡るのか見せてください", zh: "让我看看会发给 {name} 的内容", hi: "दिखाइए कि {name} को क्या जाएगा", ar: "أرِني ما الذي سيصل إلى {name}",
+  },
+  "real.sealed": {
+    en: "sealed in your vault", es: "sellado en tu cámara", fr: "scellé dans votre coffre", de: "in deinem Tresor versiegelt", pt: "selado no seu cofre", it: "sigillato nel tuo caveau", ja: "あなたの金庫に封じられています", zh: "封存在你的保险库中", hi: "आपकी तिजोरी में सीलबंद", ar: "مختوم في خزنتك",
+  },
   "rem.hub": {
     en: "Every dial in one place", es: "Todos los diales en un sitio", fr: "Tous les réglages au même endroit", de: "Alle Regler an einem Ort", pt: "Todos os botões num só lugar", it: "Tutte le manopole in un posto", ja: "すべてのつまみを一箇所に", zh: "所有旋钮集于一处", hi: "सारे डायल एक जगह", ar: "كل الأقراص في مكان واحد",
   },
