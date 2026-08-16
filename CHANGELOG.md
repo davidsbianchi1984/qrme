@@ -6,6 +6,62 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.78.0] - 2026-08-16
+
+### Changed
+
+- **The Agent tab was a card with a textarea, not a front door.** What 0.77.0
+  shipped was a poster at full width, a sentence, and a card headed *Ask for
+  it in words* holding a textarea. The tab is the way in to a collaborator for
+  the whole app, and a person opening it met an illustration and had to scroll
+  to type.
+
+      asked     is there a way to talk to the agent
+      mattered  is it the first thing on the screen
+
+  It is a composer now, the shape the sibling product's `Talk` already uses:
+  one pill with `+` inside on the left, the box, then the microphone, the room
+  and send on the right. Enter sends.
+
+  The `+` opens a vertical popover — Camera, Photos, Files, Plugins, Write or
+  edit — and each of the five opens a screen that exists: what is live in a
+  place, the wall that takes media, the source material a profile answers
+  from, the outside services it connects to, and the screen that composes,
+  proofreads and triages a person's own writing.
+
+  Above it, a rail of nineteen destinations scrolling sideways rather than
+  wrapping into four rows of chips on a phone. Each chip is a tab id and an
+  icon, and its words come from the `nav.<id>` row the navigation itself
+  reads — the destination named once, so a chip cannot end up labelled for one
+  screen and opening another. Three openings sit above the composer for
+  somebody who has the screen and not the sentence; they fill the box rather
+  than sending it.
+
+- **The poster is the tab's, and only the tab's.** It sat on the screen as
+  well, at full width, above everything — a poster inside the room it is the
+  door to, pushing the composer below the fold. It is in the navigation and
+  nowhere else now, and the style and the widgets card that went with it are
+  gone rather than left behind.
+
+### Fixed
+
+- **The deploy page had the commands and not the room.** `docs/beta-deploy.md`
+  section 7 opens on `cd /srv/qrme`. Sections 0-6 are written for somebody
+  already standing on the host and say so in their own ways; 7 was added
+  later, lifted out of a chat message, and arrived without the sentence that
+  had been implicit around it.
+
+      asked     does the page have the commands
+      mattered  does it say where to type them
+
+  `/srv/qrme` does not exist on a laptop and `docker` is usually not installed
+  there either, so a first attempt from the wrong machine fails twice over and
+  both errors read as a broken deploy rather than a wrong room. That happened
+  on the 0.77.0 deploy, to the person who wrote the page. There is an `ssh`
+  step before the pulls now, an `exit` before the health checks, and a note
+  that PowerShell needs `curl.exe` because bare `curl` is aliased to
+  `Invoke-WebRequest` and prints a table where the version should be.
+
 ## [0.77.0] - 2026-08-16
 
 ### Added
@@ -11649,7 +11705,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.77.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.78.0...HEAD
+[0.78.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.78.0
 [0.77.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.77.0
 [0.76.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.76.0
 [0.75.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.75.0
