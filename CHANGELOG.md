@@ -6,6 +6,101 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.77.0] - 2026-08-16
+
+### Added
+
+- **The Agent has its own tab, and a reach worth opening it for.** The agent
+  that can rewrite your page, edit your homepage sandbox and write your
+  widgets had existed since the Studio shipped, and the only way to reach it
+  was to open the widget workshop first — so the person who wanted to say
+  *make my page say what I actually do* had to go somewhere about code to
+  find it.
+
+      asked     can an agent edit this person's app
+      mattered  can the person find the agent
+
+  It is now the second tab, behind the QRME poster cropped to a box. What it
+  did is listed under what it said, because prose describing an edit is
+  asking to be believed and the steps are the part that can be checked.
+
+- **Its roster went from eleven rows to 113.** Eleven was the page, the
+  homepage, the friends list and the widgets, against a screen that reads as
+  a collaborator for the whole app. A surface that implies a general
+  assistant and then refuses two thirds of what is asked of it teaches people
+  to stop asking.
+
+  The list now covers the profile itself, what it knows, the face it wears,
+  proving it is really you, the wall, money, the things that exist — stickers,
+  robots, watches — messages, what it remembers of people, and how it ends.
+
+- **Twelve rows ask instead of doing.** `converse` stops when the model
+  reaches for a step that cannot be taken back and returns what it *would* do
+  — the roster's own sentence and the arguments it chose, both shown — rather
+  than doing it. `POST /profiles/{id}/authoring/act` is where a yes lands: no
+  prose reaches it and no model is asked, so the arguments run exactly as the
+  turn displayed them.
+
+      asked     may this person do this
+      mattered  did this person mean this
+
+  The owner's token has answered the first since the Studio shipped. Nothing
+  answered the second. *Wind it down* and *wind that thread down* are one word
+  apart, and no prompt gets that to zero; a button does. Winding a profile
+  down, handing it on, paying out, deriving a licence, messaging somebody,
+  unsending, granting authority, reaching out, friends in and out, answering
+  an objection, forgetting or erasing a person.
+
+  Still absent by absence: memberships and plans, key material, and
+  `DELETE /profiles/{id}` — ending has its own door in `sunset`, which is in
+  the roster and asks first.
+
+- **A row may name the fields it sets.** `PATCH /profiles/{id}` is how a
+  person renames their profile and rewrites its persona; it is also how they
+  name a successor owner and mark the profile adult. `edit_persona` takes
+  `display_name` and `persona`, and anything else is refused rather than
+  dropped — a dropped field is a change the model will report having made.
+
+- **The room is a scene, and each box is a place to appear.** Every person in
+  an audio room has their own square, the talker's square lights up, and the
+  box is where somebody turns on video, uploads a photo, or wears a mask
+  filter. Backend, console and all three shells.
+
+### Fixed
+
+- **A long answer hit the wall mid-sentence and simply stopped.** Replies were
+  capped at 1024 tokens with the comment *chat replies are deliberately
+  short* — and the same door answers *write me the migration*. The room went
+  up tenfold, and the half that matters is the second: when a provider stops
+  because it ran out of room rather than because it finished, the reply says
+  so, in whichever of the ten languages the platform is speaking. Gemini had
+  no output budget at all.
+
+- **A guard could not tell two doors apart.** The check that every writing
+  tool goes through an owner-scoped door read `"require_owner" in source`.
+  This estate also has `require_owner_or_interactor` — a weaker door, admitting
+  anybody the profile is talking to — which contains that string and read as
+  passing.
+
+- **A route guarded by a helper read as unguarded.** `request_payout` says
+  `owner = _owner_of(profile_id, request)`, and `_owner_of` is three lines
+  whose middle one is `require_owner`. The same check reported a payout route
+  with no owner check at all, and the obvious way to make that pass would
+  have been to loosen the pattern.
+
+- **A value that only survived as its caption.** iOS decodes loose JSON
+  through `AnyDecodable`, which kept a display string and nothing else,
+  because every caller only ever displayed it. The press sends arguments
+  *back*, and a number that made the round trip as `"3"` is a different
+  request from the one the person read.
+
+- **Six live translations reported dead**, after the shared agent conversation
+  took an l10n key *prefix* as a prop — every string rendered, and none was a
+  literal the untranslated-key guard could see.
+
+- **The reply wall, the Agent lesson's way in, and one screen record** that
+  counted one fewer row than it held.
+
 ## [0.76.0] - 2026-08-15
 
 ### Added
@@ -11554,7 +11649,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.76.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.77.0...HEAD
+[0.77.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.77.0
 [0.76.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.76.0
 [0.75.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.75.0
 [0.74.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.74.0
