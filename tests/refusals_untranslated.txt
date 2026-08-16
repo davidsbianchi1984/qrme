@@ -1,4 +1,4 @@
-# status: backlog — 166 rows
+# status: backlog — 149 rows
 #
 # English refusals — the sentences this product says when it says no.
 # Checked by test_the_platform_refuses_in_one_language.py, both directions,
@@ -117,7 +117,6 @@ a desk needs a name a visitor can read
 a device name is at most 60 characters
 a device needs a name you will recognise
 a donation needs an amount above zero
-a fee cannot be negative
 a free follow has nothing to renew
 a grant needs two people
 a link label is at most 60 characters
@@ -141,7 +140,6 @@ a room lends through its own routes — POST /rooms/{id}/mic. Two storage paths 
 a sample needs a positive duration
 a screen showing nothing is a screen turned off
 a session belongs to a place — name it
-a size cannot be negative
 a skill lent in one place cannot be used in another — ask there
 a video link must be http or https
 a video needs a link
@@ -150,7 +148,6 @@ accent must be a #rrggbb colour
 an 18+ stream can only be opened by the person on it: the attestor must be the owner, attesting for themselves
 an edit needs something in it — retract instead
 an empty image is not a picture
-an exchange needs two parties
 an experience entry needs a title
 an imported image needs the rights to use it. Bring one you hold, generate one, or use your own room
 an invented person cannot hold the badge — there is nobody to verify
@@ -159,8 +156,6 @@ campaign not found or already closed
 choose one — a preset emblem or your own image, not both
 coordination takes at least two departments — add another before asking them to coordinate
 delegating `research` requires a grant: without one the phase reads every source item on the profile
-direction is host_to_guest or guest_to_host
-every item needs a name the other side will read
 every share must be above zero
 give it a name — it is what the other people are shown
 hand over a card: `card` as JSON, or `content` as a base64 PNG with one embedded
@@ -177,10 +172,8 @@ no such comment
 no such connection in this session
 no such department in this organization
 no such device
-no such exchange
 no such game session
 no such grant
-no such item on this manifest
 no such message
 no such referral, or it has not been opened yet
 no such request
@@ -194,7 +187,6 @@ no voiceprint for this profile — build one first
 not a PNG — a card image starts with the PNG signature
 not subscribed
 not your comment
-nothing can be accepted until both parties have signed this manifest
 nothing to say
 only a participant can lend a microphone
 only the holder or the viewer can end this
@@ -202,18 +194,12 @@ only the host ends the party
 only the host moves the room's position
 only the person it was offered to can accept it
 only the person it was offered to can decline it
-only the side receiving an item can accept it — the sender cannot accept on their behalf
-only the two parties can reopen this
-only the two parties can sign this
-only the two parties can withdraw this
 only the two people involved can close this
 only your own turn can be edited — a profile's reply is not yours to rewrite
 only your own turn can be retracted
 remote control needs a written scope: what on the machine may be touched, in words the caller will be shown
-reopen the exchange to change the manifest
 say something
 say what is being lent, in words the other reads
-say what the work is, in one sentence
 say what you are trying to find, in your own words
 say where the money goes first — designate loved ones or organizations (PUT /profiles/{id}/proceeds) before asking anyone for it
 scope 'locality' needs a locality
@@ -246,14 +232,11 @@ the image carries a card chunk that does not decode as one
 the image could not be read — it is not base64
 the same friend twice is still one friend
 the summary changed after it was signed; sign the new one
-there is nothing on the manifest — an empty agreement agrees to nothing in particular, which is the state people sign by accident
 there is nothing to refer yet — this releases your sessions with the specialist, and there are none
 this campaign has reached today's donation count — the tokenless door is rate-limited so it can never become a ledger-spam hose; give again tomorrow
 this campaign is closed
 this deployment is reachable beyond localhost but has no QRME_ADMIN_TOKEN configured — objection review and succession stay closed until it is
 this desk is closed, so the bell is off — nobody would hear it
-this exchange is finished
-this exchange is not editable — reopen it to change the manifest, which clears both signatures
 this profile depicts a real person, so an experience entry is a claim about them — record the rights basis that covers the persona before adding one
 this profile does not accept delegated workflows
 this profile is already the organization's own — staff it as a department; a lease is for somebody else's specialist
