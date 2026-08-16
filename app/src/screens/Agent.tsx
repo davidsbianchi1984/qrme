@@ -81,6 +81,7 @@ const PLUS: { id: string; icon: string }[] = [
   { id: "wall", icon: "🖼" },
   { id: "workshop", icon: "📎" },
   { id: "remainder", icon: "🔌" },
+  { id: "assist", icon: "✏️" },
 ];
 
 /** Three openings for somebody who has the screen and not the sentence.
