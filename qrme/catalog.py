@@ -1,4 +1,4 @@
-"""The connected-apps catalog.
+"""The connected-apps catalog — what a plug-in storefront has to offer.
 
 Beyond the social platforms (``routers/social.py``), a synthetic profile and its
 agents can connect to the AI-integrated **apps** on a person's devices — the same
@@ -13,6 +13,29 @@ Each entry declares:
     * ``produce`` — generate output (images, movies, designs).
 
 This is reference data — read-only — that the connect flow validates against.
+
+## Device AI was the whole list, and a storefront is not a device
+
+The first six providers are all somebody's *hardware*: Apple Intelligence,
+Gemini, Copilot, Canva, glasses, consoles. That is a real list and it is not
+the list a person expects when they open something called plug-ins. What
+they expect is the services their day already runs through — the inbox, the
+calendar, the drive, the tracker, the payment processor — none of which are
+device AI and none of which were here.
+
+    asked     which AI features can a connector drive
+    mattered  which of the person's own services can it reach at all
+
+So three more kinds, each its own provider rather than more rows under an
+existing one, because the difference between them is what the connector is
+*allowed to do* and that difference should be legible in the storefront:
+
+- ``work``   — the services a day runs through; most are ``collect``+``act``.
+- ``search`` — reading the open web. Its own kind because the composer's plus
+  menu has had a *search the web* entry waiting on a row to open, and went
+  without one rather than ship a control that opens nothing.
+- ``scrape`` — public social pages, ``collect`` **only**. See that section's
+  own comment for why the restriction is load-bearing rather than tidy.
 """
 
 from __future__ import annotations
@@ -131,6 +154,98 @@ _ROWS = [
     ("gaming", "pc", "PC (cross-platform)",
      ["capture-clip", "screenshot", "voice", "session-context",
       "highlight-reel"], ["collect", "produce"]),
+    # ---- Work and life: what a public plug-in directory actually lists ------
+    #
+    # Everything above is device AI — what Apple, Google and Microsoft put on
+    # a person's own hardware. That is not what a plug-in directory shows
+    # somebody, which is the services their day already runs through. A
+    # storefront built on the rows above would have offered a person Genmoji
+    # and not their inbox.
+    ("work", "gmail", "Gmail", ["read", "send", "search", "labels"], ["collect", "act"]),
+    ("work", "outlook", "Outlook Email", ["read", "send", "search", "rules"], ["collect", "act"]),
+    ("work", "gcal", "Google Calendar", ["read", "schedule", "invite"], ["collect", "act"]),
+    ("work", "outlook-cal", "Outlook Calendar", ["read", "schedule", "invite"], ["collect", "act"]),
+    ("work", "drive", "Google Drive", ["docs", "sheets", "slides", "search"], ["collect", "act", "produce"]),
+    ("work", "onedrive", "OneDrive", ["files", "search"], ["collect", "act"]),
+    ("work", "dropbox", "Dropbox", ["files", "search"], ["collect", "act"]),
+    ("work", "box", "Box", ["files", "search"], ["collect", "act"]),
+    ("work", "notion", "Notion", ["pages", "databases", "search"], ["collect", "act", "produce"]),
+    ("work", "confluence", "Confluence", ["pages", "search"], ["collect", "act"]),
+    ("work", "slack", "Slack", ["read", "post", "search", "threads"], ["collect", "act"]),
+    ("work", "teams", "Microsoft Teams", ["read", "post", "meetings"], ["collect", "act"]),
+    ("work", "github", "GitHub", ["issues", "pull-requests", "ci", "publish"], ["collect", "act"]),
+    ("work", "gitlab", "GitLab", ["issues", "merge-requests", "ci"], ["collect", "act"]),
+    ("work", "jira", "Jira", ["issues", "boards", "search"], ["collect", "act"]),
+    ("work", "linear", "Linear", ["issues", "cycles", "search"], ["collect", "act"]),
+    ("work", "asana", "Asana", ["tasks", "projects"], ["collect", "act"]),
+    ("work", "trello", "Trello", ["cards", "boards"], ["collect", "act"]),
+    ("work", "monday", "monday.com", ["boards", "items"], ["collect", "act"]),
+    ("work", "clickup", "ClickUp", ["tasks", "docs"], ["collect", "act"]),
+    ("work", "airtable", "Airtable", ["bases", "records"], ["collect", "act"]),
+    ("work", "hubspot", "HubSpot", ["contacts", "deals", "email"], ["collect", "act"]),
+    ("work", "salesforce", "Salesforce", ["contacts", "opportunities"], ["collect", "act"]),
+    ("work", "zendesk", "Zendesk", ["tickets", "search"], ["collect", "act"]),
+    ("work", "intercom", "Intercom", ["conversations", "search"], ["collect", "act"]),
+    ("work", "stripe", "Stripe", ["payments", "invoices", "customers"], ["collect", "act"]),
+    ("work", "quickbooks", "QuickBooks", ["invoices", "expenses"], ["collect", "act"]),
+    ("work", "xero", "Xero", ["invoices", "expenses"], ["collect", "act"]),
+    ("work", "shopify", "Shopify", ["orders", "products", "customers"], ["collect", "act"]),
+    ("work", "figma", "Figma", ["files", "comments", "export"], ["collect", "act", "produce"]),
+    ("work", "granola", "Granola", ["meeting-notes", "context"], ["collect"]),
+    ("work", "zoom", "Zoom", ["meetings", "recordings", "transcripts"], ["collect", "act"]),
+    ("work", "calendly", "Calendly", ["availability", "booking"], ["collect", "act"]),
+    ("work", "docusign", "DocuSign", ["envelopes", "signatures"], ["collect", "act"]),
+    ("work", "twilio", "Twilio", ["sms", "voice"], ["act"]),
+    ("work", "sendgrid", "SendGrid", ["email-send", "templates"], ["act"]),
+    ("work", "spotify", "Spotify", ["library", "playlists", "playback"], ["collect", "act"]),
+    ("work", "strava", "Strava", ["activities", "routes"], ["collect"]),
+    ("work", "wikipedia", "Wikipedia", ["lookup", "citations"], ["collect"]),
+    ("work", "arxiv", "arXiv", ["papers", "citations"], ["collect"]),
+    ("work", "pubmed", "PubMed", ["papers", "citations"], ["collect"]),
+
+    # ---- Reading the open web ----------------------------------------------
+    #
+    # Its own kind rather than four more `work` rows, because this is the one
+    # a person means when they say *look it up* — and because the composer's
+    # plus menu has had a "search the web" entry waiting on a row here, and
+    # went without one rather than ship a control that opened nothing.
+    ("search", "web", "Web search", ["query", "cite"], ["collect"]),
+    ("search", "news", "News search", ["query", "cite", "recent"], ["collect"]),
+    ("search", "scholar", "Scholarly search", ["query", "cite"], ["collect"]),
+    ("search", "fetch", "Read a page", ["fetch", "extract", "cite"], ["collect"]),
+
+    # ---- Social, read rather than posted to --------------------------------
+    #
+    # `routers/social.py` already connects a profile *to* a platform: it
+    # publishes, through the same moderation pipeline as chat, and it verifies
+    # a handle somebody pasted. This is the other half, and a different act —
+    # reading a public page to learn from it, with no account on the far side
+    # and nothing posted.
+    #
+    #     asked     can this profile appear on the platform
+    #     mattered  can it read what is there
+    #
+    # Every row here is `collect` only, and that is load-bearing rather than
+    # tidy: a scrape row that could `act` would be `social.py` again under a
+    # different name, on a path with no moderation behind it. The platform
+    # names match `social.py`'s `_HOST_PLATFORM` so the two halves cannot
+    # drift into disagreeing about what a platform is called.
+    ("scrape", "instagram", "Instagram", ["public-posts", "public-profile"], ["collect"]),
+    ("scrape", "x", "X", ["public-posts", "public-profile"], ["collect"]),
+    ("scrape", "tiktok", "TikTok", ["public-posts", "public-profile"], ["collect"]),
+    ("scrape", "facebook", "Facebook", ["public-pages"], ["collect"]),
+    ("scrape", "linkedin", "LinkedIn", ["public-profile", "public-posts"], ["collect"]),
+    ("scrape", "youtube", "YouTube", ["public-videos", "transcripts"], ["collect"]),
+    ("scrape", "reddit", "Reddit", ["public-threads", "subreddits"], ["collect"]),
+    ("scrape", "threads", "Threads", ["public-posts"], ["collect"]),
+    ("scrape", "mastodon", "Mastodon", ["public-posts"], ["collect"]),
+    ("scrape", "twitch", "Twitch", ["public-streams", "clips"], ["collect"]),
+    ("scrape", "pinterest", "Pinterest", ["public-boards"], ["collect"]),
+    ("scrape", "snapchat", "Snapchat", ["public-stories"], ["collect"]),
+    ("scrape", "roblox", "Roblox", ["public-profile", "public-games"], ["collect"]),
+    ("scrape", "discord", "Discord", ["public-servers"], ["collect"]),
+    ("scrape", "whatsapp", "WhatsApp", ["public-channels"], ["collect"]),
+    ("scrape", "meta", "Meta", ["public-pages"], ["collect"]),
 ]
 
 _PROVIDER_LABEL = {
@@ -140,6 +255,9 @@ _PROVIDER_LABEL = {
     "canva": "Canva Magic Studio",
     "glasses": "Smart Glasses",
     "gaming": "Gaming Consoles & Platforms",
+    "work": "Work & life",
+    "search": "Reading the open web",
+    "scrape": "Social, read not posted to",
 }
 
 CONNECTORS = [
