@@ -67,16 +67,15 @@ nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
 .nav-item:hover { color: var(--txt); background: rgba(255,255,255,0.04); }
 .nav-item.active { color: #fff; background: rgba(123,92,255,0.18); box-shadow: inset 3px 0 0 var(--brand); }
 .nav-icon { width: 18px; text-align: center; }
-/* The one tab whose mark is a picture. It is the QRME poster cropped from
-   the Q to the E with its plate, which is a 1.9:1 banner rather than a glyph,
-   so the cell is given the width instead of the art being squeezed into a
-   square. At the 17px the other icons use it renders 32px wide and the
-   lettering is unreadable — the same failure the sibling product's menu icon
-   was redrawn to fix — so it gets a taller slot, and the nav already scrolls
-   sideways when the row runs out of room.
+/* The one tab whose mark is a picture: the QRME poster cropped Q-through-E
+   with its plate, near square at 1.21:1. An earlier crop was a 1.9:1 banner
+   and needed its cell widened to 92px to avoid being crushed; the box needs
+   none of that — 30px tall is 36px wide, which sits in an ordinary cell.
 
-   The word under the tab is the real label and is translated; the plate in
-   the picture is decoration, which is why it may be small. */
+   It still gets a taller slot than the 17px glyphs beside it, because at
+   glyph height the lettering is mud — the same failure the sibling product's
+   menu icon was redrawn to fix. The word under the tab is the real label and
+   is translated; the plate inside the picture is decoration. */
 .nav-art { width: auto; }
 .nav-art img { height: 26px; width: auto; display: block; border-radius: 5px; }
 
@@ -274,11 +273,9 @@ button.danger { background: rgba(224,104,122,0.14) !important; color: var(--red)
   }
   .nav-item.active { box-shadow: none; }
   .nav-icon { width: auto; font-size: 17px; }
-  /* 30px rather than 17: at icon height this banner is 32px wide and reads
-     as noise. Its cell is widened to match so it does not crush the tabs
-     beside it — `nav` is already `overflow-x: auto` below. */
+  /* 30px rather than 17: at glyph height the lettering is unreadable. The
+     box is 36px wide there, so it needs no extra cell width. */
   .nav-art img { height: 30px; }
-  .nav-item:has(.nav-art) { min-width: 92px; }
 
   .content {
     grid-row: 1; padding: 18px 16px 22px;
