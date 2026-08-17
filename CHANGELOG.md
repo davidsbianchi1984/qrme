@@ -6,6 +6,26 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **A guard on the sentence that forgets how it was built.** 0.81.0 fixed the
+  sealed-dialer sentence going out English in every language — `str()` on a
+  `Templated` returns a plain `str`, and the template goes with it — but fixed
+  it at the one site that was known. The guard that makes the class of defect
+  impossible landed after the tag, and it found a second site immediately: the
+  excursion route, written in the same round as the fix, laundering the
+  privilege refusal exactly the same way.
+
+      asked     is the refusal translated
+      mattered  did it still know how it was built when it got there
+
+  `test_a_built_sentence_is_not_laundered_through_str` reads which of this
+  product's own exceptions carry a built sentence, then fails any route that
+  catches one and passes on `str(exc)`. Carried by all three products, where
+  this class of defect has always lived: JIM-mini and PDI have no such
+  exception today, and the guard is what makes the first one safe rather than
+  the thing that ships the defect again.
+
 ## [0.81.0] - 2026-08-17
 
 ### Added

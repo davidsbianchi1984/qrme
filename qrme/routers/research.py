@@ -11,7 +11,7 @@ import json
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import db, privileges, research
+from .. import db, i18n, privileges, research
 from ..common import profile_or_404, require_owner
 from ..models import ExcursionStart
 
@@ -50,7 +50,9 @@ def start_excursion(profile_id: str, body: ExcursionStart, request: Request) -> 
         cid = research.excursion(profile_id, body.topic, body.question,
                                  body.private, request.app.state.cloud)
     except privileges.NotChosen as exc:
-        raise HTTPException(403, str(exc)) from None
+        # `i18n.raised`, not `str(exc)` — see i18n.raised for what str()
+        # forgets on the way.
+        raise HTTPException(403, i18n.raised(exc)) from None
     return _out(_exc_or_404(cid))
 
 
