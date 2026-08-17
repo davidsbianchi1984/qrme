@@ -124,6 +124,14 @@ data class OpenAnswer(val alias: String, val body: String, val pointsTo: String)
 data class Visited(val host: String, val times: Int, val firstSeen: String,
                    val lastSeen: String, val reasons: List<String>,
                    val persistent: Boolean, val stoodDown: Boolean?)
+/** One power the agent may be allowed to use, and what saying yes costs.
+ *  `holds` is the half a roster usually omits; `touchesOthers` marks the ones
+ *  that reach somebody who never chose this, and none of those is ever on by
+ *  default. */
+data class Privilege(val name: String, val mayDo: String, val holds: String,
+                     val needs: List<String>, val touchesOthers: Boolean,
+                     val chosen: Boolean, val byDefault: Boolean,
+                     val why: String)
 data class DialerPosture(val armed: Boolean, val waiver: String,
                          val sealed: Boolean, val callYourself: String)
 /** `placed` is set by a call that connected, and by nothing else. */
@@ -982,6 +990,33 @@ object ApiClient {
     suspend fun visitsAcross(key: String): List<Visited> {
         val arr = JSONArray(request("/visits/across", token = key))
         return (0 until arr.length()).map { visitedOf(arr.getJSONObject(it)) }
+    }
+
+    // ---- what the agent may do ----
+
+    private fun privilegeOf(o: JSONObject): Privilege {
+        val needs = o.optJSONArray("needs")
+        return Privilege(
+            o.getString("name"), o.optString("may_do", ""),
+            o.optString("holds", ""),
+            (0 until (needs?.length() ?: 0)).map { needs!!.getString(it) },
+            o.optBoolean("touches_others"), o.optBoolean("chosen"),
+            o.optBoolean("by_default"), o.optString("why", ""))
+    }
+
+    /** Readable without a token: what an agent may do on somebody's behalf is
+     *  not a secret kept from the person it would be done to. */
+    suspend fun privileges(profile: String, token: String? = null): List<Privilege> {
+        val arr = JSONArray(request("/profiles/$profile/privileges", token = token))
+        return (0 until arr.length()).map { privilegeOf(arr.getJSONObject(it)) }
+    }
+
+    /** The whole roster comes back, not the row. */
+    suspend fun allowPrivilege(profile: String, name: String, on: Boolean,
+                               token: String): List<Privilege> {
+        val arr = JSONArray(request("/profiles/$profile/privileges/$name", "POST",
+            JSONObject().put("on", on), token))
+        return (0 until arr.length()).map { privilegeOf(arr.getJSONObject(it)) }
     }
 
     // ---- when it cannot resolve it, and the door at the end ----

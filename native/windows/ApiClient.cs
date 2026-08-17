@@ -635,6 +635,20 @@ public record Visited(
     [property: JsonPropertyName("persistent")] bool Persistent,
     [property: JsonPropertyName("stood_down")] bool? StoodDown);
 
+/// <summary>One power the agent may be allowed to use, and what saying yes
+/// costs. <c>Holds</c> is the half a roster usually omits;
+/// <c>TouchesOthers</c> marks the ones that reach somebody who never chose
+/// this, and none of those is ever on by default.</summary>
+public record Privilege(
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("may_do")] string MayDo,
+    [property: JsonPropertyName("holds")] string Holds,
+    [property: JsonPropertyName("needs")] string[] Needs,
+    [property: JsonPropertyName("touches_others")] bool TouchesOthers,
+    [property: JsonPropertyName("chosen")] bool Chosen,
+    [property: JsonPropertyName("by_default")] bool ByDefault,
+    [property: JsonPropertyName("why")] string Why);
+
 public record DialerPosture(
     [property: JsonPropertyName("armed")] bool Armed,
     [property: JsonPropertyName("waiver")] string Waiver,
@@ -1734,6 +1748,20 @@ public sealed class ApiClient
     /// failure aggregate, deliberately.</summary>
     public Task<Visited[]> VisitsAcross(string key) =>
         Send<Visited[]>(Get("/visits/across", key));
+
+    // -- what the agent may do --
+
+    /// <summary>Readable without a token: what an agent may do on somebody's
+    /// behalf is not a secret kept from the person it would be done to.
+    /// </summary>
+    public Task<Privilege[]> Privileges(string profile, string? token = null) =>
+        Send<Privilege[]>(Get($"/profiles/{profile}/privileges", token));
+
+    /// <summary>The whole roster comes back, not the row.</summary>
+    public Task<Privilege[]> AllowPrivilege(string profile, string name,
+                                            bool on, string token) =>
+        Send<Privilege[]>(Post($"/profiles/{profile}/privileges/{name}",
+            new { on }, token));
 
     // -- when it cannot resolve it, and the door at the end --
 

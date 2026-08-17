@@ -44,6 +44,12 @@ def _interactor(client):
 def _open(client, profile_id, topic="repairing an old radiator",
           question="Dana needs to know what the valve on Grandpa Joe's "
                    "1920s radiator is called.", private=None):
+    # Putting the owner's question in front of strangers is a privilege the
+    # owner grants, and it is off until they do — see qrme/privileges.py. Said
+    # here once rather than in every test, because these tests are about what
+    # the board carries, not about the roster.
+    client.post(f"/profiles/{profile_id}/privileges/ask_people",
+                json={"on": True})
     r = client.post(f"/profiles/{profile_id}/inquiries",
                     json={"topic": topic, "question": question,
                           "private": private or []})

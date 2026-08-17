@@ -58,6 +58,9 @@ def _person(client, name="Sam"):
 def test_a_workflow_pauses_where_the_world_answers(client):
     p = make_profile(client)
     _seed(client, p)
+    # Two yeses, and only one of them is the grant — see qrme/privileges.py.
+    client.post(f"/profiles/{p['id']}/privileges/run_jobs", json={"on": True},
+                headers=auth_header(p))
     grant = client.post(f"/profiles/{p['id']}/grants", json={},
                         headers=auth_header(p)).json()
     wf = client.post(f"/profiles/{p['id']}/workflows", json={
@@ -154,6 +157,9 @@ def test_the_assistants_verbs_answer_the_owner(client):
 def test_a_task_grant_dies_mid_air(client):
     p = make_profile(client)
     _seed(client, p)
+    # Two yeses, and only one of them is the grant — see qrme/privileges.py.
+    client.post(f"/profiles/{p['id']}/privileges/run_jobs", json={"on": True},
+                headers=auth_header(p))
     grant = client.post(f"/profiles/{p['id']}/grants", json={},
                         headers=auth_header(p)).json()
     ran = client.post(f"/profiles/{p['id']}/tasks",

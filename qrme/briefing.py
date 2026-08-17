@@ -53,7 +53,7 @@ stops — as arithmetic rather than as policy.
 
 from __future__ import annotations
 
-from . import db, signatures, tasks
+from . import db, privileges, signatures, tasks
 
 #: What an attachment says about where it came from. The kinds are the
 #: product's own source kinds rather than a new vocabulary, so a briefing
@@ -107,6 +107,9 @@ def assemble(interactor: dict, profile: dict, provider: dict, matter: str,
     """
     if not matter.strip():
         raise NothingToBrief("say what this is about, in one line")
+    # Before anything is read: this is the profile putting somebody's material
+    # in front of a third party, and it is the row on the roster that says so.
+    privileges.require(profile["id"], "brief_a_professional")
     conn = db.connect()
     recent = conn.execute(
         "SELECT role, content FROM messages WHERE profile_id=?"

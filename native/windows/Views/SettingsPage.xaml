@@ -371,6 +371,42 @@
                                Foreground="{StaticResource QrmeT2Brush}" />
                 </StackPanel>
             </Border>
+            <!-- What the agent may do. The owner decides here; the rows that
+                 are off are shown too, because a roster that hides what
+                 nobody chose is a roster you cannot read anything from. What
+                 each row *keeps* is printed beside it rather than behind a
+                 link. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="MayHead" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="MayLead" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <ItemsControl x:Name="MayList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Spacing="4" Margin="0,0,0,10">
+                                    <TextBlock Text="{Binding MayDo}" TextWrapping="Wrap"
+                                               Foreground="{StaticResource QrmeTxtBrush}" />
+                                    <TextBlock Text="{Binding Keeps}" FontSize="12" TextWrapping="Wrap"
+                                               Foreground="{StaticResource QrmeT2Brush}" />
+                                    <TextBlock Text="{Binding NeedsText}" FontSize="12" TextWrapping="Wrap"
+                                               Visibility="{Binding NeedsVisibility}"
+                                               Foreground="{StaticResource QrmeT2Brush}" />
+                                    <TextBlock Text="{Binding OthersText}" FontSize="12" TextWrapping="Wrap"
+                                               Visibility="{Binding OthersVisibility}"
+                                               Foreground="{StaticResource QrmeTxtBrush}" />
+                                    <TextBlock Text="{Binding StateText}" FontSize="12"
+                                               Foreground="{StaticResource QrmeT2Brush}" />
+                                    <Button Content="{Binding ButtonLabel}" Tag="{Binding Name}"
+                                            Click="OnMayToggle" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </Page>

@@ -667,6 +667,25 @@ def tr_refusal(text: str, language: str) -> str:
             or _PUBLIC.get(text, {})).get(language, text)
 
 
+def raised(exc: Exception):
+    """The sentence an exception was raised with, in the shape it was raised.
+
+    `str(exc)` looks equivalent and is not. `str()` on a `str` subclass returns
+    a plain `str`, so a `Templated` carried by a domain exception and passed on
+    as `HTTPException(403, str(exc))` reaches the handler having forgotten its
+    template — English, silently, and indistinguishable from a sentence nobody
+    has translated yet.
+
+        asked     is the refusal translated
+        mattered  did it still know how it was built when it got there
+
+    The escalation router did exactly that with `DIALER_SEALED`, which is the
+    sentence a person reads while something is going wrong. A route that
+    refuses with a template uses this instead.
+    """
+    return exc.args[0] if exc.args else ""
+
+
 def sentence_of(detail) -> str | None:
     """The part of a refusal a person is meant to read, whatever shape it has.
 
@@ -843,13 +862,48 @@ DIALER_SEALED = ("the dialer is sealed on this deployment and no call was "
 DIALER_NO_CARRIER = ("the dialer is unsealed but no carrier is configured, so "
                      "no call was placed — dial {number} yourself, now")
 
+#: Nobody gave the agent this privilege. The slot holds the thing itself — the
+#: sentence the person would use for it — drawn from the closed vocabulary in
+#: `qrme/privileges.py`, so it arrives translated rather than as `run_jobs` in
+#: the middle of a Portuguese sentence.
+PRIVILEGE_NOT_GIVEN = ("this profile's agent has not been given permission to "
+                       "{doing} — turn it on under what the agent may do, "
+                       "where it says what it will keep")
+
 #: Every template this module offers. Derived from the table below rather than
 #: repeated, so a template with no translations is impossible by construction.
 TEMPLATES = (MUST_BE_ONE_OF, UNKNOWN_SURFACE, OBJECTION_ALREADY,
              MESSAGE_ALREADY, PROFILE_ALREADY, NOT_A_MEMORIAL, PLAN_GATE,
-             DIALER_SEALED, DIALER_NO_CARRIER)
+             DIALER_SEALED, DIALER_NO_CARRIER, PRIVILEGE_NOT_GIVEN)
 
 _TEMPLATES: dict[str, dict[str, str]] = {
+    PRIVILEGE_NOT_GIVEN: {
+        'es': 'el agente de este perfil no tiene permiso para {doing}: '
+              'actívalo en lo que el agente puede hacer, donde dice qué '
+              'guardará',
+        'fr': "l'agent de ce profil n'a pas la permission de {doing} — "
+              "activez-la dans ce que l'agent peut faire, où il est dit ce "
+              "qu'il conservera",
+        'de': 'der Agent dieses Profils hat keine Erlaubnis, {doing} — '
+              'schalte sie unter „was der Agent darf" frei, wo steht, was er '
+              'behält',
+        'pt': 'o agente deste perfil não tem permissão para {doing} — '
+              'ative-a em o que o agente pode fazer, onde diz o que ele '
+              'guardará',
+        'it': "l'agente di questo profilo non ha il permesso di {doing}: "
+              "attivalo in ciò che l'agente può fare, dove dice cosa "
+              "conserverà",
+        'ja': 'このプロフィールのエージェントには{doing}許可が与えられていません — '
+              '「エージェントにできること」で有効にしてください。'
+              '何を保持するかもそこに書かれています',
+        'zh': '此档案的代理未获准{doing}——请在“代理可以做什么”中开启，'
+              '那里写明了它会保留什么',
+        'hi': 'इस प्रोफ़ाइल के एजेंट को {doing} की अनुमति नहीं दी गई है — '
+              'इसे «एजेंट क्या कर सकता है» में चालू कीजिए, जहाँ लिखा है कि '
+              'वह क्या रखेगा',
+        'ar': 'لم يُمنح وكيل هذا الملف إذنًا لـ{doing} — فعّله في «ما يمكن '
+              'للوكيل فعله»، حيث يُذكر ما سيحتفظ به',
+    },
     DIALER_SEALED: {
         'es': 'el marcador está sellado en esta instalación y no se realizó ninguna llamada: marca {number} tú mismo, ahora',
         'fr': "le composeur est scellé sur ce déploiement et aucun appel n'a été passé — composez {number} vous-même, maintenant",
@@ -1116,6 +1170,139 @@ _VOCABULARY: dict[str, dict[str, str]] = {
                   'pt': 'suspenso', 'it': 'sospeso', 'ja': '停止中',
                   'zh': '暂停', 'hi': 'निलंबित', 'ar': 'موقوف'},
 }
+
+
+#: The privilege roster's own sentences — what each power does, and what it
+#: keeps. They lead two lives: shown as a list somebody chooses from, and
+#: dropped into `PRIVILEGE_NOT_GIVEN` as its slot. So they are merged into both
+#: tables below rather than typed into each, because two copies of one sentence
+#: are two sentences the moment somebody edits one.
+#:
+#: The `asks` half is phrased so it reads after "permission to" in every
+#: language — an infinitive in the Romance languages, a masdar in Arabic, an
+#: oblique infinitive in Hindi — and still reads as a list item on its own.
+_PRIVILEGE_SENTENCES: dict[str, dict[str, str]] = {
+    'go and read up on something it does not know': {
+        'es': 'ir a informarse sobre algo que no conoce',
+        'fr': "aller se documenter sur quelque chose qu'il ne connaît pas",
+        'de': 'sich über etwas zu informieren, das er nicht kennt',
+        'pt': 'ir informar-se sobre algo que não conhece',
+        'it': 'andare a informarsi su qualcosa che non conosce',
+        'ja': '知らないことを調べに行く',
+        'zh': '去查阅它所不知道的事情',
+        'hi': 'जो वह नहीं जानता उसे पढ़कर जानने',
+        'ar': 'الاطّلاع على ما لا يعرفه'},
+    'put a question to strangers who can answer it': {
+        'es': 'plantear una pregunta a desconocidos que puedan responderla',
+        'fr': "poser une question à des inconnus capables d'y répondre",
+        'de': 'Fremden eine Frage zu stellen, die sie beantworten können',
+        'pt': 'colocar uma pergunta a desconhecidos que possam respondê-la',
+        'it': 'porre una domanda a sconosciuti che possono rispondere',
+        'ja': '答えられる見知らぬ人に質問を出す',
+        'zh': '向能够回答的陌生人提出问题',
+        'hi': 'अजनबियों से, जो उत्तर दे सकें, प्रश्न पूछने',
+        'ar': 'طرح سؤال على غرباء يمكنهم الإجابة عنه'},
+    'catch a real person up on a matter before they step in': {
+        'es': 'poner al día a una persona real sobre un asunto antes de que '
+              'intervenga',
+        'fr': "mettre une personne réelle au courant d'une affaire avant "
+              "qu'elle intervienne",
+        'de': 'einen echten Menschen über eine Sache ins Bild zu setzen, '
+              'bevor er einsteigt',
+        'pt': 'pôr uma pessoa real a par de um assunto antes de ela entrar',
+        'it': 'mettere una persona reale al corrente di una questione prima '
+              'che intervenga',
+        'ja': '実在の担当者が入る前に、その件について引き継ぐ',
+        'zh': '在真人介入之前，先把事情的来龙去脉交接给他',
+        'hi': 'किसी असली व्यक्ति को, उसके आने से पहले, मामले से अवगत कराने',
+        'ar': 'إطلاع شخص حقيقي على المسألة قبل أن يتدخل'},
+    'reach emergency services when it cannot resolve something': {
+        'es': 'contactar con los servicios de emergencia cuando no puede '
+              'resolver algo',
+        'fr': "joindre les services d'urgence quand il ne peut pas résoudre "
+              "quelque chose",
+        'de': 'den Notruf zu erreichen, wenn er etwas nicht lösen kann',
+        'pt': 'contactar os serviços de emergência quando não consegue '
+              'resolver algo',
+        'it': "contattare i servizi di emergenza quando non riesce a "
+              "risolvere qualcosa",
+        'ja': '解決できないときに緊急サービスへ連絡する',
+        'zh': '在无法解决问题时联系紧急服务',
+        'hi': 'जब वह कुछ हल न कर सके तो आपातकालीन सेवाओं से संपर्क करने',
+        'ar': 'الاتصال بخدمات الطوارئ حين يعجز عن حل أمر ما'},
+    'do a multi-step job over material the owner has granted it': {
+        'es': 'realizar un trabajo de varios pasos sobre material que el '
+              'titular le ha concedido',
+        'fr': "effectuer un travail en plusieurs étapes sur des éléments que "
+              "le titulaire lui a accordés",
+        'de': 'eine mehrstufige Arbeit an Material zu erledigen, das der '
+              'Inhaber ihm freigegeben hat',
+        'pt': 'realizar um trabalho de vários passos sobre material que o '
+              'titular lhe concedeu',
+        'it': "svolgere un lavoro in più passaggi su materiale che il "
+              "titolare gli ha concesso",
+        'ja': '所有者が許可した資料について、複数段階の作業を行う',
+        'zh': '就所有者已授权的材料执行多步骤的工作',
+        'hi': 'स्वामी द्वारा दी गई सामग्री पर बहु-चरणीय कार्य करने',
+        'ar': 'تنفيذ عمل متعدد الخطوات على مواد منحه إياها المالك'},
+    'what it learned, as a knowledge source on the profile': {
+        'es': 'lo que aprendió, como fuente de conocimiento en el perfil',
+        'fr': "ce qu'il a appris, comme source de connaissance sur le profil",
+        'de': 'was es gelernt hat, als Wissensquelle im Profil',
+        'pt': 'o que aprendeu, como fonte de conhecimento no perfil',
+        'it': 'ciò che ha appreso, come fonte di conoscenza sul profilo',
+        'ja': '学んだ内容を、プロフィールの知識ソースとして',
+        'zh': '它学到的内容，作为该档案上的知识来源',
+        'hi': 'जो उसने सीखा, प्रोफ़ाइल पर ज्ञान-स्रोत के रूप में',
+        'ar': 'ما تعلّمه، كمصدر معرفة في الملف'},
+    'answers the owner accepts, as a knowledge source': {
+        'es': 'las respuestas que el titular acepta, como fuente de '
+              'conocimiento',
+        'fr': "les réponses que le titulaire accepte, comme source de "
+              "connaissance",
+        'de': 'die Antworten, die der Inhaber annimmt, als Wissensquelle',
+        'pt': 'as respostas que o titular aceita, como fonte de conhecimento',
+        'it': "le risposte che il titolare accetta, come fonte di conoscenza",
+        'ja': '所有者が受け入れた回答を、知識ソースとして',
+        'zh': '所有者接受的回答，作为知识来源',
+        'hi': 'स्वामी द्वारा स्वीकारे गए उत्तर, ज्ञान-स्रोत के रूप में',
+        'ar': 'الإجابات التي يقبلها المالك، كمصدر معرفة'},
+    'nothing new — it sends what a grant already allows': {
+        'es': 'nada nuevo: envía lo que una concesión ya permite',
+        'fr': "rien de nouveau — il envoie ce qu'une autorisation permet déjà",
+        'de': 'nichts Neues — es sendet, was eine Freigabe ohnehin erlaubt',
+        'pt': 'nada de novo — envia o que uma concessão já permite',
+        'it': 'niente di nuovo: invia ciò che una concessione già consente',
+        'ja': '新たに保持するものはなく、許可がすでに認めた範囲を送るだけ',
+        'zh': '不新增任何保留内容——它只发送授权本已允许的部分',
+        'hi': 'कुछ नया नहीं — वह वही भेजता है जिसकी अनुमति पहले से है',
+        'ar': 'لا شيء جديد — يرسل ما يسمح به التفويض أصلًا'},
+    'the matter, and whether a call connected': {
+        'es': 'el asunto, y si una llamada llegó a conectarse',
+        'fr': "l'affaire, et si un appel a abouti",
+        'de': 'die Sache, und ob ein Anruf zustande kam',
+        'pt': 'o assunto, e se uma chamada chegou a ligar-se',
+        'it': 'la questione, e se una chiamata è stata collegata',
+        'ja': 'その件と、通話がつながったかどうか',
+        'zh': '该事项，以及通话是否接通',
+        'hi': 'मामला, और क्या कोई कॉल जुड़ी',
+        'ar': 'المسألة، وما إذا كانت مكالمة قد اتصلت'},
+    "the job's finished output, watermarked": {
+        'es': 'el resultado terminado del trabajo, con marca de agua',
+        'fr': 'le résultat fini du travail, filigrané',
+        'de': 'das fertige Ergebnis der Arbeit, mit Wasserzeichen',
+        'pt': 'o resultado terminado do trabalho, com marca de água',
+        'it': "il risultato finito del lavoro, con filigrana",
+        'ja': '作業の完成物に、透かしを付けたもの',
+        'zh': '该工作的成品，带水印',
+        'hi': 'कार्य का तैयार परिणाम, वॉटरमार्क सहित',
+        'ar': 'ناتج العمل النهائي، موسومًا بعلامة مائية'},
+}
+
+# One sentence, two tables. `Term` reads the vocabulary when it fills the
+# refusal; `localize_public` reads the public table when the roster is shown.
+_VOCABULARY.update(_PRIVILEGE_SENTENCES)
+_PUBLIC.update(_PRIVILEGE_SENTENCES)
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
@@ -4573,6 +4760,10 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     # screen asks them: a refusal naming `matter` reads as an error about a
     # schema nobody was shown.
     'matter': {'en': 'What this is about', 'es': 'De qué se trata', 'fr': 'De quoi il s’agit', 'de': 'Worum es geht', 'pt': 'Do que se trata', 'it': 'Di che cosa si tratta', 'ja': '何についてか', 'zh': '这是关于什么的', 'hi': 'यह किस बारे में है', 'ar': 'موضوع هذا'},
+    # The one control on a row of the privilege roster. A switch, so the label
+    # is what the switch decides rather than a name for the field — "on" alone
+    # would be a refusal about the API's word for a thing nobody typed.
+    'on': {'en': 'Allowed or not', 'es': 'Permitido o no', 'fr': 'Autorisé ou non', 'de': 'Erlaubt oder nicht', 'pt': 'Permitido ou não', 'it': 'Consentito o no', 'ja': '許可するかどうか', 'zh': '是否允许', 'hi': 'अनुमति है या नहीं', 'ar': 'مسموح أم لا'},
     'preferred': {'en': 'Asked first', 'es': 'Se le pregunta primero', 'fr': 'Sollicité en premier', 'de': 'Zuerst gefragt', 'pt': 'Perguntado primeiro', 'it': 'Interpellato per primo', 'ja': '最初に頼む相手', 'zh': '优先联系', 'hi': 'पहले पूछा जाएगा', 'ar': 'يُسأل أولًا'},
     # The open board's answer form. Somebody with no account is typing here,
     # so a refusal naming the API's word for the field would be a refusal

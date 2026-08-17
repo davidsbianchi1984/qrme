@@ -35,7 +35,7 @@ with a switch on it is a privacy posture somebody will switch:
 
 from __future__ import annotations
 
-from . import db, research
+from . import db, privileges, research
 
 # What an outsider is allowed to see of an inquiry. Every other column on the
 # table is the owner's side of it. Keeping this list here — rather than
@@ -59,7 +59,12 @@ def compose(profile_id: str, topic: str, question: str,
     deliberately no parameter here that turns it off, no plan that exempts a
     profile from it, and no second path that reaches the board. A caller who
     wants to withhold *more* passes ``private``; nobody can withhold less.
+
+    The privilege is asked for here for the same reason the sanitiser is: this
+    is the only way to build one, so it is the only place either can be
+    skipped.
     """
+    privileges.require(profile_id, "ask_people")
     return research.sanitize(profile_id, f"{topic}\n{question}", private)
 
 

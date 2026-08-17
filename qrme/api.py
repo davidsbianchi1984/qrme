@@ -46,7 +46,8 @@ from .routers import (accounts as account_routes,
                       organizations as organization_routes,
                       overlays as overlay_routes, packs, pages, placemic,
                       problems as problem_routes,
-                      frontpage, profiles, research, revisions, robots,
+                      frontpage, privileges as privilege_routes,
+                      profiles, research, revisions, robots,
                       sharing, shops as shop_routes, signatures,
                       socialdm,
                       social, steering,
@@ -184,6 +185,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(visit_routes.router)
     app.include_router(mypeople_routes.router)
     app.include_router(escalation_routes.router)
+    app.include_router(privilege_routes.router)
     app.include_router(summon.router)
     app.include_router(community.router)
     app.include_router(assistant.router)

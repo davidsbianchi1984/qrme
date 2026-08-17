@@ -836,6 +836,21 @@ struct BriefingPreview: Decodable {
 /// Whether the emergency press would be answered, and the words that would
 /// be signed. Readable before arming, so the deployment's seal is known now
 /// rather than at the worst moment.
+/// One power the agent may be allowed to use, and what saying yes costs.
+/// `holds` is the half a roster usually omits; `touches_others` marks the
+/// ones that reach somebody who never chose this, and none of those is ever
+/// on by default.
+struct Privilege: Decodable {
+    let name: String
+    let may_do: String
+    let holds: String
+    let needs: [String]
+    let touches_others: Bool
+    let chosen: Bool
+    let by_default: Bool
+    let why: String
+}
+
 struct DialerPosture: Decodable {
     let armed: Bool
     let signed_at: String?
@@ -1761,6 +1776,24 @@ actor ApiClient {
     /// depth. Same key as the failure aggregate, deliberately.
     func visitsAcross(key: String) async throws -> [Visited] {
         try await request("/visits/across", token: key)
+    }
+
+    // MARK: What the agent may do
+
+    /// Readable without a token: what an agent may do on somebody's behalf is
+    /// not a secret kept from the person it would be done to.
+    func privileges(profile: String,
+                    token: String? = nil) async throws -> [Privilege] {
+        try await request("/profiles/\(profile)/privileges", token: token)
+    }
+
+    /// The whole roster comes back, not the row — a screen that re-reads one
+    /// row agrees with itself about that row and nothing else.
+    @discardableResult
+    func allowPrivilege(profile: String, name: String, on: Bool,
+                        token: String) async throws -> [Privilege] {
+        try await request("/profiles/\(profile)/privileges/\(name)",
+                          method: "POST", body: ["on": on], token: token)
     }
 
     // MARK: When it cannot resolve it, and the door at the end

@@ -42,6 +42,13 @@ from qrme import escalation
 
 def _unresolved(client, profile_id, interactor_id, head,
                 matter="the chest pain is getting worse"):
+    # The owner's half of it. Reaching emergency services is off until the
+    # profile's owner puts it on the roster (qrme/privileges.py); the waiver
+    # below is the *other* person's half, and neither stands in for the other.
+    # It rides here so these tests stay about the door rather than the roster —
+    # which has its own file, including the case where this is missing.
+    client.post(f"/profiles/{profile_id}/privileges/reach_emergency_services",
+                json={"on": True})
     r = client.post(f"/profiles/{profile_id}/unresolved",
                     json={"interactor_id": interactor_id, "matter": matter},
                     headers=head)

@@ -106,6 +106,9 @@ def test_tasks_run_under_revocable_grant(pdi_pair):
     client.post(f"/profiles/{p['id']}/sources", json={
         "kind": "life_event", "title": "wedding 1972",
         "content": "We danced until the band gave up and went home."})
+    # Working unattended is a privilege the owner grants once; the grant
+    # below says only what may be read. See qrme/privileges.py.
+    client.post(f"/profiles/{p['id']}/privileges/run_jobs", json={"on": True})
     grant = client.post(f"/profiles/{p['id']}/grants", json={}).json()
 
     r = client.post(f"/profiles/{p['id']}/tasks", json={

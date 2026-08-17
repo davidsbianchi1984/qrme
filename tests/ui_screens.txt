@@ -1,4 +1,4 @@
-# status: floor — 66 rows
+# status: floor — 67 rows
 #
 # Which console surface each screen drawing depicts.
 #
@@ -72,6 +72,7 @@ Campaigns       145
 Delegate        177
 Signing         178
 Visiting        179
+Allowed         202
 Stranger        180
 TheMark         181
 InWords         182

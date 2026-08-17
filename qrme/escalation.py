@@ -61,7 +61,7 @@ from __future__ import annotations
 
 import os
 
-from . import db, i18n, signatures
+from . import db, i18n, privileges, signatures
 
 _TRUTHY = {"1", "true", "yes", "on"}
 
@@ -239,6 +239,10 @@ def dial(escalation_id: str, interactor_id: str) -> dict:
     row = get(escalation_id)
     if row["interactor_id"] != interactor_id:
         raise NotArmed("that escalation belongs to somebody else")
+    # Two people have to have agreed: the profile's owner, who put this power
+    # on the roster, and the person pressing, who signed the waiver. Neither
+    # yes stands in for the other.
+    privileges.require(row["profile_id"], "reach_emergency_services")
     if not armed(interactor_id)["armed"]:
         raise NotArmed(
             "sign the emergency-services waiver before this can be pressed — "

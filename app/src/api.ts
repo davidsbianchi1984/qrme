@@ -2675,6 +2675,23 @@ export type MyPerson = {
   in_your_area?: boolean;
 };
 
+/** One power the agent may be allowed to use, and what saying yes costs.
+ *
+ *  `holds` is the half a roster usually omits — "summarise your meetings" and
+ *  "summarise your meetings, and keep the recording" are different agreements.
+ *  `touches_others` marks the ones that reach somebody who never chose this,
+ *  and nothing carrying it is ever on by default. */
+export type Privilege = {
+  name: string;
+  may_do: string;
+  holds: string;
+  needs: string[];
+  touches_others: boolean;
+  chosen: boolean;
+  by_default: boolean;
+  why: string;
+};
+
 /** Whether the emergency press would be answered, and the words that would
  *  be signed. Readable *before* arming, deliberately: a person deciding
  *  should be able to read what they would sign, and should learn now that
@@ -3359,6 +3376,16 @@ export const api = {
     req<{ provider_id: string; attached: boolean }>(
       `/interactors/${interactorId}/people/${providerId}`,
       { method: "DELETE", token }),
+  // What this profile's agent may do. Readable by anyone who can see the
+  // profile — what an agent may do on somebody's behalf is not a secret kept
+  // from the person it would be done to — and changeable only by the owner,
+  // whose token `req` sends when one is passed.
+  privileges: (profileId: string, token?: string) =>
+    req<Privilege[]>(`/profiles/${profileId}/privileges`, { token }),
+  allowPrivilege: (profileId: string, name: string, on: boolean,
+                   token: string) =>
+    req<Privilege[]>(`/profiles/${profileId}/privileges/${name}`,
+      { method: "POST", body: { on }, token }),
   // When the profile reaches its limit, and the door at the end of it.
   dialerPosture: (interactorId: string, token: string) =>
     req<DialerPosture>(`/interactors/${interactorId}/dialer`, { token }),

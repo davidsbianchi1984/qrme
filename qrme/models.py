@@ -736,6 +736,13 @@ class Unresolved(BaseModel):
     matter: str                # what the profile could not resolve
 
 
+class PrivilegeChoice(BaseModel):
+    # Yes or no to one power, named in the path. Required rather than
+    # defaulted: a body that can be empty is a body that turns something on by
+    # arriving.
+    on: bool
+
+
 class PersonAttach(BaseModel):
     provider_id: str
     note: str | None = None

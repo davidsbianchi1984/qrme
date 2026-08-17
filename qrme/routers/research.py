@@ -11,7 +11,7 @@ import json
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import db, research
+from .. import db, privileges, research
 from ..common import profile_or_404, require_owner
 from ..models import ExcursionStart
 
@@ -43,21 +43,14 @@ def _out(row: dict) -> dict:
 def start_excursion(profile_id: str, body: ExcursionStart, request: Request) -> dict:
     profile_or_404(profile_id)
     require_owner(profile_id, request)
-    cloud = request.app.state.cloud
-    # Everything outbound is sanitized: the owner's private terms never leave.
-    brief, redactions = research.sanitize(profile_id, f"{body.topic}\n{body.question}",
-                                          body.private)
-    left_host = research.would_leave(cloud)
-    findings = research.gather(brief, cloud)
-    cid = db.new_id("exc")
-    db.connect().execute(
-        "INSERT INTO excursions (id, profile_id, topic, brief, redactions,"
-        " left_host, findings, learned_src, created_at)"
-        " VALUES (?,?,?,?,?,?,?,NULL,?)",
-        (cid, profile_id, body.topic, brief, redactions, int(left_host),
-         findings, db.utcnow()),
-    )
-    db.connect().commit()
+    # Everything outbound is sanitized and the privilege is asked for on the
+    # way — both inside `research.excursion`, so a second caller cannot get
+    # either wrong.
+    try:
+        cid = research.excursion(profile_id, body.topic, body.question,
+                                 body.private, request.app.state.cloud)
+    except privileges.NotChosen as exc:
+        raise HTTPException(403, str(exc)) from None
     return _out(_exc_or_404(cid))
 
 

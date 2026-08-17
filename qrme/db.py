@@ -167,6 +167,19 @@ CREATE TABLE IF NOT EXISTS escalations (
     created_at    TEXT NOT NULL
 );
 
+-- What the owner has let the agent do. Absent means *never asked*, which is
+-- why a decision is written even when it matches the default: a row here is
+-- somebody's answer, and it survives a default changing under it. The defaults
+-- themselves live in qrme/privileges.py beside what each power costs, and a
+-- guard refuses any that reach people who did not choose them.
+CREATE TABLE IF NOT EXISTS chosen_privileges (
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    privilege  TEXT NOT NULL,
+    chosen     INTEGER NOT NULL,
+    decided_at TEXT NOT NULL,
+    PRIMARY KEY (profile_id, privilege)
+);
+
 -- The emergency-services charges waiver, signed ahead of time in calm
 -- conditions rather than during the emergency. The signed text is stored
 -- beside its hash: "they agreed" is a claim, and this is the evidence.

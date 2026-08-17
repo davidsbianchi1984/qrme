@@ -8,6 +8,61 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **A roster of what the agent may do, and nobody says yes by arriving.** The
+  product grew powers faster than it grew a place to see them. A profile could
+  go and study the open web, put a question to strangers, package a history for
+  a professional, run a job over vaulted material and reach emergency services,
+  and the only way to find out was to read a changelog or to meet one
+  mid-conversation.
+
+      asked     can the agent do this
+      mattered  did the person decide it could, knowing what it costs
+
+  **Each row says what it keeps**, which is the half these lists usually omit.
+  "Summarise your meetings" and "summarise your meetings, and keep the
+  recording" are different agreements, and only one of them is what the code
+  does. It says what access it needs, and whether exercising it reaches
+  somebody who never chose it.
+
+  **That last one is a field rather than a paragraph, so it can be checked.**
+  Anything that reaches people who did not choose it is off until somebody
+  turns it on, whatever else is true about it, and a guard reads the table and
+  refuses. Convenience defaults are how a product ends up recording a room that
+  did not agree to be recorded, and the argument for one always sounds
+  reasonable at the time. One row is on by default — going out to read — and it
+  carries the written reason why, beside the sanitiser and the visits ledger
+  that make it answerable.
+
+  **The check sits at each power's own last hop**, never in the route above it:
+  `inquiries.compose`, `briefing.assemble`, `tasks.run`, `escalation.dial`, and
+  a new `research.excursion` that took the excursion's logic out of its router
+  to have somewhere honest to put it. A refusal that lives in a route is a
+  refusal the second caller walks past.
+
+  **The refusal names the thing, not the row.** `run_jobs` in a Portuguese
+  sentence is the mixed refusal `i18n.Term` exists to prevent, so each power's
+  own sentence is in the vocabulary and arrives translated — and the same ten
+  sentences render the roster, from one table rather than two.
+
+  **Visitors read it too.** What an agent may do on somebody's behalf is not a
+  secret kept from the person it would be done to, and somebody deciding
+  whether to bring a matter here can now look instead of hoping it is offered.
+
+  This is not `social.FEATURES` and it is not `tiers.CAPABILITIES`: one is what
+  the page shows and defaults on, the other is what the plan pays for. This is
+  what a person let their agent do, and it defaults off. Three tables, three
+  questions, kept apart so nothing lands in the wrong one.
+
+  On the console, on iOS, on Android and on Windows.
+
+- **A templated refusal reached the reader as English.** `str(exc)` on a
+  `Templated` returns a plain `str`, which forgets how the sentence was built —
+  so a refusal carried through a domain exception and passed on as
+  `HTTPException(503, str(exc))` was English in every language, silently.
+  `DIALER_SEALED` went out that way: the sentence somebody reads while
+  something is going wrong, translated into nine languages last release and
+  reaching none of them. `i18n.raised` is what a route passes on now.
+
 - **A real dialer, an explicit press, and a door that will not open in beta.**
   A profile can hand a matter to somebody real. Some matters do not wait for a
   butcher or a broker, and the honest end of that ladder is emergency

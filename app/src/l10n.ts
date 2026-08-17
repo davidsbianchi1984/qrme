@@ -935,6 +935,12 @@ const CHROME: Table = {
     ja: "署名", zh: "签署", hi: "हस्ताक्षर",
     ar: "التوقيع",
   },
+  "nav.allowed": {
+    en: "What it may do", es: "Lo que puede hacer", fr: "Ce qu'il peut faire",
+    de: "Was er darf", pt: "O que pode fazer", it: "Cosa può fare",
+    ja: "できること", zh: "可以做什么", hi: "क्या कर सकता है",
+    ar: "ما يمكنه فعله",
+  },
   "nav.visiting": {
     en: "Visiting", es: "De visita", fr: "En visite",
     de: "Zu Besuch", pt: "Em visita", it: "In visita",
@@ -4969,6 +4975,39 @@ const CHROME: Table = {
   },
   "vis.scan.sharedroom": {
     en: " Scanning joins one shared room.", es: " Escanearlo lleva a una sala compartida.", fr: " Le scan fait rejoindre un salon partagé.", de: " Das Scannen führt in einen gemeinsamen Raum.", pt: " Digitalizar leva a uma sala partilhada.", it: " La scansione porta in una stanza condivisa.", ja: "スキャンすると共有ルームに参加します。", zh: "扫描后会加入同一个共享房间。", hi: " स्कैन करने पर एक साझा कक्ष में शामिल हो जाते हैं.", ar: " المسح يُدخلك غرفة مشتركة واحدة.",
+  },
+  "may.title": {
+    en: "What it may do", es: "Lo que puede hacer", fr: "Ce qu'il peut faire", de: "Was er darf", pt: "O que pode fazer", it: "Cosa può fare", ja: "エージェントにできること", zh: "代理可以做什么", hi: "यह क्या कर सकता है", ar: "ما يمكن للوكيل فعله",
+  },
+  "may.lead": {
+    en: "Every power this agent has, what each one keeps, and which of them somebody said yes to.", es: "Todo lo que este agente puede hacer, qué guarda cada cosa, y a cuáles alguien dijo que sí.", fr: "Tout ce que cet agent peut faire, ce que chaque pouvoir conserve, et ceux auxquels quelqu'un a dit oui.", de: "Alles, was dieser Agent kann, was jede Fähigkeit behält, und wozu jemand Ja gesagt hat.", pt: "Tudo o que este agente pode fazer, o que cada coisa guarda, e a quais alguém disse que sim.", it: "Tutto ciò che questo agente può fare, cosa conserva ciascuna cosa, e a quali qualcuno ha detto di sì.", ja: "このエージェントにできることすべてと、それぞれが何を保持するか、そしてどれに誰かが「はい」と言ったか。", zh: "这个代理拥有的每一项能力、每一项会保留什么，以及哪些已经有人点头同意。", hi: "इस एजेंट की हर क्षमता, हर एक क्या रखती है, और किन्हें किसी ने हाँ कहा है।", ar: "كل ما يستطيع هذا الوكيل فعله، وما تحتفظ به كل قدرة، وأيها وافق عليه أحد.",
+  },
+  "may.visitor": {
+    en: "You are reading this as a visitor: this is what the profile is able to do for you. Only its owner can change it.", es: "Lo estás leyendo como visitante: esto es lo que el perfil puede hacer por ti. Solo su titular puede cambiarlo.", fr: "Vous lisez ceci en visiteur : voici ce que le profil peut faire pour vous. Seul son titulaire peut le modifier.", de: "Du liest das als Besucher: das ist, was das Profil für dich tun kann. Ändern kann es nur sein Inhaber.", pt: "Está a ler isto como visitante: é o que o perfil pode fazer por si. Só o titular o pode alterar.", it: "Lo stai leggendo da visitatore: questo è ciò che il profilo può fare per te. Solo il titolare può cambiarlo.", ja: "訪問者として見ています。これはこのプロフィールがあなたのためにできることです。変更できるのは所有者だけです。", zh: "你是以访客身份查看：这是这份档案能为你做的事。只有它的所有者能更改。", hi: "आप इसे आगंतुक के रूप में देख रहे हैं: यह वह है जो यह प्रोफ़ाइल आपके लिए कर सकती है। इसे केवल इसका स्वामी बदल सकता है।", ar: "تقرأ هذا كزائر: هذا ما يستطيع الملف فعله من أجلك. ولا يغيّره إلا مالكه.",
+  },
+  "may.keeps": {
+    en: "What it keeps:", es: "Qué guarda:", fr: "Ce qu'il conserve :", de: "Was es behält:", pt: "O que guarda:", it: "Cosa conserva:", ja: "保持するもの：", zh: "会保留什么：", hi: "क्या रखता है:", ar: "ما يحتفظ به:",
+  },
+  "may.keeps.nothing": {
+    en: "nothing", es: "nada", fr: "rien", de: "nichts", pt: "nada", it: "niente", ja: "何も保持しません", zh: "不保留任何东西", hi: "कुछ नहीं", ar: "لا شيء",
+  },
+  "may.needs": {
+    en: "Needs:", es: "Necesita:", fr: "Nécessite :", de: "Braucht:", pt: "Precisa de:", it: "Richiede:", ja: "必要なもの：", zh: "需要：", hi: "आवश्यक:", ar: "يحتاج:",
+  },
+  "may.others": {
+    en: "This one reaches somebody who never chose it.", es: "Esta alcanza a alguien que nunca la eligió.", fr: "Celui-ci touche quelqu'un qui ne l'a jamais choisi.", de: "Diese erreicht jemanden, der sie nie gewählt hat.", pt: "Esta atinge alguém que nunca a escolheu.", it: "Questa raggiunge qualcuno che non l'ha mai scelta.", ja: "これは、選んでいない他者にも及びます。", zh: "这一项会触及从未做出选择的其他人。", hi: "यह किसी ऐसे व्यक्ति तक पहुँचती है जिसने इसे कभी नहीं चुना।", ar: "هذه تصل إلى شخص لم يخترها قط.",
+  },
+  "may.on": {
+    en: "Allowed.", es: "Permitido.", fr: "Autorisé.", de: "Erlaubt.", pt: "Permitido.", it: "Consentito.", ja: "許可されています。", zh: "已允许。", hi: "अनुमति है।", ar: "مسموح.",
+  },
+  "may.off": {
+    en: "Not allowed. Nobody has turned this on.", es: "No permitido. Nadie lo ha activado.", fr: "Non autorisé. Personne ne l'a activé.", de: "Nicht erlaubt. Niemand hat das eingeschaltet.", pt: "Não permitido. Ninguém o ativou.", it: "Non consentito. Nessuno l'ha attivato.", ja: "許可されていません。誰も有効にしていません。", zh: "未允许。没有人开启过它。", hi: "अनुमति नहीं। किसी ने इसे चालू नहीं किया।", ar: "غير مسموح. لم يفعّله أحد.",
+  },
+  "may.turnon": {
+    en: "Allow this", es: "Permitir esto", fr: "Autoriser", de: "Das erlauben", pt: "Permitir isto", it: "Consenti questo", ja: "これを許可する", zh: "允许这一项", hi: "इसकी अनुमति दें", ar: "اسمح بهذا",
+  },
+  "may.turnoff": {
+    en: "Stop allowing this", es: "Dejar de permitirlo", fr: "Ne plus autoriser", de: "Nicht mehr erlauben", pt: "Deixar de permitir", it: "Non consentire più", ja: "許可をやめる", zh: "不再允许", hi: "अनुमति हटाएँ", ar: "أوقف السماح بهذا",
   },
   "pas.title": {
     en: "Beginning, and passing on", es: "Comenzar, y pasar el testigo", fr: "Commencer, et transmettre", de: "Anfang, und Weitergabe", pt: "Começar, e passar adiante", it: "Iniziare, e passare oltre", ja: "始まりと、受け渡し", zh: "开始，以及传承", hi: "आरंभ, और आगे सौंपना", ar: "البداية، والتوريث",

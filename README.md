@@ -641,6 +641,7 @@ is exactly how the old card came to be showing yours in place of theirs.
   </tr>
   <tr>
     <td align="center" width="25%"><a href="docs/screens/201-plug-ins.svg"><img src="docs/screens/201-plug-ins.svg" width="210" alt="Plug-ins"></a><br><sub><b>201</b> · Plug-ins · what it can reach, and what it needs first</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/202-what-it-may-do.svg"><img src="docs/screens/202-what-it-may-do.svg" width="210" alt="What it may do"></a><br><sub><b>202</b> · What it may do · every power, and what each one keeps</sub></td>
   </tr>
 </table>
 

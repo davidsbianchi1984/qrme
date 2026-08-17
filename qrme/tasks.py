@@ -13,7 +13,7 @@ from __future__ import annotations
 import json
 import secrets
 
-from . import db, llm, moderation, persona, watermark
+from . import db, llm, moderation, persona, privileges, watermark
 
 
 def create_grant(profile_id: str, scope: list[str] | None) -> dict:
@@ -84,6 +84,10 @@ def run(profile: dict, kind: str, topic: str, grant_token: str,
         pdi=None, cloud=None) -> dict:
     """Execute a multi-step task under a revocable grant."""
     profile_id = profile["id"]
+    # A grant says *what may be read*. The privilege says *whether this agent
+    # works unattended at all* — two different yeses, and a revoked grant has
+    # never been an answer to the second.
+    privileges.require(profile_id, "run_jobs")
     steps: list[dict] = []
 
     # Step 1 — authorization: the grant must exist and not be revoked.

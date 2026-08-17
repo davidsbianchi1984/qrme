@@ -7,8 +7,8 @@ import json
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import (adaptation, agentlight, db, delegation, offline, simulation,
-                tasks, workflows)
+from .. import (adaptation, agentlight, db, delegation, i18n, offline,
+                privileges, simulation, tasks, workflows)
 from ..common import (require_may_publish, 
     anonymized_exchange, interactor_or_404, profile_or_404,
     require_interactor, require_owner, require_owner_or_interactor,
@@ -103,9 +103,12 @@ def run_task(profile_id: str, body: TaskRun, request: Request) -> dict:
     profile = profile_or_404(profile_id)
     require_owner(profile_id, request)
     require_may_publish(profile)
-    result = tasks.run(profile, body.kind, body.topic, body.grant_token,
-                       pdi=request.app.state.pdi,
-                       cloud=request.app.state.cloud)
+    try:
+        result = tasks.run(profile, body.kind, body.topic, body.grant_token,
+                           pdi=request.app.state.pdi,
+                           cloud=request.app.state.cloud)
+    except privileges.NotChosen as exc:
+        raise HTTPException(403, i18n.raised(exc)) from None
     if result["status"] == "failed" and "grant" in result.get("reason", ""):
         raise HTTPException(403, result["reason"])
     return result

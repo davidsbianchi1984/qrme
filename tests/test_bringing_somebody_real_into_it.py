@@ -52,6 +52,12 @@ def _provider(client, name="Marsh & Sons", area="butchery",
 
 
 def _grant(client, profile_id, scope=None):
+    # Briefing a real person is a privilege the owner grants once, separately
+    # from the grant that says *what* may be read — see qrme/privileges.py.
+    # Both are needed, and saying so here keeps the tests below about the
+    # material rather than about the roster.
+    client.post(f"/profiles/{profile_id}/privileges/brief_a_professional",
+                json={"on": True})
     r = client.post(f"/profiles/{profile_id}/grants",
                     json={"scope": scope} if scope else {})
     assert r.status_code == 201, r.text
@@ -174,6 +180,10 @@ def test_revoking_the_grant_empties_the_briefing(
         "provider_id": pid, "matter": "the lamb that arrived grey",
         "grant_token": grant["token"]}, headers=interactor_head)
     assert r.status_code == 403, r.text
+    # Refused for the revoked grant, not for a missing privilege: two refusals
+    # with one status code, and a test that only reads the number would go on
+    # passing after the path it names had stopped being reached.
+    assert "revoked" in r.text
 
 
 def test_a_narrow_grant_carries_only_what_it_names(

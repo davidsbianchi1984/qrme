@@ -3803,6 +3803,22 @@ SCREENS = [
     # the lock and what it means, the two halves of what a connector may do,
     # and uninstall, which is on this screen because it was on no screen at
     # all until now.
+    # 202: the roster. The first card is the row that is on before anybody
+    # touched it — and it is the only one allowed to be, because it reaches
+    # nobody and says in writing why. The last is the rule the whole screen
+    # exists to make visible.
+    dict(num=202, title="What It May Do", sub="Every power, and what each one keeps",
+         accent="brand", tab=0, cards=[
+        dict(icon="page", color="green", k="Read up on it",
+             s="on · keeps what it learned",
+             pill=("on", "good")),
+        dict(icon="chat", color="silver", k="Ask people who know",
+             s="nobody has turned this on"),
+        dict(icon="lock", color="amber", k="Brief a professional",
+             s="reaches somebody else · off"),
+        dict(icon="clock", color="silver", k="Reach emergency",
+             s="needs a signed waiver · off"),
+    ], button=("Off until somebody says yes", "brand")),
     dict(num=201, title="Plug-ins", sub="What it can reach, and what it needs first",
          accent="cyan", tab=0, cards=[
         dict(icon="link", color="cyan", k="The whole board",

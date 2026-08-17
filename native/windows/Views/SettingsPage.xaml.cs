@@ -23,6 +23,26 @@ public sealed partial class SettingsPage : Page
             CanAttest ? Visibility.Visible : Visibility.Collapsed;
     }
 
+    /// <summary>One row of the privilege roster. The labels ride on the row
+    /// rather than on a page field, because the controls live inside a
+    /// DataTemplate — there is no per-row button to reach for.</summary>
+    public sealed class MayRow
+    {
+        public string Name { get; init; } = "";
+        public string MayDo { get; init; } = "";
+        public string Keeps { get; init; } = "";
+        public string NeedsText { get; init; } = "";
+        public string OthersText { get; init; } = "";
+        public string StateText { get; init; } = "";
+        public string ButtonLabel { get; init; } = "";
+        public bool Chosen { get; init; }
+        public bool TouchesOthers { get; init; }
+        public Visibility NeedsVisibility =>
+            NeedsText.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility OthersVisibility =>
+            TouchesOthers ? Visibility.Visible : Visibility.Collapsed;
+    }
+
     public sealed class FeedbackRow
     {
         public string Line { get; init; } = "";
@@ -225,6 +245,58 @@ public sealed partial class SettingsPage : Page
         await LoadFeedback();
         await LoadSteering();
         await LoadWatermark();
+        await LoadMay();
+    }
+
+    /// <summary>What this profile's agent may do. Every row, including the
+    /// ones nobody has turned on — those are the half that makes the list mean
+    /// anything.</summary>
+    private async System.Threading.Tasks.Task LoadMay()
+    {
+        var s = AppState.Current;
+        var lang = s.Language;
+        MayHead.Text = L10n.T("may.title", lang);
+        MayLead.Text = L10n.T("may.lead", lang);
+        try
+        {
+            var rows = await ApiClient.Shared.Privileges(s.Pid!, s.Token);
+            MayList.ItemsSource = rows.Select(r => new MayRow
+            {
+                Name = r.Name,
+                MayDo = r.MayDo,
+                Keeps = L10n.T("may.keeps", lang) + " "
+                        + (r.Holds.Length > 0 ? r.Holds
+                           : L10n.T("may.keeps.nothing", lang)),
+                NeedsText = r.Needs.Length > 0
+                    ? L10n.T("may.needs", lang) + " " + string.Join(" · ", r.Needs)
+                    : "",
+                OthersText = L10n.T("may.others", lang),
+                TouchesOthers = r.TouchesOthers,
+                Chosen = r.Chosen,
+                StateText = r.Chosen ? L10n.T("may.on", lang)
+                                     : L10n.T("may.off", lang),
+                ButtonLabel = r.Chosen ? L10n.T("may.turnoff", lang)
+                                       : L10n.T("may.turnon", lang),
+            }).ToList();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    /// <summary>The whole roster comes back from the press, so the list is
+    /// replaced rather than patched.</summary>
+    private async void OnMayToggle(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        var name = (string)((Button)sender).Tag;
+        var row = ((IEnumerable<MayRow>)MayList.ItemsSource)
+            .First(r => r.Name == name);
+        try
+        {
+            await ApiClient.Shared.AllowPrivilege(s.Pid!, name, !row.Chosen,
+                                                  s.Token!);
+            await LoadMay();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
     }
 
     private async System.Threading.Tasks.Task LoadWatermark()

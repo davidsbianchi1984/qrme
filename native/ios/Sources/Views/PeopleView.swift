@@ -261,6 +261,7 @@ struct PeopleSection: View {
                 ReachSection()
                 LicenseSection()
                 SensesSection()
+                AllowedSection()
 
                 if let note {
                     Text(note).font(.caption).foregroundStyle(Theme.t2)

@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import escalation
+from .. import escalation, i18n, privileges
 from ..common import interactor_or_404, profile_or_404, require_interactor
 from ..models import DialArm, Unresolved
 
@@ -90,7 +90,12 @@ def dial(escalation_id: str, request: Request,
     try:
         escalation.dial(escalation_id, interactor_id)
     except escalation.Sealed as exc:
-        raise HTTPException(503, str(exc)) from None
+        # `i18n.raised`, not `str(exc)`: the seal's sentence is built from a
+        # template and `str()` on a str subclass forgets that, which left the
+        # most important refusal in this product English in every language.
+        raise HTTPException(503, i18n.raised(exc)) from None
+    except privileges.NotChosen as exc:
+        raise HTTPException(403, i18n.raised(exc)) from None
     except escalation.NotArmed as exc:
         raise HTTPException(403, str(exc)) from None
     except ValueError as exc:

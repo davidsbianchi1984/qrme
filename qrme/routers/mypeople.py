@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import briefing, mypeople, tasks
+from .. import briefing, i18n, mypeople, privileges, tasks
 from ..common import interactor_or_404, profile_or_404, require_interactor
 from ..models import BriefingPreview, PersonAttach
 
@@ -102,6 +102,8 @@ def preview_briefing(body: BriefingPreview, request: Request) -> dict:
         package = briefing.assemble(
             interactor, profile, {"name": person["name"], "area": person["area"]},
             body.matter, body.grant_token, pdi=request.app.state.pdi)
+    except privileges.NotChosen as exc:
+        raise HTTPException(403, i18n.raised(exc)) from None
     except tasks.NothingGranted as exc:
         raise HTTPException(403, str(exc)) from None
     except briefing.NothingToBrief as exc:

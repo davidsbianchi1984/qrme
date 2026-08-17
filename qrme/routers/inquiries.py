@@ -22,7 +22,7 @@ import json
 
 from fastapi import APIRouter, Header, HTTPException, Request
 
-from .. import db, i18n, inquiries, moderation
+from .. import db, i18n, inquiries, moderation, privileges
 from ..common import profile_or_404, require_owner
 from ..models import InquiryAnswer, InquiryOpen
 
@@ -75,8 +75,11 @@ def open_inquiry(profile_id: str, body: InquiryOpen, request: Request) -> dict:
     require_owner(profile_id, request)
     if not body.question.strip():
         raise HTTPException(400, "say what you want to know, in one question")
-    brief, redactions = inquiries.compose(
-        profile_id, body.topic, body.question, body.private)
+    try:
+        brief, redactions = inquiries.compose(
+            profile_id, body.topic, body.question, body.private)
+    except privileges.NotChosen as exc:
+        raise HTTPException(403, i18n.raised(exc)) from None
     iid = db.new_id("inq")
     conn = db.connect()
     conn.execute(

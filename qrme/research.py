@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import re
 
-from . import db, llm, offline
+from . import db, llm, offline, privileges
 
 REDACTION = "[private]"
 
@@ -81,3 +81,32 @@ def gather(brief: str, cloud=None) -> str:
     deterministic provider — no network."""
     provider = llm.get_provider(None if offline.enabled() else cloud)
     return provider.generate(_RESEARCH_SYSTEM, [{"role": "user", "content": brief}])
+
+
+def excursion(profile_id: str, topic: str, question: str,
+              private: list[str] | None = None, cloud=None) -> str:
+    """Go and study something, and write down what could have left.
+
+    This lived in the router until the privilege roster arrived, and a check
+    that lives in a route is a check the second caller walks past. Going out to
+    read is a thing the owner said the agent may do, so the permission is
+    asked here — on the path that sanitizes, gathers and records — rather than
+    at the door above it.
+
+    Returns the excursion id. The row is the audit trail: the sanitized brief
+    is exactly what could have left, beside the count of what was taken out.
+    """
+    privileges.require(profile_id, "study_the_web")
+    brief, redactions = sanitize(profile_id, f"{topic}\n{question}", private)
+    left_host = would_leave(cloud)
+    findings = gather(brief, cloud)
+    cid = db.new_id("exc")
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO excursions (id, profile_id, topic, brief, redactions,"
+        " left_host, findings, learned_src, created_at)"
+        " VALUES (?,?,?,?,?,?,?,NULL,?)",
+        (cid, profile_id, topic, brief, redactions, int(left_host),
+         findings, db.utcnow()))
+    conn.commit()
+    return cid

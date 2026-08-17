@@ -3674,6 +3674,7 @@ private fun PeoplePanel(vm: StudioViewModel) {
         ReachBlock(vm) { note = it }
         LicBlock(vm) { note = it }
         SensBlock(vm) { note = it }
+        MayBlock(vm) { note = it }
 
         note?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
     }
@@ -6498,6 +6499,70 @@ private fun WearBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
                 name = ""
                 onNote(if (r.getOrNull() == true) "\u2713"
                        else r.exceptionOrNull()?.message) }
+        }
+    }
+}
+
+/**
+ * What the agent may do, one row at a time.
+ *
+ * Two people read this. The owner decides and is the only one who can change
+ * anything; anybody else reads the same rows to learn what this profile is
+ * able to do for them. The rows that are *off* are here too — a roster that
+ * hides what nobody chose is a roster you cannot read anything from.
+ *
+ * "What it keeps" sits on every row rather than behind a tap: summarising a
+ * meeting and summarising a meeting *and keeping the recording* are different
+ * agreements.
+ */
+@Composable
+private fun MayBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
+    val lang = L10n.deviceLanguage()
+    var rows by remember { mutableStateOf<List<Privilege>>(emptyList()) }
+    val pid = vm.pid
+    LaunchedEffect(pid) {
+        if (pid != null) {
+            vm.call({ ApiClient.privileges(pid, vm.token) }) { r ->
+                r.fold({ rows = it }, { onNote(it.message) })
+            }
+        }
+    }
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("may.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        Text(L10n.t("may.lead", lang), color = Qrme.T2, fontSize = 12.sp)
+        if (vm.token == null) {
+            Text(L10n.t("may.visitor", lang), color = Qrme.T2, fontSize = 12.sp)
+        }
+        rows.forEach { row ->
+            Text(row.mayDo, color = Qrme.Txt, fontSize = 14.sp)
+            Text(L10n.t("may.keeps", lang) + " " +
+                (row.holds.ifBlank { L10n.t("may.keeps.nothing", lang) }),
+                color = Qrme.T2, fontSize = 12.sp)
+            if (row.needs.isNotEmpty()) {
+                Text(L10n.t("may.needs", lang) + " " +
+                    row.needs.joinToString(" · "), color = Qrme.T2,
+                    fontSize = 12.sp)
+            }
+            if (row.touchesOthers) {
+                Text(L10n.t("may.others", lang), color = Qrme.Txt,
+                    fontSize = 12.sp)
+            }
+            Text(if (row.chosen) L10n.t("may.on", lang)
+                 else L10n.t("may.off", lang),
+                color = Qrme.T2, fontSize = 12.sp)
+            val token = vm.token
+            if (pid != null && token != null) {
+                BrandButton(if (row.chosen) L10n.t("may.turnoff", lang)
+                            else L10n.t("may.turnon", lang)) {
+                    // The whole roster comes back from the press, so the
+                    // screen is replaced rather than patched.
+                    vm.call({ ApiClient.allowPrivilege(pid, row.name,
+                        !row.chosen, token) }) { r ->
+                        r.fold({ rows = it }, { onNote(it.message) })
+                    }
+                }
+            }
         }
     }
 }

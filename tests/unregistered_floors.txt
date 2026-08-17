@@ -125,5 +125,5 @@ test_the_stranger_has_a_language_too.py:118: len(keys) > 15
 test_the_strangers_language_on_a_phone.py:427: len(text) > 800
 test_the_tabs_are_translated_and_the_screens_are_not.py:554: english + calls >= 50
 test_the_tabs_are_translated_and_the_screens_are_not.py:775: len(rows) >= 10
-test_the_workshop_in_the_pocket.py:268: len(keys) >= 49
+test_the_workshop_in_the_pocket.py:274: len(keys) >= 49
 test_two_questions_a_mark_answers.py:196: len(why) > 40

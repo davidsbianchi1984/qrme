@@ -561,6 +561,29 @@ LESSONS: tuple[dict, ...] = (
          try_it="Stand a host down, then try to fetch it from a different "
                 "door — the chat box, by pasting a link — and watch the "
                 "refusal arrive there too."),
+    dict(key="maydo", chapter="Out in the world",
+         title="What the agent may do",
+         what="The product grew powers faster than it grew a place to see "
+              "them: studying the open web, asking strangers, briefing a "
+              "real professional, running a job over granted material, "
+              "reaching emergency services. The only way to find out what "
+              "one could do was to meet a power mid-conversation. The "
+              "roster is that list, and it says three things about each "
+              "row — what the agent would be allowed to do, in the words "
+              "you would use for it afterwards; **what it keeps**, which "
+              "is the half these lists usually omit, because summarising "
+              "a meeting and summarising a meeting *and keeping the "
+              "recording* are different agreements; and whether it reaches "
+              "somebody who never chose it. That last one is a field "
+              "rather than a paragraph so it can be checked: nothing that "
+              "reaches other people is ever on by default, and a guard "
+              "refuses any row that tries to be. Visitors read the same "
+              "list, because what an agent may do on somebody\'s behalf is "
+              "not a secret kept from the person it would be done to.",
+         screens=(202,),
+         try_it="Turn one off that had been used, then use it again and "
+                "read the refusal — it names the thing rather than the "
+                "row, and it arrives in your own language."),
     dict(key="asking", chapter="Out in the world",
          title="Asking people, not pages",
          what="An excursion asks a model, which can only return what "
