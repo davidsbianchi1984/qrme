@@ -6,6 +6,47 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The same page, one step further down.** 0.82.0 put `ssh` inside the block
+  somebody copies, because a fenced block of its own is a block you skip. The
+  deploy that followed found the identical defect one step down, twice in the
+  same paste.
+
+  The version checks after the deploy are meant to run **from your own
+  machine**, and the line that gets you there was a sentence between the two
+  blocks — *then `exit`, and check from your own machine* — with a paragraph
+  beneath them explaining why it mattered. Both were true; neither was run.
+  The three checks went in on the host, which is the one place they prove
+  nothing: they answer from inside the network they exist to test from
+  outside, so they printed the right version and confirmed nothing about
+  what a visitor gets.
+
+      asked     does the page say to leave the host
+      mattered  is that line inside the block somebody copies
+
+  And the Windows block, correct in every character, sat where the next step
+  goes under the words *on Windows, use these instead*. A reader working down
+  the page ran the Unix three, saw three health objects, and ran the Windows
+  three in the same shell — `curl.exe: command not found`, three times, after
+  a deploy that had again gone perfectly. An alternative laid out as a
+  sequence is read as a sequence.
+
+  `exit` is the first line of each check block now, for the reason `ssh` is
+  the first line of the deploy; the two blocks are marked as a choice; and
+  each carries all three products, because a block somebody runs on its own
+  has to check all three on its own.
+
+  One of the three new guards was written too loosely on the first pass. It
+  accepted the word *either*, which § 7 already contains four paragraphs up
+  in *docker is usually not installed there either*, so it passed on a page
+  carrying no marker at all. A guard whose word can arrive by accident
+  reports on the prose rather than on the shape.
+
+  The page lives in this repository only — JIM-mini and PDI carry a pointer
+  to it and no copy of its commands, which is what 0.82.0 established in
+  those two.
+
 ## [0.82.0] - 2026-08-17
 
 ### Added
@@ -33,34 +74,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `tests/test_the_deploy_page_is_paste_ready.py` holds the shape — the page
   may be rewritten, and its commands have to stay runnable by the reader they
   are addressed to.
-
-  **Then the next deploy found the same defect one step further down.** The
-  version checks that follow are meant to run from your own machine, and the
-  line that gets you there was a sentence between the two blocks — *then
-  `exit`, and check from your own machine* — with a paragraph beneath them
-  explaining why it mattered. Both were true; neither was run. The three
-  checks went in on the host, which is the one place they prove nothing,
-  because they answer from inside the network they exist to test from
-  outside.
-
-      asked     does the page say to leave the host
-      mattered  is that line inside the block somebody copies
-
-  And the Windows block, correct in every character, was laid out where the
-  next step goes under the words *on Windows, use these instead*. A reader
-  working down the page ran the Unix three, saw three health objects, and
-  ran the Windows three in the same shell — `curl.exe: command not found`,
-  three times, after a deploy that had again gone perfectly. An alternative
-  laid out as a sequence is read as a sequence.
-
-  `exit` is the first line of each check block now, for the reason `ssh` is
-  the first line of the deploy; the two blocks are marked as a choice and
-  each carries all three products, because a block a reader runs on its own
-  has to check all three on its own; and three more guards hold it. One of
-  those guards was itself written too loosely on the first pass — it accepted
-  the word *either*, which § 7 already contains four paragraphs up, and so
-  passed on a page carrying no marker at all. A guard whose word can arrive
-  by accident reports on the prose rather than on the shape.
 
 - **A guard on the sentence that forgets how it was built.** 0.81.0 fixed the
   sealed-dialer sentence going out English in every language — `str()` on a
