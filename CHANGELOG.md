@@ -8,6 +8,30 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The deploy page had the room and not the doorway.** `docs/beta-deploy.md`
+  § 7 warned that `/srv/qrme` is on the host, then put `ssh root@your-host` in
+  a fenced block of its own above the deploy — and a block of its own is a
+  block you skip. What gets pasted is the thing that looks like the procedure.
+  It was pasted into PowerShell on a handheld, which failed twice: no such
+  path, and no `docker`.
+
+      asked     does the page say to get on the host
+      mattered  is that line inside the block somebody copies
+
+  The Windows check lines had the same shape one layer down. The page said
+  *on PowerShell, add `.exe` to each* — true, and attached to three lines that
+  also carry `; echo`. `echo` there is `Write-Output`, which at the end of a
+  pipeline with nothing feeding it stops and prompts for input, so following
+  the instruction exactly still produced an error naming a cmdlet nobody
+  typed, after a deploy that had gone perfectly. Both are one failure: a
+  correction written *about* a command instead of *as* one.
+
+  The `ssh` is the first line of the deploy block now, the PowerShell form is
+  written out as its own block, and
+  `tests/test_the_deploy_page_is_paste_ready.py` holds the shape — the page
+  may be rewritten, and its commands have to stay runnable by the reader they
+  are addressed to.
+
 - **A guard on the sentence that forgets how it was built.** 0.81.0 fixed the
   sealed-dialer sentence going out English in every language — `str()` on a
   `Templated` returns a plain `str`, and the template goes with it — but fixed

@@ -186,16 +186,22 @@ machine that is.
 
 `/srv/qrme` does not exist on a laptop and `docker` is usually not installed
 there either, so the first attempt fails twice over with two errors that
-each look like a broken deploy rather than a wrong room. It has happened.
-Get in first:
+each look like a broken deploy rather than a wrong room. It has happened
+twice: once before this section existed, and once after — from a handheld,
+in PowerShell, against a page that already carried the warning.
+
+    asked     does the page say to get on the host
+    mattered  is that line inside the block somebody copies
+
+The second time is the one that changed this text. `ssh` was here, correct,
+in a fenced block of its own above the deploy — and a block of its own is a
+block you can skip. What gets pasted is the thing that looks like the
+procedure, and the procedure looked like the four lines below it. So the
+`ssh` is now the first line of that block rather than a preamble to it:
 
 ```bash
 ssh root@your-host
-```
 
-Then all of it:
-
-```bash
 cd /srv/qrme     && git pull --ff-only
 cd /srv/jim-mini && git pull --ff-only
 cd /srv/pdi      && git pull --ff-only
@@ -230,11 +236,34 @@ the machine changes, and the deploy above it ends with a prompt still on the
 host — so the natural thing is to keep typing, which runs the check from
 inside the network it is meant to be testing from outside.
 
-On Windows the name is `curl.exe`. PowerShell aliases bare `curl` to
-`Invoke-WebRequest`, which takes different flags and prints a table rather
-than the body — a person reading that sees noise where the version should
-be. The three lines above are for the Linux host and for a Mac; on
-PowerShell, add `.exe` to each.
+On Windows, use these instead:
+
+```powershell
+curl.exe -s https://sntheticprofiles.com/health
+curl.exe -s https://jim-mini.com/health
+curl.exe -s https://pdisystems.net/health
+```
+
+Written out rather than described, because describing them is what failed.
+This page used to say *add `.exe` to each* — a correct instruction attached
+to three lines that also carry `; echo`, which is the half it did not
+mention. `echo` in PowerShell is `Write-Output`, and `Write-Output` at the
+end of a pipeline with nothing feeding it stops and prompts for input:
+
+    cmdlet Write-Output at command pipeline position 1
+    Supply values for the following parameters:
+
+So a reader who followed the instruction exactly still got an error, after
+a deploy that had gone perfectly — and the error names a cmdlet nobody
+typed. Bare `curl` is worse and quieter about it: PowerShell aliases it to
+`Invoke-WebRequest`, which has no `-s`, reads `https:` as a drive letter,
+and reports *a drive with the name 'https' does not exist*.
+
+    asked     does the page name the Windows form
+    mattered  is the Windows form something you can paste
+
+Real `curl` prints the body and PowerShell adds the newline itself, so the
+`; echo` the Unix lines need has nothing to do here.
 
 Three self-contained lines rather than a loop, and that is the whole
 reason they look like this. The loop this replaces was three lines of
