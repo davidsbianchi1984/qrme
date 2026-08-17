@@ -827,12 +827,51 @@ PLAN_GATE = ("{capability} needs {needs} (${price}/{period}). "
              "This account is on {have}. Billing here is simulated — "
              "subscribing records a row and moves no real funds.")
 
+
+#: The two sentences a person reads when they pressed for emergency services
+#: and this deployment did not place a call. They are templated because the
+#: number differs per deployment — and the slot is a **phone number**, not
+#: prose, so translating the frame around it is safe. The rule that keeps a
+#: `Templated` honest (a translated frame around an English slot reads as a
+#: bug) is about slots holding sentences; `999` is `999` in every language.
+#:
+#: These are the most important sentences this product can say. Somebody is
+#: reading them while something is going wrong, so they are translated rather
+#: than recorded — and neither of them claims a call was placed.
+DIALER_SEALED = ("the dialer is sealed on this deployment and no call was "
+                 "placed — dial {number} yourself, now")
+DIALER_NO_CARRIER = ("the dialer is unsealed but no carrier is configured, so "
+                     "no call was placed — dial {number} yourself, now")
+
 #: Every template this module offers. Derived from the table below rather than
 #: repeated, so a template with no translations is impossible by construction.
 TEMPLATES = (MUST_BE_ONE_OF, UNKNOWN_SURFACE, OBJECTION_ALREADY,
-             MESSAGE_ALREADY, PROFILE_ALREADY, NOT_A_MEMORIAL, PLAN_GATE)
+             MESSAGE_ALREADY, PROFILE_ALREADY, NOT_A_MEMORIAL, PLAN_GATE,
+             DIALER_SEALED, DIALER_NO_CARRIER)
 
 _TEMPLATES: dict[str, dict[str, str]] = {
+    DIALER_SEALED: {
+        'es': 'el marcador está sellado en esta instalación y no se realizó ninguna llamada: marca {number} tú mismo, ahora',
+        'fr': "le composeur est scellé sur ce déploiement et aucun appel n'a été passé — composez {number} vous-même, maintenant",
+        'de': 'der Wählvorgang ist auf dieser Installation versiegelt und es wurde kein Anruf getätigt — wähle {number} selbst, jetzt',
+        'pt': 'o marcador está selado nesta instalação e nenhuma chamada foi feita — marque {number} você mesmo, agora',
+        'it': 'il combinatore è sigillato su questa installazione e non è stata effettuata alcuna chiamata: componi {number} tu stesso, adesso',
+        'ja': 'この配備では発信が封じられており、通話は行われませんでした。ご自分で {number} にすぐかけてください',
+        'zh': '此部署的拨号功能已封闭，没有发出任何通话——请你自己立刻拨打 {number}',
+        'hi': 'इस परिनियोजन में डायलर सील है और कोई कॉल नहीं की गई — आप स्वयं अभी {number} पर कॉल कीजिए',
+        'ar': 'أداة الاتصال مختومة في هذا النشر ولم تُجرَ أي مكالمة — اتصل بـ {number} بنفسك، الآن',
+    },
+    DIALER_NO_CARRIER: {
+        'es': 'el marcador está abierto pero no hay operador configurado, así que no se realizó ninguna llamada: marca {number} tú mismo, ahora',
+        'fr': "le composeur est ouvert mais aucun opérateur n'est configuré, donc aucun appel n'a été passé — composez {number} vous-même, maintenant",
+        'de': 'der Wählvorgang ist offen, aber kein Anbieter ist konfiguriert, also wurde kein Anruf getätigt — wähle {number} selbst, jetzt',
+        'pt': 'o marcador está aberto mas nenhum operador está configurado, por isso nenhuma chamada foi feita — marque {number} você mesmo, agora',
+        'it': "il combinatore è aperto ma nessun operatore è configurato, quindi non è stata effettuata alcuna chiamata: componi {number} tu stesso, adesso",
+        'ja': '発信は開いていますが通信事業者が設定されていないため、通話は行われませんでした。ご自分で {number} にすぐかけてください',
+        'zh': '拨号功能已开启但未配置运营商，因此没有发出任何通话——请你自己立刻拨打 {number}',
+        'hi': 'डायलर खुला है पर कोई वाहक कॉन्फ़िगर नहीं है, इसलिए कोई कॉल नहीं की गई — आप स्वयं अभी {number} पर कॉल कीजिए',
+        'ar': 'أداة الاتصال مفتوحة لكن لا مشغّل مضبوط، فلم تُجرَ أي مكالمة — اتصل بـ {number} بنفسك، الآن',
+    },
     PLAN_GATE: {
         'es': '{capability} requiere {needs} (${price}/{period}). Esta cuenta '
               'está en {have}. La facturación aquí es simulada: suscribirse '
@@ -1080,6 +1119,61 @@ _VOCABULARY: dict[str, dict[str, str]] = {
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'no such escalation': {
+        'es': 'no existe esa escalada',
+        'fr': 'aucune escalade de ce nom',
+        'de': 'keine solche Eskalation',
+        'pt': 'não existe esse encaminhamento urgente',
+        'it': 'nessuna escalation di questo tipo',
+        'ja': 'そのようなエスカレーションはありません',
+        'zh': '没有该升级记录',
+        'hi': 'ऐसा कोई एस्केलेशन नहीं',
+        'ar': 'لا يوجد تصعيد بهذا الوصف',
+    },
+    'say what could not be resolved, in one line': {
+        'es': 'di qué no se pudo resolver, en una línea',
+        'fr': "dites en une ligne ce qui n'a pas pu être résolu",
+        'de': 'sag in einer Zeile, was nicht gelöst werden konnte',
+        'pt': 'diga o que não foi possível resolver, numa linha',
+        'it': "di' in una riga che cosa non si è potuto risolvere",
+        'ja': '解決できなかったことを、一行で書いてください',
+        'zh': '用一行说明什么没能解决',
+        'hi': 'एक पंक्ति में बताइए कि क्या हल नहीं हो सका',
+        'ar': 'قل في سطر واحد ما الذي تعذّر حلّه',
+    },
+    'that escalation belongs to somebody else': {
+        'es': 'esa escalada es de otra persona',
+        'fr': "cette escalade appartient à quelqu'un d'autre",
+        'de': 'diese Eskalation gehört jemand anderem',
+        'pt': 'esse encaminhamento urgente é de outra pessoa',
+        'it': 'quella escalation è di qualcun altro',
+        'ja': 'そのエスカレーションは他の人のものです',
+        'zh': '那条升级记录属于别人',
+        'hi': 'वह एस्केलेशन किसी और का है',
+        'ar': 'ذلك التصعيد يخص شخصًا آخر',
+    },
+    'that signature is over different words — sign the waiver as it reads now': {
+        'es': 'esa firma cubre otras palabras: firma la exención tal como está ahora',
+        'fr': "cette signature porte sur d'autres mots — signez la décharge telle qu'elle est maintenant",
+        'de': 'diese Signatur deckt andere Worte ab — unterschreibe die Verzichtserklärung so, wie sie jetzt lautet',
+        'pt': 'essa assinatura cobre outras palavras — assine a declaração tal como está agora',
+        'it': "quella firma copre parole diverse: firma la liberatoria com'è adesso",
+        'ja': 'その署名は別の文面に対するものです。いまの免責文にあらためて署名してください',
+        'zh': '该签名针对的是另一段文字——请签署现在这份免责声明',
+        'hi': 'वह हस्ताक्षर किसी और पाठ पर है — अभी जो छूट-पत्र है उस पर हस्ताक्षर कीजिए',
+        'ar': 'ذلك التوقيع على كلمات أخرى — وقّع الإقرار بصيغته الحالية',
+    },
+    'sign the emergency-services waiver before this can be pressed — it says that services rendered may be charged to you': {
+        'es': 'firma la exención de servicios de emergencia antes de poder pulsarlo: dice que los servicios prestados pueden cobrarse',
+        'fr': "signez la décharge relative aux services d'urgence avant de pouvoir appuyer — elle indique que les services rendus peuvent vous être facturés",
+        'de': 'unterschreibe die Verzichtserklärung für Rettungsdienste, bevor dies gedrückt werden kann — sie sagt, dass erbrachte Leistungen dir berechnet werden können',
+        'pt': 'assine a declaração dos serviços de emergência antes de isto poder ser premido — diz que os serviços prestados lhe podem ser cobrados',
+        'it': 'firma la liberatoria per i servizi di emergenza prima di poterlo premere: dice che i servizi resi possono esserti addebitati',
+        'ja': '押せるようにする前に、緊急サービスの免責文に署名してください。提供された役務の費用が請求されうると書かれています',
+        'zh': '按下之前请先签署紧急服务免责声明——上面写明所提供的服务可能向你收费',
+        'hi': 'इसे दबाने से पहले आपातकालीन सेवाओं का छूट-पत्र हस्ताक्षरित कीजिए — उसमें लिखा है कि दी गई सेवाओं का शुल्क आपसे लिया जा सकता है',
+        'ar': 'وقّع إقرار خدمات الطوارئ قبل أن يمكن الضغط — فهو ينص على أن الخدمات المقدَّمة قد تُحتسب عليك',
+    },
     'no such provider': {
         'es': 'no existe ese proveedor',
         'fr': 'aucun prestataire de ce nom',

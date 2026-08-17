@@ -3896,6 +3896,51 @@ const CHROME: Table = {
   "real.sealed": {
     en: "sealed in your vault", es: "sellado en tu cámara", fr: "scellé dans votre coffre", de: "in deinem Tresor versiegelt", pt: "selado no seu cofre", it: "sigillato nel tuo caveau", ja: "あなたの金庫に封じられています", zh: "封存在你的保险库中", hi: "आपकी तिजोरी में सीलबंद", ar: "مختوم في خزنتك",
   },
+  "esc.hdr": {
+    en: "When it cannot resolve it", es: "Cuando no puede resolverlo", fr: "Quand il ne peut pas résoudre", de: "Wenn es das nicht lösen kann", pt: "Quando não consegue resolver", it: "Quando non riesce a risolverlo", ja: "解決できないとき", zh: "当它无法解决时", hi: "जब यह हल न कर सके", ar: "حين لا يستطيع الحل",
+  },
+  "esc.pitch": {
+    en: "This profile can hand a matter to somebody real, and — if it comes to it — reach emergency services. Both are yours to press; neither happens on the profile's own judgement. Read what the waiver says now, in your own time, so that pressing it later is one press.", es: "Este perfil puede pasar un asunto a alguien real y, si llega el caso, contactar con los servicios de emergencia. Ambos los pulsas tú; ninguno ocurre por decisión del perfil. Lee ahora, con calma, lo que dice la exención, para que pulsarlo luego sea una sola pulsación.", fr: "Ce profil peut confier une affaire à quelqu'un de réel et, s'il le faut, joindre les services d'urgence. C'est vous qui appuyez ; rien ne se déclenche sur le jugement du profil. Lisez maintenant, à votre rythme, ce que dit la décharge, pour qu'appuyer plus tard soit une seule pression.", de: "Dieses Profil kann eine Sache an jemanden Echten übergeben und — wenn es sein muss — den Rettungsdienst erreichen. Beides drückst du; nichts geschieht nach dem Urteil des Profils. Lies jetzt in Ruhe, was die Verzichtserklärung sagt, damit späteres Drücken ein Druck ist.", pt: "Este perfil pode passar um assunto a alguém real e, se for preciso, contactar os serviços de emergência. É você que prime; nada acontece por decisão do perfil. Leia agora, com calma, o que diz a declaração, para que primir depois seja uma só vez.", it: "Questo profilo può passare una faccenda a qualcuno di reale e, se serve, raggiungere i servizi di emergenza. Premi tu; nulla accade per giudizio del profilo. Leggi adesso, con calma, cosa dice la liberatoria, così premere dopo è una sola pressione.", ja: "このプロフィールは用件を実在の人に引き継げますし、必要なら緊急サービスにも connect します。どちらもあなたが押すもので、プロフィールの判断では起こりません。免責文をいま落ち着いて読んでおけば、あとで押すのは一度で済みます。", zh: "这个资料可以把事情交给真实的人，必要时还能联系紧急服务。两者都由你来按；都不会依资料自己的判断发生。现在从容读一遍免责声明，这样以后按下去就只是一次按压。", hi: "यह प्रोफ़ाइल मामला किसी असली व्यक्ति को सौंप सकती है और, ज़रूरत पड़ी तो, आपातकालीन सेवाओं तक पहुँच सकती है। दोनों आप दबाते हैं; कोई भी प्रोफ़ाइल के अपने निर्णय से नहीं होता। छूट-पत्र अभी इत्मीनान से पढ़ लीजिए, ताकि बाद में दबाना बस एक दबाव हो।", ar: "هذا الملف يستطيع تسليم مسألة إلى شخص حقيقي، وإن لزم الأمر الوصول إلى خدمات الطوارئ. أنت من يضغط في الحالتين؛ ولا يحدث أي منهما بحكم الملف نفسه. اقرأ الآن، على مهلك، ما يقوله الإقرار، ليكون الضغط لاحقًا ضغطة واحدة.",
+  },
+  "esc.show": {
+    en: "What can it do?", es: "¿Qué puede hacer?", fr: "Que peut-il faire ?", de: "Was kann es?", pt: "O que pode fazer?", it: "Cosa può fare?", ja: "何ができますか", zh: "它能做什么？", hi: "यह क्या कर सकता है?", ar: "ماذا يستطيع أن يفعل؟",
+  },
+  "esc.armed": {
+    en: "Signed — the press would be answered.", es: "Firmado: la pulsación sería atendida.", fr: "Signé — l'appui serait pris en compte.", de: "Unterschrieben — der Druck würde beantwortet.", pt: "Assinado — a pressão seria atendida.", it: "Firmato: la pressione verrebbe accolta.", ja: "署名済み — 押せば受け付けられます。", zh: "已签署——按下会被受理。", hi: "हस्ताक्षरित — दबाने पर स्वीकार होगा।", ar: "موقّع — سيُستجاب للضغط.",
+  },
+  "esc.notarmed": {
+    en: "Not signed yet. Nothing here is pressed until it is.", es: "Todavía sin firmar. Aquí no se pulsa nada hasta que lo esté.", fr: "Pas encore signé. Rien ici n'est pressé tant que ce n'est pas fait.", de: "Noch nicht unterschrieben. Bis dahin wird hier nichts gedrückt.", pt: "Ainda não assinado. Nada aqui é premido até estar.", it: "Non ancora firmato. Qui non si preme nulla finché non lo è.", ja: "まだ署名されていません。署名するまで、ここでは何も押されません。", zh: "尚未签署。在签署之前，这里什么也按不下去。", hi: "अभी हस्ताक्षर नहीं। जब तक न हो, यहाँ कुछ नहीं दबता।", ar: "لم يُوقّع بعد. ولا يُضغط شيء هنا قبل ذلك.",
+  },
+  "esc.sealed": {
+    en: "This deployment cannot place the call. Pressing it will say so and give you {number} to dial yourself — that is the beta posture, not a fault.", es: "Esta instalación no puede realizar la llamada. Al pulsarlo lo dirá y te dará {number} para que marques tú: es la postura de la beta, no un fallo.", fr: "Ce déploiement ne peut pas passer l'appel. Appuyer le dira et vous donnera {number} à composer vous-même — c'est la posture de la bêta, pas une panne.", de: "Diese Installation kann den Anruf nicht tätigen. Drücken sagt das und gibt dir {number} zum Selbstwählen — das ist die Beta-Haltung, kein Fehler.", pt: "Esta instalação não pode fazer a chamada. Primir dirá isso e dar-lhe-á {number} para marcar você — é a postura da beta, não uma avaria.", it: "Questa installazione non può effettuare la chiamata. Premere lo dirà e ti darà {number} da comporre tu — è la postura della beta, non un guasto.", ja: "この配備は通話を発信できません。押せばそう表示され、ご自分でかけるための {number} が示されます。これはベータの姿勢であり、故障ではありません。", zh: "此部署无法发出通话。按下会这样告诉你，并给出 {number} 让你自己拨——这是测试期的姿态，不是故障。", hi: "यह परिनियोजन कॉल नहीं कर सकता। दबाने पर यही बताया जाएगा और आपको स्वयं मिलाने के लिए {number} दिया जाएगा — यह बीटा की स्थिति है, खराबी नहीं।", ar: "هذا النشر لا يستطيع إجراء المكالمة. الضغط سيقول ذلك ويعطيك {number} لتتصل بنفسك — هذا وضع النسخة التجريبية، لا عطل.",
+  },
+  "esc.raise": {
+    en: "It could not resolve this", es: "No ha podido resolverlo", fr: "Il n'a pas pu résoudre cela", de: "Es konnte das nicht lösen", pt: "Não conseguiu resolver isto", it: "Non è riuscito a risolverlo", ja: "これは解決できませんでした", zh: "它没能解决这件事", hi: "यह इसे हल नहीं कर सका", ar: "لم يستطع حلّ هذا",
+  },
+  "esc.press": {
+    en: "Reach emergency services", es: "Contactar con los servicios de emergencia", fr: "Joindre les services d'urgence", de: "Rettungsdienst erreichen", pt: "Contactar os serviços de emergência", it: "Raggiungi i servizi di emergenza", ja: "緊急サービスに連絡する", zh: "联系紧急服务", hi: "आपातकालीन सेवाओं तक पहुँचें", ar: "تواصل مع خدمات الطوارئ",
+  },
+  "esc.placed": {
+    en: "The call connected.", es: "La llamada se ha conectado.", fr: "L'appel a abouti.", de: "Der Anruf ist zustande gekommen.", pt: "A chamada foi estabelecida.", it: "La chiamata è andata a buon fine.", ja: "通話がつながりました。", zh: "通话已接通。", hi: "कॉल जुड़ गई।", ar: "تمّ الاتصال.",
+  },
+  "esc.arm": {
+    en: "Sign the waiver", es: "Firmar la exención", fr: "Signer la décharge", de: "Verzichtserklärung unterschreiben", pt: "Assinar a declaração", it: "Firma la liberatoria", ja: "免責文に署名する", zh: "签署免责声明", hi: "छूट-पत्र पर हस्ताक्षर करें", ar: "وقّع الإقرار",
+  },
+  "esc.sig.ph": {
+    en: "the signature id from the signing ceremony", es: "el id de firma de la ceremonia", fr: "l'identifiant de signature issu de la cérémonie", de: "die Signatur-ID aus der Zeremonie", pt: "o id de assinatura da cerimónia", it: "l'id della firma dalla cerimonia", ja: "署名手続きで得た署名ID", zh: "签署流程返回的签名 ID", hi: "हस्ताक्षर प्रक्रिया से मिला हस्ताक्षर आईडी", ar: "معرّف التوقيع من مراسم التوقيع",
+  },
+  "esc.past": {
+    en: "What has been raised", es: "Lo que se ha planteado", fr: "Ce qui a été signalé", de: "Was gemeldet wurde", pt: "O que foi levantado", it: "Che cosa è stato sollevato", ja: "これまでに上げたもの", zh: "已经提出过什么", hi: "अब तक क्या उठाया गया", ar: "ما الذي أُثير",
+  },
+  "esc.none": {
+    en: "Nothing has been raised.", es: "No se ha planteado nada.", fr: "Rien n'a été signalé.", de: "Es wurde nichts gemeldet.", pt: "Nada foi levantado.", it: "Non è stato sollevato nulla.", ja: "まだ何も上げていません。", zh: "还没有提出过任何事。", hi: "अब तक कुछ नहीं उठाया गया।", ar: "لم يُثَر شيء.",
+  },
+  "esc.was.placed": {
+    en: "a call connected", es: "se conectó una llamada", fr: "un appel a abouti", de: "ein Anruf kam zustande", pt: "uma chamada foi estabelecida", it: "una chiamata è andata a buon fine", ja: "通話がつながりました", zh: "通话已接通", hi: "कॉल जुड़ी थी", ar: "تمّ اتصال",
+  },
+  "esc.was.not": {
+    en: "no call was placed", es: "no se realizó ninguna llamada", fr: "aucun appel n'a été passé", de: "es wurde kein Anruf getätigt", pt: "nenhuma chamada foi feita", it: "non è stata effettuata alcuna chiamata", ja: "通話は行われませんでした", zh: "没有发出任何通话", hi: "कोई कॉल नहीं की गई", ar: "لم تُجرَ أي مكالمة",
+  },
   "rem.hub": {
     en: "Every dial in one place", es: "Todos los diales en un sitio", fr: "Tous les réglages au même endroit", de: "Alle Regler an einem Ort", pt: "Todos os botões num só lugar", it: "Tutte le manopole in un posto", ja: "すべてのつまみを一箇所に", zh: "所有旋钮集于一处", hi: "सारे डायल एक जगह", ar: "كل الأقراص في مكان واحد",
   },

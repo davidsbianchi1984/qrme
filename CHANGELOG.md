@@ -8,6 +8,52 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **A real dialer, an explicit press, and a door that will not open in beta.**
+  A profile can hand a matter to somebody real. Some matters do not wait for a
+  butcher or a broker, and the honest end of that ladder is emergency
+  services — the most dangerous control this product could grow.
+
+      asked     can the profile hand this to a professional
+      mattered  what happens when it cannot, and nobody has time
+
+  **Said up front.** The profile states that it can escalate, and what the
+  waiver would commit the person to, before anything goes wrong. A capability
+  produced from behind the profile's back once things are already bad is a
+  capability nobody uses.
+
+  **The waiver is signed ahead**, in calm conditions, over the exact words —
+  reaching emergency services can be billed, and the text says so. It is a
+  real signature bound to *those* words rather than any valid assertion the
+  account holds, for the reason `referral.release` gives and a louder one.
+  Nobody reads a liability paragraph during an emergency; asking them to is
+  how a person in trouble ends up reading instead of pressing.
+
+  **The press is explicit.** Nothing here fires on the profile's judgement.
+
+  **And the last hop refuses.** Not a mock returning success, not a button
+  wired to nothing: the call is attempted and stopped where it would leave,
+  and what comes back says plainly that no call was placed and gives the
+  number to dial. `placed` is set by a call that connected and by nothing
+  else, so the record and the sentence agree. During a beta nobody should be
+  summoning an ambulance through software that has never been tested end to
+  end, and the way to be sure of that is to make it impossible rather than to
+  intend it.
+
+  That is the rule the beacon-alarm round settled — *an alarm that says help
+  was called has to have called it* — kept by never making the claim. The two
+  sentences a person reads at that moment are templated through `i18n.fill`
+  and translated into nine languages rather than recorded as a backlog row:
+  the slot is a phone number, not prose, and these are the most important
+  sentences this product can say.
+
+  No argument, plan, profile setting or request field opens the seal — only
+  the deployment's own `QRME_DIALER_ARMED`, read at the moment of the call so
+  shutting it needs no restart. A guard refuses any parameter that could, and
+  another holds the refusal to the router translating it rather than deciding
+  it.
+
+  On the console, on iOS, on Android and on Windows.
+
 - **Bringing somebody real into it, in every area of life.** A synthetic
   profile is an AI, and some things need a person. `referral.prepare` already
   handed a session to a clinician and did the ceremony well — the signature

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { fill, t as tr, visitorLang } from "../l10n";
-import { api, getBase, type Avatar, type Briefing,
-         type MyPerson } from "../api";
+import { api, getBase, type Avatar, type Briefing, type DialerPosture,
+         type Escalated, type MyPerson } from "../api";
 import { Briefcase } from "../Briefcase";
 import { Refusal } from "../Refusal";
 import { SkinPicker } from "../SkinPicker";
@@ -30,6 +30,14 @@ export function Chat({ onPlans }: {
   const [matter, setMatter] = useState("");
   const [grantToken, setGrantToken] = useState("");
   const [brief, setBrief] = useState<Briefing | null>(null);
+  // Shown up front rather than produced mid-conversation: a person should
+  // know what this profile can do before anything goes wrong.
+  const [dialer, setDialer] = useState<DialerPosture | null>(null);
+  const [escalated, setEscalated] = useState<Escalated | null>(null);
+  const [said, setSaid] = useState("");
+  // `signature_id`, not `envelope_id` — the ceremony returns the signature
+  // and that is what arming checks. Same shape the referral form uses.
+  const [waiverSig, setWaiverSig] = useState("");
   const lang = visitorLang();
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -282,6 +290,72 @@ export function Chat({ onPlans }: {
           <option value="operator">{tr("chat.role.operator", lang)}</option>
         </select>
       </label>
+
+      {/* --- what this profile can do, before anything goes wrong ------- */}
+      <div className="card">
+        <h3>{tr("esc.hdr", lang)}</h3>
+        <p className="muted small">{tr("esc.pitch", lang)}</p>
+        {!dialer
+          ? <button className="ghost" onClick={() => {
+              api.dialerPosture(session.interactorId || "",
+                                session.interactorToken || "")
+                .then(setDialer).catch(setError);
+            }}>{tr("esc.show", lang)}</button>
+          : (<>
+              {/* The words, readable before anybody signs anything. */}
+              <p className="small">{dialer.waiver}</p>
+              <p className="muted small">
+                {dialer.armed ? tr("esc.armed", lang) : tr("esc.notarmed", lang)}
+              </p>
+              {/* Said now, not discovered at the worst moment. */}
+              {dialer.sealed && (
+                <p className="small">
+                  {fill(tr("esc.sealed", lang), { number: dialer.call_yourself })}
+                </p>
+              )}
+              {!dialer.armed && (
+                <>
+                  <input value={waiverSig}
+                         placeholder={tr("esc.sig.ph", lang)}
+                         onChange={(e) => setWaiverSig(e.target.value)} />
+                  <button className="ghost" disabled={!waiverSig} onClick={() => {
+                    setError(null);
+                    api.armDialer(session.interactorId || "", waiverSig,
+                                  session.interactorToken || "")
+                      .then(setDialer).catch(setError);
+                  }}>{tr("esc.arm", lang)}</button>
+                </>
+              )}
+              <button className="ghost" disabled={!matter} onClick={() => {
+                setError(null);
+                api.cannotResolve(session.profileId || "",
+                                  { interactor_id: session.interactorId || "",
+                                    matter },
+                                  session.interactorToken || "")
+                  .then(setEscalated).catch(setError);
+              }}>{tr("esc.raise", lang)}</button>
+              {escalated && (
+                <button onClick={() => {
+                  setError(null); setSaid("");
+                  api.dialEmergency(escalated.id, session.interactorId || "",
+                                    session.interactorToken || "")
+                    .then(() => setSaid(tr("esc.placed", lang)))
+                    .catch(setError);
+                }}>{tr("esc.press", lang)}</button>
+              )}
+              <button className="ghost" onClick={() => {
+                api.myEscalations(session.interactorId || "",
+                                  session.interactorToken || "")
+                  .then((rows) => setSaid(rows.length === 0
+                    ? tr("esc.none", lang)
+                    : rows.map((r) => `${r.matter} · ` + (r.placed
+                        ? tr("esc.was.placed", lang)
+                        : tr("esc.was.not", lang))).join("\n")))
+                  .catch(setError);
+              }}>{tr("esc.past", lang)}</button>
+              {said && <p className="small">{said}</p>}
+            </>)}
+      </div>
 
       {/* --- bringing somebody real into it ---------------------------- */}
       <div className="card">

@@ -55,6 +55,32 @@
             <!-- Spec clauses 2/12 — advisor counsels, collaborator co-creates,
                  operator executes. "Read my prompt" is the honest default: the
                  profile infers from the wording and the reply says which. -->
+            <!-- what this profile can do, before anything goes wrong -->
+            <TextBlock x:Name="EscTitle" FontSize="16" FontWeight="Bold"
+                       Foreground="{StaticResource QrmeTxtBrush}" />
+            <TextBlock x:Name="EscSub" FontSize="12" TextWrapping="Wrap"
+                       Foreground="{StaticResource QrmeT2Brush}" />
+            <Button x:Name="EscShowButton" Click="OnEscShow"
+                    Background="Transparent" Foreground="{StaticResource QrmeBrandABrush}" />
+            <StackPanel x:Name="EscPanel" Spacing="8" Visibility="Collapsed">
+                <TextBlock x:Name="EscWaiver" FontSize="12" TextWrapping="Wrap"
+                           Foreground="{StaticResource QrmeTxtBrush}" />
+                <TextBlock x:Name="EscArmedLine" FontSize="12" TextWrapping="Wrap"
+                           Foreground="{StaticResource QrmeT2Brush}" />
+                <!-- said now, not discovered at the worst moment -->
+                <TextBlock x:Name="EscSealedLine" FontSize="12" TextWrapping="Wrap"
+                           Foreground="{StaticResource QrmeAmberBrush}" />
+                <TextBox x:Name="EscSigBox" />
+                <Button x:Name="EscArmButton" Click="OnEscArm"
+                        Background="Transparent" Foreground="{StaticResource QrmeBrandABrush}" />
+                <Button x:Name="EscRaiseButton" Click="OnEscRaise"
+                        Background="Transparent" Foreground="{StaticResource QrmeBrandABrush}" />
+                <Button x:Name="EscPressButton" Click="OnEscPress" Visibility="Collapsed"
+                        Background="Transparent" Foreground="{StaticResource QrmeRedBrush}" />
+                <TextBlock x:Name="EscSaid" FontSize="12" TextWrapping="Wrap"
+                           Foreground="{StaticResource QrmeTxtBrush}" />
+            </StackPanel>
+
             <!-- bring somebody real into this -->
             <TextBlock x:Name="RealTitle" FontSize="16" FontWeight="Bold"
                        Foreground="{StaticResource QrmeTxtBrush}" />

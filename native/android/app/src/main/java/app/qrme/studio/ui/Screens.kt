@@ -1395,6 +1395,11 @@ fun ChatScreen(vm: StudioViewModel) {
     var matter by remember { mutableStateOf("") }
     var grantToken by remember { mutableStateOf("") }
     var brief by remember { mutableStateOf<BriefingPreview?>(null) }
+    // Shown before anything goes wrong, not produced mid-conversation.
+    var dialer by remember { mutableStateOf<DialerPosture?>(null) }
+    var escalated by remember { mutableStateOf<Escalated?>(null) }
+    var escSaid by remember { mutableStateOf("") }
+    var waiverSig by remember { mutableStateOf("") }
 
     fun loadMine() {
         vm.call({ ApiClient.myPeople(vm.interactorId!!, vm.interactorToken!!) }) { r ->
@@ -1404,6 +1409,56 @@ fun ChatScreen(vm: StudioViewModel) {
     fun findPeople() {
         vm.call({ ApiClient.peopleForArea(vm.interactorId!!, realArea, vm.interactorToken!!) }) { r ->
             people = r.getOrDefault(emptyList())
+        }
+    }
+
+    @Composable
+    fun whatItCanDo() {
+        Text(L10n.t("esc.hdr", vm.language), color = Qrme.Txt, fontSize = 16.sp,
+             fontWeight = FontWeight.Bold)
+        Text(L10n.t("esc.pitch", vm.language), color = Qrme.T2, fontSize = 12.sp)
+        if (dialer == null) {
+            TextButton(onClick = {
+                vm.call({ ApiClient.dialerPosture(vm.interactorId!!, vm.interactorToken!!) }) { r ->
+                    dialer = r.getOrNull()
+                }
+            }) { Text(L10n.t("esc.show", vm.language), color = Qrme.BrandA, fontSize = 13.sp) }
+        } else dialer?.let { d ->
+            Text(d.waiver, color = Qrme.Txt, fontSize = 12.sp)
+            Text(if (d.armed) L10n.t("esc.armed", vm.language)
+                 else L10n.t("esc.notarmed", vm.language),
+                 color = Qrme.T2, fontSize = 12.sp)
+            if (d.sealed) Text(
+                L10n.fill("esc.sealed", vm.language, mapOf("number" to d.callYourself)),
+                color = Qrme.Amber, fontSize = 12.sp)
+            if (!d.armed) {
+                labeledField(L10n.t("esc.sig.ph", vm.language), waiverSig,
+                             L10n.t("esc.sig.ph", vm.language)) { waiverSig = it }
+                TextButton(onClick = {
+                    vm.call({ ApiClient.armDialer(vm.interactorId!!, waiverSig, vm.interactorToken!!) }) {
+                        vm.call({ ApiClient.dialerPosture(vm.interactorId!!, vm.interactorToken!!) }) { r ->
+                            dialer = r.getOrNull()
+                        }
+                    }
+                }) { Text(L10n.t("esc.arm", vm.language), color = Qrme.BrandA, fontSize = 13.sp) }
+            }
+            TextButton(onClick = {
+                vm.call({ ApiClient.cannotResolve(vm.pid!!, vm.interactorId!!, matter, vm.interactorToken!!) }) { r ->
+                    escalated = r.getOrNull()
+                }
+                vm.call({ ApiClient.myEscalations(vm.interactorId!!, vm.interactorToken!!) }) { }
+            }) { Text(L10n.t("esc.raise", vm.language), color = Qrme.BrandA, fontSize = 13.sp) }
+            escalated?.let { e ->
+                TextButton(onClick = {
+                    // Sealed deployments throw here; what the person reads is
+                    // the refusal, which says no call was placed.
+                    vm.call({ ApiClient.dialEmergency(e.id, vm.interactorId!!, vm.interactorToken!!) }) { r ->
+                        escSaid = r.fold({ L10n.t("esc.placed", vm.language) },
+                                         { it.message ?: "" })
+                    }
+                }) { Text(L10n.t("esc.press", vm.language), color = Qrme.Red, fontSize = 13.sp) }
+            }
+            if (escSaid.isNotBlank()) Text(escSaid, color = Qrme.Txt, fontSize = 12.sp)
         }
     }
 
@@ -1533,6 +1588,7 @@ fun ChatScreen(vm: StudioViewModel) {
             Text(L10n.t("tab.chat", vm.language), color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
             Text(L10n.fill("nchat.sub", vm.language, mapOf("name" to vm.displayName)),
                 color = Qrme.T2, fontSize = 13.sp)
+            whatItCanDo()
             bringSomebodyReal()
             messages.forEach { m ->
                 Row(Modifier.fillMaxWidth(),

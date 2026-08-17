@@ -25,6 +25,78 @@ public sealed partial class ChatPage : Page
         ("operator", "nchat.role.operator"),
     };
 
+    private string _escalationId = "";
+
+    private async void OnEscShow(object sender, RoutedEventArgs e)
+    {
+        EscPanel.Visibility = Visibility.Visible;
+        await LoadDialer();
+    }
+
+    private async System.Threading.Tasks.Task LoadDialer()
+    {
+        var s = AppState.Current;
+        try
+        {
+            var d = await ApiClient.Shared.DialerPosture_(
+                s.InteractorId!, s.InteractorToken!);
+            EscWaiver.Text = d.Waiver;
+            EscArmedLine.Text = d.Armed ? L10n.T("esc.armed") : L10n.T("esc.notarmed");
+            // The deployment's posture, said now rather than at the press.
+            EscSealedLine.Text = d.Sealed
+                ? L10n.Fill("esc.sealed", AppState.Current.Language,
+                            ("number", d.CallYourself))
+                : "";
+            EscArmButton.Visibility = d.Armed ? Visibility.Collapsed : Visibility.Visible;
+            EscSigBox.Visibility = EscArmButton.Visibility;
+        }
+        catch (Exception ex) { EscSaid.Text = ex.Message; }
+    }
+
+    private async void OnEscArm(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        try
+        {
+            await ApiClient.Shared.ArmDialer(s.InteractorId!,
+                                             EscSigBox.Text.Trim(),
+                                             s.InteractorToken!);
+            await LoadDialer();
+        }
+        catch (Exception ex) { EscSaid.Text = ex.Message; }
+    }
+
+    private async void OnEscRaise(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        try
+        {
+            var row = await ApiClient.Shared.CannotResolve(
+                s.Pid!, s.InteractorId!, RealMatterBox.Text.Trim(),
+                s.InteractorToken!);
+            _escalationId = row.Id;
+            EscPressButton.Visibility = Visibility.Visible;
+            await ApiClient.Shared.MyEscalations(s.InteractorId!, s.InteractorToken!);
+        }
+        catch (Exception ex) { EscSaid.Text = ex.Message; }
+    }
+
+    /// <summary>The explicit press. While the deployment is sealed this
+    /// throws, and what the person reads is the refusal itself — which says
+    /// no call was placed and gives them the number.</summary>
+    private async void OnEscPress(object sender, RoutedEventArgs e)
+    {
+        if (_escalationId.Length == 0) return;
+        var s = AppState.Current;
+        try
+        {
+            await ApiClient.Shared.DialEmergency(_escalationId, s.InteractorId!,
+                                                 s.InteractorToken!);
+            EscSaid.Text = L10n.T("esc.placed");
+        }
+        catch (Exception ex) { EscSaid.Text = ex.Message; }
+    }
+
     /// <summary>Somebody a person keeps, or somebody the search found. The
     /// two are different claims and the row says which.</summary>
     public sealed class RealRow
@@ -131,6 +203,13 @@ public sealed partial class ChatPage : Page
     public ChatPage()
     {
         InitializeComponent();
+        EscTitle.Text = L10n.T("esc.hdr");
+        EscSub.Text = L10n.T("esc.pitch");
+        EscShowButton.Content = L10n.T("esc.show");
+        EscSigBox.PlaceholderText = L10n.T("esc.sig.ph");
+        EscArmButton.Content = L10n.T("esc.arm");
+        EscRaiseButton.Content = L10n.T("esc.raise");
+        EscPressButton.Content = L10n.T("esc.press");
         RealTitle.Text = L10n.T("real.hdr");
         RealSub.Text = L10n.T("real.pitch");
         RealOpenButton.Content = L10n.T("real.open");

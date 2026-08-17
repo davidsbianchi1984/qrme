@@ -833,6 +833,25 @@ struct BriefingPreview: Decodable {
     let reads: String
 }
 
+/// Whether the emergency press would be answered, and the words that would
+/// be signed. Readable before arming, so the deployment's seal is known now
+/// rather than at the worst moment.
+struct DialerPosture: Decodable {
+    let armed: Bool
+    let signed_at: String?
+    let waiver: String
+    let sealed: Bool
+    let call_yourself: String
+}
+
+struct Escalated: Decodable {
+    let id: String
+    let matter: String
+    let dialed_at: String?
+    /// Set by a call that connected, and by nothing else.
+    let placed: Bool
+}
+
 struct AnswerReceipt: Decodable {
     let id: String
     let held: Bool
@@ -1742,6 +1761,42 @@ actor ApiClient {
     /// depth. Same key as the failure aggregate, deliberately.
     func visitsAcross(key: String) async throws -> [Visited] {
         try await request("/visits/across", token: key)
+    }
+
+    // MARK: When it cannot resolve it, and the door at the end
+
+    func dialerPosture(interactor: String,
+                       token: String) async throws -> DialerPosture {
+        try await request("/interactors/\(interactor)/dialer", token: token)
+    }
+
+    @discardableResult
+    func armDialer(interactor: String, signatureId: String,
+                   token: String) async throws -> DialerPosture {
+        try await request("/interactors/\(interactor)/dialer/arm",
+                          method: "POST",
+                          body: ["signature_id": signatureId], token: token)
+    }
+
+    func cannotResolve(profile: String, interactor: String, matter: String,
+                       token: String) async throws -> Escalated {
+        try await request("/profiles/\(profile)/unresolved", method: "POST",
+                          body: ["interactor_id": interactor, "matter": matter],
+                          token: token)
+    }
+
+    func myEscalations(interactor: String,
+                       token: String) async throws -> [Escalated] {
+        try await request("/interactors/\(interactor)/unresolved", token: token)
+    }
+
+    /// While the deployment is sealed this always throws, and the refusal
+    /// says no call was placed and gives the number to dial.
+    @discardableResult
+    func dialEmergency(escalation: String, interactor: String,
+                       token: String) async throws -> Escalated {
+        try await request("/escalations/\(escalation)/dial?interactor_id="
+                          + interactor, method: "POST", token: token)
     }
 
     // MARK: Your own people, and the briefing that arrives before they do

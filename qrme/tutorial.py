@@ -489,6 +489,28 @@ LESSONS: tuple[dict, ...] = (
          screens=(172,),
          try_it="Read a campaign with no token at all, and find who the "
                 "money goes to written on the same card."),
+    dict(key="lastdoor", chapter="Out in the world",
+         title="When it cannot resolve it, and the door at the end",
+         what="Some matters do not wait for a butcher or a broker, and the "
+              "honest end of the ladder is emergency services. The profile "
+              "says up front that it can reach them, rather than producing "
+              "it from behind its back once things are already bad — a "
+              "capability discovered mid-emergency is a capability nobody "
+              "uses. Reaching them can cost money, so the waiver says so and "
+              "is signed **ahead of time**, in calm conditions: nobody reads "
+              "a liability paragraph during an emergency, and asking them to "
+              "is how a person in trouble ends up reading instead of "
+              "pressing. The press is explicit and nothing fires on the "
+              "profile's own judgement. And through the beta the last hop "
+              "**refuses**: the call is attempted and stopped at the point "
+              "it would leave, and what comes back says plainly that no call "
+              "was placed and gives the number to dial. That is a posture "
+              "rather than a fault. The rule it keeps is the one the beacon "
+              "alarms settled — an alarm that says help was called has to "
+              "have called it — kept here by never making the claim.",
+         screens=(172,),
+         try_it="Press it. Read the refusal, then look at what was raised: "
+                "the attempt is recorded and `placed` is still false."),
     dict(key="bringreal", chapter="Out in the world",
          title="Bringing somebody real into it",
          what="A synthetic profile is an AI, and some things need a person. "

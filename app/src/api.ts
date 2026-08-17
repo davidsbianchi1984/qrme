@@ -2675,6 +2675,28 @@ export type MyPerson = {
   in_your_area?: boolean;
 };
 
+/** Whether the emergency press would be answered, and the words that would
+ *  be signed. Readable *before* arming, deliberately: a person deciding
+ *  should be able to read what they would sign, and should learn now that
+ *  the deployment is sealed rather than at the worst moment. */
+export type DialerPosture = {
+  armed: boolean;
+  signed_at: string | null;
+  waiver: string;
+  sealed: boolean;
+  call_yourself: string;
+};
+
+export type Escalated = {
+  id: string;
+  profile_id: string;
+  interactor_id: string;
+  matter: string;
+  dialed_at: string | null;
+  placed: boolean;          // set by a call that connected, and nothing else
+  raised_at: string;
+};
+
 /** What a provider would receive, before anybody is contacted. */
 export type Briefing = {
   package: {
@@ -3337,6 +3359,26 @@ export const api = {
     req<{ provider_id: string; attached: boolean }>(
       `/interactors/${interactorId}/people/${providerId}`,
       { method: "DELETE", token }),
+  // When the profile reaches its limit, and the door at the end of it.
+  dialerPosture: (interactorId: string, token: string) =>
+    req<DialerPosture>(`/interactors/${interactorId}/dialer`, { token }),
+  armDialer: (interactorId: string, signatureId: string, token: string) =>
+    req<DialerPosture>(`/interactors/${interactorId}/dialer/arm`,
+      { method: "POST", body: { signature_id: signatureId }, token }),
+  cannotResolve: (profileId: string,
+                  body: { interactor_id: string; matter: string },
+                  token: string) =>
+    req<Escalated>(`/profiles/${profileId}/unresolved`,
+      { method: "POST", body, token }),
+  myEscalations: (interactorId: string, token: string) =>
+    req<Escalated[]>(`/interactors/${interactorId}/unresolved`, { token }),
+  // While the deployment is sealed this always refuses, and the refusal says
+  // no call was placed and gives the number. It never reports a success it
+  // cannot back.
+  dialEmergency: (escalationId: string, interactorId: string, token: string) =>
+    req<Escalated>(`/escalations/${escalationId}/dial?interactor_id=`
+      + encodeURIComponent(interactorId), { method: "POST", token }),
+
   // Nothing is sent by this: it is the whole file, readable before anybody
   // is contacted, so declining is still free.
   previewBriefing: (body: { interactor_id: string; profile_id: string;

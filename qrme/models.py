@@ -726,6 +726,16 @@ class ExcursionStart(BaseModel):
     private: list[str] = Field(default_factory=list)  # extra caller-marked private terms
 
 
+class DialArm(BaseModel):
+    # A verified signature over escalation.WAIVER, and nothing else.
+    signature_id: str
+
+
+class Unresolved(BaseModel):
+    interactor_id: str
+    matter: str                # what the profile could not resolve
+
+
 class PersonAttach(BaseModel):
     provider_id: str
     note: str | None = None

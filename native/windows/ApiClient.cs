@@ -635,6 +635,19 @@ public record Visited(
     [property: JsonPropertyName("persistent")] bool Persistent,
     [property: JsonPropertyName("stood_down")] bool? StoodDown);
 
+public record DialerPosture(
+    [property: JsonPropertyName("armed")] bool Armed,
+    [property: JsonPropertyName("waiver")] string Waiver,
+    [property: JsonPropertyName("sealed")] bool Sealed,
+    [property: JsonPropertyName("call_yourself")] string CallYourself);
+
+/// <summary><c>Placed</c> is set by a call that connected, and nothing else.</summary>
+public record Escalated(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("matter")] string Matter,
+    [property: JsonPropertyName("dialed_at")] string? DialedAt,
+    [property: JsonPropertyName("placed")] bool Placed);
+
 /// <summary>Somebody a person keeps in an area of life. <c>Yours</c>
 /// separates the ones they chose from the ones the search found.</summary>
 public record MyPerson(
@@ -1721,6 +1734,34 @@ public sealed class ApiClient
     /// failure aggregate, deliberately.</summary>
     public Task<Visited[]> VisitsAcross(string key) =>
         Send<Visited[]>(Get("/visits/across", key));
+
+    // -- when it cannot resolve it, and the door at the end --
+
+    public Task<DialerPosture> DialerPosture_(string interactor, string token) =>
+        Send<DialerPosture>(Get($"/interactors/{interactor}/dialer", token));
+
+    public async Task ArmDialer(string interactor, string signatureId, string token)
+    {
+        var req = Post($"/interactors/{interactor}/dialer/arm",
+                       new { signature_id = signatureId }, token);
+        (await Dispatch(req)).EnsureSuccessStatusCode();
+    }
+
+    public Task<Escalated> CannotResolve(string profile, string interactor,
+                                         string matter, string token) =>
+        Send<Escalated>(Post($"/profiles/{profile}/unresolved",
+            new { interactor_id = interactor, matter }, token));
+
+    public Task<Escalated[]> MyEscalations(string interactor, string token) =>
+        Send<Escalated[]>(Get($"/interactors/{interactor}/unresolved", token));
+
+    /// <summary>While the deployment is sealed this always throws, and the
+    /// refusal says no call was placed and gives the number to dial.</summary>
+    public Task<Escalated> DialEmergency(string escalation, string interactor,
+                                         string token) =>
+        Send<Escalated>(Post(
+            $"/escalations/{escalation}/dial?interactor_id={interactor}",
+            new { }, token));
 
     // -- your own people, and the briefing that arrives before they do --
 

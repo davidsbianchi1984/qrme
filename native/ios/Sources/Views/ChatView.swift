@@ -33,6 +33,11 @@ struct ChatView: View {
     @State private var matter = ""
     @State private var grantToken = ""
     @State private var brief: BriefingPreview?
+    // Shown before anything goes wrong, not produced mid-conversation.
+    @State private var dialer: DialerPosture?
+    @State private var escalated: Escalated?
+    @State private var said = ""
+    @State private var waiverSig = ""
 
     var body: some View {
         VStack(spacing: 0) {
@@ -42,6 +47,48 @@ struct ChatView: View {
                         Text(L10n.t("tab.chat", state.language)).font(.title2.bold()).foregroundStyle(Theme.txt)
                         Text(L10n.fill("nchat.sub", state.language, ["name": state.displayName]))
                             .font(.footnote).foregroundStyle(Theme.t2)
+
+                        // --- what this profile can do, before trouble ----
+                        Text(L10n.t("esc.hdr", state.language))
+                            .font(.headline).foregroundStyle(Theme.txt)
+                        Text(L10n.t("esc.pitch", state.language))
+                            .font(.caption).foregroundStyle(Theme.t2)
+                        if dialer == nil {
+                            Button(L10n.t("esc.show", state.language)) {
+                                loadDialer()
+                            }.font(.caption.bold()).foregroundStyle(Theme.brandA)
+                        } else if let d = dialer {
+                            Text(d.waiver).font(.caption).foregroundStyle(Theme.txt)
+                            Text(d.armed
+                                 ? L10n.t("esc.armed", state.language)
+                                 : L10n.t("esc.notarmed", state.language))
+                                .font(.caption2).foregroundStyle(Theme.t2)
+                            if d.sealed {
+                                // Said now, not discovered at the worst moment.
+                                Text(L10n.fill("esc.sealed", state.language,
+                                               ["number": d.call_yourself]))
+                                    .font(.caption).foregroundStyle(Theme.amber)
+                            }
+                            if !d.armed {
+                                TextField(L10n.t("esc.sig.ph", state.language),
+                                          text: $waiverSig)
+                                    .font(.footnote).foregroundStyle(Theme.txt)
+                                Button(L10n.t("esc.arm", state.language)) {
+                                    armWaiver()
+                                }.font(.caption.bold()).foregroundStyle(Theme.brandA)
+                            }
+                            Button(L10n.t("esc.raise", state.language)) {
+                                raiseUnresolved()
+                            }.font(.caption.bold()).foregroundStyle(Theme.brandA)
+                            if escalated != nil {
+                                Button(L10n.t("esc.press", state.language)) {
+                                    pressForHelp()
+                                }.font(.caption.bold()).foregroundStyle(Theme.red)
+                            }
+                            if !said.isEmpty {
+                                Text(said).font(.caption).foregroundStyle(Theme.txt)
+                            }
+                        }
 
                         // --- bring somebody real into this ---------------
                         Text(L10n.t("real.hdr", state.language))
@@ -191,6 +238,50 @@ struct ChatView: View {
                 .disabled(draft.isEmpty || busy)
             }
             .padding(.horizontal, 20).padding(.bottom, 12)
+        }
+    }
+
+    private func loadDialer() {
+        guard let iid = state.interactorId, let tok = state.interactorToken
+        else { return }
+        Task { dialer = try? await ApiClient.shared.dialerPosture(
+            interactor: iid, token: tok) }
+    }
+
+    private func armWaiver() {
+        guard let iid = state.interactorId, let tok = state.interactorToken
+        else { return }
+        Task {
+            dialer = try? await ApiClient.shared.armDialer(
+                interactor: iid, signatureId: waiverSig, token: tok)
+        }
+    }
+
+    private func raiseUnresolved() {
+        guard let iid = state.interactorId, let tok = state.interactorToken,
+              let pid = state.pid else { return }
+        Task {
+            escalated = try? await ApiClient.shared.cannotResolve(
+                profile: pid, interactor: iid, matter: matter, token: tok)
+            _ = try? await ApiClient.shared.myEscalations(
+                interactor: iid, token: tok)
+        }
+    }
+
+    /// The explicit press. While the deployment is sealed this throws, and
+    /// what the person reads is the refusal itself — which says no call was
+    /// placed and gives them the number.
+    private func pressForHelp() {
+        guard let e = escalated, let iid = state.interactorId,
+              let tok = state.interactorToken else { return }
+        Task {
+            do {
+                _ = try await ApiClient.shared.dialEmergency(
+                    escalation: e.id, interactor: iid, token: tok)
+                said = L10n.t("esc.placed", state.language)
+            } catch {
+                said = error.localizedDescription
+            }
         }
     }
 

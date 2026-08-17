@@ -152,6 +152,32 @@ CREATE TABLE IF NOT EXISTS providers (
     created_at TEXT NOT NULL
 );
 
+-- The profile reached its limit on a named matter. The exits hang off this
+-- record rather than off a sentence in a chat turn, so what was offered and
+-- what happened next are answerable afterwards by somebody who was not there.
+-- `placed` is set by a call that actually connected and by nothing else: a
+-- deployment whose dialer is sealed records the attempt and leaves it 0.
+CREATE TABLE IF NOT EXISTS escalations (
+    id            TEXT PRIMARY KEY,
+    profile_id    TEXT NOT NULL REFERENCES profiles(id),
+    interactor_id TEXT NOT NULL REFERENCES interactors(id),
+    matter        TEXT NOT NULL,
+    dialed_at     TEXT,
+    placed        INTEGER NOT NULL DEFAULT 0,
+    created_at    TEXT NOT NULL
+);
+
+-- The emergency-services charges waiver, signed ahead of time in calm
+-- conditions rather than during the emergency. The signed text is stored
+-- beside its hash: "they agreed" is a claim, and this is the evidence.
+CREATE TABLE IF NOT EXISTS dial_waivers (
+    interactor_id TEXT PRIMARY KEY REFERENCES interactors(id),
+    signature_id  TEXT NOT NULL,
+    waiver        TEXT NOT NULL,
+    waiver_sha256 TEXT NOT NULL,
+    signed_at     TEXT NOT NULL
+);
+
 -- The people a user has already chosen, in every area of life — their
 -- butcher, their broker, their doctor. `referral.match` searches the map;
 -- this is who they trust, and a handoff consults it first. `area` is copied

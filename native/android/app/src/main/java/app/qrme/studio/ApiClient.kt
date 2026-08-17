@@ -124,6 +124,11 @@ data class OpenAnswer(val alias: String, val body: String, val pointsTo: String)
 data class Visited(val host: String, val times: Int, val firstSeen: String,
                    val lastSeen: String, val reasons: List<String>,
                    val persistent: Boolean, val stoodDown: Boolean?)
+data class DialerPosture(val armed: Boolean, val waiver: String,
+                         val sealed: Boolean, val callYourself: String)
+/** `placed` is set by a call that connected, and by nothing else. */
+data class Escalated(val id: String, val matter: String,
+                     val dialedAt: String?, val placed: Boolean)
 /** Somebody a person keeps in an area of life. `yours` separates the ones
  *  they chose from the ones the search found for them. */
 data class MyPerson(val providerId: String, val name: String, val area: String,
@@ -978,6 +983,42 @@ object ApiClient {
         val arr = JSONArray(request("/visits/across", token = key))
         return (0 until arr.length()).map { visitedOf(arr.getJSONObject(it)) }
     }
+
+    // ---- when it cannot resolve it, and the door at the end ----
+
+    suspend fun dialerPosture(interactor: String, token: String): DialerPosture {
+        val o = JSONObject(request("/interactors/$interactor/dialer", token = token))
+        return DialerPosture(o.optBoolean("armed"), o.optString("waiver", ""),
+            o.optBoolean("sealed"), o.optString("call_yourself", ""))
+    }
+
+    suspend fun armDialer(interactor: String, signatureId: String, token: String) {
+        request("/interactors/$interactor/dialer/arm", "POST",
+            JSONObject().put("signature_id", signatureId), token)
+    }
+
+    private fun escalatedOf(o: JSONObject) = Escalated(
+        o.getString("id"), o.optString("matter", ""),
+        o.optString("dialed_at", null), o.optBoolean("placed"))
+
+    suspend fun cannotResolve(profile: String, interactor: String,
+                              matter: String, token: String): Escalated =
+        escalatedOf(JSONObject(request("/profiles/$profile/unresolved", "POST",
+            JSONObject().put("interactor_id", interactor).put("matter", matter),
+            token)))
+
+    suspend fun myEscalations(interactor: String, token: String): List<Escalated> {
+        val arr = JSONArray(request("/interactors/$interactor/unresolved", token = token))
+        return (0 until arr.length()).map { escalatedOf(arr.getJSONObject(it)) }
+    }
+
+    /** While the deployment is sealed this always throws, and the refusal
+     *  says no call was placed and gives the number to dial. */
+    suspend fun dialEmergency(escalation: String, interactor: String,
+                              token: String): Escalated =
+        escalatedOf(JSONObject(request(
+            "/escalations/$escalation/dial?interactor_id=$interactor",
+            "POST", null, token)))
 
     // ---- your own people, and the briefing that arrives before them ----
 

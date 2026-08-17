@@ -33,7 +33,8 @@ from .routers import (accounts as account_routes,
                       access, apps, assistant, audience, avatars,
                       briefcase as briefcase_routes, commerce,
                       community, connections,
-                      desks, displays, dock, earnings, exchange,
+                      desks, displays, dock, earnings,
+                      escalation as escalation_routes, exchange,
                       feed as feed_routes, feedback,
                       friends,
                       gamelobby, gaming,
@@ -182,6 +183,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(inquiry_routes.router)
     app.include_router(visit_routes.router)
     app.include_router(mypeople_routes.router)
+    app.include_router(escalation_routes.router)
     app.include_router(summon.router)
     app.include_router(community.router)
     app.include_router(assistant.router)
