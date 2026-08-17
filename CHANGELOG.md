@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.82.0] - 2026-08-17
+
 ### Added
 
 - **The deploy page had the room and not the doorway.** `docs/beta-deploy.md`
@@ -12104,7 +12106,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.81.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.82.0...HEAD
+[0.82.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.81.0...app-v0.82.0
 [0.81.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.81.0
 [0.80.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.80.0
 [0.79.0]: https://github.com/davidsbianchi1984/qrme/releases/tag/app-v0.79.0
