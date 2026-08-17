@@ -21,10 +21,24 @@ read like a broken deploy.
 and prompts for input. So following the instruction exactly still produced an
 error naming a cmdlet nobody typed, after a deploy that had gone perfectly.
 
-Both are the same failure: a correction written *about* a command instead of
-*as* one. These guards hold the shape rather than the wording — the page is
-free to be rewritten, and the commands have to stay runnable by the reader
-they are addressed to.
+**The room again, one step later.** The check that follows the deploy runs
+from your own machine, and the line that gets you there was a sentence
+between the two blocks — *then `exit`, and check from your own machine* —
+with a paragraph under them explaining why it mattered. Both were true and
+neither was run: the three checks went in on the host, which is the one place
+they prove nothing, because they answer from inside the network they exist to
+test from outside.
+
+**The alternative that was laid out as a sequence.** The Windows block read
+*on Windows, use these instead* and sat where the next step goes, so a reader
+working down the page ran the Unix three, saw three health objects, and then
+ran the Windows three in the same shell — `curl.exe: command not found`,
+three times, after a deploy that had gone perfectly.
+
+All four are the same failure: a correction written *about* a command instead
+of *as* one, or a choice written where a step belongs. These guards hold the
+shape rather than the wording — the page is free to be rewritten, and the
+commands have to stay runnable by the reader they are addressed to.
 """
 
 from pathlib import Path
@@ -85,14 +99,79 @@ def test_the_deploy_block_carries_the_step_that_changes_machine():
             "block rather than in the paragraph above it")
 
 
+def _checks() -> list[str]:
+    """Every block that checks what a deployed name answers.
+
+    Found by what they do rather than by which language opened them, because
+    there is one of these per shell and the point of the guards below is that
+    each one stands on its own.
+    """
+    return [b for b in _fenced("bash") + _fenced("powershell")
+            if "/health" in b]
+
+
 @pytest.mark.parametrize("host", ["sntheticprofiles.com", "jim-mini.com",
                                   "pdisystems.net"])
 def test_every_product_is_checked_after_a_deploy(host):
     """All three, every time — a box carrying two versions reports the
-    mismatch to whoever is using it rather than to whoever deployed it."""
-    checks = "\n".join(_fenced("bash") + _fenced("powershell"))
-    assert f"{host}/health" in checks, (
-        f"nothing on the page checks {host} after a deploy")
+    mismatch to whoever is using it rather than to whoever deployed it.
+
+    In **every** check block rather than across them added together. One
+    block per shell, and a reader runs one of them: three hosts spread over
+    two blocks is a check nobody actually performs.
+    """
+    blocks = _checks()
+    assert blocks, "the update section has no check block any more"
+    for block in blocks:
+        assert f"{host}/health" in block, (
+            f"a check block does not reach {host}. Each one is run on its "
+            "own, so each one has to check all three")
+
+
+def test_the_check_block_carries_the_step_that_leaves_the_host():
+    """`exit` in a sentence is a step a reader skips.
+
+    Same repair as the `ssh` above, for the same reason and after the same
+    failure: the deploy ends with a prompt still on the host, so the natural
+    thing is to keep typing. A check run there answers from inside the
+    network it exists to test from outside — it passes, and it proves
+    nothing.
+    """
+    for block in _checks():
+        first = next(l.strip() for l in block.splitlines() if l.strip())
+        assert first == "exit", (
+            f"a check block opens on `{first}` rather than `exit`, so it "
+            "runs on the host. That is the one place these three commands "
+            "cannot tell you what a visitor gets")
+
+
+def test_the_two_shells_are_a_choice_and_not_a_sequence():
+    """Two blocks doing the same work for different machines.
+
+    An alternative laid out as a sequence is read as a sequence — that is
+    what put PowerShell's three lines into a bash prompt. The page has to say
+    that one of them is the one to run, and the guard accepts any of the
+    words somebody might write it in rather than pinning the sentence.
+
+    The accepted phrasings all name the count, which is what makes them
+    unmistakable. The first version of this guard also took `either`, and
+    passed on a page carrying no marker at all: § 7 already says `docker` is
+    usually not installed *there either*, four paragraphs up. A guard whose
+    word can arrive by accident is a guard that reports on the prose rather
+    than on the shape.
+    """
+    blocks = _checks()
+    assert len(blocks) > 1, (
+        "one check block, so there is no choice to mark — if the Windows "
+        "form has gone, `test_the_windows_lines_are_lines_a_windows_reader_"
+        "can_paste` is the guard that says why it has to come back")
+    said = _updating().lower()
+    assert any(w in said for w in ("not both", "one of the two",
+                                   "one of these two", "one of the following "
+                                   "two")), (
+        "nothing on the page says these blocks are alternatives. Laid out as "
+        "consecutive steps, both get run: the second one was, in a shell "
+        "that has no `curl.exe`, after a deploy that had gone perfectly")
 
 
 def test_the_windows_lines_are_lines_a_windows_reader_can_paste():

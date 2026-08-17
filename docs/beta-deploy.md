@@ -221,34 +221,59 @@ added to tables somebody already has are applied there too, so a table
 added in a release appears the first time the new code opens the file. The
 databases live in named volumes and the rebuild does not touch them.
 
-Then `exit`, and check what actually answers **from your own machine** rather
-than the host — that is the path a visitor takes, and `/health` carries the
-version for exactly this:
+Then check what actually answers **from your own machine** rather than the
+host — that is the path a visitor takes, and `/health` carries the version
+for exactly this.
+
+    asked     does the page say to leave the host
+    mattered  is that line inside the block somebody copies
+
+**Run one of the two blocks below, not both.** They are the same three
+checks for two different machines, and which one you want is decided by what
+you are sitting at rather than by what you just deployed to.
+
+If your own machine runs a Unix shell:
 
 ```bash
+exit
+
 curl -s https://sntheticprofiles.com/health; echo
 curl -s https://jim-mini.com/health; echo
 curl -s https://pdisystems.net/health; echo
 ```
 
-The `exit` is part of the step. This is the one place in the section where
-the machine changes, and the deploy above it ends with a prompt still on the
-host — so the natural thing is to keep typing, which runs the check from
-inside the network it is meant to be testing from outside.
-
-On Windows, use these instead:
+If your own machine is Windows, in PowerShell:
 
 ```powershell
+exit
+
 curl.exe -s https://sntheticprofiles.com/health
 curl.exe -s https://jim-mini.com/health
 curl.exe -s https://pdisystems.net/health
 ```
 
-Written out rather than described, because describing them is what failed.
-This page used to say *add `.exe` to each* — a correct instruction attached
-to three lines that also carry `; echo`, which is the half it did not
-mention. `echo` in PowerShell is `Write-Output`, and `Write-Output` at the
-end of a pipeline with nothing feeding it stops and prompts for input:
+The `exit` is the first line of each block for the same reason `ssh` is the
+first line of the deploy above. It used to be a sentence — *then `exit`, and
+check from your own machine* — sitting between the deploy and the checks,
+with a paragraph under them explaining why it mattered. Both were true, and
+neither was a line anybody ran: the deploy ends with a prompt still on the
+host, so the natural thing is to keep typing. The three checks were run on
+the box, which is the one place they prove nothing. They answer from inside
+the network they exist to test from outside.
+
+The two blocks are marked as a choice for the same reason. The Windows one
+used to read *on Windows, use these instead* and sit where the next step
+goes, so a reader working down the page ran the Unix three, saw three health
+objects, and then ran the Windows three in the same shell —
+`curl.exe: command not found`, three times, after a deploy that had gone
+perfectly. An alternative laid out as a sequence is read as a sequence.
+
+The Windows lines are written out rather than described, because describing
+them is what failed. This page used to say *add `.exe` to each* — a correct
+instruction attached to three lines that also carry `; echo`, which is the
+half it did not mention. `echo` in PowerShell is `Write-Output`, and `Write-
+Output` at the end of a pipeline with nothing feeding it stops and prompts
+for input:
 
     cmdlet Write-Output at command pipeline position 1
     Supply values for the following parameters:
