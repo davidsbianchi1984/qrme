@@ -128,21 +128,60 @@ def test_every_product_is_checked_after_a_deploy(host):
             "own, so each one has to check all three")
 
 
-def test_the_check_block_carries_the_step_that_leaves_the_host():
-    """`exit` in a sentence is a step a reader skips.
+def test_no_check_block_changes_machine_inside_itself():
+    """`exit` in the block is a step a reader *cannot* run.
 
-    Same repair as the `ssh` above, for the same reason and after the same
-    failure: the deploy ends with a prompt still on the host, so the natural
-    thing is to keep typing. A check run there answers from inside the
-    network it exists to test from outside — it passes, and it proves
-    nothing.
+    This guard is the inverse of the one it replaces, and the reversal is the
+    lesson. The first version held that `exit` must be the **first line** of
+    each check block, by analogy with the `ssh` at the top of the deploy
+    block. The analogy is false. `ssh host` followed by more lines works
+    because ssh takes the rest as standard input; `exit` followed by more
+    lines does not, because the shell tears down and the rest of the paste
+    goes into a closing session. It echoes and is lost.
+
+    So the page said to do something that could not be done, and the checks
+    silently never ran after a deploy that had gone perfectly — worse than
+    the sentence everybody skipped, because a skipped step leaves a prompt
+    you can still type into.
+
+    A block somebody pastes must therefore contain **no change of machine at
+    all**. Getting to your own machine is a new window, and that is prose
+    because it is not a command.
     """
     for block in _checks():
-        first = next(l.strip() for l in block.splitlines() if l.strip())
-        assert first == "exit", (
-            f"a check block opens on `{first}` rather than `exit`, so it "
-            "runs on the host. That is the one place these three commands "
-            "cannot tell you what a visitor gets")
+        for line in (l.strip() for l in block.splitlines() if l.strip()):
+            assert line != "exit", (
+                "a check block starts by closing the connection, so every "
+                "line under it is pasted into a dying session and never "
+                "runs. Leaving the host is a new window, not a line in the "
+                "block")
+            assert not line.startswith("ssh "), (
+                "a check block opens a connection to the host, which is the "
+                "one place these three commands cannot tell you what a "
+                "visitor gets")
+
+
+def test_the_page_says_how_to_get_to_your_own_machine():
+    """Prose, but it has to be there.
+
+    The command form was tried twice and failed twice, so what is left is an
+    instruction — and this holds that it did not vanish along with the `exit`
+    that replaced it, which is exactly how the step went missing the first
+    time.
+
+    The phrase checked is the **imperative**, not the bare words. The first
+    version of this guard accepted "new window", which the paragraphs
+    explaining *why* it is a new window also contain, so deleting the
+    instruction left the guard green. That is the second time in two days a
+    guard on this page has matched its own surrounding prose — the other
+    took the word `either`, four paragraphs from an unrelated sentence. A
+    guard that can be satisfied by the explanation of a rule is not checking
+    the rule.
+    """
+    said = _updating().lower()
+    assert "open a new terminal window" in said, (
+        "nothing tells the reader how to get off the host. That step has "
+        "been lost once already, and the checks then ran on the box")
 
 
 def test_the_two_shells_are_a_choice_and_not_a_sequence():

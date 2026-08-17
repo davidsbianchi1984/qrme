@@ -6,6 +6,45 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The step that was impossible to perform.** 0.83.0 moved `exit` to the
+  first line of each check block on this page, reasoning that it was *the
+  same repair as the `ssh` at the top of the deploy block*. The reasoning was
+  wrong and the next deploy proved it in one paste.
+
+      asked     does the page say to leave the host
+      mattered  can the reader actually get there
+
+  The two are not symmetric. `ssh host` followed by more lines works, because
+  ssh takes the rest as standard input and runs it on the far side. `exit`
+  followed by more lines does not: the shell tears down and the remainder
+  goes into a session that is already closing. It echoes, and it is gone.
+
+      root@ubuntu:/srv/qrme# exit
+      curl -s https://sntheticprofiles.com/health;
+      echo
+      …
+      logout
+      Connection to 74.208.19.30 closed.
+
+  A deploy that had gone perfectly, three checks that never ran, and no error
+  to say so. The first version made the step easy to skip; the second made it
+  impossible to perform, which is worse — a skipped step at least leaves a
+  prompt you can still type into.
+
+  Getting to your own machine is **a new window**, and that is prose because
+  it is not a command. The guard is inverted to match: a check block must now
+  contain no change of machine at all, where it previously required one.
+
+  Its companion was too loose on the first pass and had to be tightened
+  before it could catch anything: it accepted a bare *new window*, which the
+  paragraphs explaining why it is a new window also contain, so deleting the
+  instruction left it green. That is the second guard on this page in two
+  days to match its own surrounding prose — the other took the word
+  *either*. A guard that can be satisfied by the explanation of a rule is not
+  checking the rule.
+
 ## [0.83.0] - 2026-08-17
 
 ### Added

@@ -226,17 +226,46 @@ host — that is the path a visitor takes, and `/health` carries the version
 for exactly this.
 
     asked     does the page say to leave the host
-    mattered  is that line inside the block somebody copies
+    mattered  can the reader actually get there
 
-**Run one of the two blocks below, not both.** They are the same three
+**Open a new terminal window on your own machine.** Not `exit` — a new
+window. Leave the deploy's window where it is.
+
+That instruction is the third shape this step has had, and the first that
+runs. It was a sentence between the blocks, which everybody skipped, and the
+checks went in on the host: the one place they prove nothing, because they
+answer from inside the network they exist to test from outside. So `exit`
+was moved to the first line of the check block, on the reasoning that it was
+*the same repair as the `ssh` at the top of the deploy block.*
+
+That reasoning was wrong, and the next deploy proved it in one paste. The
+two are not symmetric:
+
+* `ssh host` followed by more lines works, because ssh takes the rest as
+  standard input and runs it on the far side;
+* `exit` followed by more lines does **not**, because the shell tears down
+  and the rest of the pasted text goes into a session that is already
+  closing. It echoes, and then it is gone.
+
+    root@ubuntu:/srv/qrme# exit
+    curl -s https://sntheticprofiles.com/health;
+    echo
+    …
+    logout
+    Connection to 74.208.19.30 closed.
+
+A deploy that had gone perfectly, three checks that never ran, and no error
+to say so. The first version made the step easy to skip; the second made it
+impossible to perform. A new window is the only shape where the block a
+person pastes contains no change of machine at all.
+
+**Then run one of the two blocks below, not both.** They are the same three
 checks for two different machines, and which one you want is decided by what
 you are sitting at rather than by what you just deployed to.
 
 If your own machine runs a Unix shell:
 
 ```bash
-exit
-
 curl -s https://sntheticprofiles.com/health; echo
 curl -s https://jim-mini.com/health; echo
 curl -s https://pdisystems.net/health; echo
@@ -245,21 +274,15 @@ curl -s https://pdisystems.net/health; echo
 If your own machine is Windows, in PowerShell:
 
 ```powershell
-exit
-
 curl.exe -s https://sntheticprofiles.com/health
 curl.exe -s https://jim-mini.com/health
 curl.exe -s https://pdisystems.net/health
 ```
 
-The `exit` is the first line of each block for the same reason `ssh` is the
-first line of the deploy above. It used to be a sentence — *then `exit`, and
-check from your own machine* — sitting between the deploy and the checks,
-with a paragraph under them explaining why it mattered. Both were true, and
-neither was a line anybody ran: the deploy ends with a prompt still on the
-host, so the natural thing is to keep typing. The three checks were run on
-the box, which is the one place they prove nothing. They answer from inside
-the network they exist to test from outside.
+If the terminal you use is an SSH client with the connection saved, a new
+window may reconnect to the host on its own — mine does. Three browser tabs
+at the same three URLs is the same check from the same place, and it is the
+one that always works from a phone.
 
 The two blocks are marked as a choice for the same reason. The Windows one
 used to read *on Windows, use these instead* and sit where the next step
