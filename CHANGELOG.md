@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.86.0] - 2026-08-18
+
 ### Added
 
 - **The AR and VR rooms become places to stand in.** The homepage has sold
@@ -12673,6 +12675,7 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   per-OS installer release workflow.
 
 [Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.85.0...HEAD
+[0.86.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.85.0...app-v0.86.0
 [0.85.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.84.0...app-v0.85.0
 [0.84.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.83.0...app-v0.84.0
 [0.83.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.82.0...app-v0.83.0
