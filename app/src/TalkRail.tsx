@@ -17,7 +17,9 @@
 
 import { useEffect, useState } from "react";
 import { api } from "./api";
-import type { MemoryAccount, Profile, ProfileSteering } from "./api";
+import type {
+  MemoryAccount, Profile, ProfileSteering, RecollectionShelf,
+} from "./api";
 import { t as tr, fill } from "./l10n";
 
 export type RailPanel = "profile" | "memory" | "relationship" | "controls";
@@ -132,13 +134,20 @@ function MemoryPanel({ profileId, interactorId, token, lang, onError }: {
   lang: string; onError: (m: string) => void;
 }) {
   const [acc, setAcc] = useState<MemoryAccount | null>(null);
+  const [sealed, setSealed] = useState<RecollectionShelf | null>(null);
   const [about, setAbout] = useState("");
   const [busy, setBusy] = useState(false);
 
   const load = () =>
     api.memoryAccount(profileId, interactorId, token).then(setAcc)
        .catch((e) => onError(String(e.message || e)));
-  useEffect(() => { load(); }, [profileId, interactorId]);
+  // The sealed shelf beside the distilled account — the other axis of
+  // memory, shown the same way it is held. Absent rather than broken on
+  // deployments without a vault: nothing was sealed, nothing lists.
+  const loadSealed = () =>
+    api.recollections(profileId, interactorId, token).then(setSealed)
+       .catch(() => setSealed(null));
+  useEffect(() => { load(); loadSealed(); }, [profileId, interactorId]);
 
   const forget = () => {
     const words = about.trim();
@@ -174,6 +183,39 @@ function MemoryPanel({ profileId, interactorId, token, lang, onError }: {
         </button>
       </div>
       <p className="muted small">{tr("rail.mem.scalpel", lang)}</p>
+      {sealed && (
+        <>
+          <div className="tile-label">{tr("rail.mem.sealed", lang)}</div>
+          <p className="muted small">{tr("rail.mem.sealed.lead", lang)}</p>
+          {!sealed.readable && (
+            <p className="muted small">
+              {tr("rail.mem.sealed.unreadable", lang)}
+            </p>
+          )}
+          {sealed.memories.length === 0 && (
+            <p className="muted small">{tr("rail.mem.sealed.none", lang)}</p>
+          )}
+          {sealed.memories.map((m) => (
+            <div className="row" key={m.ref}>
+              <span className="small" style={{ flex: 1 }}>
+                {m.line ?? "…"}
+                {m.at && (
+                  <span className="muted small"> — {m.at.slice(0, 10)}</span>
+                )}
+              </span>
+              <button disabled={busy} onClick={() => {
+                setBusy(true);
+                api.forgetRecollection(profileId, interactorId, m.ref, token)
+                   .then(() => loadSealed())
+                   .catch((e) => onError(String(e.message || e)))
+                   .finally(() => setBusy(false));
+              }}>
+                {tr("rail.mem.sealed.forget", lang)}
+              </button>
+            </div>
+          ))}
+        </>
+      )}
     </div>
   );
 }

@@ -325,6 +325,8 @@ public sealed partial class PeoplePage : Page
         MemForgetButton.Content = L10n.T("mem.forget");
         MemTurnIdBox.PlaceholderText = L10n.T("mem.turnid");
         MemStrikeButton.Content = L10n.T("mem.strike");
+        MemSealedButton.Content = L10n.T("mem.sealed");
+        MemSealedForgetButton.Content = L10n.T("mem.sealed.forget");
         MemNewWordsBox.PlaceholderText = L10n.T("mem.newwords");
         MemSaveWordsButton.Content = L10n.T("action.save");
         PairTitle.Text = L10n.T("who.title");
@@ -2312,6 +2314,38 @@ public sealed partial class PeoplePage : Page
                 new[] { MemTurnIdBox.Text.Trim() }, AppState.Current.Token!);
             MemTurnIdBox.Text = "";
             StatusText.Text = outp.StruckTurns.ToString();
+        });
+
+    private async void OnMemSealed(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            // The sealed shelf: what the vault remembers of this pair,
+            // ref by ref — the ref rides the turn-id box, because the
+            // ref of a sealed moment is the turn it was sealed from.
+            var s = await ApiClient.Shared.Recollections(
+                AppState.Current.Pid!, MemIdBox.Text.Trim(),
+                AppState.Current.Token!);
+            if (s.Memories.Length == 0)
+            {
+                StatusText.Text = L10n.T("mem.sealed.none");
+                return;
+            }
+            var rows = string.Join("\n", s.Memories.Select(
+                m => m.Ref + " — " + (m.Line ?? "…")));
+            StatusText.Text = s.Readable ? rows
+                : L10n.T("mem.sealed.unreadable") + "\n" + rows;
+        });
+
+    private async void OnMemSealedForget(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            // Take one sealed moment back the whole way: the vector, the
+            // seal and the ledger row go together.
+            var outp = await ApiClient.Shared.ForgetRecollection(
+                AppState.Current.Pid!, MemIdBox.Text.Trim(),
+                MemTurnIdBox.Text.Trim(), AppState.Current.Token!);
+            MemTurnIdBox.Text = "";
+            StatusText.Text = outp.Forgotten ? "✓" : (outp.Why ?? "—");
         });
 
     private async void OnMemSaveWords(object sender, RoutedEventArgs e) =>

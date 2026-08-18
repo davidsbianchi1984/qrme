@@ -79,6 +79,40 @@ struct MemorySection: View {
                     }
                 }.font(.caption).disabled(busy || visitorId.isEmpty)
             }
+            // The sealed shelf: what the vault remembers of this pair,
+            // ref by ref — and the door that takes one back the whole
+            // way. The ref rides the turn-id field below, because the
+            // ref of a sealed moment is the turn it was sealed from.
+            HStack {
+                Button(L10n.t("mem.sealed", state.language)) {
+                    run {
+                        let s = try await ApiClient.shared.recollections(
+                            id: state.pid!, interactorId: visitorId,
+                            token: state.token!)
+                        if s.memories.isEmpty {
+                            line = L10n.t("mem.sealed.none", state.language)
+                        } else {
+                            let rows = s.memories
+                                .map { $0.ref + " — " + ($0.line ?? "…") }
+                                .joined(separator: "\n")
+                            line = s.readable ? rows
+                                : L10n.t("mem.sealed.unreadable",
+                                         state.language) + "\n" + rows
+                        }
+                    }
+                }.font(.caption).disabled(busy || visitorId.isEmpty)
+                Button(L10n.t("mem.sealed.forget", state.language)) {
+                    run {
+                        let out = try await ApiClient.shared
+                            .forgetRecollection(
+                                id: state.pid!, interactorId: visitorId,
+                                ref: turnId, token: state.token!)
+                        turnId = ""
+                        line = out.forgotten ? "✓" : (out.why ?? "—")
+                    }
+                }.font(.caption)
+                    .disabled(busy || visitorId.isEmpty || turnId.isEmpty)
+            }
             // Forget that one thing — the scalpel beside the erase-all.
             HStack {
                 TextField(L10n.t("mem.forget.ph", state.language),

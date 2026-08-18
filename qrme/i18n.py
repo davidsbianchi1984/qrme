@@ -1417,6 +1417,17 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'hi': 'इस प्रोफ़ाइल से कोई बोलने की आवाज़ नहीं जुड़ी — मालिक इसे वॉइस में सेट करता है',
         'ar': 'لا صوت منطوقًا مرتبطًا بهذا الملف — يضبطه المالك في قسم الصوت',
     },
+    'no sealed moment here has that ref': {
+        'es': 'ningún momento sellado aquí tiene esa referencia',
+        'fr': 'aucun moment scellé ici ne porte cette référence',
+        'de': 'kein versiegelter Moment hier trägt diese Referenz',
+        'pt': 'nenhum momento selado aqui tem essa referência',
+        'it': 'nessun momento sigillato qui ha quel riferimento',
+        'ja': 'ここに封印された瞬間の中に、その参照を持つものはありません',
+        'zh': '这里没有任何封存的时刻带有该引用',
+        'hi': 'यहाँ किसी सीलबंद पल के पास वह संदर्भ नहीं है',
+        'ar': 'لا لحظة مختومة هنا تحمل هذا المرجع',
+    },
     'no such matter': {
         'es': 'no existe ese asunto',
         'fr': 'aucune affaire de ce nom',

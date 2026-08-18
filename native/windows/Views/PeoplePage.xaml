@@ -935,6 +935,12 @@
                     <TextBox x:Name="MemTurnIdBox" />
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <Button x:Name="MemStrikeButton" Click="OnMemStrike" />
+                        <!-- The sealed shelf, and the door that takes one
+                             moment back the whole way; the ref rides the
+                             turn-id box above. -->
+                        <Button x:Name="MemSealedButton" Click="OnMemSealed" />
+                        <Button x:Name="MemSealedForgetButton"
+                                Click="OnMemSealedForget" />
                     </StackPanel>
                     <TextBox x:Name="MemNewWordsBox" />
                     <Button x:Name="MemSaveWordsButton" Click="OnMemSaveWords" />

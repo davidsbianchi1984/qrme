@@ -4603,6 +4603,42 @@ extension ApiClient {
             token: token)
     }
 
+    struct RecolledMoment: Decodable {
+        let ref: String
+        let line: String?
+        let at: String?
+    }
+
+    struct RecollectionShelf: Decodable {
+        let memories: [RecolledMoment]
+        let readable: Bool
+    }
+
+    /// The pair's sealed shelf — what the vault remembers of this
+    /// conversation, read back line by line.
+    func recollections(id: String, interactorId: String,
+                       token: String) async throws -> RecollectionShelf {
+        try await request(
+            "/profiles/\(id)/memory/\(interactorId)/recollections",
+            token: token)
+    }
+
+    struct RecollectionForgotten: Decodable {
+        let forgotten: Bool
+        let vectors_removed: Int?
+        let why: String?
+    }
+
+    /// Take one sealed moment back the whole way: the vector, the seal
+    /// and the ledger row go together.
+    func forgetRecollection(id: String, interactorId: String, ref: String,
+                            token: String) async throws
+        -> RecollectionForgotten {
+        try await request(
+            "/profiles/\(id)/memory/\(interactorId)/recollections/\(ref)",
+            method: "DELETE", token: token)
+    }
+
     struct ForgetOut: Decodable {
         let forgotten_turns: Int
         let remembrance_reset: Bool

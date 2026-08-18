@@ -130,6 +130,57 @@ def chat_block(pdi, profile_id: str, interactor_id: str,
             + "\n- ".join(lines))
 
 
+def shelf(pdi, profile_id: str, interactor_id: str) -> dict:
+    """Every sealed moment this pair holds, read back.
+
+    The refs come from the `recollections` ledger — the same rows the
+    erasure sweep walks — and the lines from the vault, so the answer is
+    exactly what recall can actually surface, not a claim about it. A
+    tandem that cannot be reached answers `readable: false` with whatever
+    refs exist, because "I hold twelve moments I cannot show you right
+    now" and "I hold nothing" are different answers. The pair scoping is
+    in the SQL: Bob's shelf never lists what Alice said.
+    """
+    rows = db.connect().execute(
+        "SELECT id, pdi_key, created_at FROM recollections"
+        " WHERE profile_id=? AND interactor_id=?"
+        " ORDER BY created_at, rowid", (profile_id, interactor_id)).fetchall()
+    moments, readable = [], pdi is not None
+    for r in rows:
+        entry = {}
+        if pdi is not None:
+            try:
+                raw = pdi.get(r["pdi_key"])
+                entry = json.loads(raw) if raw else {}
+            except Exception:  # noqa: BLE001
+                readable = False
+        moments.append({"ref": r["id"], "line": entry.get("line"),
+                        "at": entry.get("at")})
+    return {"memories": moments, "readable": readable}
+
+
+def forget(pdi, profile_id: str, interactor_id: str, ref: str) -> dict:
+    """Unmake one sealed moment: the vector, the seal, and the ledger row
+    — so a forgotten memory stops being findable, not merely stops being
+    readable. The chat turn itself is not touched; striking the
+    transcript stays at its own door. Non-fatal like everything here."""
+    if pdi is None:
+        return {"forgotten": False, "why": "no vault for this plan"}
+    key = _key(profile_id, interactor_id, ref)
+    try:
+        removed = pdi.resident_forget(key)
+        pdi.delete(key)
+        conn = db.connect()
+        conn.execute(
+            "DELETE FROM recollections WHERE id=? AND profile_id=?"
+            " AND interactor_id=?", (ref, profile_id, interactor_id))
+        conn.commit()
+    except Exception as exc:  # noqa: BLE001
+        return {"forgotten": False,
+                "why": f"{type(exc).__name__}: {exc}"[:200]}
+    return {"forgotten": True, "vectors_removed": removed}
+
+
 def forget_profile(pdi, profile_id: str) -> int | None:
     """Erasure's call: every vector under this profile's memory prefix, in
     one trip. None when the tandem could not be reached — the erasure

@@ -1321,6 +1321,15 @@ export interface MemoryAccount {
   } | null;
 }
 
+/** The pair's sealed shelf: what the vault remembers of this conversation,
+ *  read back line by line. `line` is null when the tandem cannot be reached
+ *  — the refs still list, because "I hold a moment I cannot show you right
+ *  now" and "I hold nothing" are different answers. */
+export interface RecollectionShelf {
+  memories: { ref: string; line: string | null; at: string | null }[];
+  readable: boolean;
+}
+
 // ---- endpoints ----
 export interface PairInfo {
   console_url: string; api_url: string; console_built: boolean;
@@ -4044,6 +4053,17 @@ export const api = {
     req<MemoryAccount>(
       `/profiles/${profileId}/memory/${interactorId}/account`, { token }),
 
+  // The pair's sealed shelf — every moment the vault remembers of this
+  // conversation, and the door that takes one back the whole way.
+  recollections: (profileId: string, interactorId: string, token: string) =>
+    req<RecollectionShelf>(
+      `/profiles/${profileId}/memory/${interactorId}/recollections`,
+      { token }),
+  forgetRecollection: (profileId: string, interactorId: string, ref: string,
+                       token: string) =>
+    req<{ forgotten: boolean; vectors_removed?: number; why?: string }>(
+      `/profiles/${profileId}/memory/${interactorId}/recollections/${ref}`,
+      { method: "DELETE", token }),
   // Forget that one thing: the turns that carry the words are deleted and
   // the kept memory is re-folded from what remains.
   forgetMemory: (profileId: string, interactorId: string, about: string,

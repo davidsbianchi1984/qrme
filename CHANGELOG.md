@@ -6,6 +6,36 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The sealed shelf, shown and curatable — the interactor's own door.**
+  JIM's shelf round put the coach's remembered moments in front of the
+  person they are about; this is QRME's twin, one wall stricter.
+  `GET /profiles/{id}/memory/{interactor_id}/recollections` lists every
+  moment the vault remembers of this pair — refs from the `recollections`
+  ledger (the same rows erasure walks), lines read back from the tandem —
+  behind the pair's own `require_owner_or_interactor` door, so the answer
+  is exactly what recall can surface, not a claim about it. A tandem that
+  cannot be reached answers `readable: false` with the refs still listed,
+  because "I hold a moment I cannot show you right now" and "I hold
+  nothing" are different answers.
+
+      asked     does the profile remember through the vault
+      mattered  can the person see what it remembers, and take one back
+
+  `DELETE …/recollections/{ref}` takes one moment back the whole way —
+  the vector, the seal and the ledger row together, so it stops being
+  findable rather than merely unreadable — while the chat turn it was
+  sealed from stays in the transcript: forgetting the sealed memory is
+  not striking the conversation, which keeps its own doors. The ref is
+  scoped to the pair's ledger before the vault is asked anything, so a
+  borrowed ref from someone else's conversation forgets nothing. Both
+  doors read the *real* vault, not the plan-gated one — `vault_for`
+  gates writes only, and somebody who moved to Free still has a history
+  they must be able to read back and let go of. Doors on the talk rail
+  (list with per-moment forget under the scalpel) and all three shells
+  (the pocket's id-driven idiom: the ref rides the turn-id field).
+
 ### Fixed
 
 - **Profile erasure takes the memory vectors too.** The recollection

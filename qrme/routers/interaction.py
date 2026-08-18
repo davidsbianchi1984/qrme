@@ -903,6 +903,55 @@ def memory_account(profile_id: str, interactor_id: str,
     }
 
 
+@router.get("/profiles/{profile_id}/memory/{interactor_id}/recollections")
+def sealed_recollections(profile_id: str, interactor_id: str,
+                         request: Request) -> dict:
+    """The pair's sealed shelf: every moment the vault remembers of this
+    conversation, read back line by line — the recollection index made
+    visible to the two people it is of.
+
+        asked     does the profile remember through the vault
+        mattered  can the person see what it remembers, and take one back
+
+    The account two doors up answers with the distilled paragraph; this
+    answers with the sealed moments themselves — the other axis of memory,
+    shown the same way it is held. The *real* vault, not the plan-gated
+    one: `storage.vault_for` gates writes only, and a member who moved to
+    Free still has a history of sealed moments they must be able to read
+    back. A free account's turns were never sealed, so its ledger is
+    empty and its shelf honestly so.
+    """
+    profile_or_404(profile_id)
+    require_owner_or_interactor(profile_id, interactor_id, request)
+    from .. import recollection
+    return recollection.shelf(request.app.state.pdi, profile_id,
+                              interactor_id)
+
+
+@router.delete(
+    "/profiles/{profile_id}/memory/{interactor_id}/recollections/{ref}")
+def forget_recollection(profile_id: str, interactor_id: str, ref: str,
+                        request: Request) -> dict:
+    """Take back one sealed moment: the vector, the seal and the ledger
+    row go together, so it stops being findable — not merely readable.
+    The chat turn it came from is untouched; striking the transcript
+    stays at its own door. The ref is scoped to this pair's ledger, so a
+    borrowed ref from someone else's conversation forgets nothing. The
+    real vault, not the plan-gated one — `storage.vault_for` gates writes
+    only, and a plan-gated delete leaves records nobody can reach and
+    calls that forgetting."""
+    profile_or_404(profile_id)
+    require_owner_or_interactor(profile_id, interactor_id, request)
+    row = db.connect().execute(
+        "SELECT id FROM recollections WHERE id=? AND profile_id=?"
+        " AND interactor_id=?", (ref, profile_id, interactor_id)).fetchone()
+    if row is None:
+        raise HTTPException(404, "no sealed moment here has that ref")
+    from .. import recollection
+    return recollection.forget(request.app.state.pdi, profile_id,
+                               interactor_id, ref)
+
+
 @router.post("/profiles/{profile_id}/memory/{interactor_id}/forget")
 def forget_one_thing(profile_id: str, interactor_id: str, body: MemoryForget,
                      request: Request) -> dict:

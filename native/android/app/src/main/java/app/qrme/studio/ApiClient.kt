@@ -13,6 +13,8 @@ data class ProfileCreated(val id: String, val displayName: String, val kind: Str
 data class ProfileCard(val id: String, val displayName: String, val kind: String, val status: String?)
 data class Post(val id: String, val topic: String?, val content: String?, val status: String?,
                 val provenance: Provenance? = null, val watermarkLine: String? = null)
+data class RecolledMoment(val ref: String, val line: String?, val at: String?)
+data class RecollectionShelf(val memories: List<RecolledMoment>, val readable: Boolean)
 data class ProviderInfo(val name: String, val label: String, val configured: Boolean)
 data class ModelChoice(val provider: String, val effective: String)
 data class WatermarkDesign(val mark: String, val label: String, val line: String, val custom: Boolean)
@@ -3947,6 +3949,35 @@ object ApiClient {
         val kept = if (o.isNull("remembers")) "" else o.optString("remembers")
         return kept + " · " + o.optInt("folded_turns") + "+" +
             o.optInt("recent_turns")
+    }
+
+    // The pair's sealed shelf — what the vault remembers of this
+    // conversation, read back line by line.
+    suspend fun recollections(id: String, interactorId: String,
+                              token: String): RecollectionShelf {
+        val o = org.json.JSONObject(request(
+            "/profiles/$id/memory/$interactorId/recollections",
+            token = token))
+        val arr = o.getJSONArray("memories")
+        val out = mutableListOf<RecolledMoment>()
+        for (i in 0 until arr.length()) {
+            val m = arr.getJSONObject(i)
+            out.add(RecolledMoment(
+                m.getString("ref"),
+                if (m.isNull("line")) null else m.optString("line"),
+                if (m.isNull("at")) null else m.optString("at")))
+        }
+        return RecollectionShelf(out, o.optBoolean("readable"))
+    }
+
+    // Take one sealed moment back the whole way: the vector, the seal
+    // and the ledger row go together.
+    suspend fun forgetRecollection(id: String, interactorId: String,
+                                   ref: String, token: String): Boolean {
+        val o = org.json.JSONObject(request(
+            "/profiles/$id/memory/$interactorId/recollections/$ref",
+            "DELETE", token = token))
+        return o.optBoolean("forgotten")
     }
 
     // Forget that one thing; the kept memory re-folds from what remains.

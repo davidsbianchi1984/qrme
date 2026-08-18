@@ -2497,6 +2497,23 @@ public sealed class ApiClient
         Send<MemoryAccountOut>(Get(
             $"/profiles/{profileId}/memory/{interactorId}/account", token));
 
+    /// <summary>The pair's sealed shelf — what the vault remembers of
+    /// this conversation, read back line by line.</summary>
+    public Task<RecollectionShelfOut> Recollections(string profileId,
+        string interactorId, string token) =>
+        Send<RecollectionShelfOut>(Get(
+            $"/profiles/{profileId}/memory/{interactorId}/recollections",
+            token));
+
+    /// <summary>Take one sealed moment back the whole way: the vector,
+    /// the seal and the ledger row go together.</summary>
+    public Task<RecollectionForgottenOut> ForgetRecollection(
+        string profileId, string interactorId, string momentRef,
+        string token) =>
+        Send<RecollectionForgottenOut>(Delete(
+            $"/profiles/{profileId}/memory/{interactorId}/recollections/{momentRef}",
+            token));
+
     /// <summary>Forget that one thing; the kept memory re-folds.</summary>
     public Task<ForgetOut> ForgetMemory(string profileId,
         string interactorId, string about, string token) =>
@@ -5163,6 +5180,22 @@ public record MemoryAccountOut(
 public record ForgetOut(
     [property: JsonPropertyName("forgotten_turns")] int ForgottenTurns,
     [property: JsonPropertyName("remembrance_reset")] bool RemembranceReset);
+
+public record RecolledMomentOut(
+    [property: JsonPropertyName("ref")] string Ref,
+    // Null when the tandem cannot be reached: the ref still lists,
+    // because "held but unreadable" and "held nothing" differ.
+    [property: JsonPropertyName("line")] string? Line,
+    [property: JsonPropertyName("at")] string? At);
+
+public record RecollectionShelfOut(
+    [property: JsonPropertyName("memories")] RecolledMomentOut[] Memories,
+    [property: JsonPropertyName("readable")] bool Readable);
+
+public record RecollectionForgottenOut(
+    [property: JsonPropertyName("forgotten")] bool Forgotten,
+    [property: JsonPropertyName("vectors_removed")] int? VectorsRemoved,
+    [property: JsonPropertyName("why")] string? Why);
 
 public record ExportTicketOut(
     [property: JsonPropertyName("ticket")] string? Ticket,

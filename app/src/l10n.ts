@@ -8988,6 +8988,21 @@ const CHROME: Table = {
   "rail.mem.scalpel": {
     en: "This strikes one thing without ending the friendship.", es: "Esto borra una cosa sin terminar la amistad.", fr: "Cela efface une chose sans mettre fin à la relation.", de: "Das streicht eine Sache, ohne die Freundschaft zu beenden.", pt: "Isto apaga uma coisa sem acabar com a amizade.", it: "Cancella una cosa senza chiudere il rapporto.", ja: "関係を終わらせずに、その一件だけを消します。", zh: "这只抹去一件事，不会结束这段关系。", hi: "यह एक बात मिटाता है, दोस्ती ख़त्म नहीं करता।", ar: "هذا يمحو أمرًا واحدًا دون إنهاء الصداقة.",
   },
+  "rail.mem.sealed": {
+    en: "Sealed moments", es: "Momentos sellados", fr: "Moments scellés", de: "Versiegelte Momente", pt: "Momentos selados", it: "Momenti sigillati", ja: "封印された出来事", zh: "封存的时刻", hi: "सीलबंद पल", ar: "لحظات مختومة",
+  },
+  "rail.mem.sealed.lead": {
+    en: "What this profile can find again about you — sealed in the vault, searched by meaning, and yours to take back one by one.", es: "Lo que este perfil puede volver a encontrar sobre ti — sellado en la bóveda, buscado por significado, y tuyo para retirar uno a uno.", fr: "Ce que ce profil peut retrouver à votre sujet — scellé dans le coffre, cherché par le sens, et à vous de le reprendre un par un.", de: "Was dieses Profil über dich wiederfinden kann — versiegelt im Tresor, gesucht nach Bedeutung, und du kannst es einzeln zurücknehmen.", pt: "O que este perfil consegue reencontrar sobre ti — selado no cofre, procurado por significado, e teu para retirar um a um.", it: "Ciò che questo profilo può ritrovare su di te — sigillato nel vault, cercato per significato, e tuo da riprendere uno alla volta.", ja: "このプロフィールがあなたについて後から見つけ出せるもの。ボールトに封緘され、意味で検索されます。1件ずつ取り戻せます。", zh: "这个形象能再次找到的关于你的内容：封存在保险库中，按含义检索，你可以逐条收回。", hi: "यह प्रोफ़ाइल आपके बारे में जो दोबारा खोज सकती है — वॉल्ट में सील, अर्थ से खोजा गया, और एक-एक करके वापस लेना आपका हक़।", ar: "ما يستطيع هذا الملف العثور عليه مجددًا عنك — مختوم في الخزنة ويُبحث فيه بالمعنى، ولك أن تسترده واحدًا واحدًا.",
+  },
+  "rail.mem.sealed.none": {
+    en: "Nothing sealed yet.", es: "Nada sellado todavía.", fr: "Rien de scellé pour l'instant.", de: "Noch nichts versiegelt.", pt: "Nada selado ainda.", it: "Niente di sigillato finora.", ja: "まだ何も封印されていません。", zh: "还没有封存任何内容。", hi: "अभी कुछ भी सीलबंद नहीं है।", ar: "لا شيء مختوم بعد.",
+  },
+  "rail.mem.sealed.unreadable": {
+    en: "The vault cannot be reached right now — the moments are listed, their words are not.", es: "La bóveda no responde ahora mismo: los momentos se listan, sus palabras no.", fr: "Le coffre est injoignable pour l'instant — les moments sont listés, leurs mots non.", de: "Der Tresor ist gerade nicht erreichbar — die Momente stehen in der Liste, ihre Worte nicht.", pt: "O cofre não responde agora — os momentos estão listados, as palavras não.", it: "Il vault ora non risponde: i momenti sono elencati, le loro parole no.", ja: "現在ボールトに接続できません — 一覧は出ますが、言葉は表示できません。", zh: "目前无法连接保险库 — 时刻已列出，但内容无法显示。", hi: "वॉल्ट अभी पहुँच से बाहर है — पल सूचीबद्ध हैं, उनके शब्द नहीं।", ar: "تعذّر الوصول إلى الخزنة الآن — اللحظات مدرجة، أمّا كلماتها فلا.",
+  },
+  "rail.mem.sealed.forget": {
+    en: "Forget this memory", es: "Olvidar este recuerdo", fr: "Oublier ce souvenir", de: "Diese Erinnerung vergessen", pt: "Esquecer esta memória", it: "Dimentica questo ricordo", ja: "この記憶を忘れる", zh: "忘掉这条记忆", hi: "यह स्मृति भुला दें", ar: "انسَ هذه الذكرى",
+  },
   "rail.rel.nobody": {
     en: "Nobody is signed in to have a relationship with.", es: "No hay nadie con quien tener una relación.", fr: "Personne n'est connecté avec qui avoir une relation.", de: "Niemand ist angemeldet, mit dem eine Beziehung bestehen könnte.", pt: "Não há ninguém com quem ter uma relação.", it: "Non c'è nessuno con cui avere una relazione.", ja: "関係を結ぶ相手がサインインしていません。", zh: "没有已登录的人可以建立关系。", hi: "संबंध बनाने के लिए कोई साइन-इन नहीं है।", ar: "لا أحد مُسجَّل الدخول لتكون بينكما علاقة.",
   },

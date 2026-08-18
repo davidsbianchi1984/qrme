@@ -5741,6 +5741,37 @@ private fun MemBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
                     onNote(r.getOrNull() ?: r.exceptionOrNull()?.message) }
             }
         }
+        // The sealed shelf: what the vault remembers of this pair, ref by
+        // ref — and the door that takes one back the whole way. The ref
+        // rides the turn-id field below, because the ref of a sealed
+        // moment is the turn it was sealed from.
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            BrandButton(L10n.t("mem.sealed", lang),
+                enabled = visitorId.isNotBlank()) {
+                vm.call({ ApiClient.recollections(vm.pid!!, visitorId,
+                    vm.token!!) }) { r ->
+                    val s = r.getOrNull()
+                    onNote(when {
+                        s == null -> r.exceptionOrNull()?.message
+                        s.memories.isEmpty() -> L10n.t("mem.sealed.none", lang)
+                        else -> {
+                            val rows = s.memories.joinToString("\n") {
+                                it.ref + " — " + (it.line ?: "…") }
+                            if (s.readable) rows
+                            else L10n.t("mem.sealed.unreadable", lang) +
+                                "\n" + rows
+                        }
+                    }) }
+            }
+            BrandButton(L10n.t("mem.sealed.forget", lang),
+                enabled = visitorId.isNotBlank() && turnId.isNotBlank()) {
+                vm.call({ ApiClient.forgetRecollection(vm.pid!!, visitorId,
+                    turnId, vm.token!!) }) { r ->
+                    turnId = ""
+                    onNote(if (r.getOrNull() == true) "✓"
+                           else r.exceptionOrNull()?.message ?: "—") }
+            }
+        }
         // Forget that one thing — the scalpel beside the erase-all.
         labeledField(L10n.t("mem.forget", lang), forgetWords,
             L10n.t("mem.forget.ph", lang)) { forgetWords = it }
