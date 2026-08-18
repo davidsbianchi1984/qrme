@@ -235,3 +235,90 @@ def test_the_windows_lines_are_lines_a_windows_reader_can_paste():
                 assert "curl.exe" in line, (
                     f"`{line}` reaches PowerShell's `Invoke-WebRequest` "
                     "alias, which has no `-s` and reads `https:` as a drive")
+
+
+def _blocks_on_the_whole_page() -> list[str]:
+    """Every fenced block on the page, in any shell.
+
+    The guards above scope themselves to § 7 on purpose — sections 0-6 are
+    written for somebody already standing on the box. The two below cannot,
+    because what they hold went wrong in § 3 and § 4: a command is either
+    runnable where the page put you or it is not, and which section it sits
+    in has no bearing on that.
+    """
+    blocks, current = [], None
+    for line in PAGE.read_text(encoding="utf-8").splitlines():
+        if current is not None:
+            if line.startswith("```"):
+                blocks.append("\n".join(current))
+                current = None
+            else:
+                current.append(line)
+        elif line.startswith("```") and line.strip() != "```":
+            current = []
+    return blocks
+
+
+def _compose_lines() -> list[str]:
+    """Every line on the page that drives this stack's compose file."""
+    return [line.strip()
+            for block in _blocks_on_the_whole_page()
+            for line in block.splitlines()
+            if "docker compose" in line and "beta-compose.yml" in line]
+
+
+def test_every_compose_command_carries_the_file_that_fills_it():
+    """`--env-file .env` on all of them, not only on the one that builds.
+
+    Compose interpolates the whole file before it does anything, so `ps` and
+    `logs` need the values exactly as much as `up` does — and it cannot find
+    them by itself, because `.env` is at `/srv/qrme/.env` while compose looks
+    beside the compose file it was handed, in `docker/`.
+
+        asked     does the page have the commands
+        mattered  do they run in the directory the page put you in
+
+    § 2 makes every variable `${VAR:?}` deliberately, so the flag going
+    missing does not degrade anything quietly — it returns ten lines naming
+    ten missing variables. On `up` that reads as the guard it is. On a
+    read-only subcommand against a stack that is already up and answering, it
+    reads as a broken deploy, which is how this was found: `ps` was run to
+    check a container's state after a deploy that had gone perfectly, and the
+    page's own line could not run.
+
+    Four of the six compose commands here were missing it. They had never
+    been typed — the deploy line was the one anybody used — which is the
+    same shape as every other drift on this page: correct prose around a
+    command nobody had run in the room it is addressed to.
+    """
+    lines = _compose_lines()
+    assert lines, "no compose commands on the page any more"
+    for line in lines:
+        assert "--env-file" in line, (
+            f"`{line}` does not say where the values are. Compose "
+            "interpolates the whole file for every subcommand and looks for "
+            "`.env` beside the compose file rather than in `/srv/qrme`, so "
+            "this stops with ten missing variables and reads like a broken "
+            "deploy")
+
+
+def test_no_command_in_a_block_is_written_with_an_ellipsis():
+    """An elided command is a described command.
+
+    This page has twice shipped an instruction *about* a command instead of
+    the command — *add `.exe` to each*, and *then `exit`* — and both were
+    followed exactly and still failed. `docker compose ... restart caddy` is
+    the same shape one turn further on, and the part the ellipsis swallowed
+    was the flag without which it does not run.
+
+    Fenced blocks only. The prose is free to name the abbreviation it is
+    warning against, and § 4 now does; a guard that could not tell those
+    apart would forbid the page from explaining itself.
+    """
+    for block in _blocks_on_the_whole_page():
+        for line in (l.strip() for l in block.splitlines() if l.strip()):
+            assert "..." not in line, (
+                f"`{line}` is a command with a hole in it. Whoever reads it "
+                "has to know what the ellipsis stood for, and the reader "
+                "this page is addressed to is looking at it because they do "
+                "not")

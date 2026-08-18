@@ -112,9 +112,25 @@ First build pulls two base images and installs dependencies for four
 services — several minutes, and the one moment RAM matters.
 
 ```bash
-docker compose -f docker/beta-compose.yml ps
-docker compose -f docker/beta-compose.yml logs --tail=40 pdi qrme jim cloudgw
+docker compose -f docker/beta-compose.yml --env-file .env ps
+docker compose -f docker/beta-compose.yml --env-file .env logs --tail=40 pdi qrme jim cloudgw
 ```
+
+**`--env-file .env` is on every one of these, not only on `up`.** Compose
+interpolates the whole file before it does anything at all, so a subcommand
+that changes nothing needs the values just as much as the one that builds.
+And it cannot find them on its own: `.env` is at `/srv/qrme/.env`, while
+compose looks for one beside the compose file it was handed — `docker/` —
+which is a different directory.
+
+    asked     does the page have the commands
+    mattered  do they run in the directory the page put you in
+
+Section 2 makes every variable `${VAR:?}` deliberately, so what comes back is
+ten lines naming ten missing variables rather than a stack started quietly
+degraded. That is the guard doing its job, and on a read-only subcommand it
+reads exactly like a broken deploy — which is how this was found, by running
+`ps` against a stack that was already up and answering.
 
 Startup order is enforced rather than hoped for: PDI must report healthy,
 then `bootstrap` mints a PDI tenant token for each of QRME and JIM and
@@ -129,11 +145,20 @@ Nothing to do. Caddy requests one per name on first request and renews
 without being asked. Watch it happen:
 
 ```bash
-docker compose -f docker/beta-compose.yml logs caddy | grep -i certificate
+docker compose -f docker/beta-compose.yml --env-file .env logs caddy | grep -i certificate
 ```
 
 If a name fails, the cause is almost always DNS — that name does not resolve
-to this host yet. Fix the record, then `docker compose ... restart caddy`.
+to this host yet. Fix the record, then restart the one container:
+
+```bash
+docker compose -f docker/beta-compose.yml --env-file .env restart caddy
+```
+
+Written out rather than abbreviated to `docker compose ... restart caddy`,
+for the reason the Windows lines in § 7 are written out: an elided command is
+a described command, and the part an ellipsis swallows here is the flag
+without which it does not run.
 
 ## 5. Check it from somewhere else
 

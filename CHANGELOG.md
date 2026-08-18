@@ -6,6 +6,49 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Four commands on the deploy page that had never been typed.** The stack
+  came up, all three names answered `0.84.0`, and then `docker compose -f
+  docker/beta-compose.yml ps` — the page's own line, § 3 — stopped with ten
+  errors naming ten missing variables.
+
+      asked     does the page have the commands
+      mattered  do they run in the directory the page put you in
+
+  Nothing was wrong with the stack. Compose interpolates the whole file
+  before it does anything at all, so a read-only subcommand needs the values
+  exactly as much as the one that builds — and it cannot find them on its
+  own, because `.env` is at `/srv/qrme/.env` while compose looks for one
+  beside the compose file it was handed, in `docker/`. `--env-file .env` was
+  on the two `up` lines and on none of the other four.
+
+  § 2 makes every variable `${VAR:?}` deliberately, and that is what turns
+  the omission into ten lines rather than a stack started quietly degraded.
+  It is also what makes the failure so easy to misread: on `up` it is
+  plainly the guard doing its job, and on `ps` against containers that are
+  already running and answering it looks exactly like a broken deploy.
+
+  **They were wrong because nobody had run them.** The deploy line is the one
+  anybody types; `ps`, `logs`, `logs caddy` and the restart sit around it and
+  had been read rather than used. That is the same shape as everything else
+  this page keeps finding in itself — correct prose around a command nobody
+  had performed in the room it is addressed to.
+
+  The restart in § 4 was the other half: `docker compose ... restart caddy`,
+  in prose, with the ellipsis standing exactly where the missing flag goes.
+  This page has shipped a described command twice before — *add `.exe` to
+  each*, and *then `exit`* — and both were followed exactly and still failed.
+  It is written out now, in a block, and § 4 says why in one sentence.
+
+  Two guards, and both were checked by putting the defect back: one holds
+  that every line driving `beta-compose.yml` carries `--env-file`, the other
+  that no command inside a fenced block is written with a hole in it. They
+  read the whole page rather than § 7, because which section a command sits
+  in has no bearing on whether it runs. The prose stays free to name the
+  abbreviation it is warning against — a guard that could not tell those
+  apart would stop the page explaining itself.
+
 ## [0.84.0] - 2026-08-17
 
 ### Fixed
