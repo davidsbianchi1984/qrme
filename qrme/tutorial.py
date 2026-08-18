@@ -584,6 +584,32 @@ LESSONS: tuple[dict, ...] = (
          try_it="Turn one off that had been used, then use it again and "
                 "read the refusal — it names the thing rather than the "
                 "row, and it arrives in your own language."),
+    dict(key="matters", chapter="Out in the world",
+         title="Getting your matter looked at",
+         what="Something wrong with the app, with your profiles, or with "
+              "the platform. Say it here and it becomes a **matter**: a "
+              "record with your own words in it, what was done about it, "
+              "and how it ended — not a question that scrolls away. The "
+              "help box answers first, because most of what arrives at a "
+              "support door has a written answer and one that costs "
+              "nothing and arrives now beats a queue. What it says is "
+              "offered, never filed: a matter with an answer waiting on it "
+              "reads *here is something, is that it*, with **That was it** "
+              "and **That was not it** side by side, and only a person "
+              "ever moves it to settled. That line exists because a help "
+              "box matches loosely on purpose — an approximately right "
+              "paragraph costs a reader nothing, and the same guess "
+              "disposing of a billing complaint costs them the complaint. "
+              "You do not need an account: the person locked out of the "
+              "account they are complaining about is the one who most "
+              "needs this door, so a matter raised without signing in "
+              "comes back with a claim, shown once, which is the only "
+              "thing that opens it again.",
+         screens=(203,),
+         try_it="Raise one without signing in, keep the claim, then press "
+                "**That was not it** — the matter goes back to waiting and "
+                "the record keeps the fact that it was answered wrongly "
+                "once, which is a different thing from never answered."),
     dict(key="asking", chapter="Out in the world",
          title="Asking people, not pages",
          what="An excursion asks a model, which can only return what "

@@ -73,6 +73,24 @@ data class FeedbackItem(val category: String, val message: String, val status: S
 data class FeedbackState(val mine: List<FeedbackItem>, val tally: Map<String, Int>, val total: Int)
 data class AccessReportRow(val doing: String, val wall: String, val help: String?,
                            val lang: String, val createdAt: String)
+data class MatterStep(val did: String, val note: String, val steppedAt: String)
+/** One matter. Every field is filled whatever happened to it — a payload that
+ *  grows keys only when something happened leaves this shell reading defaults
+ *  on the case it meets most, which is the fresh one. */
+data class Matter(val id: String, val concern: String, val trouble: String,
+                  val standing: String, val settledBy: String,
+                  val answer: String, val raisedAt: String,
+                  val settledAt: String?, val anonymous: Boolean,
+                  val trail: List<MatterStep>,
+                  /** Only on the reply to raising one, and only without an
+                   *  account. Shown once; the backend keeps only its hash. */
+                  val claim: String?,
+                  /** What the help box said when it did *not* recognise it. */
+                  val offered: String?)
+data class MattersMine(val myMatters: List<Matter>, val concerns: List<String>,
+                       val standings: List<String>)
+data class MatterQueue(val unsettled: List<Matter>, val standing: String,
+                       val standings: List<String>)
 data class SteeringDial(val name: String, val group: String, val label: String,
                         val low: String, val high: String, val min: Int, val max: Int)
 data class SteeringHubState(val dials: List<SteeringDial>, val values: Map<String, Int>,
@@ -318,6 +336,7 @@ object ApiClient {
     private suspend fun request(
         path: String, method: String = "GET",
         body: JSONObject? = null, token: String? = null,
+        claim: String? = null,
     ): String = withContext(Dispatchers.IO) {
         val conn = (URL(base + path).openConnection() as HttpURLConnection).apply {
             requestMethod = method
@@ -332,6 +351,12 @@ object ApiClient {
                     signupKey.takeIf { it.isNotEmpty() }?.let {
                         setRequestProperty("x-signup-key", it) }
             token?.let { setRequestProperty("authorization", "Bearer $it") }
+            // The claim that opens a matter raised without an account. A
+            // header, never a query item: a query string is written to the
+            // access log of every proxy it passes, and this one opens
+            // somebody's own complaint about their own account.
+            claim?.takeIf { it.isNotEmpty() }?.let {
+                setRequestProperty("x-matter-claim", it) }
             connectTimeout = 8000; readTimeout = 8000
             if (body != null) {
                 doOutput = true
@@ -833,6 +858,82 @@ object ApiClient {
         help?.takeIf { it.isNotBlank() }?.let { body.put("help", it) }
         return JSONObject(request("/access/reports", "POST", body))
             .optString("status", "received")
+    }
+
+    private fun matterOf(o: JSONObject): Matter {
+        val arr = o.optJSONArray("trail")
+        val trail = (0 until (arr?.length() ?: 0)).map { i ->
+            val st = arr!!.getJSONObject(i)
+            MatterStep(st.optString("did", ""), st.optString("note", ""),
+                st.optString("stepped_at", ""))
+        }
+        return Matter(
+            o.optString("id", ""), o.optString("concern", ""),
+            o.optString("trouble", ""), o.optString("standing", ""),
+            o.optString("settled_by", ""), o.optString("answer", ""),
+            o.optString("raised_at", ""),
+            o.optString("settled_at", "").takeIf { it.isNotBlank() },
+            o.optBoolean("anonymous", false), trail,
+            o.optString("claim", "").takeIf { it.isNotBlank() },
+            o.optString("offered", "").takeIf { it.isNotBlank() })
+    }
+
+    /** Somebody's matter. Raising is tokenless on purpose — the person whose
+     *  matter is that they cannot sign in is exactly who an authenticated
+     *  support door shuts out. */
+    suspend fun raiseMatter(trouble: String, concerns: String,
+                            token: String? = null): Matter {
+        val body = JSONObject().put("trouble", trouble).put("concerns", concerns)
+        return matterOf(JSONObject(request("/matters", "POST", body, token)))
+    }
+
+    suspend fun myMatters(token: String?): MattersMine {
+        val o = JSONObject(request("/matters", token = token))
+        val arr = o.optJSONArray("my_matters")
+        val mine = (0 until (arr?.length() ?: 0)).map { matterOf(arr!!.getJSONObject(it)) }
+        val concerns = o.optJSONArray("concerns")
+        val standings = o.optJSONArray("standings")
+        return MattersMine(mine,
+            (0 until (concerns?.length() ?: 0)).map { concerns!!.getString(it) },
+            (0 until (standings?.length() ?: 0)).map { standings!!.getString(it) })
+    }
+
+    suspend fun matter(id: String, token: String? = null,
+                       claim: String? = null): Matter =
+        matterOf(JSONObject(request("/matters/$id", token = token, claim = claim)))
+
+    suspend fun rejectMatterAnswer(id: String, token: String? = null,
+                                   claim: String? = null): Matter =
+        matterOf(JSONObject(request("/matters/$id/not-it", "POST", null,
+                                    token, claim)))
+
+    suspend fun settleMatter(id: String, answer: String, helped: Boolean = false,
+                             token: String? = null, claim: String? = null): Matter {
+        val body = JSONObject().put("answer", answer).put("helped", helped)
+        return matterOf(JSONObject(request("/matters/$id/settle", "POST", body,
+                                           token, claim)))
+    }
+
+    /** The three for whoever answers them — reviewer token, never an owner's:
+     *  this queue is people's own words about their own accounts. */
+    suspend fun matterQueue(reviewerToken: String): MatterQueue {
+        val o = JSONObject(request("/matters/queue", token = reviewerToken))
+        val arr = o.optJSONArray("unsettled")
+        val waiting = (0 until (arr?.length() ?: 0)).map { matterOf(arr!!.getJSONObject(it)) }
+        val standings = o.optJSONArray("standings")
+        return MatterQueue(waiting, o.optString("standing", ""),
+            (0 until (standings?.length() ?: 0)).map { standings!!.getString(it) })
+    }
+
+    suspend fun takeMatter(id: String, reviewerToken: String): Matter =
+        matterOf(JSONObject(request("/matters/$id/take", "POST", null,
+                                    reviewerToken)))
+
+    suspend fun recordMatterStep(id: String, step: String, note: String = "",
+                                 reviewerToken: String): Matter {
+        val body = JSONObject().put("did", step).put("note", note)
+        return matterOf(JSONObject(request("/matters/$id/used", "POST", body,
+                                           reviewerToken)))
     }
 
     /** Reviewer-token read — the deployment's steward, never a profile. */

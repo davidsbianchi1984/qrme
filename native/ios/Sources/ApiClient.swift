@@ -657,6 +657,46 @@ struct AccessReportRow: Decodable {
     let help: String?; let status: String; let created_at: String
 }
 struct AccessReportsState: Decodable { let reports: [AccessReportRow]; let total: Int }
+struct MatterStep: Decodable {
+    let did: String
+    let note: String
+    let stepped_at: String
+}
+
+/// One matter. Every field is present whatever happened to it — a payload
+/// that grows keys only when something happened hands this shell `nil` on the
+/// case it meets most, which is the fresh one.
+struct Matter: Decodable {
+    let id: String
+    let concern: String
+    let trouble: String
+    let standing: String
+    let settled_by: String
+    let answer: String
+    let raised_at: String
+    let settled_at: String?
+    let anonymous: Bool
+    let trail: [MatterStep]
+    /// Only on the reply to raising one, and only without an account. Shown
+    /// once and held nowhere: it is the single thing that reads the matter
+    /// again, and the backend keeps only its hash.
+    let claim: String?
+    /// What the help box said when it did *not* recognise the question.
+    let offered: String?
+}
+
+struct MattersMine: Decodable {
+    let my_matters: [Matter]
+    let concerns: [String]
+    let standings: [String]
+}
+
+struct MatterQueue: Decodable {
+    let unsettled: [Matter]
+    let standing: String
+    let standings: [String]
+}
+
 struct FeedbackItem: Decodable {
     let id: String
     let category: String
@@ -956,7 +996,8 @@ actor ApiClient {
 
     private func request<T: Decodable>(_ path: String, method: String = "GET",
                                        body: [String: Any]? = nil, token: String? = nil,
-                                       query: [String: String]? = nil) async throws -> T {
+                                       query: [String: String]? = nil,
+                                       claim: String? = nil) async throws -> T {
         var url = base.appendingPathComponent(path)
         if let query, var parts = URLComponents(url: url, resolvingAgainstBaseURL: false) {
             parts.queryItems = query.map { URLQueryItem(name: $0.key, value: $0.value) }
@@ -983,6 +1024,13 @@ actor ApiClient {
             req.setValue(signupKey, forHTTPHeaderField: "x-signup-key")
         }
         if let token { req.setValue("Bearer \(token)", forHTTPHeaderField: "authorization") }
+        // The claim that opens a matter raised without an account. A header
+        // rather than a query item: a query string is written to the access
+        // log of every proxy it passes, and this one opens somebody's own
+        // complaint about their own account.
+        if let claim, !claim.isEmpty {
+            req.setValue(claim, forHTTPHeaderField: "x-matter-claim")
+        }
         if let body { req.httpBody = try JSONSerialization.data(withJSONObject: body) }
 
         let data: Data
@@ -1170,6 +1218,59 @@ actor ApiClient {
         if let help, !help.isEmpty { body["help"] = help }
         return try await request("/access/reports", method: "POST", body: body,
                                  token: nil)
+    }
+
+    // Somebody's matter. Raising is deliberately tokenless — the person whose
+    // matter is that they cannot sign in is exactly who an authenticated
+    // support door shuts out.
+    func raiseMatter(trouble: String, concerns: String,
+                     token: String? = nil) async throws -> Matter {
+        try await request("/matters", method: "POST",
+                          body: ["trouble": trouble, "concerns": concerns],
+                          token: token)
+    }
+
+    func myMatters(token: String?) async throws -> MattersMine {
+        try await request("/matters", token: token)
+    }
+
+    func matter(id: String, token: String? = nil,
+                claim: String? = nil) async throws -> Matter {
+        try await request("/matters/\(id)", token: token, claim: claim)
+    }
+
+    func rejectMatterAnswer(id: String, token: String? = nil,
+                            claim: String? = nil) async throws -> Matter {
+        try await request("/matters/\(id)/not-it", method: "POST",
+                          token: token, claim: claim)
+    }
+
+    func settleMatter(id: String, answer: String, helped: Bool = false,
+                      token: String? = nil,
+                      claim: String? = nil) async throws -> Matter {
+        try await request("/matters/\(id)/settle", method: "POST",
+                          body: ["answer": answer, "helped": helped],
+                          token: token, claim: claim)
+    }
+
+    /// The three for whoever answers them. Reviewer token, never an owner's:
+    /// this queue is people's own words about their own accounts.
+    func matterQueue(reviewerToken: String,
+                     standing: String? = nil) async throws -> MatterQueue {
+        try await request("/matters/queue", token: reviewerToken,
+                          query: standing.map { ["standing": $0] })
+    }
+
+    func takeMatter(id: String, reviewerToken: String) async throws -> Matter {
+        try await request("/matters/\(id)/take", method: "POST",
+                          token: reviewerToken)
+    }
+
+    func recordMatterStep(id: String, step: String, note: String = "",
+                          reviewerToken: String) async throws -> Matter {
+        try await request("/matters/\(id)/used", method: "POST",
+                          body: ["did": step, "note": note],
+                          token: reviewerToken)
     }
 
     /// Reviewer-token read — the deployment's steward, never a profile owner.

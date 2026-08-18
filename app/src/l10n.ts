@@ -25,6 +25,63 @@ const CHROME: Table = {
   "refusal.signin": {
     en: "Go to sign-in", es: "Ir a iniciar sesión", fr: "Aller à la connexion", de: "Zur Anmeldung", pt: "Ir para o login", it: "Vai all'accesso", ja: "サインインへ", zh: "去登录", hi: "साइन-इन पर जाएँ", ar: "اذهب إلى تسجيل الدخول",
   },
+  "nav.matters": {
+    en: "Get help", es: "Pedir ayuda", fr: "Obtenir de l'aide", de: "Hilfe holen", pt: "Pedir ajuda", it: "Chiedi aiuto", ja: "ヘルプ", zh: "获取帮助", hi: "मदद लें", ar: "اطلب مساعدة",
+  },
+  "matter.title": {
+    en: "Get help with something", es: "Pedir ayuda con algo", fr: "Obtenir de l'aide", de: "Hilfe zu etwas bekommen", pt: "Obter ajuda com algo", it: "Chiedere aiuto per qualcosa", ja: "困りごとの相談", zh: "获取帮助", hi: "किसी बात में मदद लें", ar: "احصل على مساعدة",
+  },
+  "matter.sub": {
+    en: "something wrong with the app, your profiles or the platform", es: "algo que va mal con la app, tus perfiles o la plataforma", fr: "un problème avec l'application, vos profils ou la plateforme", de: "etwas stimmt nicht mit der App, deinen Profilen oder der Plattform", pt: "algo errado com a app, os seus perfis ou a plataforma", it: "qualcosa non va con l'app, i tuoi profili o la piattaforma", ja: "アプリ・プロフィール・プラットフォームの不具合", zh: "应用、你的形象或平台出了问题", hi: "ऐप, आपके प्रोफ़ाइल या प्लैटफ़ॉर्म में कुछ गड़बड़", ar: "خلل في التطبيق أو ملفاتك أو المنصّة",
+  },
+  "matter.concerns.app": {
+    en: "The app", es: "La app", fr: "L'application", de: "Die App", pt: "A app", it: "L'app", ja: "アプリ", zh: "应用", hi: "ऐप", ar: "التطبيق",
+  },
+  "matter.concerns.profiles": {
+    en: "My profiles", es: "Mis perfiles", fr: "Mes profils", de: "Meine Profile", pt: "Os meus perfis", it: "I miei profili", ja: "自分のプロフィール", zh: "我的形象", hi: "मेरे प्रोफ़ाइल", ar: "ملفاتي",
+  },
+  "matter.concerns.platform": {
+    en: "The platform", es: "La plataforma", fr: "La plateforme", de: "Die Plattform", pt: "A plataforma", it: "La piattaforma", ja: "プラットフォーム", zh: "平台", hi: "प्लैटफ़ॉर्म", ar: "المنصّة",
+  },
+  "matter.send": {
+    en: "Send it", es: "Enviarlo", fr: "Envoyer", de: "Absenden", pt: "Enviar", it: "Invia", ja: "送信する", zh: "发送", hi: "भेजें", ar: "أرسِل",
+  },
+  "matter.claim.keep": {
+    en: "Keep this. It is the only way back to this matter, and it is not shown again.", es: "Guarda esto. Es la única forma de volver a este asunto, y no se muestra otra vez.", fr: "Conservez ceci. C'est le seul moyen de retrouver cette affaire, et il ne sera plus affiché.", de: "Bewahre das auf. Es ist der einzige Weg zurück zu diesem Vorgang, und es wird nicht noch einmal gezeigt.", pt: "Guarde isto. É a única forma de voltar a este assunto, e não volta a ser mostrado.", it: "Conserva questo. È l'unico modo per tornare a questa questione, e non verrà mostrato di nuovo.", ja: "これを控えてください。この案件に戻る唯一の手段で、二度と表示されません。", zh: "请保存好。这是回到该事项的唯一方式，且不会再次显示。", hi: "इसे सहेज लें। इस मामले तक लौटने का यही एक रास्ता है, और यह दोबारा नहीं दिखेगा।", ar: "احتفظ بهذا. إنه السبيل الوحيد للعودة إلى هذه المسألة، ولن يُعرض مرة أخرى.",
+  },
+  "matter.standing.open": {
+    en: "Waiting", es: "En espera", fr: "En attente", de: "Wartet", pt: "À espera", it: "In attesa", ja: "対応待ち", zh: "等待中", hi: "प्रतीक्षा में", ar: "في الانتظار",
+  },
+  "matter.standing.answered": {
+    en: "An answer is waiting on you", es: "Hay una respuesta esperándote", fr: "Une réponse vous attend", de: "Eine Antwort wartet auf dich", pt: "Há uma resposta à sua espera", it: "C'è una risposta che ti aspetta", ja: "回答が届いています", zh: "有一条回复等你确认", hi: "एक उत्तर आपकी प्रतीक्षा में है", ar: "هناك ردّ في انتظارك",
+  },
+  "matter.standing.with_a_person": {
+    en: "Somebody has picked it up", es: "Alguien lo ha tomado", fr: "Quelqu'un s'en occupe", de: "Jemand hat es übernommen", pt: "Alguém pegou nisto", it: "Qualcuno se ne sta occupando", ja: "担当者が対応中です", zh: "已有人接手", hi: "किसी ने इसे उठाया है", ar: "تولّاها أحدهم",
+  },
+  "matter.standing.settled": {
+    en: "Settled", es: "Resuelto", fr: "Réglé", de: "Erledigt", pt: "Resolvido", it: "Risolto", ja: "解決済み", zh: "已解决", hi: "हल हो गया", ar: "تمّت التسوية",
+  },
+  "matter.that_was_it": {
+    en: "That was it", es: "Eso era", fr: "C'était ça", de: "Das war es", pt: "Era isso", it: "Era quello", ja: "これで解決しました", zh: "就是这个", hi: "यही था", ar: "كان هذا هو",
+  },
+  "matter.not_it": {
+    en: "That was not it", es: "Eso no era", fr: "Ce n'était pas ça", de: "Das war es nicht", pt: "Não era isso", it: "Non era quello", ja: "これではありません", zh: "不是这个", hi: "यह नहीं था", ar: "لم يكن هذا هو",
+  },
+  "matter.settle": {
+    en: "Say what settled it", es: "Di qué lo resolvió", fr: "Dites ce qui l'a réglé", de: "Sag, was es geklärt hat", pt: "Diga o que o resolveu", it: "Di' che cosa l'ha risolto", ja: "何で解決したか書く", zh: "说明是什么解决了它", hi: "बताइए इसे किसने हल किया", ar: "قل ما الذي حسم الأمر",
+  },
+  "matter.queue": {
+    en: "Matters waiting", es: "Asuntos en espera", fr: "Affaires en attente", de: "Wartende Vorgänge", pt: "Assuntos à espera", it: "Questioni in attesa", ja: "対応待ちの案件", zh: "等待处理的事项", hi: "प्रतीक्षारत मामले", ar: "مسائل في الانتظار",
+  },
+  "matter.take": {
+    en: "Pick it up", es: "Tomarlo", fr: "S'en charger", de: "Übernehmen", pt: "Assumir", it: "Prendilo in carico", ja: "対応する", zh: "接手", hi: "इसे उठाएँ", ar: "تولَّها",
+  },
+  "matter.empty": {
+    en: "Nothing raised yet.", es: "Nada planteado todavía.", fr: "Rien de signalé pour l'instant.", de: "Bisher nichts gemeldet.", pt: "Nada levantado ainda.", it: "Ancora niente segnalato.", ja: "まだ何もありません。", zh: "还没有任何事项。", hi: "अभी कुछ नहीं उठाया गया।", ar: "لم يُطرح شيء بعد.",
+  },
+  "matter.offered": {
+    en: "The help box said this, and it is not an answer to your matter:", es: "La ayuda dijo esto, y no es una respuesta a tu asunto:", fr: "L'aide a répondu ceci, et ce n'est pas une réponse à votre affaire :", de: "Die Hilfe sagte dies, und es ist keine Antwort auf deinen Vorgang:", pt: "A ajuda disse isto, e não é uma resposta ao seu assunto:", it: "L'aiuto ha detto questo, e non è una risposta alla tua questione:", ja: "ヘルプはこう答えましたが、あなたの案件への回答ではありません：", zh: "帮助框这样说，但这不是对你事项的答复：", hi: "सहायता ने यह कहा, और यह आपके मामले का उत्तर नहीं है:", ar: "قال مربّع المساعدة هذا، وهو ليس ردًّا على مسألتك:",
+  },
   "feed.title": {
     en: "Feed", es: "Muro", fr: "Fil", de: "Feed", pt: "Fluxo",
     it: "Flusso", ja: "フィード", zh: "动态", hi: "फ़ीड", ar: "التدفّق",

@@ -45,6 +45,7 @@ from .routers import (accounts as account_routes,
                       mypeople as mypeople_routes,
                       organizations as organization_routes,
                       overlays as overlay_routes, packs, pages, placemic,
+                      matters as matter_routes,
                       problems as problem_routes,
                       frontpage, privileges as privilege_routes,
                       profiles, research, revisions, robots,
@@ -199,6 +200,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(avatars.router)
     app.include_router(steering.router)
     app.include_router(feedback.router)
+    app.include_router(matter_routes.router)
     app.include_router(access.router)
     app.include_router(account_routes.router)
     app.include_router(gaming.router)

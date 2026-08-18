@@ -147,6 +147,41 @@ public record AccessReportRow(
     [property: JsonPropertyName("lang")] string Lang,
     [property: JsonPropertyName("created_at")] string CreatedAt);
 
+public record MatterStep(
+    [property: JsonPropertyName("did")] string Did,
+    [property: JsonPropertyName("note")] string Note,
+    [property: JsonPropertyName("stepped_at")] string SteppedAt);
+
+// One matter. Every field is present whatever happened to it — a payload that
+// grows keys only when something happened leaves this shell reading nulls on
+// the case it meets most, which is the fresh one.
+public record Matter(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("concern")] string Concern,
+    [property: JsonPropertyName("trouble")] string Trouble,
+    [property: JsonPropertyName("standing")] string Standing,
+    [property: JsonPropertyName("settled_by")] string SettledBy,
+    [property: JsonPropertyName("answer")] string Answer,
+    [property: JsonPropertyName("raised_at")] string RaisedAt,
+    [property: JsonPropertyName("settled_at")] string? SettledAt,
+    [property: JsonPropertyName("anonymous")] bool Anonymous,
+    [property: JsonPropertyName("trail")] MatterStep[] Trail,
+    // Only on the reply to raising one, and only without an account. Shown
+    // once; the backend keeps only its hash.
+    [property: JsonPropertyName("claim")] string? Claim,
+    // What the help box said when it did *not* recognise the question.
+    [property: JsonPropertyName("offered")] string? Offered);
+
+public record MattersMine(
+    [property: JsonPropertyName("my_matters")] Matter[] MyMatters,
+    [property: JsonPropertyName("concerns")] string[] Concerns,
+    [property: JsonPropertyName("standings")] string[] Standings);
+
+public record MatterQueue(
+    [property: JsonPropertyName("unsettled")] Matter[] Unsettled,
+    [property: JsonPropertyName("standing")] string Standing,
+    [property: JsonPropertyName("standings")] string[] Standings);
+
 public record AccessReportsState(
     [property: JsonPropertyName("reports")] AccessReportRow[] Reports,
     [property: JsonPropertyName("total")] int Total);
@@ -1103,6 +1138,72 @@ public sealed class ApiClient
         res.EnsureSuccessStatusCode();
         return "received";
     }
+
+    // Somebody's matter. Raising is tokenless on purpose — the person whose
+    // matter is that they cannot sign in is exactly who an authenticated
+    // support door shuts out.
+    public Task<Matter> RaiseMatter(string trouble, string concerns,
+                                    string? token = null) =>
+        Send<Matter>(Post("/matters", new { trouble, concerns }, token));
+
+    public Task<MattersMine> MyMatters(string? token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, "/matters");
+        if (token is { Length: > 0 }) req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<MattersMine>(req);
+    }
+
+    // The claim rides in a header, never in the query: a query string is
+    // written to the access log of every proxy it passes, and this one opens
+    // somebody's own complaint about their own account.
+    //
+    // Added at each call site rather than behind a `WithClaim` helper. The
+    // guard that asks whether a client can send the headers its routes
+    // require reads the source beside the path, and a header set one function
+    // away is a header it cannot see — which is the same shape as the parity
+    // check that passed while every client was equally wrong.
+    public Task<Matter> Matter(string id, string? token = null,
+                               string? claim = null)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, $"/matters/{id}");
+        if (token is { Length: > 0 }) req.Headers.Add("authorization", $"Bearer {token}");
+        if (claim is { Length: > 0 }) req.Headers.Add("x-matter-claim", claim);
+        return Send<Matter>(req);
+    }
+
+    public Task<Matter> RejectMatterAnswer(string id, string? token = null,
+                                           string? claim = null)
+    {
+        var req = Post($"/matters/{id}/not-it", new { }, token);
+        if (claim is { Length: > 0 }) req.Headers.Add("x-matter-claim", claim);
+        return Send<Matter>(req);
+    }
+
+    public Task<Matter> SettleMatter(string id, string answer,
+                                     bool helped = false, string? token = null,
+                                     string? claim = null)
+    {
+        var req = Post($"/matters/{id}/settle", new { answer, helped }, token);
+        if (claim is { Length: > 0 }) req.Headers.Add("x-matter-claim", claim);
+        return Send<Matter>(req);
+    }
+
+    // The three for whoever answers them — reviewer token, never an owner's:
+    // this queue is people's own words about their own accounts.
+    public Task<MatterQueue> MatterQueue(string reviewerToken)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, "/matters/queue");
+        req.Headers.Add("authorization", $"Bearer {reviewerToken}");
+        return Send<MatterQueue>(req);
+    }
+
+    public Task<Matter> TakeMatter(string id, string reviewerToken) =>
+        Send<Matter>(Post($"/matters/{id}/take", new { }, reviewerToken));
+
+    public Task<Matter> RecordMatterStep(string id, string step, string note,
+                                         string reviewerToken) =>
+        Send<Matter>(Post($"/matters/{id}/used", new { did = step, note },
+                          reviewerToken));
 
     // Reviewer-token read — the deployment's steward, never a profile.
     public Task<AccessReportsState> AccessReports(string reviewerToken)

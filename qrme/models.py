@@ -701,6 +701,21 @@ class FeedbackSubmit(BaseModel):
     rating: int | None = None         # optional 1..5 satisfaction
 
 
+class MatterRaise(BaseModel):
+    trouble: str                       # what is wrong, in their own words
+    concerns: str = "app"              # app | profiles | platform
+
+
+class MatterSettle(BaseModel):
+    answer: str                        # what settled it
+    helped: bool = False               # the raiser saying the offered answer did it
+
+
+class MatterStep(BaseModel):
+    did: str                           # see qrme.matters.STEPS
+    note: str = ""
+
+
 class AccessReportSubmit(BaseModel):
     doing: str                         # what you were trying to do
     wall: str                          # what stood in the way

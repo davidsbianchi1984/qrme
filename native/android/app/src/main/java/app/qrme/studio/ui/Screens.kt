@@ -1062,6 +1062,7 @@ fun SettingsScreen(vm: StudioViewModel) {
 
         FeedbackPanel(vm)
         AccessPanel(vm)
+        MatterPanel(vm)
 
         error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }
     }
@@ -1235,6 +1236,144 @@ private fun RelationshipPanel(vm: StudioViewModel) {
             }
         }
         status?.let { Text(it, color = Qrme.Green, fontSize = 12.sp) }
+    }
+}
+
+/** Somebody's matter, from saying it to seeing what happened to it.
+ *
+ *  Four things this panel will not smooth over: raising takes no token,
+ *  because the person whose matter is that they cannot sign in is exactly who
+ *  an authenticated support door shuts out; the claim is shown once and said
+ *  to be, and is held in composition state and written nowhere, since the
+ *  backend keeps only its hash; `answered` is drawn as a question with both
+ *  buttons rather than as a tick, because the server refuses to let the help
+ *  box settle anything; and the standings are the server's closed set, said
+ *  here in the reader's language rather than composed. */
+@Composable
+private fun MatterPanel(vm: StudioViewModel) {
+    var trouble by remember { mutableStateOf("") }
+    var concerns by remember { mutableStateOf("app") }
+    var raised by remember { mutableStateOf<Matter?>(null) }
+    var claim by remember { mutableStateOf("") }
+    var mine by remember { mutableStateOf<List<Matter>>(emptyList()) }
+    var answer by remember { mutableStateOf("") }
+    var reviewer by remember { mutableStateOf("") }
+    var queue by remember { mutableStateOf<MatterQueue?>(null) }
+
+    Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(L10n.t("ns.mtr", vm.language), color = Qrme.Txt, fontSize = 16.sp,
+            fontWeight = FontWeight.Bold)
+        Text(L10n.t("ns.mtr.lead", vm.language), color = Qrme.T2, fontSize = 12.sp)
+
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            listOf("app", "profiles", "platform").forEach { about ->
+                SmallAction(L10n.t("ns.mtr.$about", vm.language)) { concerns = about }
+            }
+        }
+        OutlinedTextField(value = trouble, onValueChange = { trouble = it },
+            label = { Text(L10n.t("ns.mtr", vm.language)) }, minLines = 2,
+            modifier = Modifier.fillMaxWidth())
+        SmallAction(L10n.t("ns.mtr.send", vm.language)) {
+            if (trouble.isNotBlank())
+                vm.call({ ApiClient.raiseMatter(trouble.trim(), concerns) }) { r ->
+                    r.getOrNull()?.let {
+                        raised = it
+                        claim = it.claim ?: ""
+                        trouble = ""
+                    }
+                    vm.call({ ApiClient.myMatters(null) }) { m ->
+                        mine = m.getOrNull()?.myMatters ?: emptyList()
+                    }
+                }
+        }
+
+        if (claim.isNotEmpty()) {
+            Text(L10n.t("ns.mtr.claim", vm.language), color = Qrme.Amber,
+                fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Text(claim, color = Qrme.Txt, fontSize = 12.sp)
+        }
+
+        raised?.let { matter ->
+            Text(L10n.t("ns.mtr.st.${matter.standing}", vm.language),
+                color = Qrme.Txt, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            if (matter.answer.isNotEmpty())
+                Text(matter.answer, color = Qrme.T2, fontSize = 12.sp)
+            matter.offered?.let {
+                Text(L10n.t("ns.mtr.offered", vm.language), color = Qrme.T2,
+                    fontSize = 11.sp)
+                Text(it, color = Qrme.T2, fontSize = 11.sp)
+            }
+            if (matter.standing == "answered") {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    SmallAction(L10n.t("ns.mtr.wasit", vm.language)) {
+                        vm.call({ ApiClient.settleMatter(matter.id, matter.answer,
+                            true, null, claim.ifEmpty { null }) }) { r ->
+                            raised = r.getOrNull()
+                        }
+                    }
+                    SmallAction(L10n.t("ns.mtr.notit", vm.language)) {
+                        vm.call({ ApiClient.rejectMatterAnswer(matter.id, null,
+                            claim.ifEmpty { null }) }) { r -> raised = r.getOrNull() }
+                    }
+                }
+            }
+            if (matter.standing != "settled") {
+                OutlinedTextField(value = answer, onValueChange = { answer = it },
+                    label = { Text(L10n.t("ns.mtr.settle", vm.language)) },
+                    modifier = Modifier.fillMaxWidth())
+                SmallAction(L10n.t("ns.mtr.settle", vm.language)) {
+                    if (answer.isNotBlank())
+                        vm.call({ ApiClient.settleMatter(matter.id, answer.trim(),
+                            false, null, claim.ifEmpty { null }) }) { r ->
+                            raised = r.getOrNull(); answer = ""
+                        }
+                }
+            }
+            matter.trail.forEach { st ->
+                Text("• " + st.did + " — " + st.steppedAt, color = Qrme.T3,
+                    fontSize = 11.sp)
+            }
+        }
+
+        if (mine.isEmpty())
+            Text(L10n.t("ns.mtr.empty", vm.language), color = Qrme.T3, fontSize = 11.sp)
+        else mine.take(6).forEach { m ->
+            Text(m.trouble + " — " + L10n.t("ns.mtr.st.${m.standing}", vm.language),
+                color = Qrme.T2, fontSize = 12.sp)
+        }
+
+        // Whoever answers them. Typed here rather than held in the session:
+        // the deployment's steward is not whoever is signed in on this phone.
+        OutlinedTextField(value = reviewer, onValueChange = { reviewer = it },
+            label = { Text(L10n.t("ns.mtr.token.ph", vm.language)) },
+            modifier = Modifier.fillMaxWidth())
+        SmallAction(L10n.t("ns.mtr.queue", vm.language)) {
+            vm.call({ ApiClient.matterQueue(reviewer.trim()) }) { r ->
+                queue = r.getOrNull()
+            }
+        }
+        queue?.unsettled?.forEach { m ->
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(m.trouble, color = Qrme.T2, fontSize = 12.sp)
+                if (m.standing != "with_a_person")
+                    SmallAction(L10n.t("ns.mtr.take", vm.language)) {
+                        vm.call({ ApiClient.takeMatter(m.id, reviewer.trim()) }) { _ ->
+                            vm.call({ ApiClient.recordMatterStep(m.id,
+                                "handed_to_a_person", "", reviewer.trim()) }) { _ ->
+                                // Read it back the way its raiser will see it,
+                                // not the way the queue does.
+                                if (claim.isNotEmpty())
+                                    vm.call({ ApiClient.matter(m.id, null, claim) }) { r ->
+                                        raised = r.getOrNull()
+                                    }
+                                vm.call({ ApiClient.matterQueue(reviewer.trim()) }) { q ->
+                                    queue = q.getOrNull()
+                                }
+                            }
+                        }
+                    }
+            }
+        }
     }
 }
 

@@ -1846,6 +1846,36 @@ CREATE TABLE IF NOT EXISTS problem_reports (
     PRIMARY KEY (source, app_version, platform, op, status)
 );
 
+-- Somebody's matter: what they said was wrong with the app, their profiles or
+-- the platform, and what happened to it. Distinct from `feedback` (a
+-- suggestion box nobody replies to) and from `problem_reports` (counters with
+-- nobody in them). `claim` is the hash of a one-time string, and only for a
+-- raiser with no account — the person whose matter is that they cannot sign
+-- in has to be able to read the answer.
+CREATE TABLE IF NOT EXISTS matters (
+    id         TEXT PRIMARY KEY,
+    raised_by  TEXT NOT NULL DEFAULT 'anonymous',  -- role:subject or 'anonymous'
+    claim      TEXT NOT NULL DEFAULT '',   -- sha256 of the one-time claim, or ''
+    concerns   TEXT NOT NULL,              -- app | profiles | platform
+    trouble    TEXT NOT NULL,              -- their words, kept as written
+    standing   TEXT NOT NULL DEFAULT 'open',   -- open | with_a_person | settled
+    settled_by TEXT NOT NULL DEFAULT '',   -- help | a_person | the_person | ''
+    answer     TEXT NOT NULL DEFAULT '',   -- what settled it, if anything did
+    raised_at  TEXT NOT NULL,
+    settled_at TEXT
+);
+
+-- What was done to a matter, dated. The account somebody who was not there
+-- reads afterwards — the same reason `qrme/escalation.py` hangs its exits off
+-- a record rather than off a sentence in a chat turn.
+CREATE TABLE IF NOT EXISTS matter_steps (
+    id         TEXT PRIMARY KEY,
+    matter_id  TEXT NOT NULL REFERENCES matters(id),
+    step       TEXT NOT NULL,   -- see qrme.matters.STEPS
+    note       TEXT NOT NULL DEFAULT '',
+    stepped_at TEXT NOT NULL
+);
+
 -- The upper-torso form of an avatar: the figure that stands in a live feed
 -- or an AR scene at 1:1 scale. The circular bubble is only the form of a
 -- profile that has no avatar yet; a profile with a torso renders as one.

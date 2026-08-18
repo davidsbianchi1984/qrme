@@ -6,6 +6,90 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The agent's remit, which was prose in a docstring until now.** The field
+  ask, in its own words: *I wanted to assist users, especially within the app
+  and outside the app, in regards to their issues with their app, synthetic
+  profiles or platform.*
+
+      asked     can somebody get their issue looked at
+      mattered  can they find out afterwards what happened to it
+
+  `qrme/privileges.py` opens by saying what this agent is for — not a
+  life-wide companion, that is JIM's shape, but a thing that exists to **get a
+  person's matter resolved**. Every power in that roster is justified by that
+  sentence, and there was nowhere for a matter to live. Three modules answered
+  neighbouring questions and none of them this one: `help` says how the
+  product works and writes nothing, `feedback` takes ideas into a box nobody
+  replies to, and `problems` counts what broke, content-free, never knowing
+  whose failure it was.
+
+  **The help box answers first, and settles nothing.** Most of what arrives at
+  a support door is a question with a written answer, so a matter opens by
+  putting the person's own words to `help.ask` — the same ladder `jim.noticed`
+  walks next door, free and local first. The first draft let a recognised
+  question open the matter already settled, and the first sentence run through
+  it was *"my card was charged twice on tuesday"*, which came back settled, by
+  help, on the strength of a keyword. That matching is right for what it was
+  built for: an approximately right paragraph costs a reader nothing. The same
+  guess disposing of a billing complaint costs them the complaint, silently,
+  because a settled matter is in nobody's queue. So a matter with an answer
+  waiting on it stands at `answered` — *here is something, is that it* — and
+  only a person moves anything to `settled`. That holds for a model's sentence
+  too, and the model is why the line has to exist at all.
+
+  **It is raisable by somebody who cannot sign in.** *Within the app and
+  outside the app* includes the account somebody has been locked out of, and
+  an issue tracker that requires an account is closed to exactly the people
+  whose issue is the account. So a matter may be raised with no principal, and
+  what comes back is a **claim** — one string, shown once, stored as a hash the
+  way `escalation` keeps the waiver's. Nothing else opens an anonymous matter:
+  not being the operator, not knowing the id, not guessing. And they are
+  unreachable as a group rather than filtered out of one, so there is no
+  caller a listing could return them to.
+
+  **Nothing here exercises a power.** A matter can *name* that one of the
+  roster's powers was used on it and it cannot use one — a support record that
+  could also spend somebody's grants would be a second door onto every power
+  in that roster, and the roster's whole argument is one door per power with
+  the person standing in it. No row was added to the roster this round: the
+  remit did not need a new power, it needed somewhere for the powers there to
+  be pointed. A guard reads the module's own imports, and the first version of
+  it — which asked whether the text contained `"from . import research"` —
+  stayed green when `research` was added to the grouped import this module
+  already had.
+
+  **Two more things the running code found.** The queue's default was `open`,
+  and it came back empty on a database holding two matters nobody had
+  answered, because both had gone to `answered` on help's say-so: a support
+  queue reporting *nothing to do* while people wait is worse than no queue, so
+  the default is everything unsettled. And the raiser had no way to say *that
+  was not the answer* — only to wait for somebody here to notice — so they can,
+  it goes back to `open`, and the step stays on the record, because a matter
+  answered wrongly once is a different thing from one nobody ever answered.
+
+  `help.ask` gained `recognised` for this, and it is worth its own line:
+  `source` could not answer *did this box actually know the question*, because
+  the fallback *"I can only help with using QRME"* is as `written` as a real
+  answer is, and a caller wanting the difference had to compare the sentence
+  against a copy of itself.
+
+  **Five wire names carried two types each,** and the guard named all five:
+  `concerns` was a matter's subject *and* the list of subjects a client offers;
+  `mine` was this list and `feedback`'s; `step` and `steps` were this and the
+  tutorial's; `waiting` was a list here and a count elsewhere. They are
+  `concern`, `my_matters`, `did`, `trail` and `unsettled`. Two more came from
+  the same sweep: an interpolated `L10n` key on iOS, which reads fine and is
+  invisible to the guard counting English literals behind a translated tab bar,
+  so the four standings are written out one literal at a time; and a screen
+  with no lesson behind it.
+
+  On the console, on iOS, on Android and on Windows, with the claim in a
+  header on all four — a query string is written to the access log of every
+  proxy it passes, and this one opens somebody's own complaint about their own
+  account.
+
 ### Fixed
 
 - **Four commands on the deploy page that had never been typed.** The stack

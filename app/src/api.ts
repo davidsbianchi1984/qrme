@@ -1099,10 +1099,14 @@ export interface ShopOrder {
 
 async function req<T>(
   path: string,
-  opts: { method?: string; body?: unknown; token?: string } = {},
+  opts: { method?: string; body?: unknown; token?: string; claim?: string } = {},
 ): Promise<T> {
   const headers: Record<string, string> = { "content-type": "application/json" };
   if (opts.token) headers["authorization"] = `Bearer ${opts.token}`;
+  // The claim that opens an anonymous matter. A header rather than a query
+  // param on purpose: a query string is written to the access log of every
+  // proxy it passes, and this one opens somebody's account complaint.
+  if (opts.claim) headers["x-matter-claim"] = opts.claim;
   const llmKey = getLlmKey();
   if (llmKey) headers["x-llm-api-key"] = llmKey;
   const signupKey = getSignupKey();
@@ -3338,6 +3342,38 @@ export interface AgentTurn {
            says: string } | null;
 }
 
+export interface MatterStep {
+  did: string;
+  note: string;
+  stepped_at: string;
+}
+export interface Matter {
+  id: string;
+  concern: string;
+  trouble: string;
+  standing: string;
+  settled_by: string;
+  answer: string;
+  raised_at: string;
+  settled_at: string | null;
+  anonymous: boolean;
+  trail: MatterStep[];
+  /** Only on the reply to raising one, and only for a raiser with no account. */
+  claim?: string;
+  /** What the help box said when it did *not* recognise the question. */
+  offered?: string;
+}
+export interface MattersMine {
+  my_matters: Matter[];
+  concerns: string[];
+  standings: string[];
+}
+export interface MatterQueue {
+  unsettled: Matter[];
+  standing: string;
+  standings: string[];
+}
+
 export const api = {
   // `health` used to sit here: the same route, the body thrown away, a
   // boolean returned. Nothing called it — `healthInfo` below returns the
@@ -5541,6 +5577,40 @@ export const api = {
   // the profile's own maturity filter where `compose` forces `strict`, so a
   // profile set to `open` was held to the loosest rule on the way out.
   // ---------------------------------------------------------------------
+
+  // Somebody's matter: what they said is wrong with the app, their profiles
+  // or the platform. Raising takes no token — the person whose matter is that
+  // they cannot sign in is exactly who an authenticated support door shuts
+  // out — and what comes back to them is a claim, once, which is the only
+  // thing that reads it again.
+  raiseMatter: (body: { trouble: string; concerns: string }, token?: string) =>
+    req<Matter>("/matters", { method: "POST", body,
+                              ...(token ? { token } : {}) }),
+  myMatters: (token?: string) =>
+    req<MattersMine>("/matters", token ? { token } : {}),
+  matter: (id: string, opts: { token?: string; claim?: string } = {}) =>
+    req<Matter>(`/matters/${id}`, opts),
+  rejectMatterAnswer: (id: string,
+                       opts: { token?: string; claim?: string } = {}) =>
+    req<Matter>(`/matters/${id}/not-it`, { method: "POST", ...opts }),
+  settleMatter: (id: string, body: { answer: string; helped?: boolean },
+                 opts: { token?: string; claim?: string } = {}) =>
+    req<Matter>(`/matters/${id}/settle`, { method: "POST", body, ...opts }),
+
+  // The three the person answering them uses. The reviewer token, never an
+  // owner's — the same role that adjudicates objections and reads the
+  // accessibility reports, because this queue is people's own words about
+  // their own accounts.
+  matterQueue: (reviewerToken: string, standing?: string) =>
+    req<MatterQueue>(
+      "/matters/queue" + (standing ? `?standing=${encodeURIComponent(standing)}` : ""),
+      { token: reviewerToken }),
+  takeMatter: (id: string, reviewerToken: string) =>
+    req<Matter>(`/matters/${id}/take`, { method: "POST", token: reviewerToken }),
+  recordMatterStep: (id: string, body: { did: string; note?: string },
+                     reviewerToken: string) =>
+    req<Matter>(`/matters/${id}/used`,
+                { method: "POST", body, token: reviewerToken }),
 
   feedback: (token?: string) =>
     req<FeedbackBoard>("/feedback", token ? { token } : {}),

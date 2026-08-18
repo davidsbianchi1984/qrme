@@ -3803,6 +3803,24 @@ SCREENS = [
     # the lock and what it means, the two halves of what a connector may do,
     # and uninstall, which is on this screen because it was on no screen at
     # all until now.
+    # 203: the support door. The first card is the case the whole screen was
+    # built around — somebody locked out of the account they are complaining
+    # about — and the claim under it is the only way back in. The third is the
+    # line the backend refuses to cross: the help box answers and never
+    # settles, so `answered` is drawn as a question with two buttons rather
+    # than as a tick.
+    dict(num=203, title="Get Help", sub="Your matter, and what happened to it",
+         accent="amber", tab=0, cards=[
+        dict(icon="lock", color="amber", k="No account needed",
+             s="the claim is the only way back",
+             pill=("once", "good")),
+        dict(icon="chat", color="silver", k="What it is about",
+             s="the app, your profiles, platform"),
+        dict(icon="page", color="brand", k="An answer is waiting",
+             s="that was it · that was not it"),
+        dict(icon="clock", color="green", k="Somebody has it",
+             s="dated, and on the record"),
+    ], button=("Only a person ever settles it", "amber")),
     # 202: the roster. The first card is the row that is on before anybody
     # touched it — and it is the only one allowed to be, because it reaches
     # nobody and says in writing why. The last is the rule the whole screen

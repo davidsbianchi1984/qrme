@@ -200,6 +200,12 @@ _WALKTHROUGH: dict[str, tuple[tuple[str, ...], str]] = {
 # The phrases are what people type, not what the feature is called. Somebody
 # looking for overlays types *change my face*; nobody types *overlays*.
 DIRECTIONS: dict[str, tuple[str, ...]] = {
+    # The support door. The phrasings are what somebody types when something
+    # has gone wrong rather than when they want to know how a thing works —
+    # this is the one lesson people reach for while annoyed.
+    "matters": ("get help", "something is wrong", "report a problem",
+                "contact support", "raise an issue", "my account is broken",
+                "I cannot sign in", "who do I talk to"),
     "make_one": ("make a profile", "new profile", "create a profile",
                  "add a profile", "genesis", "character card",
                  "import a card", "sillytavern", "chara card"),
@@ -651,11 +657,21 @@ def ask(question: str, provider=None, mode: str = "text") -> dict:
     one, and ``ai`` so a surface can mark it — a generated sentence on a page
     full of disclosed synthetic profiles should not be the one unlabelled
     thing on it.
+
+    And ``recognised``: whether this box actually knew the question, as
+    against having something to say about it. ``source`` cannot answer that —
+    the fallback *"I can only help with using QRME"* is as ``written`` as a
+    real answer is, and a caller wanting to tell them apart had no way but to
+    compare the sentence against a copy of itself. :mod:`qrme.matters` needs
+    the difference to decide whether somebody's issue was settled here or has
+    to wait for a person, and a support queue that filled up with answered
+    questions would be the wrong queue.
     """
     question = (question or "").strip()
     if not question:
         return {"answer": "Ask me anything about using QRME.",
                 "source": "written", "ai": False, "refused": False,
+                "recognised": False,
                 "disclosure": DISCLOSURE, "topics": topics()}
 
     # Before anything else, and before any model sees it: the questions that
@@ -663,7 +679,8 @@ def ask(question: str, provider=None, mode: str = "text") -> dict:
     refusal = _match(question, REFUSALS)
     if refusal:
         return {"answer": refusal, "source": "written", "ai": False,
-                "refused": True, "disclosure": DISCLOSURE, "topics": topics()}
+                "refused": True, "recognised": True,
+                "disclosure": DISCLOSURE, "topics": topics()}
 
     # "Show me around" is not a question with an answer — it is a request for
     # the walkthrough. Matched here rather than left as a topic, because the
@@ -680,6 +697,7 @@ def ask(question: str, provider=None, mode: str = "text") -> dict:
         return {
             "answer": step.get("speak") or f"{step['title']}. {step['what']}",
             "source": "written", "ai": False, "refused": False,
+            "recognised": True,
             "disclosure": DISCLOSURE, "topics": topics(),
             "walkthrough": {"started": True, "step": step,
                             "steps": len(tutorial.LESSONS),
@@ -694,7 +712,8 @@ def ask(question: str, provider=None, mode: str = "text") -> dict:
     directions = where_is(question)
     if directions is not None:
         return {"answer": directions["say"], "source": "written", "ai": False,
-                "refused": False, "disclosure": DISCLOSURE, "topics": topics(),
+                "refused": False, "recognised": True,
+                "disclosure": DISCLOSURE, "topics": topics(),
                 "directions": directions}
 
     written = _match(question, TOPICS)
@@ -717,8 +736,8 @@ def ask(question: str, provider=None, mode: str = "text") -> dict:
                 [{"role": "user", "content": question}])
             if reply and reply.strip():
                 return {"answer": reply.strip(), "source": "model", "ai": True,
-                        "refused": False, "disclosure": DISCLOSURE,
-                        "topics": topics()}
+                        "refused": False, "recognised": False,
+                        "disclosure": DISCLOSURE, "topics": topics()}
         except Exception:
             pass          # a provider outage is not a reason to stop helping
 
@@ -728,5 +747,6 @@ def ask(question: str, provider=None, mode: str = "text") -> dict:
             "desks, reviews and the age gate. Ask about one of those, or the "
             "profile on this page can answer for itself."),
         "source": "written", "ai": False, "refused": False,
+        "recognised": written is not None,
         "disclosure": DISCLOSURE, "topics": topics(),
     }

@@ -826,6 +826,10 @@ UNKNOWN_SURFACE = "unknown surface {surface} — one of {choices}"
 #: is exactly what `_SLOT_TOKEN` cannot tell apart from an identifier. Naming
 #: the subject inside the template puts it where it can be translated.
 OBJECTION_ALREADY = "objection is already {status}"
+NO_SUCH_MATTER = "no such matter"
+MATTER_NEEDS_WORDS = "say what is wrong, in your own words"
+MATTER_NEEDS_AN_ANSWER = "say what settled it"
+
 MESSAGE_ALREADY = "message is already {status}"
 PROFILE_ALREADY = "profile is already {status}"
 NOT_A_MEMORIAL = "this profile is {status}, not a memorial"
@@ -1306,6 +1310,39 @@ _PUBLIC.update(_PRIVILEGE_SENTENCES)
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'no such matter': {
+        'es': 'no existe ese asunto',
+        'fr': 'aucune affaire de ce nom',
+        'de': 'kein solcher Vorgang',
+        'pt': 'não existe esse assunto',
+        'it': 'nessuna questione di questo tipo',
+        'ja': 'そのような案件はありません',
+        'zh': '没有该事项',
+        'hi': 'ऐसा कोई मामला नहीं',
+        'ar': 'لا توجد مسألة بهذا الوصف',
+    },
+    'say what is wrong, in your own words': {
+        'es': 'di qué va mal, con tus propias palabras',
+        'fr': 'dites ce qui ne va pas, avec vos propres mots',
+        'de': 'sag mit deinen eigenen Worten, was nicht stimmt',
+        'pt': 'diga o que está errado, com as suas palavras',
+        'it': "di' che cosa non va, con parole tue",
+        'ja': '何が問題なのかを、ご自身の言葉で書いてください',
+        'zh': '用你自己的话说明哪里出了问题',
+        'hi': 'अपने शब्दों में बताइए कि क्या गड़बड़ है',
+        'ar': 'قل ما الخطأ، بكلماتك أنت',
+    },
+    'say what settled it': {
+        'es': 'di qué lo resolvió',
+        'fr': "dites ce qui l'a réglé",
+        'de': 'sag, was es geklärt hat',
+        'pt': 'diga o que o resolveu',
+        'it': "di' che cosa l'ha risolto",
+        'ja': '何で解決したのかを書いてください',
+        'zh': '说明是什么解决了它',
+        'hi': 'बताइए कि इसे किसने हल किया',
+        'ar': 'قل ما الذي حسم الأمر',
+    },
     'no such escalation': {
         'es': 'no existe esa escalada',
         'fr': 'aucune escalade de ce nom',
@@ -4756,6 +4793,11 @@ _WHERE_MARKERS = ("body", "query", "path", "header", "cookie")
 #: A field with no row keeps its identifier, exactly as before, and is recorded
 #: in `tests/field_labels_unmapped.txt`.
 _FIELD_LABELS: dict[str, dict[str, str]] = {
+    'answer': {'en': 'The answer', 'es': 'La respuesta', 'fr': 'La réponse', 'de': 'Die Antwort', 'pt': 'A resposta', 'it': 'La risposta', 'ja': '回答', 'zh': '答复', 'hi': 'उत्तर', 'ar': 'الردّ'},
+    'helped': {'en': 'The help box answered it', 'es': 'La ayuda lo respondió', 'fr': "L'aide y a répondu", 'de': 'Die Hilfe hat es beantwortet', 'pt': 'A ajuda respondeu', 'it': "L'aiuto ha risposto", 'ja': 'ヘルプで解決した', 'zh': '帮助框已解答', 'hi': 'सहायता ने उत्तर दिया', 'ar': 'أجاب عنه مربّع المساعدة'},
+    'did': {'en': 'What was done', 'es': 'Qué se hizo', 'fr': 'Ce qui a été fait', 'de': 'Was getan wurde', 'pt': 'O que foi feito', 'it': 'Che cosa è stato fatto', 'ja': '行ったこと', 'zh': '做了什么', 'hi': 'क्या किया गया', 'ar': 'ما الذي جرى'},
+    'trouble': {'en': 'What is wrong', 'es': 'Qué va mal', 'fr': "Ce qui ne va pas", 'de': 'Was nicht stimmt', 'pt': 'O que está errado', 'it': 'Che cosa non va', 'ja': '何が問題か', 'zh': '哪里出了问题', 'hi': 'क्या गड़बड़ है', 'ar': 'ما الخطأ'},
+    'concerns': {'en': 'What this is about', 'es': 'De qué se trata', 'fr': "Ce que cela concerne", 'de': 'Worum es geht', 'pt': 'Do que se trata', 'it': 'Di che cosa si tratta', 'ja': '何についてか', 'zh': '这与什么有关', 'hi': 'यह किस बारे में है', 'ar': 'بشأن ماذا'},
     # The briefing form, and the one control on a kept person. Worded as the
     # screen asks them: a refusal naming `matter` reads as an error about a
     # schema nobody was shown.

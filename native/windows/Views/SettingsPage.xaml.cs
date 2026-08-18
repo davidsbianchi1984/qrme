@@ -187,6 +187,23 @@ public sealed partial class SettingsPage : Page
         AccLoad.Content = L10n.T("ns.acc.load", lang);
         AccEmpty.Text = L10n.T("ns.acc.none", lang);
 
+        MtrHead.Text = L10n.T("ns.mtr", lang);
+        MtrLead.Text = L10n.T("ns.mtr.lead", lang);
+        MtrConcerns.ItemsSource = new[]
+        {
+            L10n.T("ns.mtr.app", lang), L10n.T("ns.mtr.profiles", lang),
+            L10n.T("ns.mtr.platform", lang),
+        };
+        MtrSend.Content = L10n.T("ns.mtr.send", lang);
+        MtrClaimNote.Text = L10n.T("ns.mtr.claim", lang);
+        MtrWasIt.Content = L10n.T("ns.mtr.wasit", lang);
+        MtrNotIt.Content = L10n.T("ns.mtr.notit", lang);
+        MtrSettle.Content = L10n.T("ns.mtr.settle", lang);
+        MtrEmpty.Text = L10n.T("ns.mtr.empty", lang);
+        MtrReviewerBox.PlaceholderText = L10n.T("ns.acc.token.ph", lang);
+        MtrQueueLoad.Content = L10n.T("ns.mtr.queue", lang);
+        MtrTake.Content = L10n.T("ns.mtr.take", lang);
+
         PrHead.Text = L10n.T("ns.pr", lang);
         ProblemsYes.Content = L10n.T("ns.pr.send", lang);
         ProblemsNo.Content = L10n.T("ns.pr.dont", lang);
@@ -539,6 +556,141 @@ public sealed partial class SettingsPage : Page
                        + (r.Help is { Length: > 0 } h ? $" ({h})" : "")
                        + $" · {r.Lang} · {r.CreatedAt}",
             }).ToList();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    // Somebody's matter. `_matterClaim` lives on the page and is written
+    // nowhere else: it is the single thing that reads an anonymous matter
+    // again, and the backend deliberately keeps only its hash.
+    private string _matterClaim = "";
+    private Matter? _matter;
+
+    private static readonly string[] MatterConcerns =
+        { "app", "profiles", "platform" };
+
+    private void ShowMatter(Matter matter)
+    {
+        var lang = AppState.Current.Language;
+        _matter = matter;
+        MtrStanding.Text = L10n.T($"ns.mtr.st.{matter.Standing}", lang);
+        MtrAnswer.Text = matter.Answer;
+        // `answered` is drawn as a question, never as a tick: the server
+        // refuses to let the help box settle anything, and a page that showed
+        // it as done would put the closure back that the server took out.
+        var waiting = matter.Standing == "answered"
+            ? Visibility.Visible : Visibility.Collapsed;
+        MtrWasIt.Visibility = waiting;
+        MtrNotIt.Visibility = waiting;
+        MtrOffered.Text = matter.Offered is { Length: > 0 } o
+            ? L10n.T("ns.mtr.offered", lang) + " " + o : "";
+    }
+
+    private async void OnRaiseMatter(object sender, RoutedEventArgs e)
+    {
+        var trouble = MtrTrouble.Text.Trim();
+        if (trouble.Length == 0) return;
+        try
+        {
+            var index = Math.Max(0, MtrConcerns.SelectedIndex);
+            var matter = await ApiClient.Shared.RaiseMatter(
+                trouble, MatterConcerns[index]);
+            _matterClaim = matter.Claim ?? "";
+            MtrClaim.Text = _matterClaim;
+            MtrClaimNote.Visibility = _matterClaim.Length > 0
+                ? Visibility.Visible : Visibility.Collapsed;
+            MtrTrouble.Text = "";
+            ShowMatter(matter);
+            await LoadMyMatters();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async Task LoadMyMatters()
+    {
+        var lang = AppState.Current.Language;
+        try
+        {
+            var listed = await ApiClient.Shared.MyMatters(null);
+            MtrEmpty.Visibility = listed.MyMatters.Length == 0
+                ? Visibility.Visible : Visibility.Collapsed;
+            MtrMineList.ItemsSource = listed.MyMatters.Take(6).Select(m => new FeedbackRow
+            {
+                Line = $"{m.Trouble} — " + L10n.T($"ns.mtr.st.{m.Standing}", lang),
+            }).ToList();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnMatterWasIt(object sender, RoutedEventArgs e)
+    {
+        if (_matter is null) return;
+        try
+        {
+            ShowMatter(await ApiClient.Shared.SettleMatter(
+                _matter.Id, _matter.Answer, true, null, _matterClaim));
+            await LoadMyMatters();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnMatterNotIt(object sender, RoutedEventArgs e)
+    {
+        if (_matter is null) return;
+        try
+        {
+            ShowMatter(await ApiClient.Shared.RejectMatterAnswer(
+                _matter.Id, null, _matterClaim));
+            await LoadMyMatters();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnSettleMatter(object sender, RoutedEventArgs e)
+    {
+        if (_matter is null) return;
+        var answer = MtrSettleText.Text.Trim();
+        if (answer.Length == 0) return;
+        try
+        {
+            ShowMatter(await ApiClient.Shared.SettleMatter(
+                _matter.Id, answer, false, null, _matterClaim));
+            MtrSettleText.Text = "";
+            await LoadMyMatters();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnLoadMatterQueue(object sender, RoutedEventArgs e)
+    {
+        var lang = AppState.Current.Language;
+        try
+        {
+            var queue = await ApiClient.Shared.MatterQueue(
+                MtrReviewerBox.Password.Trim());
+            MtrQueueList.ItemsSource = queue.Unsettled.Take(6).Select(m => new FeedbackRow
+            {
+                Line = $"{m.Trouble} — " + L10n.T($"ns.mtr.st.{m.Standing}", lang),
+            }).ToList();
+            if (queue.Unsettled.Length > 0) _matter = queue.Unsettled[0];
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnTakeMatter(object sender, RoutedEventArgs e)
+    {
+        if (_matter is null) return;
+        var reviewer = MtrReviewerBox.Password.Trim();
+        try
+        {
+            await ApiClient.Shared.TakeMatter(_matter.Id, reviewer);
+            await ApiClient.Shared.RecordMatterStep(
+                _matter.Id, "handed_to_a_person", "", reviewer);
+            // Read it back the way its raiser will see it, not the way the
+            // queue does.
+            if (_matterClaim.Length > 0)
+                ShowMatter(await ApiClient.Shared.Matter(_matter.Id, null,
+                                                         _matterClaim));
         }
         catch (Exception ex) { ShowError(ex.Message); }
     }
