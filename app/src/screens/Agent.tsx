@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
-import { api, type AgentTurn } from "../api";
+import { useEffect, useRef, useState } from "react";
+import { api, type AgentTurn, type WebSearchAnswer,
+         uploadMedia } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
@@ -46,27 +47,31 @@ import { useSession } from "../store";
  *  which is the row the navigation itself reads. A `label` field here would
  *  be a second name for one screen and the way a chip ends up saying one
  *  thing and opening another. */
-const RAIL: { id: string; icon: string }[] = [
-  { id: "studio", icon: "🛠" },
-  { id: "corner", icon: "🏠" },
-  { id: "wall", icon: "🧱" },
-  { id: "workshop", icon: "🧩" },
-  { id: "plugins", icon: "🔌" },
-  { id: "assist", icon: "🛠" },
-  { id: "market", icon: "🏷" },
-  { id: "shop", icon: "🛒" },
-  { id: "discover", icon: "🛍" },
-  { id: "rooms", icon: "🎧" },
-  { id: "live", icon: "🎥" },
-  { id: "presence", icon: "🖼" },
-  { id: "beacons", icon: "🔳" },
-  { id: "voice", icon: "🎙" },
-  { id: "identity", icon: "🪪" },
-  { id: "memory", icon: "🔒" },
-  { id: "simulate", icon: "🔮" },
-  { id: "campaigns", icon: "🎗" },
-  { id: "selling", icon: "💰" },
-  { id: "remainder", icon: "🧩" },
+/** The strip above the composer: things the agent *does*, not places the
+ *  menu already goes. A field report put it exactly: the sliders were menu
+ *  tabs — twenty destinations the navigation and the + menu carry anyway —
+ *  and a launcher pretending to be a toolbar teaches nobody what the agent
+ *  is for. Six actions now, each wired to the strongest machinery this
+ *  product has today:
+ *
+ *  - `video` and `image` fill the box with a structured brief (image after
+ *    an upload, so the brief carries the real reference). The agent answers
+ *    from its roster — and where the engine is not built yet it says so,
+ *    which beats a chip that navigates somewhere unrelated;
+ *  - `voicemode` toggles spoken replies (and dictation where the browser
+ *    has it — iOS Safari does not, so the toggle never depends on it);
+ *  - `docs` hands a file to the same upload door media uses and fills the
+ *    box with a reading ask;
+ *  - `customize` and `widget` fill the box for the two things the roster
+ *    is best at: the page and a small tool.
+ */
+const ACTIONS: { key: string; icon: string }[] = [
+  { key: "video", icon: "\u{1F3AC}" },
+  { key: "image", icon: "\u{1F5BC}\uFE0F" },
+  { key: "voicemode", icon: "\u{1F399}\uFE0F" },
+  { key: "docs", icon: "\u{1F4C4}" },
+  { key: "customize", icon: "\u{1F3A8}" },
+  { key: "widget", icon: "\u{1F9E9}" },
 ];
 
 /** The composer's `+`. Five entries, each opening a screen that exists.
@@ -89,14 +94,48 @@ const PLUS: { id: string; icon: string }[] = [
   { id: "assist", icon: "✏️" },
 ];
 
-/** Three openings for somebody who has the screen and not the sentence.
- *  They fill the box rather than sending it: what the agent does is still
- *  something a person presses. */
+/** Three openings for somebody who has the screen and not the sentence —
+ *  and each one *does* its thing rather than describing it. Create opens
+ *  the picker and the send button publishes; Search runs a real web search
+ *  through the keyless door (`/profiles/{id}/search`), which is the one of
+ *  the three that works on a deployment with no model configured; Write
+ *  fills the box and hands the sentence to the agent, whose strongest
+ *  tools are exactly the writing ones. */
 const OPENERS: { key: string; icon: string }[] = [
-  { key: "agent.try.page", icon: "🎨" },
-  { key: "agent.try.widget", icon: "🛠" },
-  { key: "agent.try.post", icon: "🧱" },
+  { key: "agent.open.create", icon: "🎬" },
+  { key: "agent.open.search", icon: "🔎" },
+  { key: "agent.open.write", icon: "✍\uFE0F" },
 ];
+
+/** The browser's own recogniser, where there is one. iOS Safari has none,
+ *  which is why every path that reaches for this has a keyboard answer. */
+type SR = { new(): {
+  continuous: boolean; interimResults: boolean; lang: string;
+  onresult: ((e: { results: ArrayLike<ArrayLike<{ transcript: string }>
+                             & { isFinal: boolean }> }) => void) | null;
+  onend: (() => void) | null; start: () => void; stop: () => void;
+} };
+
+function recogniserOf(): SR | undefined {
+  const w = window as unknown as {
+    SpeechRecognition?: SR; webkitSpeechRecognition?: SR };
+  return w.SpeechRecognition || w.webkitSpeechRecognition;
+}
+
+/** A voice waveform, drawn rather than found: no emoji reads as one, and
+ *  the button it sits on is the door to the orb. */
+function WaveIcon() {
+  const bars: [number, number, number][] = [
+    [1, 6, 4], [4, 3, 10], [7, 1, 14], [10, 4, 8], [13, 6, 4]];
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+      {bars.map(([x, y, h]) => (
+        <rect key={x} x={x} y={y} width="2" height={h} rx="1"
+              fill="currentColor" />
+      ))}
+    </svg>
+  );
+}
 
 export function Agent({ onPlans, go }: {
   onPlans: () => void;
@@ -117,6 +156,34 @@ export function Agent({ onPlans, go }: {
   // leaving the tab is the whole of forgetting it, the same bargain the
   // Studio's own agent makes.
   const [talk, setTalk] = useState<{ role: string; content: string }[]>([]);
+  // Voice mode: the reply is spoken. Dictation rides along only where the
+  // browser has SpeechRecognition — iOS Safari does not, and a toggle that
+  // depended on it would be a dead control on the phone this was asked from.
+  const [voiceMode, setVoiceMode] = useState(false);
+  // Dictation is the *other* microphone: it types into the box and sends
+  // nothing. Separate from the orb on purpose — one press was asked to mean
+  // one thing.
+  const [dictating, setDictating] = useState(false);
+  const [micHint, setMicHint] = useState(false);
+  // "Search the Internet": the composer becomes a search box, the answer is
+  // rows with links, and none of it needs a model.
+  const [searchMode, setSearchMode] = useState(false);
+  const [finds, setFinds] = useState<WebSearchAnswer | null>(null);
+  // A picked picture or video, uploaded and waiting for its words. The send
+  // button publishes it — the caption is required by the wall's own door,
+  // which is the door doing the asking, not this screen.
+  const [pending, setPending] = useState<{ id: string; name: string } | null>(
+    null);
+  const docPicker = useRef<HTMLInputElement>(null);
+  const imgPicker = useRef<HTMLInputElement>(null);
+  const mediaPicker = useRef<HTMLInputElement>(null);
+  const dictation = useRef<{ stop: () => void } | null>(null);
+  const askBox = useRef<HTMLInputElement>(null);
+  // The browser's own recogniser, where there is one. Held in a ref — it is
+  // a live handle like the room camera's MediaStream, not a value to render
+  // on. iOS Safari has none: there, voice mode is the orb, spoken replies,
+  // and the keyboard's own dictation key into a focused box.
+  const recogniser = useRef<{ stop: () => void } | null>(null);
   const [did, setDid] = useState<AgentTurn | null>(null);
   const [error, setError] = useState<unknown>(null);
   // What it stopped to ask about. Held here rather than inside `did`, because
@@ -130,9 +197,114 @@ export function Agent({ onPlans, go }: {
     api.studioAgent().then(setReach).catch(() => setReach(null));
   }, []);
 
-  async function send() {
+  function stopVoice() {
+    recogniser.current?.stop();
+    recogniser.current = null;
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    setVoiceMode(false);
+  }
+
+  function startVoice() {
+    setVoiceMode(true);
+    const Rec = recogniserOf();
+    if (!Rec) {
+      // No recogniser (iOS Safari). The orb still runs: the box takes the
+      // keyboard's dictation key, and the reply comes back spoken.
+      askBox.current?.focus();
+      return;
+    }
+    const r = new Rec();
+    r.continuous = false;
+    r.interimResults = true;
+    r.lang = lang;
+    r.onresult = (e) => {
+      const last = e.results[e.results.length - 1];
+      const words = last[0]?.transcript || "";
+      setAsk(words);
+      if ((last as { isFinal: boolean }).isFinal && words.trim()) {
+        void sendSaid(words);
+      }
+    };
+    r.onend = () => {
+      // One utterance per press keeps the mic honest: it is hot only while
+      // the orb says so, and it relights when the next turn starts.
+      recogniser.current = null;
+    };
+    recogniser.current = r;
+    r.start();
+  }
+
+  function stopDictation() {
+    dictation.current?.stop();
+    dictation.current = null;
+    setDictating(false);
+  }
+
+  function startDictation() {
+    const Rec = recogniserOf();
+    if (!Rec) {
+      // iOS Safari has no recogniser. The honest version of this button
+      // there is the keyboard's own dictation key, and a hint that says so
+      // beats a control that silently does nothing.
+      askBox.current?.focus();
+      setMicHint(true);
+      window.setTimeout(() => setMicHint(false), 6000);
+      return;
+    }
+    const r = new Rec();
+    r.continuous = true;
+    r.interimResults = true;
+    r.lang = lang;
+    const base = ask.trim() ? ask.trim() + " " : "";
+    r.onresult = (e) => {
+      let finals = "", interim = "";
+      for (let i = 0; i < e.results.length; i++) {
+        const words = e.results[i][0]?.transcript || "";
+        if ((e.results[i] as { isFinal: boolean }).isFinal) finals += words;
+        else interim += words;
+      }
+      setAsk(base + finals + interim);
+    };
+    r.onend = () => { dictation.current = null; setDictating(false); };
+    dictation.current = r;
+    setDictating(true);
+    r.start();
+  }
+
+  async function doSearch(qWhat: string) {
     if (!session.profileId || !session.ownerToken) return;
-    const said = ask;
+    const q = qWhat.trim();
+    if (!q) return;
+    setAsking(true); setError(null);
+    try {
+      setFinds(await api.webSearch(session.profileId, q, session.ownerToken));
+      setAsk("");
+    } catch (e) { setError(e); }
+    finally { setAsking(false); }
+  }
+
+  async function postIt() {
+    if (!session.profileId || !session.ownerToken || !pending) return;
+    setAsking(true); setError(null);
+    try {
+      await api.publishPost(session.profileId,
+        { body: ask, media_ids: [pending.id] }, session.ownerToken);
+      setTalk([...talk, { role: "user", content: ask },
+               { role: "assistant", content: tr("agent.open.created", lang) }]);
+      setPending(null); setAsk("");
+    } catch (e) { setError(e); }
+    finally { setAsking(false); }
+  }
+
+  async function send() {
+    if (searchMode) return doSearch(ask);
+    if (pending) return postIt();
+    return sendSaid(ask);
+  }
+
+  async function sendSaid(saidWhat: string) {
+    if (!session.profileId || !session.ownerToken) return;
+    const said = saidWhat;
     setAsking(true); setError(null);
     try {
       const turn = await api.authoringTurn(
@@ -142,6 +314,17 @@ export function Agent({ onPlans, go }: {
       setTalk([...talk, { role: "user", content: said },
                { role: "assistant", content: turn.reply }]);
       setAsk("");
+      // Voice mode says the reply out loud, with the device's own voice —
+      // the same fallback the chat screen uses, for the same reason: it
+      // works offline and costs nothing.
+      if (voiceMode && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+        const spoken = new SpeechSynthesisUtterance(turn.reply);
+        // The next turn: when the reply finishes, the mic relights — a
+        // conversation, not a dictation box with extra steps.
+        spoken.onend = () => { if (!recogniser.current) startVoice(); };
+        window.speechSynthesis.speak(spoken);
+      }
       // What it may have changed is somebody's own page, so the roster is
       // re-read rather than assumed — a tool that stopped being available
       // mid-conversation should stop being offered.
@@ -259,29 +442,131 @@ export function Agent({ onPlans, go }: {
       {/* Three openings, for the person who has the screen and not the
           sentence. Each one fills the box rather than sending — what it does
           is still theirs to press. */}
-      {talk.length === 0 && (
+      {finds && (
+        <div className="card agent-found">
+          <div className="row">
+            <strong style={{ flex: 1 }}>{finds.q}</strong>
+            <button aria-label={tr("agent.search.done", lang)}
+                    onClick={() => { setFinds(null); setSearchMode(false); }}>
+              ✕
+            </button>
+          </div>
+          {finds.pages.length === 0 && (
+            <p className="muted small">{tr("agent.search.none", lang)}</p>
+          )}
+          <ul className="agent-links">
+            {finds.pages.map((row) => (
+              <li key={row.url}>
+                <a href={row.url} target="_blank" rel="noreferrer">
+                  {row.title || row.url}
+                </a>
+                {row.note && <p className="muted small">{row.note}</p>}
+              </li>
+            ))}
+          </ul>
+          <a className="small" href={finds.more_url} target="_blank"
+             rel="noreferrer">
+            {tr("agent.search.more", lang)}
+          </a>
+        </div>
+      )}
+
+      {talk.length === 0 && !finds && (
         <div className="agent-openers">
           {OPENERS.map((o) => (
             <button key={o.key} className="agent-opener"
-                    onClick={() => setAsk(tr(o.key, lang))}>
+                    aria-pressed={o.key === "agent.open.search"
+                                  ? searchMode : undefined}
+                    onClick={() => {
+                      if (o.key === "agent.open.create") {
+                        mediaPicker.current?.click();
+                      } else if (o.key === "agent.open.search") {
+                        setSearchMode(!searchMode);
+                        askBox.current?.focus();
+                      } else {
+                        setSearchMode(false);
+                        setAsk(tr("agent.open.write.ask", lang));
+                        askBox.current?.focus();
+                      }
+                    }}>
               <span aria-hidden="true">{o.icon}</span> {tr(o.key, lang)}
             </button>
           ))}
         </div>
       )}
 
-      {/* The rail: every tool and connection this agent works alongside, as a
-          launcher for screens that already exist. Each chip is a tab id, and
-          its words come from the same `nav.<id>` row the navigation uses —
-          the destination named once, so a chip cannot end up labelled for one
-          screen and opening another. */}
+      {/* The action strip. These do things; the places live in the menu. */}
       <div className="agent-rail">
-        {RAIL.map((c) => (
-          <button key={c.id} className="agent-chip" onClick={() => go(c.id)}>
-            <span aria-hidden="true">{c.icon}</span> {tr(`nav.${c.id}`, lang)}
+        {ACTIONS.map((c) => (
+          <button key={c.key} className="agent-chip"
+                  aria-pressed={c.key === "voicemode" ? voiceMode : undefined}
+                  onClick={() => {
+                    if (c.key === "voicemode") {
+                      if (voiceMode) stopVoice(); else startVoice();
+                    } else if (c.key === "docs") {
+                      docPicker.current?.click();
+                    } else if (c.key === "image") {
+                      imgPicker.current?.click();
+                    } else {
+                      setAsk(tr(`agent.act.${c.key}.ask`, lang));
+                    }
+                  }}>
+            {c.key === "voicemode"
+              ? <WaveIcon />
+              : <span aria-hidden="true">{c.icon}</span>}
+            {" "}{tr(`agent.act.${c.key}`, lang)}
+            {c.key === "voicemode" && voiceMode ? " \u2713" : ""}
           </button>
         ))}
+        <input ref={docPicker} type="file"
+               accept=".pdf,.txt,.md,.doc,.docx,text/*,application/pdf"
+               style={{ display: "none" }}
+               onChange={(e) => {
+                 const f = e.target.files?.[0]; e.target.value = "";
+                 if (!f || !session.profileId || !session.ownerToken) return;
+                 uploadMedia(session.profileId, f, session.ownerToken)
+                   .then((up) => setAsk(
+                     tr("agent.act.docs.ask", lang) + " " + (up.id || f.name)))
+                   .catch(setError);
+               }} />
+        <input ref={mediaPicker} type="file" accept="image/*,video/*"
+               style={{ display: "none" }}
+               onChange={(e) => {
+                 const f = e.target.files?.[0]; e.target.value = "";
+                 if (!f || !session.profileId || !session.ownerToken) return;
+                 setAsking(true);
+                 uploadMedia(session.profileId, f, session.ownerToken)
+                   .then((up) => { setPending({ id: up.id, name: f.name });
+                                   askBox.current?.focus(); })
+                   .catch(setError)
+                   .finally(() => setAsking(false));
+               }} />
+        <input ref={imgPicker} type="file" accept="image/*"
+               style={{ display: "none" }}
+               onChange={(e) => {
+                 const f = e.target.files?.[0]; e.target.value = "";
+                 if (!f || !session.profileId || !session.ownerToken) return;
+                 uploadMedia(session.profileId, f, session.ownerToken)
+                   .then((up) => setAsk(
+                     tr("agent.act.image.ask", lang) + " " + (up.id || f.name)))
+                   .catch(setError);
+               }} />
       </div>
+
+      {/* The orb: voice mode, visibly running. Tap it to stop. It relights
+          the recogniser for the next turn where the browser has one; where
+          it does not (iOS Safari) the orb is the state and the keyboard's
+          dictation key is the microphone. */}
+      {voiceMode && (
+        <button className="agent-orb" onClick={stopVoice}
+                aria-label={tr("agent.orb.stop", lang)}>
+          <span className="agent-orb-ball" aria-hidden="true" />
+          <span className="small">
+            {asking ? tr("agent.orb.thinking", lang)
+                    : tr("agent.orb.listening", lang)}
+          </span>
+        </button>
+      )}
 
       <div className="agent-bar">
         {plus && (
@@ -298,10 +583,25 @@ export function Agent({ onPlans, go }: {
             </button>
           </div>
         )}
+        {pending && (
+          <div className="agent-pending">
+            <span className="small">🖼 {pending.name}</span>
+            <button aria-label={tr("agent.open.drop", lang)}
+                    onClick={() => setPending(null)}>✕</button>
+          </div>
+        )}
+        {micHint && (
+          <p className="muted small agent-michint">
+            {tr("agent.mic.keyboard", lang)}
+          </p>
+        )}
         <div className="agent-pill">
           <button className="agent-plusbtn" aria-label={tr("agent.plus", lang)}
                   aria-expanded={plus} onClick={() => setPlus(!plus)}>+</button>
-          <input value={ask} placeholder={tr("agent.ask.ph", lang)}
+          <input ref={askBox} value={ask}
+                 placeholder={pending ? tr("agent.open.caption", lang)
+                              : searchMode ? tr("agent.search.ph", lang)
+                              : tr("agent.ask.ph", lang)}
                  onChange={(e) => setAsk(e.target.value)}
                  onKeyDown={(e) => { if (e.key === "Enter") send(); }} />
           {talk.length > 0 && (
@@ -310,10 +610,24 @@ export function Agent({ onPlans, go }: {
               ⟲
             </button>
           )}
-          <button className="agent-mic" aria-label={tr("nav.voice", lang)}
-                  onClick={() => go("voice")}>🎙</button>
-          <button className="agent-voice" aria-label={tr("nav.rooms", lang)}
-                  onClick={() => go("rooms")}>🎧</button>
+          {/* Two buttons, two meanings, told apart on purpose: the mic
+              *records into the box* — a take you stop when you are done —
+              and the waveform beside it opens the orb. The mic used to be
+              a navigator, then it was the orb; both were the same defect,
+              a control doing something other than what its icon says. */}
+          <button className={"agent-mic" + (dictating ? " rec" : "")}
+                  aria-pressed={dictating}
+                  aria-label={dictating ? tr("agent.mic.stop", lang)
+                                        : tr("agent.mic.dictate", lang)}
+                  onClick={() => (dictating ? stopDictation()
+                                            : startDictation())}>
+            {dictating ? "⏹" : "🎙"}
+          </button>
+          <button className="agent-wave" aria-pressed={voiceMode}
+                  aria-label={tr("agent.orb.open", lang)}
+                  onClick={() => (voiceMode ? stopVoice() : startVoice())}>
+            <WaveIcon />
+          </button>
           <button className="agent-send"
                   disabled={asking || !session.ownerToken || !ask.trim()}
                   onClick={send}>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, type VoiceprintStatus } from "../api";
+import { api, type VoiceprintStatus , type ProfileVoice } from "../api";
 import { Refusal } from "../Refusal";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { useSession } from "../store";
@@ -28,12 +28,17 @@ export function Voice({ onPlans }: {
   const [say, setSay] = useState("");
   const [spoken, setSpoken] = useState<{ basis: string; disclosure: string } | null>(null);
 
+  const [bound, setBound] = useState<ProfileVoice | null>(null);
+  const [voiceId, setVoiceId] = useState("");
+  const [voiceLabel, setVoiceLabel] = useState("");
+
   const pid = session.profileId;
 
   async function load() {
     if (!pid) return;
     try { setState(await api.voiceprint(pid)); }
     catch (e) { setError(e); }
+    api.profileVoice(pid).then(setBound).catch(() => setBound(null));
   }
   useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [pid]);
 
@@ -192,6 +197,64 @@ export function Voice({ onPlans }: {
           <li>{tr("vce.hold3", lang)}</li>
         </ul>
         {state?.disclosure && <p className="muted small">{state.disclosure}</p>}
+      </div>
+      {/* The spoken voice: a reference, not a clone. The enrollment above
+          is QRME learning *your* voice under an attestation; this is the
+          profile speaking with a voice you made and verified on the
+          engine's own surface — the deployment holds the engine key, this
+          screen holds only the reference. */}
+      <div className="card">
+        <h3>{tr("voice.spoken.title", lang)}</h3>
+        <p className="muted small">{tr("voice.spoken.lead", lang)}</p>
+        {bound?.speaks && (
+          <p className="small">
+            {tr("voice.spoken.bound", lang)}{" "}
+            <strong>{bound.label || bound.voice_id}</strong>
+          </p>
+        )}
+        <div className="row">
+          <input value={voiceId} placeholder={tr("voice.spoken.id.ph", lang)}
+                 onChange={(e) => setVoiceId(e.target.value)}
+                 style={{ flex: 1 }} />
+          <input value={voiceLabel}
+                 placeholder={tr("voice.spoken.label.ph", lang)}
+                 onChange={(e) => setVoiceLabel(e.target.value)}
+                 style={{ flex: 1 }} />
+        </div>
+        <div className="row">
+          <button disabled={busy || !pid || !session.ownerToken || !voiceId.trim()}
+                  onClick={() => run(async () => {
+                    await api.setProfileVoice(pid as string,
+                      { voice_id: voiceId.trim(), label: voiceLabel.trim() },
+                      session.ownerToken as string);
+                    setVoiceId(""); setVoiceLabel("");
+                  })}>
+            {tr("voice.spoken.save", lang)}
+          </button>
+          {bound?.speaks && (
+            <>
+              <button disabled={busy}
+                      onClick={() => run(async () => {
+                        await api.setProfileVoice(pid as string,
+                          { voice_id: "" }, session.ownerToken as string);
+                      })}>
+                {tr("voice.spoken.unbind", lang)}
+              </button>
+              <button disabled={busy}
+                      onClick={() => run(async () => {
+                        const blob = await api.sayInProfileVoice(
+                          pid as string, tr("voice.spoken.bound", lang),
+                          session.ownerToken as string);
+                        const src = URL.createObjectURL(blob);
+                        const sound = new Audio(src);
+                        sound.onended = () => URL.revokeObjectURL(src);
+                        void sound.play();
+                      })}>
+                {tr("voice.spoken.test", lang)}
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

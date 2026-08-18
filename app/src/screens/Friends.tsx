@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, InboxEvent } from "../api";
+import { api, getBase, InboxEvent } from "../api";
 import { t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
@@ -32,6 +32,21 @@ export function Friends({ onPlans, onVisit }: {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
+  // The finder: beta testers looking for each other by the name they know.
+  const [findQ, setFindQ] = useState("");
+  const [found, setFound] = useState<
+    { profile_id: string; display_name: string; handle: string | null;
+      avatar: string | null }[] | null>(null);
+
+  async function findPeople() {
+    if (!findQ.trim()) return;
+    setBusy(true); setError(null);
+    try {
+      const r = await api.findPeople(findQ.trim());
+      setFound(r.found);
+    } catch (e) { setError(e); }
+    finally { setBusy(false); }
+  }
   const [inbox, setInbox] = useState<{ events: InboxEvent[]; unseen: number } | null>(null);
 
   function load() {
@@ -149,6 +164,49 @@ export function Friends({ onPlans, onVisit }: {
       )}
 
       <div className="card">
+        <h3>{tr("frn.find", lang)}</h3>
+        <div className="row">
+          <input value={findQ} placeholder={tr("frn.find.ph", lang)}
+                 onChange={(e) => setFindQ(e.target.value)}
+                 onKeyDown={(e) => { if (e.key === "Enter") findPeople(); }} />
+          <button disabled={busy || !findQ.trim()} onClick={findPeople}>
+            {tr("dsc.search", lang)}
+          </button>
+        </div>
+        {found !== null && found.length === 0 && (
+          <p className="muted small">{tr("frn.found.none", lang)}</p>
+        )}
+        {(found || []).map((p) => {
+          const mine = (data?.friends || []).some(
+            (f) => f.profile_id === p.profile_id);
+          return (
+            <div key={p.profile_id} className="friend-row">
+              {p.avatar ? (
+                <img className="friend-photo" src={getBase() + p.avatar} alt="" />
+              ) : (
+                <span className="friend-photo friend-initials" aria-hidden="true">
+                  {p.display_name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2)}
+                </span>
+              )}
+              <button className="linkish friend-name"
+                      onClick={() => onVisit(p.profile_id)}>
+                {p.display_name}
+              </button>
+              {p.handle && <span className="muted small">@{p.handle}</span>}
+              {mine ? (
+                <span className="muted small">{tr("frn.already", lang)}</span>
+              ) : (
+                <button className="primary" disabled={busy}
+                        onClick={() => add(p.profile_id)}>
+                  {tr("frn.add", lang)}
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="card">
         {(data?.friends || []).length === 0 && (
           <p className="muted center">{tr("frn.nofriends", lang)}</p>
         )}
@@ -157,6 +215,13 @@ export function Friends({ onPlans, onVisit }: {
           return (
             <div key={f.profile_id} className={"friend-row" + (isFounder ? " founder" : "")}>
               <span className="friend-rank">{i + 1}</span>
+              {f.avatar ? (
+                <img className="friend-photo" src={getBase() + f.avatar} alt="" />
+              ) : (
+                <span className="friend-photo friend-initials" aria-hidden="true">
+                  {f.display_name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2)}
+                </span>
+              )}
               {/* The name is the door. A row that carries somebody's name,
                   their handle and a Remove button, and no way to look at
                   them, is a list about people you cannot visit. */}
@@ -172,9 +237,11 @@ export function Friends({ onPlans, onVisit }: {
                   the platform and answer 409, and the list marks them — so
                   the control is absent rather than present and refused. */}
               {!isFounder && (
-                <button className="chip" disabled={busy}
+                <button className="friend-x" disabled={busy}
+                        aria-label={tr("frn.remove", lang)}
+                        title={tr("frn.remove", lang)}
                         onClick={() => remove(f.profile_id, f.display_name)}>
-                  {tr("frn.remove", lang)}
+                  ✕
                 </button>
               )}
             </div>

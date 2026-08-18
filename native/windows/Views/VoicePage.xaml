@@ -81,6 +81,34 @@
                 </StackPanel>
             </Border>
 
+            <!-- The spoken voice: a reference to a voice made on the
+                 engine's own surface, and one utterance of audio back. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="SpokenHead" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="SpokenLead" FontSize="11" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <StackPanel x:Name="BindPanel" Spacing="8">
+                        <TextBox x:Name="BindIdBox" />
+                        <TextBox x:Name="BindLabelBox" />
+                        <Button x:Name="BindButton" Click="OnBind"
+                                Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                    </StackPanel>
+                    <StackPanel x:Name="BoundPanel" Visibility="Collapsed" Spacing="8">
+                        <TextBlock x:Name="BoundText" FontSize="12" TextWrapping="Wrap"
+                                   Foreground="{StaticResource QrmeTxtBrush}" />
+                        <TextBox x:Name="SayLineBox" />
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button x:Name="SayButton" Click="OnSay"
+                                    Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                            <Button x:Name="UnbindButton" Click="OnUnbind" />
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="6">

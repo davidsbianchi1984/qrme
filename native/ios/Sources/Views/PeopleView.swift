@@ -27,6 +27,10 @@ struct PeopleSection: View {
     @State private var posts: [WallPostRow] = []
     @State private var comments: [CommentRow] = []
     @State private var addId = ""
+    // The finder: beta testers looking for each other by the name they know.
+    @State private var findQ = ""
+    @State private var foundPeople: [ApiClient.FoundPerson] = []
+    @State private var searched = false
     @State private var draft = ""
     @State private var openPost: String?
     @State private var commentDraft = ""
@@ -83,6 +87,54 @@ struct PeopleSection: View {
                     .background(Theme.card)
                     .clipShape(RoundedRectangle(cornerRadius: 14))
                 }
+                // Find people: publicly listed profiles by name or handle —
+                // the door two beta testers needed to become friends.
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(L10n.t("nfp.title", state.language))
+                        .font(.headline).foregroundStyle(Theme.txt)
+                    HStack(spacing: 8) {
+                        TextField(L10n.t("nfp.ph", state.language), text: $findQ)
+                            .font(.subheadline).foregroundStyle(Theme.txt)
+                            .padding(10).background(Theme.scrBot)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                        Button(L10n.t("nfp.title", state.language)) {
+                            run {
+                                let r = try await ApiClient.shared.findPeople(q: findQ)
+                                foundPeople = r.found
+                                searched = true
+                            }
+                        }
+                        .font(.caption.bold())
+                        .disabled(busy || findQ.trimmingCharacters(in: .whitespaces).isEmpty)
+                    }
+                    if searched && foundPeople.isEmpty {
+                        Text(L10n.t("nfp.none", state.language))
+                            .font(.caption2).foregroundStyle(Theme.t2)
+                    }
+                    ForEach(foundPeople, id: \.profile_id) { p in
+                        HStack {
+                            Button(p.display_name) { visiting = p.profile_id }
+                                .font(.caption).foregroundStyle(Theme.txt)
+                            if let h = p.handle {
+                                Text("@" + h).font(.caption2)
+                                    .foregroundStyle(Theme.t3)
+                            }
+                            Spacer()
+                            if friends.contains(where: { $0.profile_id == p.profile_id }) {
+                                Text(L10n.t("nfp.already", state.language))
+                                    .font(.caption2).foregroundStyle(Theme.t2)
+                            } else {
+                                Button(L10n.t("people.add", state.language)) {
+                                    add(p.profile_id)
+                                }.font(.caption2).disabled(busy)
+                            }
+                        }
+                    }
+                }
+                .padding(12)
+                .background(Theme.card)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+
                 VStack(alignment: .leading, spacing: 8) {
                     Text(L10n.t("people.friends", state.language))
                         .font(.headline).foregroundStyle(Theme.txt)
@@ -309,6 +361,13 @@ struct PeopleSection: View {
             _ = try await ApiClient.shared.addFriend(
                 profileId: state.pid!, friendId: addId, token: state.token!)
             addId = ""
+        }
+    }
+
+    private func add(_ friendId: String) {
+        run {
+            _ = try await ApiClient.shared.addFriend(
+                profileId: state.pid!, friendId: friendId, token: state.token!)
         }
     }
 

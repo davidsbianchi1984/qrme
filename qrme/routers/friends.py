@@ -14,7 +14,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from .. import friends, verification
+from .. import friends, i18n, verification
 from ..common import profile_or_404, require_owner
 
 router = APIRouter()
@@ -51,6 +51,17 @@ def list_friends(profile_id: str) -> dict:
         # client does not have to know the convention to render the badge.
         "founder_handles": list(friends.FOUNDER_HANDLES),
     }
+
+
+@router.get("/people")
+def find_people(q: str = "") -> dict:
+    """Who is here, by the name you already know. Public, like the friends
+    list above it, and made of the same already-public rows — see
+    :func:`qrme.friends.find` for the two exclusions that matter."""
+    try:
+        return {"q": (q or "").strip(), "found": friends.find(q)}
+    except friends.FriendError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from exc
 
 
 @router.get("/profiles/{profile_id}/friends/suggested")

@@ -801,7 +801,12 @@ def room_transcript(room_id: str, request: Request) -> list[dict]:
     rows = db.connect().execute(
         "SELECT * FROM room_messages WHERE room_id=? AND status='approved'"
         " ORDER BY created_at, rowid", (room_id,)).fetchall()
+    # `sender_id` rides along so a client can follow a turn back to the
+    # thing that produced it — a profile turn to the voice route, a person's
+    # to nothing. It names a fellow participant, which is who the read is
+    # already scoped to.
     return [{"id": r["id"], "sender_kind": r["sender_kind"],
+             "sender_id": r["sender_id"],
              "from": _display(r["sender_kind"], r["sender_id"]),
              "content": r["content"],
              "watermark": watermark.brief(r["watermark_id"]),

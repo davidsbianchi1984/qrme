@@ -129,7 +129,8 @@ export function Blend({ onPlans }: {
               const pick = picks.find((x) => x.profile_id === c.profile_id);
               const pct = pick && total > 0 ? Math.round((pick.weight / total) * 100) : null;
               return (
-                <div key={c.profile_id} className="friend-row">
+                <div key={c.profile_id} className="blend-cand">
+                <div className="friend-row">
                   <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <input type="checkbox" checked={!!pick} onChange={() => toggle(c)} />
                     <span>
@@ -142,8 +143,13 @@ export function Blend({ onPlans }: {
                       )}
                     </span>
                   </label>
+                </div>
                   {pick && (
-                    <>
+                    /* Below the name, never beside it: three controls
+                       squeezed into the name's flex row is what the field
+                       report's screenshot showed — inputs shouldering each
+                       other off a phone. */
+                    <div className="row blend-pick">
                       <label>{tr("bld.share", lang)}
                         <input type="number" min={1} max={9} value={pick.weight}
                                style={{ width: 56 }}
@@ -154,7 +160,7 @@ export function Blend({ onPlans }: {
                                onChange={(e) => setPick(c.profile_id, { aspect: e.target.value })} />
                       </label>
                       {pct !== null && <span className="tag">{pct}%</span>}
-                    </>
+                    </div>
                   )}
                 </div>
               );

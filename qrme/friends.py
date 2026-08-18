@@ -311,6 +311,45 @@ S_TAG_CAP = 60
 S_FRIEND_OF_PIN = 5     # the founder is everybody's friend, so this is faint
 
 
+def find(q: str, limit: int = 20) -> list[dict]:
+    """People search, by the name or handle somebody already knows.
+
+    Two beta testers who know each other by name had no way to become
+    friends: suggestions walk the friend graph they are not on yet, and the
+    marketplace lists only profiles that chose a storefront. The field
+    report said it plainly — *I'm not seeing any of my beta testers, how
+    come we're not being able to find each other.*
+
+        asked     can a profile be found
+        mattered  by somebody who already knows its name
+
+    What it returns is only what the profile already shows the public:
+    name, handle, portrait, kind, badge. Two exclusions carry the privacy
+    argument. **Anonymous profiles never match** — anonymity that a name
+    search could pierce would not be anonymity. And **only active profiles
+    match**: a restricted or departed profile is not greeting strangers.
+    """
+    q = (q or "").strip()
+    if not q:
+        raise FriendError("nothing to search for — say a few words first")
+    like = f"%{q.lstrip('@')}%"
+    rows = db.connect().execute(
+        "SELECT p.id, p.display_name, p.avatar, p.kind, h.handle"
+        "  FROM profiles p LEFT JOIN handles h ON h.profile_id = p.id"
+        " WHERE (p.display_name LIKE ? OR h.handle LIKE ?)"
+        "   AND p.status = 'active' AND p.anonymous = 0"
+        " ORDER BY p.display_name LIMIT ?", (like, like, limit)).fetchall()
+    badges = verification.statuses([r["id"] for r in rows])
+    return [{
+        "profile_id": r["id"],
+        "display_name": r["display_name"],
+        "handle": r["handle"],
+        "avatar": avatars.shown(r["avatar"]),
+        "kind": r["kind"],
+        "verification": badges.get(r["id"], {}),
+    } for r in rows]
+
+
 def suggestions(profile_id: str, limit: int = 10) -> list[dict]:
     """Profiles this one might want to know, most likely first, and why.
 

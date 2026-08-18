@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { api, type MicsHere, type RoomFaces, type RoomMsg } from "../api";
+import { api, getBase, type Avatar, type MicsHere, type RoomFaces,
+         type RoomMsg } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
@@ -53,6 +54,30 @@ import { useSession } from "../store";
  * shows is not something this product offers, and the route refuses it — but
  * a control that renders and then refuses is worse than one that is absent.
  */
+// What a worn mask draws over your own preview, per catalogue kind. Your
+// pixels never leave this device — the other seats show an on-air marker,
+// not your stream — so the wearer's preview is the only place a mask can
+// render at all, and until this map existed it rendered nowhere: the mask
+// machinery recorded the disclosure and drew nothing, which read as broken.
+//
+// The glyph rides the box, not your facial landmarks. That is the honest
+// budget of a beta with no face tracking, and the disclosure line stays the
+// truth-bearing part. Three kinds are treatments of the video itself and
+// carry a CSS class instead; `backdrop` would need segmentation this beta
+// does not have, so it stays disclosure-only.
+const MASK_GLYPHS: Record<string, string> = {
+  mask: "\u{1F3AD}", half_mask: "\u{1F978}", character: "\u{1F9B9}",
+  creature: "\u{1F98A}", puppet: "\u{1FA86}", avatar_2d: "\u{1F5BC}\uFE0F",
+  avatar_3d: "\u{1F5FF}", helmet_hud: "\u{1FA96}", paint: "\u{1F3A8}",
+  makeup: "\u{1F484}", hair: "\u{1F9D4}", headwear: "\u{1F3A9}",
+  eyewear: "\u{1F576}\uFE0F", prosthetic: "\u{1F47A}",
+  stylised: "\u{1F58C}\uFE0F",
+};
+const MASK_TREATMENTS: Record<string, string> = {
+  obscured: " rs-obscured", silhouette: " rs-silhouette",
+  touch_up: " rs-touchup",
+};
+
 export function Inside({ onPlans, start = "" }: {
   onPlans: () => void;
   /** A room id handed in by the Rooms screen's join — the field is
@@ -73,7 +98,23 @@ export function Inside({ onPlans, start = "" }: {
   const [scene, setScene] = useState<RoomFaces | null>(null);
   const [masks, setMasks] = useState<
     { kind: string; covers_face: boolean; means: string }[]>([]);
+  // The synthetic seats' portraits. `GET /profiles/{id}/avatar` is the one
+  // shape every surface reads — 2-D, 3-D, VR, AR — and it carries the AI
+  // badge and the likeness record with the picture, so this screen cannot
+  // show the face without having been handed the disclosure. Until this map
+  // existed a profile seat drew two initials while the platform held a whole
+  // portrait for it, which read as "my agent has no avatar".
+  const [aiFaces, setAiFaces] = useState<Record<string, Avatar>>({});
   const picker = useRef<HTMLInputElement>(null);
+  // Which of the device's cameras. "user" is the selfie side; flipping asks
+  // for the other and the effect below re-acquires the stream.
+  const [facing, setFacing] = useState<"user" | "environment">("user");
+  // Whether the controls are shown over a live full-bleed camera. A camera
+  // that fills its box leaves nowhere for buttons to live politely, so they
+  // hide — and a double-tap or a long press brings them back. Both gestures,
+  // because neither is discoverable and two chances beat one.
+  const [reveal, setReveal] = useState(false);
+  const hold = useRef<number | null>(null);
   // The local preview. Rendering is the device's, exactly as `overlays` says —
   // what the backend holds is the fact that a camera is on, which is what
   // lets everybody else's client draw the same scene.
@@ -106,6 +147,17 @@ export function Inside({ onPlans, start = "" }: {
     api.overlayCatalogue().then((c) => setMasks(c.kinds)).catch(() => setMasks([]));
   }, []);
 
+  useEffect(() => {
+    for (const seat of seats) {
+      if (seat.kind === "user" || aiFaces[seat.id]) continue;
+      api.avatar(seat.id, token)
+        .then((a) => setAiFaces((m) => ({ ...m, [seat.id]: a })))
+        .catch(() => undefined);
+    }
+    // aiFaces deliberately not a dep: it is the cache this effect fills.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seats, token]);
+
   const showing = scene?.faces[me]?.showing || "voice";
 
   // The camera itself. Held in a ref rather than state because a MediaStream
@@ -113,8 +165,15 @@ export function Inside({ onPlans, start = "" }: {
   // is the only thing that puts the device's own light out.
   useEffect(() => {
     let dropped = false;
-    if (showing === "camera" && !stream.current) {
-      navigator.mediaDevices?.getUserMedia({ video: true })
+    if (showing === "camera") {
+      // A flip re-runs this effect, so the old side is stopped before the
+      // new one is asked for — two live tracks is two camera lights.
+      stream.current?.getTracks().forEach((t) => t.stop());
+      stream.current = null;
+      navigator.mediaDevices?.getUserMedia(
+        // `ideal` rather than `exact`: a laptop has no back camera, and a
+        // hard constraint there turns the flip button into an error dialog.
+        { video: { facingMode: { ideal: facing } } })
         .then((s) => {
           if (dropped) { s.getTracks().forEach((t) => t.stop()); return; }
           stream.current = s;
@@ -122,13 +181,14 @@ export function Inside({ onPlans, start = "" }: {
         })
         .catch((e) => setError(e));
     }
-    if (showing !== "camera" && stream.current) {
-      stream.current.getTracks().forEach((t) => t.stop());
+    if (showing !== "camera") {
+      stream.current?.getTracks().forEach((t) => t.stop());
       stream.current = null;
       if (mine.current) mine.current.srcObject = null;
+      setReveal(false);
     }
     return () => { dropped = true; };
-  }, [showing]);
+  }, [showing, facing]);
 
   // Leaving the screen with a camera still running is how an indicator light
   // stays on in somebody's room after they have gone.
@@ -187,15 +247,47 @@ export function Inside({ onPlans, start = "" }: {
               const isMe = s.kind === "user" && s.id === me;
               const wearing = scene?.wearing.find(
                 (w) => w.interactor_id === s.id);
+              const camLive = isMe && face?.showing === "camera";
               return (
               <div key={s.id}
-                   className={"rs-tile" + (talking === s.display ? " talking" : "")}>
+                   className={"rs-tile" + (talking === s.display ? " talking" : "")
+                              + (camLive ? " rs-camtile" : "")}
+                   onDoubleClick={camLive
+                     ? () => setReveal((v) => !v) : undefined}
+                   onPointerDown={camLive ? () => {
+                     hold.current = window.setTimeout(
+                       () => setReveal((v) => !v), 550);
+                   } : undefined}
+                   onPointerUp={camLive ? () => {
+                     if (hold.current) window.clearTimeout(hold.current);
+                     hold.current = null;
+                   } : undefined}
+                   onPointerLeave={camLive ? () => {
+                     if (hold.current) window.clearTimeout(hold.current);
+                     hold.current = null;
+                   } : undefined}>
                 {/* What is in the box. A camera, a picture, or the initials —
                     and the box is the same size in all three, because the
                     quiet person is as present as the talking one. */}
                 {isMe && face?.showing === "camera" ? (
-                  <video ref={mine} className="rs-live" autoPlay playsInline
-                         muted aria-label={tr("ins.face.yourcamera", lang)} />
+                  <>
+                    <video ref={mine}
+                           className={"rs-live rs-fullbleed"
+                             + (wearing
+                                ? MASK_TREATMENTS[wearing.kind] || "" : "")}
+                           autoPlay playsInline muted
+                           aria-label={tr("ins.face.yourcamera", lang)} />
+                    {wearing && MASK_GLYPHS[wearing.kind] && (
+                      <span className="rs-mask" aria-hidden="true">
+                        {MASK_GLYPHS[wearing.kind]}
+                      </span>
+                    )}
+                    {!reveal && (
+                      <span className="rs-hint">
+                        {tr("ins.face.hint", lang)}
+                      </span>
+                    )}
+                  </>
                 ) : face?.showing === "camera" ? (
                   // Somebody else's camera. The fact is shared; the pixels
                   // are not — this product carries no stream between clients,
@@ -208,6 +300,15 @@ export function Inside({ onPlans, start = "" }: {
                 ) : face?.showing === "photo" && face.media_url ? (
                   <img className="rs-photo" src={face.media_url}
                        alt={s.display} />
+                ) : s.kind !== "user" && aiFaces[s.id]?.asset
+                    && !aiFaces[s.id]?.placeholder ? (
+                  // The profile's own portrait, in the same circle a person's
+                  // photo uses. The AI mark on this tile is the disclosure the
+                  // avatar route insists travels with the picture.
+                  <img className="rs-photo" alt={s.display}
+                       src={(aiFaces[s.id].asset as string).startsWith("http")
+                              ? (aiFaces[s.id].asset as string)
+                              : getBase() + aiFaces[s.id].asset} />
                 ) : (
                   <span className="rs-face">
                     {(s.display || "?").split(/\s+/)
@@ -241,7 +342,7 @@ export function Inside({ onPlans, start = "" }: {
                     {wearing.disclosure}
                   </span>
                 )}
-                {isMe && (
+                {isMe && (!camLive || reveal) && (
                   <div className="rs-controls">
                     <button className="chip" disabled={busy}
                             aria-pressed={face?.showing === "camera"}
@@ -255,6 +356,13 @@ export function Inside({ onPlans, start = "" }: {
                         ? tr("ins.face.cameraoff", lang)
                         : tr("ins.face.cameraon", lang)}
                     </button>
+                    {camLive && (
+                      <button className="chip" disabled={busy}
+                              onClick={() => setFacing(
+                                (f) => f === "user" ? "environment" : "user")}>
+                        {tr("ins.face.flip", lang)}
+                      </button>
+                    )}
                     <button className="chip" disabled={busy}
                             onClick={() => picker.current?.click()}>
                       {tr("ins.face.photo", lang)}
@@ -325,6 +433,27 @@ export function Inside({ onPlans, start = "" }: {
             {transcript.map((m) => (
               <p className="small" key={m.id}>
                 <strong>{m.from}</strong>: {m.content}
+                {/* A profile turn can be heard in the voice its owner bound.
+                    A press, never autoplay: the phone's rule and the room's
+                    are the same — sound starts on a gesture. */}
+                {m.sender_kind === "profile" && m.sender_id && (
+                  <button className="chip" disabled={busy}
+                          aria-label={tr("ins.hear", lang)}
+                          onClick={() => {
+                            api.sayInProfileVoice(m.sender_id as string,
+                                                  m.content || "", token)
+                              .then((blob) => {
+                                const src = URL.createObjectURL(blob);
+                                const sound = new Audio(src);
+                                sound.onended = () =>
+                                  URL.revokeObjectURL(src);
+                                void sound.play();
+                              })
+                              .catch(setError);
+                          }}>
+                    🔊
+                  </button>
+                )}
                 {/* A profile's turn is always watermarked and a person's
                     never is, so the mark is the honest way to tell which
                     kind of speaker this was — not the name. */}

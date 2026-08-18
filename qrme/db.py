@@ -1846,6 +1846,17 @@ CREATE TABLE IF NOT EXISTS problem_reports (
     PRIMARY KEY (source, app_version, platform, op, status)
 );
 
+-- The voice a profile speaks with: a reference to a voice made and governed
+-- on the provider's own surface. The engine key is the deployment's and
+-- never lands here — see qrme/spoken.py.
+CREATE TABLE IF NOT EXISTS profile_voices (
+    profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
+    provider   TEXT NOT NULL,             -- see qrme.spoken.PROVIDERS
+    voice_id   TEXT NOT NULL,             -- the provider's own reference
+    label      TEXT NOT NULL DEFAULT '',
+    bound_at   TEXT NOT NULL
+);
+
 -- Somebody's matter: what they said was wrong with the app, their profiles or
 -- the platform, and what happened to it. Distinct from `feedback` (a
 -- suggestion box nobody replies to) and from `problem_reports` (counters with

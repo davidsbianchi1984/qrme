@@ -23,6 +23,14 @@ struct VoiceView: View {
     @State private var revocation: VoiceRevocation?
     @State private var error: String?
     @State private var busy = false
+    // The spoken voice: a reference to a voice made on the engine's own
+    // surface — a different thing from the voiceprint above, which is why it
+    // does not sit behind the enrollment consent.
+    @State private var binding: ApiClient.SpokenBinding?
+    @State private var bindId = ""
+    @State private var bindLabel = ""
+    @State private var sayLine = ""
+    @State private var player: AVAudioPlayer?
 
     private var consented: Bool { status?.consent.granted == true }
 
@@ -53,6 +61,7 @@ struct VoiceView: View {
                     enrollment
                     voiceprint
                 }
+                spokenVoice
                 invariants
                 if let error {
                     Text(error).font(.footnote).foregroundStyle(Theme.red)
@@ -214,6 +223,69 @@ struct VoiceView: View {
         .card()
     }
 
+    // MARK: the spoken voice — the binding, and a line said aloud
+
+    private var spokenVoice: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(L10n.t("nsv.title", state.language))
+                .font(.headline).foregroundStyle(Theme.txt)
+            Text(L10n.t("nsv.lead", state.language))
+                .font(.caption2).foregroundStyle(Theme.t2)
+            if let b = binding, b.speaks {
+                Text(L10n.t("nsv.bound", state.language) + " "
+                     + (b.label.isEmpty ? b.voice_id : b.label))
+                    .font(.caption).foregroundStyle(Theme.txt)
+                TextField(L10n.t("nsv.test", state.language), text: $sayLine)
+                    .font(.subheadline).foregroundStyle(Theme.txt)
+                    .padding(10).background(Theme.scrBot)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                HStack(spacing: 8) {
+                    Button(L10n.t("nsv.test", state.language)) {
+                        act {
+                            let audio = try await ApiClient.shared.saySpoken(
+                                id: profileId, token: token, text: sayLine)
+                            player = try AVAudioPlayer(data: audio)
+                            player?.play()
+                        }
+                    }
+                    .font(.caption.bold()).foregroundStyle(.white)
+                    .padding(.horizontal, 12).padding(.vertical, 9)
+                    .background(Theme.brandA).clipShape(Capsule())
+                    .disabled(busy || sayLine.trimmingCharacters(in: .whitespaces).isEmpty)
+                    Button(L10n.t("nsv.unbind", state.language)) {
+                        act {
+                            binding = try await ApiClient.shared.bindSpokenVoice(
+                                id: profileId, token: token, voiceId: "", label: "")
+                        }
+                    }
+                    .font(.caption).foregroundStyle(Theme.t2)
+                    .disabled(busy)
+                }
+            } else {
+                TextField(L10n.t("nsv.id.ph", state.language), text: $bindId)
+                    .font(.subheadline).foregroundStyle(Theme.txt)
+                    .padding(10).background(Theme.scrBot)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                TextField(L10n.t("nsv.label.ph", state.language), text: $bindLabel)
+                    .font(.subheadline).foregroundStyle(Theme.txt)
+                    .padding(10).background(Theme.scrBot)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                Button(L10n.t("nsv.save", state.language)) {
+                    act {
+                        binding = try await ApiClient.shared.bindSpokenVoice(
+                            id: profileId, token: token,
+                            voiceId: bindId, label: bindLabel)
+                    }
+                }
+                .font(.caption.bold()).foregroundStyle(.white)
+                .padding(.horizontal, 12).padding(.vertical, 9)
+                .background(Theme.brandA).clipShape(Capsule())
+                .disabled(busy || bindId.trimmingCharacters(in: .whitespaces).isEmpty)
+            }
+        }
+        .card()
+    }
+
     private var invariants: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(L10n.t("nvoi.holds", state.language)).font(.headline).foregroundStyle(Theme.txt)
@@ -269,6 +341,10 @@ struct VoiceView: View {
 
     private func load() async {
         do { status = try await ApiClient.shared.voiceprint(id: profileId, token: token) }
+        catch { self.error = error.localizedDescription }
+        // The binding reads the same for bound and not, so a failure here is
+        // a failure worth showing, not an empty state to paper over.
+        do { binding = try await ApiClient.shared.spokenVoice(id: profileId) }
         catch { self.error = error.localizedDescription }
     }
 

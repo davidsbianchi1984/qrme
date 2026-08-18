@@ -26,7 +26,7 @@ const CHROME: Table = {
     en: "Go to sign-in", es: "Ir a iniciar sesión", fr: "Aller à la connexion", de: "Zur Anmeldung", pt: "Ir para o login", it: "Vai all'accesso", ja: "サインインへ", zh: "去登录", hi: "साइन-इन पर जाएँ", ar: "اذهب إلى تسجيل الدخول",
   },
   "nav.matters": {
-    en: "Get help", es: "Pedir ayuda", fr: "Obtenir de l'aide", de: "Hilfe holen", pt: "Pedir ajuda", it: "Chiedi aiuto", ja: "ヘルプ", zh: "获取帮助", hi: "मदद लें", ar: "اطلب مساعدة",
+    en: "Support", es: "Soporte", fr: "Assistance", de: "Support", pt: "Suporte", it: "Assistenza", ja: "サポート", zh: "支持", hi: "सहायता", ar: "الدعم",
   },
   "matter.title": {
     en: "Get help with something", es: "Pedir ayuda con algo", fr: "Obtenir de l'aide", de: "Hilfe zu etwas bekommen", pt: "Obter ajuda com algo", it: "Chiedere aiuto per qualcosa", ja: "困りごとの相談", zh: "获取帮助", hi: "किसी बात में मदद लें", ar: "احصل على مساعدة",
@@ -201,14 +201,50 @@ const CHROME: Table = {
   },
   // Three openings for the Agent's empty screen. They fill the box rather
   // than sending it, so what the agent does stays something a person presses.
-  "agent.try.page": {
-    en: "Make my page say what I actually do", es: "Haz que mi página diga lo que realmente hago", fr: "Fais que ma page dise ce que je fais vraiment", de: "Lass meine Seite sagen, was ich wirklich mache", pt: "Faz a minha página dizer o que eu realmente faço", it: "Fai dire alla mia pagina quello che faccio davvero", ja: "自分のページに、実際にしていることを書かせて", zh: "让我的主页写出我真正在做的事", hi: "मेरे पेज पर वही लिखवाइए जो मैं सचमुच करता हूँ", ar: "اجعل صفحتي تقول ما أفعله فعلًا",
+  "agent.open.create": {
+    en: "Create picture or video", es: "Crear foto o vídeo", fr: "Créer une photo ou une vidéo", de: "Bild oder Video erstellen", pt: "Criar foto ou vídeo", it: "Crea foto o video", ja: "写真や動画を作る", zh: "创建图片或视频", hi: "फ़ोटो या वीडियो बनाएँ", ar: "أنشئ صورة أو فيديو",
   },
-  "agent.try.widget": {
-    en: "Write me a small tool", es: "Escríbeme una herramienta pequeña", fr: "Écris-moi un petit outil", de: "Schreib mir ein kleines Werkzeug", pt: "Escreve-me uma ferramenta pequena", it: "Scrivimi un piccolo strumento", ja: "小さな道具をひとつ書いて", zh: "给我写一个小工具", hi: "मेरे लिए एक छोटा औज़ार लिखिए", ar: "اكتب لي أداة صغيرة",
+  "agent.open.search": {
+    en: "Search the Internet", es: "Buscar en Internet", fr: "Chercher sur Internet", de: "Das Internet durchsuchen", pt: "Pesquisar na Internet", it: "Cerca su Internet", ja: "インターネットを検索", zh: "搜索互联网", hi: "इंटरनेट पर खोजें", ar: "ابحث في الإنترنت",
   },
-  "agent.try.post": {
-    en: "Put something on my wall", es: "Publica algo en mi muro", fr: "Publie quelque chose sur mon mur", de: "Stell etwas an meine Wand", pt: "Publica algo no meu mural", it: "Pubblica qualcosa sulla mia bacheca", ja: "ウォールに何か投稿して", zh: "在我的墙上发点什么", hi: "मेरी दीवार पर कुछ डालिए", ar: "انشر شيئًا على حائطي",
+  "agent.open.write": {
+    en: "Write or edit", es: "Escribir o editar", fr: "Écrire ou modifier", de: "Schreiben oder bearbeiten", pt: "Escrever ou editar", it: "Scrivi o modifica", ja: "書く・編集する", zh: "撰写或编辑", hi: "लिखें या संपादित करें", ar: "اكتب أو حرّر",
+  },
+  "agent.open.write.ask": {
+    en: "Help me write or edit — here is what I am working with: ", es: "Ayúdame a escribir o editar — esto es con lo que trabajo: ", fr: "Aide-moi à écrire ou à modifier — voici ce que j'ai : ", de: "Hilf mir beim Schreiben oder Bearbeiten — hier ist, womit ich arbeite: ", pt: "Ajuda-me a escrever ou editar — é com isto que estou a trabalhar: ", it: "Aiutami a scrivere o modificare — ecco con cosa lavoro: ", ja: "書く・編集するのを手伝って — 手元にあるのはこれ：", zh: "帮我撰写或编辑——这是我手头的内容：", hi: "लिखने या संपादित करने में मदद करें — मेरे पास यह है: ", ar: "ساعدني في الكتابة أو التحرير — هذا ما أعمل عليه: ",
+  },
+  "agent.open.caption": {
+    en: "Say something about it…", es: "Di algo sobre esto…", fr: "Dites quelque chose à son sujet…", de: "Sag etwas dazu…", pt: "Diz algo sobre isto…", it: "Di' qualcosa al riguardo…", ja: "ひとこと添えて…", zh: "说点什么吧…", hi: "इसके बारे में कुछ कहें…", ar: "قل شيئًا عنها…",
+  },
+  "agent.open.created": {
+    en: "Posted to your wall.", es: "Publicado en tu muro.", fr: "Publié sur votre mur.", de: "An deine Wand gestellt.", pt: "Publicado no teu mural.", it: "Pubblicato sulla tua bacheca.", ja: "ウォールに投稿しました。", zh: "已发布到你的墙上。", hi: "आपकी दीवार पर पोस्ट हो गया।", ar: "نُشر على حائطك.",
+  },
+  "agent.open.drop": {
+    en: "Remove", es: "Quitar", fr: "Retirer", de: "Entfernen", pt: "Remover", it: "Rimuovi", ja: "取り消す", zh: "移除", hi: "हटाएँ", ar: "إزالة",
+  },
+  "agent.search.ph": {
+    en: "Search the Internet…", es: "Buscar en Internet…", fr: "Chercher sur Internet…", de: "Das Internet durchsuchen…", pt: "Pesquisar na Internet…", it: "Cerca su Internet…", ja: "インターネットを検索…", zh: "搜索互联网…", hi: "इंटरनेट पर खोजें…", ar: "ابحث في الإنترنت…",
+  },
+  "agent.search.more": {
+    en: "All results on the web", es: "Todos los resultados en la web", fr: "Tous les résultats sur le web", de: "Alle Ergebnisse im Netz", pt: "Todos os resultados na web", it: "Tutti i risultati sul web", ja: "ウェブ上のすべての結果", zh: "网页上的全部结果", hi: "वेब पर सारे परिणाम", ar: "كل النتائج على الويب",
+  },
+  "agent.search.none": {
+    en: "Nothing found here — try the full results page", es: "No se encontró nada aquí — prueba la página completa de resultados", fr: "Rien trouvé ici — essayez la page complète des résultats", de: "Hier nichts gefunden — versuch die volle Ergebnisseite", pt: "Nada encontrado aqui — tenta a página completa de resultados", it: "Niente trovato qui — prova la pagina completa dei risultati", ja: "ここでは見つかりませんでした — 全結果ページをお試しください", zh: "这里没有找到——试试完整结果页", hi: "यहाँ कुछ नहीं मिला — पूरा परिणाम पृष्ठ आज़माएँ", ar: "لم يُعثر على شيء هنا — جرّب صفحة النتائج الكاملة",
+  },
+  "agent.search.done": {
+    en: "Close", es: "Cerrar", fr: "Fermer", de: "Schließen", pt: "Fechar", it: "Chiudi", ja: "閉じる", zh: "关闭", hi: "बंद करें", ar: "إغلاق",
+  },
+  "agent.mic.dictate": {
+    en: "Speak into the box", es: "Habla al cuadro de texto", fr: "Parlez dans la zone de texte", de: "Sprich in das Textfeld", pt: "Fala para a caixa de texto", it: "Parla nella casella di testo", ja: "テキスト欄に話す", zh: "对着文本框说话", hi: "टेक्स्ट बॉक्स में बोलें", ar: "تحدّث إلى مربّع النص",
+  },
+  "agent.mic.stop": {
+    en: "Stop recording", es: "Detener la grabación", fr: "Arrêter l'enregistrement", de: "Aufnahme beenden", pt: "Parar a gravação", it: "Ferma la registrazione", ja: "録音を停止", zh: "停止录音", hi: "रिकॉर्डिंग रोकें", ar: "أوقف التسجيل",
+  },
+  "agent.mic.keyboard": {
+    en: "This browser has no speech recognizer — use the microphone key on your keyboard", es: "Este navegador no tiene reconocimiento de voz — usa la tecla de micrófono de tu teclado", fr: "Ce navigateur n'a pas de reconnaissance vocale — utilisez la touche micro de votre clavier", de: "Dieser Browser hat keine Spracherkennung — nutze die Mikrofontaste deiner Tastatur", pt: "Este navegador não tem reconhecimento de voz — usa a tecla de microfone do teu teclado", it: "Questo browser non ha il riconoscimento vocale — usa il tasto microfono della tastiera", ja: "このブラウザーには音声認識がありません — キーボードのマイクキーをお使いください", zh: "这个浏览器没有语音识别——请用键盘上的麦克风键", hi: "इस ब्राउज़र में वाक् पहचान नहीं है — अपने कीबोर्ड की माइक्रोफ़ोन कुंजी इस्तेमाल करें", ar: "لا يملك هذا المتصفّح تعرّفًا على الكلام — استخدم زرّ الميكروفون في لوحة مفاتيحك",
+  },
+  "agent.orb.open": {
+    en: "Voice mode", es: "Modo de voz", fr: "Mode vocal", de: "Sprachmodus", pt: "Modo de voz", it: "Modalità vocale", ja: "音声モード", zh: "语音模式", hi: "वॉइस मोड", ar: "وضع الصوت",
   },
   "agent.plus": {
     en: "Attach or connect", es: "Adjuntar o conectar", fr: "Joindre ou connecter", de: "Anhängen oder verbinden", pt: "Anexar ou ligar", it: "Allega o collega", ja: "添付・接続", zh: "附加或连接", hi: "जोड़ें या कनेक्ट करें", ar: "إرفاق أو ربط",
@@ -382,6 +418,27 @@ const CHROME: Table = {
     en: "Feed", es: "Muro", fr: "Fil", de: "Feed", pt: "Fluxo",
     it: "Flusso", ja: "フィード", zh: "动态", hi: "फ़ीड", ar: "التدفّق",
   },
+  "navgrp.community": {
+    en: "Community", es: "Comunidad", fr: "Communauté", de: "Community", pt: "Comunidade", it: "Comunità", ja: "コミュニティ", zh: "社区", hi: "समुदाय", ar: "مجتمع",
+  },
+  "navgrp.profile": {
+    en: "My Profile", es: "Mi perfil", fr: "Mon profil", de: "Mein Profil", pt: "O meu perfil", it: "Il mio profilo", ja: "マイプロフィール", zh: "我的档案", hi: "मेरी प्रोफ़ाइल", ar: "ملفي",
+  },
+  "navgrp.create": {
+    en: "Create", es: "Crear", fr: "Créer", de: "Erstellen", pt: "Criar", it: "Crea", ja: "作成", zh: "创建", hi: "बनाएँ", ar: "إنشاء",
+  },
+  "navgrp.business": {
+    en: "Business", es: "Negocio", fr: "Activité", de: "Geschäft", pt: "Negócio", it: "Attività", ja: "ビジネス", zh: "业务", hi: "व्यवसाय", ar: "الأعمال",
+  },
+  "navgrp.trust": {
+    en: "Trust & Safety", es: "Confianza y seguridad", fr: "Confiance et sécurité", de: "Vertrauen & Sicherheit", pt: "Confiança e segurança", it: "Fiducia e sicurezza", ja: "信頼と安全", zh: "信任与安全", hi: "विश्वास और सुरक्षा", ar: "الثقة والأمان",
+  },
+  "navgrp.system": {
+    en: "System", es: "Sistema", fr: "Système", de: "System", pt: "Sistema", it: "Sistema", ja: "システム", zh: "系统", hi: "सिस्टम", ar: "النظام",
+  },
+  "nav.menu": {
+    en: "Menu", es: "Menú", fr: "Menu", de: "Menü", pt: "Menu", it: "Menu", ja: "メニュー", zh: "菜单", hi: "मेनू", ar: "القائمة",
+  },
   "nav.home": {
     en: "Home", es: "Inicio", fr: "Accueil", de: "Start", pt: "Início",
     it: "Home", ja: "ホーム", zh: "主页", hi: "होम", ar: "الرئيسية",
@@ -408,9 +465,7 @@ const CHROME: Table = {
     it: "Stanze", ja: "ルーム", zh: "房间", hi: "कक्ष", ar: "الغرف",
   },
   "nav.solitude": {
-    en: "Your side", es: "Tu parte", fr: "Votre côté", de: "Deine Seite",
-    pt: "O teu lado", it: "Il tuo lato", ja: "あなたの側", zh: "你这一边",
-    hi: "आपका पक्ष", ar: "جانبك",
+    en: "My Attention", es: "Mi atención", fr: "Mon attention", de: "Meine Aufmerksamkeit", pt: "A minha atenção", it: "La mia attenzione", ja: "マイアテンション", zh: "我的注意力", hi: "मेरा ध्यान", ar: "انتباهي",
   },
   "nav.blend": {
     en: "Blend", es: "Fusionar", fr: "Fusionner", de: "Mischen",
@@ -444,9 +499,7 @@ const CHROME: Table = {
     ar: "خزنة الذكريات",
   },
   "nav.settings": {
-    en: "Control", es: "Control", fr: "Contrôle", de: "Steuerung",
-    pt: "Controle", it: "Controllo", ja: "コントロール", zh: "控制",
-    hi: "नियंत्रण", ar: "التحكم",
+    en: "Settings", es: "Ajustes", fr: "Réglages", de: "Einstellungen", pt: "Configurações", it: "Impostazioni", ja: "設定", zh: "设置", hi: "सेटिंग्स", ar: "الإعدادات",
   },
   // The four below were missing, and a missing key here does not fall back
   // to the English label sitting right next to it in NAV — `t()` returns the
@@ -550,9 +603,7 @@ const CHROME: Table = {
     hi: "ने आपको एक कमरे में बुलाया", ar: "دعاك إلى غرفة",
   },
   "nav.corner": {
-    en: "Your corner", es: "Tu rincón", fr: "Votre coin", de: "Deine Ecke",
-    pt: "O seu cantinho", it: "Il tuo angolo", ja: "あなたのコーナー", zh: "你的角落",
-    hi: "आपका कोना", ar: "ركنك",
+    en: "My Space", es: "Mi espacio", fr: "Mon espace", de: "Mein Bereich", pt: "O meu espaço", it: "Il mio spazio", ja: "マイスペース", zh: "我的空间", hi: "मेरा स्पेस", ar: "مساحتي",
   },
   "corner.title": {
     en: "Your corner", es: "Tu rincón", fr: "Votre coin", de: "Deine Ecke",
@@ -901,93 +952,46 @@ const CHROME: Table = {
     hi: "पहचान", ar: "الهوية",
   },
   "nav.presence": {
-    en: "Where it is seen", es: "Dónde se ve", fr: "Où on le voit",
-    de: "Wo es zu sehen ist", pt: "Onde aparece", it: "Dove si vede",
-    ja: "表示される場所", zh: "展示位置", hi: "कहाँ दिखता है",
-    ar: "أين يُعرض",
+    en: "Presence", es: "Presencia", fr: "Présence", de: "Präsenz", pt: "Presença", it: "Presenza", ja: "プレゼンス", zh: "展示位置", hi: "प्रेज़ेंस", ar: "الحضور",
   },
   "nav.live": {
-    en: "What is live", es: "Qué está activo", fr: "Ce qui est en direct",
-    de: "Was gerade läuft", pt: "O que está ativo", it: "Cosa è attivo",
-    ja: "起動中のもの", zh: "正在进行", hi: "क्या चालू है",
-    ar: "ما هو نشط",
+    en: "Live Now", es: "En vivo ahora", fr: "En direct", de: "Jetzt live", pt: "Em direto agora", it: "In diretta ora", ja: "ライブ中", zh: "正在直播", hi: "अभी लाइव", ar: "مباشر الآن",
   },
   "nav.contest": {
-    en: "Contest a profile", es: "Impugnar un perfil",
-    fr: "Contester un profil", de: "Profil anfechten",
-    pt: "Contestar um perfil", it: "Contestare un profilo",
-    ja: "プロフィールの異議", zh: "申诉档案", hi: "प्रोफ़ाइल पर आपत्ति",
-    ar: "الاعتراض على ملف",
+    en: "Disputes", es: "Disputas", fr: "Litiges", de: "Einsprüche", pt: "Disputas", it: "Contestazioni", ja: "異議申し立て", zh: "争议", hi: "विवाद", ar: "النزاعات",
   },
   "nav.guide": {
-    en: "Show me around", es: "Guíame", fr: "Faire le tour",
-    de: "Rundgang", pt: "Mostrar tudo", it: "Fammi da guida",
-    ja: "案内して", zh: "带我熟悉", hi: "मुझे दिखाएँ",
-    ar: "جولة تعريفية",
+    en: "Tour", es: "Recorrido", fr: "Visite guidée", de: "Rundgang", pt: "Visita guiada", it: "Tour", ja: "ツアー", zh: "导览", hi: "टूर", ar: "جولة",
   },
   "nav.workshop": {
-    en: "What it is made of", es: "De qué está hecho",
-    fr: "Ce qui le compose", de: "Woraus es besteht",
-    pt: "Do que é feito", it: "Di cosa è fatto",
-    ja: "何でできているか", zh: "由什么构成", hi: "किससे बना है",
-    ar: "مِمَّ يتكوّن",
+    en: "Profile Builder", es: "Constructor de perfil", fr: "Atelier du profil", de: "Profil-Werkstatt", pt: "Construtor de perfil", it: "Costruttore del profilo", ja: "プロフィールビルダー", zh: "档案构建器", hi: "प्रोफ़ाइल बिल्डर", ar: "منشئ الملف",
   },
   "nav.assist": {
-    en: "What it can do for you", es: "Qué puede hacer por ti",
-    fr: "Ce qu'il peut faire pour vous", de: "Was es für dich tun kann",
-    pt: "O que pode fazer por si", it: "Cosa può fare per te",
-    ja: "できること", zh: "它能为你做什么", hi: "यह आपके लिए क्या कर सकता है",
-    ar: "ما يمكنه فعله لك",
+    en: "Tasks", es: "Tareas", fr: "Tâches", de: "Aufgaben", pt: "Tarefas", it: "Attività", ja: "タスク", zh: "任务", hi: "कार्य", ar: "المهام",
   },
   "nav.referrals": {
-    en: "Somebody qualified", es: "Alguien cualificado",
-    fr: "Quelqu'un de qualifié", de: "Jemand mit Qualifikation",
-    pt: "Alguém qualificado", it: "Qualcuno di qualificato",
-    ja: "専門家へ", zh: "转给专业人士", hi: "योग्य व्यक्ति",
-    ar: "شخص مؤهل",
+    en: "Referrals", es: "Derivaciones", fr: "Orientations", de: "Überweisungen", pt: "Encaminhamentos", it: "Segnalazioni", ja: "紹介", zh: "转介", hi: "रेफ़रल", ar: "الإحالات",
   },
   "nav.lobby": {
-    en: "In the game", es: "En la partida", fr: "Dans la partie",
-    de: "Im Spiel", pt: "Na partida", it: "In partita",
-    ja: "ゲーム中", zh: "对局中", hi: "खेल में", ar: "في اللعبة",
+    en: "Gaming", es: "Juegos", fr: "Jeux", de: "Gaming", pt: "Jogos", it: "Gaming", ja: "ゲーム", zh: "游戏", hi: "गेमिंग", ar: "الألعاب",
   },
   "nav.audience": {
-    en: "Who follows", es: "Quién sigue", fr: "Qui suit",
-    de: "Wer folgt", pt: "Quem segue", it: "Chi segue",
-    ja: "フォロワー", zh: "谁在关注", hi: "कौन फ़ॉलो करता है",
-    ar: "من يتابع",
+    en: "Audience", es: "Audiencia", fr: "Audience", de: "Publikum", pt: "Audiência", it: "Pubblico", ja: "オーディエンス", zh: "受众", hi: "ऑडियंस", ar: "الجمهور",
   },
   "nav.beacons": {
-    en: "Connections to the world", es: "Conexiones con el mundo",
-    fr: "Connexions au monde", de: "Verbindungen zur Welt",
-    pt: "Ligações com o mundo", it: "Connessioni con il mondo",
-    ja: "世界とのつながり", zh: "与世界的连接",
-    hi: "दुनिया से जुड़ाव", ar: "روابط مع العالم",
+    en: "Beacons", es: "Balizas", fr: "Balises", de: "Beacons", pt: "Balizas", it: "Beacon", ja: "ビーコン", zh: "信标", hi: "बीकन", ar: "المنارات",
   },
   "nav.reaching": {
-    en: "Reaching out", es: "Contactar", fr: "Prendre contact",
-    de: "Sich melden", pt: "Entrar em contacto", it: "Farsi vivo",
-    ja: "こちらから連絡", zh: "主动联系", hi: "पहल करना",
-    ar: "المبادرة بالتواصل",
+    en: "Outreach", es: "Contacto", fr: "Prise de contact", de: "Ansprache", pt: "Contacto", it: "Contatto", ja: "アウトリーチ", zh: "主动联络", hi: "आउटरीच", ar: "التواصل",
   },
   "nav.leaving": {
-    en: "What leaves", es: "Qué sale", fr: "Ce qui sort",
-    de: "Was hinausgeht", pt: "O que sai", it: "Cosa esce",
-    ja: "外へ出るもの", zh: "哪些内容外流", hi: "क्या बाहर जाता है",
-    ar: "ما الذي يخرج",
+    en: "Exports & Licensing", es: "Exportaciones y licencias", fr: "Exports et licences", de: "Exporte & Lizenzen", pt: "Exportações e licenças", it: "Esportazioni e licenze", ja: "エクスポートとライセンス", zh: "导出与许可", hi: "निर्यात और लाइसेंस", ar: "التصدير والترخيص",
   },
   "nav.selling": {
-    en: "What you are owed", es: "Lo que se te debe",
-    fr: "Ce qui vous est dû", de: "Was Ihnen zusteht",
-    pt: "O que lhe é devido", it: "Quanto ti spetta",
-    ja: "受け取るべきもの", zh: "该付给你的",
-    hi: "जो आपको मिलना है", ar: "ما هو مستحق لك",
+    en: "Earnings", es: "Ingresos", fr: "Revenus", de: "Einnahmen", pt: "Rendimentos", it: "Guadagni", ja: "収益", zh: "收益", hi: "कमाई", ar: "الأرباح",
   },
   "nav.inside": {
-    en: "Inside a room", es: "Dentro de una sala", fr: "Dans un salon",
-    de: "Im Raum", pt: "Dentro de uma sala", it: "Dentro una stanza",
-    ja: "ルームの中", zh: "在房间里", hi: "कमरे के भीतर",
-    ar: "داخل الغرفة",
+    en: "Room", es: "Sala", fr: "Salle", de: "Raum", pt: "Sala", it: "Stanza", ja: "ルーム", zh: "房间", hi: "रूम", ar: "الغرفة",
   },
   "nav.signing": {
     en: "Signing", es: "Firma", fr: "Signature",
@@ -996,39 +1000,22 @@ const CHROME: Table = {
     ar: "التوقيع",
   },
   "nav.allowed": {
-    en: "What it may do", es: "Lo que puede hacer", fr: "Ce qu'il peut faire",
-    de: "Was er darf", pt: "O que pode fazer", it: "Cosa può fare",
-    ja: "できること", zh: "可以做什么", hi: "क्या कर सकता है",
-    ar: "ما يمكنه فعله",
+    en: "Permissions", es: "Permisos", fr: "Autorisations", de: "Berechtigungen", pt: "Permissões", it: "Permessi", ja: "権限", zh: "权限", hi: "अनुमतियाँ", ar: "الأذونات",
   },
   "nav.visiting": {
-    en: "Visiting", es: "De visita", fr: "En visite",
-    de: "Zu Besuch", pt: "Em visita", it: "In visita",
-    ja: "訪ねる", zh: "上门", hi: "मिलने जाना",
-    ar: "زيارة",
+    en: "Visits", es: "Visitas", fr: "Visites", de: "Besuche", pt: "Visitas", it: "Visite", ja: "訪問", zh: "访问", hi: "विज़िट", ar: "الزيارات",
   },
   "nav.stranger": {
-    en: "Strangers", es: "Desconocidos", fr: "Inconnus",
-    de: "Fremde", pt: "Desconhecidos", it: "Sconosciuti",
-    ja: "見知らぬ人", zh: "陌生人", hi: "अजनबी",
-    ar: "الغرباء",
+    en: "Guest Access", es: "Acceso de invitados", fr: "Accès invité", de: "Gastzugang", pt: "Acesso de convidado", it: "Accesso ospite", ja: "ゲストアクセス", zh: "访客访问", hi: "अतिथि पहुँच", ar: "دخول الضيوف",
   },
   "nav.themark": {
-    en: "The mark", es: "La marca", fr: "La marque",
-    de: "Die Kennzeichnung", pt: "A marca", it: "Il marchio",
-    ja: "表示マーク", zh: "标识", hi: "चिह्न",
-    ar: "العلامة",
+    en: "Watermark", es: "Marca de agua", fr: "Filigrane", de: "Wasserzeichen", pt: "Marca de água", it: "Filigrana", ja: "透かし", zh: "水印", hi: "वॉटरमार्क", ar: "العلامة المائية",
   },
   "nav.inwords": {
-    en: "In its words", es: "En sus palabras", fr: "Dans ses mots",
-    de: "In seinen Worten", pt: "Nas suas palavras",
-    it: "Con parole sue", ja: "その言葉で", zh: "用它的话",
-    hi: "अपने शब्दों में", ar: "بكلماته",
+    en: "Language & Name", es: "Idioma y nombre", fr: "Langue et nom", de: "Sprache & Name", pt: "Idioma e nome", it: "Lingua e nome", ja: "言語と名前", zh: "语言与名称", hi: "भाषा और नाम", ar: "اللغة والاسم",
   },
   "nav.remainder": {
-    en: "Miscellaneous", es: "Misceláneo", fr: "Divers",
-    de: "Verschiedenes", pt: "Diversos", it: "Varie",
-    ja: "その他いろいろ", zh: "杂项", hi: "विविध", ar: "متفرقات",
+    en: "More Tools", es: "Más herramientas", fr: "Autres outils", de: "Weitere Werkzeuge", pt: "Mais ferramentas", it: "Altri strumenti", ja: "その他のツール", zh: "更多工具", hi: "और उपकरण", ar: "أدوات أخرى",
   },
   // The storefront. `nav.plugins` has to read the same as NAV's own label,
   // which the nav guard checks — the tab is named once.
@@ -1112,11 +1099,7 @@ const CHROME: Table = {
     en: "Sign in with a profile of your own — plug-ins connect to it, so it needs to know whose.", es: "Entra con un perfil tuyo: los complementos se conectan a él, así que necesita saber de quién es.", fr: "Connectez-vous avec un profil à vous — les modules s'y rattachent, il faut savoir lequel.", de: "Melde dich mit einem eigenen Profil an — Plug-ins hängen daran und müssen wissen, an welchem.", pt: "Entre com um perfil seu — as extensões ligam-se a ele, por isso precisa de saber de quem é.", it: "Accedi con un profilo tuo: i plug-in si collegano a quello, quindi deve sapere quale.", ja: "ご自身のプロフィールでサインインしてください。プラグインはそこにつながるので、誰のものかを知る必要があります。", zh: "用你自己的档案登录——插件连的是它，所以得知道是谁的。", hi: "अपनी प्रोफ़ाइल से साइन इन करें — प्लग-इन उसी से जुड़ते हैं, तो जानना ज़रूरी है कि किसकी।", ar: "سجّل الدخول بملف يخصّك — فالإضافات ترتبط به ويجب أن يعرف لمن.",
   },
   "nav.named": {
-    en: "Look one thing up", es: "Consulta una cosa",
-    fr: "Consulter une chose", de: "Eine Sache nachschlagen",
-    pt: "Consultar uma coisa", it: "Cerca una cosa",
-    ja: "ひとつ調べる", zh: "查一件事", hi: "एक चीज़ देखें",
-    ar: "ابحث عن شيء واحد",
+    en: "Lookup", es: "Consulta", fr: "Recherche", de: "Nachschlagen", pt: "Consulta", it: "Ricerca", ja: "ルックアップ", zh: "查询", hi: "लुकअप", ar: "استعلام",
   },
   "idn.passing": {
     en: "Beginning and passing on", es: "Comienzo y sucesión",
@@ -1126,21 +1109,13 @@ const CHROME: Table = {
     hi: "आरंभ और उत्तराधिकार", ar: "البداية والانتقال",
   },
   "nav.robots": {
-    en: "Bodies", es: "Cuerpos", fr: "Corps", de: "Körper",
-    pt: "Corpos", it: "Corpi", ja: "ボディ", zh: "机体",
-    hi: "देह", ar: "الأجساد",
+    en: "Robots & Devices", es: "Robots y dispositivos", fr: "Robots et appareils", de: "Roboter & Geräte", pt: "Robôs e dispositivos", it: "Robot e dispositivi", ja: "ロボットとデバイス", zh: "机器人与设备", hi: "रोबोट और डिवाइस", ar: "الروبوتات والأجهزة",
   },
   "nav.placements": {
-    en: "Where it is marketed", es: "Dónde se anuncia",
-    fr: "Où c'est diffusé", de: "Wo es beworben wird",
-    pt: "Onde é divulgado", it: "Dove è promosso",
-    ja: "掲載先", zh: "投放位置", hi: "कहाँ प्रचारित",
-    ar: "أين يُعرض",
+    en: "Ad Placements", es: "Emplazamientos publicitarios", fr: "Emplacements publicitaires", de: "Werbeplatzierungen", pt: "Espaços publicitários", it: "Spazi pubblicitari", ja: "広告掲載", zh: "广告投放", hi: "विज्ञापन स्थान", ar: "مواضع الإعلانات",
   },
   "nav.plans": {
-    en: "Plans", es: "Planes", fr: "Formules", de: "Tarife",
-    pt: "Planos", it: "Piani", ja: "プラン", zh: "方案",
-    hi: "योजनाएँ", ar: "الخطط",
+    en: "Plans & Billing", es: "Planes y facturación", fr: "Forfaits et facturation", de: "Tarife & Abrechnung", pt: "Planos e faturação", it: "Piani e fatturazione", ja: "プランと請求", zh: "套餐与账单", hi: "प्लान और बिलिंग", ar: "الخطط والفوترة",
   },
   "nav.exchanges": {
     en: "Exchanges", es: "Intercambios", fr: "Échanges", de: "Austausch",
@@ -1148,15 +1123,10 @@ const CHROME: Table = {
     ar: "التبادلات",
   },
   "nav.grants": {
-    en: "Lent skills", es: "Aptitudes prestadas", fr: "Compétences prêtées",
-    de: "Geliehene Fähigkeiten", pt: "Aptidões emprestadas",
-    it: "Abilità prestate", ja: "貸した技能", zh: "借出的技能",
-    hi: "उधार दिए कौशल", ar: "المهارات المُعارة",
+    en: "Skill Lending", es: "Préstamo de habilidades", fr: "Prêt de compétences", de: "Fähigkeiten-Verleih", pt: "Empréstimo de competências", it: "Prestito di competenze", ja: "スキル貸与", zh: "技能出借", hi: "कौशल उधार", ar: "إعارة المهارات",
   },
   "nav.party": {
-    en: "Watch together", es: "Ver juntos", fr: "Regarder ensemble",
-    de: "Zusammen ansehen", pt: "Assistir juntos", it: "Guardare insieme",
-    ja: "一緒に見る", zh: "一起观看", hi: "साथ देखें", ar: "المشاهدة معًا",
+    en: "Watch Party", es: "Fiesta de visionado", fr: "Séance partagée", de: "Watch Party", pt: "Sessão partilhada", it: "Watch party", ja: "ウォッチパーティー", zh: "一起看", hi: "वॉच पार्टी", ar: "مشاهدة جماعية",
   },
   "signout": {
     en: "Sign out", es: "Cerrar sesión", fr: "Se déconnecter", de: "Abmelden",
@@ -8146,6 +8116,81 @@ const CHROME: Table = {
   "ins.face.cameraon": {
     en: "Camera on", es: "Cámara encendida", fr: "Caméra activée", de: "Kamera an", pt: "Câmara ligada", it: "Fotocamera accesa", ja: "カメラをオン", zh: "开启摄像头", hi: "कैमरा चालू", ar: "تشغيل الكاميرا",
   },
+  "ins.hear": {
+    en: "Hear it in their voice", es: "Óyelo con su voz", fr: "L'entendre avec sa voix", de: "In ihrer Stimme hören", pt: "Ouvir na voz deles", it: "Ascolta con la sua voce", ja: "その声で聞く", zh: "用它的声音听", hi: "उसकी आवाज़ में सुनें", ar: "اسمعها بصوته",
+  },
+  "voice.spoken.title": {
+    en: "Spoken voice", es: "Voz hablada", fr: "Voix parlée", de: "Sprechstimme", pt: "Voz falada", it: "Voce parlata", ja: "話す声", zh: "语音音色", hi: "बोलने की आवाज़", ar: "الصوت المنطوق",
+  },
+  "voice.spoken.lead": {
+    en: "Point this profile at a voice you made on the engine's own surface. QRME keeps the reference; the engine keeps the voice.", es: "Apunta este perfil a una voz que creaste en la superficie del motor. QRME guarda la referencia; el motor guarda la voz.", fr: "Reliez ce profil à une voix créée sur la surface du moteur. QRME garde la référence ; le moteur garde la voix.", de: "Verbinde dieses Profil mit einer Stimme, die du auf der Oberfläche der Engine erstellt hast. QRME hält die Referenz; die Engine hält die Stimme.", pt: "Aponte este perfil para uma voz criada na superfície do motor. O QRME guarda a referência; o motor guarda a voz.", it: "Collega questo profilo a una voce creata sulla superficie del motore. QRME tiene il riferimento; il motore tiene la voce.", ja: "エンジン側で作った声にこのプロフィールを結び付けます。QRMEは参照だけを持ち、声はエンジンにあります。", zh: "把这个形象指向你在引擎端创建的声音。QRME 保存引用；声音留在引擎。", hi: "इस प्रोफ़ाइल को उस आवाज़ से जोड़ें जो आपने इंजन पर बनाई। QRME संदर्भ रखता है; आवाज़ इंजन के पास रहती है।", ar: "اربط هذا الملف بصوت أنشأته على منصّة المحرّك. يحتفظ QRME بالمرجع؛ ويبقى الصوت لدى المحرّك.",
+  },
+  "voice.spoken.id.ph": {
+    en: "Voice ID from the engine", es: "ID de voz del motor", fr: "ID de voix du moteur", de: "Stimm-ID der Engine", pt: "ID de voz do motor", it: "ID voce del motore", ja: "エンジンのボイスID", zh: "引擎的声音 ID", hi: "इंजन की वॉइस ID", ar: "معرّف الصوت من المحرّك",
+  },
+  "voice.spoken.label.ph": {
+    en: "What you call this voice", es: "Cómo llamas a esta voz", fr: "Comment vous appelez cette voix", de: "Wie du diese Stimme nennst", pt: "Como chamas esta voz", it: "Come chiami questa voce", ja: "この声の呼び名", zh: "你怎么称呼这个声音", hi: "आप इस आवाज़ को क्या कहते हैं", ar: "ماذا تسمّي هذا الصوت",
+  },
+  "voice.spoken.save": {
+    en: "Bind it", es: "Vincularla", fr: "La lier", de: "Binden", pt: "Vincular", it: "Collegala", ja: "結び付ける", zh: "绑定", hi: "जोड़ें", ar: "اربطه",
+  },
+  "voice.spoken.unbind": {
+    en: "Unbind", es: "Desvincular", fr: "Délier", de: "Lösen", pt: "Desvincular", it: "Scollega", ja: "解除する", zh: "解绑", hi: "हटाएँ", ar: "افصل",
+  },
+  "voice.spoken.test": {
+    en: "Say a line", es: "Di una frase", fr: "Dire une phrase", de: "Einen Satz sagen", pt: "Dizer uma frase", it: "Di' una frase", ja: "一言話す", zh: "说一句", hi: "एक पंक्ति बोलो", ar: "قل جملة",
+  },
+  "voice.spoken.bound": {
+    en: "This profile speaks with:", es: "Este perfil habla con:", fr: "Ce profil parle avec :", de: "Dieses Profil spricht mit:", pt: "Este perfil fala com:", it: "Questo profilo parla con:", ja: "このプロフィールの声：", zh: "这个形象的声音：", hi: "यह प्रोफ़ाइल इस आवाज़ से बोलता है:", ar: "يتحدّث هذا الملف بـ:",
+  },
+  "agent.orb.listening": {
+    en: "Listening — say it", es: "Escuchando: dilo", fr: "J'écoute — dites-le", de: "Ich höre — sag es", pt: "A ouvir — diga", it: "In ascolto — dillo", ja: "聞いています — どうぞ", zh: "正在听——请说", hi: "सुन रहा हूँ — बोलिए", ar: "أستمع — قلها",
+  },
+  "agent.orb.thinking": {
+    en: "Thinking…", es: "Pensando…", fr: "Je réfléchis…", de: "Denke nach…", pt: "A pensar…", it: "Sto pensando…", ja: "考え中…", zh: "思考中…", hi: "सोच रहा हूँ…", ar: "أفكّر…",
+  },
+  "agent.orb.stop": {
+    en: "Stop voice mode", es: "Detener el modo voz", fr: "Arrêter le mode voix", de: "Sprachmodus beenden", pt: "Parar o modo de voz", it: "Ferma la modalità voce", ja: "音声モードを止める", zh: "停止语音模式", hi: "वॉइस मोड बंद करें", ar: "أوقف وضع الصوت",
+  },
+  "agent.act.video": {
+    en: "Create videos", es: "Crear vídeos", fr: "Créer des vidéos", de: "Videos erstellen", pt: "Criar vídeos", it: "Crea video", ja: "動画を作る", zh: "创建视频", hi: "वीडियो बनाएँ", ar: "أنشئ فيديوهات",
+  },
+  "agent.act.video.ask": {
+    en: "Create a video for my wall about ", es: "Crea un vídeo para mi muro sobre ", fr: "Crée une vidéo pour mon mur sur ", de: "Erstelle ein Video für meine Wand über ", pt: "Cria um vídeo para o meu mural sobre ", it: "Crea un video per la mia bacheca su ", ja: "ウォール用の動画を作って。テーマは ", zh: "为我的墙创建一个视频，主题是 ", hi: "मेरी वॉल के लिए एक वीडियो बनाओ, विषय ", ar: "أنشئ فيديو لجداري عن ",
+  },
+  "agent.act.image": {
+    en: "Edit image", es: "Editar imagen", fr: "Modifier l'image", de: "Bild bearbeiten", pt: "Editar imagem", it: "Modifica immagine", ja: "画像を編集", zh: "编辑图片", hi: "छवि संपादित करें", ar: "حرّر الصورة",
+  },
+  "agent.act.image.ask": {
+    en: "Edit this image:", es: "Edita esta imagen:", fr: "Modifie cette image :", de: "Bearbeite dieses Bild:", pt: "Edita esta imagem:", it: "Modifica questa immagine:", ja: "この画像を編集して：", zh: "编辑这张图片：", hi: "इस छवि को संपादित करो:", ar: "حرّر هذه الصورة:",
+  },
+  "agent.act.voicemode": {
+    en: "Voice mode", es: "Modo voz", fr: "Mode voix", de: "Sprachmodus", pt: "Modo de voz", it: "Modalità voce", ja: "音声モード", zh: "语音模式", hi: "वॉइस मोड", ar: "وضع الصوت",
+  },
+  "agent.act.docs": {
+    en: "Analyze docs", es: "Analizar documentos", fr: "Analyser des documents", de: "Dokumente analysieren", pt: "Analisar documentos", it: "Analizza documenti", ja: "文書を分析", zh: "分析文档", hi: "दस्तावेज़ विश्लेषण", ar: "حلّل المستندات",
+  },
+  "agent.act.docs.ask": {
+    en: "Read this and tell me what matters:", es: "Lee esto y dime qué importa:", fr: "Lis ceci et dis-moi ce qui compte :", de: "Lies das und sag mir, was wichtig ist:", pt: "Lê isto e diz-me o que importa:", it: "Leggi questo e dimmi che cosa conta:", ja: "これを読んで大事な点を教えて：", zh: "读一读这个，告诉我重点：", hi: "इसे पढ़ो और बताओ क्या मायने रखता है:", ar: "اقرأ هذا وأخبرني بما يهم:",
+  },
+  "agent.act.customize": {
+    en: "Customize", es: "Personalizar", fr: "Personnaliser", de: "Anpassen", pt: "Personalizar", it: "Personalizza", ja: "カスタマイズ", zh: "自定义", hi: "अनुकूलित करें", ar: "خصّص",
+  },
+  "agent.act.customize.ask": {
+    en: "Change my page: theme, colour, tagline — ", es: "Cambia mi página: tema, color, lema — ", fr: "Change ma page : thème, couleur, slogan — ", de: "Ändere meine Seite: Thema, Farbe, Motto — ", pt: "Muda a minha página: tema, cor, lema — ", it: "Cambia la mia pagina: tema, colore, motto — ", ja: "ページを変えて。テーマ・色・キャッチコピー — ", zh: "改我的页面：主题、颜色、标语 — ", hi: "मेरा पेज बदलो: थीम, रंग, टैगलाइन — ", ar: "غيّر صفحتي: السمة واللون والشعار — ",
+  },
+  "agent.act.widget": {
+    en: "Create widget", es: "Crear widget", fr: "Créer un widget", de: "Widget erstellen", pt: "Criar widget", it: "Crea widget", ja: "ウィジェット作成", zh: "创建小组件", hi: "विजेट बनाएँ", ar: "أنشئ ودجة",
+  },
+  "agent.act.widget.ask": {
+    en: "Write me a small tool that ", es: "Escríbeme una pequeña herramienta que ", fr: "Écris-moi un petit outil qui ", de: "Schreib mir ein kleines Werkzeug, das ", pt: "Escreve-me uma pequena ferramenta que ", it: "Scrivimi un piccolo strumento che ", ja: "小さなツールを書いて。機能は ", zh: "给我写一个小工具，它要 ", hi: "मेरे लिए एक छोटा टूल लिखो जो ", ar: "اكتب لي أداة صغيرة تقوم بـ ",
+  },
+  "ins.face.flip": {
+    en: "Flip camera", es: "Girar la cámara", fr: "Changer de caméra", de: "Kamera wechseln", pt: "Virar a câmara", it: "Cambia fotocamera", ja: "カメラを切り替える", zh: "翻转摄像头", hi: "कैमरा पलटें", ar: "اقلب الكاميرا",
+  },
+  "ins.face.hint": {
+    en: "Double-tap or hold for controls", es: "Toca dos veces o mantén pulsado para los controles", fr: "Touchez deux fois ou maintenez pour les commandes", de: "Doppeltippen oder halten für die Bedienelemente", pt: "Toque duas vezes ou segure para os controlos", it: "Tocca due volte o tieni premuto per i comandi", ja: "ダブルタップまたは長押しで操作を表示", zh: "双击或长按显示控制项", hi: "नियंत्रण के लिए दो बार टैप करें या दबाए रखें", ar: "انقر مرّتين أو اضغط مطوّلًا لإظهار الأزرار",
+  },
   "ins.face.cameraoff": {
     en: "Camera off", es: "Apagar cámara", fr: "Couper la caméra", de: "Kamera aus", pt: "Desligar câmara", it: "Spegni fotocamera", ja: "カメラを切る", zh: "关闭摄像头", hi: "कैमरा बंद", ar: "أوقف الكاميرا",
   },
@@ -8836,6 +8881,18 @@ const CHROME: Table = {
   },
   "frn.founder": {
     en: "founder", es: "fundador", fr: "fondateur", de: "Gründer", pt: "fundador", it: "fondatore", ja: "創設者", zh: "创始人", hi: "संस्थापक", ar: "المؤسس",
+  },
+  "frn.find": {
+    en: "Find people", es: "Encontrar personas", fr: "Trouver des personnes", de: "Leute finden", pt: "Encontrar pessoas", it: "Trova persone", ja: "人を探す", zh: "查找用户", hi: "लोग खोजें", ar: "ابحث عن أشخاص",
+  },
+  "frn.find.ph": {
+    en: "Search by name or @handle", es: "Busca por nombre o @usuario", fr: "Cherchez par nom ou @pseudo", de: "Nach Name oder @Handle suchen", pt: "Procura por nome ou @utilizador", it: "Cerca per nome o @handle", ja: "名前か@ハンドルで検索", zh: "按名字或@用户名搜索", hi: "नाम या @हैंडल से खोजें", ar: "ابحث بالاسم أو @المعرّف",
+  },
+  "frn.found.none": {
+    en: "Nobody found by that name — ask them for their @handle", es: "No se encontró a nadie con ese nombre — pídeles su @usuario", fr: "Personne trouvée à ce nom — demandez-leur leur @pseudo", de: "Niemanden mit diesem Namen gefunden — frag nach dem @Handle", pt: "Ninguém encontrado com esse nome — pede-lhes o @utilizador", it: "Nessuno trovato con quel nome — chiedi il loro @handle", ja: "その名前では見つかりませんでした — 相手に@ハンドルを聞いてください", zh: "没找到这个名字——问问对方的@用户名", hi: "उस नाम से कोई नहीं मिला — उनसे उनका @हैंडल पूछें", ar: "لم يُعثر على أحد بهذا الاسم — اطلب منهم @المعرّف",
+  },
+  "frn.already": {
+    en: "Already friends", es: "Ya son amigos", fr: "Déjà amis", de: "Schon befreundet", pt: "Já são amigos", it: "Già amici", ja: "すでに友だち", zh: "已是好友", hi: "पहले से मित्र", ar: "أصدقاء بالفعل",
   },
   "frn.remove": {
     en: "remove", es: "quitar", fr: "retirer", de: "entfernen", pt: "remover", it: "rimuovi", ja: "外す", zh: "移除", hi: "हटाएँ", ar: "أزِل",

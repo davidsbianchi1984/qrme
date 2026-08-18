@@ -1970,6 +1970,100 @@ object ApiClient {
         return VoiceSpoken(o.optString("basis", ""), o.optString("disclosure", ""))
     }
 
+    // ---- The spoken voice: a reference to a voice made on the engine's own
+    // surface, and one utterance of audio back (qrme/spoken.py) ----
+
+    data class SpokenBinding(val provider: String, val voiceId: String,
+                             val label: String, val speaks: Boolean)
+
+    private fun spokenBindingOf(o: JSONObject) = SpokenBinding(
+        o.optString("provider", ""), o.optString("voice_id", ""),
+        o.optString("label", ""), o.optBoolean("speaks", false))
+
+    /** Which voice this profile speaks with, or the empty binding — one
+     *  shape either way, so the screen never special-cases the common case. */
+    suspend fun spokenVoice(id: String): SpokenBinding =
+        spokenBindingOf(JSONObject(request("/profiles/$id/voice")))
+
+    /** The owner points the profile at a voice made on the engine's own
+     *  surface. An empty voiceId unbinds. QRME keeps the reference; the
+     *  engine keeps the voice — and its key, which never touches this app. */
+    suspend fun bindSpokenVoice(id: String, token: String, voiceId: String,
+                                label: String): SpokenBinding =
+        spokenBindingOf(JSONObject(request("/profiles/$id/voice", "PUT",
+            JSONObject().put("voice_id", voiceId).put("label", label), token)))
+
+    /** One utterance, synthesized server-side and watermarked there. Raw
+     *  bytes rather than the shared helper, because this answer is sound. */
+    suspend fun saySpoken(id: String, token: String, text: String): ByteArray =
+        withContext(Dispatchers.IO) {
+            val conn = (URL("$base/profiles/$id/voice/say")
+                .openConnection() as HttpURLConnection).apply {
+                requestMethod = "POST"
+                setRequestProperty("content-type", "application/json")
+                setRequestProperty("accept-language", L10n.deviceLanguage())
+                setRequestProperty("authorization", "Bearer $token")
+                doOutput = true
+                outputStream.use {
+                    it.write(JSONObject().put("text", text)
+                        .toString().toByteArray()) }
+            }
+            val code = conn.responseCode
+            if (code !in 200..299) {
+                val text2 = conn.errorStream?.bufferedReader()
+                    ?.use { it.readText() } ?: ""
+                Problems.record("POST", "/profiles/{id}/voice/say", code)
+                val said = runCatching {
+                    val body = JSONObject(text2)
+                    body.optString("message").ifBlank {
+                        if (body.opt("detail") is String)
+                            body.optString("detail") else ""
+                    }
+                }.getOrNull()
+                throw ApiException(
+                    if (said.isNullOrBlank()) "HTTP $code" else said)
+            }
+            conn.inputStream.use { it.readBytes() }
+        }
+
+    // ---- The open web, and the people here (qrme/websearch.py, /people) ----
+
+    data class WebSearchRow(val title: String, val url: String, val note: String)
+    data class WebSearchAnswer(val pages: List<WebSearchRow>, val moreUrl: String)
+
+    /** A real search, keyless: the query goes out and nothing else — see the
+     *  door's own docstring for why it works with no model configured. */
+    suspend fun webSearch(id: String, token: String, q: String): WebSearchAnswer {
+        val enc = java.net.URLEncoder.encode(q, "UTF-8")
+        val o = JSONObject(request("/profiles/$id/search?q=$enc", token = token))
+        val rows = mutableListOf<WebSearchRow>()
+        val arr = o.optJSONArray("pages")
+        if (arr != null) for (i in 0 until arr.length()) {
+            val r = arr.getJSONObject(i)
+            rows.add(WebSearchRow(r.optString("title", ""),
+                r.optString("url", ""), r.optString("note", "")))
+        }
+        return WebSearchAnswer(rows, o.optString("more_url", ""))
+    }
+
+    data class FoundPerson(val profileId: String, val displayName: String,
+                           val handle: String)
+
+    /** Publicly listed profiles by name or handle — the door two beta
+     *  testers needed to become friends. Anonymous profiles never match. */
+    suspend fun findPeople(q: String): List<FoundPerson> {
+        val enc = java.net.URLEncoder.encode(q, "UTF-8")
+        val o = JSONObject(request("/people?q=$enc"))
+        val out = mutableListOf<FoundPerson>()
+        val arr = o.optJSONArray("found")
+        if (arr != null) for (i in 0 until arr.length()) {
+            val r = arr.getJSONObject(i)
+            out.add(FoundPerson(r.optString("profile_id", ""),
+                r.optString("display_name", ""), r.optString("handle", "")))
+        }
+        return out
+    }
+
     /** Withdrawal: the samples go, the print retires, the withdrawal stays. */
     suspend fun revokeVoiceprint(id: String, token: String): VoiceRevocation {
         val o = JSONObject(request("/profiles/$id/voiceprint", "DELETE", null, token))

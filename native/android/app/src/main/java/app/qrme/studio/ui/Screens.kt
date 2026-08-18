@@ -1858,6 +1858,11 @@ fun StudyScreen(vm: StudioViewModel) {
     var topic by remember { mutableStateOf("") }
     var question by remember { mutableStateOf("") }
     var excursions by remember { mutableStateOf<List<Excursion>>(emptyList()) }
+    // Search the Internet: a real search through the keyless door, working
+    // on a deployment with no model configured — which an excursion is not.
+    var webQ by remember { mutableStateOf("") }
+    var webFound by remember {
+        mutableStateOf<ApiClient.WebSearchAnswer?>(null) }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
 
@@ -1903,6 +1908,46 @@ fun StudyScreen(vm: StudioViewModel) {
                     r.onSuccess { topic = ""; question = "" }
                      .onFailure { error = it.message }
                     reload()
+                }
+            }
+        }
+
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(L10n.t("nws.title", vm.language), color = Qrme.Txt,
+                fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            labeledField(L10n.t("nws.title", vm.language), webQ,
+                L10n.t("nws.ph", vm.language)) { webQ = it }
+            BrandButton(L10n.t("nws.title", vm.language),
+                enabled = webQ.isNotBlank(), busy = busy) {
+                busy = true; error = null
+                vm.call({ ApiClient.webSearch(vm.pid!!, vm.token!!,
+                    webQ.trim()) }) { r ->
+                    busy = false
+                    r.fold({ webFound = it }, { error = it.message })
+                }
+            }
+            webFound?.let { found ->
+                if (found.pages.isEmpty()) {
+                    Text(L10n.t("nws.none", vm.language),
+                        color = Qrme.T2, fontSize = 11.sp)
+                }
+                val opener = androidx.compose.ui.platform.LocalUriHandler.current
+                found.pages.forEach { row ->
+                    Column {
+                        TextButton(onClick = { opener.openUri(row.url) }) {
+                            Text(row.title.ifBlank { row.url },
+                                color = Qrme.BrandA, fontSize = 12.sp)
+                        }
+                        if (row.note.isNotBlank()) {
+                            Text(row.note, color = Qrme.T2, fontSize = 11.sp)
+                        }
+                    }
+                }
+                if (found.moreUrl.isNotBlank()) {
+                    TextButton(onClick = { opener.openUri(found.moreUrl) }) {
+                        Text(L10n.t("nws.more", vm.language),
+                            color = Qrme.T3, fontSize = 11.sp)
+                    }
                 }
             }
         }
@@ -3573,6 +3618,11 @@ private fun PeoplePanel(vm: StudioViewModel) {
     var posts by remember { mutableStateOf<List<WallPost>>(emptyList()) }
     var comments by remember { mutableStateOf<List<CommentRow>>(emptyList()) }
     var addId by remember { mutableStateOf("") }
+    // The finder: beta testers looking for each other by the name they know.
+    var findQ by remember { mutableStateOf("") }
+    var foundPeople by remember {
+        mutableStateOf<List<ApiClient.FoundPerson>>(emptyList()) }
+    var searched by remember { mutableStateOf(false) }
     var draft by remember { mutableStateOf("") }
     var openPost by remember { mutableStateOf<String?>(null) }
     var commentDraft by remember { mutableStateOf("") }
@@ -3642,6 +3692,47 @@ private fun PeoplePanel(vm: StudioViewModel) {
                 }
             }
         }
+        // Find people: publicly listed profiles by name or handle — the
+        // door two beta testers needed to become friends.
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(L10n.t("nfp.title", lang), color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+            labeledField(L10n.t("nfp.title", lang), findQ,
+                L10n.t("nfp.ph", lang)) { findQ = it }
+            BrandButton(L10n.t("nfp.title", lang), enabled = findQ.isNotBlank()) {
+                vm.call({ ApiClient.findPeople(findQ.trim()) }) { r ->
+                    r.fold({ foundPeople = it; searched = true },
+                           { note = it.message })
+                }
+            }
+            if (searched && foundPeople.isEmpty()) {
+                Text(L10n.t("nfp.none", lang), color = Qrme.T2, fontSize = 11.sp)
+            }
+            foundPeople.forEach { p ->
+                Row(Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    TextButton(onClick = { visiting = p.profileId }) {
+                        Text(p.displayName +
+                                if (p.handle.isNotBlank()) " @" + p.handle else "",
+                            color = Qrme.Txt, fontSize = 12.sp)
+                    }
+                    if (friends.any { it.profileId == p.profileId }) {
+                        Text(L10n.t("nfp.already", lang),
+                            color = Qrme.T3, fontSize = 11.sp)
+                    } else {
+                        TextButton(onClick = {
+                            vm.call({ ApiClient.addFriend(vm.pid!!, p.profileId,
+                                vm.token!!) }) { r ->
+                                r.exceptionOrNull()?.let { note = it.message }
+                                reload()
+                            }
+                        }) { Text(L10n.t("people.add.go", lang),
+                                color = Qrme.BrandA, fontSize = 11.sp) }
+                    }
+                }
+            }
+        }
+
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(L10n.t("people.friends", lang), color = Qrme.Txt, fontSize = 16.sp,
                 fontWeight = FontWeight.Bold)

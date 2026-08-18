@@ -167,6 +167,23 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="8">
+                    <!-- Find people: publicly listed profiles by name or
+                         handle — the door two beta testers needed to
+                         become friends. -->
+                    <TextBlock x:Name="FindHead" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="FindQBox" />
+                    <Button x:Name="FindButton" Click="OnFindPeople" />
+                    <TextBlock x:Name="FindNoneText" FontSize="11" Visibility="Collapsed"
+                               TextWrapping="Wrap" Foreground="{StaticResource QrmeT2Brush}" />
+                    <ItemsControl x:Name="FoundList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="13" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeTxtBrush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                     <!-- The id typed here is the door. A friend row above is
                          a line of text on this shell; this is what opens
                          one, and it takes any profile id, which is what a

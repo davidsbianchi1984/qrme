@@ -29,10 +29,14 @@ what a screen *says*, and this was a question about where a thing *sits*.
 
 ## What this checks
 
-The bar's height is read out of the stylesheet rather than written here, so
-the clearance tracks the bar: if somebody makes the tap targets taller, this
-recomputes and the light has to move with them. Anything fixed to the bottom
-of the viewport must, inside the mobile block, clear that height.
+The bar's height was read out of the stylesheet rather than written here,
+so the clearance tracked the bar. Then the bar itself was retired — the
+owner's report called the fifty-six-door bottom rail what it was, and the
+menu became a drawer opened from the top-left. The question this file asks
+survives the redesign in a new shape: the menu must still win. Nothing the
+console pins to the glass may sit *over* an open drawer, which is a
+question of stacking rather than of height — so the drawer's z-index is
+read out of the stylesheet and every pinned widget has to stack below it.
 """
 from __future__ import annotations
 
@@ -129,21 +133,31 @@ def _px(declarations: str, prop: str) -> float | None:
     return float(px.group(1)) if px else None
 
 
-def _bar_height() -> float:
-    """What the bottom bar occupies, from the stylesheet's own numbers."""
+def _int(declarations: str, prop: str) -> float | None:
+    m = re.search(rf"\b{prop}:\s*(\d+(?:\.\d+)?)\s*;", declarations)
+    return float(m.group(1)) if m else None
+
+
+def _drawer_z() -> float:
+    """The menu drawer's stacking level, from the stylesheet's own numbers.
+
+    The mobile sidebar is the drawer: `position: fixed`, slid off-canvas by
+    a transform until `.open`. If those rules disappear, the menu has
+    changed shape again and a person should re-point this guard rather than
+    let it pass on nothing.
+    """
     block = _mobile_block()
-    item = _rule(block, ".nav-item")
     sidebar = _rule(block, ".sidebar")
-    assert item and sidebar, (
-        "the bottom bar's rules have been renamed — this guard measures the "
-        "bar out of `.sidebar` and `.nav-item`, and cannot see them")
-    tap = _px(item, "min-height")
-    assert tap, ".nav-item no longer declares a min-height to measure"
-    pad = re.search(r"padding:\s*(\d+(?:\.\d+)?)px", sidebar)
-    assert pad, ".sidebar no longer declares padding to measure"
-    # Padding is shorthand: the first number is the top, and the bottom is
-    # the same number plus the safe-area inset.
-    return tap + 2 * float(pad.group(1))
+    assert sidebar, (
+        "the drawer's rules have been renamed — this guard reads the mobile "
+        "`.sidebar`, and cannot see it")
+    assert "position: fixed" in sidebar and "transform" in sidebar, (
+        "the mobile sidebar is no longer a fixed drawer — the menu changed "
+        "shape again, and this guard needs a person to look at what covers "
+        "what now")
+    z = _int(sidebar, "z-index")
+    assert z is not None, ".sidebar no longer declares a z-index to measure"
+    return z
 
 
 #: Everything pinned to the bottom of the viewport. A new one is a new row
@@ -167,21 +181,31 @@ def test_the_stylesheet_still_pins_these_to_the_bottom():
 
 @pytest.mark.parametrize("selector", BOTTOM_FIXED)
 def test_nothing_fixed_to_the_bottom_covers_the_bar(selector):
-    """The defect, directly.
+    """The defect, in the menu's current shape.
 
-    On a phone the navigation *is* the bottom of the screen. Anything the
-    console fixes there has to sit above it, or it is a lid on the menu.
+    The navigation is a drawer now, not a band of the screen, so a pinned
+    widget cannot sit *beside* it — it can only sit *over* it, by stacking
+    higher. Each widget's z-index therefore has to stay below the drawer's,
+    wherever the widget declares one; a widget declaring none stacks at
+    auto, which the fixed drawer's own level already beats.
+
+    The name is kept although the bar is gone, deliberately: the three
+    products carry this guard by name, and the divergence ledger reads
+    names. What is asked is the same question the field report asked —
+    can the person's thumb reach the menu under the light.
     """
-    rule = _rule(_mobile_block(), selector)
-    assert rule, (
-        f"{selector} keeps its desktop `bottom` at the mobile breakpoint, so "
-        "it sits on top of the tab bar — the field report that produced this "
-        'guard read "It seems to be blocking the PDI menus"')
-    bottom = _px(rule, "bottom")
-    bar = _bar_height()
-    assert bottom is not None and bottom >= bar, (
-        f"{selector} sits {bottom}px from the bottom and the tab bar is "
-        f"{bar}px tall, so it covers the menu")
+    drawer = _drawer_z()
+    for block in (_base(), _mobile_block()):
+        rule = _rule(block, selector)
+        if not rule:
+            continue
+        z = _int(rule, "z-index")
+        if z is not None:
+            assert z < drawer, (
+                f"{selector} stacks at {z} and the menu drawer at {drawer}, "
+                "so an open menu sits under the light — the field report "
+                'that produced this guard read "It seems to be blocking '
+                'the PDI menus"')
 
 
 #: What the minimized light may occupy on a phone, and how solid it may be.

@@ -30,6 +30,35 @@
                 </StackPanel>
             </Border>
 
+            <!-- Search the Internet: a real search through the keyless
+                 door, working on a deployment with no model configured —
+                 which an excursion is not. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="WebHead" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="WebQBox" />
+                    <Button x:Name="WebGoButton" Click="OnWebSearch"
+                            Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                    <TextBlock x:Name="WebNoneText" FontSize="11" Visibility="Collapsed"
+                               TextWrapping="Wrap" Foreground="{StaticResource QrmeT2Brush}" />
+                    <ItemsControl x:Name="WebList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Spacing="2">
+                                    <HyperlinkButton Content="{Binding Title}"
+                                                     NavigateUri="{Binding Uri}" FontSize="13" />
+                                    <TextBlock Text="{Binding Note}" FontSize="11" TextWrapping="Wrap"
+                                               Foreground="{StaticResource QrmeT2Brush}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <HyperlinkButton x:Name="WebMoreLink" FontSize="11" Visibility="Collapsed" />
+                </StackPanel>
+            </Border>
+
             <TextBlock x:Name="ErrorText" Foreground="{StaticResource QrmeRed}" FontSize="13"
                        TextWrapping="Wrap" Visibility="Collapsed" />
 

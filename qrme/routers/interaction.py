@@ -7,7 +7,7 @@ import json
 import re
 from datetime import date
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Response
 
 from .. import (adaptation, auth, briefcase, companion, db, engagement, i18n,
                 llm, moderation, offline, persona, referral, remembrance,
@@ -24,7 +24,7 @@ from ..models import (
     ChatRequest, ChatResponse, ComposeRequest, EngagementOut, Feedback,
     InteractorCreate, MemoryForget, MemoryStrike, MessageOut, QuietHoursSet,
     RehearsalOpen, RehearsalSay, RelationshipSet, TurnEdit, VoiceConsent,
-    VoiceSample, VoiceSay,
+    VoiceBind, VoiceSample, VoiceSay,
 )
 
 MEMORY_WINDOW = 30  # prior messages included as context per interactor
@@ -1126,6 +1126,55 @@ def speak_in_voice(profile_id: str, body: VoiceSay, request: Request) -> dict:
         return voiceprint.speak(profile_id, body.text)
     except voiceprint.VoiceError as exc:
         raise HTTPException(422, str(exc))
+
+
+# -- The spoken voice: a bound engine reference (qrme/spoken.py) -------------
+
+@router.get("/profiles/{profile_id}/voice")
+def profile_voice(profile_id: str) -> dict:
+    """Which voice this profile speaks with. Public read, like the avatar:
+    a voice a stranger can hear is a voice a stranger should be able to
+    check the provenance of."""
+    profile_or_404(profile_id)
+    from .. import spoken
+    return spoken.bound(profile_id)
+
+
+@router.put("/profiles/{profile_id}/voice")
+def bind_profile_voice(profile_id: str, body: VoiceBind,
+                       request: Request) -> dict:
+    """The owner points the profile at a voice made on the provider's own
+    surface. An empty voice_id unbinds."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    from .. import spoken
+    try:
+        return spoken.bind(profile_id, body.provider, body.voice_id,
+                           body.label)
+    except spoken.SpokenError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
+
+
+@router.post("/profiles/{profile_id}/voice/say")
+def say_in_profile_voice(profile_id: str, body: VoiceSay,
+                         request: Request) -> Response:
+    """One utterance in the bound voice, as audio.
+
+    Any signed-in principal: the text is the caller's to have already — a
+    room turn they can read, a page they are looking at — so the audio adds
+    no information, only a bill, and the ceiling in `spoken.say` bounds that.
+    The stamp's credential id rides in a header so the audio stays audio.
+    """
+    profile_or_404(profile_id)
+    if auth.principal(request) is None:
+        raise HTTPException(401, "sign in to hear a profile speak")
+    from .. import spoken
+    try:
+        audio, about = spoken.say(profile_id, body.text)
+    except spoken.SpokenError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
+    return Response(content=audio, media_type=about["mime"],
+                    headers={"x-watermark-id": about["watermark_id"]})
 
 
 @router.delete("/profiles/{profile_id}/voiceprint")

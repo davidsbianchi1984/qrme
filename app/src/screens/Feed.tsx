@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, FeedItem } from "../api";
+import { api, FeedItem, getBase } from "../api";
 import { t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
@@ -163,9 +163,14 @@ export function Feed({ onPlans, onParty }: {
                   anything. Only the pane being looked at gets a decoder:
                   a deck that plays every video it has loaded is a phone
                   that gets warm and a battery that goes. */}
+              {/* The stream hands `/media/{id}` relative to the API, and
+                  this document lives on the console origin — resolved bare,
+                  the request went to a host that has no media and the pane
+                  stayed black. The wall resolved it correctly all along,
+                  which is exactly how the report read: only on my wall. */}
               <div className="deck-media">
                 {Math.abs(index - at) <= 1 ? (
-                  <video src={item.src} loop muted playsInline
+                  <video src={getBase() + (item.src || "")} loop muted playsInline
                          autoPlay={index === at}
                          ref={(el) => {
                            if (!el) return;

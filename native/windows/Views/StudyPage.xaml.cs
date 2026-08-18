@@ -94,6 +94,9 @@ public sealed partial class StudyPage : Page
         QuestionBox.Header = L10n.T("nstu.question", lang);
         QuestionBox.PlaceholderText = L10n.T("nstu.question.ph", lang);
         StudyButton.Content = L10n.T("nstu.go", lang);
+        WebHead.Text = L10n.T("nws.title");
+        WebQBox.PlaceholderText = L10n.T("nws.ph");
+        WebGoButton.Content = L10n.T("nws.title");
         AskTitle.Text = L10n.T("nask", lang);
         AskSub.Text = L10n.T("nask.sub", lang);
         AskTopicBox.Header = L10n.T("ncmp.topic", lang);
@@ -115,6 +118,44 @@ public sealed partial class StudyPage : Page
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e) => await Reload();
+
+    public sealed class WebRow
+    {
+        public string Title { get; init; } = "";
+        public string Note { get; init; } = "";
+        public Uri? Uri { get; init; }
+    }
+
+    private async void OnWebSearch(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        var q = WebQBox.Text.Trim();
+        if (s.Pid is null || s.Token is null || q.Length == 0) return;
+        try
+        {
+            var found = await ApiClient.Shared.WebSearch(s.Pid, s.Token, q);
+            WebNoneText.Text = L10n.T("nws.none");
+            WebNoneText.Visibility = found.Pages.Length == 0
+                ? Visibility.Visible : Visibility.Collapsed;
+            WebList.ItemsSource = found.Pages.Select(r => new WebRow
+            {
+                Title = r.Title.Length > 0 ? r.Title : r.Url,
+                Note = r.Note,
+                Uri = Uri.TryCreate(r.Url, UriKind.Absolute, out var u) ? u : null,
+            }).ToList();
+            if (Uri.TryCreate(found.MoreUrl, UriKind.Absolute, out var more))
+            {
+                WebMoreLink.Content = L10n.T("nws.more");
+                WebMoreLink.NavigateUri = more;
+                WebMoreLink.Visibility = Visibility.Visible;
+            }
+        }
+        catch (Exception ex)
+        {
+            WebNoneText.Text = ex.Message;
+            WebNoneText.Visibility = Visibility.Visible;
+        }
+    }
 
     private async System.Threading.Tasks.Task Reload()
     {

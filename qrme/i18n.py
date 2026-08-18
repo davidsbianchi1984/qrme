@@ -816,6 +816,12 @@ def refusal_language(request) -> str:
 #: translation, `field` as a slot: the field name is the API's own and is the
 #: same string in every language.
 MUST_BE_ONE_OF = "{field} must be one of {choices}"
+SAY_CEILING = ("an utterance is at most {max} characters — synthesis is "
+               "billed per character, and a wall beats a surprise")
+ENGINE_REFUSED = ("the voice engine refused ({code}) — the binding may name "
+                  "a voice this key cannot use")
+SEARCH_REFUSED = ("the search engine refused ({code}) — try again in a "
+                  "moment")
 
 #: `identity` and `overlays` both name a surface that does not exist.
 UNKNOWN_SURFACE = "unknown surface {surface} — one of {choices}"
@@ -876,11 +882,46 @@ PRIVILEGE_NOT_GIVEN = ("this profile's agent has not been given permission to "
 
 #: Every template this module offers. Derived from the table below rather than
 #: repeated, so a template with no translations is impossible by construction.
-TEMPLATES = (MUST_BE_ONE_OF, UNKNOWN_SURFACE, OBJECTION_ALREADY,
+TEMPLATES = (MUST_BE_ONE_OF, SAY_CEILING, ENGINE_REFUSED,
+             SEARCH_REFUSED,
+             UNKNOWN_SURFACE, OBJECTION_ALREADY,
              MESSAGE_ALREADY, PROFILE_ALREADY, NOT_A_MEMORIAL, PLAN_GATE,
              DIALER_SEALED, DIALER_NO_CARRIER, PRIVILEGE_NOT_GIVEN)
 
 _TEMPLATES: dict[str, dict[str, str]] = {
+    SAY_CEILING: {
+        'es': 'una locución tiene como máximo {max} caracteres — la síntesis se cobra por carácter, y un muro es mejor que una sorpresa',
+        'fr': "une prise de parole fait au plus {max} caractères — la synthèse se facture au caractère, et un mur vaut mieux qu'une surprise",
+        'de': 'eine Äußerung hat höchstens {max} Zeichen — Synthese wird pro Zeichen abgerechnet, und eine Wand ist besser als eine Überraschung',
+        'pt': 'uma fala tem no máximo {max} caracteres — a síntese é cobrada por carácter, e um muro é melhor do que uma surpresa',
+        'it': 'una battuta è al massimo di {max} caratteri — la sintesi si paga a carattere, e un muro è meglio di una sorpresa',
+        'ja': '一度の発話は最大{max}文字です — 合成は文字単位で課金され、壁は不意打ちに勝ります',
+        'zh': '一次话语最多 {max} 个字符——合成按字符计费，撞墙好过账单惊吓',
+        'hi': 'एक कथन अधिकतम {max} अक्षरों का है — संश्लेषण प्रति अक्षर बिल होता है, और दीवार अचानक बिल से बेहतर है',
+        'ar': 'الحدّ الأقصى للجملة {max} حرفًا — التوليد يُحاسَب بالحرف، والجدار خير من المفاجأة',
+    },
+    ENGINE_REFUSED: {
+        'es': 'el motor de voz lo rechazó ({code}) — el vínculo puede nombrar una voz que esta clave no puede usar',
+        'fr': "le moteur vocal a refusé ({code}) — le lien nomme peut-être une voix que cette clé ne peut pas utiliser",
+        'de': 'die Sprach-Engine hat abgelehnt ({code}) — die Bindung nennt womöglich eine Stimme, die dieser Schlüssel nicht nutzen kann',
+        'pt': 'o motor de voz recusou ({code}) — o vínculo pode nomear uma voz que esta chave não pode usar',
+        'it': 'il motore vocale ha rifiutato ({code}) — il collegamento potrebbe indicare una voce che questa chiave non può usare',
+        'ja': '音声エンジンが拒否しました（{code}）— この鍵では使えない声が結び付けられている可能性があります',
+        'zh': '语音引擎拒绝了（{code}）——绑定的声音可能是这把密钥无权使用的',
+        'hi': 'वॉइस इंजन ने मना कर दिया ({code}) — बंधन में शायद ऐसी आवाज़ है जिसे यह कुंजी उपयोग नहीं कर सकती',
+        'ar': 'رفض محرّك الصوت ({code}) — قد يشير الربط إلى صوت لا يستطيع هذا المفتاح استخدامه',
+    },
+    SEARCH_REFUSED: {
+        'es': 'el buscador lo rechazó ({code}) — inténtalo de nuevo en un momento',
+        'fr': 'le moteur de recherche a refusé ({code}) — réessayez dans un instant',
+        'de': 'die Suchmaschine hat abgelehnt ({code}) — versuche es gleich noch einmal',
+        'pt': 'o motor de busca recusou ({code}) — tente de novo daqui a pouco',
+        'it': 'il motore di ricerca ha rifiutato ({code}) — riprova tra un momento',
+        'ja': '検索エンジンが拒否しました（{code}）— 少し待ってからもう一度お試しください',
+        'zh': '搜索引擎拒绝了（{code}）——请稍后再试',
+        'hi': 'सर्च इंजन ने मना कर दिया ({code}) — थोड़ी देर में फिर आज़माएँ',
+        'ar': 'رفض محرّك البحث ({code}) — أعد المحاولة بعد لحظة',
+    },
     PRIVILEGE_NOT_GIVEN: {
         'es': 'el agente de este perfil no tiene permiso para {doing}: '
               'actívalo en lo que el agente puede hacer, donde dice qué '
@@ -1310,6 +1351,72 @@ _PUBLIC.update(_PRIVILEGE_SENTENCES)
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'sign in to hear a profile speak': {
+        'es': 'inicia sesión para oír hablar a un perfil',
+        'fr': 'connectez-vous pour entendre un profil parler',
+        'de': 'melde dich an, um ein Profil sprechen zu hören',
+        'pt': 'inicie sessão para ouvir um perfil falar',
+        'it': 'accedi per sentire parlare un profilo',
+        'ja': 'プロフィールの声を聞くにはサインインしてください',
+        'zh': '登录后才能听形象说话',
+        'hi': 'प्रोफ़ाइल की आवाज़ सुनने के लिए साइन इन करें',
+        'ar': 'سجّل الدخول لتسمع الملف يتحدث',
+    },
+    'nothing to search for — say a few words first': {
+        'es': 'nada que buscar — escribe unas palabras primero',
+        'fr': "rien à chercher — écrivez d'abord quelques mots",
+        'de': 'nichts zu suchen — schreib zuerst ein paar Worte',
+        'pt': 'nada para procurar — escreva primeiro algumas palavras',
+        'it': 'niente da cercare — scrivi prima qualche parola',
+        'ja': '検索するものがありません — まず言葉をいくつか入力してください',
+        'zh': '没有可搜索的内容——先输入几个词',
+        'hi': 'खोजने के लिए कुछ नहीं — पहले कुछ शब्द लिखें',
+        'ar': 'لا شيء للبحث عنه — اكتب بضع كلمات أولًا',
+    },
+    'the search engine could not be reached from this deployment': {
+        'es': 'no se pudo contactar con el buscador desde esta instalación',
+        'fr': "le moteur de recherche n'a pas pu être joint depuis cette installation",
+        'de': 'die Suchmaschine war von dieser Installation aus nicht erreichbar',
+        'pt': 'não foi possível contactar o motor de busca a partir desta instalação',
+        'it': 'il motore di ricerca non era raggiungibile da questa installazione',
+        'ja': 'この環境から検索エンジンに接続できませんでした',
+        'zh': '此部署无法连接搜索引擎',
+        'hi': 'इस परिनियोजन से सर्च इंजन तक नहीं पहुँचा जा सका',
+        'ar': 'تعذّر الوصول إلى محرّك البحث من هذا النشر',
+    },
+    'the voice engine could not be reached from this deployment': {
+        'es': 'no se pudo contactar con el motor de voz desde esta instalación',
+        'fr': "le moteur vocal n'a pas pu être joint depuis cette installation",
+        'de': 'die Sprach-Engine war von dieser Installation aus nicht erreichbar',
+        'pt': 'não foi possível contactar o motor de voz a partir desta instalação',
+        'it': 'il motore vocale non era raggiungibile da questa installazione',
+        'ja': 'この環境から音声エンジンに接続できませんでした',
+        'zh': '此部署无法连接语音引擎',
+        'hi': 'इस परिनियोजन से वॉइस इंजन तक नहीं पहुँचा जा सका',
+        'ar': 'تعذّر الوصول إلى محرّك الصوت من هذا النشر',
+    },
+    'this deployment has no ELEVENLABS_API_KEY configured — the binding exists, the engine does not': {
+        'es': 'esta instalación no tiene ELEVENLABS_API_KEY configurada — el vínculo existe, el motor no',
+        'fr': "cette installation n'a pas d'ELEVENLABS_API_KEY configurée — le lien existe, le moteur non",
+        'de': 'diese Installation hat keinen ELEVENLABS_API_KEY konfiguriert — die Bindung existiert, die Engine nicht',
+        'pt': 'esta instalação não tem ELEVENLABS_API_KEY configurada — o vínculo existe, o motor não',
+        'it': 'questa installazione non ha ELEVENLABS_API_KEY configurata — il collegamento esiste, il motore no',
+        'ja': 'この環境には ELEVENLABS_API_KEY が設定されていません — 結び付けはあっても、エンジンがありません',
+        'zh': '此部署未配置 ELEVENLABS_API_KEY——绑定在，引擎不在',
+        'hi': 'इस परिनियोजन में ELEVENLABS_API_KEY कॉन्फ़िगर नहीं है — बंधन है, इंजन नहीं',
+        'ar': 'هذا النشر بلا ELEVENLABS_API_KEY مُهيّأ — الربط موجود والمحرّك غائب',
+    },
+    'this profile has no spoken voice bound — its owner sets one under Voice': {
+        'es': 'este perfil no tiene voz hablada vinculada — su propietario la configura en Voz',
+        'fr': "ce profil n'a pas de voix parlée liée — son propriétaire en définit une sous Voix",
+        'de': 'dieses Profil hat keine Sprechstimme gebunden — sein Besitzer legt eine unter Stimme fest',
+        'pt': 'este perfil não tem voz falada vinculada — o dono define uma em Voz',
+        'it': 'questo profilo non ha una voce parlata collegata — il proprietario la imposta in Voce',
+        'ja': 'このプロフィールには話す声が結び付けられていません — 所有者が「声」で設定します',
+        'zh': '这个形象还没有绑定语音——由所有者在“声音”里设置',
+        'hi': 'इस प्रोफ़ाइल से कोई बोलने की आवाज़ नहीं जुड़ी — मालिक इसे वॉइस में सेट करता है',
+        'ar': 'لا صوت منطوقًا مرتبطًا بهذا الملف — يضبطه المالك في قسم الصوت',
+    },
     'no such matter': {
         'es': 'no existe ese asunto',
         'fr': 'aucune affaire de ce nom',
@@ -4793,6 +4900,8 @@ _WHERE_MARKERS = ("body", "query", "path", "header", "cookie")
 #: A field with no row keeps its identifier, exactly as before, and is recorded
 #: in `tests/field_labels_unmapped.txt`.
 _FIELD_LABELS: dict[str, dict[str, str]] = {
+    'voice_id': {'en': 'Voice ID from the engine', 'es': 'ID de voz del motor', 'fr': 'ID de voix du moteur', 'de': 'Stimm-ID der Engine', 'pt': 'ID de voz do motor', 'it': 'ID voce del motore', 'ja': 'エンジンのボイスID', 'zh': '引擎的声音 ID', 'hi': 'इंजन की वॉइस ID', 'ar': 'معرّف الصوت من المحرّك'},
+    'provider': {'en': 'Voice engine', 'es': 'Motor de voz', 'fr': 'Moteur vocal', 'de': 'Sprach-Engine', 'pt': 'Motor de voz', 'it': 'Motore vocale', 'ja': '音声エンジン', 'zh': '语音引擎', 'hi': 'वॉइस इंजन', 'ar': 'محرّك الصوت'},
     'answer': {'en': 'The answer', 'es': 'La respuesta', 'fr': 'La réponse', 'de': 'Die Antwort', 'pt': 'A resposta', 'it': 'La risposta', 'ja': '回答', 'zh': '答复', 'hi': 'उत्तर', 'ar': 'الردّ'},
     'helped': {'en': 'The help box answered it', 'es': 'La ayuda lo respondió', 'fr': "L'aide y a répondu", 'de': 'Die Hilfe hat es beantwortet', 'pt': 'A ajuda respondeu', 'it': "L'aiuto ha risposto", 'ja': 'ヘルプで解決した', 'zh': '帮助框已解答', 'hi': 'सहायता ने उत्तर दिया', 'ar': 'أجاب عنه مربّع المساعدة'},
     'did': {'en': 'What was done', 'es': 'Qué se hizo', 'fr': 'Ce qui a été fait', 'de': 'Was getan wurde', 'pt': 'O que foi feito', 'it': 'Che cosa è stato fatto', 'ja': '行ったこと', 'zh': '做了什么', 'hi': 'क्या किया गया', 'ar': 'ما الذي جرى'},

@@ -8,6 +8,106 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **People can be found, on all four clients.** `GET /people` searches
+  publicly listed profiles by name or handle — the door two beta testers
+  needed to become friends, since suggestions walk a friend graph they are
+  not on yet and the marketplace lists only profiles that chose a
+  storefront. An anonymous profile never matches (anonymity a name search
+  could pierce would not be anonymity), and only active profiles greet
+  strangers. The console's Friends screen carries the finder, and so do
+  the three shells — beside doors the phones also gained this round for
+  the spoken voice (bind, unbind, and a line said aloud through each
+  platform's own player) and the web search, so the per-shell doorless
+  records stay at the zero the last-doors round drove them to.
+
+- **The profile speaks with the voice its owner made.** A field report from a
+  room said only that the audio was not working — from a person who had done
+  their half: the voice existed, made, named and verified on the engine's own
+  surface, and the agent's turns were in the transcript. What did not exist
+  was any path from one to the other. `voiceprint.speak` says synthesis
+  belongs to whichever engine the deployment configures, and no deployment
+  configured one.
+
+      asked     can the profile speak
+      mattered  with the voice its owner made for it, on the box it runs on
+
+  `qrme/spoken.py` is the binding and the call, shaped like the avatar market
+  next door: the voice stays made and governed on the provider's surface, and
+  QRME holds a **reference** — with the one difference that synthesis runs
+  server-side, so the deployment holds the provider credential.
+  `ELEVENLABS_API_KEY` lives in the host's `.env`, is never written anywhere
+  by this module, and a missing key refuses **naming the variable** — a voice
+  that silently fell back to nothing is how this gap survived long enough to
+  be field-reported. Every utterance is stamped through `watermark` exactly
+  as a text turn is, the credential id rides beside the audio, and `say`
+  refuses over its character ceiling outright, because synthesis is billed
+  per character and a wall beats a surprise. Owners bind under Voice; a room
+  turn now carries `sender_id`, and the console offers to say a profile's
+  turn aloud — a press, never autoplay. The three shells' doors are recorded
+  as deferred the way the widget studio was: playback needs each shell's own
+  audio pipeline.
+
+- **The room seat wears the profile's own face.** A profile seat drew two
+  initials while the platform held a whole portrait for it — which read, from
+  the phone it was reported from, as *my agent has no avatar*. The scene now
+  reads `GET /profiles/{id}/avatar`, the one shape every surface reads, so
+  the AI badge and the likeness record travel with the picture into the room.
+
+- **Your camera fills its box, and the masks finally draw.** A live camera in
+  a 72px circle is a peephole; camera on now means the tile *is* the picture,
+  full-bleed, with the name as a chip and the controls hidden — a double-tap
+  or a long press brings them back, and a flip control asks for the device's
+  other side (`ideal`, not `exact`: a laptop has no back camera, and a hard
+  constraint would turn the button into an error dialog). And the mask
+  machinery, which recorded a disclosure and drew nothing: your pixels never
+  leave the device — other seats show an on-air marker, not your stream — so
+  the wearer's own preview is the only place a mask can render, and now it
+  does: a glyph riding the box for the covering kinds, treatments of the
+  video for `obscured`, `silhouette` and `touch_up`, and `backdrop` staying
+  disclosure-only because segmentation is an engine this beta does not have.
+  The glyph rides the box, not facial landmarks, and the disclosure line
+  stays the truth-bearing part.
+
+- **The agent's strip does things now; the places went back to the menu.**
+  The rail under the composer was twenty tab destinations — the field report
+  put it exactly: menu tabs, not belonging in the slider. Six actions stand
+  there instead: create videos, edit image, voice mode, analyze docs,
+  customize, create widget — image and docs going through the same upload
+  door media uses, the two engine-shaped ones filling the box with a
+  structured brief the agent answers honestly from its roster.
+
+- **Two microphones, told apart.** The composer's mic went through three
+  meanings before landing on the asked-for one: first a navigator that
+  landed on voiceprint enrollment, then a toggle for the whole voice mode —
+  and the correction that followed drew the line this release ships. The
+  **mic records into the box**: press it and your words type themselves
+  where you would normally write, a visible red take you stop when you are
+  done, sending nothing on its own. The **waveform beside it opens the
+  orb**: a drawn audio wave, not a found emoji, and pressing it starts the
+  conversation mode — orb up and listening, the reply spoken, the
+  recogniser relit for the next turn. On iOS Safari, which ships no
+  in-page recogniser, the mic says so honestly in a sentence and hands the
+  box to the keyboard's own dictation key rather than doing nothing.
+
+- **Three openers that do what they say.** The starter chips filled the box
+  with a sentence and stopped; they are now the three things a person walks
+  in wanting, and each one functions on the deployment it was asked from —
+  including one with no model configured. **Create picture or video** opens
+  the picker, uploads what you chose, and the send button publishes it to
+  your wall with the caption you type — the wall's own door asking for the
+  words, not the screen. **Search the Internet** is a real search: a new
+  keyless door (`GET /profiles/{id}/search`, DuckDuckGo's instant-answer
+  engine) sends the query and nothing else, witnesses the trip under your
+  profile like every other trip off the host, refuses before the engine is
+  reached when there is nothing to ask, and always answers with somewhere
+  honest to go — the engine's own results page rides along for everything
+  an instant answer cannot carry. **Write or edit** hands the sentence to
+  the agent, whose strongest tools are exactly the writing ones. The
+  spoken-voice engine call, and this one, both consult offline mode at the
+  socket now — the guard that watches every way out of this host found the
+  first gap before a person could.
+
+
 - **A subscription that finally tells somebody.** The estate's connections all
   run one way: a profile posts, a desk goes live, and the people hear about it
   because the thing reached them. `audience.subscribe` was meant to be the
@@ -43,32 +143,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   filter advertising its own catch, which is why `audience.comment` sends no
   event for a blocked comment either.
 
-### Changed
-
-- **`cloud:false` is a decision now, not an omission.** `docker/beta-compose.yml`
-  runs the `cloudgw` container and sets neither `QRME_CLOUD_URL` nor
-  `JIM_CLOUD_URL`, so all three products answer `"cloud": false` on `/health`.
-  Read cold that looks like a container running for nothing, and it sat on the
-  open-questions list for two releases because nobody could tell from the file
-  whether it was intended.
-
-      asked     why is the gateway up and nothing pointing at it
-      mattered  which of its two jobs this beta actually uses
-
-  It uses one of them. The gateway is the **error-report collector** — that is
-  what the `consoles` token and `CLOUDGW_PROBLEM_READERS` are for, and it is
-  live. It is also the **greater model and the contribution intake**, and that
-  is what those two variables would switch on. Setting them routes inference
-  for everybody on the box to the hosted tier while the local provider stack
-  already works, and a beta is not where you change which model answers.
-
-  Written into the compose file beside the container rather than into a
-  release note, because the next person to wonder will be reading the compose
-  file. It names the two lines that turn it on, and says all three products go
-  together — a box where two use the greater model and the third does not is a
-  box answering the same question two ways.
-
-### Added
 
 - **A guard on the translations that are already there.**
   `refusals_untranslated.txt` counts the sentences with **no** translation yet
@@ -94,8 +168,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   pretend to; it catches *this is not that language at all*. Byte-identical in
   QRME, JIM-mini and PDI, like `release_fields.txt`, because the defect is the
   estate's and so is the check.
-
-### Added
 
 - **The agent's remit, which was prose in a docstring until now.** The field
   ask, in its own words: *I wanted to assist users, especially within the app
@@ -181,6 +253,42 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **The feed plays what the wall already played.** A video posted from a
+  phone rendered on its own wall and arrived in the feed as a black pane.
+  The stream hands hosted footage as `/media/{id}` relative to the API,
+  and the deck resolved it against the console's own origin — a host with
+  no media on it. The wall resolved it correctly all along, which is
+  exactly how the field report read: *only on my wall*. One prefix, and
+  the pane plays.
+
+- **A discovery card is a door now.** Discover rendered a storefront of
+  profiles with one control: befriend. Opening one — the thing the screen
+  is named for — was not offered anywhere on the card. The face and the
+  name open the profile's public page, and the friend button keeps doing
+  the one thing it did.
+
+- **Friends look like people, and people can be found.** The list showed
+  a rank, a name and a full-size Remove button; it shows the face beside
+  the name now, and removal is a small red ✕ that cannot be mistaken for
+  the row's purpose. Above the list, the finder: `GET /people` searches
+  publicly listed profiles by name or handle — the door two beta testers
+  needed to become friends, since suggestions walk a friend graph they
+  are not on yet and the marketplace lists only profiles that chose a
+  storefront. An anonymous profile never matches (anonymity a name search
+  could pierce would not be anonymity), and only active profiles greet
+  strangers.
+
+- **The blend form fits the screen that reported it.** A picked source
+  grew three controls *beside* its name in one flex row, and on a phone
+  they shouldered each other off the edge. The share, the aspect and the
+  percentage sit on their own row under the name now.
+
+- **A chip is a chip on a phone too.** The mobile stylesheet's 44px
+  button floor — right for buttons that do things — inflated every
+  marketplace shelf chip into a wall that hid the bottom of the page.
+  Chips keep their size on a phone now, and the content pane's bottom
+  padding respects the phone's own safe area.
+
 - **Four commands on the deploy page that had never been typed.** The stack
   came up, all three names answered `0.84.0`, and then `docker compose -f
   docker/beta-compose.yml ps` — the page's own line, § 3 — stopped with ten
@@ -221,6 +329,58 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   in has no bearing on whether it runs. The prose stays free to name the
   abbreviation it is warning against — a guard that could not tell those
   apart would stop the page explaining itself.
+
+### Changed
+
+- **The menu is a menu.** Fifty-six doors rendered as one flat rail on a
+  desktop and a bottom corridor of icons on a phone — the owner's report
+  called it what it was. The sidebar now groups every door under six
+  professional headings (Community, My Profile, Create, Business, Trust &
+  Safety, System) with the five daily doors on top, each group expandable
+  and the active tab's own group opening itself. On a phone the whole
+  thing is a drawer opened from a top-left menu button — the asked-for
+  shape — and the bottom bar is gone. Two dozen tabs lost their riddle
+  names in the same pass: My Space, Earnings, Permissions, Watermark,
+  Disputes, Live Now, Support — the words a business product uses, in all
+  ten languages, with the English label the guards hold beside each row
+  updated to match.
+
+- **The front page reads like a product, and the mockups moved next door.**
+  A field report from the owner's own phone called the README what it had
+  become: thousands of lines, hundreds of mockups, and the thing a visitor
+  should learn in a minute buried under both. The README is now a
+  professional overview — what it does, the surfaces, quick start,
+  configuration, the release table folded but present, and the watch faces
+  kept in place as asked. The desktop, mobile and portrait sets live in
+  `docs/gallery.md`, the long-form capability sections in
+  `docs/capabilities.md`, and every guard that held the old page — screens
+  shown somewhere, galleries shaped for a phone, no stale test counts, the
+  banner naming the shipped version — now holds the same promises across
+  the pages they moved to.
+
+- **`cloud:false` is a decision now, not an omission.** `docker/beta-compose.yml`
+  runs the `cloudgw` container and sets neither `QRME_CLOUD_URL` nor
+  `JIM_CLOUD_URL`, so all three products answer `"cloud": false` on `/health`.
+  Read cold that looks like a container running for nothing, and it sat on the
+  open-questions list for two releases because nobody could tell from the file
+  whether it was intended.
+
+      asked     why is the gateway up and nothing pointing at it
+      mattered  which of its two jobs this beta actually uses
+
+  It uses one of them. The gateway is the **error-report collector** — that is
+  what the `consoles` token and `CLOUDGW_PROBLEM_READERS` are for, and it is
+  live. It is also the **greater model and the contribution intake**, and that
+  is what those two variables would switch on. Setting them routes inference
+  for everybody on the box to the hosted tier while the local provider stack
+  already works, and a beta is not where you change which model answers.
+
+  Written into the compose file beside the container rather than into a
+  release note, because the next person to wonder will be reading the compose
+  file. It names the two lines that turn it on, and says all three products go
+  together — a box where two use the greater model and the third does not is a
+  box answering the same question two ways.
+
 
 ## [0.84.0] - 2026-08-17
 

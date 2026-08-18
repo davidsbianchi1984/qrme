@@ -36,6 +36,9 @@ public sealed partial class PeoplePage : Page
         InboxSeenButton.Content = L10n.T("inbox.seen");
         VisitIdBox.Header = L10n.T("prf.visit.id");
         VisitButton.Content = L10n.T("prf.visit");
+        FindHead.Text = L10n.T("nfp.title");
+        FindQBox.PlaceholderText = L10n.T("nfp.ph");
+        FindButton.Content = L10n.T("nfp.title");
         VisitTheirs.Text = L10n.T("prf.theirs");
         VisitOffersLabel.Text = L10n.T("prf.offers");
         VisitSayBox.PlaceholderText = L10n.T("prf.sayhint");
@@ -651,6 +654,33 @@ public sealed partial class PeoplePage : Page
     /// fails, and one drawn the moment you add them still fails, which is
     /// the worse of the two because it looks like it should have worked.
     private string[] _befriended = System.Array.Empty<string>();
+
+    private async void OnFindPeople(object sender, RoutedEventArgs e)
+    {
+        var q = FindQBox.Text.Trim();
+        if (q.Length == 0) return;
+        try
+        {
+            var r = await ApiClient.Shared.FindPeople(q);
+            FindNoneText.Text = L10n.T("nfp.none");
+            FindNoneText.Visibility = r.Found.Length == 0
+                ? Visibility.Visible : Visibility.Collapsed;
+            // Marked against your own list, so a row can say the search is
+            // already over for that one.
+            var mine = AppState.Current.Pid is { } pid
+                ? (await ApiClient.Shared.Friends(pid))
+                    .Select(f => f.ProfileId).ToHashSet()
+                : new HashSet<string>();
+            FoundList.ItemsSource = r.Found.Select(x => new Row(
+                $"{x.ProfileId} · {x.DisplayName}"
+                + (string.IsNullOrWhiteSpace(x.Handle) ? "" : $" · @{x.Handle}")
+                + (mine.Contains(x.ProfileId)
+                   ? $" · {L10n.T("nfp.already")}" : "")))
+                .ToList();
+        }
+        catch (Exception ex) { FindNoneText.Text = ex.Message;
+                               FindNoneText.Visibility = Visibility.Visible; }
+    }
 
     private async void OnVisit(object sender, RoutedEventArgs e)
     {

@@ -82,6 +82,11 @@ PDI_PUBLIC_URL=https://pdisystems.net
 
 # --- yours -------------------------------------------------------------
 ANTHROPIC_API_KEY=
+
+# --- optional: the agent's spoken voice ---------------------------------
+# From the voice engine's own dashboard. Empty means profiles can bind a
+# voice and the say route refuses, naming this variable.
+ELEVENLABS_API_KEY=
 EOF
 
 nano .env      # paste the key on the last line
@@ -176,6 +181,25 @@ From your own machine, not the host — that is the path a tester takes.
 
 If ops gets `403` and consoles `200`, the two are the wrong way round in
 `.env`.
+
+### Which model actually answers
+
+A stack can be green on every row above and still answer with the stub —
+which reads, on the What If screen, as *no model answered this request*.
+The stub is the deployment saying `ANTHROPIC_API_KEY` never reached the
+process (or is not a working key), not the feature being broken. Ask the
+box itself:
+
+```bash
+curl -s https://sntheticprofiles.com/api/models | python3 -c \
+  "import json,sys; d=json.load(sys.stdin); print('default:', d['default'])"
+```
+
+`default: anthropic` is the healthy answer. `default: stub` means the key
+is missing from `/srv/qrme/.env` or the container came up before it was
+added — fix the file, then re-run § 7 so the containers restart with it.
+A key that exists but is refused by the provider (spent, revoked) also
+lands on the stub; the same check catches it after a key rotation.
 
 ## 6. Back up the three databases
 

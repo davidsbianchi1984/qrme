@@ -20,7 +20,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from .. import authoring, i18n, llm, offline, widgets
+from .. import authoring, i18n, llm, offline, websearch, widgets
 from ..common import (profile_or_404, require_may_publish,
                       require_may_speak, require_owner)
 
@@ -85,6 +85,24 @@ def studio_agent() -> dict:
     return {"can_touch": authoring.what_it_can_touch(),
             "tools": list(authoring.tool_names()),
             "available": bool(llm.available())}
+
+
+@router.get("/profiles/{profile_id}/search")
+def web_search(profile_id: str, request: Request, q: str = "") -> dict:
+    """Search the open web, as yourself.
+
+    The agent screen's opener stands on this door, and the door works on a
+    deployment with no model and no key configured — see
+    :mod:`qrme.websearch` for why that is the whole point. Owner-scoped
+    because the trip off the host is witnessed under this profile's name,
+    and an errand recorded against you is one only you get to run.
+    """
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    try:
+        return websearch.search(profile_id, q)
+    except websearch.SearchError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from exc
 
 
 @router.post("/profiles/{profile_id}/authoring/turn")

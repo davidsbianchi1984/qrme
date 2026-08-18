@@ -216,6 +216,12 @@ class VoiceSample(BaseModel):
     reference: str | None = None
 
 
+class VoiceBind(BaseModel):
+    provider: str = "elevenlabs"       # see qrme.spoken.PROVIDERS
+    voice_id: str = ""                 # empty unbinds
+    label: str = ""
+
+
 class VoiceSay(BaseModel):
     text: str
 

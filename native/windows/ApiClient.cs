@@ -112,6 +112,29 @@ public record VoiceprintRecord(
     [property: JsonPropertyName("built_at")] string? BuiltAt,
     [property: JsonPropertyName("active")] bool Active);
 
+public record SpokenBinding(
+    [property: JsonPropertyName("provider")] string Provider,
+    [property: JsonPropertyName("voice_id")] string VoiceId,
+    [property: JsonPropertyName("label")] string Label,
+    [property: JsonPropertyName("speaks")] bool Speaks);
+
+public record WebSearchRow(
+    [property: JsonPropertyName("title")] string Title,
+    [property: JsonPropertyName("url")] string Url,
+    [property: JsonPropertyName("note")] string Note);
+
+public record WebSearchAnswer(
+    [property: JsonPropertyName("pages")] WebSearchRow[] Pages,
+    [property: JsonPropertyName("more_url")] string MoreUrl);
+
+public record FoundPerson(
+    [property: JsonPropertyName("profile_id")] string ProfileId,
+    [property: JsonPropertyName("display_name")] string DisplayName,
+    [property: JsonPropertyName("handle")] string? Handle);
+
+public record FoundPeople(
+    [property: JsonPropertyName("found")] FoundPerson[] Found);
+
 public record VoiceprintStatus(
     [property: JsonPropertyName("consent")] VoiceConsentState Consent,
     [property: JsonPropertyName("enrollment")] VoiceEnrollment? Enrollment,
@@ -2113,6 +2136,72 @@ public sealed class ApiClient
 
     public Task<VoiceSpoken> SpeakInVoice(string id, string token, string text) =>
         Send<VoiceSpoken>(Post($"/profiles/{id}/voiceprint/speak", new { text }, token));
+
+    // MARK: The spoken voice — a reference to a voice made on the engine's
+    // own surface, and one utterance of audio back (qrme/spoken.py)
+
+    /// <summary>Which voice this profile speaks with, or the empty binding —
+    /// one shape either way, so the page never special-cases the common
+    /// case.</summary>
+    public Task<SpokenBinding> SpokenVoice(string id) =>
+        Send<SpokenBinding>(Get($"/profiles/{id}/voice"));
+
+    /// <summary>The owner points the profile at a voice made on the engine's
+    /// own surface. An empty voiceId unbinds. QRME keeps the reference; the
+    /// engine keeps the voice — and its key, which never touches this
+    /// app.</summary>
+    public Task<SpokenBinding> BindSpokenVoice(string id, string token,
+                                               string voiceId, string label) =>
+        Send<SpokenBinding>(Put($"/profiles/{id}/voice",
+            new { voice_id = voiceId, label }, token));
+
+    /// <summary>One utterance, synthesized server-side and watermarked
+    /// there. Raw bytes rather than the decoding helper, because this answer
+    /// is sound.</summary>
+    public async Task<byte[]> SaySpoken(string id, string token, string text)
+    {
+        var req = Post($"/profiles/{id}/voice/say", new { text }, token);
+        // The path as written, for the recorder — same derivation Send<T>
+        // uses, so no second copy of the literal exists to drift.
+        var path = req.RequestUri is { IsAbsoluteUri: true } abs
+            ? abs.AbsolutePath
+            : req.RequestUri?.ToString() ?? "";
+        var resp = await Dispatch(req);
+        if (!resp.IsSuccessStatusCode)
+        {
+            Problems.Record("POST", path, (int)resp.StatusCode);
+            string? said = null;
+            try
+            {
+                var root = JsonDocument.Parse(
+                    await resp.Content.ReadAsStringAsync()).RootElement;
+                if (root.TryGetProperty("message", out var m)
+                    && m.ValueKind == JsonValueKind.String)
+                    said = m.GetString();
+                else if (root.TryGetProperty("detail", out var d)
+                         && d.ValueKind == JsonValueKind.String)
+                    said = d.GetString();
+            }
+            catch { /* non-JSON error body */ }
+            throw new HttpRequestException(
+                said ?? $"HTTP {(int)resp.StatusCode}");
+        }
+        return await resp.Content.ReadAsByteArrayAsync();
+    }
+
+    // MARK: The open web, and the people here (qrme/websearch.py, /people)
+
+    /// <summary>A real search, keyless: the query goes out and nothing else —
+    /// see the door's own docstring for why it works with no model
+    /// configured.</summary>
+    public Task<WebSearchAnswer> WebSearch(string id, string token, string q) =>
+        Send<WebSearchAnswer>(Get($"/profiles/{id}/search?q={Uri.EscapeDataString(q)}", token));
+
+    /// <summary>Publicly listed profiles by name or handle — the door two
+    /// beta testers needed to become friends. Anonymous profiles never
+    /// match.</summary>
+    public Task<FoundPeople> FindPeople(string q) =>
+        Send<FoundPeople>(Get($"/people?q={Uri.EscapeDataString(q)}"));
 
     /// <summary>Withdrawal: the samples go, the print retires, the withdrawal
     /// itself stays — which is why this reports counts.</summary>

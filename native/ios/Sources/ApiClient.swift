@@ -2183,6 +2183,93 @@ actor ApiClient {
                           body: ["text": text], token: token)
     }
 
+    // MARK: The spoken voice — a reference to a voice made on the engine's
+    // own surface, and one utterance of audio back (qrme/spoken.py)
+
+    struct SpokenBinding: Decodable {
+        let profile_id: String
+        let provider: String
+        let voice_id: String
+        let label: String
+        let bound_at: String?
+        let speaks: Bool
+    }
+
+    /// Which voice this profile speaks with, or the empty binding — one
+    /// shape either way, so the screen never special-cases the common case.
+    func spokenVoice(id: String) async throws -> SpokenBinding {
+        try await request("/profiles/\(id)/voice")
+    }
+
+    /// The owner points the profile at a voice made on the engine's own
+    /// surface. An empty `voiceId` unbinds. QRME keeps the reference; the
+    /// engine keeps the voice — and its key, which never touches this app.
+    func bindSpokenVoice(id: String, token: String, voiceId: String,
+                         label: String) async throws -> SpokenBinding {
+        try await request("/profiles/\(id)/voice", method: "PUT",
+                          body: ["voice_id": voiceId, "label": label],
+                          token: token)
+    }
+
+    /// One utterance, synthesized server-side and watermarked there. Raw
+    /// bytes rather than the decoding helper, because this answer is sound.
+    func saySpoken(id: String, token: String,
+                   text: String) async throws -> Data {
+        var req = URLRequest(url: base.appendingPathComponent("/profiles/\(id)/voice/say"))
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "content-type")
+        req.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+        req.httpBody = try JSONSerialization.data(withJSONObject: ["text": text])
+        let (data, resp) = try await dispatch(req)
+        guard let http = resp as? HTTPURLResponse,
+              (200..<300).contains(http.statusCode) else {
+            let body = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+            let said = (body?["message"] as? String) ?? (body?["detail"] as? String)
+            throw ApiError.http(said ?? "speech failed")
+        }
+        return data
+    }
+
+    // MARK: The open web, and the people here (qrme/websearch.py, /people)
+
+    struct WebSearchRow: Decodable {
+        let title: String
+        let url: String
+        let note: String
+    }
+    struct WebSearchAnswer: Decodable {
+        let q: String
+        let engine: String
+        let pages: [WebSearchRow]
+        let more_url: String
+    }
+
+    /// A real search, keyless: the query goes out and nothing else — see
+    /// the door's own docstring for why it works with no model configured.
+    func webSearch(id: String, token: String,
+                   q: String) async throws -> WebSearchAnswer {
+        try await request("/profiles/\(id)/search", token: token,
+                          query: ["q": q])
+    }
+
+    struct FoundPerson: Decodable {
+        let profile_id: String
+        let display_name: String
+        let handle: String?
+        let avatar: String?
+        let kind: String
+    }
+    struct FoundPeople: Decodable {
+        let q: String
+        let found: [FoundPerson]
+    }
+
+    /// Publicly listed profiles by name or handle — the door two beta
+    /// testers needed to become friends. Anonymous profiles never match.
+    func findPeople(q: String) async throws -> FoundPeople {
+        try await request("/people", query: ["q": q])
+    }
+
     /// Withdrawal. The samples are deleted and the print retires; the record
     /// of the withdrawal itself stays, which is why this reports counts.
     func revokeVoiceprint(id: String, token: String) async throws -> VoiceRevocation {

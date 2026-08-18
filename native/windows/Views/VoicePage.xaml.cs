@@ -67,6 +67,13 @@ public sealed partial class VoicePage : Page
         HoldsOwn.Text = L10n.T("nvoi.holds.own", lang);
         HoldsMark.Text = L10n.T("nvoi.holds.mark", lang);
         HoldsWithdraw.Text = L10n.T("nvoi.holds.withdraw", lang);
+        SpokenHead.Text = L10n.T("nsv.title", lang);
+        SpokenLead.Text = L10n.T("nsv.lead", lang);
+        BindIdBox.PlaceholderText = L10n.T("nsv.id.ph", lang);
+        BindLabelBox.PlaceholderText = L10n.T("nsv.label.ph", lang);
+        BindButton.Content = L10n.T("nsv.save", lang);
+        SayButton.Content = L10n.T("nsv.test", lang);
+        UnbindButton.Content = L10n.T("nsv.unbind", lang);
     }
 
     protected override async void OnNavigatedTo(NavigationEventArgs e) => await Load();
@@ -91,6 +98,20 @@ public sealed partial class VoicePage : Page
         }
         try { Render(await ApiClient.Shared.Voiceprint(pid, token)); }
         catch (Exception ex) { ShowError(ex.Message); }
+        // The spoken voice — a different thing from the voiceprint above,
+        // which is why it does not sit behind the enrollment consent.
+        try { RenderSpoken(await ApiClient.Shared.SpokenVoice(pid)); }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private void RenderSpoken(SpokenBinding b)
+    {
+        var lang = AppState.Current.Language;
+        BindPanel.Visibility = b.Speaks ? Visibility.Collapsed : Visibility.Visible;
+        BoundPanel.Visibility = b.Speaks ? Visibility.Visible : Visibility.Collapsed;
+        if (b.Speaks)
+            BoundText.Text = L10n.T("nsv.bound", lang) + " "
+                + (b.Label is { Length: > 0 } ? b.Label : b.VoiceId);
     }
 
     private void Render(VoiceprintStatus s)
@@ -254,6 +275,44 @@ public sealed partial class VoicePage : Page
     }
 
     // MARK: plumbing
+
+    // MARK: the spoken voice — the binding, and a line said aloud
+
+    private async void OnBind(object sender, RoutedEventArgs e) =>
+        await Call(async (pid, token) => RenderSpoken(
+            await ApiClient.Shared.BindSpokenVoice(
+                pid, token, BindIdBox.Text.Trim(), BindLabelBox.Text.Trim())));
+
+    private async void OnUnbind(object sender, RoutedEventArgs e) =>
+        await Call(async (pid, token) => RenderSpoken(
+            await ApiClient.Shared.BindSpokenVoice(pid, token, "", "")));
+
+    private async void OnSay(object sender, RoutedEventArgs e) =>
+        await Call(async (pid, token) =>
+        {
+            var audio = await ApiClient.Shared.SaySpoken(
+                pid, token, SayLineBox.Text);
+            // Played from this app's temporary folder: the media player
+            // reads files, and the utterance is not something to keep.
+            var dir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "QrmeStudio", "voice");
+            Directory.CreateDirectory(dir);
+            var path = Path.Combine(dir,
+                $"say-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}.mp3");
+            await File.WriteAllBytesAsync(path, audio);
+            var player = new Windows.Media.Playback.MediaPlayer
+            {
+                Source = Windows.Media.Core.MediaSource.CreateFromUri(
+                    new Uri(path)),
+            };
+            player.MediaEnded += (_, _) =>
+            {
+                player.Dispose();
+                try { File.Delete(path); } catch { /* already gone */ }
+            };
+            player.Play();
+        });
 
     private async Task Call(Func<string, string, Task> work)
     {

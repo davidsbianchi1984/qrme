@@ -2056,6 +2056,8 @@ export type LentMic = {
 export type RoomMsg = {
   id: string;
   sender_kind: string;          // user | profile
+  sender_id?: string;           // a fellow participant; profile turns use it
+                                // to reach the spoken-voice route
   from: string;
   content: string | null;
   watermark: { display?: { line?: string } } | null;
@@ -3374,6 +3376,30 @@ export interface MatterQueue {
   standings: string[];
 }
 
+export interface WebSearchRow {
+  title: string;
+  url: string;
+  note: string;
+}
+export interface WebSearchAnswer {
+  q: string;
+  engine: string;
+  // `pages`, not `results`: the marketplace already answers `results` with
+  // its own shape, and one name carrying two types is the thing the wire
+  // guard exists to stop.
+  pages: WebSearchRow[];
+  more_url: string;
+}
+
+export interface ProfileVoice {
+  profile_id: string;
+  provider: string;
+  voice_id: string;
+  label: string;
+  bound_at: string | null;
+  speaks: boolean;
+}
+
 export const api = {
   // `health` used to sit here: the same route, the body thrown away, a
   // boolean returned. Nothing called it — `healthInfo` below returns the
@@ -3587,6 +3613,15 @@ export const api = {
                      handle?: string | null; avatar?: string | null;
                      founder?: boolean }[]; founder_handles: string[] }>(
       `/profiles/${profileId}/friends`),
+  // People search: publicly listed profiles only, by name or handle —
+  // the door that lets two beta testers who know each other's names become
+  // friends without one reading the other's profile id over the phone.
+  findPeople: (q: string) =>
+    req<{ q: string; found: { profile_id: string; display_name: string;
+                              handle: string | null; avatar: string | null;
+                              kind: string;
+                              verification: Record<string, unknown> }[] }>(
+      `/people?q=${encodeURIComponent(q)}`),
   suggestedFriends: (profileId: string) =>
     // The key is `suggested`. Declaring `suggestions` — in both arms of a
     // union, so neither could match — meant the reader's `?? []` fired every
@@ -3615,6 +3650,34 @@ export const api = {
                 token: string) =>
     req<WallPost>(`/profiles/${profileId}/wall`,
       { method: "POST", body, token }),
+  // The spoken voice: a reference to a voice made on the provider's own
+  // surface, and one utterance of audio back. The blob path is hand-rolled
+  // like uploadMedia's, because req() speaks JSON and this answer is sound.
+  profileVoice: (profileId: string) =>
+    req<ProfileVoice>(`/profiles/${profileId}/voice`),
+  setProfileVoice: (profileId: string,
+                    body: { provider?: string; voice_id: string;
+                            label?: string }, token: string) =>
+    req<ProfileVoice>(`/profiles/${profileId}/voice`,
+                      { method: "PUT", body, token }),
+  sayInProfileVoice: async (profileId: string, text: string,
+                            token: string): Promise<Blob> => {
+    const res = await fetch(getBase() + `/profiles/${profileId}/voice/say`, {
+      method: "POST",
+      headers: { "content-type": "application/json",
+                 authorization: `Bearer ${token}` },
+      body: JSON.stringify({ text }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      const body = data as { detail?: unknown; message?: unknown };
+      throw new RequestError(res.status,
+                             body.detail ?? `speech failed (${res.status})`,
+                             body.message);
+    }
+    return res.blob();
+  },
+
   uploadMedia: async (profileId: string, file: File, token: string,
                       alt = "") => {
     // Raw bytes, not multipart — the backend reads the kind from the bytes;
@@ -3752,6 +3815,11 @@ export const api = {
   studioAgent: () =>
     req<{ can_touch: string[]; tools: string[];
           available: boolean }>("/studio/agent"),
+  // The open web, keyless — works on a deployment with no model configured,
+  // which is the deployment the opener was pressed on.
+  webSearch: (profileId: string, q: string, token: string) =>
+    req<WebSearchAnswer>(
+      `/profiles/${profileId}/search?q=${encodeURIComponent(q)}`, { token }),
   // The conversation is the console's to keep — the agent has no memory of
   // its own, which is both cheaper and the design where *forget this* is
   // something a person can actually do.

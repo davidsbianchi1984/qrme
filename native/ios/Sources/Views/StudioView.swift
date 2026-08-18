@@ -55,6 +55,11 @@ struct StudyView: View {
     // The far hosts this agent keeps returning to, and the lever.
     @State private var been: [Visited] = []
 
+    // Search the Internet: a real search through the keyless door, working
+    // on a deployment with no model configured — which an excursion is not.
+    @State private var webQ = ""
+    @State private var webFound: ApiClient.WebSearchAnswer?
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -74,6 +79,44 @@ struct StudyView: View {
                             .background(Theme.brand).foregroundStyle(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                     }.disabled(topic.isEmpty || question.isEmpty || busy)
+                }.card()
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(L10n.t("nws.title", state.language))
+                        .font(.headline).foregroundStyle(Theme.txt)
+                    HStack(spacing: 8) {
+                        TextField(L10n.t("nws.ph", state.language), text: $webQ)
+                            .foregroundStyle(Theme.txt)
+                            .padding(10).background(Theme.scrBot)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                        Button(L10n.t("nws.title", state.language)) { webSearch() }
+                            .font(.caption.bold())
+                            .disabled(busy || webQ.trimmingCharacters(in: .whitespaces).isEmpty)
+                    }
+                    if let found = webFound {
+                        if found.pages.isEmpty {
+                            Text(L10n.t("nws.none", state.language))
+                                .font(.caption2).foregroundStyle(Theme.t2)
+                        }
+                        ForEach(found.pages, id: \.url) { row in
+                            VStack(alignment: .leading, spacing: 2) {
+                                if let u = URL(string: row.url) {
+                                    Link(row.title.isEmpty ? row.url : row.title,
+                                         destination: u)
+                                        .font(.caption).foregroundStyle(Theme.brandA)
+                                }
+                                if !row.note.isEmpty {
+                                    Text(row.note).font(.caption2)
+                                        .foregroundStyle(Theme.t2)
+                                }
+                            }
+                        }
+                        if let more = URL(string: found.more_url) {
+                            Link(L10n.t("nws.more", state.language),
+                                 destination: more)
+                                .font(.caption2).foregroundStyle(Theme.t3)
+                        }
+                    }
                 }.card()
 
                 if let error { Text(error).font(.footnote).foregroundStyle(Theme.red) }
@@ -283,6 +326,17 @@ struct StudyView: View {
             try? await ApiClient.shared.visitHostAgain(
                 id: pid, host: v.host, token: token)
             await load()
+        }
+    }
+
+    private func webSearch() {
+        guard let pid = state.pid, let token = state.token else { return }
+        busy = true; error = nil
+        Task {
+            defer { busy = false }
+            do { webFound = try await ApiClient.shared.webSearch(
+                    id: pid, token: token, q: webQ) }
+            catch { self.error = error.localizedDescription }
         }
     }
 

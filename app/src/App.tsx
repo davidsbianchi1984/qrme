@@ -76,66 +76,70 @@ type Tab = "profile" | "home" | "agent" | "feed" | "chat" | "discover" | "market
 // second, optional field rather than widening `icon` to a node: the nav guards
 // parse this table as text for `id:`, `label:` and the icon, and a shape they
 // cannot read is a shape that stops being checked.
-const NAV: { id: Tab; label: string; icon: string; art?: string }[] = [
+const NAV: { id: Tab; label: string; icon: string; art?: string;
+             group?: string }[] = [
   { id: "home", label: "Home", icon: "◎" },
-  // The mark is relative, not rooted: the console is served under /app and
-  // vite builds with base "./", so a leading slash would 404 in production
-  // and work in dev, which is the worst way for this to be wrong.
   { id: "agent", label: "Agent", icon: "✦", art: "agent.png" },
   { id: "feed", label: "Feed", icon: "▶" },
-  { id: "guide", label: "Show me around", icon: "🧭" },
+  { id: "guide", label: "Tour", icon: "🧭" },
   { id: "chat", label: "Chat", icon: "💬" },
-  { id: "discover", label: "Discover", icon: "🛍" },
-  { id: "market", label: "Marketplace", icon: "🏷" },
-  { id: "shop", label: "Shops", icon: "🛒" },
-  { id: "corner", label: "Your corner", icon: "🏠" },
-  { id: "wall", label: "Wall", icon: "🧱" },
-  { id: "friends", label: "Friends", icon: "👥" },
-  { id: "rooms", label: "Rooms", icon: "🎧" },
-  { id: "blend", label: "Blend", icon: "🫱🏽‍🫲🏻" },
-  { id: "solitude", label: "Your side", icon: "🪞" },
-  { id: "simulate", label: "What If", icon: "🔮" },
-  { id: "campaigns", label: "Campaigns", icon: "🎗" },
-  { id: "org", label: "Org", icon: "🏛" },
-  { id: "relationships", label: "Relationships", icon: "👥" },
-  { id: "memory", label: "Memory Vault", icon: "🔒" },
-  { id: "studio", label: "Widgets", icon: "🛠" },
-  { id: "delegate", label: "Delegation", icon: "🤝" },
-  { id: "desk", label: "Desk", icon: "🛎" },
-  { id: "identity", label: "Identity", icon: "🪪" },
-  { id: "presence", label: "Where it is seen", icon: "🖼" },
-  { id: "live", label: "What is live", icon: "🎥" },
-  { id: "contest", label: "Contest a profile", icon: "⚖" },
-  { id: "exchanges", label: "Exchanges", icon: "📝" },
-  { id: "grants", label: "Lent skills", icon: "🪄" },
-  { id: "party", label: "Watch together", icon: "🍿" },
-  { id: "voice", label: "Voice", icon: "🎙" },
-  { id: "workshop", label: "What it is made of", icon: "🧩" },
-  { id: "assist", label: "What it can do for you", icon: "🛠" },
-  { id: "referrals", label: "Somebody qualified", icon: "🩺" },
-  { id: "lobby", label: "In the game", icon: "🎮" },
-  { id: "audience", label: "Who follows", icon: "💛" },
-  { id: "beacons", label: "Connections to the world", icon: "🔳" },
-  { id: "reaching", label: "Reaching out", icon: "🌙" },
-  { id: "leaving", label: "What leaves", icon: "📤" },
-  { id: "selling", label: "What you are owed", icon: "💰" },
-  { id: "inside", label: "Inside a room", icon: "🚪" },
-  { id: "signing", label: "Signing", icon: "🖋" },
-  { id: "visiting", label: "Visiting", icon: "🔔" },
-  { id: "allowed", label: "What it may do", icon: "🔑" },
-  { id: "stranger", label: "Strangers", icon: "🎭" },
-  { id: "themark", label: "The mark", icon: "✦" },
-  { id: "inwords", label: "In its words", icon: "🗣" },
-  { id: "remainder", label: "Miscellaneous", icon: "🧩" },
-  { id: "plugins", label: "Plug-ins", icon: "🔌" },
-  { id: "named", label: "Look one thing up", icon: "🔎" },
-  { id: "robots", label: "Bodies", icon: "🤖" },
-  { id: "placements", label: "Where it is marketed", icon: "📌" },
-  { id: "plans", label: "Plans", icon: "🎟" },
-  { id: "access", label: "Accessibility", icon: "♿" },
-  { id: "matters", label: "Get help", icon: "🛟" },
-  { id: "settings", label: "Control", icon: "⚙" },
+  { id: "discover", label: "Discover", icon: "🛍", group: "community" },
+  { id: "market", label: "Marketplace", icon: "🏷", group: "community" },
+  { id: "shop", label: "Shops", icon: "🛒", group: "community" },
+  { id: "corner", label: "My Space", icon: "🏠", group: "profile" },
+  { id: "wall", label: "Wall", icon: "🧱", group: "profile" },
+  { id: "friends", label: "Friends", icon: "👥", group: "community" },
+  { id: "rooms", label: "Rooms", icon: "🎧", group: "community" },
+  { id: "blend", label: "Blend", icon: "🫱🏽‍🫲🏻", group: "create" },
+  { id: "solitude", label: "My Attention", icon: "🪞", group: "profile" },
+  { id: "simulate", label: "What If", icon: "🔮", group: "create" },
+  { id: "campaigns", label: "Campaigns", icon: "🎗", group: "business" },
+  { id: "org", label: "Org", icon: "🏛", group: "business" },
+  { id: "relationships", label: "Relationships", icon: "👥", group: "profile" },
+  { id: "memory", label: "Memory Vault", icon: "🔒", group: "profile" },
+  { id: "studio", label: "Widgets", icon: "🛠", group: "create" },
+  { id: "delegate", label: "Delegation", icon: "🤝", group: "business" },
+  { id: "desk", label: "Desk", icon: "🛎", group: "business" },
+  { id: "identity", label: "Identity", icon: "🪪", group: "profile" },
+  { id: "presence", label: "Presence", icon: "🖼", group: "profile" },
+  { id: "live", label: "Live Now", icon: "🎥", group: "trust" },
+  { id: "contest", label: "Disputes", icon: "⚖", group: "trust" },
+  { id: "exchanges", label: "Exchanges", icon: "📝", group: "business" },
+  { id: "grants", label: "Skill Lending", icon: "🪄", group: "business" },
+  { id: "party", label: "Watch Party", icon: "🍿", group: "community" },
+  { id: "voice", label: "Voice", icon: "🎙", group: "profile" },
+  { id: "workshop", label: "Profile Builder", icon: "🧩", group: "profile" },
+  { id: "assist", label: "Tasks", icon: "🛠", group: "create" },
+  { id: "referrals", label: "Referrals", icon: "🩺", group: "business" },
+  { id: "lobby", label: "Gaming", icon: "🎮", group: "business" },
+  { id: "audience", label: "Audience", icon: "💛", group: "community" },
+  { id: "beacons", label: "Beacons", icon: "🔳", group: "trust" },
+  { id: "reaching", label: "Outreach", icon: "🌙", group: "trust" },
+  { id: "leaving", label: "Exports & Licensing", icon: "📤", group: "business" },
+  { id: "selling", label: "Earnings", icon: "💰", group: "business" },
+  { id: "inside", label: "Room", icon: "🚪", group: "community" },
+  { id: "signing", label: "Signing", icon: "🖋", group: "trust" },
+  { id: "visiting", label: "Visits", icon: "🔔", group: "community" },
+  { id: "allowed", label: "Permissions", icon: "🔑", group: "trust" },
+  { id: "stranger", label: "Guest Access", icon: "🎭", group: "community" },
+  { id: "themark", label: "Watermark", icon: "✦", group: "trust" },
+  { id: "inwords", label: "Language & Name", icon: "🗣", group: "profile" },
+  { id: "remainder", label: "More Tools", icon: "🧩", group: "system" },
+  { id: "plugins", label: "Plug-ins", icon: "🔌", group: "system" },
+  { id: "named", label: "Lookup", icon: "🔎", group: "create" },
+  { id: "robots", label: "Robots & Devices", icon: "🤖", group: "business" },
+  { id: "placements", label: "Ad Placements", icon: "📌", group: "business" },
+  { id: "plans", label: "Plans & Billing", icon: "🎟", group: "system" },
+  { id: "access", label: "Accessibility", icon: "♿", group: "trust" },
+  { id: "matters", label: "Support", icon: "🛟", group: "trust" },
+  { id: "settings", label: "Settings", icon: "⚙", group: "system" },
 ];
+
+/** The drawer's sections, in the order they stack. Derived order
+ *  lives here rather than in the table so a tab moved between
+ *  groups is one field, not a reshuffle. */
+const NAV_GROUPS = ["community", "profile", "create", "business",
+                    "trust", "system"];
 
 export function App() {
   const { session, signOut } = useSession();
@@ -159,6 +163,21 @@ export function App() {
   // more doors: walking friend-to-friend and pressing Back should retrace
   // the walk, not drop you at whichever screen started it.
   const [visitingId, setVisitingId] = useState("");
+  // The menu: a drawer on a phone, opened from the top-left — the owner's
+  // asked-for shape — and a grouped sidebar on a desktop. Which sections
+  // stand open is state, and the active tab's own section opens itself.
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    const g = NAV.find((n) => n.id === tab)?.group;
+    if (g) setOpenGroups((prev) =>
+      prev.has(g) ? prev : new Set(prev).add(g));
+  }, [tab]);
+  const toggleGroup = (g: string) => setOpenGroups((prev) => {
+    const next = new Set(prev);
+    if (next.has(g)) next.delete(g); else next.add(g);
+    return next;
+  });
   // Read only through its own updater — the trail is history, never render
   // state, so nothing below needs to see it.
   const [, setVisitTrail] = useState<{ tab: Tab; id: string }[]>([]);
@@ -235,7 +254,14 @@ export function App() {
     <div className="app">
       <VersionGuard />
       <Footsteps />
-      <aside className="sidebar">
+      <button className="menu-fab" aria-label={t("nav.menu", lang)}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen(!menuOpen)}>☰</button>
+      {menuOpen && (
+        <button className="menu-scrim" aria-label={t("nav.menu", lang)}
+                onClick={() => setMenuOpen(false)} />
+      )}
+      <aside className={"sidebar" + (menuOpen ? " open" : "")}>
         <div className="brand">
           <span className="orb" />
           <div>
@@ -244,17 +270,43 @@ export function App() {
           </div>
         </div>
         <nav>
-          {NAV.map((n) => (
+          {NAV.filter((n) => !n.group).map((n) => (
             <button
               key={n.id}
               className={"nav-item" + (tab === n.id ? " active" : "")}
-              onClick={() => setTab(n.id)}
+              onClick={() => { setTab(n.id); setMenuOpen(false); }}
             >
               <span className={"nav-icon" + (n.art ? " nav-art" : "")}>
                 {n.art ? <img src={n.art} alt="" /> : n.icon}
               </span>
               {t(`nav.${n.id}`, lang)}
             </button>
+          ))}
+          {NAV_GROUPS.map((g) => (
+            <div key={g} className="nav-group">
+              <button className={"nav-group-head"
+                                 + (openGroups.has(g) ? " open" : "")}
+                      aria-expanded={openGroups.has(g)}
+                      onClick={() => toggleGroup(g)}>
+                <span className="nav-caret" aria-hidden="true">
+                  {openGroups.has(g) ? "▾" : "▸"}
+                </span>
+                {t(`navgrp.${g}`, lang)}
+              </button>
+              {openGroups.has(g) && NAV.filter((n) => n.group === g)
+                .map((n) => (
+                  <button
+                    key={n.id}
+                    className={"nav-item" + (tab === n.id ? " active" : "")}
+                    onClick={() => { setTab(n.id); setMenuOpen(false); }}
+                  >
+                    <span className={"nav-icon" + (n.art ? " nav-art" : "")}>
+                      {n.art ? <img src={n.art} alt="" /> : n.icon}
+                    </span>
+                    {t(`nav.${n.id}`, lang)}
+                  </button>
+                ))}
+            </div>
           ))}
         </nav>
         <button className="signout" onClick={signOut}>
@@ -271,7 +323,7 @@ export function App() {
                    onInside={(id) => { setInsideRoom(id); setTab("inside"); }} />
         )}
         {tab === "chat" && <Chat onPlans={toPlans} />}
-        {tab === "discover" && <Discover onPlans={toPlans} />}
+        {tab === "discover" && <Discover onPlans={toPlans} onVisit={visitProfile} />}
         {tab === "market" && <Market onPlans={toPlans} />}
         {tab === "shop" && <Shops onPlans={toPlans} />}
         {tab === "corner" && <Corner onPlans={toPlans} />}

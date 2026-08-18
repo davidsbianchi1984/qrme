@@ -105,6 +105,9 @@ services:
       bootstrap:
         condition: service_completed_successfully
     environment:
+      # The agent's spoken voice (qrme/spoken.py). Optional: empty means
+      # profiles bind voices and the say route refuses, naming this variable.
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
       # Advertised by GET /pair, so the QR a phone scans has to point at the
       # public name rather than the container.
       QRME_PUBLIC_URL: ${QRME_PUBLIC_URL:?set QRME_PUBLIC_URL in .env}
@@ -153,7 +156,8 @@ services:
       # not `:?`, because a deployment that does not pay for a voice is a
       # working deployment. Unset, every user gets the device's own
       # recogniser and speech, and `GET /voice/quota` says so rather than
-      # degrading in silence. Only JIM reads it; QRME has no ElevenLabs path.
+      # degrading in silence. QRME reads the same variable now — the spoken
+      # voice, qrme/spoken.py — so one key serves both products.
       ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
     volumes:
       - shared:/shared

@@ -61,6 +61,14 @@ fun VoiceScreen(vm: StudioViewModel) {
     var spoken by remember { mutableStateOf<VoiceSpoken?>(null) }
     var revocation by remember { mutableStateOf<VoiceRevocation?>(null) }
     var say by remember { mutableStateOf("") }
+    // The spoken voice: a reference to a voice made on the engine's own
+    // surface — a different thing from the voiceprint, which is why it does
+    // not sit behind the enrollment consent.
+    var spokenBinding by remember {
+        mutableStateOf<ApiClient.SpokenBinding?>(null) }
+    var bindId by remember { mutableStateOf("") }
+    var bindLabel by remember { mutableStateOf("") }
+    var sayLine by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
 
@@ -80,6 +88,9 @@ fun VoiceScreen(vm: StudioViewModel) {
         val token = vm.token ?: return
         vm.call({ ApiClient.voiceprint(pid, token) }) { r ->
             r.fold({ status = it }, { error = it.message })
+        }
+        vm.call({ ApiClient.spokenVoice(pid) }) { r ->
+            r.fold({ spokenBinding = it }, { error = it.message })
         }
     }
     LaunchedEffect(Unit) { reload() }
@@ -255,6 +266,58 @@ fun VoiceScreen(vm: StudioViewModel) {
                         Text(L10n.t("nvoi.retired", vm.language),
                             color = Qrme.T3, fontSize = 10.sp)
                     }
+                }
+            }
+        }
+
+        // ---- The spoken voice: the binding, and a line said aloud ----
+        Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(L10n.t("nsv.title", vm.language), color = Qrme.Txt, fontSize = 16.sp,
+                fontWeight = FontWeight.Bold)
+            Text(L10n.t("nsv.lead", vm.language), color = Qrme.T2, fontSize = 11.sp)
+            val b = spokenBinding
+            if (b != null && b.speaks) {
+                Text(L10n.t("nsv.bound", vm.language) + " " +
+                        b.label.ifBlank { b.voiceId },
+                    color = Qrme.Txt, fontSize = 12.sp)
+                labeledField(L10n.t("nsv.test", vm.language), sayLine, "…") { sayLine = it }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Pill(L10n.t("nsv.test", vm.language), Qrme.BrandA,
+                        enabled = !busy && sayLine.isNotBlank()) {
+                        val pid = vm.pid ?: return@Pill
+                        val token = vm.token ?: return@Pill
+                        busy = true; error = null
+                        vm.call({ ApiClient.saySpoken(pid, token, sayLine) }) { r ->
+                            busy = false
+                            r.fold({ bytes ->
+                                // The audio plays from the app's own cache:
+                                // MediaPlayer reads files, not arrays.
+                                val f = java.io.File.createTempFile(
+                                    "say", ".mp3", context.cacheDir)
+                                f.writeBytes(bytes)
+                                android.media.MediaPlayer().apply {
+                                    setDataSource(f.absolutePath)
+                                    setOnCompletionListener { release(); f.delete() }
+                                    prepare(); start()
+                                }
+                            }, { error = it.message })
+                        }
+                    }
+                    Pill(L10n.t("nsv.unbind", vm.language), Qrme.Card,
+                        enabled = !busy) {
+                        val pid = vm.pid ?: return@Pill
+                        val token = vm.token ?: return@Pill
+                        act { ApiClient.bindSpokenVoice(pid, token, "", "") }
+                    }
+                }
+            } else {
+                labeledField(L10n.t("nsv.id.ph", vm.language), bindId, "…") { bindId = it }
+                labeledField(L10n.t("nsv.label.ph", vm.language), bindLabel, "…") { bindLabel = it }
+                Pill(L10n.t("nsv.save", vm.language), Qrme.BrandA,
+                    enabled = !busy && bindId.isNotBlank()) {
+                    val pid = vm.pid ?: return@Pill
+                    val token = vm.token ?: return@Pill
+                    act { ApiClient.bindSpokenVoice(pid, token, bindId, bindLabel) }
                 }
             }
         }

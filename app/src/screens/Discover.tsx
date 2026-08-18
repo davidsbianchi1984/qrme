@@ -8,10 +8,13 @@ import { useSession } from "../store";
 // Everything here was already in the backend; the console just never showed
 // the doors. The starter collection installs on demand (idempotent server
 // side), and every card is a real profile you can befriend.
-export function Discover({ onPlans }: {
+export function Discover({ onPlans, onVisit }: {
   /** Where a plan refusal sends somebody. Threaded in from the shell
    *  rather than looked up here, so the tab id stays in one place. */
   onPlans: () => void;
+  /** Open a profile's public page. A discovery card you cannot open is a
+   *  storefront with no door — the field report tried every card. */
+  onVisit: (profileId: string) => void;
 }) {
   const { session } = useSession();
   const lang = visitorLang();
@@ -87,6 +90,8 @@ export function Discover({ onPlans }: {
       <div className="discover-grid">
         {cards.map((c) => (
           <div key={c.profile_id} className="card discover-card">
+            <button className="dc-open" onClick={() => onVisit(c.profile_id)}
+                    aria-label={c.display_name}>
             <div className="dc-face">
               {c.avatar ? (
                 <img className="dc-avatar" src={getBase() + c.avatar}
@@ -107,6 +112,7 @@ export function Discover({ onPlans }: {
               <span className="dc-badge real">{tr("dsc.badge.real", lang)}</span>
             )}
             <b>{c.display_name}</b>
+            </button>
             {c.blurb && <p className="muted small">{c.blurb}</p>}
             <div className="tag-row">
               {c.tags.slice(0, 4).map((t) => <span key={t} className="tag">{t}</span>)}
