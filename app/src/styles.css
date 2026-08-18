@@ -1124,3 +1124,7 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .idn-bubble-empty { display: inline-block;
   background: rgba(255,255,255,0.05);
   border-style: dashed; border-color: var(--t3); }
+
+/* ---- the chat composer's + : same drawer the agent's bar earned ---- */
+.composer { position: relative; }
+.composer-plus { bottom: calc(100% + 8px); }

@@ -78,6 +78,10 @@ export function Chat({ onPlans }: {
   // here — so a person could give a starter they had just met a document,
   // and could not give one to the profile built from their own life.
   const [bcOpen, setBcOpen] = useState(false);
+  // The composer's +. Five tools lived as full-size buttons in the bar and
+  // the text box paid for it — the field report could not even see it. The
+  // mic, the box and Send stay; everything else folds here.
+  const [plusOpen, setPlusOpen] = useState(false);
   const [skinOpen, setSkinOpen] = useState(false);
   // The camera. A photograph goes into the briefcase rather than into a
   // route of its own — the briefcase is already the place material handed to
@@ -602,10 +606,34 @@ export function Chat({ onPlans }: {
       )}
 
       <div className="composer">
-        <button title={tr("prf.bc.heading", lang)}
-                aria-label={tr("prf.bc.heading", lang)}
-                className={bcOpen ? "primary" : ""}
-                onClick={() => setBcOpen((o) => !o)}>📎</button>
+        {plusOpen && (
+          <div className="agent-plus composer-plus" role="menu">
+            <button role="menuitem"
+                    onClick={() => { setPlusOpen(false); setBcOpen((o) => !o); }}>
+              📎 {tr("prf.bc.heading", lang)}{bcOpen ? " ✓" : ""}
+            </button>
+            <button role="menuitem"
+                    disabled={!session.profileId || !session.interactorId}
+                    onClick={() => { setPlusOpen(false); camRef.current?.click(); }}>
+              📷 {tr("chat.camera", lang)}
+            </button>
+            <button role="menuitem"
+                    onClick={() => { setPlusOpen(false); setRhOpen((o) => !o); }}>
+              🎭 {tr("cht.rh", lang)}{rhOpen || rehearsal ? " ✓" : ""}
+            </button>
+            <button role="menuitem"
+                    onClick={() => { setPlusOpen(false); setWhereOpen((w) => !w); }}>
+              📍 {tr("chat.wheretitle", lang)}{whereOpen ? " ✓" : ""}
+            </button>
+            <button role="menuitem" aria-pressed={speakOn}
+                    onClick={() => { setPlusOpen(false); setSpeakOn((v) => !v); }}>
+              {speakOn ? "🔊" : "🔇"} {tr("chat.speak", lang)}{speakOn ? " ✓" : ""}
+            </button>
+          </div>
+        )}
+        <button className="agent-plusbtn" aria-label={tr("agent.plus", lang)}
+                aria-expanded={plusOpen}
+                onClick={() => setPlusOpen(!plusOpen)}>+</button>
         {/* The camera. `capture="environment"` is what makes a phone open the
             lens rather than the picker — without it this is the paperclip
             again with a different glyph, which is how a camera button ends up
@@ -619,21 +647,6 @@ export function Chat({ onPlans }: {
                  e.target.value = "";
                  if (f) shoot(f);
                }} />
-        <button title={tr("chat.camera", lang)}
-                aria-label={tr("chat.camera", lang)}
-                disabled={!session.profileId || !session.interactorId}
-                onClick={() => camRef.current?.click()}>📷</button>
-        <button title={tr("cht.rh", lang)}
-                className={rhOpen || rehearsal ? "primary" : ""}
-                onClick={() => setRhOpen((o) => !o)}>🎭</button>
-        <button title={tr("chat.wheretitle", lang)}
-                className={whereOpen ? "primary" : ""}
-                onClick={() => setWhereOpen((w) => !w)}>📍</button>
-        <button title={tr("chat.speak", lang)}
-                aria-label={tr("chat.speak", lang)}
-                aria-pressed={speakOn}
-                className={speakOn ? "primary" : ""}
-                onClick={() => setSpeakOn((s) => !s)}>{speakOn ? "🔊" : "🔇"}</button>
         {Recognition && (
           <button title={tr("chat.mic", lang)}
                   aria-label={tr("chat.mic", lang)}

@@ -8,6 +8,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The chat composer's tools fold behind a +.** The re-audit of the
+  owner's own screenshots found the one report the rounds had walked
+  past: the Chat screen's composer still carried five full-size tool
+  buttons — briefcase, camera, rehearsal, location, speak-aloud — and
+  the text box paid for them, exactly as the photograph showed ("I can't
+  even see the text box"). They fold behind the same + the agent's bar
+  earned, with the mic, the box and Send staying visible, and each
+  folded entry showing its own on state.
+
 - **Available means somebody real answers.** `llm.available()` is the
   provider catalog — nine rows, configured or not — and `bool()` of a
   non-empty list answered a different question: the beta ran the stub
