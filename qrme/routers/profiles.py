@@ -560,6 +560,11 @@ def delete_profile(profile_id: str, request: Request) -> dict:
     vaulted += [r["vault_key"] for r in conn.execute(
         "SELECT vault_key FROM finetune_runs WHERE profile_id=?"
         " AND vault_key IS NOT NULL", (profile_id,)).fetchall()]
+    # The recollection ledger (qrme/recollection.py): every sealed memory's
+    # key, written beside the seal precisely so this line could exist.
+    vaulted += [r["pdi_key"] for r in conn.execute(
+        "SELECT pdi_key FROM recollections WHERE profile_id=?",
+        (profile_id,)).fetchall()]
     if vaulted:
         deleted["pdi_records"] = sum(
             1 for key in vaulted if pdi is not None and pdi.delete(key))

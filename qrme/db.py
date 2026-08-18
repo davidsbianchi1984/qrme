@@ -638,6 +638,18 @@ CREATE TABLE IF NOT EXISTS surfaces (
 -- owner's private terms redacted). ``brief`` is exactly what could leave;
 -- ``left_host`` records whether anything actually did (offline: never). Findings
 -- come back as general knowledge and can be folded into a knowledge source.
+-- The recollection ledger (qrme/recollection.py). Content lives sealed in
+-- the tandem under pdi_key and embedded in the resident's index; this table
+-- holds only the keys, so the profile-erasure sweep — which reads pdi_key
+-- columns — deletes every memory with the profile that made it.
+CREATE TABLE IF NOT EXISTS recollections (
+    id            TEXT PRIMARY KEY,
+    profile_id    TEXT NOT NULL REFERENCES profiles(id),
+    interactor_id TEXT NOT NULL,
+    pdi_key       TEXT NOT NULL,
+    created_at    TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS excursions (
     id           TEXT PRIMARY KEY,
     profile_id   TEXT NOT NULL REFERENCES profiles(id),

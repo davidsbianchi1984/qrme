@@ -6,6 +6,37 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The profile remembers by meaning, through the vault.** `remembrance`
+  distills forward, in order — turns past the window folded into a running
+  summary. `qrme/recollection.py` adds the other axis: each thing a person
+  says to a profile is sealed AES-256-GCM into the tandem and embedded
+  under the same key through PDI 0.86.0's resident index (which stores a
+  hash of the text and never the text), so the reply that matters can find
+  the moment that is *about* it — the sister from Lisbon mentioned once in
+  March surfaces when the cooking question comes in October. The recalled
+  lines ride the prompt beside the distillate, attributed as memory the
+  profile may draw on, never an instruction.
+
+  The JIM round's three rules hold, plus one stricter: memory never breaks
+  the doing (a chat turn lands even when the tandem is down, and the
+  return says what happened); no vault means no memory and no pretending
+  (the gate is the plan through `storage.vault_for` — free is platform
+  custody, and an older PDI without the resident is reported as "the vault
+  has no memory index" while the words stay sealed); and **one pair's
+  memories** — the recall prefix carries the profile *and the interactor*,
+  because one profile talks to many people and what Alice told it must
+  never surface in its reply to Bob. Erasure knows every key from the
+  first one cut: each seal writes a `recollections` ledger row, and the
+  profile-erasure sweep reads its `pdi_key` column — the lesson the JIM
+  round learned mid-flight, applied here before it could recur.
+
+  And the study ledger writes itself into the vault's tables: each
+  research excursion hands its row — topic, redactions, whether anything
+  left the host, never the findings themselves — to the PDI resident as a
+  `qrme_studies` dataset, queryable in the PDI console.
+
 ## [0.86.0] - 2026-08-18
 
 ### Added

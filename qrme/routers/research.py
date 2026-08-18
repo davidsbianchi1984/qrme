@@ -47,8 +47,12 @@ def start_excursion(profile_id: str, body: ExcursionStart, request: Request) -> 
     # way — both inside `research.excursion`, so a second caller cannot get
     # either wrong.
     try:
-        cid = research.excursion(profile_id, body.topic, body.question,
-                                 body.private, request.app.state.cloud)
+        from .. import storage as storage_mod, tiers as tiers_mod
+        cid = research.excursion(
+            profile_id, body.topic, body.question, body.private,
+            request.app.state.cloud,
+            pdi=storage_mod.vault_for(tiers_mod.plan_of_profile(profile_id),
+                                      request.app.state.pdi))
     except privileges.NotChosen as exc:
         # `i18n.raised`, not `str(exc)` — see i18n.raised for what str()
         # forgets on the way.

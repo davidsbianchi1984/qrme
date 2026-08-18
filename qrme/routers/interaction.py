@@ -227,6 +227,16 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     conn.commit()
     clear_awaiting_reply(profile_id, body.interactor_id)  # the recipient replied
 
+    # The turn becomes a memory (qrme/recollection.py): sealed in the tandem
+    # and embedded, so a later reply can find this moment by meaning. Plan-
+    # gated like every seal point, and non-fatal — a turn that lands and is
+    # not remembered beats a turn refused because the tandem was down.
+    from .. import recollection, storage as storage_mod, tiers as tiers_mod
+    memory_vault = storage_mod.vault_for(
+        tiers_mod.plan_of_profile(profile_id), pdi)
+    recollection.remember(memory_vault, profile_id, body.interactor_id,
+                          interactor_msg_id, body.message)
+
     engagement_state = engagement.record_message(
         profile_id, body.interactor_id, body.message)
     relationship = get_relationship(profile_id, body.interactor_id)
@@ -323,6 +333,13 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         system += ("\n\nWhat you remember from your earlier conversations "
                    "with this person, before the recent transcript:\n"
                    + remembered)
+    # And the other axis of memory: the distillate above remembers forward,
+    # in order; this finds the moment that is *about* what was just said,
+    # however long ago — the pair's own memories only.
+    recalled_block = recollection.chat_block(
+        memory_vault, profile_id, body.interactor_id, body.message)
+    if recalled_block:
+        system += "\n\n" + recalled_block
     # The link handed mid-conversation: read it where this deployment may,
     # and say so plainly where it may not. Only for a link this turn has not
     # already imported — a briefcase item is the same page, read once and

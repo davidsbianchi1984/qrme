@@ -84,7 +84,7 @@ def gather(brief: str, cloud=None) -> str:
 
 
 def excursion(profile_id: str, topic: str, question: str,
-              private: list[str] | None = None, cloud=None) -> str:
+              private: list[str] | None = None, cloud=None, pdi=None) -> str:
     """Go and study something, and write down what could have left.
 
     This lived in the router until the privilege roster arrived, and a check
@@ -109,4 +109,14 @@ def excursion(profile_id: str, topic: str, question: str,
         (cid, profile_id, topic, brief, redactions, int(left_host),
          findings, db.utcnow()))
     conn.commit()
+    # The study writes its own ledger row into the vault's tables
+    # (qrme/recollection.py → PDI resident): what was studied and what it
+    # cost in redactions, queryable in the PDI console — never the findings
+    # themselves, which stay in this row under this deployment's custody.
+    from . import recollection
+    recollection.tabulate(pdi, "qrme_studies",
+                          [{"excursion": cid, "topic": topic,
+                            "redactions": redactions,
+                            "left_host": int(left_host)}],
+                          source_ref=profile_id)
     return cid
