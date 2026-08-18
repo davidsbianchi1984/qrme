@@ -4,15 +4,40 @@ import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
-export function Home({ go, onVisit }: {
+export function Home({ go, onVisit, onInside }: {
   go: (t: "chat" | "relationships" | "memory" | "blend" | "simulate"
         | "campaigns" | "org" | "plans" | "friends"
         | "identity" | "stranger" | "rooms" | "studio") => void;
   /** Press a face and land on that person's homepage. */
   onVisit: (profileId: string) => void;
+  /** Land inside a room opened from here. The homepage is where the owner
+   *  asked to pick the kind — VR, AR, 2-D — rather than three screens in. */
+  onInside: (roomId: string) => void;
 }) {
   const { session } = useSession();
   const lang = visitorLang();
+  const [roomBusy, setRoomBusy] = useState(false);
+  const [roomErr, setRoomErr] = useState<unknown>(null);
+
+  async function openRoom(channel: string) {
+    if (!session.interactorId || !session.profileId) {
+      setRoomErr(tr("rms.signinpick", lang)); return;
+    }
+    setRoomBusy(true); setRoomErr(null);
+    try {
+      // A room of one isn't a room: you and your own profile open it
+      // together — the same rule the Rooms screen keeps.
+      const room = await api.createRoom({
+        channel,
+        participants: [
+          { kind: "user", id: session.interactorId },
+          { kind: "profile", id: session.profileId },
+        ],
+      });
+      onInside(room.id);
+    } catch (e) { setRoomErr(e); }
+    finally { setRoomBusy(false); }
+  }
   const [stats, setStats] = useState<Stats | null>(null);
   const [face, setFace] = useState<Avatar | null>(null);
   const [pals, setPals] = useState<
@@ -128,6 +153,23 @@ export function Home({ go, onVisit }: {
       <div className="persona-card">
         <div className="tile-label">{tr("hom.persona", lang)}</div>
         <p>{p?.persona}</p>
+      </div>
+
+      {/* Open a room, by kind, from the front page — the owner's ask,
+          verbatim: VR, AR, 2-D. The same door Rooms uses; the chips are
+          the vocabulary the backend already speaks. */}
+      <div className="card home-rooms">
+        <h3>{tr("hom.openroom", lang)}</h3>
+        <div className="actions" style={{ marginTop: 8 }}>
+          {(["chat", "voice", "video", "ar", "vr"] as const).map((ch) => (
+            <button key={ch} className={"chip room-kind rk-" + ch}
+                    disabled={roomBusy}
+                    onClick={() => openRoom(ch)}>
+              {tr(`rms.ch.${ch}`, lang)}
+            </button>
+          ))}
+        </div>
+        {roomErr != null && <Refusal error={roomErr} variant="inline" />}
       </div>
 
       <div className="actions">

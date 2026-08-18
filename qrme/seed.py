@@ -436,6 +436,7 @@ def _seed_one_founder(conn, handle, name, persona, appearance, asset) -> str:
         # the avatar entirely, so the two profiles the user actually recognizes
         # were the two the portrait repair could never reach.
         _backfill_founder(conn, taken["profile_id"], handle)
+        _voice(conn, taken["profile_id"], handle)
         if handle == FOUNDER_HANDLE:
             for industry in FOUNDER_AI_PACKS:
                 _ground(conn, taken["profile_id"], industry, force=True)
@@ -446,6 +447,7 @@ def _seed_one_founder(conn, handle, name, persona, appearance, asset) -> str:
         persona=persona, purpose="creator_persona",
         verification=Verification(birthdate=_BIRTHDATE)))
     claim_handle(profile["id"], HandleSet(handle=handle))
+    _voice(conn, profile["id"], handle)
 
     conn.execute("UPDATE profiles SET appearance=? WHERE id=?",
                  (appearance, profile["id"]))
@@ -532,6 +534,78 @@ def _seed_founder(conn) -> tuple[str, str]:
     return rendered, live
 
 
+# handle -> (voice_id, label). Chosen from the workspace's own list by the
+# brief's profession, register and age — never by ethnicity for its own sake —
+# and reused across handles freely: two professionals sharing a premade voice
+# is ordinary; a dead control is not. The two founder profiles take the
+# owner's verified professional clone.
+STARTER_VOICES = {
+    "david_bianchi_ai":  ("QkRFZOOi2WQXZ8b3eeYd", "David Bianchi voice"),
+    "david_bianchi":     ("QkRFZOOi2WQXZ8b3eeYd", "David Bianchi voice"),
+    "dr_amara_osei":     ("XrExE9yKIg1WjnnlVkGX", "Matilda"),
+    "marcus_bell":       ("JBFqnCBsd6RMkjVDRZzb", "George"),
+    "priya_raman":       ("NP8gGMLAGXx7ddlMa06t", "Sarika"),
+    "elena_vasquez":     ("Xb7hH8MSUJpSbSDYk0k2", "Alice"),
+    "jonathan_ashe":     ("cjVigY5qzO86Huf0OWal", "Eric"),
+    "sam_whitfield":     ("CwhRBWXzGAHq8TQ4Fs17", "Roger"),
+    "ingrid_halvorsen":  ("EXAVITQu4vr4xnSDxMaL", "Sarah"),
+    "diego_fuentes":     ("IKne3meq5aSn9XLyUdCD", "Charlie"),
+    "naomi_clarke":      ("cgSgspJ2msm6clMCkdW9", "Jessica"),
+    "tomas_rivera":      ("bIHbv24MWmeRgasZH58o", "Will"),
+    "odessa_grant":      ("hpp4J3VqNfWAUOO0d1Us", "Bella"),
+    "ken_nakamura":      ("TX3LPaxmHKxFdv7VOQHJ", "Liam"),
+    "lucia_moretti":     ("hpp4J3VqNfWAUOO0d1Us", "Bella"),
+    "ray_coleman":       ("JBFqnCBsd6RMkjVDRZzb", "George"),
+    "wren_okafor":       ("FGY2WhTYpPnrIDTdsKH5", "Laura"),
+    "coach_dana_reyes":  ("IKne3meq5aSn9XLyUdCD", "Charlie"),
+    "chef_henri_laurent": ("N2lVS1w4EtoT3dr4eOWO", "Callum"),
+    "dr_sana_iqbal":     ("NP8gGMLAGXx7ddlMa06t", "Sarika"),
+    "pete_kowalski":     ("SAz9YHcvj6GT2YYXdXww", "River"),
+    "grace_mwangi":      ("XrExE9yKIg1WjnnlVkGX", "Matilda"),
+    "dr_felix_baum":     ("bIHbv24MWmeRgasZH58o", "Will"),
+    "aisha_diallo":      ("EXAVITQu4vr4xnSDxMaL", "Sarah"),
+    "harold_jenkins":    ("SAz9YHcvj6GT2YYXdXww", "River"),
+    "rosa_delgado":      ("EXAVITQu4vr4xnSDxMaL", "Sarah"),
+    "cmdr_ellen_park":   ("XrExE9yKIg1WjnnlVkGX", "Matilda"),
+    "mimi_beaumont":     ("cgSgspJ2msm6clMCkdW9", "Jessica"),
+    "jack_osei_turner":  ("VZcBEw9QXVSghzV5UKLN", "Michael Joshua"),
+    "nadia_petrova":     ("SAz9YHcvj6GT2YYXdXww", "River"),
+    "bev_lindqvist":     ("hpp4J3VqNfWAUOO0d1Us", "Bella"),
+    "otis_marsh":        ("CwhRBWXzGAHq8TQ4Fs17", "Roger"),
+    "dr_lena_whitcomb":  ("EXAVITQu4vr4xnSDxMaL", "Sarah"),
+    "dr_marcus_adeyemi": ("VZcBEw9QXVSghzV5UKLN", "Michael Joshua"),
+    "dr_priya_nair":     ("NP8gGMLAGXx7ddlMa06t", "Sarika"),
+    "vivienne_sable":    ("FGY2WhTYpPnrIDTdsKH5", "Laura"),
+}
+
+
+def _voice(conn, profile_id: str, handle: str) -> bool:
+    """Bind a starter's spoken voice if none is bound. Blank-only, like the
+    portrait backfill above it: an owner who bound their own voice keeps it,
+    so re-seeding is a repair rather than a reset.
+
+    A binding is a **reference** — see ``qrme/spoken.py`` — so this writes
+    no credential and costs nothing until somebody actually asks the
+    profile to speak, on a deployment whose host holds the engine key.
+    """
+    from . import db as _db
+
+    chosen = STARTER_VOICES.get(handle)
+    if not chosen:
+        return False
+    row = conn.execute("SELECT 1 FROM profile_voices WHERE profile_id=?",
+                       (profile_id,)).fetchone()
+    if row is not None:
+        return False
+    voice_id, label = chosen
+    conn.execute(
+        "INSERT INTO profile_voices (profile_id, provider, voice_id, label,"
+        " bound_at) VALUES (?,?,?,?,?)",
+        (profile_id, "elevenlabs", voice_id, label, _db.utcnow()))
+    conn.commit()
+    return True
+
+
 def _backfill(conn, profile_id: str, handle: str) -> bool:
     """Fill in a starter's portrait and appearance if they are missing.
 
@@ -612,6 +686,8 @@ def repair() -> dict:
                            (handle,)).fetchone()
         if row and _backfill(conn, row["profile_id"], handle):
             repaired.append(handle)
+        if row and _voice(conn, row["profile_id"], handle):
+            repaired.append(f"{handle} (voice)")
         # The dossier arrives the same way the faces did: on the first
         # launch after the upgrade, not only when somebody finds the seed
         # button. Blank-aware, so it never overwrites an owner's edits.
@@ -622,6 +698,8 @@ def repair() -> dict:
                            (handle,)).fetchone()
         if row and _backfill_founder(conn, row["profile_id"], handle):
             repaired.append(handle)
+        if row and _voice(conn, row["profile_id"], handle):
+            repaired.append(f"{handle} (voice)")
     return {"repaired": len(repaired), "repaired_handles": repaired}
 
 
@@ -852,6 +930,8 @@ def seed() -> dict:
             # missing, it does not restore starters to factory settings.
             if _backfill(conn, taken["profile_id"], handle):
                 repaired.append(handle)
+            if _voice(conn, taken["profile_id"], handle):
+                repaired.append(f"{handle} (voice)")
             # Grounding is part of the repair too: every deployment seeded
             # before this shipped has starters with no source material at
             # all, and they cannot be fixed by hand at 34 profiles.
@@ -870,6 +950,10 @@ def seed() -> dict:
             plan="pro",
             verification=Verification(birthdate=_BIRTHDATE)))
         claim_handle(profile["id"], HandleSet(handle=handle))
+        # The spoken voice, bound at birth the way the face is set below —
+        # a reference to the engine workspace, costing nothing until asked
+        # to speak. See STARTER_VOICES for how each was chosen.
+        _voice(conn, profile["id"], handle)
         # The portrait brief doubles as the profile's `appearance`, which
         # rides on the prompt (persona.py). One description behind the face
         # and the voice, so a profile that looks like it is holding an

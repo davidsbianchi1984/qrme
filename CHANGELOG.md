@@ -8,6 +8,25 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Pick the kind of room from the front page.** The owner's ask, verbatim:
+  VR, AR, 2-D, from the homepage. The Home screen now carries an
+  "Open a room" card with one chip per channel the backend already speaks —
+  chat, voice, video, AR, VR — opening through the same door the Rooms
+  screen uses (you and your own profile together, anyone else joins) and
+  landing you inside the room rather than on a list that contains it. The
+  homepage got its decoration in the same pass: the persona card wears the
+  brand's own gradients instead of a flat panel.
+
+- **Every starter speaks.** The pack profiles carried professions,
+  portraits and dossiers, and no voices — the other half of the owner's
+  decoration ask. `qrme/seed.py` now binds each starter a spoken voice
+  from the engine workspace, chosen by profession and register, with the
+  two founder profiles taking the owner's own verified clone. Bound at
+  seed and repaired at startup exactly the way the faces are; blank-only,
+  so a voice an owner bound themselves is never overwritten; and a
+  binding is a reference, so nothing is billed until somebody actually
+  asks a profile to speak.
+
 - **People can be found, on all four clients.** `GET /people` searches
   publicly listed profiles by name or handle — the door two beta testers
   needed to become friends, since suggestions walk a friend graph they are

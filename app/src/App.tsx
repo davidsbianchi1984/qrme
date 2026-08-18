@@ -316,7 +316,8 @@ export function App() {
 
       <main className="content" ref={contentRef}>
         <ProblemNotice />
-        {tab === "home" && <Home go={setTab} onVisit={visitProfile} />}
+        {tab === "home" && <Home go={setTab} onVisit={visitProfile}
+                 onInside={(id) => { setInsideRoom(id); setTab("inside"); }} />}
         {tab === "profile" && (
           <Profile profileId={visitingId} onBack={leaveProfile}
                    onPlans={toPlans} onVisit={visitProfile}

@@ -8597,6 +8597,9 @@ const CHROME: Table = {
   "prf.offers": {
     en: "What they offer", es: "Lo que ofrecen", fr: "Ce qu'ils proposent", de: "Was sie anbieten", pt: "O que oferecem", it: "Cosa offrono", ja: "この人が提供しているもの", zh: "他们提供的服务", hi: "वे क्या देते हैं", ar: "ما يقدّمونه",
   },
+  "hom.openroom": {
+    en: "Open a room", es: "Abrir una sala", fr: "Ouvrir une salle", de: "Einen Raum öffnen", pt: "Abrir uma sala", it: "Apri una stanza", ja: "ルームを開く", zh: "打开房间", hi: "रूम खोलें", ar: "افتح غرفة",
+  },
   "hom.newinrelease": {
     en: "New in this release", es: "Novedades de esta versión", fr: "Nouveautés de cette version", de: "Neu in dieser Ausgabe", pt: "Novidades desta versão", it: "Novità di questa versione", ja: "このリリースで新しくなったこと", zh: "本次发布的新内容", hi: "इस रिलीज़ में नया", ar: "الجديد في هذا الإصدار",
   },
