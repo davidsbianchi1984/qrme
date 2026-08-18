@@ -8,6 +8,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Live Now leads with what is live.** The screen was a wall of set-up
+  forms with the status buried under them — the field report called the
+  share form what it deserved. What is live comes first now: the cameras
+  running, the place you are looking at; the three set-up flows (share a
+  camera, lend a microphone, wear a mask) sit folded behind a Set up
+  button until somebody means to change something. The lend and wear
+  sections say plainly that a room does both from its own controls — the
+  forms here cover the surfaces that have no room around them. My Space
+  and Chat gained the sentence each was missing: the page you edit here
+  is exactly what a visitor sees, and the chat is your own profile
+  answering as the persona you built.
+
 - **The words inside match the doors outside.** The menu round renamed
   the tabs; this one walks through the doors. Seventeen screen headers
   drop their riddle names for the menu's own words — My Space, Earnings,

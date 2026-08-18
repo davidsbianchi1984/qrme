@@ -84,6 +84,11 @@ export function Live({ onPlans }: {
 
   const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
+  // The three set-up flows, folded until meant. The screen's job is what
+  // is live; a wall of forms was the field report's whole complaint.
+  const [setupCam, setSetupCam] = useState(false);
+  const [setupMic, setSetupMic] = useState(false);
+  const [setupWear, setSetupWear] = useState(false);
   const fail = (e: unknown) => setError(e);
 
   useEffect(() => {
@@ -149,6 +154,90 @@ export function Live({ onPlans }: {
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
+      {live.length > 0 && (
+        <div className="card">
+          <h3>{tr("liv.camon", lang)}</h3>
+          {live.map((s) => (
+            <div key={s.id}>
+              <div className="row">
+                <div style={{ flex: 1 }}>
+                  <strong>{s.subject}</strong> — {s.subject_means}
+                  <div className="muted small">
+                    {fill(tr("liv.camline", lang), {
+                      surface: s.surface, id: s.surface_id,
+                      minutes: s.minutes,
+                      rec: s.recording
+                        ? tr("liv.recording", lang)
+                        : tr("liv.notrecording", lang),
+                    })}
+                  </div>
+                </div>
+                <button onClick={async () => {
+                  setError(null); setNote(null);
+                  try {
+                    await api.closeCamera(s.id, me, token);
+                    setNote(tr("liv.stopped.said", lang));
+                    api.liveCameras(me, token).then(setLive).catch(() => undefined);
+                  } catch (e) { fail(e); }
+                }}>{tr("liv.stop", lang)}</button>
+              </div>
+              {/* Verbatim: the six things the person watching cannot do. */}
+              <ul className="small">
+                {Object.entries(s.never).map(([k, v]) => (
+                  <li key={k}>{v}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="card">
+        <h3>{tr("liv.lookplace", lang)}</h3>
+        <div className="row">
+          <select value={surface} onChange={(e) => setSurface(e.target.value)}>
+            {places?.places.map((p) => (
+              <option key={p.surface} value={p.surface}>{p.surface}</option>
+            ))}
+          </select>
+          <input value={surfaceId} onChange={(e) => setSurfaceId(e.target.value)}
+                 placeholder={tr("liv.id.ph", lang)} style={{ flex: 1 }} />
+          <button disabled={!token || !surfaceId.trim()} onClick={loadPlace}>
+            {tr("liv.look", lang)}
+          </button>
+        </div>
+        <p className="muted small">
+          {places?.places.find((p) => p.surface === surface)?.why}
+        </p>
+        {/* Rooms lend through their own route, and the reply says so. */}
+        {places && <p className="muted small">{places.room}</p>}
+        {whose && (
+          <p className="small">
+            {fill(tr("liv.whose", lang), {
+              who: whose.display_name || whose.account_id, is: whose.is })}
+          </p>
+        )}
+        {disclosure && (
+          <p className="small">
+            {disclosure.note}
+            {disclosure.any_recording &&
+              <strong> {tr("liv.somethingrec", lang)}</strong>}
+          </p>
+        )}
+      </div>
+
+      {/* Set-up, folded: this screen leads with what is live; a form
+          is opened when somebody means to change that. */}
+      {!setupCam ? (
+        <div className="card">
+          <div className="row">
+            <h3 style={{ flex: 1, margin: 0 }}>{tr("liv.share", lang)}</h3>
+            <button className="chip" onClick={() => setSetupCam(true)}>
+              {tr("liv.setup", lang)}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
       <div className="card">
         <h3>{tr("liv.share", lang)}</h3>
         <div className="row">
@@ -242,7 +331,6 @@ export function Live({ onPlans }: {
         )}
       </div>
 
-      {/* Whose problem the room is, said plainly. */}
       {bys && (
         <div className="card">
           <h3>{tr("liv.bystanders", lang)}</h3>
@@ -256,79 +344,23 @@ export function Live({ onPlans }: {
           <p className="muted small"><em>{bys.why_it_is_yours}</em></p>
         </div>
       )}
-
-      {live.length > 0 && (
-        <div className="card">
-          <h3>{tr("liv.camon", lang)}</h3>
-          {live.map((s) => (
-            <div key={s.id}>
-              <div className="row">
-                <div style={{ flex: 1 }}>
-                  <strong>{s.subject}</strong> — {s.subject_means}
-                  <div className="muted small">
-                    {fill(tr("liv.camline", lang), {
-                      surface: s.surface, id: s.surface_id,
-                      minutes: s.minutes,
-                      rec: s.recording
-                        ? tr("liv.recording", lang)
-                        : tr("liv.notrecording", lang),
-                    })}
-                  </div>
-                </div>
-                <button onClick={async () => {
-                  setError(null); setNote(null);
-                  try {
-                    await api.closeCamera(s.id, me, token);
-                    setNote(tr("liv.stopped.said", lang));
-                    api.liveCameras(me, token).then(setLive).catch(() => undefined);
-                  } catch (e) { fail(e); }
-                }}>{tr("liv.stop", lang)}</button>
-              </div>
-              {/* Verbatim: the six things the person watching cannot do. */}
-              <ul className="small">
-                {Object.entries(s.never).map(([k, v]) => (
-                  <li key={k}>{v}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+        </>
       )}
 
-      <div className="card">
-        <h3>{tr("liv.lookplace", lang)}</h3>
-        <div className="row">
-          <select value={surface} onChange={(e) => setSurface(e.target.value)}>
-            {places?.places.map((p) => (
-              <option key={p.surface} value={p.surface}>{p.surface}</option>
-            ))}
-          </select>
-          <input value={surfaceId} onChange={(e) => setSurfaceId(e.target.value)}
-                 placeholder={tr("liv.id.ph", lang)} style={{ flex: 1 }} />
-          <button disabled={!token || !surfaceId.trim()} onClick={loadPlace}>
-            {tr("liv.look", lang)}
-          </button>
+      {/* Set-up, folded: this screen leads with what is live; a form
+          is opened when somebody means to change that. */}
+      {!setupMic ? (
+        <div className="card">
+          <div className="row">
+            <h3 style={{ flex: 1, margin: 0 }}>{tr("liv.lendmic", lang)}</h3>
+            <button className="chip" onClick={() => setSetupMic(true)}>
+              {tr("liv.setup", lang)}
+            </button>
+          </div>
+        <p className="muted small">{tr("liv.lend.where", lang)}</p>
         </div>
-        <p className="muted small">
-          {places?.places.find((p) => p.surface === surface)?.why}
-        </p>
-        {/* Rooms lend through their own route, and the reply says so. */}
-        {places && <p className="muted small">{places.room}</p>}
-        {whose && (
-          <p className="small">
-            {fill(tr("liv.whose", lang), {
-              who: whose.display_name || whose.account_id, is: whose.is })}
-          </p>
-        )}
-        {disclosure && (
-          <p className="small">
-            {disclosure.note}
-            {disclosure.any_recording &&
-              <strong> {tr("liv.somethingrec", lang)}</strong>}
-          </p>
-        )}
-      </div>
-
+      ) : (
+        <>
       <div className="card">
         <h3>{tr("liv.lendmic", lang)}</h3>
         {mic && (
@@ -385,7 +417,23 @@ export function Live({ onPlans }: {
           } catch (e) { fail(e); }
         }}>{tr("liv.lendmine", lang)}</button>
       </div>
+        </>
+      )}
 
+      {/* Set-up, folded: this screen leads with what is live; a form
+          is opened when somebody means to change that. */}
+      {!setupWear ? (
+        <div className="card">
+          <div className="row">
+            <h3 style={{ flex: 1, margin: 0 }}>{tr("liv.wear", lang)}</h3>
+            <button className="chip" onClick={() => setSetupWear(true)}>
+              {tr("liv.setup", lang)}
+            </button>
+          </div>
+        <p className="muted small">{tr("liv.wear.where", lang)}</p>
+        </div>
+      ) : (
+        <>
       <div className="card">
         <h3>{tr("liv.wear", lang)}</h3>
         <div className="row">
@@ -440,6 +488,8 @@ export function Live({ onPlans }: {
           </>
         )}
       </div>
+        </>
+      )}
     </div>
   );
 }

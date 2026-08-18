@@ -609,16 +609,7 @@ const CHROME: Table = {
     en: "My Space", es: "Mi espacio", fr: "Mon espace", de: "Mein Bereich", pt: "O meu espaço", it: "Il mio spazio", ja: "マイスペース", zh: "我的空间", hi: "मेरा स्पेस", ar: "مساحتي",
   },
   "corner.sub": {
-    en: "your homepage and your messages — the person's own surfaces",
-    es: "tu página personal y tus mensajes — las superficies de la persona",
-    fr: "votre page personnelle et vos messages — les surfaces de la personne",
-    de: "deine Startseite und deine Nachrichten — die Flächen der Person",
-    pt: "a sua página pessoal e as suas mensagens — as superfícies da pessoa",
-    it: "la tua pagina personale e i tuoi messaggi — le superfici della persona",
-    ja: "あなたのホームページとメッセージ — 本人のための場所",
-    zh: "你的主页和你的消息 — 属于本人的界面",
-    hi: "आपका होमपेज और आपके संदेश — व्यक्ति की अपनी जगहें",
-    ar: "صفحتك الشخصية ورسائلك — مساحات الشخص نفسه",
+    en: "Your public page and your messages. What you edit here is exactly what a visitor sees.", es: "Tu página pública y tus mensajes. Lo que editas aquí es exactamente lo que ve un visitante.", fr: "Votre page publique et vos messages. Ce que vous modifiez ici est exactement ce qu'un visiteur voit.", de: "Deine öffentliche Seite und deine Nachrichten. Was du hier bearbeitest, sieht ein Besucher genau so.", pt: "A tua página pública e as tuas mensagens. O que editas aqui é exatamente o que um visitante vê.", it: "La tua pagina pubblica e i tuoi messaggi. Ciò che modifichi qui è esattamente ciò che vede un visitatore.", ja: "あなたの公開ページとメッセージ。ここで編集した内容が、訪問者に見えるそのままの姿です。", zh: "你的公开主页和你的消息。你在这里编辑的，就是访客看到的样子。", hi: "आपका सार्वजनिक पेज और आपके संदेश। आप यहाँ जो संपादित करते हैं, आगंतुक ठीक वही देखता है।", ar: "صفحتك العلنية ورسائلك. ما تحرّره هنا هو بالضبط ما يراه الزائر.",
   },
   "corner.page": {
     en: "Your homepage", es: "Tu página personal", fr: "Votre page personnelle",
@@ -6033,6 +6024,15 @@ const CHROME: Table = {
   "liv.title": {
     en: "Live Now", es: "En vivo ahora", fr: "En direct", de: "Jetzt live", pt: "Em direto agora", it: "In diretta ora", ja: "ライブ中", zh: "正在直播", hi: "अभी लाइव", ar: "مباشر الآن",
   },
+  "liv.setup": {
+    en: "Set up", es: "Configurar", fr: "Configurer", de: "Einrichten", pt: "Configurar", it: "Configura", ja: "設定する", zh: "设置", hi: "सेट करें", ar: "إعداد",
+  },
+  "liv.lend.where": {
+    en: "Inside a room, lend from the room's own controls. This form covers watch parties.", es: "Dentro de una sala, presta desde los controles de la propia sala. Este formulario cubre las sesiones compartidas.", fr: "Dans une salle, prêtez depuis les commandes de la salle elle-même. Ce formulaire couvre les séances partagées.", de: "In einem Raum leihst du über die Regler des Raums selbst. Dieses Formular gilt für Watch Partys.", pt: "Dentro de uma sala, empresta a partir dos controlos da própria sala. Este formulário cobre as sessões partilhadas.", it: "Dentro una stanza, presta dai controlli della stanza stessa. Questo modulo copre i watch party.", ja: "ルーム内では、ルーム自身のコントロールから貸与します。このフォームはウォッチパーティー向けです。", zh: "在房间里，用房间自己的控件出借。这个表单用于一起看。", hi: "रूम के अंदर, रूम के अपने नियंत्रणों से उधार दें। यह फ़ॉर्म वॉच पार्टियों के लिए है।", ar: "داخل الغرفة، أعِر من أدوات الغرفة نفسها. هذا النموذج للمشاهدات الجماعية.",
+  },
+  "liv.wear.where": {
+    en: "Inside a room, wear a mask from the camera's own controls. This form covers the other surfaces.", es: "Dentro de una sala, ponte una máscara desde los controles de la propia cámara. Este formulario cubre las demás superficies.", fr: "Dans une salle, portez un masque depuis les commandes de la caméra elle-même. Ce formulaire couvre les autres surfaces.", de: "In einem Raum trägst du eine Maske über die Regler der Kamera selbst. Dieses Formular gilt für die übrigen Flächen.", pt: "Dentro de uma sala, usa uma máscara a partir dos controlos da própria câmara. Este formulário cobre as outras superfícies.", it: "Dentro una stanza, indossa una maschera dai controlli della fotocamera stessa. Questo modulo copre le altre superfici.", ja: "ルーム内では、カメラ自身のコントロールからマスクを着けます。このフォームはその他のサーフェス向けです。", zh: "在房间里，用相机自己的控件戴面具。这个表单用于其他场景。", hi: "रूम के अंदर, कैमरे के अपने नियंत्रणों से मास्क पहनें। यह फ़ॉर्म बाक़ी सतहों के लिए है।", ar: "داخل الغرفة، ارتدِ قناعًا من أدوات الكاميرا نفسها. هذا النموذج لبقية الأسطح.",
+  },
   "liv.lead": {
     en: "A camera, a microphone, a face over a camera. Whatever you put between yourself and the people around you, they are told.", es: "Una cámara, un micrófono, una cara sobre una cámara. Lo que sea que ponga entre usted y la gente a su alrededor, a ellos se les dice.", fr: "Une caméra, un microphone, un visage par-dessus une caméra. Quoi que vous placiez entre vous et les gens autour de vous, on le leur dit.", de: "Eine Kamera, ein Mikrofon, ein Gesicht über einer Kamera. Was immer Sie zwischen sich und die Menschen um Sie herum stellen — es wird ihnen gesagt.", pt: "Uma câmara, um microfone, um rosto sobre uma câmara. O que quer que ponha entre si e as pessoas à sua volta, elas são informadas.", it: "Una telecamera, un microfono, un volto sopra una telecamera. Qualunque cosa metti tra te e le persone intorno a te, a loro viene detto.", ja: "カメラ、マイク、カメラの上に重ねる顔。自分と周りの人たちのあいだに何を置こうと、そのことは相手に伝えられます。", zh: "一台摄像头、一支麦克风、覆在摄像头上的一张脸。无论你在自己与周围的人之间放了什么，他们都会被告知。", hi: "एक कैमरा, एक माइक्रोफ़ोन, कैमरे पर चढ़ा एक चेहरा। आप अपने और आसपास के लोगों के बीच जो भी रखें, उन्हें बता दिया जाता है।", ar: "كاميرا، وميكروفون، ووجه فوق كاميرا. أيًّا كان ما تضعه بينك وبين من حولك، يُخبَرون به.",
   },
@@ -7891,7 +7891,7 @@ const CHROME: Table = {
     en: "Chat with {name}", es: "Chat con {name}", fr: "Discussion avec {name}", de: "Chat mit {name}", pt: "Conversa com {name}", it: "Chat con {name}", ja: "{name} とのチャット", zh: "与 {name} 聊天", hi: "{name} से चैट", ar: "دردشة مع {name}",
   },
   "chat.pitch": {
-    en: "every response is persona- & relationship-conditioned", es: "cada respuesta está condicionada por la persona y por la relación", fr: "chaque réponse est conditionnée par le personnage et la relation", de: "jede Antwort ist von Persona und Beziehung geprägt", pt: "cada resposta é condicionada pela persona e pela relação", it: "ogni risposta è condizionata dalla persona e dalla relazione", ja: "どの返答も、ペルソナと関係性に条件づけられています", zh: "每一条回复都受人格与关系的调节", hi: "हर उत्तर व्यक्तित्व और रिश्ते से तय होता है", ar: "كل ردّ مشروط بالشخصية وبالعلاقة",
+    en: "You are talking to your own profile. It answers as the persona you built, and adapts to whoever it speaks with.", es: "Estás hablando con tu propio perfil. Responde como la persona que construiste y se adapta a quien le habla.", fr: "Vous parlez à votre propre profil. Il répond selon le personnage que vous avez créé et s'adapte à son interlocuteur.", de: "Du sprichst mit deinem eigenen Profil. Es antwortet als die Persona, die du gebaut hast, und passt sich seinem Gegenüber an.", pt: "Estás a falar com o teu próprio perfil. Responde como a persona que construíste e adapta-se a quem fala com ele.", it: "Stai parlando con il tuo stesso profilo. Risponde come la persona che hai costruito e si adatta a chi gli parla.", ja: "話している相手は、あなた自身のプロフィールです。あなたが作ったペルソナとして答え、話す相手に合わせて変わります。", zh: "你正在和你自己的档案交谈。它以你打造的人设作答，并会因交谈对象而调整。", hi: "आप अपनी ही प्रोफ़ाइल से बात कर रहे हैं। यह आपकी बनाई पर्सोना की तरह जवाब देती है और सामने वाले के अनुसार ढलती है।", ar: "أنت تتحدث إلى ملفك أنت. يجيب بالشخصية التي بنيتها ويتكيّف مع من يحادثه.",
   },
   "bcn.scrape": {
     en: "Fetch the page", es: "Traer la página", fr: "Récupérer la page", de: "Die Seite holen", pt: "Buscar a página", it: "Recupera la pagina", ja: "ページを取得", zh: "抓取页面", hi: "पेज लाएँ", ar: "جلب الصفحة",
