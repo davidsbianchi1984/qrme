@@ -174,6 +174,31 @@ services:
   # also what makes the consoles' error reporting live — but only from the
   # next release, because the collector address is compiled into installers
   # at build time. See docs/cloudgw-deploy.md.
+  #
+  # The gateway does two jobs and this beta uses **one of them**, on purpose.
+  #
+  #   1. the error-report collector — used. That is what the `consoles` token
+  #      and CLOUDGW_PROBLEM_READERS above are for.
+  #   2. the greater model, and the contribution intake — **not** used. That
+  #      is what QRME_CLOUD_URL / JIM_CLOUD_URL would switch on, and neither
+  #      is set anywhere in this file.
+  #
+  # Which is why all three products answer `"cloud": false` on /health. Read
+  # cold that looks like a container running for nothing, and it was listed as
+  # an undecided question for two releases. It is decided here rather than
+  # inferred again: setting those variables routes **inference** for everybody
+  # on the box to the gateway's hosted tier, and the local provider stack
+  # already works. A beta is not where you change which model answers.
+  #
+  # It is one edit away when that is wanted, and all three go together — a box
+  # where two products use the greater model and the third does not is a box
+  # answering the same question two ways:
+  #
+  #   QRME_CLOUD_URL: http://cloudgw:8300
+  #   QRME_CLOUD_TOKEN: ${CLOUDGW_CONSOLES_TOKEN:?}
+  #
+  # Contribution stays opt-in per profile either way; pointing a product at
+  # the gateway only makes the offer possible, it does not accept it.
   cloudgw:
     build:
       context: ${QRME_CONTEXT:-..}

@@ -6,6 +6,31 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **`cloud:false` is a decision now, not an omission.** `docker/beta-compose.yml`
+  runs the `cloudgw` container and sets neither `QRME_CLOUD_URL` nor
+  `JIM_CLOUD_URL`, so all three products answer `"cloud": false` on `/health`.
+  Read cold that looks like a container running for nothing, and it sat on the
+  open-questions list for two releases because nobody could tell from the file
+  whether it was intended.
+
+      asked     why is the gateway up and nothing pointing at it
+      mattered  which of its two jobs this beta actually uses
+
+  It uses one of them. The gateway is the **error-report collector** — that is
+  what the `consoles` token and `CLOUDGW_PROBLEM_READERS` are for, and it is
+  live. It is also the **greater model and the contribution intake**, and that
+  is what those two variables would switch on. Setting them routes inference
+  for everybody on the box to the hosted tier while the local provider stack
+  already works, and a beta is not where you change which model answers.
+
+  Written into the compose file beside the container rather than into a
+  release note, because the next person to wonder will be reading the compose
+  file. It names the two lines that turn it on, and says all three products go
+  together — a box where two use the greater model and the third does not is a
+  box answering the same question two ways.
+
 ### Added
 
 - **A guard on the translations that are already there.**
