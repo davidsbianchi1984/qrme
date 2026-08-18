@@ -6,6 +6,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Profile erasure takes the memory vectors too.** The recollection
+  round wrote the ledger row erasure reads, so the sealed lines died with
+  the profile — but their embedding vectors survived in the resident's
+  index, still ranking. Erasure now takes every vector under the
+  profile's memory prefix in one resident call and reports the count in
+  its answer — `memory_vectors: null` when the tandem was unreached, said
+  rather than guessed.
+
 ### Added
 
 - **The profile remembers by meaning, through the vault.** `remembrance`

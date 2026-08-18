@@ -130,6 +130,20 @@ def chat_block(pdi, profile_id: str, interactor_id: str,
             + "\n- ".join(lines))
 
 
+def forget_profile(pdi, profile_id: str) -> int | None:
+    """Erasure's call: every vector under this profile's memory prefix, in
+    one trip. None when the tandem could not be reached — the erasure
+    answer says so rather than counting what it cannot see. The sealed
+    texts and the `recollections` ledger rows are taken by the erasure
+    sweep itself; this is the half only the resident can do."""
+    if pdi is None:
+        return None
+    try:
+        return pdi.resident_forget(f"qrme/{profile_id}/memory/", prefix=True)
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def tabulate(pdi, dataset: str, rows: list[dict],
              source_ref: str | None = None) -> bool:
     """Structured results into a vault table the PDI console can query —

@@ -568,6 +568,11 @@ def delete_profile(profile_id: str, request: Request) -> dict:
     if vaulted:
         deleted["pdi_records"] = sum(
             1 for key in vaulted if pdi is not None and pdi.delete(key))
+    # And the vectors (qrme/recollection.py): a memory's embedding ranks
+    # even after its seal is gone, so erasure takes the whole shelf in one
+    # call. None means the tandem was unreached, and the answer says so.
+    from .. import recollection
+    deleted["memory_vectors"] = recollection.forget_profile(pdi, profile_id)
     # Derived from the schema, not written down. The list that stood here
     # named twenty-four tables and this schema has sixty-six with a
     # `profile_id` column, so "every trace of it" left forty-two standing —

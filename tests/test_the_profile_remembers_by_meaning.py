@@ -54,6 +54,13 @@ class FakeResidentVault:
         scored.sort(reverse=True)
         return [{"key": k, "score": float(s)} for s, k in scored[:top_k]]
 
+    def resident_forget(self, key, prefix=False):
+        doomed = ([k for k in self.embedded if k.startswith(key)]
+                  if prefix else [k for k in self.embedded if k == key])
+        for k in doomed:
+            del self.embedded[k]
+        return len(doomed)
+
     def resident_tabulate(self, dataset, rows, source_ref=None):
         if not self.has_resident:
             return False
@@ -230,3 +237,17 @@ def test_a_down_tandem_keeps_the_study(client, profile_id, monkeypatch):
     row = db.connect().execute(
         "SELECT * FROM excursions WHERE id=?", (cid,)).fetchone()
     assert row["topic"] == "sleep"
+
+
+def test_erasure_takes_the_memory_vectors_too(client, profile_id,
+                                              interactor_id):
+    """The seal dies with the ledger row; the vector dies here — a memory
+    somebody erased must stop being findable, not merely stop being
+    readable."""
+    vault = FakeResidentVault()
+    client.app.state.pdi = vault
+    _chat(client, profile_id, interactor_id, "remember the lake house")
+    assert len(vault.embedded) == 1
+    gone = client.delete(f"/profiles/{profile_id}?mode=erase")
+    assert gone.status_code == 200, gone.text
+    assert vault.embedded == {}, "memory vectors survived erasure"
