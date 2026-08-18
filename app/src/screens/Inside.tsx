@@ -96,6 +96,27 @@ export function Inside({ onPlans, start = "" }: {
     { kind: string; id: string; display: string }[]>([]);
   const [draft, setDraft] = useState("");
   const [scene, setScene] = useState<RoomFaces | null>(null);
+  // The room's own channel, read off the join answer. `chat`, `voice` and
+  // `video` present flat; `ar` and `vr` are the two the homepage sells as
+  // *places*, and until this state existed the screen rendered them as the
+  // same flat grid — the channel was a badge on the way in and nothing
+  // inside. The scene card offers a stage for both now.
+  const [channel, setChannel] = useState("");
+  // The immersive stage. Entered by a press and left by one — never on the
+  // room's behalf, because going fullscreen and turning sensors on are
+  // decisions a person makes, not properties a room has.
+  const [immersed, setImmersed] = useState(false);
+  // VR look direction: degrees of yaw, driven by dragging the stage. The
+  // seats sit on a turntable this angle turns.
+  const [yaw, setYaw] = useState(0);
+  const dragFrom = useRef<{ x: number; yaw: number } | null>(null);
+  // AR passthrough — the device's world-facing camera as the stage floor.
+  // Deliberately separate from the room-face camera machinery: this stream
+  // renders your surroundings to you and only you, shares no fact with the
+  // room, and stops the moment you step out.
+  const pass = useRef<HTMLVideoElement>(null);
+  const passStream = useRef<MediaStream | null>(null);
+  const [passDenied, setPassDenied] = useState(false);
   const [masks, setMasks] = useState<
     { kind: string; covers_face: boolean; means: string }[]>([]);
   // The synthetic seats' portraits. `GET /profiles/{id}/avatar` is the one
@@ -135,7 +156,8 @@ export function Inside({ onPlans, start = "" }: {
     // doubles as the who-is-here read — and going in renders a scene
     // rather than leaving you on the same form, which a field report
     // described as "it just stayed here in the same menu".
-    api.joinRoom(open, token).then((r) => setSeats(r.participants))
+    api.joinRoom(open, token)
+      .then((r) => { setSeats(r.participants); setChannel(r.channel); })
       .catch(() => setSeats([]));
     // What is in the seats, and who is wearing what — one call, because a
     // second one would draw a frame with a face and no disclosure on it.
@@ -196,6 +218,61 @@ export function Inside({ onPlans, start = "" }: {
     stream.current?.getTracks().forEach((t) => t.stop());
     stream.current = null;
   }, []);
+
+  // The AR passthrough, alive exactly while the stage is. The refusal path
+  // matters as much as the grant: a denied camera downgrades the stage to
+  // the flat backdrop and says so, rather than presenting a black room as
+  // though that were the feature.
+  useEffect(() => {
+    if (!(immersed && channel === "ar")) {
+      passStream.current?.getTracks().forEach((t) => t.stop());
+      passStream.current = null;
+      if (pass.current) pass.current.srcObject = null;
+      return;
+    }
+    let gone = false;
+    setPassDenied(false);
+    navigator.mediaDevices?.getUserMedia(
+      { video: { facingMode: { ideal: "environment" } } })
+      .then((s) => {
+        if (gone) { s.getTracks().forEach((t) => t.stop()); return; }
+        passStream.current = s;
+        if (pass.current) pass.current.srcObject = s;
+      })
+      .catch(() => setPassDenied(true));
+    return () => {
+      gone = true;
+      passStream.current?.getTracks().forEach((t) => t.stop());
+      passStream.current = null;
+    };
+  }, [immersed, channel]);
+
+  /** What a seat shows at stage size: the photo somebody chose, a
+   *  profile's own portrait with its AI mark, or the initials — the same
+   *  resolution order the flat tiles use, because the stage is a way of
+   *  standing in the room, not a different room. */
+  const stageFace = (s: { kind: string; id: string; display: string }) => {
+    const face = scene?.faces[s.id];
+    if (face?.showing === "photo" && face.media_url) {
+      return <img className="rs-photo" src={face.media_url} alt={s.display} />;
+    }
+    if (s.kind !== "user" && aiFaces[s.id]?.asset
+        && !aiFaces[s.id]?.placeholder) {
+      return <img className="rs-photo" alt={s.display}
+                  src={(aiFaces[s.id].asset as string).startsWith("http")
+                         ? (aiFaces[s.id].asset as string)
+                         : getBase() + aiFaces[s.id].asset} />;
+    }
+    if (face?.showing === "camera") {
+      return <span className="rs-face rs-oncam"
+                   title={tr("ins.face.theirs", lang)}>
+        {tr("ins.face.camicon", lang)}
+      </span>;
+    }
+    return <span className="rs-face">
+      {(s.display || "?").split(/\s+/).map((w) => w[0]).join("").slice(0, 2)}
+    </span>;
+  };
 
   // Whose square is lit: the last voice in the transcript. `from` carries
   // the display name each seat also carries.
@@ -420,6 +497,117 @@ export function Inside({ onPlans, start = "" }: {
             })}
           </div>
           {scene && <p className="muted small">{scene.note}</p>}
+          {/* The way into the stage, offered only in the rooms whose whole
+              pitch is being a place. Flat rooms stay flat; nothing here
+              turns a chat room into a headset demand. */}
+          {(channel === "ar" || channel === "vr") && (
+            <button disabled={busy} onClick={() => {
+              setYaw(0); setImmersed(true);
+            }}>
+              {channel === "ar" ? tr("ins.stage.ar", lang)
+                                : tr("ins.stage.vr", lang)}
+            </button>
+          )}
+        </div>
+      )}
+
+      {immersed && (channel === "ar" || channel === "vr") && (
+        // The stage: the same room, stood in. AR draws the seats over this
+        // device's own passthrough; VR draws them around a turntable the
+        // drag turns. Both are rendered here and only here — no pixels of
+        // yours and no room of anybody else's crosses the wire for this.
+        <div className={"room-stage" + (channel === "vr" ? " vr" : "")}
+             role="dialog" aria-label={tr("ins.stage.title", lang)}
+             onPointerDown={(e) => {
+               dragFrom.current = { x: e.clientX, yaw };
+             }}
+             onPointerMove={(e) => {
+               if (dragFrom.current == null) return;
+               // A third of a degree per pixel: a full swipe across a phone
+               // turns about 120° — enough to look around the circle without
+               // a flick spinning the room.
+               setYaw(dragFrom.current.yaw
+                 + (e.clientX - dragFrom.current.x) / 3);
+             }}
+             onPointerUp={() => { dragFrom.current = null; }}
+             onPointerLeave={() => { dragFrom.current = null; }}>
+          {channel === "ar" && !passDenied && (
+            <video ref={pass} className="stage-pass" autoPlay playsInline muted
+                   aria-label={tr("ins.stage.passlabel", lang)} />
+          )}
+          {channel === "ar" && passDenied && (
+            <p className="stage-note">{tr("ins.stage.denied", lang)}</p>
+          )}
+          {channel === "vr" && (
+            <div className="stage-floor" aria-hidden="true" />
+          )}
+          {channel === "vr" ? (
+            <div className="stage-turn">
+              {seats.map((s, i) => {
+                // The circle: seats spaced evenly, each card counter-rotated
+                // so it faces the viewer from wherever the turntable stops —
+                // a billboard, which is what a face is for.
+                const a = (360 / Math.max(seats.length, 1)) * i;
+                return (
+                  <div key={s.id} className="stage-anchor"
+                       style={{ transform:
+                         `rotateY(${a + yaw}deg) translateZ(-280px)` }}>
+                    <div className={"stage-seat"
+                                    + (talking === s.display ? " talking" : "")}
+                         style={{ transform: `rotateY(${-(a + yaw)}deg)` }}>
+                      {stageFace(s)}
+                      <span className="rs-name">{s.display}</span>
+                      {s.kind !== "user" && (
+                        <span className="rs-ai"
+                              title={tr("ins.seat.profile", lang)}>
+                          {tr("ins.seat.aimark", lang)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            seats.map((s, i) => {
+              // Anchored over the passthrough deterministically: the same
+              // room shows everyone the same arrangement, because the seat
+              // index — not a random draw — decides where a face floats.
+              const n = Math.max(seats.length, 1);
+              const left = 10 + (i * 80) / n + (i % 2) * 6;
+              const top = 24 + ((i * 29) % 42);
+              return (
+                <div key={s.id}
+                     className={"stage-seat ar"
+                                + (talking === s.display ? " talking" : "")}
+                     style={{ left: `${left}%`, top: `${top}%` }}>
+                  {stageFace(s)}
+                  <span className="rs-name">{s.display}</span>
+                  {s.kind !== "user" && (
+                    <span className="rs-ai" title={tr("ins.seat.profile", lang)}>
+                      {tr("ins.seat.aimark", lang)}
+                    </span>
+                  )}
+                </div>
+              );
+            })
+          )}
+          {/* The last thing said rides the stage, so stepping in is not
+              stepping out of the conversation. */}
+          {transcript.length > 0 && (
+            <p className="stage-line">
+              <strong>{transcript[transcript.length - 1].from}</strong>
+              {": "}{transcript[transcript.length - 1].content}
+            </p>
+          )}
+          <p className="stage-note">
+            {channel === "ar" ? tr("ins.stage.arnote", lang)
+                              : tr("ins.stage.vrnote", lang)}
+          </p>
+          <button className="stage-leave"
+                  onClick={() => setImmersed(false)}>
+            {tr("ins.stage.leave", lang)}
+          </button>
         </div>
       )}
 

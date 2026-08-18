@@ -6,6 +6,28 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The AR and VR rooms become places to stand in.** The homepage has sold
+  rooms in three presentations since the channels shipped — 2-D, AR, VR —
+  and the room screen rendered all five channels as the same flat grid: the
+  channel was a badge on the way in and nothing inside. The join answer has
+  always carried the channel; the screen reads it now, and the two immersive
+  channels offer a **stage**. In an AR room the stage is the device's own
+  world-facing camera as passthrough, with every seat anchored over it at a
+  position the seat index decides — the same room shows everyone the same
+  arrangement — and the honest note carried on the stage itself: the
+  passthrough is drawn only for you, nothing of your surroundings is
+  streamed or stored, and a refused camera downgrades to a plain backdrop
+  and says so rather than presenting a black room. In a VR room the stage
+  is a rendered scene on this device: a floor grid under a turntable of
+  seats spaced evenly around a circle, each card counter-rotated to face
+  you from wherever a drag leaves the room turned. Both stages keep the
+  scene's rules — the photo somebody chose, a profile's own portrait with
+  its AI mark, the talking light on whoever spoke last, and the last thing
+  said riding the stage so stepping in is not stepping out of the
+  conversation. Entered by a press, left by one, in ten languages.
+
 ## [0.85.0] - 2026-08-18
 
 ### Added

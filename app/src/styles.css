@@ -1128,3 +1128,41 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 /* ---- the chat composer's + : same drawer the agent's bar earned ---- */
 .composer { position: relative; }
 .composer-plus { bottom: calc(100% + 8px); }
+
+/* The room stage — AR passthrough or the VR turntable. One fixed layer
+   over everything, left by its own button; nothing behind it unmounts. */
+.room-stage { position: fixed; inset: 0; z-index: 80; overflow: hidden;
+  background: radial-gradient(90% 70% at 50% 20%, #101b30 0%, #070b15 70%);
+  touch-action: none; cursor: grab; }
+.room-stage:active { cursor: grabbing; }
+.stage-pass { position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; }
+.room-stage.vr { perspective: 640px; }
+.stage-floor { position: absolute; left: 50%; top: 62%; width: 1400px;
+  height: 1400px; margin-left: -700px;
+  transform: rotateX(84deg) translateZ(-120px);
+  background:
+    repeating-linear-gradient(0deg, rgba(122,162,255,0.16) 0 1px, transparent 1px 70px),
+    repeating-linear-gradient(90deg, rgba(122,162,255,0.16) 0 1px, transparent 1px 70px);
+  mask-image: radial-gradient(closest-side, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(closest-side, #000 30%, transparent 75%); }
+.stage-turn { position: absolute; left: 50%; top: 46%;
+  transform-style: preserve-3d; }
+.stage-anchor { position: absolute; transform-style: preserve-3d; }
+.stage-seat { display: flex; flex-direction: column; align-items: center;
+  gap: 6px; width: 128px; margin-left: -64px; padding: 12px 8px;
+  background: rgba(10,16,28,0.55); border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 16px; backdrop-filter: blur(4px); }
+.stage-seat.ar { position: absolute; }
+.stage-seat.talking { border-color: rgba(123,196,127,0.8);
+  box-shadow: 0 0 22px rgba(123,196,127,0.35); }
+.stage-seat .rs-photo, .stage-seat .rs-face { width: 72px; height: 72px; }
+.stage-line { position: absolute; left: 50%; bottom: 76px;
+  transform: translateX(-50%); max-width: 80%; margin: 0; padding: 8px 14px;
+  background: rgba(10,16,28,0.72); border-radius: 12px; font-size: 13px; }
+.stage-note { position: absolute; left: 50%; bottom: 44px;
+  transform: translateX(-50%); max-width: 86%; margin: 0; font-size: 11px;
+  opacity: 0.75; text-align: center; }
+.stage-leave { position: absolute; top: 14px; right: 14px;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 999px; padding: 9px 16px; }
