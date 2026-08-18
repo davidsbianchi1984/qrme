@@ -26,12 +26,29 @@ import re
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 README = os.path.join(ROOT, "README.md")
+#: The desktop, mobile and portrait galleries moved out of the README when
+#: it was cut down to a professional front page that keeps only the watch
+#: set — the owner's call. The screens are still shown *somewhere*, which
+#: is what this file holds; somewhere is now here.
+GALLERY = os.path.join(ROOT, "docs", "gallery.md")
+CAPABILITIES = os.path.join(ROOT, "docs", "capabilities.md")
 SCREENS = os.path.join(ROOT, "docs", "screens")
 
 
 def _readme() -> str:
     with open(README, encoding="utf-8") as fh:
         return fh.read()
+
+
+def _pages() -> str:
+    """Everywhere a screen may be shown. The gallery page references images
+    relative to docs/, so both `docs/screens/x.svg` and `screens/x.svg`
+    count as a reference."""
+    text = _readme()
+    for path in (GALLERY, CAPABILITIES):
+        with open(path, encoding="utf-8") as fh:
+            text += fh.read()
+    return text
 
 
 def _referenced(src: str) -> list[str]:
@@ -43,7 +60,7 @@ def _referenced(src: str) -> list[str]:
     each is preserved.
     """
     seen: dict[str, None] = {}
-    for name in re.findall(r"docs/screens/([\w\-.]+\.svg)", src):
+    for name in re.findall(r"(?:docs/)?screens/([\w\-.]+\.svg)", src):
         seen.setdefault(name, None)
     return list(seen)
 
@@ -55,7 +72,7 @@ def _on_disk() -> set[str]:
 def test_every_referenced_screen_exists():
     """A broken image in a README is invisible to whoever wrote it — it
     renders as a small box on somebody else's machine."""
-    missing = sorted(set(_referenced(_readme())) - _on_disk())
+    missing = sorted(set(_referenced(_pages())) - _on_disk())
     assert not missing, ("the README points at screens that are not on disk:\n  "
                          + "\n  ".join(missing))
 
@@ -64,7 +81,7 @@ def test_every_screen_is_shown_somewhere():
     """The other direction, and the one that catches a shelved feature coming
     back: screen 81 was built, held, and returned, and nothing but this would
     have noticed if it had returned without a place to be seen."""
-    unshown = sorted(_on_disk() - set(_referenced(_readme())))
+    unshown = sorted(_on_disk() - set(_referenced(_pages())))
     assert not unshown, ("screens exist that the README never shows:\n  "
                          + "\n  ".join(unshown))
 
@@ -96,7 +113,7 @@ def test_the_gallery_runs_in_order_and_skips_nothing():
     appearing is exactly what nobody re-reads a 1,800-line README to find.
     """
     numbers: list[int] = []
-    for name in _referenced(_readme()):
+    for name in _referenced(_pages()):
         head = name.split("-", 1)[0]
         if head.isdigit():
             n = int(head)
@@ -128,7 +145,13 @@ def test_every_test_count_the_readme_claims_is_true():
     import re
 
     root = pathlib.Path(__file__).resolve().parent.parent
+    # The claims lived in the README's capability sections until the front
+    # page was cut down; the defect this guards is a *wrong* number wherever
+    # one is printed, so the scan covers the README and every markdown page
+    # under docs/. An absence of claims would be a legal state.
     readme = (root / "README.md").read_text()
+    for page in sorted((root / "docs").glob("*.md")):
+        readme += page.read_text()
     claims = re.findall(
         r"`((?:qrme|jim)/[\w/]+\.py)`[^\n]{0,40}?(\d+) tests", readme)
     assert claims, "no test-count claims found — has the README format changed?"
