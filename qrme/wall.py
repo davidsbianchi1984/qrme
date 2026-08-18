@@ -249,6 +249,15 @@ def publish(profile_id: str, body: str, author: dict | None = None,
     # Ownership was checked above, before the insert; this just records it.
     attached = media_mod.attach(post_id, profile_id, media_ids) \
         if media_ids else []
+    # The people who asked to hear from this profile. Only an approved post:
+    # a blocked one is visible to its author and to nobody else, and an inbox
+    # row about a thing the reader can never see would be the filter
+    # advertising its own catch — the same reason `audience.comment` sends no
+    # event for a blocked comment.
+    if verdict.approved:
+        from . import audience
+        audience.published("profile", profile_id, post_id)
+
     return {"id": post_id, "profile_id": profile_id, "body": body,
             "listing_id": listing_id, "video": video, "media": attached,
             "status": status,

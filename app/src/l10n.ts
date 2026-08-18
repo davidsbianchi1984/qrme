@@ -536,6 +536,9 @@ const CHROME: Table = {
     ja: "が配信への出演を認めました", zh: "让你加入了他们的直播",
     hi: "ने आपको अपनी स्ट्रीम में जगह दी", ar: "منحك مكانًا في بثه",
   },
+  "inbox.kind.published": {
+    en: "has more for you", es: "tiene algo nuevo para ti", fr: "a du nouveau pour vous", de: "hat Neues für dich", pt: "tem novidades para você", it: "ha qualcosa di nuovo per te", ja: "から新しい投稿があります", zh: "有新内容给你", hi: "के पास आपके लिए कुछ नया है", ar: "لديه جديد لك",
+  },
   "inbox.kind.room_invite": {
     en: "asked you into a room",
     es: "te invitó a una sala",

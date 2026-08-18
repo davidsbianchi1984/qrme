@@ -2,7 +2,12 @@
 
 Every event here is something *somebody else did to you* — a message sent,
 a comment left under your post, a friendship extended, an exchange signed,
-a place on a stream granted. The 0.42.x rounds built each of those doors,
+a place on a stream granted — with one deliberate exception, `published`,
+which is something you asked to hear about. Subscribing says *tell me when
+there is more from them*, and until it was added the telling did not exist:
+the subscription was a row, a charge and a number on a page, and the person
+who bought it still had to go and look. The inbox is where the platform keeps
+that kind of promise, so it is where this one is kept too. The 0.42.x rounds built each of those doors,
 and every one of them shared a silence: the thing happened, and the person
 it happened to found out only by going to look. A capability nobody is
 told about is reachable the way a doorless route is — technically.
@@ -43,6 +48,7 @@ KINDS = (
     "exchange_signed",  # the other party signed your exchange
     "guest_accepted",  # a host gave you your place on their stream
     "room_invite",     # somebody in a room asked you into it
+    "published",       # somebody you subscribe to has more
 )
 
 

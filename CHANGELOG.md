@@ -6,6 +6,43 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **A subscription that finally tells somebody.** The estate's connections all
+  run one way: a profile posts, a desk goes live, and the people hear about it
+  because the thing reached them. `audience.subscribe` was meant to be the
+  other direction and it half was — a `subscriptions` table, two tiers, a
+  charge per period, `subscribers()` and `subscriptions_of()`.
+
+      asked     can somebody subscribe to this
+      mattered  does subscribing ever reach them
+
+  It did not. `subscribers()` was read in exactly two places, a route that
+  lists them and the `counts` payload, so what a person bought was a row, a
+  charge and a number on somebody else's page — while `subscribe`'s own
+  docstring said subscribing means *tell me when there is more from them*.
+
+  `audience.published` is the one delivery door, and the telling goes to
+  `qrme/inbox.py`, whose docstring already made this argument for every other
+  capability: *a capability nobody is told about is reachable the way a
+  doorless route is — technically*. A second delivery surface beside it would
+  be the drift that module was written to prevent. `published` is the one
+  exception to the inbox's *somebody did this to you* framing, and deliberately
+  so: it is the thing you asked to hear.
+
+  Three things it does not do. It **carries a reference, never the words** —
+  the inbox's own first rule, earning a second reason here, because the thing
+  published has its own gates and a notice carrying the content would be a path
+  around every one of them. It tells **active subscribers only**, since
+  cancelling is not a pause on the billing with the delivery left running. And
+  it does not tell the publisher about themselves, leaning on the rule
+  `inbox.note` already owns rather than repeating it.
+
+  Wired to the one producer that means *more from them*: `wall.publish`, and
+  only on an approved post. An inbox row about a blocked one would be the
+  filter advertising its own catch, which is why `audience.comment` sends no
+  event for a blocked comment either.
+
 ### Changed
 
 - **`cloud:false` is a decision now, not an omission.** `docker/beta-compose.yml`

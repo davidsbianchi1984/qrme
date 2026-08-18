@@ -503,6 +503,47 @@ def subscriptions_of(subscriber: str, active_only: bool = True) -> list:
     return [subscription(r["id"]) for r in rows]
 
 
+def published(kind: str, subject_id: str, ref: str) -> dict:
+    """A subject has more. Tell the people who asked to hear.
+
+    The half of a subscription that was missing. :func:`subscribe` says, in
+    its own docstring, that subscribing means *tell me when there is more from
+    them* — and nothing told anybody. `subscribers` was read in two places, a
+    route that lists them and the counts payload, so what a person bought was
+    a row, a charge, and a number on somebody else's page.
+
+        asked     can somebody subscribe to this
+        mattered  does subscribing ever reach them
+
+    Three things this does not do, each on purpose:
+
+    * **It carries a reference, never the words.** That is the inbox's own
+      first rule and it is the right one here for an extra reason: the thing
+      published has its own gates — a rated desk runs the deployment's
+      verified-adult check, a blocked post is visible only to its author — and
+      a notice that copied the content would be a second path around every one
+      of them. The notice points; reading follows the pointer through the
+      door that was already there.
+
+    * **It tells active subscribers only.** Cancelling is not a pause on the
+      billing with the delivery left running.
+
+    * **It does not tell the publisher about themselves.** :func:`inbox.note`
+      already drops an event where actor and recipient are the same profile,
+      and this leans on that rather than repeating it — one rule, in the place
+      that owns it.
+    """
+    _check_subject(kind)
+    actor = subject_id if kind == "profile" else _owner_of(kind, subject_id)
+    told = 0
+    for row in subscribers(kind, subject_id, active_only=True):
+        if actor is None:
+            break
+        inbox.note(row["subscriber"], "published", actor, ref)
+        told += 1
+    return {"kind": kind, "subject_id": subject_id, "ref": ref, "told": told}
+
+
 def counts(kind: str, target_id: str, viewer_id: str | None = None) -> dict:
     """The numbers a client renders next to the buttons, in one call."""
     out = {
