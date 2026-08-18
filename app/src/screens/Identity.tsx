@@ -406,12 +406,23 @@ export function Identity({ onPlans, onPassing }: {
         <h3>{tr("idn.bubble", lang)}</h3>
         {avatar && (
           <>
-            <p className="small">
-              {avatar.placeholder || avatar.silhouette
-                ? tr("idn.bubble.empty", lang)
-                : fill(tr("idn.bubble.showing", lang),
-                    { asset: <code>{avatar.asset}</code> })}
-            </p>
+            {/* The picture itself, first. This card used to *describe* the
+                bubble — an asset path in a code span — and the field report
+                read exactly as that deserved: not sure what is going on
+                here. A picture card shows the picture. */}
+            <div className="idn-bubble-row">
+              {avatar.asset && !avatar.placeholder ? (
+                <img className="idn-bubble" src={getBase() + avatar.asset}
+                     alt={tr("idn.bubble", lang)} />
+              ) : (
+                <span className="idn-bubble idn-bubble-empty" aria-hidden="true" />
+              )}
+              {(avatar.placeholder || avatar.silhouette) && (
+                <p className="small" style={{ flex: 1 }}>
+                  {tr("idn.bubble.empty", lang)}
+                </p>
+              )}
+            </div>
             {/* Always displayed, by the product's own rule — so the screen
                 shows it rather than implying it is a setting. */}
             <p className="muted small">

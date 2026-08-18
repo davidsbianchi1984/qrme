@@ -55,6 +55,18 @@ KINDS: dict[str, dict] = {
                      "means": "on your own desk, facing you"},
     "table_top": {"passers_by": False,
                   "means": "a small screen in your own room"},
+    # The three the owner asked after by name: a screen you cast to, one
+    # paired over Bluetooth, one plugged straight in. All private-side —
+    # the grouping is who stands in front, and these live in your own
+    # space; a cast sink in a lobby is a wall_panel wearing a dongle.
+    "cast_sink": {"passers_by": False,
+                  "means": "a TV or monitor you cast to over the network "
+                           "(AirPlay, Cast)"},
+    "bluetooth_device": {"passers_by": False,
+                         "means": "a nearby device paired over Bluetooth"},
+    "attached_device": {"passers_by": False,
+                        "means": "a screen plugged straight into this "
+                                 "machine (USB, HDMI)"},
 }
 
 # Small or full, and it is not only a size. A `badge` is a strip — a name, a

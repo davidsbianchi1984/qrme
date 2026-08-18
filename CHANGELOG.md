@@ -8,6 +8,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The words inside match the doors outside.** The menu round renamed
+  the tabs; this one walks through the doors. Seventeen screen headers
+  drop their riddle names for the menu's own words — My Space, Earnings,
+  Permissions, Watermark, Live Now, Tour — in all ten languages. The
+  identity card once called "The bubble" is **Profile picture** now, and
+  it shows the picture: the card used to describe the image as an asset
+  path in a code span, which the field report read exactly as that
+  deserved. The camera-share form's viewer field offers the profiles you
+  actually know — your own and your friends' — instead of a box waiting
+  for an id. And the fixed-screen registry gains the three kinds the
+  owner asked after by name: a cast sink, a Bluetooth-paired device, and
+  a screen plugged straight in.
+
 - **The engine's avatars lead the import list.** The owner makes his
   avatars and voices on the same platform surface, and asked for it to
   front the market. ElevenLabs is the first import source now, with the

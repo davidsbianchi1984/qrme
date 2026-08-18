@@ -606,9 +606,7 @@ const CHROME: Table = {
     en: "My Space", es: "Mi espacio", fr: "Mon espace", de: "Mein Bereich", pt: "O meu espaço", it: "Il mio spazio", ja: "マイスペース", zh: "我的空间", hi: "मेरा स्पेस", ar: "مساحتي",
   },
   "corner.title": {
-    en: "Your corner", es: "Tu rincón", fr: "Votre coin", de: "Deine Ecke",
-    pt: "O seu cantinho", it: "Il tuo angolo", ja: "あなたのコーナー", zh: "你的角落",
-    hi: "आपका कोना", ar: "ركنك",
+    en: "My Space", es: "Mi espacio", fr: "Mon espace", de: "Mein Bereich", pt: "O meu espaço", it: "Il mio spazio", ja: "マイスペース", zh: "我的空间", hi: "मेरा स्पेस", ar: "مساحتي",
   },
   "corner.sub": {
     en: "your homepage and your messages — the person's own surfaces",
@@ -2901,7 +2899,7 @@ const CHROME: Table = {
     ar: "مرفوض",
   },
   "asst.title": {
-    en: "What it can do for you", es: "Lo que puede hacer por ti", fr: "Ce qu'il peut faire pour vous", de: "Was es für Sie tun kann", pt: "O que pode fazer por si", it: "Cosa può fare per te", ja: "あなたのためにできること", zh: "它能为你做什么", hi: "यह आपके लिए क्या कर सकता है", ar: "ما يمكنه فعله من أجلك",
+    en: "Tasks", es: "Tareas", fr: "Tâches", de: "Aufgaben", pt: "Tarefas", it: "Attività", ja: "タスク", zh: "任务", hi: "कार्य", ar: "المهام",
   },
   "asst.lead": {
     en: "Sort a pile, fix a draft, make something worth keeping — and every generated thing carries a mark you can check.", es: "Ordena un montón, arregla un borrador, crea algo que valga la pena guardar — y todo lo generado lleva una marca que puedes comprobar.", fr: "Triez une pile, corrigez un brouillon, créez quelque chose à garder — et tout ce qui est généré porte une marque vérifiable.", de: "Einen Stapel sortieren, einen Entwurf verbessern, etwas Bleibendes schaffen — und alles Generierte trägt ein prüfbares Zeichen.", pt: "Ordene uma pilha, corrija um rascunho, crie algo que valha a pena guardar — e tudo o que é gerado traz uma marca verificável.", it: "Ordina una pila, sistema una bozza, crea qualcosa da tenere — e ogni cosa generata porta un marchio verificabile.", ja: "山を仕分け、下書きを直し、残す価値のあるものを作る — 生成されたものには必ず確認できるマークが付きます。", zh: "整理一堆、修改草稿、创作值得保留的东西 — 每件生成物都带有可核验的标记。", hi: "ढेर छाँटें, मसौदा सुधारें, रखने लायक कुछ बनाएँ — और हर जनित चीज़ पर जाँचने योग्य चिह्न होता है।", ar: "رتّب كومة، أصلح مسودة، اصنع شيئًا يستحق الحفظ — وكل ما يُولَّد يحمل علامة يمكنك التحقق منها.",
@@ -3240,7 +3238,7 @@ const CHROME: Table = {
     en: "⚠ Right now it resolves to {effective} — the one you picked has no key on this deployment yet.", es: "⚠ Ahora mismo se resuelve a {effective} — el que elegiste aún no tiene clave en este despliegue.", fr: "⚠ En ce moment, cela se résout en {effective} — celui que vous avez choisi n'a pas encore de clé sur ce déploiement.", de: "⚠ Derzeit löst es zu {effective} auf — das gewählte hat auf diesem Deployment noch keinen Schlüssel.", pt: "⚠ Neste momento resolve para {effective} — o que escolheu ainda não tem chave neste deployment.", it: "⚠ In questo momento si risolve in {effective} — quello scelto non ha ancora una chiave su questo deployment.", ja: "⚠ 現在は{effective}に解決されます — 選んだものはまだこの配備にキーがありません。", zh: "⚠ 当前解析为{effective} — 你选的那个在此部署上还没有密钥。", hi: "⚠ अभी यह {effective} पर हल होता है — आपके चुने हुए की इस डिप्लॉयमेंट पर अभी कुंजी नहीं है।", ar: "⚠ الآن يُحل إلى {effective} — الذي اخترته لا مفتاح له في هذا النشر بعد.",
   },
   "sell.title": {
-    en: "What you are owed", es: "Lo que se te debe", fr: "Ce qui vous est dû", de: "Was Ihnen zusteht", pt: "O que lhe é devido", it: "Ciò che ti è dovuto", ja: "あなたへの支払い", zh: "你应得的", hi: "आपका बकाया", ar: "ما يُستحق لك",
+    en: "Earnings", es: "Ingresos", fr: "Revenus", de: "Einnahmen", pt: "Rendimentos", it: "Guadagni", ja: "収益", zh: "收益", hi: "कमाई", ar: "الأرباح",
   },
   "sell.lead": {
     en: "The seller's side. What your profile is offered for, who holds a licence on it, what that has earned, and asking to be paid.", es: "El lado del vendedor. Por cuánto se ofrece tu perfil, quién tiene una licencia, qué ha ganado y cómo pedir el pago.", fr: "Le côté vendeur. À quel prix votre profil est offert, qui détient une licence, ce que cela a rapporté, et demander à être payé.", de: "Die Verkäuferseite. Wofür Ihr Profil angeboten wird, wer eine Lizenz hält, was das eingebracht hat, und die Auszahlung anfordern.", pt: "O lado do vendedor. Por quanto o seu perfil é oferecido, quem detém uma licença, o que isso rendeu, e pedir para ser pago.", it: "Il lato del venditore. A quanto è offerto il tuo profilo, chi ne detiene una licenza, cosa ha fruttato, e chiedere di essere pagato.", ja: "売り手側の画面。プロフィールの提供条件、ライセンス保持者、収益、そして支払いの請求。", zh: "卖方视角。你的资料以什么条件提供、谁持有许可、赚了多少、以及请求付款。", hi: "विक्रेता पक्ष। आपका प्रोफ़ाइल किस पर पेश है, किसके पास लाइसेंस है, उसने क्या कमाया, और भुगतान माँगना।", ar: "جانب البائع. بمَ يُعرض ملفك، ومن يحمل ترخيصًا عليه، وما كسبه، وطلب الدفع.",
@@ -3726,7 +3724,7 @@ const CHROME: Table = {
     en: "Send it", es: "Enviarlo", fr: "L'envoyer", de: "Absenden", pt: "Enviá-lo", it: "Invialo", ja: "送信する", zh: "发送", hi: "भेजें", ar: "أرسله",
   },
   "rem.title": {
-    en: "Miscellaneous", es: "Misceláneo", fr: "Divers", de: "Verschiedenes", pt: "Diversos", it: "Varie", ja: "その他いろいろ", zh: "杂项", hi: "विविध", ar: "متفرقات",
+    en: "More Tools", es: "Más herramientas", fr: "Autres outils", de: "Weitere Werkzeuge", pt: "Mais ferramentas", it: "Altri strumenti", ja: "その他のツール", zh: "更多工具", hi: "और उपकरण", ar: "أدوات أخرى",
   },
   "rem.fb": {
     en: "Tell us about the app", es: "Cuéntanos sobre la app", fr: "Parlez-nous de l'appli", de: "Erzählen Sie uns von der App", pt: "Fale-nos da app", it: "Parlaci dell'app", ja: "アプリについて教えてください", zh: "跟我们聊聊这个应用", hi: "ऐप के बारे में बताएँ", ar: "أخبرنا عن التطبيق",
@@ -4173,10 +4171,7 @@ const CHROME: Table = {
     en: "Not withheld", es: "No reservado", fr: "Non retenu", de: "Nicht zurückgehalten", pt: "Não reservado", it: "Non riservato", ja: "伏せられないもの", zh: "并未隐去", hi: "नहीं रोका गया", ar: "غير محجوب",
   },
   "idn.bubble": {
-    en: "The bubble", es: "La burbuja", fr: "La bulle", de: "Die Blase", pt: "A bolha", it: "La bolla", ja: "バブル", zh: "气泡", hi: "बुलबुला", ar: "الفقاعة",
-  },
-  "idn.bubble.showing": {
-    en: "Showing {asset}", es: "Mostrando {asset}", fr: "Affiche {asset}", de: "Zeigt {asset}", pt: "A mostrar {asset}", it: "Mostra {asset}", ja: "表示中: {asset}", zh: "正在显示 {asset}", hi: "दिखा रहा {asset}", ar: "يعرض {asset}",
+    en: "Profile picture", es: "Foto de perfil", fr: "Photo de profil", de: "Profilbild", pt: "Foto de perfil", it: "Immagine del profilo", ja: "プロフィール画像", zh: "头像", hi: "प्रोफ़ाइल चित्र", ar: "صورة الملف",
   },
   "idn.bubble.portrait": {
     en: "Or a portrait", es: "O un retrato", fr: "Ou un portrait", de: "Oder ein Porträt", pt: "Ou um retrato", it: "Oppure un ritratto", ja: "あるいは肖像", zh: "或者一幅肖像", hi: "या एक चित्र", ar: "أو صورة شخصية",
@@ -4245,7 +4240,7 @@ const CHROME: Table = {
     en: "{n} other kinds of record had nothing to erase.", es: "Otros {n} tipos de registro no tenían nada que borrar.", fr: "{n} autres sortes d'enregistrement n'avaient rien à effacer.", de: "{n} andere Arten von Datensätzen hatten nichts zu löschen.", pt: "Outros {n} tipos de registo não tinham nada para apagar.", it: "Altri {n} tipi di record non avevano nulla da cancellare.", ja: "他の{n}種類のレコードには消すものがありませんでした。", zh: "另有{n}类记录没有可抹除的内容。", hi: "अन्य {n} प्रकार के रिकॉर्ड में मिटाने को कुछ नहीं था।", ar: "لم يكن لدى {n} أنواع أخرى من السجلات ما يُمحى.",
   },
   "wsh.title": {
-    en: "What it is made of", es: "De qué está hecho", fr: "De quoi c'est fait", de: "Woraus es besteht", pt: "De que é feito", it: "Di cosa è fatto", ja: "何でできているか", zh: "它由什么构成", hi: "यह किससे बना है", ar: "مما هو مصنوع",
+    en: "Profile Builder", es: "Constructor de perfil", fr: "Atelier du profil", de: "Profil-Werkstatt", pt: "Construtor de perfil", it: "Costruttore del profilo", ja: "プロフィールビルダー", zh: "档案构建器", hi: "प्रोफ़ाइल बिल्डर", ar: "منشئ الملف",
   },
   "wsh.lead": {
     en: "The material a profile is built from, the manner it comes across in, and everything it can hand on to somebody who knows more.", es: "El material con el que se construye un perfil, la manera en que se presenta, y todo lo que puede pasar a alguien que sabe más.", fr: "La matière dont un profil est fait, la manière dont il se présente, et tout ce qu'il peut transmettre à quelqu'un qui en sait plus.", de: "Das Material, aus dem ein Profil gebaut ist, die Art, wie es rüberkommt, und alles, was es an jemanden weitergeben kann, der mehr weiß.", pt: "O material de que um perfil é feito, a maneira como se apresenta, e tudo o que pode passar a alguém que saiba mais.", it: "Il materiale di cui è fatto un profilo, il modo in cui si presenta, e tutto ciò che può passare a qualcuno che ne sa di più.", ja: "プロフィールを形づくる素材、その伝わり方、そしてより詳しい誰かへ渡せるすべて。", zh: "构成一份资料的材料、它给人的感觉，以及它能转交给更懂行者的一切。", hi: "जिस सामग्री से प्रोफ़ाइल बनी है, जिस ढंग से वह सामने आती है, और वह सब जो वह किसी अधिक जानकार को सौंप सकती है।", ar: "المادة التي يُبنى منها الملف، والطريقة التي يظهر بها، وكل ما يمكنه تسليمه لمن يعرف أكثر.",
@@ -4701,7 +4696,7 @@ const CHROME: Table = {
     en: "Ask again", es: "Preguntar de nuevo", fr: "Redemander", de: "Nochmal fragen", pt: "Perguntar de novo", it: "Chiedi di nuovo", ja: "もう一度尋ねる", zh: "再问一次", hi: "फिर पूछें", ar: "اسأل مجددًا",
   },
   "rch.title": {
-    en: "Reaching out, and what stops it", es: "Contactar, y qué lo impide", fr: "Prendre contact, et ce qui l'empêche", de: "Kontakt aufnehmen, und was das verhindert", pt: "Tomar a iniciativa, e o que a trava", it: "Farsi vivo, e cosa lo ferma", ja: "こちらから声をかけること、そしてそれを止めるもの", zh: "主动联系，以及什么会阻止它", hi: "पहल करके संपर्क, और उसे क्या रोकता है", ar: "المبادرة بالتواصل، وما يمنعها",
+    en: "Outreach", es: "Contacto", fr: "Prise de contact", de: "Ansprache", pt: "Contacto", it: "Contatto", ja: "アウトリーチ", zh: "主动联络", hi: "आउटरीच", ar: "التواصل",
   },
   "rch.lead": {
     en: "Four different refusals, and only two of them are yours to lift.", es: "Cuatro negativas distintas, y solo dos son suyas para levantar.", fr: "Quatre refus différents, et deux seulement vous appartiennent.", de: "Vier verschiedene Ablehnungen, und nur zwei davon können Sie aufheben.", pt: "Quatro recusas diferentes, e só duas são suas para levantar.", it: "Quattro rifiuti diversi, e solo due sono tuoi da togliere.", ja: "四つの異なる拒否があり、そのうちあなたが解除できるのは二つだけです。", zh: "四种不同的拒绝，其中只有两种是你能解除的。", hi: "चार अलग-अलग इनकार, और उनमें से केवल दो हटाना आपके हाथ में है।", ar: "أربعة أنواع من الرفض، اثنان منها فقط بيدك رفعهما.",
@@ -4836,7 +4831,7 @@ const CHROME: Table = {
     en: "Version {v}, moved {when}.", es: "Versión {v}, movida {when}.", fr: "Version {v}, modifiée {when}.", de: "Version {v}, bewegt {when}.", pt: "Versão {v}, movida {when}.", it: "Versione {v}, mossa {when}.", ja: "バージョン {v}、更新 {when}。", zh: "版本 {v}，变动于 {when}。", hi: "संस्करण {v}, हिला {when}।", ar: "الإصدار {v}، تحرّك {when}.",
   },
   "vis.title": {
-    en: "Visiting, and being found", es: "Visitar, y ser encontrado", fr: "Rendre visite, et être trouvé", de: "Zu Besuch, und gefunden werden", pt: "Visitar, e ser encontrado", it: "Far visita, ed essere trovato", ja: "訪ねること、そして見つけられること", zh: "造访，以及被找到", hi: "मिलने जाना, और मिल जाना", ar: "الزيارة، وأن يُعثَر عليك",
+    en: "Visits", es: "Visitas", fr: "Visites", de: "Besuche", pt: "Visitas", it: "Visite", ja: "訪問", zh: "访问", hi: "विज़िट", ar: "الزيارات",
   },
   "vis.lead": {
     en: "Two halves of the same idea: standing in front of somebody else's desk, and leaving your own profile somewhere for a stranger to find.", es: "Dos mitades de la misma idea: estar delante del mostrador de otra persona, y dejar su propio perfil en algún sitio para que lo encuentre un desconocido.", fr: "Deux moitiés d'une même idée : se tenir devant le comptoir de quelqu'un d'autre, et laisser son propre profil quelque part pour qu'un inconnu le trouve.", de: "Zwei Hälften derselben Idee: vor dem Tresen einer anderen Person zu stehen, und das eigene Profil irgendwo zu hinterlassen, damit eine fremde Person es findet.", pt: "Duas metades da mesma ideia: estar em frente ao balcão de outra pessoa, e deixar o seu próprio perfil algures para um desconhecido encontrar.", it: "Due metà della stessa idea: stare davanti al banco di qualcun altro, e lasciare il proprio profilo da qualche parte perché uno sconosciuto lo trovi.", ja: "同じ考えの二つの半分です：誰かのデスクの前に立つことと、見知らぬ人が見つけられるように自分のプロフィールをどこかに置いておくこと。", zh: "同一个想法的两半：站在别人的柜台前，以及把自己的资料留在某处让陌生人找到。", hi: "एक ही विचार के दो हिस्से: किसी और के डेस्क के सामने खड़ा होना, और अपनी प्रोफ़ाइल कहीं छोड़ देना ताकि कोई अजनबी उसे पा सके।", ar: "نصفان لفكرة واحدة: أن تقف أمام مكتب شخص آخر، وأن تترك ملفك في مكان ما ليعثر عليه غريب.",
@@ -5007,7 +5002,7 @@ const CHROME: Table = {
     en: " Scanning joins one shared room.", es: " Escanearlo lleva a una sala compartida.", fr: " Le scan fait rejoindre un salon partagé.", de: " Das Scannen führt in einen gemeinsamen Raum.", pt: " Digitalizar leva a uma sala partilhada.", it: " La scansione porta in una stanza condivisa.", ja: "スキャンすると共有ルームに参加します。", zh: "扫描后会加入同一个共享房间。", hi: " स्कैन करने पर एक साझा कक्ष में शामिल हो जाते हैं.", ar: " المسح يُدخلك غرفة مشتركة واحدة.",
   },
   "may.title": {
-    en: "What it may do", es: "Lo que puede hacer", fr: "Ce qu'il peut faire", de: "Was er darf", pt: "O que pode fazer", it: "Cosa può fare", ja: "エージェントにできること", zh: "代理可以做什么", hi: "यह क्या कर सकता है", ar: "ما يمكن للوكيل فعله",
+    en: "Permissions", es: "Permisos", fr: "Autorisations", de: "Berechtigungen", pt: "Permissões", it: "Permessi", ja: "権限", zh: "权限", hi: "अनुमतियाँ", ar: "الأذونات",
   },
   "may.lead": {
     en: "Every power this agent has, what each one keeps, and which of them somebody said yes to.", es: "Todo lo que este agente puede hacer, qué guarda cada cosa, y a cuáles alguien dijo que sí.", fr: "Tout ce que cet agent peut faire, ce que chaque pouvoir conserve, et ceux auxquels quelqu'un a dit oui.", de: "Alles, was dieser Agent kann, was jede Fähigkeit behält, und wozu jemand Ja gesagt hat.", pt: "Tudo o que este agente pode fazer, o que cada coisa guarda, e a quais alguém disse que sim.", it: "Tutto ciò che questo agente può fare, cosa conserva ciascuna cosa, e a quali qualcuno ha detto di sì.", ja: "このエージェントにできることすべてと、それぞれが何を保持するか、そしてどれに誰かが「はい」と言ったか。", zh: "这个代理拥有的每一项能力、每一项会保留什么，以及哪些已经有人点头同意。", hi: "इस एजेंट की हर क्षमता, हर एक क्या रखती है, और किन्हें किसी ने हाँ कहा है।", ar: "كل ما يستطيع هذا الوكيل فعله، وما تحتفظ به كل قدرة، وأيها وافق عليه أحد.",
@@ -5331,7 +5326,7 @@ const CHROME: Table = {
     en: "What this does not prove", es: "Lo que esto no prueba", fr: "Ce que cela ne prouve pas", de: "Was das nicht beweist", pt: "O que isto não prova", it: "Cosa questo non dimostra", ja: "これが証明しないこと", zh: "这不能证明什么", hi: "यह क्या सिद्ध नहीं करता", ar: "ما لا يثبته هذا",
   },
   "plc.title": {
-    en: "Where it is marketed", es: "Dónde se anuncia", fr: "Où il est diffusé", de: "Wo es beworben wird", pt: "Onde é divulgado", it: "Dove viene promosso", ja: "どこで宣伝されているか", zh: "它在哪里被推广", hi: "इसका प्रचार कहाँ है", ar: "أين يُعلَن عنه",
+    en: "Ad Placements", es: "Emplazamientos publicitarios", fr: "Emplacements publicitaires", de: "Werbeplatzierungen", pt: "Espaços publicitários", it: "Spazi pubblicitari", ja: "広告掲載", zh: "广告投放", hi: "विज्ञापन स्थान", ar: "مواضع الإعلانات",
   },
   "plc.lead": {
     en: "An adult-mode profile can be advertised at an adult venue, as a link or a printable code.", es: "Un perfil en modo adulto puede anunciarse en un local para adultos, como enlace o como código imprimible.", fr: "Un profil en mode adulte peut être diffusé sur un espace pour adultes, sous forme de lien ou de code imprimable.", de: "Ein Profil im Erwachsenenmodus kann an einem Erwachsenen-Ort beworben werden, als Link oder als druckbarer Code.", pt: "Um perfil em modo adulto pode ser divulgado num espaço para adultos, como ligação ou como código imprimível.", it: "Un profilo in modalità adulti può essere promosso in uno spazio per adulti, come link o come codice stampabile.", ja: "アダルトモードのプロフィールは、アダルト向けの場でリンクまたは印刷可能なコードとして宣伝できます。", zh: "成人模式的资料可以在成人场所进行推广，形式为链接或可打印的二维码。", hi: "वयस्क-मोड प्रोफ़ाइल का प्रचार किसी वयस्क स्थल पर लिंक या छपने योग्य कोड के रूप में किया जा सकता है।", ar: "يمكن الإعلان عن ملف في وضع البالغين في مكان للبالغين، كرابط أو كرمز قابل للطباعة.",
@@ -6036,7 +6031,7 @@ const CHROME: Table = {
     en: "Rejected.", es: "Rechazado.", fr: "Rejeté.", de: "Abgelehnt.", pt: "Rejeitado.", it: "Rifiutato.", ja: "却下しました。", zh: "已拒绝。", hi: "अस्वीकृत।", ar: "رُفض.",
   },
   "liv.title": {
-    en: "What is live here", es: "Qué está en directo aquí", fr: "Ce qui est en direct ici", de: "Was hier live ist", pt: "O que está em direto aqui", it: "Cosa è in diretta qui", ja: "ここで生中継されているもの", zh: "此处正在直播什么", hi: "यहाँ क्या लाइव है", ar: "ما هو مباشر هنا",
+    en: "Live Now", es: "En vivo ahora", fr: "En direct", de: "Jetzt live", pt: "Em direto agora", it: "In diretta ora", ja: "ライブ中", zh: "正在直播", hi: "अभी लाइव", ar: "مباشر الآن",
   },
   "liv.lead": {
     en: "A camera, a microphone, a face over a camera. Whatever you put between yourself and the people around you, they are told.", es: "Una cámara, un micrófono, una cara sobre una cámara. Lo que sea que ponga entre usted y la gente a su alrededor, a ellos se les dice.", fr: "Une caméra, un microphone, un visage par-dessus une caméra. Quoi que vous placiez entre vous et les gens autour de vous, on le leur dit.", de: "Eine Kamera, ein Mikrofon, ein Gesicht über einer Kamera. Was immer Sie zwischen sich und die Menschen um Sie herum stellen — es wird ihnen gesagt.", pt: "Uma câmara, um microfone, um rosto sobre uma câmara. O que quer que ponha entre si e as pessoas à sua volta, elas são informadas.", it: "Una telecamera, un microfono, un volto sopra una telecamera. Qualunque cosa metti tra te e le persone intorno a te, a loro viene detto.", ja: "カメラ、マイク、カメラの上に重ねる顔。自分と周りの人たちのあいだに何を置こうと、そのことは相手に伝えられます。", zh: "一台摄像头、一支麦克风、覆在摄像头上的一张脸。无论你在自己与周围的人之间放了什么，他们都会被告知。", hi: "एक कैमरा, एक माइक्रोफ़ोन, कैमरे पर चढ़ा एक चेहरा। आप अपने और आसपास के लोगों के बीच जो भी रखें, उन्हें बता दिया जाता है।", ar: "كاميرا، وميكروفون، ووجه فوق كاميرا. أيًّا كان ما تضعه بينك وبين من حولك، يُخبَرون به.",
@@ -6729,7 +6724,7 @@ const CHROME: Table = {
     en: "The buyer's side of the ledger. The seller's side is on the marketplace screen — two questions, so two lists.", es: "El lado del comprador del libro. El del vendedor está en la pantalla del mercado — dos preguntas, así que dos listas.", fr: "Le côté acheteur du registre. Le côté vendeur est sur l'écran de la place de marché — deux questions, donc deux listes.", de: "Die Käuferseite des Buchs. Die Verkäuferseite steht auf dem Marktplatz-Bildschirm — zwei Fragen, also zwei Listen.", pt: "O lado do comprador do livro. O lado do vendedor está no ecrã do mercado — duas perguntas, por isso duas listas.", it: "Il lato acquirente del registro. Il lato venditore è nella schermata del mercato — due domande, quindi due elenchi.", ja: "帳簿の買い手側です。売り手側はマーケットプレイスの画面にあります — 問いが二つなので、一覧も二つです。", zh: "账本的买方一侧。卖方那一侧在市集页面上——两个问题，所以两份清单。", hi: "बही का ख़रीदार पक्ष। विक्रेता पक्ष बाज़ार स्क्रीन पर है — दो सवाल, इसलिए दो सूचियाँ।", ar: "جانب المشتري من الدفتر. أما جانب البائع فعلى شاشة السوق — سؤالان، فقائمتان.",
   },
   "iw.title": {
-    en: "In its own words", es: "Con sus propias palabras", fr: "Dans ses propres mots", de: "Mit seinen eigenen Worten", pt: "Nas suas próprias palavras", it: "Con parole sue", ja: "自分の言葉で", zh: "用它自己的话", hi: "अपने ही शब्दों में", ar: "بكلماته هو",
+    en: "Language & Name", es: "Idioma y nombre", fr: "Langue et nom", de: "Sprache & Name", pt: "Idioma e nome", it: "Lingua e nome", ja: "言語と名前", zh: "语言与名称", hi: "भाषा और नाम", ar: "اللغة والاسم",
   },
   "iw.pickfirst": {
     en: "Choose a profile first.", es: "Elija antes un perfil.", fr: "Choisissez d'abord un profil.", de: "Wählen Sie zuerst ein Profil.", pt: "Escolha primeiro um perfil.", it: "Scegli prima un profilo.", ja: "先にプロフィールを選んでください。", zh: "请先选择一份资料。", hi: "पहले एक प्रोफ़ाइल चुनें।", ar: "اختر ملفًا أولًا.",
@@ -6831,7 +6826,7 @@ const CHROME: Table = {
     en: "Held — {why}. The text is not returned here, deliberately, and it is not public either. It is waiting in the mark screen's queue.", es: "Retenido — {why}. El texto no se devuelve aquí, a propósito, y tampoco es público. Está esperando en la cola de la pantalla de la marca.", fr: "Retenu — {why}. Le texte n'est pas renvoyé ici, délibérément, et il n'est pas public non plus. Il attend dans la file de l'écran de la marque.", de: "Zurückgehalten — {why}. Der Text wird hier absichtlich nicht zurückgegeben, und öffentlich ist er auch nicht. Er wartet in der Warteschlange des Kennzeichen-Bildschirms.", pt: "Retido — {why}. O texto não é devolvido aqui, deliberadamente, e também não é público. Está à espera na fila do ecrã da marca.", it: "Trattenuto — {why}. Il testo non viene restituito qui, di proposito, e non è nemmeno pubblico. Sta aspettando nella coda della schermata del contrassegno.", ja: "保留 — {why}。本文はここには意図的に返されませんし、公開もされていません。標章画面の待ち行列で待っています。", zh: "已留置 — {why}。文本被有意不在此返回，也并未公开。它正在标记页面的队列里等待。", hi: "रोका गया — {why}। पाठ यहाँ जान-बूझकर नहीं लौटाया जाता, और वह सार्वजनिक भी नहीं है। वह चिह्न-स्क्रीन की क़तार में प्रतीक्षा कर रहा है।", ar: "محتجز — {why}. لا يُعاد النص هنا عمدًا، وليس علنيًا أيضًا. إنه ينتظر في طابور شاشة العلامة.",
   },
   "str.title": {
-    en: "Arriving, and strangers", es: "Llegar, y los desconocidos", fr: "Arriver, et les inconnus", de: "Ankommen, und Fremde", pt: "Chegar, e desconhecidos", it: "Arrivare, e sconosciuti", ja: "たどり着くこと、そして見知らぬ人", zh: "抵达，以及陌生人", hi: "आना, और अजनबी", ar: "الوصول، والغرباء",
+    en: "Guest Access", es: "Acceso de invitados", fr: "Accès invité", de: "Gastzugang", pt: "Acesso de convidado", it: "Accesso ospite", ja: "ゲストアクセス", zh: "访客访问", hi: "अतिथि पहुँच", ar: "دخول الضيوف",
   },
   "str.q.hdr": {
     en: "Questions people have put out", es: "Preguntas que la gente ha publicado", fr: "Des questions que des gens ont posées", de: "Fragen, die Leute ausgehängt haben", pt: "Perguntas que as pessoas publicaram", it: "Domande che la gente ha messo in bacheca", ja: "誰かが出している質問", zh: "别人贴出的问题", hi: "लोगों ने जो प्रश्न रखे हैं", ar: "أسئلة طرحها الناس",
@@ -7263,7 +7258,7 @@ const CHROME: Table = {
     en: "The mark, and what is said about it", es: "La marca, y lo que se dice de ella", fr: "La marque, et ce qu'on en dit", de: "Das Kennzeichen, und was darüber gesagt wird", pt: "A marca, e o que se diz dela", it: "Il marchio, e ciò che se ne dice", ja: "しるしと、それについて言われていること", zh: "标记，以及关于它的说法", hi: "निशान, और उसके बारे में जो कहा जाता है", ar: "العلامة، وما يُقال عنها",
   },
   "mrk.title.short": {
-    en: "The mark", es: "La marca", fr: "La marque", de: "Das Kennzeichen", pt: "A marca", it: "Il marchio", ja: "しるし", zh: "标记", hi: "निशान", ar: "العلامة",
+    en: "Watermark", es: "Marca de agua", fr: "Filigrane", de: "Wasserzeichen", pt: "Marca de água", it: "Filigrana", ja: "透かし", zh: "水印", hi: "वॉटरमार्क", ar: "العلامة المائية",
   },
   "mrk.chooseprofile": {
     en: "Choose a profile first.", es: "Elige primero un perfil.", fr: "Choisissez d'abord un profil.", de: "Wählen Sie zuerst ein Profil.", pt: "Escolha primeiro um perfil.", it: "Scegli prima un profilo.", ja: "先にプロフィールを選んでください。", zh: "请先选择一个档案。", hi: "पहले एक प्रोफ़ाइल चुनें।", ar: "اختر ملفًا أولًا.",
@@ -7344,7 +7339,7 @@ const CHROME: Table = {
     en: "Re-attesting is all you can do here, deliberately. You cannot resolve an objection against your own profile — that is a reviewer's call, because an owner who could dismiss it would be deciding their own case.", es: "Volver a acreditar es lo único que puedes hacer aquí, y es a propósito. No puedes resolver una objeción contra tu propio perfil — eso le toca a quien revisa, porque un propietario que pudiera desestimarla estaría fallando su propio caso.", fr: "Ré-attester est tout ce que vous pouvez faire ici, à dessein. Vous ne pouvez pas trancher une contestation visant votre propre profil — cela revient à l'examinateur, car un propriétaire qui pourrait la rejeter jugerait sa propre cause.", de: "Erneut zu bekräftigen ist alles, was Sie hier tun können, und das mit Absicht. Sie können einen Widerspruch gegen Ihr eigenes Profil nicht entscheiden — das obliegt der prüfenden Person, denn wer ihn abweisen könnte, entschiede in eigener Sache.", pt: "Voltar a atestar é tudo o que pode fazer aqui, de propósito. Não pode resolver uma contestação ao seu próprio perfil — isso cabe a quem revê, porque um proprietário que pudesse rejeitá-la estaria a julgar a sua própria causa.", it: "Riattestare è tutto ciò che puoi fare qui, e non per caso. Non puoi risolvere una contestazione contro il tuo stesso profilo — spetta a chi revisiona, perché un proprietario che potesse respingerla deciderebbe la propria causa.", ja: "ここでできるのは再表明だけで、それは意図的なものです。自分のプロフィールに対する異議を、自分で解決することはできません — それは審査する側の判断です。取り下げられる所有者は、自分の件を自分で裁くことになるからです。", zh: "在这里你能做的只有重新声明，这是有意为之。你不能裁决针对你自己档案的异议——那是审核者的判断，因为一个可以驳回它的所有者，等于在裁决自己的案子。", hi: "यहाँ आप बस फिर से पुष्टि कर सकते हैं, और यह जानबूझकर है। अपनी ही प्रोफ़ाइल के ख़िलाफ़ आई आपत्ति को आप निपटा नहीं सकते — वह समीक्षक का फ़ैसला है, क्योंकि जो मालिक उसे ख़ारिज कर सकता हो, वह अपना ही मुक़दमा तय कर रहा होगा।", ar: "إعادة التوثيق هي كل ما يمكنك فعله هنا، وذلك عن قصد. لا يمكنك البتّ في اعتراض على ملفك أنت — فذلك قرار المراجِع، لأن مالكًا يستطيع ردّه سيكون قاضيًا في قضيته.",
   },
   "nmd.title": {
-    en: "Look one thing up", es: "Consulta una cosa", fr: "Consulter une chose", de: "Eine Sache nachschlagen", pt: "Consultar uma coisa", it: "Cerca una cosa", ja: "ひとつ調べる", zh: "查一件事", hi: "एक चीज़ देखें", ar: "ابحث عن شيء واحد",
+    en: "Lookup", es: "Consulta", fr: "Recherche", de: "Nachschlagen", pt: "Consulta", it: "Ricerca", ja: "ルックアップ", zh: "查询", hi: "लुकअप", ar: "استعلام",
   },
   "nmd.pitch": {
     en: "Six reads, six different answers to who is allowed to ask.", es: "Seis lecturas, seis respuestas distintas a quién puede preguntar.", fr: "Six lectures, six réponses différentes à la question de qui a le droit de demander.", de: "Sechs Abfragen, sechs verschiedene Antworten darauf, wer fragen darf.", pt: "Seis leituras, seis respostas diferentes a quem pode perguntar.", it: "Sei letture, sei risposte diverse a chi è ammesso a chiedere.", ja: "六つの読み取り、そして「誰が尋ねてよいか」への六つの異なる答え。", zh: "六种读取，对“谁可以问”给出六个不同的答案。", hi: "छह पठन, और “कौन पूछ सकता है” के छह अलग-अलग उत्तर।", ar: "ست قراءات، وست إجابات مختلفة عن مَن يحق له أن يسأل.",
@@ -7461,7 +7456,7 @@ const CHROME: Table = {
     en: "None of yours here.", es: "Aquí no hay ninguno tuyo.", fr: "Aucun des vôtres ici.", de: "Keine von Ihnen hier.", pt: "Nenhum seu aqui.", it: "Nessuno dei tuoi qui.", ja: "ここにあなたのものはありません。", zh: "这里没有你的。", hi: "यहाँ आपका कोई नहीं।", ar: "لا شيء لك هنا.",
   },
   "lvg.title": {
-    en: "What leaves, and on what terms", es: "Qué sale, y con qué condiciones", fr: "Ce qui part, et à quelles conditions", de: "Was hinausgeht, und zu welchen Bedingungen", pt: "O que sai, e em que termos", it: "Cosa esce, e a quali condizioni", ja: "何が出ていくのか、どんな条件で", zh: "什么会离开，以及以什么条件", hi: "क्या बाहर जाता है, और किन शर्तों पर", ar: "ما الذي يخرج، وبأي شروط",
+    en: "Exports & Licensing", es: "Exportaciones y licencias", fr: "Exports et licences", de: "Exporte & Lizenzen", pt: "Exportações e licenças", it: "Esportazioni e licenze", ja: "エクスポートとライセンス", zh: "导出与许可", hi: "निर्यात और लाइसेंस", ar: "التصدير والترخيص",
   },
   "lvg.pitch": {
     en: "Two different kinds of leaving. One sends an exchange with the names taken out; the other sends the profile itself.", es: "Dos maneras distintas de salir. Una envía un intercambio con los nombres quitados; la otra envía el perfil mismo.", fr: "Deux façons différentes de partir. L'une envoie un échange dont les noms ont été retirés ; l'autre envoie le profil lui-même.", de: "Zwei verschiedene Arten des Hinausgehens. Die eine sendet einen Austausch ohne die Namen; die andere sendet das Profil selbst.", pt: "Duas maneiras diferentes de sair. Uma envia uma troca com os nomes retirados; a outra envia o próprio perfil.", it: "Due modi diversi di uscire. Uno manda uno scambio con i nomi tolti; l'altro manda il profilo stesso.", ja: "出ていき方は二種類あります。ひとつは名前を抜いたやり取りを送るもの、もうひとつはプロフィールそのものを送るものです。", zh: "两种不同的离开。一种是把名字去掉后送出一段对话；另一种是把档案本身送出去。", hi: "बाहर जाने के दो अलग तरीक़े। एक में नाम हटाकर एक संवाद भेजा जाता है; दूसरे में प्रोफ़ाइल ख़ुद भेजी जाती है।", ar: "نوعان مختلفان من الخروج. أحدهما يرسل محادثة نُزعت منها الأسماء؛ والآخر يرسل الملف نفسه.",
@@ -7671,7 +7666,7 @@ const CHROME: Table = {
     en: "Send", es: "Enviar", fr: "Envoyer", de: "Senden", pt: "Enviar", it: "Invia", ja: "送信", zh: "发送", hi: "भेजें", ar: "إرسال",
   },
   "gde.title": {
-    en: "Show me around", es: "Enséñame esto", fr: "Faites-moi visiter", de: "Zeigen Sie mir alles", pt: "Mostre-me isto", it: "Fammi fare un giro", ja: "案内してください", zh: "带我看看", hi: "मुझे घुमाइए", ar: "خذني في جولة",
+    en: "Tour", es: "Recorrido", fr: "Visite guidée", de: "Rundgang", pt: "Visita guiada", it: "Tour", ja: "ツアー", zh: "导览", hi: "टूर", ar: "جولة",
   },
   "gde.whereyouare": {
     en: "Where you are", es: "Dónde estás", fr: "Où vous en êtes", de: "Wo du stehst", pt: "Onde você está", it: "A che punto sei", ja: "現在地", zh: "当前进度", hi: "आप कहाँ हैं", ar: "أين أنت",
@@ -7782,7 +7777,7 @@ const CHROME: Table = {
     en: "Nothing to blend yet — install the starter collection in Discover.", es: "Todavía no hay nada que mezclar — instala la colección inicial en Descubrir.", fr: "Rien à mélanger pour l'instant — installez la collection de départ dans Découvrir.", de: "Noch nichts zum Mischen — installieren Sie die Startsammlung unter Entdecken.", pt: "Ainda não há nada para misturar — instale a coleção inicial em Descobrir.", it: "Ancora niente da mescolare — installa la raccolta iniziale in Scopri.", ja: "まだ混ぜるものがありません — 「発見」でスターターコレクションを入れてください。", zh: "还没有可调配的对象——请在“发现”中安装入门合集。", hi: "अभी मिलाने को कुछ नहीं — “खोजें” में शुरुआती संग्रह इंस्टॉल कीजिए।", ar: "لا شيء لمزجه بعد — ثبّت المجموعة المبدئية من «استكشف».",
   },
   "sol.title": {
-    en: "Your side of it", es: "Tu parte", fr: "Votre côté", de: "Deine Seite", pt: "O teu lado", it: "Il tuo lato", ja: "あなたの側", zh: "你这一边", hi: "आपका पक्ष", ar: "جانبك أنت",
+    en: "My Attention", es: "Mi atención", fr: "Mon attention", de: "Meine Aufmerksamkeit", pt: "A minha atenção", it: "La mia attenzione", ja: "マイアテンション", zh: "我的注意力", hi: "मेरा ध्यान", ar: "انتباهي",
   },
   "sol.pitch": {
     en: "Counts from your own logs. Nobody else can read them.", es: "Recuentos de tu propio registro. Nadie más puede verlos.", fr: "Des comptes tirés de votre propre journal. Personne d'autre ne peut les lire.", de: "Zahlen aus deinem eigenen Verlauf. Niemand sonst kann sie lesen.", pt: "Contagens do teu próprio registo. Mais ninguém as pode ler.", it: "Conteggi dal tuo registro. Nessun altro può leggerli.", ja: "あなた自身の記録からの件数です。他の誰にも見えません。", zh: "来自你自己记录的计数。别人看不到。", hi: "आपके अपने रिकॉर्ड से गिनती। इसे कोई और नहीं देख सकता।", ar: "أرقام من سجلّك أنت. لا يمكن لأحد غيرك قراءتها.",
@@ -8841,7 +8836,7 @@ const CHROME: Table = {
     en: "Withhold my name", es: "Ocultar mi nombre", fr: "Ne pas divulguer mon nom", de: "Meinen Namen zurückhalten", pt: "Reter o meu nome", it: "Non mostrare il mio nome", ja: "名前を伏せる", zh: "隐去我的名字", hi: "मेरा नाम रोकें", ar: "احجب اسمي",
   },
   "idn.bubble.empty": {
-    en: "Nothing in it yet.", es: "Todavía no hay nada.", fr: "Rien dedans pour l'instant.", de: "Noch nichts darin.", pt: "Ainda não há nada.", it: "Ancora niente dentro.", ja: "まだ何も入っていません。", zh: "里面还什么都没有。", hi: "इसमें अभी कुछ नहीं है।", ar: "لا شيء فيه بعد.",
+    en: "No picture yet — import one below, or start from a portrait.", es: "Aún sin foto — importa una abajo, o parte de un retrato.", fr: "Pas encore de photo — importez-en une ci-dessous, ou partez d'un portrait.", de: "Noch kein Bild — importiere unten eins oder beginne mit einem Porträt.", pt: "Ainda sem foto — importe uma abaixo, ou comece por um retrato.", it: "Ancora nessuna foto — importane una qui sotto, o parti da un ritratto.", ja: "まだ画像がありません — 下から取り込むか、ポートレートから始めてください。", zh: "还没有头像——在下方导入一张，或从肖像开始。", hi: "अभी कोई चित्र नहीं — नीचे से एक आयात करें, या किसी पोर्ट्रेट से शुरू करें।", ar: "لا صورة بعد — استورد واحدة أدناه، أو ابدأ من صورة شخصية.",
   },
   "idn.export.redeem": {
     en: "Redeem it", es: "Canjearlo", fr: "L'utiliser", de: "Einlösen", pt: "Resgatá-lo", it: "Riscattalo", ja: "受け取る", zh: "领取", hi: "प्राप्त करें", ar: "استرده",

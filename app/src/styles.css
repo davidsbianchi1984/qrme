@@ -1115,3 +1115,12 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .rk-vr { border-color: rgba(123,92,255,0.7); }
 .rk-ar { border-color: rgba(64,201,255,0.7); }
 .rk-video { border-color: rgba(126,231,135,0.6); }
+
+/* ---- the profile picture, shown as itself ---- */
+.idn-bubble-row { display: flex; align-items: center; gap: 14px;
+  margin-bottom: 10px; }
+.idn-bubble { width: 84px; height: 84px; border-radius: 50%;
+  object-fit: cover; border: 2px solid var(--line); flex: 0 0 auto; }
+.idn-bubble-empty { display: inline-block;
+  background: rgba(255,255,255,0.05);
+  border-style: dashed; border-color: var(--t3); }

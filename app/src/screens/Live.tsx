@@ -70,6 +70,9 @@ export function Live({ onPlans }: {
   // the old form, and the field report called it what it was.
   const [myRooms, setMyRooms] = useState<
     { id: string; topic?: string | null }[]>([]);
+  // Profiles a viewer id could sensibly name: your own, and your friends'.
+  const [knownProfiles, setKnownProfiles] = useState<
+    { profile_id: string; display_name: string }[]>([]);
   const [surface, setSurface] = useState("party");
   const [surfaceId, setSurfaceId] = useState("");
   const [whose, setWhose] = useState<WhosePlace | null>(null);
@@ -100,6 +103,18 @@ export function Live({ onPlans }: {
     }).catch(() => undefined);
     api.listRooms().then(setMyRooms).catch(() => setMyRooms([]));
   }, []);
+
+  useEffect(() => {
+    const pid = session.profileId;
+    if (!pid) return;
+    api.friends(pid).then((r) => {
+      const mine = session.profile
+        ? [{ profile_id: pid, display_name: session.profile.display_name }]
+        : [];
+      setKnownProfiles([...mine, ...r.friends.map((f) => (
+        { profile_id: f.profile_id, display_name: f.display_name }))]);
+    }).catch(() => setKnownProfiles([]));
+  }, [session.profileId, session.profile]);
 
   // The bystander note is per subject kind, because the honest answer
   // differs: a boiler has no face, a room full of people does.
@@ -146,8 +161,20 @@ export function Live({ onPlans }: {
                   onChange={(e) => setViewerKind(e.target.value)}>
             {cam?.viewers.map((v) => <option key={v} value={v}>{v}</option>)}
           </select>
-          <input value={viewerId} onChange={(e) => setViewerId(e.target.value)}
-                 placeholder={tr("liv.who.ph", lang)} style={{ flex: 1 }} />
+          {viewerKind === "profile" && knownProfiles.length > 0 ? (
+            <select value={viewerId} style={{ flex: 1 }}
+                    onChange={(e) => setViewerId(e.target.value)}>
+              <option value="">{tr("liv.who.ph", lang)}</option>
+              {knownProfiles.map((k) => (
+                <option key={k.profile_id} value={k.profile_id}>
+                  {k.display_name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input value={viewerId} onChange={(e) => setViewerId(e.target.value)}
+                   placeholder={tr("liv.who.ph", lang)} style={{ flex: 1 }} />
+          )}
         </div>
         <p className="muted small">
           {fill(tr("liv.subjectline", lang), {
