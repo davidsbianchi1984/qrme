@@ -659,9 +659,21 @@ def list_rooms() -> list[dict]:
         " LEFT JOIN room_participants p ON p.room_id = r.id"
         " WHERE r.status='active' GROUP BY r.id ORDER BY r.created_at DESC"
     ).fetchall()
-    return [{"id": r["id"], "topic": r["topic"], "channel": r["channel"],
-             "participants": r["heads"], "created_at": r["created_at"]}
-            for r in rows]
+    # The roster, before the door: the field report said people should be
+    # able to look before entering, and a separate screen for looking was
+    # a screen too many. Names only — the same words the room shows the
+    # moment you join — capped so a crowded room stays a list, not a wall.
+    out = []
+    for r in rows:
+        seated = conn.execute(
+            "SELECT kind, ref_id FROM room_participants WHERE room_id=?"
+            " LIMIT 6", (r["id"],)).fetchall()
+        out.append({
+            "id": r["id"], "topic": r["topic"], "channel": r["channel"],
+            "participants": r["heads"], "created_at": r["created_at"],
+            "who": [_display(p["kind"], p["ref_id"]) for p in seated],
+        })
+    return out
 
 
 @router.post("/rooms/{room_id}/mic", status_code=201)

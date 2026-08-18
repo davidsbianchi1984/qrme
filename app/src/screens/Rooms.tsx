@@ -158,6 +158,13 @@ export function Rooms({ onPlans, onInside }: {
             {(r.channel === "ar" || r.channel === "vr") && (
               <span className="muted small">{tr("rms.headset", lang)}</span>
             )}
+            {/* Look before entering — the roster on the card, not a
+                separate screen away. */}
+            {r.who.length > 0 && (
+              <span className="muted small rms-who">
+                {r.who.join(" · ")}
+              </span>
+            )}
             {/* The list used to show rooms nobody could enter — the door
                 in was frozen at creation. Joining takes the interactor
                 token, and lands you Inside. */}

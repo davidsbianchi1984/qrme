@@ -3889,7 +3889,7 @@ export const api = {
     req<{ created: string[]; skipped: string[]; repaired?: string[] }>(
       `/marketplace/seed`, { method: "POST" }),
   listRooms: () =>
-    req<{ id: string; topic?: string | null; channel: string;
+    req<{ id: string; topic?: string | null; channel: string; who: string[];
           participants: number; created_at: string }[]>(`/rooms`),
   // The standing rooms: blueprints shown when the live list is empty,
   // each one press away from being a real room through createRoom.

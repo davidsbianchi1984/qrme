@@ -8,6 +8,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The engine's avatars lead the import list.** The owner makes his
+  avatars and voices on the same platform surface, and asked for it to
+  front the market. ElevenLabs is the first import source now, with the
+  market's own pattern — made there, exported as an image, referenced
+  here.
+
+- **Look before entering.** The rooms list carries the roster on the card
+  — the first six names seated, the same words the room shows the moment
+  you join — so a separate looking screen is no longer the price of
+  knowing who is inside.
+
+- **The share form points at real places.** Sharing a camera into a room
+  meant typing the room's raw id into a box; the form now offers your
+  actual rooms by topic, and keeps the typed field only for the surfaces
+  that have no list to offer.
+
 - **Pick the kind of room from the front page.** The owner's ask, verbatim:
   VR, AR, 2-D, from the homepage. The Home screen now carries an
   "Open a room" card with one chip per channel the backend already speaks —

@@ -66,6 +66,10 @@ export function Live({ onPlans }: {
   // one vocabulary 422s on half its own options.
   const [camSurface, setCamSurface] = useState("room");
   const [camSurfaceId, setCamSurfaceId] = useState("");
+  // Real places to point the pickers at. Typing a raw id was the whole of
+  // the old form, and the field report called it what it was.
+  const [myRooms, setMyRooms] = useState<
+    { id: string; topic?: string | null }[]>([]);
   const [surface, setSurface] = useState("party");
   const [surfaceId, setSurfaceId] = useState("");
   const [whose, setWhose] = useState<WhosePlace | null>(null);
@@ -94,6 +98,7 @@ export function Live({ onPlans }: {
       setOverlays(c);
       setOverlayKind(c.kinds[0]?.kind || "mask");
     }).catch(() => undefined);
+    api.listRooms().then(setMyRooms).catch(() => setMyRooms([]));
   }, []);
 
   // The bystander note is per subject kind, because the honest answer
@@ -166,9 +171,21 @@ export function Live({ onPlans }: {
               <option key={s} value={s}>{s}</option>
             ))}
           </select>
-          <input value={camSurfaceId}
-                 onChange={(e) => setCamSurfaceId(e.target.value)}
-                 placeholder={tr("liv.where.ph", lang)} style={{ flex: 1 }} />
+          {camSurface === "room" && myRooms.length > 0 ? (
+            <select value={camSurfaceId} style={{ flex: 1 }}
+                    onChange={(e) => setCamSurfaceId(e.target.value)}>
+              <option value="">{tr("liv.where.ph", lang)}</option>
+              {myRooms.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.topic || r.id}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input value={camSurfaceId}
+                   onChange={(e) => setCamSurfaceId(e.target.value)}
+                   placeholder={tr("liv.where.ph", lang)} style={{ flex: 1 }} />
+          )}
           <button disabled={!token || !viewerId.trim() || !camSurfaceId.trim()
                             || mayWatch === false}
                   onClick={async () => {

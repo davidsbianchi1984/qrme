@@ -346,6 +346,12 @@ def catalog() -> list[dict]:
 #: the honest verb is *import*, and the provider's own license keeps
 #: governing what the person may do with their avatar.
 MARKET: tuple[dict, ...] = (
+    # First on purpose — the owner runs his voices and avatars on this
+    # platform's surface and asked for it to lead the list. The pattern is
+    # the market's own: made there, exported as an image, referenced here.
+    {"key": "elevenlabs", "name": "ElevenLabs",
+     "how": "In ElevenLabs, open My Avatars, save your avatar's portrait "
+            "image, then upload or paste it here."},
     {"key": "ready_player_me", "name": "Ready Player Me",
      "how": "Open your avatar at readyplayer.me, use Share/Export to get the "
             "portrait image or the .glb link, and paste it here."},
