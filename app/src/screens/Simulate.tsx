@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, SimulationOut } from "../api";
+import { accountApi, api, SimulationOut } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
@@ -29,6 +29,16 @@ export function Simulate({ onPlans }: {
   const [latest, setLatest] = useState<SimulationOut | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
+  // Whether anything real answers on this deployment. The field report
+  // read the stub's apology inside a prediction card and called the
+  // feature broken; the state belongs on the screen's face, not three
+  // sentences into a narrative.
+  const [stubbed, setStubbed] = useState(false);
+
+  useEffect(() => {
+    accountApi.listModels().then((m) => setStubbed(m.default === "stub"))
+      .catch(() => undefined);
+  }, []);
   // Which past run is open. The rows carried the whole prediction all
   // along and rendered one line of it — "I can't tap into it or
   // anything", the field report said.
@@ -76,6 +86,12 @@ export function Simulate({ onPlans }: {
         <h2>{tr("sim.title", lang)}</h2>
         <span className="muted small">{tr("sim.pitch", lang)}</span>
       </header>
+
+      {stubbed && (
+        <div className="card error">
+          <p className="small">{tr("sim.nomodel", lang)}</p>
+        </div>
+      )}
 
       {/* Above the form, not under the history: a refusal rendered at the
           bottom of the screen is invisible on a phone, and "Run" looks

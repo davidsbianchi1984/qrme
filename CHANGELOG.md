@@ -8,6 +8,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Available means somebody real answers.** `llm.available()` is the
+  provider catalog — nine rows, configured or not — and `bool()` of a
+  non-empty list answered a different question: the beta ran the stub
+  while every screen was told a model was there, which is how *unable to
+  view the simulation* reached the owner as a mystery instead of as a
+  configuration line. The studio agent's `available` reads the resolved
+  default now, so the no-model sentence the screens have carried all
+  along finally fires — and What If wears the state on its face: a
+  banner names the missing provider key and who adds it, instead of the
+  stub's apology arriving three sentences into a prediction card. Two
+  cryptic screen leads — Lookup's and Outreach's — say plainly what
+  their doors do.
+
 - **Live Now leads with what is live.** The screen was a wall of set-up
   forms with the status buried under them — the field report called the
   share form what it deserved. What is live comes first now: the cameras

@@ -84,7 +84,11 @@ def studio_agent() -> dict:
     """
     return {"can_touch": authoring.what_it_can_touch(),
             "tools": list(authoring.tool_names()),
-            "available": bool(llm.available())}
+            # `llm.available()` is the provider *catalog* — nine rows,
+            # configured or not — so bool() of it was always true, and the
+            # beta ran the stub while every screen was told a model was
+            # there. Available means somebody real answers.
+            "available": llm.default_name() != "stub"}
 
 
 @router.get("/profiles/{profile_id}/search")
