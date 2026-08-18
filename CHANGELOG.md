@@ -6,6 +6,32 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Transcript curation reaches the vault — no door forgets halfway.**
+  The doors that curate the transcript — strike by checkbox, forget by
+  words, rewrite in place, erase the whole memory — deleted the local
+  turns and left the sealed recollection of those turns in the vault,
+  still findable: somebody who struck "custody hearing" from the record
+  could have it surface in the profile's next reply, recalled by meaning
+  from a seal no door had touched.
+
+      asked     did the turn leave the transcript
+      mattered  did the moment stop being findable
+
+  Strike and forget-by-words now unmake each struck turn's sealed memory
+  — vector, seal and ledger row — and answer `sealed_forgotten` with
+  what the vault actually let go of (profile turns are never sealed and
+  count nothing; a down tandem counts zero rather than failing the
+  strike). A rewrite forgets the old seal through the real vault and
+  re-seals the new words through the plan-gated one, answering
+  `memory_resealed` — on a plan without a vault the memory simply ends,
+  because old words that stayed findable would betray the edit. Clearing
+  a whole memory sweeps the pair's vectors, seals and ledger rows in one
+  trip (`recollection.forget_pair`); when the tandem is down the local
+  clearing still lands and the unswept rows stay on the shelf — readable
+  and individually forgettable later — rather than being orphaned.
+
 ### Added
 
 - **The sealed shelf, shown and curatable — the interactor's own door.**

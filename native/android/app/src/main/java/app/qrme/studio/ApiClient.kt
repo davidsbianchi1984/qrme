@@ -3986,7 +3986,9 @@ object ApiClient {
         val o = org.json.JSONObject(request(
             "/profiles/$id/memory/$interactorId/forget", "POST",
             JSONObject().put("about", about), token = token))
-        return o.optInt("forgotten_turns").toString()
+        // Turns struck, then sealed memories the vault let go of with them.
+        return o.optInt("forgotten_turns").toString() + " · " +
+            o.optInt("sealed_forgotten")
     }
 
     suspend fun eraseMemory(id: String, interactorId: String,
@@ -4004,7 +4006,9 @@ object ApiClient {
             "/profiles/$id/memory/$interactorId/strike", "POST",
             JSONObject().put("message_ids",
                 org.json.JSONArray(messageIds)), token = token))
-        return o.optInt("struck_turns").toString()
+        // Turns struck, then sealed memories the vault let go of with them.
+        return o.optInt("struck_turns").toString() + " · " +
+            o.optInt("sealed_forgotten")
     }
 
     // Rewrite one remembered turn. A profile turn loses its synthetic-media

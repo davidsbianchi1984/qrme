@@ -976,6 +976,11 @@ def forget_one_thing(profile_id: str, interactor_id: str, body: MemoryForget,
     if not hits and not in_remembrance:
         raise HTTPException(
             404, "nothing remembered here carries those words")
+    marks = ",".join("?" for _ in hits)
+    sealed_refs = {r["id"] for r in conn.execute(
+        f"SELECT id FROM recollections WHERE profile_id=? AND interactor_id=?"
+        f" AND id IN ({marks})", (profile_id, interactor_id, *hits))} \
+        if hits else set()
     for message_id in hits:
         conn.execute("DELETE FROM messages WHERE id=?", (message_id,))
     if row:
@@ -985,7 +990,17 @@ def forget_one_thing(profile_id: str, interactor_id: str, body: MemoryForget,
             "DELETE FROM remembrances WHERE profile_id=? AND interactor_id=?",
             (profile_id, interactor_id))
     conn.commit()
-    return {"forgotten_turns": len(hits), "remembrance_reset": bool(row)}
+    # The struck turns' sealed memories go with them: a moment somebody
+    # forgot must stop being findable, not merely stop being readable.
+    # Non-fatal — the strike stands even when the tandem is down, and the
+    # count says what the vault actually let go of.
+    from .. import recollection
+    sealed = sum(
+        1 for message_id in sealed_refs
+        if recollection.forget(request.app.state.pdi, profile_id,
+                               interactor_id, message_id)["forgotten"])
+    return {"forgotten_turns": len(hits), "remembrance_reset": bool(row),
+            "sealed_forgotten": sealed}
 
 
 @router.post("/profiles/{profile_id}/memory/{interactor_id}/strike")
@@ -1012,6 +1027,9 @@ def strike_turns(profile_id: str, interactor_id: str, body: MemoryStrike,
         f" AND id IN ({marks})", (profile_id, interactor_id, *ids))]
     if not hits:
         raise HTTPException(404, "none of those turns are in this memory")
+    sealed_refs = {r["id"] for r in conn.execute(
+        f"SELECT id FROM recollections WHERE profile_id=? AND interactor_id=?"
+        f" AND id IN ({marks})", (profile_id, interactor_id, *ids))}
     for message_id in hits:
         conn.execute("DELETE FROM message_edits WHERE message_id=?",
                      (message_id,))
@@ -1022,7 +1040,17 @@ def strike_turns(profile_id: str, interactor_id: str, body: MemoryStrike,
             "DELETE FROM remembrances WHERE profile_id=? AND interactor_id=?",
             (profile_id, interactor_id))
     conn.commit()
-    return {"struck_turns": len(hits), "remembrance_reset": bool(row)}
+    # A struck turn's sealed memory goes with it — the vector, the seal
+    # and the ledger row — so it stops being findable, not merely stops
+    # being readable. Only refs the ledger actually holds are counted:
+    # profile turns are never sealed, and a strike of one forgets nothing.
+    from .. import recollection
+    sealed = sum(
+        1 for message_id in sealed_refs
+        if recollection.forget(request.app.state.pdi, profile_id,
+                               interactor_id, message_id)["forgotten"])
+    return {"struck_turns": len(hits), "remembrance_reset": bool(row),
+            "sealed_forgotten": sealed}
 
 
 @router.put("/profiles/{profile_id}/memory/{interactor_id}/turns/{message_id}")
@@ -1069,10 +1097,32 @@ def edit_turn(profile_id: str, interactor_id: str, message_id: str,
             "DELETE FROM remembrances WHERE profile_id=? AND interactor_id=?",
             (profile_id, interactor_id))
     conn.commit()
+    # The sealed memory of an interactor turn is re-made from the words as
+    # they now stand: the old seal and vector go first (the real vault — a
+    # delete), then the rewrite is sealed and embedded again (the
+    # plan-gated vault — a write). On a plan without a vault the memory
+    # simply ends, because old words that stayed findable would betray the
+    # edit. Non-fatal like every memory step; the return says what stood.
+    resealed = False
+    ledgered = conn.execute(
+        "SELECT id FROM recollections WHERE id=? AND profile_id=?"
+        " AND interactor_id=?",
+        (message_id, profile_id, interactor_id)).fetchone() is not None
+    if row["role"] == "interactor" and ledgered:
+        from .. import recollection, storage as storage_mod, tiers as tiers_mod
+        gone = recollection.forget(request.app.state.pdi, profile_id,
+                                   interactor_id, message_id)
+        if gone["forgotten"]:
+            vault = storage_mod.vault_for(
+                tiers_mod.plan_of_profile(profile_id), request.app.state.pdi)
+            resealed = recollection.remember(
+                vault, profile_id, interactor_id, message_id,
+                content)["remembered"]
     turn = message_out(dict(conn.execute(
         "SELECT * FROM messages WHERE id=?", (message_id,)).fetchone()))
     turn.edited = True
-    return {"turn": turn, "remembrance_reset": had_remembrance}
+    return {"turn": turn, "remembrance_reset": had_remembrance,
+            "memory_resealed": resealed}
 
 
 @router.delete("/profiles/{profile_id}/memory/{interactor_id}", status_code=204)
@@ -1080,6 +1130,13 @@ def clear_memory(profile_id: str, interactor_id: str,
                  request: Request) -> None:
     profile_or_404(profile_id)
     require_owner_or_interactor(profile_id, interactor_id, request)
+    # The pair's sealed memories go with the transcript — vectors, seals
+    # and ledger rows in one sweep. Non-fatal: the local clearing stands
+    # even when the tandem is down, and rows whose seals the vault never
+    # let go of stay on the shelf rather than being orphaned.
+    from .. import recollection
+    recollection.forget_pair(request.app.state.pdi, profile_id,
+                             interactor_id)
     conn = db.connect()
     conn.execute("DELETE FROM messages WHERE profile_id=? AND interactor_id=?",
                  (profile_id, interactor_id))

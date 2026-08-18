@@ -124,7 +124,8 @@ struct MemorySection: View {
                             id: state.pid!, interactorId: visitorId,
                             about: forgetWords, token: state.token!)
                         forgetWords = ""
-                        line = String(out.forgotten_turns)
+                        line = String(out.forgotten_turns) + " · "
+                            + String(out.sealed_forgotten ?? 0)
                     }
                 }.font(.caption)
                     .disabled(busy || visitorId.isEmpty || forgetWords.isEmpty)
@@ -142,7 +143,8 @@ struct MemorySection: View {
                             id: state.pid!, interactorId: visitorId,
                             messageIds: [turnId], token: state.token!)
                         turnId = ""
-                        line = String(out.struck_turns)
+                        line = String(out.struck_turns) + " · "
+                            + String(out.sealed_forgotten ?? 0)
                     }
                 }.font(.caption)
                     .disabled(busy || visitorId.isEmpty || turnId.isEmpty)

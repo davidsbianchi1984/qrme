@@ -2301,7 +2301,8 @@ public sealed partial class PeoplePage : Page
                 AppState.Current.Pid!, MemIdBox.Text.Trim(),
                 MemForgetBox.Text.Trim(), AppState.Current.Token!);
             MemForgetBox.Text = "";
-            StatusText.Text = outp.ForgottenTurns.ToString();
+            StatusText.Text = outp.ForgottenTurns + " · "
+                + outp.SealedForgotten;
         });
 
     private async void OnMemStrike(object sender, RoutedEventArgs e) =>
@@ -2313,7 +2314,8 @@ public sealed partial class PeoplePage : Page
                 AppState.Current.Pid!, MemIdBox.Text.Trim(),
                 new[] { MemTurnIdBox.Text.Trim() }, AppState.Current.Token!);
             MemTurnIdBox.Text = "";
-            StatusText.Text = outp.StruckTurns.ToString();
+            StatusText.Text = outp.StruckTurns + " · "
+                + outp.SealedForgotten;
         });
 
     private async void OnMemSealed(object sender, RoutedEventArgs e) =>

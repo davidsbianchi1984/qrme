@@ -4642,6 +4642,8 @@ extension ApiClient {
     struct ForgetOut: Decodable {
         let forgotten_turns: Int
         let remembrance_reset: Bool
+        // How many sealed memories the vault let go of with the turns.
+        let sealed_forgotten: Int?
     }
 
     /// Forget that one thing; the kept memory re-folds from what remains.
@@ -4663,6 +4665,8 @@ extension ApiClient {
     struct StrikeOut: Decodable {
         let struck_turns: Int
         let remembrance_reset: Bool
+        // How many sealed memories the vault let go of with the turns.
+        let sealed_forgotten: Int?
     }
 
     /// Strike selected turns by id; the kept memory re-folds from what
@@ -4677,6 +4681,8 @@ extension ApiClient {
     struct TurnEditOut: Decodable {
         let turn: MemoryTurn
         let remembrance_reset: Bool
+        // Whether the sealed memory was re-made from the rewritten words.
+        let memory_resealed: Bool?
     }
 
     /// Rewrite one remembered turn. A profile turn loses its synthetic-media

@@ -4068,20 +4068,23 @@ export const api = {
   // the kept memory is re-folded from what remains.
   forgetMemory: (profileId: string, interactorId: string, about: string,
                  token: string) =>
-    req<{ forgotten_turns: number; remembrance_reset: boolean }>(
+    req<{ forgotten_turns: number; remembrance_reset: boolean;
+          sealed_forgotten: number }>(
       `/profiles/${profileId}/memory/${interactorId}/forget`,
       { method: "POST", body: { about }, token }),
   // Strike the turns selected by checkbox — the delete-selected door.
   strikeTurns: (profileId: string, interactorId: string,
                 messageIds: string[], token: string) =>
-    req<{ struck_turns: number; remembrance_reset: boolean }>(
+    req<{ struck_turns: number; remembrance_reset: boolean;
+          sealed_forgotten: number }>(
       `/profiles/${profileId}/memory/${interactorId}/strike`,
       { method: "POST", body: { message_ids: messageIds }, token }),
   // Rewrite one remembered turn in place. A profile turn loses its
   // synthetic-media credential — it must not vouch for rewritten words.
   editTurn: (profileId: string, interactorId: string, messageId: string,
              content: string, token: string) =>
-    req<{ turn: MemoryEntry; remembrance_reset: boolean }>(
+    req<{ turn: MemoryEntry; remembrance_reset: boolean;
+          memory_resealed: boolean }>(
       `/profiles/${profileId}/memory/${interactorId}/turns/${messageId}`,
       { method: "PUT", body: { content }, token }),
   // The voiceprint, in FIG. 800's order (qrme/voiceprint.py).

@@ -5179,7 +5179,9 @@ public record MemoryAccountOut(
 
 public record ForgetOut(
     [property: JsonPropertyName("forgotten_turns")] int ForgottenTurns,
-    [property: JsonPropertyName("remembrance_reset")] bool RemembranceReset);
+    [property: JsonPropertyName("remembrance_reset")] bool RemembranceReset,
+    // How many sealed memories the vault let go of with the turns.
+    [property: JsonPropertyName("sealed_forgotten")] int SealedForgotten = 0);
 
 public record RecolledMomentOut(
     [property: JsonPropertyName("ref")] string Ref,
@@ -5211,11 +5213,15 @@ public record MemoryTurn(
 
 public record StrikeOut(
     [property: JsonPropertyName("struck_turns")] int StruckTurns,
-    [property: JsonPropertyName("remembrance_reset")] bool RemembranceReset);
+    [property: JsonPropertyName("remembrance_reset")] bool RemembranceReset,
+    // How many sealed memories the vault let go of with the turns.
+    [property: JsonPropertyName("sealed_forgotten")] int SealedForgotten = 0);
 
 public record TurnEditOut(
     [property: JsonPropertyName("turn")] MemoryTurn? Turn,
-    [property: JsonPropertyName("remembrance_reset")] bool RemembranceReset);
+    [property: JsonPropertyName("remembrance_reset")] bool RemembranceReset,
+    // Whether the sealed memory was re-made from the rewritten words.
+    [property: JsonPropertyName("memory_resealed")] bool MemoryResealed = false);
 
 public record ThreadTurn(
     [property: JsonPropertyName("role")] string? Role,

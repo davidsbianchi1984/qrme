@@ -55,7 +55,8 @@ def test_forget_that_one_thing_and_only_that_thing(client, profile_id,
     r = client.post(f"/profiles/{profile_id}/memory/{interactor_id}/forget",
                     json={"about": "my ex"})
     assert r.status_code == 200, r.text
-    assert r.json() == {"forgotten_turns": 1, "remembrance_reset": True}
+    assert r.json() == {"forgotten_turns": 1, "remembrance_reset": True,
+                        "sealed_forgotten": 0}
 
     # The turn that said it is gone; the garden stays.
     left = [row["content"] for row in db.connect().execute(

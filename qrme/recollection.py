@@ -181,6 +181,33 @@ def forget(pdi, profile_id: str, interactor_id: str, ref: str) -> dict:
     return {"forgotten": True, "vectors_removed": removed}
 
 
+def forget_pair(pdi, profile_id: str, interactor_id: str) -> int | None:
+    """The pair's erase-all: every vector, seal and ledger row under this
+    conversation's memory prefix, in one sweep — called beside the local
+    deletes when somebody clears a whole memory. None when the tandem
+    could not be reached; the ledger rows are then left standing, because
+    a row whose seal the vault never let go of belongs on the shelf, not
+    orphaned. Each row goes only after its seal did."""
+    if pdi is None:
+        return None
+    try:
+        removed = pdi.resident_forget(
+            f"qrme/{profile_id}/memory/{interactor_id}/", prefix=True)
+        conn = db.connect()
+        rows = conn.execute(
+            "SELECT id, pdi_key FROM recollections WHERE profile_id=?"
+            " AND interactor_id=?", (profile_id, interactor_id)).fetchall()
+        for r in rows:
+            pdi.delete(r["pdi_key"])
+            conn.execute(
+                "DELETE FROM recollections WHERE id=? AND profile_id=?"
+                " AND interactor_id=?", (r["id"], profile_id, interactor_id))
+        conn.commit()
+        return removed
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def forget_profile(pdi, profile_id: str) -> int | None:
     """Erasure's call: every vector under this profile's memory prefix, in
     one trip. None when the tandem could not be reached — the erasure
