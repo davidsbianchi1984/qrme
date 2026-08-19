@@ -76,6 +76,9 @@
                                 <StackPanel Spacing="2" Margin="0,0,0,6">
                                     <TextBlock Text="{Binding Line}" FontSize="13" TextWrapping="Wrap"
                                                Foreground="{StaticResource QrmeTxtBrush}" />
+                                    <TextBlock Text="{Binding Trouble}" FontSize="11" TextWrapping="Wrap"
+                                               Visibility="{Binding TroubleVisibility}"
+                                               Foreground="{StaticResource QrmeRed}" />
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <Button Content="{Binding ReadLabel}" Tag="{Binding Id}"
                                                 Click="OnReadLookout" Background="Transparent"

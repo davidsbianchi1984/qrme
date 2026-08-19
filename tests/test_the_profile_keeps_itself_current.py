@@ -30,6 +30,7 @@ class StandingVault(FakeResidentVault):
         super().__init__()
         self.standing: dict[str, dict] = {}
         self.cancelled: list[str] = []
+        self.runs: dict[str, list] = {}
         self._n = 0
 
     def resident_stand(self, goal, steps, every_hours):
@@ -51,6 +52,9 @@ class StandingVault(FakeResidentVault):
 
     def resident_tasks(self):
         return [dict(t) for t in self.standing.values()]
+
+    def resident_runs(self, task_id):
+        return list(self.runs.get(task_id, []))
 
 
 class OlderVault(StandingVault):
@@ -298,3 +302,49 @@ def test_a_capture_before_fingerprints_says_nothing_not_now(client,
                      "/page").json()
     assert got["readable"] is True and got["changed_at"] is None
     assert "last changed" not in lookout.prompt_block(profile_id, vault)
+
+
+# -- the trouble line: why the watching last failed --------------------------
+
+def test_the_list_says_why_the_watching_last_failed(client, profile_id):
+    vault = StandingVault()
+    client.app.state.pdi = vault
+    _allow_study(profile_id)
+    planted = _plant(client, profile_id)
+    vault.runs[planted["task_id"]] = [
+        {"id": "rrun_2", "ran_at": "2026-08-19T10:00:00+00:00",
+         "status": "failed", "note": "ResidentError: the wire is down"},
+        {"id": "rrun_1", "ran_at": "2026-08-19T09:00:00+00:00",
+         "status": "done", "note": "fetched 12 chars"},
+    ]
+    row = client.get(f"/profiles/{profile_id}/lookout").json()["lookouts"][0]
+    assert row["trouble"] == "ResidentError: the wire is down"
+
+
+def test_a_recovered_lookout_carries_no_stale_trouble(client, profile_id):
+    """Only the *latest* round speaks: a lookout that failed yesterday
+    and ran clean this morning is not in trouble."""
+    vault = StandingVault()
+    client.app.state.pdi = vault
+    _allow_study(profile_id)
+    planted = _plant(client, profile_id)
+    vault.runs[planted["task_id"]] = [
+        {"id": "rrun_2", "ran_at": "2026-08-19T10:00:00+00:00",
+         "status": "done", "note": "fetched 12 chars, sealed (unchanged)"},
+        {"id": "rrun_1", "ran_at": "2026-08-19T09:00:00+00:00",
+         "status": "failed", "note": "ResidentError: the wire is down"},
+    ]
+    row = client.get(f"/profiles/{profile_id}/lookout").json()["lookouts"][0]
+    assert row["trouble"] is None
+
+
+def test_an_older_vault_without_the_ledger_says_nothing(client, profile_id):
+    class NoLedgerVault(StandingVault):
+        resident_runs = None
+
+    vault = NoLedgerVault()
+    client.app.state.pdi = vault
+    _allow_study(profile_id)
+    _plant(client, profile_id)
+    row = client.get(f"/profiles/{profile_id}/lookout").json()["lookouts"][0]
+    assert row["trouble"] is None

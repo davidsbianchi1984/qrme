@@ -115,6 +115,10 @@ struct StudyView: View {
                                          ["when": String($0.prefix(10))])
                                  } ?? ""))
                                 .font(.caption2).foregroundStyle(Theme.t2)
+                            if let trouble = watch.trouble {
+                                Text(trouble).font(.caption2)
+                                    .foregroundStyle(Color.red)
+                            }
                             HStack {
                                 Button(L10n.t("lkt.read", state.language)) {
                                     readWatch(watch)

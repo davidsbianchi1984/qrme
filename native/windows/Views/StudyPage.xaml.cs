@@ -82,6 +82,9 @@ public sealed partial class StudyPage : Page
     {
         public string Id { get; init; } = "";
         public string Line { get; init; } = "";
+        public string Trouble { get; init; } = "";
+        public Visibility TroubleVisibility =>
+            Trouble.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
         public string ReadLabel => L10n.T("lkt.read");
         public string DropLabel => L10n.T("lkt.drop");
     }
@@ -214,6 +217,7 @@ public sealed partial class StudyPage : Page
                         : " · " + L10n.T("lkt.changed").Replace(
                             "{when}",
                             w.ChangedAt[..Math.Min(10, w.ChangedAt.Length)])),
+                Trouble = w.Trouble ?? "",
             }).ToList();
         }
         catch (Exception ex) { ShowError(ex.Message); }

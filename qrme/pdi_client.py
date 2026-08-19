@@ -168,6 +168,16 @@ class PDIClient:
             raise RuntimeError(f"PDI tasks failed: {r.status_code}")
         return r.json()
 
+    def resident_runs(self, task_id: str) -> list[dict] | None:
+        """The task's past cycles, newest first — None on an older PDI
+        without the runs ledger, which is not the same as no rounds."""
+        r = self._do("GET", f"/resident/tasks/{task_id}/runs")
+        if r.status_code == 404:
+            return None
+        if r.status_code >= 300:
+            raise RuntimeError(f"PDI runs failed: {r.status_code}")
+        return r.json()
+
     def resident_ask(self, question: str, prefix: str | None = None,
                      system: str | None = None) -> dict | None:
         """A grounded local answer from the vault ({model, text,

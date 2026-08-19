@@ -768,6 +768,7 @@ public record LookoutRow(
     [property: JsonPropertyName("status")] string? Status,
     [property: JsonPropertyName("next_run_at")] string? NextRunAt,
     [property: JsonPropertyName("changed_at")] string? ChangedAt,
+    [property: JsonPropertyName("trouble")] string? Trouble,
     [property: JsonPropertyName("created_at")] string CreatedAt);
 
 public record LookoutList(

@@ -1944,6 +1944,9 @@ fun StudyScreen(vm: StudioViewModel) {
                         "lkt.changed", vm.language,
                         mapOf("when" to it.take(10))) } ?: ""),
                     color = Qrme.T2, fontSize = 11.sp)
+                w.trouble?.let {
+                    Text(it, color = Qrme.Red, fontSize = 10.sp)
+                }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     TextButton(onClick = {
                         vm.call({ ApiClient.lookoutPage(vm.pid!!, w.id, vm.token!!) }) { r ->

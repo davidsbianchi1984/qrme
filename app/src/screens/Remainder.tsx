@@ -422,6 +422,9 @@ export function Remainder() {
                 {w.next_run_at && ` · ${w.next_run_at.slice(0, 16)}`}
                 {w.changed_at && <> · {fill(tr("lkt.changed", lang),
                   { when: w.changed_at.slice(0, 10) })}</>}
+                {w.trouble && (
+                  <span className="error"> · {w.trouble}</span>
+                )}
               </div>
             </div>
             <button onClick={() => go(
