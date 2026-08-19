@@ -140,6 +140,8 @@ def create_app(pdi_client: PDIClient | None = None,
         pdi_client = PDIClient(token=os.environ.get("QRME_PDI_TOKEN", ""),
                                base_url=os.environ["QRME_PDI_URL"])
     app.state.pdi = pdi_client
+    from . import pdi_client as pdi_client_mod
+    pdi_client_mod.bind_active(lambda: app.state.pdi)
 
     # Cloud Model Gateway: greater-model inference with local fallback, and
     # the opt-in contribution intake (QRME_CLOUD_URL + QRME_CLOUD_TOKEN).

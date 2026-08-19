@@ -130,6 +130,16 @@ class PDIClient:
             raise RuntimeError(f"PDI search failed: {r.status_code}")
         return r.json().get("matches", [])
 
+    def resident_infer(self, prompt: str) -> dict | None:
+        """One local turn from the vault's own model ({model, text,
+        leaves_host}), or None on an older PDI without the voice door."""
+        r = self._do("POST", "/resident/infer", {"prompt": prompt})
+        if r.status_code == 404:
+            return None
+        if r.status_code >= 300:
+            raise RuntimeError(f"PDI inference failed: {r.status_code}")
+        return r.json()
+
     def resident_tabulate(self, dataset: str, rows: list,
                           source_ref: str | None = None) -> bool:
         """Rows into a queryable dataset, through the resident's own doors:
@@ -165,3 +175,23 @@ class PDIClient:
         if r.status_code >= 300:
             return None
         return bool((r.json() or {}).get("intact"))
+
+
+# --------------------------------------------------------------------------- #
+# The live client, reachable from outside a request
+# --------------------------------------------------------------------------- #
+
+#: `api.create_app` points this at its own app state so the vault provider
+#: (qrme/llm.py) reaches the client the app is *currently* holding —
+#: including one a test injected after startup. A snapshot taken at
+#: startup would be a provider speaking through a client the app replaced.
+_active_getter = None
+
+
+def bind_active(getter) -> None:
+    global _active_getter
+    _active_getter = getter
+
+
+def active():
+    return _active_getter() if _active_getter is not None else None
