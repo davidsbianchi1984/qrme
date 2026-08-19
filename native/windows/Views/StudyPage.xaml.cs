@@ -89,6 +89,12 @@ public sealed partial class StudyPage : Page
         public string DropLabel => L10n.T("lkt.drop");
     }
 
+    public sealed class LetterRow
+    {
+        public string WeekStart { get; init; } = "";
+        public string Body { get; init; } = "";
+    }
+
     private string _openedAsk = "";
     private string _answeringId = "";
 
@@ -115,6 +121,8 @@ public sealed partial class StudyPage : Page
         LookoutUrlBox.Header = L10n.T("lkt.url", lang);
         LookoutHoursBox.Header = L10n.T("lkt.hours", lang);
         LookoutPlantButton.Content = L10n.T("lkt.plant", lang);
+        LetterHead.Text = L10n.T("ltr.title", lang);
+        LetterWriteButton.Content = L10n.T("ltr.write", lang);
         AskTitle.Text = L10n.T("nask", lang);
         AskSub.Text = L10n.T("nask.sub", lang);
         AskTopicBox.Header = L10n.T("ncmp.topic", lang);
@@ -198,6 +206,7 @@ public sealed partial class StudyPage : Page
         }
         catch (Exception ex) { ShowError(ex.Message); }
         await ReloadLookouts();
+        await ReloadLetters();
         await ReloadAsks();
         await ReloadBoard();
         await ReloadBeen();
@@ -221,6 +230,34 @@ public sealed partial class StudyPage : Page
             }).ToList();
         }
         catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async System.Threading.Tasks.Task ReloadLetters()
+    {
+        var s = AppState.Current;
+        try
+        {
+            var mail = await ApiClient.Shared.Letters(s.Pid!, s.Token!);
+            LetterPanel.ItemsSource = mail.Select(l => new LetterRow
+            {
+                WeekStart = l.WeekStart,
+                Body = l.Body,
+            }).ToList();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnWriteLetter(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        LetterWriteButton.IsEnabled = false;
+        try
+        {
+            await ApiClient.Shared.WriteLetter(s.Pid!, s.Token!);
+            await ReloadLetters();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+        finally { LetterWriteButton.IsEnabled = true; }
     }
 
     private async void OnPlantLookout(object sender, RoutedEventArgs e)

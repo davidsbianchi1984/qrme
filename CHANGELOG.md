@@ -22,6 +22,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
       asked     does the study speak with the chosen voice
       mattered  a choice honored in one room and not the next is decor
 
+- **The week in the pair's words.** JIM's letter, twinned toward
+  custody: an owner runs a profile that talks to people, seals moments,
+  studies topics and watches pages — and the only way to know what
+  kind of week it had was to open four screens. `POST
+  /profiles/{id}/letter` composes the week from what it actually held
+  (messages exchanged and with whom, moments sealed, studies taken,
+  watched pages that changed or are failing), as a deterministic
+  digest the profile's own provider turns into warm prose — the voice
+  that speaks all week is the voice that reports on it, so the vault
+  choice is honored here too, and `described_by` says whether a model
+  or the digest wrote the body. An empty week writes no letter, said
+  translated. A shelf keeps past letters with the facts under the
+  words, on the console and all three shells.
+
+      asked     what kind of week did the profile have
+      mattered  an account rendered only on request is an account withheld
+
 ## [0.90.0] - 2026-08-19
 
 ### Added

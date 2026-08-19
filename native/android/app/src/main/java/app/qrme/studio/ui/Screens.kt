@@ -1862,6 +1862,7 @@ fun StudyScreen(vm: StudioViewModel) {
     var watchHours by remember { mutableStateOf("24") }
     var watches by remember { mutableStateOf<List<Lookout>>(emptyList()) }
     var captureLine by remember { mutableStateOf<String?>(null) }
+    var mail by remember { mutableStateOf<List<Letter>>(emptyList()) }
     // Search the Internet: a real search through the keyless door, working
     // on a deployment with no model configured — which an excursion is not.
     var webQ by remember { mutableStateOf("") }
@@ -1962,6 +1963,21 @@ fun StudyScreen(vm: StudioViewModel) {
                 }
             }
             captureLine?.let { Text(it, color = Qrme.T2, fontSize = 11.sp) }
+
+            Text(L10n.t("ltr.title", vm.language), color = Qrme.Txt,
+                fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            BrandButton(L10n.t("ltr.write", vm.language)) {
+                vm.call({ ApiClient.writeLetter(vm.pid!!, vm.token!!) }) { _ ->
+                    vm.call({ ApiClient.letters(vm.pid!!, vm.token!!) }) { r ->
+                        mail = r.getOrDefault(emptyList())
+                    }
+                }
+            }
+            mail.forEach { l ->
+                Text(l.weekStart, color = Qrme.Txt, fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold)
+                Text(l.body, color = Qrme.T2, fontSize = 11.sp)
+            }
 
             Text(L10n.t("nws.title", vm.language), color = Qrme.Txt,
                 fontSize = 16.sp, fontWeight = FontWeight.Bold)

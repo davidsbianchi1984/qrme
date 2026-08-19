@@ -761,6 +761,12 @@ public record Excursion(
 // Status and next_run_at are what the tandem said, null when it could not
 // be asked — the list says `readable: false` then rather than inventing.
 
+public record LetterOut(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("week_start")] string WeekStart,
+    [property: JsonPropertyName("body")] string Body,
+    [property: JsonPropertyName("described_by")] string DescribedBy);
+
 public record LookoutRow(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("url")] string Url,
@@ -1870,6 +1876,19 @@ public sealed class ApiClient
             HttpMethod.Delete, $"/profiles/{id}/lookout/{lid}");
         req.Headers.Add("authorization", $"Bearer {token}");
         return Send<LookoutRemoved>(req);
+    }
+
+    // -- the weekly letter: the profile's week, written to its owner --
+
+    public Task<LetterOut> WriteLetter(string id, string token) =>
+        Send<LetterOut>(Post($"/profiles/{id}/letter", new { }, token));
+
+    public Task<LetterOut[]> Letters(string id, string token)
+    {
+        var req = new HttpRequestMessage(
+            HttpMethod.Get, $"/profiles/{id}/letters");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<LetterOut[]>(req);
     }
 
     // -- inquiries: ask people, not pages --

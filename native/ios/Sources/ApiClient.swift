@@ -1787,6 +1787,13 @@ actor ApiClient {
         try await request("/profiles/\(id)/excursions", token: token)
     }
 
+    struct Letter: Decodable {
+        let id: String
+        let week_start: String
+        let body: String
+        let described_by: String
+    }
+
     struct Lookout: Decodable {
         let id: String
         let url: String
@@ -1845,6 +1852,15 @@ actor ApiClient {
                      token: String) async throws -> LookoutRemoved {
         try await request("/profiles/\(id)/lookout/\(lid)",
                           method: "DELETE", token: token)
+    }
+
+    func writeLetter(id: String, token: String) async throws -> Letter {
+        try await request("/profiles/\(id)/letter", method: "POST",
+                          token: token)
+    }
+
+    func letters(id: String, token: String) async throws -> [Letter] {
+        try await request("/profiles/\(id)/letters", token: token)
     }
 
     func startExcursion(id: String, token: String, topic: String,

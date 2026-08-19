@@ -96,6 +96,29 @@
                 </StackPanel>
             </Border>
 
+            <!-- the weekly letter: the profile's week, written to its owner -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="LetterHead" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <Button x:Name="LetterWriteButton" Click="OnWriteLetter"
+                            Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                    <ItemsControl x:Name="LetterPanel">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Spacing="2" Margin="0,0,0,8">
+                                    <TextBlock Text="{Binding WeekStart}" FontSize="12" FontWeight="Bold"
+                                               Foreground="{StaticResource QrmeTxtBrush}" />
+                                    <TextBlock Text="{Binding Body}" FontSize="12" TextWrapping="Wrap"
+                                               Foreground="{StaticResource QrmeT2Brush}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
             <TextBlock x:Name="ErrorText" Foreground="{StaticResource QrmeRed}" FontSize="13"
                        TextWrapping="Wrap" Visibility="Collapsed" />
 

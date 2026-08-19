@@ -1351,6 +1351,18 @@ _PUBLIC.update(_PRIVILEGE_SENTENCES)
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'an empty week writes no letter': {
+        'es': 'una semana vacía no escribe carta',
+        'fr': "une semaine vide n'écrit pas de lettre",
+        'de': 'eine leere Woche schreibt keinen Brief',
+        'pt': 'uma semana vazia não escreve carta',
+        'it': 'una settimana vuota non scrive lettere',
+        'ja': '何もなかった週は手紙を書きません',
+        'zh': '空空的一周写不出信',
+        'hi': 'खाली सप्ताह कोई चिट्ठी नहीं लिखता',
+        'ar': 'أسبوع فارغ لا يكتب رسالة',
+    },
+
     'no such lookout': {
         'es': 'no existe esa vigilancia',
         'fr': 'aucune surveillance de ce nom',

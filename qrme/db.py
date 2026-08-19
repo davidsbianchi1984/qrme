@@ -650,6 +650,16 @@ CREATE TABLE IF NOT EXISTS recollections (
     created_at    TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS letters (
+    id           TEXT PRIMARY KEY,
+    profile_id   TEXT NOT NULL REFERENCES profiles(id),
+    week_start   TEXT NOT NULL,
+    body         TEXT NOT NULL,
+    described_by TEXT NOT NULL,   -- model | digest
+    digest       TEXT NOT NULL,   -- the facts under the words
+    created_at   TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS lookouts (
     id           TEXT PRIMARY KEY,
     profile_id   TEXT NOT NULL REFERENCES profiles(id),

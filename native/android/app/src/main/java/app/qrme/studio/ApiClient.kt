@@ -120,6 +120,8 @@ data class VoiceprintStatus(val consent: VoiceConsentState,
 data class VoiceSpoken(val basis: String, val disclosure: String)
 data class VoiceRevocation(val samplesDeleted: Int, val note: String)
 data class TranslateResult(val translation: String, val engine: String, val note: String?)
+data class Letter(val id: String, val weekStart: String, val body: String,
+                  val describedBy: String)
 data class Lookout(val id: String, val url: String, val everyHours: Double,
                    val status: String?, val nextRunAt: String?,
                    val changedAt: String?, val trouble: String?)
@@ -1038,6 +1040,22 @@ object ApiClient {
     suspend fun dropLookout(id: String, lid: String, token: String): Boolean {
         return JSONObject(request("/profiles/$id/lookout/$lid", "DELETE",
                                   null, token)).optBoolean("removed")
+    }
+
+    suspend fun writeLetter(id: String, token: String): Letter {
+        val o = JSONObject(request("/profiles/$id/letter", "POST",
+                                   JSONObject(), token))
+        return Letter(o.getString("id"), o.getString("week_start"),
+                      o.getString("body"), o.getString("described_by"))
+    }
+
+    suspend fun letters(id: String, token: String): List<Letter> {
+        val arr = JSONArray(request("/profiles/$id/letters", token = token))
+        return (0 until arr.length()).map { i ->
+            val l = arr.getJSONObject(i)
+            Letter(l.getString("id"), l.getString("week_start"),
+                   l.getString("body"), l.getString("described_by"))
+        }
     }
 
     // ---- inquiries: ask people, not pages ----

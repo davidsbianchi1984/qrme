@@ -11,7 +11,7 @@ import json
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import db, i18n, lookout, privileges, research
+from .. import db, i18n, letter as letter_mod, lookout, privileges, research
 from ..common import profile_or_404, require_owner
 from ..models import ExcursionStart, LookoutCreate
 
@@ -58,6 +58,29 @@ def start_excursion(profile_id: str, body: ExcursionStart, request: Request) -> 
         # forgets on the way.
         raise HTTPException(403, i18n.raised(exc)) from None
     return _out(_exc_or_404(cid))
+
+
+@router.post("/profiles/{profile_id}/letter", status_code=201)
+def write_letter(profile_id: str, request: Request) -> dict:
+    """The weekly letter: the profile's week, written to its owner
+    (qrme/letter.py) — composed only from what the week actually held.
+    A week with nothing in it gets no letter."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    try:
+        return letter_mod.compose(profile_id, cloud=request.app.state.cloud,
+                                  pdi=request.app.state.pdi)
+    except letter_mod.LetterError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
+
+
+@router.get("/profiles/{profile_id}/letters")
+def letter_shelf(profile_id: str, request: Request) -> list[dict]:
+    """Past weekly letters, newest first, each carrying the digest the
+    words were made from."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    return letter_mod.shelf(profile_id)
 
 
 @router.post("/profiles/{profile_id}/lookout", status_code=201)

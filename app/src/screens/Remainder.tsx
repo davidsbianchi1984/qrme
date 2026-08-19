@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, uploadMedia, type AppConnector, type ConnectorCatalogue,
          type Excursion, type FeedbackBoard, type GameSession, type Inquiry,
-         type LookoutList, type LookoutPage,
+         type Letter, type LookoutList, type LookoutPage,
          type PackDetail, type Visited,
          type PackRegistry, type SocialPublished, type SteeringHub } from "../api";
 import { Refusal } from "../Refusal";
@@ -59,6 +59,7 @@ export function Remainder() {
   const [watchUrl, setWatchUrl] = useState("");
   const [watchHours, setWatchHours] = useState("24");
   const [capture, setCapture] = useState<LookoutPage | null>(null);
+  const [mail, setMail] = useState<Letter[]>([]);
   const [board, setBoard] = useState<FeedbackBoard | null>(null);
   const [category, setCategory] = useState("idea");
   const [message, setMessage] = useState("");
@@ -119,6 +120,7 @@ export function Remainder() {
     go(() => api.profileApps(me, token), setApps);
     go(() => api.excursions(me, token), setTrips);
     go(() => api.lookouts(me, token), setWatches);
+    go(() => api.letters(me, token), setMail);
     go(() => api.inquiries(me, token), setAsks);
     go(() => api.visits(me, token), setBeen);
     go(() => api.steeringHub(me, token), setHub);
@@ -454,6 +456,23 @@ export function Remainder() {
             )}
           </div>
         )}
+      </div>
+
+      {/* --- the week in its words ---------------------------------------- */}
+      <div className="card">
+        <h3>{tr("ltr.title", lang)}</h3>
+        <button disabled={!me || !token} onClick={() => go(
+          () => api.writeLetter(me, token),
+          () => go(() => api.letters(me, token), setMail))}>
+          {tr("ltr.write", lang)}
+        </button>
+        {mail.map((l) => (
+          <div key={l.id} className="muted small"
+               style={{ marginTop: 8 }}>
+            <b>{l.week_start}</b>
+            <div style={{ whiteSpace: "pre-wrap" }}>{l.body}</div>
+          </div>
+        ))}
       </div>
 
       {/* --- asking people ------------------------------------------------ */}

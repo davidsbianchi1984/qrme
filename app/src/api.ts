@@ -2604,6 +2604,10 @@ export type LightLegend = {
  *  from the current capture. `status`/`next_run_at` are what the vault
  *  said just now; null with `readable: false` means the tandem could not
  *  be asked, not that the appointment is gone. */
+export type Letter = {
+  id: string; week_start: string; body: string;
+  described_by: string; created_at: string;
+};
 export type Lookout = {
   id: string; url: string; every_hours: number;
   status: string | null; next_run_at: string | null;
@@ -5797,6 +5801,10 @@ export const api = {
   lookoutPage: (profileId: string, lid: string, token: string) =>
     req<LookoutPage>(`/profiles/${profileId}/lookout/${lid}/page`,
       { token }),
+  writeLetter: (profileId: string, token: string) =>
+    req<Letter>(`/profiles/${profileId}/letter`, { method: "POST", token }),
+  letters: (profileId: string, token: string) =>
+    req<Letter[]>(`/profiles/${profileId}/letters`, { token }),
   dropLookout: (profileId: string, lid: string, token: string) =>
     req<{ removed: boolean; id?: string; why?: string }>(
       `/profiles/${profileId}/lookout/${lid}`, { method: "DELETE", token }),

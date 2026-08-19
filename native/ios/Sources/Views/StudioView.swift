@@ -135,6 +135,29 @@ struct StudyView: View {
                     }
                 }.card()
 
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(L10n.t("ltr.title", state.language)).font(.headline)
+                        .foregroundStyle(Theme.txt)
+                    Button(L10n.t("ltr.write", state.language)) {
+                        Task {
+                            guard let pid = state.pid, let token = state.token
+                            else { return }
+                            _ = try? await ApiClient.shared.writeLetter(
+                                id: pid, token: token)
+                            mail = (try? await ApiClient.shared.letters(
+                                id: pid, token: token)) ?? []
+                        }
+                    }.font(.caption).tint(Theme.brandA)
+                    ForEach(mail, id: \.id) { l in
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(l.week_start).font(.caption2).bold()
+                                .foregroundStyle(Theme.txt)
+                            Text(l.body).font(.caption2)
+                                .foregroundStyle(Theme.t2)
+                        }
+                    }
+                }.card()
+
                 VStack(alignment: .leading, spacing: 10) {
                     Text(L10n.t("nws.title", state.language))
                         .font(.headline).foregroundStyle(Theme.txt)
