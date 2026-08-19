@@ -197,7 +197,7 @@ process (or is not a working key), not the feature being broken. Ask the
 box itself:
 
 ```bash
-curl -s https://sntheticprofiles.com/api/models | python3 -c \
+curl -s https://sntheticprofiles.com/models | python3 -c \
   "import json,sys; d=json.load(sys.stdin); print('default:', d['default'])"
 ```
 
