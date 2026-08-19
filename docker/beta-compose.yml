@@ -56,6 +56,10 @@ services:
       PDI_ADMIN_TOKEN: ${PDI_ADMIN_TOKEN:?set PDI_ADMIN_TOKEN in .env}
       PDI_PUBLIC_URL: ${PDI_PUBLIC_URL:?set PDI_PUBLIC_URL in .env}
       PDI_DB: /data/pdi.db
+      # The vault's own heartbeat (seconds between beats). Empty means no
+      # in-process pulse and standing tasks wait for a caller — the
+      # pre-0.88 posture. 60 is the documented beta value.
+      PDI_RESIDENT_PULSE: ${PDI_RESIDENT_PULSE:-}
     volumes:
       - pdi-data:/data
     expose:

@@ -80,6 +80,12 @@ QRME_PUBLIC_URL=https://sntheticprofiles.com
 JIM_PUBLIC_URL=https://jim-mini.com
 PDI_PUBLIC_URL=https://pdisystems.net
 
+# --- the vault's heartbeat ---------------------------------------------
+# Seconds between beats of PDI's in-process pulse: the resident re-runs
+# its standing tasks (lookouts, appointments) on this clock. Empty means
+# no heartbeat — standing tasks stand still.
+PDI_RESIDENT_PULSE=60
+
 # --- yours -------------------------------------------------------------
 ANTHROPIC_API_KEY=
 
