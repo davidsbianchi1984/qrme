@@ -130,6 +130,24 @@ class PDIClient:
             raise RuntimeError(f"PDI search failed: {r.status_code}")
         return r.json().get("matches", [])
 
+    def resident_ask(self, question: str, prefix: str | None = None,
+                     system: str | None = None) -> dict | None:
+        """A grounded local answer from the vault ({model, text,
+        leaves_host, drew_on}) — retrieval scoped to `prefix` so one
+        pair's question never grounds on another's seals. None on an
+        older PDI without the ask door."""
+        body = {"question": question}
+        if prefix is not None:
+            body["prefix"] = prefix
+        if system is not None:
+            body["system"] = system
+        r = self._do("POST", "/resident/ask", body)
+        if r.status_code == 404:
+            return None
+        if r.status_code >= 300:
+            raise RuntimeError(f"PDI ask failed: {r.status_code}")
+        return r.json()
+
     def resident_infer(self, prompt: str) -> dict | None:
         """One local turn from the vault's own model ({model, text,
         leaves_host}), or None on an older PDI without the voice door."""

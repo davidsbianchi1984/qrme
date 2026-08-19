@@ -107,3 +107,63 @@ def test_no_tandem_means_the_choice_is_not_configured(client, profile_id):
     # A stored preference can never wedge generation: the choice resolves
     # to the platform default rather than a provider that cannot answer.
     assert llm.resolve_choice("vault") == llm.default_name()
+
+
+class GroundedVault(VoiceVault):
+    """A PDI with the ask door: retrieval and generation both inside."""
+
+    def __init__(self, **kw):
+        super().__init__(**kw)
+        self.asked: list[dict] = []
+
+    def resident_ask(self, question, prefix=None, system=None):
+        self.asked.append({"question": question, "prefix": prefix,
+                           "system": system})
+        return {"model": self.model, "text": self.text,
+                "leaves_host": False,
+                "drew_on": [prefix + "m1"] if prefix else []}
+
+
+def test_a_profile_answers_grounded_in_the_pairs_seals(client, profile_id,
+                                                       interactor_id):
+    """Retrieval and generation both inside the facility: the vault ranks
+    the pair's own seals against the last thing said and answers from
+    them — the prefix is the per-pair wall inside the shared tenant, and
+    the provenance says the grounding actually happened."""
+    vault = GroundedVault()
+    client.app.state.pdi = vault
+    _choose_vault(client, profile_id)
+    answered = _chat(client, profile_id, interactor_id,
+                     "what should I cook when my sister arrives")
+    assert answered["profile_message"]["content"] == vault.text
+    assert answered["provenance"]["grounded_in_vault"] is True
+    ask = vault.asked[-1]
+    assert ask["question"] == "what should I cook when my sister arrives"
+    assert ask["prefix"] == f"qrme/{profile_id}/memory/{interactor_id}/"
+    assert ask["system"], "the persona was dropped on the way to the vault"
+    # And recall stepped aside: the resident reads the same seals, so
+    # fetching the lines here too would say them twice.
+    assert "Moments you remember" not in ask["system"]
+
+
+def test_grounding_is_pair_scoped(client, profile_id, interactor_id):
+    from tests.test_the_profile_remembers_by_meaning import _second_interactor
+    vault = GroundedVault()
+    client.app.state.pdi = vault
+    _choose_vault(client, profile_id)
+    bob = _second_interactor(client)
+    _chat(client, profile_id, bob, "hello from Bob")
+    assert vault.asked[-1]["prefix"] == \
+        f"qrme/{profile_id}/memory/{bob}/"
+
+
+def test_an_older_pdi_speaks_ungrounded_and_says_so(client, profile_id,
+                                                    interactor_id):
+    """A PDI with the voice door but not the ask door still speaks —
+    ungrounded, and the provenance says so rather than pretending."""
+    vault = VoiceVault()          # has resident_infer, no resident_ask
+    client.app.state.pdi = vault
+    _choose_vault(client, profile_id)
+    answered = _chat(client, profile_id, interactor_id, "hello there")
+    assert answered["profile_message"]["content"] == vault.text
+    assert answered["provenance"]["grounded_in_vault"] is False

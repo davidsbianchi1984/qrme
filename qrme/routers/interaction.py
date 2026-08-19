@@ -339,7 +339,15 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     # The real vault, not the plan-gated one: `vault_for` gates writes
     # only, and a member who moved to Free still has sealed moments this
     # reply must go on finding — the same split the shelf holds.
-    recalled_block = recollection.chat_block(
+    #
+    # And when this profile's provider is the vault itself, recall steps
+    # aside: the resident ranks the pair's seals against the question and
+    # answers from them *inside* the facility (llm.VaultProvider), so
+    # fetching the lines here would read the same seals twice and say
+    # them twice. Whether the grounding actually happened is disclosed in
+    # the provenance, not assumed.
+    vault_grounds = llm.resolve_choice(llm.get_choice(profile_id)) == "vault"
+    recalled_block = None if vault_grounds else recollection.chat_block(
         pdi, profile_id, body.interactor_id, body.message)
     if recalled_block:
         system += "\n\n" + recalled_block
@@ -398,7 +406,15 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         system += (f"\n\nHonesty about multiplicity: you also hold {others} "
                    "other ongoing relationship(s). If asked, acknowledge "
                    "this truthfully and kindly — never deny it.")
-    reply = provider.generate(system, llm_messages)
+    # The pair's memory prefix rides the generation: the vault provider
+    # may ground on these seals and no others.
+    ground = llm.ground_on(
+        f"qrme/{profile_id}/memory/{body.interactor_id}/"
+        if vault_grounds else None)
+    try:
+        reply = provider.generate(system, llm_messages)
+    finally:
+        llm.ground_reset(ground)
 
     verdict = moderation.review(reply, relationship, interactor,
                                 maturity=profile["maturity"])
@@ -439,9 +455,15 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
                       engagement.get(profile_id, body.interactor_id),
                       biometrics=body.biometrics)
 
+    # True only when the vault actually ranked the pair's seals and
+    # answered from them — said, never assumed.
+    inner = getattr(provider, "_primary", provider)
+    grounded = bool(getattr(inner, "grounded", False))
+    chat_provenance = content_provenance(speaking_profile, sources, status,
+                                         flag_reason)
+    chat_provenance["grounded_in_vault"] = grounded
     return ChatResponse(
-        provenance=content_provenance(speaking_profile, sources, status,
-                                      flag_reason),
+        provenance=chat_provenance,
         interactor_message=message_out(rows[interactor_msg_id]),
         profile_message=message_out(rows[profile_msg_id]),
         modality=_modality_descriptor(

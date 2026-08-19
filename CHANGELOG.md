@@ -4,6 +4,24 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **The profile answers grounded in the vault.** With the `vault`
+  provider chosen, the resident ranks the pair's own seals against the
+  last thing said and answers *from* them — retrieval and generation
+  both inside the facility, with the pair prefix as the wall inside the
+  shared tenant, so what Alice told a profile still never grounds its
+  reply to Bob. Client-side recall steps aside when the vault grounds
+  (the same seals said twice is not more memory), and
+  `grounded_in_vault` in the provenance says whether the grounding
+  actually happened: an older PDI without the ask door still speaks
+  through the voice door, ungrounded and disclosed.
+
+      asked     does the profile remember
+      mattered  where the remembering happens, and who is told
+
 ## [0.88.0] - 2026-08-19
 
 ### Fixed

@@ -346,6 +346,24 @@ class StubProvider:
         )
 
 
+#: The memory prefix the vault provider may ground on, set around a
+#: generation by whoever knows whose conversation this is (the chat
+#: route). A contextvar rather than a constructor argument because
+#: providers are built per call, below the layer that knows the pair.
+_GROUND_PREFIX: ContextVar[str | None] = ContextVar("qrme_ground_prefix",
+                                                    default=None)
+
+
+def ground_on(prefix: str | None):
+    """Install the pair's memory prefix for this generation; returns the
+    reset token. The caller owns the set/reset pairing."""
+    return _GROUND_PREFIX.set(prefix)
+
+
+def ground_reset(token) -> None:
+    _GROUND_PREFIX.reset(token)
+
+
 class VaultProvider:
     """The vault's own local model, through PDI's resident voice door.
 
@@ -359,15 +377,39 @@ class VaultProvider:
     product's own stub, and the reason is in the log.
     """
 
+    #: Whether the last answer was grounded in the pair's own seals —
+    #: read by the chat route for the provenance disclosure.
+    grounded = False
+    drew_on: list = []
+
     def generate(self, system: str, messages: list[dict]) -> str:
         from . import pdi_client
         client = pdi_client.active()
         if client is None:
             raise RuntimeError("no PDI tandem is configured")
+        self.grounded, self.drew_on = False, []
         turns = "\n".join(
             ("Person: " if m["role"] == "user" else "You: ") + m["content"]
             for m in messages)
-        out = client.resident_infer(system + "\n\n" + turns + "\nYou: ")
+        prefix = _GROUND_PREFIX.get()
+        out = None
+        if prefix and messages:
+            # Grounded: the vault ranks this pair's own seals against the
+            # last thing said and answers from them — retrieval and
+            # generation both inside the facility, with the prefix as the
+            # per-pair wall inside the shared tenant. An older PDI
+            # without the ask door answers None and the voice door below
+            # still speaks, ungrounded and said so.
+            question = messages[-1]["content"]
+            ask = getattr(client, "resident_ask", None)
+            out = ask(question, prefix=prefix,
+                      system=system + "\n\nThe conversation so far:\n"
+                      + turns) if ask else None
+            if out is not None:
+                self.grounded = True
+                self.drew_on = list(out.get("drew_on") or [])
+        if out is None:
+            out = client.resident_infer(system + "\n\n" + turns + "\nYou: ")
         if out is None:
             raise RuntimeError("this PDI has no voice door (older tandem)")
         if out.get("model") == "stub":
