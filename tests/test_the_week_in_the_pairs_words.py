@@ -78,3 +78,23 @@ def test_the_chosen_voice_writes_the_letter(client, profile_id,
     letter = r.json()
     assert letter["described_by"] == "model"
     assert letter["body"] == "A quiet week, mostly catching up."
+
+
+def test_the_letter_accounts_for_the_asking(client, profile_id):
+    client.post(f"/profiles/{profile_id}/privileges/ask_people",
+                json={"on": True})
+    r = client.post(f"/profiles/{profile_id}/inquiries",
+                    json={"topic": "old radiators",
+                          "question": "what is this valve called"})
+    assert r.status_code == 201, r.text
+    inq = r.json()
+    posted = client.post(f"/open-questions/{inq['id']}/answers", json={
+        "body": "A thermostatic radiator valve."})
+    assert posted.status_code == 201, posted.text
+
+    r = client.post(f"/profiles/{profile_id}/letter")
+    assert r.status_code == 201, r.text
+    digest = r.json()["digest"]
+    assert any("1 question asked on the open board" == line
+               for line in digest), digest
+    assert any("1 answer came back" == line for line in digest), digest

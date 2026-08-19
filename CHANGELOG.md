@@ -39,6 +39,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
       asked     what kind of week did the profile have
       mattered  an account rendered only on request is an account withheld
 
+- **The letter accounts for the asking.** The weekly letter counted
+  messages, sealed moments, studies and the watching — and said nothing
+  about the open board: the questions this profile put in front of
+  strangers, and the answers they left. The digest now carries both —
+  the half of the studying that is done by people, and as much a part
+  of the week as the pages.
+
+      asked     who did the profile ask this week, and did anyone answer
+      mattered  work done on your behalf belongs in your account of it
+
 ## [0.90.0] - 2026-08-19
 
 ### Added

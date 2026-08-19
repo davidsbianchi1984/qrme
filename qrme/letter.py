@@ -85,6 +85,24 @@ def _digest(profile_id: str, since: str) -> list[str]:
         lines.append(f"{len(studies)}"
                      f" stud{'ies' if len(studies) != 1 else 'y'} taken,"
                      f" most recently: {sample}")
+
+    # The asking: questions this profile put on the open board, and the
+    # answers strangers left on them — the half of the studying that is
+    # done by people, and as much a part of the week as the pages.
+    row = conn.execute(
+        "SELECT COUNT(*) AS n FROM inquiries WHERE profile_id=? AND"
+        " created_at>=?", (profile_id, since)).fetchone()
+    if row["n"]:
+        lines.append(f"{row['n']}"
+                     f" question{'s' if row['n'] != 1 else ''}"
+                     " asked on the open board")
+    row = conn.execute(
+        "SELECT COUNT(*) AS n FROM inquiry_answers a JOIN inquiries q ON"
+        " q.id=a.inquiry_id WHERE q.profile_id=? AND a.created_at>=?"
+        " AND a.blocked=0", (profile_id, since)).fetchone()
+    if row["n"]:
+        lines.append(f"{row['n']}"
+                     f" answer{'s' if row['n'] != 1 else ''} came back")
     return lines
 
 
