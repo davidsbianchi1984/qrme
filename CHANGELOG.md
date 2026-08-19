@@ -4,6 +4,28 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **The pulse reaches the container.** `PDI_RESIDENT_PULSE=60` in
+  `/srv/qrme/.env` was the documented deploy step for the vault's
+  heartbeat — and `docker/beta-compose.yml` never forwarded it: compose
+  passes only what a service's `environment:` block names, so the
+  standing tasks would have stood still on a box whose operator had
+  done everything the instructions said. The pdi service now passes it
+  through (empty default: no pulse, the pre-0.88 posture), and the
+  deploy page's `.env` template carries the line. Written here as what
+  it was — a gap between the docs and the compose file is a real
+  failure surface, and the awkward entries are the ones that earn a
+  changelog its credibility.
+
+- **The models check asks a door that exists.** The deploy runbook's
+  "which model actually answers" command said `/api/models`; the proxy
+  serves each domain 1:1 with no `/api` prefix, so the exact line the
+  page hands the operator answered 404 mid-deploy, wearing the costume
+  of a broken stack. The route is `/models`; the page now says so.
+
 ## [0.91.0] - 2026-08-19
 
 ### Added
