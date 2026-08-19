@@ -757,6 +757,38 @@ public record Excursion(
     [property: JsonPropertyName("findings")] string Findings,
     [property: JsonPropertyName("learned")] bool Learned);
 
+// Lookouts: pages the vault keeps fresh, and the profile speaks from.
+// Status and next_run_at are what the tandem said, null when it could not
+// be asked — the list says `readable: false` then rather than inventing.
+
+public record LookoutRow(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("url")] string Url,
+    [property: JsonPropertyName("every_hours")] double EveryHours,
+    [property: JsonPropertyName("status")] string? Status,
+    [property: JsonPropertyName("next_run_at")] string? NextRunAt,
+    [property: JsonPropertyName("created_at")] string CreatedAt);
+
+public record LookoutList(
+    [property: JsonPropertyName("lookouts")] LookoutRow[] Lookouts,
+    [property: JsonPropertyName("readable")] bool Readable);
+
+public record LookoutPage(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("url")] string Url,
+    [property: JsonPropertyName("readable")] bool Readable,
+    [property: JsonPropertyName("fetched_at")] string? FetchedAt,
+    [property: JsonPropertyName("chars")] int Chars,
+    [property: JsonPropertyName("text")] string? Text);
+
+public record LookoutPlanted(
+    [property: JsonPropertyName("planted")] bool Planted,
+    [property: JsonPropertyName("id")] string Id);
+
+public record LookoutRemoved(
+    [property: JsonPropertyName("removed")] bool Removed,
+    [property: JsonPropertyName("why")] string? Why);
+
 /// <summary>
 // Live desks. A real person, so the card carries no AI watermark — it makes
 // the opposite claim, and says who attested it.
@@ -1805,6 +1837,36 @@ public sealed class ApiClient
         var req = Post($"/excursions/{cid}/learn", new { }, token);
         var res = await Dispatch(req);
         res.EnsureSuccessStatusCode();
+    }
+
+    // -- lookouts: pages the vault keeps fresh --
+
+    public Task<LookoutList> Lookouts(string id, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Get, $"/profiles/{id}/lookout");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<LookoutList>(req);
+    }
+
+    public Task<LookoutPlanted> PlantLookout(string id, string token,
+                                             string url, double everyHours) =>
+        Send<LookoutPlanted>(Post($"/profiles/{id}/lookout",
+            new { url, every_hours = everyHours }, token));
+
+    public Task<LookoutPage> ReadLookout(string id, string lid, string token)
+    {
+        var req = new HttpRequestMessage(
+            HttpMethod.Get, $"/profiles/{id}/lookout/{lid}/page");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<LookoutPage>(req);
+    }
+
+    public Task<LookoutRemoved> DropLookout(string id, string lid, string token)
+    {
+        var req = new HttpRequestMessage(
+            HttpMethod.Delete, $"/profiles/{id}/lookout/{lid}");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<LookoutRemoved>(req);
     }
 
     // -- inquiries: ask people, not pages --

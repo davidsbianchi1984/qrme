@@ -650,6 +650,15 @@ CREATE TABLE IF NOT EXISTS recollections (
     created_at    TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS lookouts (
+    id           TEXT PRIMARY KEY,
+    profile_id   TEXT NOT NULL REFERENCES profiles(id),
+    url          TEXT NOT NULL,
+    every_hours  REAL NOT NULL,
+    task_id      TEXT NOT NULL,   -- the standing task in the vault
+    created_at   TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS excursions (
     id           TEXT PRIMARY KEY,
     profile_id   TEXT NOT NULL REFERENCES profiles(id),

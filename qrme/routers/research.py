@@ -11,9 +11,9 @@ import json
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import db, i18n, privileges, research
+from .. import db, i18n, lookout, privileges, research
 from ..common import profile_or_404, require_owner
-from ..models import ExcursionStart
+from ..models import ExcursionStart, LookoutCreate
 
 router = APIRouter()
 
@@ -58,6 +58,64 @@ def start_excursion(profile_id: str, body: ExcursionStart, request: Request) -> 
         # forgets on the way.
         raise HTTPException(403, i18n.raised(exc)) from None
     return _out(_exc_or_404(cid))
+
+
+@router.post("/profiles/{profile_id}/lookout", status_code=201)
+def plant_lookout(profile_id: str, body: LookoutCreate,
+                  request: Request) -> dict:
+    """Keep an eye on a page: one standing appointment in the vault
+    (qrme/lookout.py), whose resident re-fetches and re-seals the current
+    capture on the interval — the profile then answers from the capture.
+    Behind the same `study_the_web` privilege the excursions ask for."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    from .. import storage as storage_mod, tiers as tiers_mod
+    try:
+        out = lookout.plant(
+            profile_id, body.url, body.every_hours,
+            pdi=storage_mod.vault_for(tiers_mod.plan_of_profile(profile_id),
+                                      request.app.state.pdi))
+    except privileges.NotChosen as exc:
+        raise HTTPException(403, i18n.raised(exc)) from None
+    if not out["planted"]:
+        raise HTTPException(422, out["why"])
+    return out
+
+
+@router.get("/profiles/{profile_id}/lookout")
+def list_lookouts(profile_id: str, request: Request) -> dict:
+    """This profile's lookouts, with what the vault says about each —
+    `readable: false` when the tandem could not be asked. The real
+    vault: reads keep `app.state.pdi`."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    return lookout.watches(profile_id, pdi=request.app.state.pdi)
+
+
+@router.get("/profiles/{profile_id}/lookout/{lookout_id}/page")
+def read_lookout(profile_id: str, lookout_id: str,
+                 request: Request) -> dict:
+    """The current capture, read back from the seal."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    out = lookout.page(profile_id, lookout_id,
+                       pdi=request.app.state.pdi)
+    if out is None:
+        raise HTTPException(404, "no such lookout")
+    return out
+
+
+@router.delete("/profiles/{profile_id}/lookout/{lookout_id}")
+def drop_lookout(profile_id: str, lookout_id: str,
+                 request: Request) -> dict:
+    """Stop the watching the whole way: the appointment, the seal, the
+    row — in that order. The real vault, like every delete."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    out = lookout.drop(profile_id, lookout_id, pdi=request.app.state.pdi)
+    if out is None:
+        raise HTTPException(404, "no such lookout")
+    return out
 
 
 @router.get("/profiles/{profile_id}/excursions")

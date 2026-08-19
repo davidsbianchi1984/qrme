@@ -573,6 +573,12 @@ def delete_profile(profile_id: str, request: Request) -> dict:
     # call. None means the tandem was unreached, and the answer says so.
     from .. import recollection
     deleted["memory_vectors"] = recollection.forget_profile(pdi, profile_id)
+    # The lookouts (qrme/lookout.py): each is a standing appointment in
+    # the vault and a sealed capture under the task's key — both outside
+    # the pdi_key ledgers, so the sweep names them itself. None means the
+    # tandem was unreached; the rows die with the tables either way.
+    from .. import lookout as lookout_mod
+    deleted["lookouts_cancelled"] = lookout_mod.drop_all(profile_id, pdi=pdi)
     # Derived from the schema, not written down. The list that stood here
     # named twenty-four tables and this schema has sixty-six with a
     # `profile_id` column, so "every trace of it" left forty-two standing —

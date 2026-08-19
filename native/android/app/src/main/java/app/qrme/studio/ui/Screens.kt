@@ -1858,6 +1858,10 @@ fun StudyScreen(vm: StudioViewModel) {
     var topic by remember { mutableStateOf("") }
     var question by remember { mutableStateOf("") }
     var excursions by remember { mutableStateOf<List<Excursion>>(emptyList()) }
+    var watchUrl by remember { mutableStateOf("") }
+    var watchHours by remember { mutableStateOf("24") }
+    var watches by remember { mutableStateOf<List<Lookout>>(emptyList()) }
+    var captureLine by remember { mutableStateOf<String?>(null) }
     // Search the Internet: a real search through the keyless door, working
     // on a deployment with no model configured — which an excursion is not.
     var webQ by remember { mutableStateOf("") }
@@ -1886,6 +1890,7 @@ fun StudyScreen(vm: StudioViewModel) {
     }
     fun reload() {
         vm.call({ ApiClient.excursions(vm.pid!!, vm.token!!) }) { r -> excursions = r.getOrDefault(emptyList()) }
+        vm.call({ ApiClient.lookouts(vm.pid!!, vm.token!!) }) { r -> watches = r.getOrNull()?.lookouts ?: emptyList() }
         vm.call({ ApiClient.inquiries(vm.pid!!, vm.token!!) }) { r -> asks = r.getOrDefault(emptyList()) }
         reloadBoard()
         vm.call({ ApiClient.visits(vm.pid!!, vm.token!!) }) { r -> been = r.getOrDefault(emptyList()) }
@@ -1913,6 +1918,45 @@ fun StudyScreen(vm: StudioViewModel) {
         }
 
         Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            // The lookout: a page the vault re-reads on its schedule and
+            // re-seals in place — the profile answers from the current
+            // capture. Behind the same study privilege.
+            Text(L10n.t("lkt.title", vm.language), color = Qrme.Txt, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+            labeledField(L10n.t("lkt.url", vm.language), watchUrl, L10n.t("lkt.url", vm.language)) { watchUrl = it }
+            labeledField(L10n.t("lkt.hours", vm.language), watchHours, L10n.t("lkt.hours", vm.language)) { watchHours = it }
+            BrandButton(L10n.t("lkt.plant", vm.language), enabled = watchUrl.isNotBlank()) {
+                vm.call({
+                    ApiClient.plantLookout(vm.pid!!, watchUrl,
+                        watchHours.toDoubleOrNull() ?: 24.0, vm.token!!)
+                    ApiClient.lookouts(vm.pid!!, vm.token!!)
+                }) { r ->
+                    watchUrl = ""
+                    r.onSuccess { watches = it.lookouts }
+                     .onFailure { error = it.message }
+                }
+            }
+            watches.forEach { w ->
+                Text(w.url, color = Qrme.Txt, fontSize = 12.sp)
+                Text("" + w.everyHours +
+                    (w.status?.let { " \u00b7 " + it } ?: "") +
+                    (w.nextRunAt?.let { " \u00b7 " + it.take(16) } ?: ""),
+                    color = Qrme.T2, fontSize = 11.sp)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TextButton(onClick = {
+                        vm.call({ ApiClient.lookoutPage(vm.pid!!, w.id, vm.token!!) }) { r ->
+                            captureLine = r.getOrNull() ?: r.exceptionOrNull()?.message
+                        }
+                    }) { Text(L10n.t("lkt.read", vm.language), color = Qrme.BrandA, fontSize = 11.sp) }
+                    TextButton(onClick = {
+                        vm.call({
+                            ApiClient.dropLookout(vm.pid!!, w.id, vm.token!!)
+                            ApiClient.lookouts(vm.pid!!, vm.token!!)
+                        }) { r -> r.onSuccess { watches = it.lookouts } }
+                    }) { Text(L10n.t("lkt.drop", vm.language), color = Qrme.Red, fontSize = 11.sp) }
+                }
+            }
+            captureLine?.let { Text(it, color = Qrme.T2, fontSize = 11.sp) }
+
             Text(L10n.t("nws.title", vm.language), color = Qrme.Txt,
                 fontSize = 16.sp, fontWeight = FontWeight.Bold)
             labeledField(L10n.t("nws.title", vm.language), webQ,

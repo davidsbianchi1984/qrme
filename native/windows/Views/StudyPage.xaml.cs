@@ -75,6 +75,17 @@ public sealed partial class StudyPage : Page
             StoodDown ? L10n.T("rem.been.resume") : L10n.T("rem.been.stop");
     }
 
+    /// <summary>One watched page. <c>Line</c> folds the vault's word on it in:
+    /// a null status means the tandem could not be asked, and the row says
+    /// nothing rather than inventing one.</summary>
+    public sealed class LookoutItem
+    {
+        public string Id { get; init; } = "";
+        public string Line { get; init; } = "";
+        public string ReadLabel => L10n.T("lkt.read");
+        public string DropLabel => L10n.T("lkt.drop");
+    }
+
     private string _openedAsk = "";
     private string _answeringId = "";
 
@@ -97,6 +108,10 @@ public sealed partial class StudyPage : Page
         WebHead.Text = L10n.T("nws.title");
         WebQBox.PlaceholderText = L10n.T("nws.ph");
         WebGoButton.Content = L10n.T("nws.title");
+        LookoutHead.Text = L10n.T("lkt.title", lang);
+        LookoutUrlBox.Header = L10n.T("lkt.url", lang);
+        LookoutHoursBox.Header = L10n.T("lkt.hours", lang);
+        LookoutPlantButton.Content = L10n.T("lkt.plant", lang);
         AskTitle.Text = L10n.T("nask", lang);
         AskSub.Text = L10n.T("nask.sub", lang);
         AskTopicBox.Header = L10n.T("ncmp.topic", lang);
@@ -179,9 +194,72 @@ public sealed partial class StudyPage : Page
             }).ToList();
         }
         catch (Exception ex) { ShowError(ex.Message); }
+        await ReloadLookouts();
         await ReloadAsks();
         await ReloadBoard();
         await ReloadBeen();
+    }
+
+    private async System.Threading.Tasks.Task ReloadLookouts()
+    {
+        var s = AppState.Current;
+        try
+        {
+            var watched = await ApiClient.Shared.Lookouts(s.Pid!, s.Token!);
+            LookoutPanel.ItemsSource = watched.Lookouts.Select(w => new LookoutItem
+            {
+                Id = w.Id,
+                Line = w.Status is null ? w.Url : w.Url + " — " + w.Status,
+            }).ToList();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnPlantLookout(object sender, RoutedEventArgs e)
+    {
+        var url = LookoutUrlBox.Text.Trim();
+        if (url.Length == 0) return;
+        if (!double.TryParse(LookoutHoursBox.Text.Trim(), out var hours))
+            hours = 24;
+        var s = AppState.Current;
+        LookoutPlantButton.IsEnabled = false;
+        try
+        {
+            await ApiClient.Shared.PlantLookout(s.Pid!, s.Token!, url, hours);
+            LookoutUrlBox.Text = "";
+            await ReloadLookouts();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+        finally { LookoutPlantButton.IsEnabled = true; }
+    }
+
+    private async void OnReadLookout(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string lid) return;
+        var s = AppState.Current;
+        try
+        {
+            var page = await ApiClient.Shared.ReadLookout(s.Pid!, lid, s.Token!);
+            LookoutCapture.Text = page.Readable && page.Text is not null
+                ? page.FetchedAt + " — " + page.Text
+                : L10n.T("lkt.nocapture");
+            LookoutCapture.Visibility = Visibility.Visible;
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
+    }
+
+    private async void OnDropLookout(object sender, RoutedEventArgs e)
+    {
+        if ((sender as Button)?.Tag is not string lid) return;
+        var s = AppState.Current;
+        try
+        {
+            var gone = await ApiClient.Shared.DropLookout(s.Pid!, lid, s.Token!);
+            if (!gone.Removed && gone.Why is not null) ShowError(gone.Why);
+            LookoutCapture.Visibility = Visibility.Collapsed;
+            await ReloadLookouts();
+        }
+        catch (Exception ex) { ShowError(ex.Message); }
     }
 
     private async System.Threading.Tasks.Task ReloadBeen()

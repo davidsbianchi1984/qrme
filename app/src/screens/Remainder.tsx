@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, uploadMedia, type AppConnector, type ConnectorCatalogue,
          type Excursion, type FeedbackBoard, type GameSession, type Inquiry,
+         type LookoutList, type LookoutPage,
          type PackDetail, type Visited,
          type PackRegistry, type SocialPublished, type SteeringHub } from "../api";
 import { Refusal } from "../Refusal";
@@ -54,6 +55,10 @@ export function Remainder() {
   const [error, setError] = useState<unknown>(null);
   const [said, setSaid] = useState("");
 
+  const [watches, setWatches] = useState<LookoutList | null>(null);
+  const [watchUrl, setWatchUrl] = useState("");
+  const [watchHours, setWatchHours] = useState("24");
+  const [capture, setCapture] = useState<LookoutPage | null>(null);
   const [board, setBoard] = useState<FeedbackBoard | null>(null);
   const [category, setCategory] = useState("idea");
   const [message, setMessage] = useState("");
@@ -113,6 +118,7 @@ export function Remainder() {
     go(() => api.packRegistries(token), setRegistries);
     go(() => api.profileApps(me, token), setApps);
     go(() => api.excursions(me, token), setTrips);
+    go(() => api.lookouts(me, token), setWatches);
     go(() => api.inquiries(me, token), setAsks);
     go(() => api.visits(me, token), setBeen);
     go(() => api.steeringHub(me, token), setHub);
@@ -378,6 +384,69 @@ export function Remainder() {
             )}
           </div>
         ))}
+      </div>
+
+      {/* --- the lookout: a page the vault keeps fresh -------------------- */}
+      <div className="card">
+        <h3>{tr("lkt.title", lang)}</h3>
+        <p className="muted small">{tr("lkt.lead", lang)}</p>
+        {watches && !watches.readable && (
+          <p className="muted small">{tr("lkt.unreadable", lang)}</p>
+        )}
+        <div className="row">
+          <input value={watchUrl} placeholder={tr("lkt.url", lang)}
+                 onChange={(e) => setWatchUrl(e.target.value)}
+                 style={{ flex: 1 }} />
+          <input value={watchHours} type="number" min={0.25} max={744}
+                 aria-label={tr("lkt.hours", lang)}
+                 onChange={(e) => setWatchHours(e.target.value)}
+                 style={{ width: 72 }} />
+          <button disabled={!me || !token || !watchUrl.trim() || !watchHours}
+                  onClick={() => go(
+                    () => api.plantLookout(me, watchUrl.trim(),
+                                           Number(watchHours), token),
+                    () => {
+                      setWatchUrl("");
+                      go(() => api.lookouts(me, token), setWatches);
+                    })}>
+            {tr("lkt.plant", lang)}
+          </button>
+        </div>
+        {watches?.lookouts.map((w) => (
+          <div key={w.id} className="spec-row">
+            <div style={{ flex: 1 }}>
+              {w.url}
+              <div className="muted small">
+                {w.every_hours}
+                {w.status && ` · ${w.status}`}
+                {w.next_run_at && ` · ${w.next_run_at.slice(0, 16)}`}
+              </div>
+            </div>
+            <button onClick={() => go(
+              () => api.lookoutPage(me, w.id, token), setCapture)}>
+              {tr("lkt.read", lang)}
+            </button>
+            <button className="danger" onClick={() => go(
+              () => api.dropLookout(me, w.id, token),
+              () => go(() => api.lookouts(me, token), setWatches))}>
+              {tr("lkt.drop", lang)}
+            </button>
+          </div>
+        ))}
+        {capture && (
+          <div className="muted small">
+            <b>{capture.url}</b>
+            {capture.readable
+              ? ` · ${capture.fetched_at?.slice(0, 16)} · ${capture.chars}`
+              : ` · ${tr("lkt.nocapture", lang)}`}
+            {capture.text && (
+              <div style={{ whiteSpace: "pre-wrap", maxHeight: 160,
+                            overflow: "auto" }}>
+                {capture.text.slice(0, 2000)}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* --- asking people ------------------------------------------------ */}

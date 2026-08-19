@@ -1787,6 +1787,63 @@ actor ApiClient {
         try await request("/profiles/\(id)/excursions", token: token)
     }
 
+    struct Lookout: Decodable {
+        let id: String
+        let url: String
+        let every_hours: Double
+        let status: String?
+        let next_run_at: String?
+    }
+
+    struct LookoutList: Decodable {
+        let lookouts: [Lookout]
+        let readable: Bool
+    }
+
+    struct LookoutPage: Decodable {
+        let url: String
+        let readable: Bool
+        let fetched_at: String?
+        let chars: Int
+        let text: String?
+    }
+
+    struct LookoutPlanted: Decodable {
+        let planted: Bool
+        let id: String
+    }
+
+    struct LookoutRemoved: Decodable {
+        let removed: Bool
+        let why: String?
+    }
+
+    /// The lookout: a page the vault re-reads on its schedule — the
+    /// profile answers from the current capture, and the watching never
+    /// leaves the facility.
+    func lookouts(id: String, token: String) async throws -> LookoutList {
+        try await request("/profiles/\(id)/lookout", token: token)
+    }
+
+    func plantLookout(id: String, url: String, everyHours: Double,
+                      token: String) async throws -> LookoutPlanted {
+        try await request("/profiles/\(id)/lookout", method: "POST",
+                          body: ["url": url, "every_hours": everyHours],
+                          token: token)
+    }
+
+    func lookoutPage(id: String, lid: String,
+                     token: String) async throws -> LookoutPage {
+        try await request("/profiles/\(id)/lookout/\(lid)/page",
+                          token: token)
+    }
+
+    func dropLookout(id: String, lid: String,
+                     token: String) async throws -> LookoutRemoved {
+        try await request("/profiles/\(id)/lookout/\(lid)",
+                          method: "DELETE", token: token)
+    }
+
     func startExcursion(id: String, token: String, topic: String,
                         question: String) async throws -> Excursion {
         try await request("/profiles/\(id)/excursions", method: "POST",

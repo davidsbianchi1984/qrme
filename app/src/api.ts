@@ -2600,6 +2600,20 @@ export type LightLegend = {
  *  it went, and `left_host` says whether anything actually left this machine
  *  at all. Both are the point: a research feature that could not tell you
  *  either would be asking for trust it had not earned. */
+/** A page the vault re-reads on its own appointment; the profile answers
+ *  from the current capture. `status`/`next_run_at` are what the vault
+ *  said just now; null with `readable: false` means the tandem could not
+ *  be asked, not that the appointment is gone. */
+export type Lookout = {
+  id: string; url: string; every_hours: number;
+  status: string | null; next_run_at: string | null; created_at: string;
+};
+export type LookoutList = { lookouts: Lookout[]; readable: boolean };
+export type LookoutPage = {
+  id: string; url: string; readable: boolean;
+  fetched_at: string | null; chars: number; text: string | null;
+};
+
 export type Excursion = {
   id: string;
   profile_id: string;
@@ -5768,6 +5782,22 @@ export const api = {
 
   excursions: (profileId: string, token: string) =>
     req<Excursion[]>(`/profiles/${profileId}/excursions`, { token }),
+  // The lookout: a page the vault keeps fresh, and the profile speaks
+  // from — plant, list, read the capture back, stop watching.
+  plantLookout: (profileId: string, url: string, everyHours: number,
+                 token: string) =>
+    req<{ planted: boolean; id: string; url: string; every_hours: number;
+          task_id: string; next_run_at: string | null }>(
+      `/profiles/${profileId}/lookout`,
+      { method: "POST", body: { url, every_hours: everyHours }, token }),
+  lookouts: (profileId: string, token: string) =>
+    req<LookoutList>(`/profiles/${profileId}/lookout`, { token }),
+  lookoutPage: (profileId: string, lid: string, token: string) =>
+    req<LookoutPage>(`/profiles/${profileId}/lookout/${lid}/page`,
+      { token }),
+  dropLookout: (profileId: string, lid: string, token: string) =>
+    req<{ removed: boolean; id?: string; why?: string }>(
+      `/profiles/${profileId}/lookout/${lid}`, { method: "DELETE", token }),
   // `redactions` and `left_host` on the answer are the point of the feature:
   // what was stripped before the question went out, and whether it went out.
   startExcursion: (profileId: string,

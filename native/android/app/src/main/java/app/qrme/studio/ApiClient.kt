@@ -120,6 +120,9 @@ data class VoiceprintStatus(val consent: VoiceConsentState,
 data class VoiceSpoken(val basis: String, val disclosure: String)
 data class VoiceRevocation(val samplesDeleted: Int, val note: String)
 data class TranslateResult(val translation: String, val engine: String, val note: String?)
+data class Lookout(val id: String, val url: String, val everyHours: Double,
+                   val status: String?, val nextRunAt: String?)
+data class LookoutList(val lookouts: List<Lookout>, val readable: Boolean)
 data class Excursion(val id: String, val topic: String, val redactions: Int,
                      val leftHost: Boolean, val findings: String, val learned: Boolean)
 /** A question put to people rather than to a model. `brief` is the sanitized
@@ -991,6 +994,45 @@ object ApiClient {
 
     suspend fun learn(cid: String, token: String) {
         request("/excursions/$cid/learn", "POST", null, token)
+    }
+
+    // The lookout: a page the vault re-reads on its schedule — the
+    // profile answers from the current capture, and the watching never
+    // leaves the facility.
+    suspend fun lookouts(id: String, token: String): LookoutList {
+        val o = JSONObject(request("/profiles/$id/lookout", token = token))
+        val arr = o.optJSONArray("lookouts")
+        return LookoutList(
+            (0 until (arr?.length() ?: 0)).map { i ->
+                val w = arr!!.getJSONObject(i)
+                Lookout(
+                    w.getString("id"), w.getString("url"),
+                    w.getDouble("every_hours"),
+                    if (w.isNull("status")) null else w.optString("status"),
+                    if (w.isNull("next_run_at")) null
+                    else w.optString("next_run_at"))
+            },
+            o.optBoolean("readable"))
+    }
+
+    suspend fun plantLookout(id: String, url: String, everyHours: Double,
+                             token: String): Boolean {
+        val body = JSONObject().put("url", url).put("every_hours", everyHours)
+        return JSONObject(request("/profiles/$id/lookout", "POST", body,
+                                  token)).optBoolean("planted")
+    }
+
+    suspend fun lookoutPage(id: String, lid: String, token: String): String {
+        val o = JSONObject(request("/profiles/$id/lookout/$lid/page",
+                                   token = token))
+        return (if (o.isNull("fetched_at")) "\u2014"
+                else o.optString("fetched_at")) +
+            " \u00b7 " + o.optInt("chars")
+    }
+
+    suspend fun dropLookout(id: String, lid: String, token: String): Boolean {
+        return JSONObject(request("/profiles/$id/lookout/$lid", "DELETE",
+                                  null, token)).optBoolean("removed")
     }
 
     // ---- inquiries: ask people, not pages ----

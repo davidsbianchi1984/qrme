@@ -59,6 +59,40 @@
                 </StackPanel>
             </Border>
 
+            <!-- Watched pages: the vault re-reads each one on its schedule,
+                 and the profile answers from the current capture. -->
+            <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="8">
+                    <TextBlock x:Name="LookoutHead" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBox x:Name="LookoutUrlBox" />
+                    <TextBox x:Name="LookoutHoursBox" Text="24" />
+                    <Button x:Name="LookoutPlantButton" Click="OnPlantLookout"
+                            Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                    <ItemsControl x:Name="LookoutPanel">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Spacing="2" Margin="0,0,0,6">
+                                    <TextBlock Text="{Binding Line}" FontSize="13" TextWrapping="Wrap"
+                                               Foreground="{StaticResource QrmeTxtBrush}" />
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Button Content="{Binding ReadLabel}" Tag="{Binding Id}"
+                                                Click="OnReadLookout" Background="Transparent"
+                                                Foreground="{StaticResource QrmeBrandABrush}" />
+                                        <Button Content="{Binding DropLabel}" Tag="{Binding Id}"
+                                                Click="OnDropLookout" Background="Transparent"
+                                                Foreground="{StaticResource QrmeRed}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock x:Name="LookoutCapture" FontSize="12" Visibility="Collapsed"
+                               TextWrapping="Wrap" Foreground="{StaticResource QrmeT2Brush}" />
+                </StackPanel>
+            </Border>
+
             <TextBlock x:Name="ErrorText" Foreground="{StaticResource QrmeRed}" FontSize="13"
                        TextWrapping="Wrap" Visibility="Collapsed" />
 

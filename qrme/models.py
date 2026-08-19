@@ -820,6 +820,11 @@ class MessageOut(BaseModel):
     edited: bool = False
 
 
+class LookoutCreate(BaseModel):
+    url: str
+    every_hours: float
+
+
 class ChatResponse(BaseModel):
     interactor_message: MessageOut
     profile_message: MessageOut

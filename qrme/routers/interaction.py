@@ -365,6 +365,14 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     carried = briefcase.block(profile_id, body.interactor_id)
     if carried:
         system += "\n\n" + carried
+    # The watched pages (qrme/lookout.py): the vault keeps their current
+    # captures fresh on its own appointments, and the profile answers
+    # from them — dated, capped, and absent rather than fatal when the
+    # tandem cannot be read. The real vault: this is a read.
+    from .. import lookout as lookout_mod
+    watched = lookout_mod.prompt_block(profile_id, pdi)
+    if watched:
+        system += "\n\n" + watched
     # Attention conditioning from the latent embedding (claims 21/22).
     attention = adaptation.attention_prompt(
         adaptation.get(profile_id, body.interactor_id))

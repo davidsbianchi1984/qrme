@@ -33,6 +33,10 @@ struct StudioView: View {
 struct StudyView: View {
     @EnvironmentObject var state: AppState
     @State private var topic = ""
+    @State private var watchUrl = ""
+    @State private var watchHours = "24"
+    @State private var watches: [ApiClient.Lookout] = []
+    @State private var captureLine: String?
     @State private var question = ""
     @State private var excursions: [Excursion] = []
     @State private var busy = false
@@ -79,6 +83,47 @@ struct StudyView: View {
                             .background(Theme.brand).foregroundStyle(.white)
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                     }.disabled(topic.isEmpty || question.isEmpty || busy)
+                }.card()
+
+                // The lookout: a page the vault re-reads on its schedule
+                // and re-seals in place — the profile answers from the
+                // current capture, and the watching never leaves the
+                // facility. Behind the same study privilege.
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(L10n.t("lkt.title", state.language))
+                        .font(.headline).foregroundStyle(Theme.txt)
+                    TextField(L10n.t("lkt.url", state.language),
+                              text: $watchUrl)
+                        .textFieldStyle(.roundedBorder)
+                    TextField(L10n.t("lkt.hours", state.language),
+                              text: $watchHours)
+                        .textFieldStyle(.roundedBorder)
+                    Button(L10n.t("lkt.plant", state.language)) {
+                        plantWatch()
+                    }.font(.caption).disabled(busy || watchUrl.isEmpty)
+                    ForEach(watches, id: \.id) { watch in
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(watch.url).font(.caption)
+                                .foregroundStyle(Theme.txt)
+                            Text(String(watch.every_hours)
+                                 + (watch.status.map { " · " + $0 } ?? "")
+                                 + (watch.next_run_at.map {
+                                     " · " + String($0.prefix(16)) } ?? ""))
+                                .font(.caption2).foregroundStyle(Theme.t2)
+                            HStack {
+                                Button(L10n.t("lkt.read", state.language)) {
+                                    readWatch(watch)
+                                }.font(.caption2)
+                                Button(L10n.t("lkt.drop", state.language)) {
+                                    dropWatch(watch)
+                                }.font(.caption2)
+                            }
+                        }
+                    }
+                    if let captureLine {
+                        Text(captureLine).font(.caption2)
+                            .foregroundStyle(Theme.t2)
+                    }
                 }.card()
 
                 VStack(alignment: .leading, spacing: 10) {
@@ -304,6 +349,8 @@ struct StudyView: View {
     private func load() async {
         guard let pid = state.pid, let token = state.token else { return }
         excursions = (try? await ApiClient.shared.excursions(id: pid, token: token)) ?? []
+        watches = (try? await ApiClient.shared.lookouts(
+            id: pid, token: token))?.lookouts ?? []
         asks = (try? await ApiClient.shared.inquiries(id: pid, token: token)) ?? []
         // The board needs no credential, so it loads for anybody who reaches
         // this screen — including a signed-out one.
@@ -337,6 +384,43 @@ struct StudyView: View {
             do { webFound = try await ApiClient.shared.webSearch(
                     id: pid, token: token, q: webQ) }
             catch { self.error = error.localizedDescription }
+        }
+    }
+
+    private func plantWatch() {
+        guard let pid = state.pid, let token = state.token else { return }
+        busy = true; error = nil
+        Task {
+            do {
+                _ = try await ApiClient.shared.plantLookout(
+                    id: pid, url: watchUrl,
+                    everyHours: Double(watchHours) ?? 24, token: token)
+                watchUrl = ""
+                watches = (try? await ApiClient.shared.lookouts(
+                    id: pid, token: token))?.lookouts ?? watches
+            } catch { self.error = error.localizedDescription }
+            busy = false
+        }
+    }
+
+    private func readWatch(_ watch: ApiClient.Lookout) {
+        guard let pid = state.pid, let token = state.token else { return }
+        Task {
+            if let page = try? await ApiClient.shared.lookoutPage(
+                id: pid, lid: watch.id, token: token) {
+                captureLine = (page.fetched_at ?? "—") + " · "
+                    + String(page.chars)
+            }
+        }
+    }
+
+    private func dropWatch(_ watch: ApiClient.Lookout) {
+        guard let pid = state.pid, let token = state.token else { return }
+        Task {
+            _ = try? await ApiClient.shared.dropLookout(
+                id: pid, lid: watch.id, token: token)
+            watches = (try? await ApiClient.shared.lookouts(
+                id: pid, token: token))?.lookouts ?? []
         }
     }
 

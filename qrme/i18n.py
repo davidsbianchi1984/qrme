@@ -1351,6 +1351,17 @@ _PUBLIC.update(_PRIVILEGE_SENTENCES)
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'no such lookout': {
+        'es': 'no existe esa vigilancia',
+        'fr': 'aucune surveillance de ce nom',
+        'de': 'keine solche Beobachtung',
+        'pt': 'não existe essa vigilância',
+        'it': 'nessuna sorveglianza di questo tipo',
+        'ja': 'そのような見守りはありません',
+        'zh': '没有该关注项',
+        'hi': 'ऐसी कोई निगरानी नहीं',
+        'ar': 'لا توجد مراقبة بهذا الوصف',
+    },
     'sign in to hear a profile speak': {
         'es': 'inicia sesión para oír hablar a un perfil',
         'fr': 'connectez-vous pour entendre un profil parler',
@@ -4911,6 +4922,7 @@ _WHERE_MARKERS = ("body", "query", "path", "header", "cookie")
 #: A field with no row keeps its identifier, exactly as before, and is recorded
 #: in `tests/field_labels_unmapped.txt`.
 _FIELD_LABELS: dict[str, dict[str, str]] = {
+    'every_hours': {'en': 'Repeats every (hours)', 'es': 'Se repite cada (horas)', 'fr': 'Se répète toutes les (heures)', 'de': 'Wiederholt sich alle (Stunden)', 'pt': 'Repete-se a cada (horas)', 'it': 'Si ripete ogni (ore)', 'ja': '繰り返し間隔（時間）', 'zh': '重复间隔（小时）', 'hi': 'हर (घंटे) में दोहराए', 'ar': 'يتكرر كل (ساعات)'},
     'voice_id': {'en': 'Voice ID from the engine', 'es': 'ID de voz del motor', 'fr': 'ID de voix du moteur', 'de': 'Stimm-ID der Engine', 'pt': 'ID de voz do motor', 'it': 'ID voce del motore', 'ja': 'エンジンのボイスID', 'zh': '引擎的声音 ID', 'hi': 'इंजन की वॉइस ID', 'ar': 'معرّف الصوت من المحرّك'},
     'provider': {'en': 'Voice engine', 'es': 'Motor de voz', 'fr': 'Moteur vocal', 'de': 'Sprach-Engine', 'pt': 'Motor de voz', 'it': 'Motore vocale', 'ja': '音声エンジン', 'zh': '语音引擎', 'hi': 'वॉइस इंजन', 'ar': 'محرّك الصوت'},
     'answer': {'en': 'The answer', 'es': 'La respuesta', 'fr': 'La réponse', 'de': 'Die Antwort', 'pt': 'A resposta', 'it': 'La risposta', 'ja': '回答', 'zh': '答复', 'hi': 'उत्तर', 'ar': 'الردّ'},

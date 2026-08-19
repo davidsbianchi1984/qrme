@@ -22,6 +22,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
       asked     does the profile remember
       mattered  where the remembering happens, and who is told
 
+- **The profile keeps itself current — the lookout twin.** JIM's
+  lookout, with the payoff turned toward conversation: an owner plants
+  "keep an eye on this page" as one standing appointment in the vault,
+  whose single `fetch.url` step re-seals the current capture every
+  cycle — and the profile *answers from* it. The latest captures ride
+  the chat prompt dated and capped, so a persona whose menu changed
+  this morning speaks this morning's menu. Planting requires the
+  profile's `study_the_web` privilege (the resident leaves its host on
+  this profile's behalf); the list, the read-back and the drop keep the
+  real vault; a drop cancels the appointment, unseals the capture, then
+  lets the row go — and erasure walks the same path for every lookout
+  the profile has. Doors on all four clients.
+
+      asked     can a profile stay current on a page
+      mattered  who does the watching, and where the page lives
+
 ## [0.88.0] - 2026-08-19
 
 ### Fixed

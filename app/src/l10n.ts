@@ -3774,6 +3774,33 @@ const CHROME: Table = {
   "rem.apps.connected": {
     en: "Connected {n}.", es: "{n} conectadas.", fr: "{n} connectées.", de: "{n} verbunden.", pt: "{n} ligadas.", it: "{n} connesse.", ja: "{n}件接続しました。", zh: "已连接 {n} 个。", hi: "{n} कनेक्ट हुए।", ar: "تم اتصال {n}.",
   },
+  "lkt.title": {
+    en: "Watched pages", es: "Páginas vigiladas", fr: "Pages surveillées", de: "Beobachtete Seiten", pt: "Páginas vigiadas", it: "Pagine sorvegliate", ja: "見守り中のページ", zh: "被关注的页面", hi: "निगरानी में पेज", ar: "صفحات مراقَبة",
+  },
+  "lkt.lead": {
+    en: "The vault re-reads each page on its schedule — the profile answers from the current capture, and the watching never leaves the facility.", es: "La bóveda relee cada página según su horario — el perfil responde con la captura actual, y la vigilancia nunca sale de la instalación.", fr: "Le coffre relit chaque page selon son horaire — le profil répond à partir de la capture actuelle, et la surveillance ne quitte jamais l'installation.", de: "Der Tresor liest jede Seite nach ihrem Zeitplan neu — das Profil antwortet aus der aktuellen Aufnahme, und das Beobachten verlässt die Einrichtung nie.", pt: "O cofre relê cada página no seu horário — o perfil responde com a captura atual, e a vigilância nunca sai da instalação.", it: "Il vault rilegge ogni pagina secondo il suo orario — il profilo risponde dalla cattura attuale, e la sorveglianza non lascia mai la struttura.", ja: "ボールトが各ページを予定どおり読み直します。プロフィールは最新の取得内容から答え、見守りが施設の外に出ることはありません。", zh: "保险库按计划重读每个页面——形象根据最新抓取内容作答，盯守从不离开设施。", hi: "वॉल्ट हर पेज को उसके शेड्यूल पर दोबारा पढ़ता है — प्रोफ़ाइल ताज़ा कैप्चर से जवाब देती है, और निगरानी कभी सुविधा से बाहर नहीं जाती।", ar: "تعيد الخزنة قراءة كل صفحة وفق جدولها — يجيب الملف من الالتقاط الحالي، ولا تغادر المراقبة المنشأة أبدًا.",
+  },
+  "lkt.unreadable": {
+    en: "The vault cannot be reached right now — the lookouts are listed, their status is not.", es: "La bóveda no responde ahora mismo: las vigilancias se listan, su estado no.", fr: "Le coffre est injoignable pour l'instant — les surveillances sont listées, leur état non.", de: "Der Tresor ist gerade nicht erreichbar — die Beobachtungen stehen in der Liste, ihr Status nicht.", pt: "O cofre não responde agora — as vigilâncias estão listadas, o estado não.", it: "Il vault ora non risponde: le sorveglianze sono elencate, il loro stato no.", ja: "現在ボールトに接続できません — 一覧は出ますが、状態は表示できません。", zh: "目前无法连接保险库 — 列表已列出，但状态无法显示。", hi: "वॉल्ट अभी पहुँच से बाहर है — निगरानियाँ सूचीबद्ध हैं, उनकी स्थिति नहीं।", ar: "تعذّر الوصول إلى الخزنة الآن — المراقبات مدرجة، أمّا حالتها فلا.",
+  },
+  "lkt.url": {
+    en: "Page address", es: "Dirección de la página", fr: "Adresse de la page", de: "Adresse der Seite", pt: "Endereço da página", it: "Indirizzo della pagina", ja: "ページのアドレス", zh: "页面地址", hi: "पेज का पता", ar: "عنوان الصفحة",
+  },
+  "lkt.hours": {
+    en: "Repeats every (hours)", es: "Se repite cada (horas)", fr: "Se répète toutes les (heures)", de: "Wiederholt sich alle (Stunden)", pt: "Repete-se a cada (horas)", it: "Si ripete ogni (ore)", ja: "繰り返し間隔（時間）", zh: "重复间隔（小时）", hi: "हर (घंटे) में दोहराए", ar: "يتكرر كل (ساعات)",
+  },
+  "lkt.plant": {
+    en: "Watch this page", es: "Vigilar esta página", fr: "Surveiller cette page", de: "Diese Seite beobachten", pt: "Vigiar esta página", it: "Sorveglia questa pagina", ja: "このページを見守る", zh: "关注这个页面", hi: "इस पेज पर नज़र रखें", ar: "راقب هذه الصفحة",
+  },
+  "lkt.read": {
+    en: "Read the capture", es: "Leer la captura", fr: "Lire la capture", de: "Die Aufnahme lesen", pt: "Ler a captura", it: "Leggi la cattura", ja: "取得内容を読む", zh: "查看抓取内容", hi: "कैप्चर पढ़ें", ar: "اقرأ الالتقاط",
+  },
+  "lkt.drop": {
+    en: "Stop watching", es: "Dejar de vigilar", fr: "Ne plus surveiller", de: "Nicht mehr beobachten", pt: "Deixar de vigiar", it: "Smetti di osservare", ja: "見守りをやめる", zh: "不再留意", hi: "नज़र रखना बंद करें", ar: "أوقف المتابعة",
+  },
+  "lkt.nocapture": {
+    en: "Nothing captured yet.", es: "Aún no hay ninguna captura.", fr: "Rien de capturé pour l'instant.", de: "Noch nichts aufgenommen.", pt: "Ainda não há captura.", it: "Ancora nessuna cattura.", ja: "まだ何も取得されていません。", zh: "还没有任何抓取内容。", hi: "अभी कोई कैप्चर नहीं है।", ar: "لا التقاط بعد.",
+  },
   "rem.trip": {
     en: "Send it out to research something", es: "Envíalo a investigar algo", fr: "Envoyez-le faire une recherche", de: "Schicken Sie es los, etwas zu recherchieren", pt: "Mande-o investigar algo", it: "Mandalo a fare una ricerca", ja: "調べ物に行かせる", zh: "派它去调研点什么", hi: "इसे कुछ खोजने भेजें", ar: "أرسله ليبحث في أمر ما",
   },
