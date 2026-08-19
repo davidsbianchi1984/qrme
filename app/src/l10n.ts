@@ -3774,6 +3774,18 @@ const CHROME: Table = {
   "rem.apps.connected": {
     en: "Connected {n}.", es: "{n} conectadas.", fr: "{n} connectées.", de: "{n} verbunden.", pt: "{n} ligadas.", it: "{n} connesse.", ja: "{n}件接続しました。", zh: "已连接 {n} 个。", hi: "{n} कनेक्ट हुए।", ar: "تم اتصال {n}.",
   },
+  "lkt.changed": {
+    en: "Changed {when}",
+    es: "Cambió el {when}",
+    fr: "A changé le {when}",
+    de: "Geändert am {when}",
+    pt: "Mudou em {when}",
+    it: "È cambiata il {when}",
+    ja: "{when} に変化",
+    zh: "{when} 有变化",
+    hi: "{when} को बदला",
+    ar: "تغيّرت في {when}",
+  },
   "lkt.title": {
     en: "Watched pages", es: "Páginas vigiladas", fr: "Pages surveillées", de: "Beobachtete Seiten", pt: "Páginas vigiadas", it: "Pagine sorvegliate", ja: "見守り中のページ", zh: "被关注的页面", hi: "निगरानी में पेज", ar: "صفحات مراقَبة",
   },

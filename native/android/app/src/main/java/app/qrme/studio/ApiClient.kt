@@ -121,7 +121,8 @@ data class VoiceSpoken(val basis: String, val disclosure: String)
 data class VoiceRevocation(val samplesDeleted: Int, val note: String)
 data class TranslateResult(val translation: String, val engine: String, val note: String?)
 data class Lookout(val id: String, val url: String, val everyHours: Double,
-                   val status: String?, val nextRunAt: String?)
+                   val status: String?, val nextRunAt: String?,
+                   val changedAt: String?)
 data class LookoutList(val lookouts: List<Lookout>, val readable: Boolean)
 data class Excursion(val id: String, val topic: String, val redactions: Int,
                      val leftHost: Boolean, val findings: String, val learned: Boolean)
@@ -1010,7 +1011,9 @@ object ApiClient {
                     w.getDouble("every_hours"),
                     if (w.isNull("status")) null else w.optString("status"),
                     if (w.isNull("next_run_at")) null
-                    else w.optString("next_run_at"))
+                    else w.optString("next_run_at"),
+                    if (w.isNull("changed_at")) null
+                    else w.optString("changed_at"))
             },
             o.optBoolean("readable"))
     }

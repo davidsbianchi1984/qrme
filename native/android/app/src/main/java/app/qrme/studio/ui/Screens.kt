@@ -1939,7 +1939,10 @@ fun StudyScreen(vm: StudioViewModel) {
                 Text(w.url, color = Qrme.Txt, fontSize = 12.sp)
                 Text("" + w.everyHours +
                     (w.status?.let { " \u00b7 " + it } ?: "") +
-                    (w.nextRunAt?.let { " \u00b7 " + it.take(16) } ?: ""),
+                    (w.nextRunAt?.let { " \u00b7 " + it.take(16) } ?: "") +
+                    (w.changedAt?.let { " \u00b7 " + L10n.fill(
+                        "lkt.changed", vm.language,
+                        mapOf("when" to it.take(10))) } ?: ""),
                     color = Qrme.T2, fontSize = 11.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     TextButton(onClick = {

@@ -767,6 +767,7 @@ public record LookoutRow(
     [property: JsonPropertyName("every_hours")] double EveryHours,
     [property: JsonPropertyName("status")] string? Status,
     [property: JsonPropertyName("next_run_at")] string? NextRunAt,
+    [property: JsonPropertyName("changed_at")] string? ChangedAt,
     [property: JsonPropertyName("created_at")] string CreatedAt);
 
 public record LookoutList(
@@ -778,6 +779,7 @@ public record LookoutPage(
     [property: JsonPropertyName("url")] string Url,
     [property: JsonPropertyName("readable")] bool Readable,
     [property: JsonPropertyName("fetched_at")] string? FetchedAt,
+    [property: JsonPropertyName("changed_at")] string? ChangedAt,
     [property: JsonPropertyName("chars")] int Chars,
     [property: JsonPropertyName("text")] string? Text);
 

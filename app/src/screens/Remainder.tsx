@@ -420,6 +420,8 @@ export function Remainder() {
                 {w.every_hours}
                 {w.status && ` · ${w.status}`}
                 {w.next_run_at && ` · ${w.next_run_at.slice(0, 16)}`}
+                {w.changed_at && <> · {fill(tr("lkt.changed", lang),
+                  { when: w.changed_at.slice(0, 10) })}</>}
               </div>
             </div>
             <button onClick={() => go(
@@ -439,6 +441,8 @@ export function Remainder() {
             {capture.readable
               ? ` · ${capture.fetched_at?.slice(0, 16)} · ${capture.chars}`
               : ` · ${tr("lkt.nocapture", lang)}`}
+            {capture.changed_at && <> · {fill(tr("lkt.changed", lang),
+              { when: capture.changed_at.slice(0, 10) })}</>}
             {capture.text && (
               <div style={{ whiteSpace: "pre-wrap", maxHeight: 160,
                             overflow: "auto" }}>

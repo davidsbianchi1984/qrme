@@ -261,3 +261,40 @@ def test_erasure_cancels_every_appointment_and_unseals_every_capture(client,
     assert db.connect().execute(
         "SELECT COUNT(*) AS n FROM lookouts WHERE profile_id=?",
         (profile_id,)).fetchone()["n"] == 0
+
+
+# -- the change date rides everywhere the capture shows ----------------------
+
+def test_the_list_and_the_page_say_when_the_page_changed(client, profile_id):
+    vault = StandingVault()
+    client.app.state.pdi = vault
+    _allow_study(profile_id)
+    planted = _plant(client, profile_id)
+    vault.records[lookout.capture_key(planted["task_id"])] = json.dumps(
+        {"url": "https://example.com/menu", "text": "words",
+         "fetched_at": "2026-08-19T09:00:00+00:00",
+         "changed_at": "2026-08-18T07:00:00+00:00"})
+    row = client.get(f"/profiles/{profile_id}/lookout").json()["lookouts"][0]
+    assert row["changed_at"] == "2026-08-18T07:00:00+00:00"
+    got = client.get(f"/profiles/{profile_id}/lookout/{planted['id']}"
+                     "/page").json()
+    assert got["changed_at"] == "2026-08-18T07:00:00+00:00"
+    block = lookout.prompt_block(profile_id, vault)
+    assert "last changed 2026-08-18" in block
+
+
+def test_a_capture_before_fingerprints_says_nothing_not_now(client,
+                                                            profile_id):
+    """A seal from before PDI carried change history has no changed_at;
+    the list answers None rather than inventing a date."""
+    vault = StandingVault()
+    client.app.state.pdi = vault
+    _allow_study(profile_id)
+    planted = _plant(client, profile_id)
+    _seal_capture(vault, planted["task_id"], "words")
+    row = client.get(f"/profiles/{profile_id}/lookout").json()["lookouts"][0]
+    assert row["changed_at"] is None
+    got = client.get(f"/profiles/{profile_id}/lookout/{planted['id']}"
+                     "/page").json()
+    assert got["readable"] is True and got["changed_at"] is None
+    assert "last changed" not in lookout.prompt_block(profile_id, vault)

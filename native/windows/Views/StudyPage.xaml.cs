@@ -209,7 +209,11 @@ public sealed partial class StudyPage : Page
             LookoutPanel.ItemsSource = watched.Lookouts.Select(w => new LookoutItem
             {
                 Id = w.Id,
-                Line = w.Status is null ? w.Url : w.Url + " — " + w.Status,
+                Line = (w.Status is null ? w.Url : w.Url + " — " + w.Status)
+                     + (w.ChangedAt is null ? ""
+                        : " · " + L10n.T("lkt.changed").Replace(
+                            "{when}",
+                            w.ChangedAt[..Math.Min(10, w.ChangedAt.Length)])),
             }).ToList();
         }
         catch (Exception ex) { ShowError(ex.Message); }
@@ -240,9 +244,13 @@ public sealed partial class StudyPage : Page
         try
         {
             var page = await ApiClient.Shared.ReadLookout(s.Pid!, lid, s.Token!);
-            LookoutCapture.Text = page.Readable && page.Text is not null
+            LookoutCapture.Text = (page.Readable && page.Text is not null
                 ? page.FetchedAt + " — " + page.Text
-                : L10n.T("lkt.nocapture");
+                : L10n.T("lkt.nocapture"))
+                + (page.ChangedAt is null ? ""
+                   : " · " + L10n.T("lkt.changed").Replace(
+                       "{when}",
+                       page.ChangedAt[..Math.Min(10, page.ChangedAt.Length)]));
             LookoutCapture.Visibility = Visibility.Visible;
         }
         catch (Exception ex) { ShowError(ex.Message); }

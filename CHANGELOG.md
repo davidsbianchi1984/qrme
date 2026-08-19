@@ -4,6 +4,22 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **The lookout says when the page changed.** PDI 0.89's fetch
+  fingerprints its captures; now that knowledge reaches the owner. The
+  lookout list and the capture read-back carry `changed_at` — when the
+  watched page last actually changed, not merely when it was last read
+  — shown translated on all four clients, and the profile's prompt
+  block wears it too ("captured ..., last changed ..."), so a persona
+  can say how fresh the menu it is quoting really is. A capture from
+  before fingerprints answers nothing rather than inventing a date.
+
+      asked     when did the page change
+      mattered  a fetch date answers when we looked, not when it moved
+
 ## [0.89.0] - 2026-08-19
 
 ### Added

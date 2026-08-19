@@ -108,7 +108,12 @@ struct StudyView: View {
                             Text(String(watch.every_hours)
                                  + (watch.status.map { " · " + $0 } ?? "")
                                  + (watch.next_run_at.map {
-                                     " · " + String($0.prefix(16)) } ?? ""))
+                                     " · " + String($0.prefix(16)) } ?? "")
+                                 + (watch.changed_at.map {
+                                     " · " + L10n.fill(
+                                         "lkt.changed", state.language,
+                                         ["when": String($0.prefix(10))])
+                                 } ?? ""))
                                 .font(.caption2).foregroundStyle(Theme.t2)
                             HStack {
                                 Button(L10n.t("lkt.read", state.language)) {
@@ -410,6 +415,10 @@ struct StudyView: View {
                 id: pid, lid: watch.id, token: token) {
                 captureLine = (page.fetched_at ?? "—") + " · "
                     + String(page.chars)
+                    + (page.changed_at.map {
+                        " · " + L10n.fill("lkt.changed", state.language,
+                                          ["when": String($0.prefix(10))])
+                    } ?? "")
             }
         }
     }
