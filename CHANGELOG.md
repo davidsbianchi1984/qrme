@@ -6,6 +6,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Recall keeps the real vault.** The last read still behind the plan
+  gate: the chat route passed the write-gated `memory_vault` to
+  `recollection.chat_block`, so a member who moved to Free had a shelf
+  that showed the pair's sealed moments and a reply that had stopped
+  finding them. Recall now reads the real vault while the seal keeps the
+  plan gate — the same writes-only split every other memory door already
+  holds — and a free account's new turns are honestly not sealed at all.
+
 ### Added
 
 - **The voice inside the vault.** A `vault` provider joins the model

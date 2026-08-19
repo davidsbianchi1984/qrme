@@ -336,8 +336,11 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     # And the other axis of memory: the distillate above remembers forward,
     # in order; this finds the moment that is *about* what was just said,
     # however long ago — the pair's own memories only.
+    # The real vault, not the plan-gated one: `vault_for` gates writes
+    # only, and a member who moved to Free still has sealed moments this
+    # reply must go on finding — the same split the shelf holds.
     recalled_block = recollection.chat_block(
-        memory_vault, profile_id, body.interactor_id, body.message)
+        pdi, profile_id, body.interactor_id, body.message)
     if recalled_block:
         system += "\n\n" + recalled_block
     # The link handed mid-conversation: read it where this deployment may,

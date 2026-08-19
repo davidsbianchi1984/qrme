@@ -251,3 +251,32 @@ def test_erasure_takes_the_memory_vectors_too(client, profile_id,
     gone = client.delete(f"/profiles/{profile_id}?mode=erase")
     assert gone.status_code == 200, gone.text
     assert vault.embedded == {}, "memory vectors survived erasure"
+
+
+def test_recall_survives_a_move_to_an_open_plan(client, profile_id,
+                                                interactor_id, monkeypatch):
+    """`vault_for` gates writes only, and the reply's recall is a read: a
+    member who moved to Free keeps being recalled from what was sealed
+    while they paid — and their new turns are honestly not sealed at
+    all."""
+    from qrme import storage
+    from qrme.routers import interaction as interaction_mod  # noqa: F401
+    vault = FakeResidentVault()
+    client.app.state.pdi = vault
+    _chat(client, profile_id, interactor_id,
+          "my sister is visiting from Lisbon in October")
+    assert len(vault.embedded) == 1
+    monkeypatch.setattr(storage, "vault_for", lambda plan, pdi: None)
+    seen = {}
+    orig = recollection.chat_block
+
+    def spy(pdi_arg, *a, **k):
+        seen["pdi"] = pdi_arg
+        return orig(pdi_arg, *a, **k)
+
+    monkeypatch.setattr(recollection, "chat_block", spy)
+    answered = _chat(client, profile_id, interactor_id,
+                     "what should I cook when my sister arrives")
+    assert answered["profile_message"]["content"]
+    assert seen["pdi"] is vault, "recall was gated behind the plan"
+    assert len(vault.embedded) == 1, "an open plan's turn was sealed"
