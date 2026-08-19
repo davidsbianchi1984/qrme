@@ -6,6 +6,31 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **A backup you haven't restored from is a belief.** The deploy page
+  grows §6a, the restore drill: boot the newest dump in a scratch
+  container with the master key and admin token typed from the password
+  manager — never from the box's `.env`, because the fire that burns
+  the disk burns the `.env` with it — prove the audit chain intact end
+  to end, and read a record sealed *before* today back through the
+  typed key. A fresh seal round-tripping proves nothing; only old data
+  can vouch for a key. The backup loop now writes a `.last-ok`
+  freshness marker after every dump and §6 says how to read it, so a
+  quietly dead loop is a line you can check instead of a discovery you
+  make beside a dead disk. Every command in the drill is one short,
+  complete, paste-safe line — the section was field-tested from a
+  handheld as it was written, and carries what the first run found: a
+  clipboard that breaks long lines, an unprivileged image user against
+  a root-owned bind mount, a health check racing the container awake,
+  and hands that cannot retype 44 characters of base64 the same way
+  twice, answered with key fingerprints instead of eyes. Above all,
+  the first run cashed the drill's whole argument: it caught the
+  password manager holding a wrong master key while the box's `.env`
+  still held the right one — the exact ending this section exists to
+  prevent, converted into a same-day fix. Run it quarterly, and after
+  any key rotation.
+
 ### Fixed
 
 - **The pulse reaches the container.** `PDI_RESIDENT_PULSE=60` in

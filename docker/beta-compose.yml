@@ -261,6 +261,9 @@ services:
           [ -f /live/cloudgw/problems.json ] \
             && cp /live/cloudgw/problems.json "/backups/problems-$$stamp.json"
           find /backups -name '*-20*' -mtime +14 -delete
+          # The freshness marker: a backup loop that dies silently is
+          # worse than none, and this is what the staleness check reads.
+          date -u +%FT%TZ > /backups/.last-ok
           sleep 86400
         done
 

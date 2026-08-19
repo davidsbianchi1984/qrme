@@ -223,6 +223,174 @@ with it. Downloading `/root/backups` somewhere else now and then — or
 pointing a cron job at it from another box — is still a manual step, and
 the one that matters in the fire that actually burns.
 
+The loop also writes a freshness marker after every successful pass, and
+a loop that died silently is worse than none — it keeps the shape of a
+backup while holding yesterday's. Check the marker, not the folder:
+
+```bash
+cat /root/backups/.last-ok
+```
+
+A date older than a day means the loop is dead: `docker compose -f
+docker/beta-compose.yml --env-file .env restart backup`, then look again.
+
+## 6a. The restore drill
+
+A backup you haven't restored from is a belief. Every other failure on
+this page costs a redeploy to fix; a dead backup discovered beside a dead
+disk costs everything sealed since the beginning, permanently, by design —
+envelope encryption means losing `PDI_MASTER_KEY` doesn't degrade the
+vault, it deletes it. So the drill proves three things at once, none of
+them provable any other way: the dumps restore, the audit chain in them is
+intact, and **the password manager's copies of the two unrecoverable
+secrets are the real ones** — the drill types them from there, never from
+the box's `.env`, because the fire that burns the disk burns the `.env`
+with it.
+
+**On the host.** Boot the newest dump in a scratch container on a spare
+port. Every command below fits on one short line and is complete on its
+own — the first run of this drill was driven from a handheld whose
+clipboard broke long lines wherever the chat window had wrapped them,
+and a backslash-continued `docker run` arrived as five fragments, four
+of them errors. A block that survives being pasted badly is part of
+what makes a runbook a runbook.
+
+    asked     do the commands work
+    mattered  do they survive the copy
+
+```bash
+ssh root@your-host
+
+mkdir -p /root/drill && cd /root/drill
+cp "$(ls -t /root/backups/pdi-*.db | head -1)" pdi.db
+ls -l pdi.db
+IMG=$(docker ps --format '{{.Image}}' --filter name=pdi | head -1)
+echo "IMG=$IMG"
+```
+
+The two secrets come from the password manager, never from the box's
+`.env` — that is the point of the drill. Use the manager's **copy**
+button and paste into the silent prompt: the first run tried keying 44
+characters of base64 by hand and produced eight different keys in
+eight attempts, none of them the key. The silent prompt keeps the
+value off the screen, out of the scrollback, and out of any
+photograph. Paste these **one at a time**: `read` swallows the next
+pasted line as its answer, so pasting them together feeds one prompt
+to the other.
+
+```bash
+read -rsp 'master key: ' MK; printf %s "$MK" | sha256sum | cut -c1-12
+```
+
+```bash
+read -rsp 'admin token: ' AT; echo ok
+```
+
+The master-key line prints a 12-character fingerprint of what actually
+arrived — never the key itself. While the live box still stands, ask
+the running vault for the fingerprint of the key *it* operates under,
+and compare before booting anything:
+
+```bash
+C=$(docker ps --format '{{.Names}}' | grep pdi | grep -v drill)
+H='printf %s "$PDI_MASTER_KEY" | sha256sum'
+docker exec $C sh -c "$H" | cut -c1-12
+```
+
+A mismatch caught here costs a re-paste; the same mismatch discovered
+after boot arrives as a decryption error wearing the costume of a dead
+backup. And if the pasted value matches *itself* run after run while
+still differing from the container's, the drill has found its real
+prize: **the escrowed copy is wrong.** Fix it the same day, while the
+`.env` still holds the truth, and verify the fix as a closed loop —
+copy the key from the `.env` into the manager, copy it *back out of
+the manager*, paste it into the master-key prompt, and only a
+fingerprint matching the container's counts as repaired. Eyes do not
+verify keys; fingerprints do.
+
+The container takes its settings as a file rather than as `-e` flags —
+four short lines instead of one long one — and runs as root (`-u 0:0`).
+That flag is load-bearing: the image's own unprivileged user cannot
+write a root-owned bind mount, and the vault writes on every connection
+(`journal_mode=WAL`), so without it every door except `/health` answers
+`server_error`. Production never meets this — its named volume is owned
+by the image's user — which is exactly the kind of fact only a drill
+surfaces.
+
+```bash
+echo "PDI_MASTER_KEY=$MK" > drill.env
+echo "PDI_ADMIN_TOKEN=$AT" >> drill.env
+echo "PDI_DB=/data/pdi.db" >> drill.env
+cut -d= -f1 drill.env
+V="-v /root/drill:/data --env-file /root/drill/drill.env"
+docker run -d -u 0:0 --name pdi-drill -p 8199:8100 $V "$IMG"
+sleep 3
+curl -s http://localhost:8199/health; echo
+```
+
+Three settings and no more — the drill deliberately skips
+`PDI_PUBLIC_URL`, which only shapes QR links and whose absence is one
+fewer line for a bad paste to lose. The `cut` prints the three setting
+*names* — a split paste loses lines, and this catches the loss without
+ever printing a value. Health answers a small JSON; an empty answer
+means the curl beat the container awake — run that one line again
+before deciding anything failed.
+
+Then the three proofs, in order. The chain first — create a drill tenant
+(any tenant may verify the whole chain) and walk it end to end:
+
+```bash
+U=http://localhost:8199
+A="authorization: Bearer $AT"
+C='content-type: application/json'
+B='{"name":"restore-drill"}'
+R=$(curl -s -X POST $U/tenants -H "$A" -H "$C" -d "$B")
+echo "$R"
+DRILL=$(echo "$R" | sed 's/.*"token":"//;s/".*//')
+curl -s $U/audit/verify -H "authorization: Bearer $DRILL"; echo
+```
+
+`{"intact": true, ...}` with a non-zero entry count is the chain proof.
+Then the key proof — read a record **sealed before today** back through
+the drill key. A freshly sealed record round-tripping proves nothing (any
+key round-trips with itself); only old data can vouch for the key. The
+live QRME tenant's token is in the shared bootstrap volume:
+
+```bash
+SV=$(docker volume ls -q | grep shared | head -1)
+MP=$(docker volume inspect --format '{{.Mountpoint}}' $SV)
+TOK=$(grep 'QRME_PDI_TOKEN=' $MP/qrme.env | cut -d= -f2)
+echo ${#TOK}
+Q="authorization: Bearer $TOK"
+KEY=$(curl -s $U/records -H "$Q" | sed 's/.*"keys":\["//;s/".*//')
+echo "KEY=$KEY"
+curl -s "$U/records/$KEY" -H "$Q" | head -c 300; echo
+```
+
+(`/records` answers `{"keys": [...]}`; the sed takes the first key.
+The grep is deliberately unanchored: bootstrap writes the line as
+`export QRME_PDI_TOKEN=...` so compose can source the file, and an
+anchored grep matches nothing — an empty token here reads as a 401
+wearing the drill's clothes. The `echo ${#TOK}` prints the token's
+*length*, never the token: a zero means stop and look at the volume,
+anything else means proceed.)
+
+A record with a readable `value` is the key proof: the dump decrypted
+under the password manager's copy. A decryption error here, with the chain
+intact, means the password manager holds the wrong key — **stop and fix
+that today**, while the box still has the right one in `.env` to re-copy.
+Tear down and log:
+
+```bash
+docker rm -f pdi-drill
+rm -rf /root/drill
+unset MK AT DRILL TOK
+```
+
+Write the drill's date next to `PDI_MASTER_KEY` in the password manager.
+Run it quarterly, and after any key rotation — the two moments a stale
+copy is born.
+
 ## 7. Updating a running beta
 
 Everything above stands the beta up once. This is the other thing, and it
