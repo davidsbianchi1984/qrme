@@ -4,9 +4,24 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.93.0] - 2026-08-20
 
 ### Added
+
+- **The letter does not outlive the memory.** A stored Sunday letter
+  kept narrating facts its owner had since forgotten through the
+  curation doors. A letter is a cached view of its week now: every
+  forgetting door stamps the profile's forget-epoch, and a shelf read
+  rebuilds any letter built before the last forgetting — from what the
+  tables still hold, its own week bounded on both sides — before it is
+  shown. A week whose facts are gone loses its letter with it, by
+  design; untouched letters read straight from the cache and never
+  change under the reader. A rebuilt old week states only what is
+  still derivable — "has been failing" is a fact about now, and a
+  rebuilt letter does not pretend to remember it.
+
+      asked     can a letter say what the person erased
+      mattered  forgetting that leaves a narrator behind is not forgetting
 
 - **The letter is not the looser door.** The study path sanitizes
   what leaves the host and writes down that it left; the weekly letter
@@ -13013,7 +13028,7 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.92.0...HEAD
+[0.93.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.92.0...app-v0.93.0
 [0.92.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.91.0...app-v0.92.0
 [0.91.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.90.0...app-v0.91.0
 [0.90.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.89.0...app-v0.90.0
