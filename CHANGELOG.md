@@ -8,6 +8,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Every documented variable reaches its container.** The pulse
+  lesson, promoted from changelog scar to standing guard: a test now
+  parses the deploy page's `.env` template and the compose file's
+  parsed service blocks, both ways. A variable the page documents must
+  be forwarded by some service's environment block — a documented dial
+  connected to nothing is a lie with good documentation — and a
+  variable the compose file refuses to start without must be one the
+  page told the operator about. The guard reads the YAML compose
+  actually parses, so a commented-out block (a door deliberately not
+  built yet) is not mistaken for a requirement.
+
 - **Complete context rides the briefcase and the lookouts.** The
   owner's instruction was a complete scrape, and the eyes now serve it
   everywhere a page is read on someone's behalf: the briefcase's
