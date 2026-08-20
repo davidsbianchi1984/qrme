@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.91.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v0.92.0** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -180,6 +180,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **0.92.0** | **A backup you haven't restored from is a belief** — the deploy page grows the restore drill: the newest dump booted in a scratch container, the audit chain proven intact end to end, and a record sealed before today read back through the escrowed master key — every command one short paste-safe line, field-tested live, and the drill's first run caught a wrong escrowed key while the right one still existed; the backup loop writes a freshness marker so a quietly dead loop is a line you can check, and the deploy-day gaps (the unforwarded pulse, the wrong models path) are written down as what they were |
 | **0.91.0** | **The profile reports to its owner** — the excursion honors the voice choice (a vault-voiced profile studies inside, the cloud sees nothing, `left_host` honestly false), and the weekly letter arrives: `POST /profiles/{id}/letter` composes the pair's week from what it actually held — messages and with whom, moments sealed, studies taken, watched pages that changed or are failing, questions asked on the open board and the answers that came back — as a deterministic digest the profile's *own* provider turns into prose, `described_by` disclosing whether a model or the digest wrote the body, an empty week refusing translated, a shelf on all four clients |
 | **0.90.0** | **The watching answers to its owner** — the lookout list and the capture read-back say when each watched page last *actually* changed (PDI's fingerprinted captures, translated "Changed {when}" on all four clients), the profile's prompt block wears the change date beside the capture date so a persona can say how fresh the menu it quotes really is, and when the vault's latest round on a lookout failed, its why rides the row in red — only the latest round speaks, an older vault says nothing rather than guessing |
 | **0.89.0** | **The profile speaks from what it keeps, and keeps itself current** — with the `vault` provider chosen, the resident ranks the pair's own seals against the last thing said and answers *from* them: retrieval and generation both inside the facility, the pair prefix standing as the wall inside the shared tenant, client-side recall stepping aside when the vault grounds, `grounded_in_vault` disclosed in the provenance. And the **lookout twin**: an owner plants "keep an eye on this page" as one standing appointment in the vault whose single fetch re-seals the current capture every cycle, the latest captures riding the chat prompt dated and capped — a persona whose menu changed this morning speaks this morning's menu. Consent-gated behind `study_the_web`, erasure-honest, on all four clients |
