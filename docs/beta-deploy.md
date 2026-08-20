@@ -413,7 +413,13 @@ up after a deploy:
 
 ```bash
 docker compose -f docker/beta-compose.yml --env-file .env ps renderer
+docker compose -f docker/beta-compose.yml --env-file .env logs --tail 3 renderer
 ```
+
+`ps` proves the container restarts politely; the log tail proves it
+booted — the beta host once carried a renderer that had crash-looped
+from its first deploy, invisibly, because the check stopped at `ps`.
+A healthy tail ends with `Uvicorn running`.
 
 ## 6c. The ears
 
@@ -443,7 +449,11 @@ never reaches out for them. To check the ears are up after a deploy:
 
 ```bash
 docker compose -f docker/beta-compose.yml --env-file .env ps ears
+docker compose -f docker/beta-compose.yml --env-file .env logs --tail 3 ears
 ```
+
+The same two-part check as the eyes: a healthy tail ends with
+`Uvicorn running`.
 
 ## 7. Updating a running beta
 

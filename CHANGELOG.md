@@ -8,6 +8,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **The eyes open on the beta host.** Field find, from the deploy
+  itself: the renderer container had crash-looped since its first
+  deploy — `ModuleNotFoundError: No module named 'playwright'` — and
+  `pip show playwright` inside the image answered "not found". The
+  Playwright base image bakes the *browsers*, but the module was not
+  importable by the python uvicorn runs under, so every capture on the
+  host has been riding the honest plain-fetch fallback (`rendered:
+  false`, with the reason in the seal) since 0.93. The Dockerfile now
+  installs `playwright==1.47.0` explicitly, pinned to the image's own
+  baked browsers. The fallback disclosure worked exactly as designed —
+  which is also how the failure stayed invisible until somebody read
+  the container's own log.
+
+      asked     is the sidecar up
+      mattered  did anything ever actually render on the host
+
 - **The voice memo lands.** A true audio file — an MP3, a WAV, an
   Ogg, a FLAC — handed to the briefcase was refused at the door with
   "unrecognized file", the deferred half of the upload round. It is a
