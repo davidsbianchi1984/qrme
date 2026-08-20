@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.93.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v0.94.0** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -180,6 +180,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **0.94.0** | **The stack grows ears, and the lookout hears** — a transcription sidecar joins the deploy stack (a local speech-to-text model, outward-looking only, no copy kept), the vault's `fetch.listen` seals the words said in a recording, and a lookout planted on a media URL stands a listening appointment with the same change-memory the pages keep; the study says who answered on the wire and on the screens, and the letter calls a watched recording what it is |
 | **0.93.0** | **The stack grows eyes, and the letters keep every promise** — a rendering sidecar joins the deploy stack (outward-looking only, a fresh browser per render) and everything reading a page on someone's behalf uses it: the briefcase's read-once links carry the page a person meets instead of "read once — 12 characters", and the lookout twin watches rendered pages; the weekly letter is no longer the looser door (sanitized before any voice that leaves, `left_host` disclosed) and no longer outlives the memory (letters rebuild from what the tables still hold after any forgetting); a standing guard proves every documented variable reaches its container |
 | **0.92.0** | **A backup you haven't restored from is a belief** — the deploy page grows the restore drill: the newest dump booted in a scratch container, the audit chain proven intact end to end, and a record sealed before today read back through the escrowed master key — every command one short paste-safe line, field-tested live, and the drill's first run caught a wrong escrowed key while the right one still existed; the backup loop writes a freshness marker so a quietly dead loop is a line you can check, and the deploy-day gaps (the unforwarded pulse, the wrong models path) are written down as what they were |
 | **0.91.0** | **The profile reports to its owner** — the excursion honors the voice choice (a vault-voiced profile studies inside, the cloud sees nothing, `left_host` honestly false), and the weekly letter arrives: `POST /profiles/{id}/letter` composes the pair's week from what it actually held — messages and with whom, moments sealed, studies taken, watched pages that changed or are failing, questions asked on the open board and the answers that came back — as a deterministic digest the profile's *own* provider turns into prose, `described_by` disclosing whether a model or the digest wrote the body, an empty week refusing translated, a shelf on all four clients |

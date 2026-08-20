@@ -4,9 +4,30 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.94.0] - 2026-08-20
 
 ### Added
+
+- **The lookout hears.** Planting a lookout on a URL that *is* a
+  recording — the media file itself (.mp3, .mp4 and kin, read from the
+  path, never the query), not a page containing a player — now stands
+  a listening appointment on the vault's new `fetch.listen`. Same
+  capture key, same change-memory: the read-back, the changed_at, the
+  chat prompt and the letter all read a transcript exactly the way
+  they read a page, and the letter's line says "watched recording",
+  because new words said are not a page edited. A deployment without
+  ears fails the cycle in words and the lookout's `trouble` line
+  carries the reason.
+
+      asked     can a profile keep an ear on a recording
+      mattered  the same lookout, hearing where hearing is what the URL is
+
+- **The study's author on screen.** The excursion surfaces — the trips
+  list on the owner's screen, the single-study view — now wear
+  `answered_by` beside `left_host` and the redaction count, in ten
+  languages; absent on rows that predate the record. The wire carried
+  the honesty since the last round; a provenance only the API can see
+  is disclosure to nobody.
 
 - **The stack grows ears.** A transcription sidecar joins the deploy
   stack (`docker/ears`): a local speech-to-text model in its own
@@ -13067,7 +13088,7 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.93.0...HEAD
+[0.94.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.93.0...app-v0.94.0
 [0.93.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.92.0...app-v0.93.0
 [0.92.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.91.0...app-v0.92.0
 [0.91.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.90.0...app-v0.91.0
