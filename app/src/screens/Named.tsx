@@ -172,6 +172,12 @@ export function Named({ onPlans }: { onPlans: () => void }) {
                          ? tr("nmd.redacted.one", lang)
                          : tr("nmd.redacted.many", lang),
                        { n: excursion.redactions })}
+              {/* Who actually wrote the findings — the wire's answered_by
+                  (0.94), absent on rows that predate the record. */}
+              {excursion.answered_by && (
+                <> {tr("nmd.by", lang)
+                     .replace("{who}", excursion.answered_by)}</>
+              )}
             </p>
             <p className="small">{excursion.brief}</p>
             {excursion.findings && (

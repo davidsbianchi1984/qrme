@@ -4140,6 +4140,11 @@ const CHROME: Table = {
   "rem.exc.folded": {
     en: " · folded in", es: " · incorporado", fr: " · intégré", de: " · eingearbeitet", pt: " · incorporado", it: " · integrato", ja: " · 取り込み済み", zh: " · 已并入", hi: " · समाहित", ar: " · مُدمج",
   },
+  // Who actually wrote the findings (the wire's answered_by) — the row's
+  // provenance, worn on the screen rather than left in the API.
+  "rem.exc.by": {
+    en: "answered by {who}", es: "respondió {who}", fr: "répondu par {who}", de: "beantwortet von {who}", pt: "respondido por {who}", it: "risposta di {who}", ja: "{who} が回答", zh: "由 {who} 回答", hi: "{who} ने उत्तर दिया", ar: "أجاب {who}",
+  },
   "rem.hub.rated.on": {
     en: ", including the ones only a rated profile has.", es: ", incluidos los que solo tiene un perfil clasificado.", fr: ", y compris ceux que seul un profil classé possède.", de: ", einschließlich derer, die nur ein eingestuftes Profil hat.", pt: ", incluindo os que só um perfil classificado tem.", it: ", compresi quelli che ha solo un profilo classificato.", ja: "（レーティング付きプロフィールだけが持つものを含む）。", zh: "，包括只有分级档案才有的那些。", hi: ", उनमें वे भी जो केवल रेटेड प्रोफ़ाइल के पास हैं।", ar: "، بما فيها ما لا يملكه إلا ملف مُصنّف.",
   },
@@ -7466,6 +7471,12 @@ const CHROME: Table = {
   },
   "nmd.nothingleft": {
     en: "Nothing left this machine.", es: "Nada salió de esta máquina.", fr: "Rien n'a quitté cette machine.", de: "Nichts hat diese Maschine verlassen.", pt: "Nada saiu desta máquina.", it: "Niente ha lasciato questa macchina.", ja: "この機械からは何も出ていません。", zh: "没有任何东西离开这台机器。", hi: "इस मशीन से कुछ भी बाहर नहीं गया।", ar: "لم يغادر شيء هذا الجهاز.",
+  },
+  // Who actually wrote the findings (the wire's answered_by) — shown with
+  // the two custody numbers, because "nothing left" and "the vault
+  // answered" are two halves of one account.
+  "nmd.by": {
+    en: "Answered by {who}.", es: "Respondió {who}.", fr: "Répondu par {who}.", de: "Beantwortet von {who}.", pt: "Respondido por {who}.", it: "Risposta di {who}.", ja: "{who} が回答しました。", zh: "由 {who} 回答。", hi: "{who} ने उत्तर दिया।", ar: "أجاب {who}.",
   },
   "nmd.noredactions": {
     en: "Nothing was redacted from the brief.", es: "No se tachó nada del encargo.", fr: "Rien n'a été caviardé dans la consigne.", de: "Aus dem Auftrag wurde nichts geschwärzt.", pt: "Nada foi ocultado da incumbência.", it: "Nulla è stato oscurato dall'incarico.", ja: "依頼文から伏せられたものはありません。", zh: "委托中没有任何内容被涂去。", hi: "निर्देश में से कुछ भी नहीं हटाया गया।", ar: "لم يُحجب شيء من التكليف.",

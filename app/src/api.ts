@@ -2629,6 +2629,10 @@ export type Excursion = {
   left_host: boolean;
   findings: string | null;
   learned: boolean;
+  // Who actually wrote the findings (qrme/research.py's answered_by):
+  // the model's registry name, "vault", "local fallback", or "stub" —
+  // null on rows that predate the record.
+  answered_by: string | null;
 };
 
 /** A question the agent put where people can answer it.

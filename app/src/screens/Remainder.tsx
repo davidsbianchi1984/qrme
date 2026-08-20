@@ -375,6 +375,12 @@ export function Remainder() {
                           .replace("{n}", String(t.redactions)))}
               {" · "}
               {t.left_host ? tr("rem.exc.left", lang) : tr("rem.exc.stayed", lang)}
+              {/* Who actually wrote the findings — the wire's answered_by
+                  (0.94), absent on rows that predate the record. */}
+              {t.answered_by && (
+                <>{" · "}{tr("rem.exc.by", lang)
+                    .replace("{who}", t.answered_by)}</>
+              )}
               {t.learned && tr("rem.exc.folded", lang)}
             </p>
             {!t.learned && (
