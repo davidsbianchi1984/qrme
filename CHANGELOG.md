@@ -8,6 +8,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The letter is not the looser door.** The study path sanitizes
+  what leaves the host and writes down that it left; the weekly letter
+  — naming the people the pair talked with, the watched pages, the
+  week's counts — reached the same network models with neither. Now a
+  voice that would leave the host receives the *sanitized* digest,
+  with the week's own names passed to the sanitize pass the way the
+  inquiry path passes its extras (the owner's letter keeps every word
+  — sanitizing is about what leaves, never what they may read of
+  their own week), and each letter carries `left_host` and the
+  redaction count. The vault's voice still reads the full digest: the
+  facility's own wire is not leaving, exactly as the excursions
+  already ruled.
+
 - **Every documented variable reaches its container.** The pulse
   lesson, promoted from changelog scar to standing guard: a test now
   parses the deploy page's `.env` template and the compose file's

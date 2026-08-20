@@ -98,3 +98,61 @@ def test_the_letter_accounts_for_the_asking(client, profile_id):
     assert any("1 question asked on the open board" == line
                for line in digest), digest
     assert any("1 answer came back" == line for line in digest), digest
+
+
+def test_a_network_voice_gets_the_sanitized_digest(client, profile_id,
+                                                   monkeypatch):
+    """The letter is not the looser door: the study path sanitizes what
+    leaves and says that it left, and the letter now keeps the same
+    promise. The week's digest names the person the profile talked with
+    most; the network model receives that line with the name taken out,
+    while the owner's own letter keeps it."""
+    from qrme import llm, research
+
+    sam = client.post("/interactors", json={
+        "display_name": "Sam", "birthdate": "2000-01-15"}).json()["id"]
+    kim = client.post("/interactors", json={
+        "display_name": "Kim", "birthdate": "1999-03-03"}).json()["id"]
+    _chat(client, profile_id, sam, "hello there")
+    _chat(client, profile_id, sam, "hello again")
+    _chat(client, profile_id, kim, "hi")
+
+    sent = {}
+
+    class Capture:
+        def generate(self, system, messages):
+            sent["content"] = messages[0]["content"]
+            return "A week, retold without names."
+
+    monkeypatch.setattr(llm, "provider_for_profile",
+                        lambda pid, cloud=None: Capture())
+    monkeypatch.setattr(llm, "resolve_choice", lambda c: "anthropic")
+
+    r = client.post(f"/profiles/{profile_id}/letter")
+    assert r.status_code == 201, r.text
+    letter = r.json()
+    assert letter["left_host"] is True
+    assert letter["redactions"] >= 1
+    assert "Sam" not in sent["content"]
+    assert research.REDACTION in sent["content"]
+    # The owner's own letter keeps the real digest — sanitizing is about
+    # what leaves, never about what they may read of their own week.
+    assert any("Sam" in line for line in letter["digest"])
+
+    shelf = client.get(f"/profiles/{profile_id}/letters").json()
+    assert shelf[0]["left_host"] is True and shelf[0]["redactions"] >= 1
+
+
+def test_a_voice_that_stays_home_reads_the_full_digest(client, profile_id,
+                                                       interactor_id):
+    """The vault's voice studies inside: nothing leaves, the digest goes
+    whole, and left_host says so — the same word the excursions use."""
+    vault = VoiceVault(text="A quiet week.")
+    client.app.state.pdi = vault
+    _choose_vault(client, profile_id)
+    _chat(client, profile_id, interactor_id, "hello there")
+
+    r = client.post(f"/profiles/{profile_id}/letter")
+    assert r.status_code == 201, r.text
+    letter = r.json()
+    assert letter["left_host"] is False and letter["redactions"] == 0

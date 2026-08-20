@@ -751,6 +751,17 @@ def set_choice(profile_id: str, provider: str) -> str:
     return provider
 
 
+def is_network(name: str) -> bool:
+    """Whether a resolved provider name reaches an external host — the
+    registry's own `network` column, published rather than re-guessed by
+    each caller. Unknown names answer False — a door not in the registry
+    is not a door to the internet. Note the vault answers True: a socket
+    does open; whether that counts as *leaving* is the caller's question
+    (the excursions and the letter both say the facility's own wire does
+    not)."""
+    return bool(_REGISTRY.get(name, {}).get("network"))
+
+
 def provider_for_profile(profile_id: str, cloud=None) -> Provider:
     """The provider a given profile should generate with — its stored choice,
     resolved through :func:`get_provider`."""

@@ -657,6 +657,11 @@ CREATE TABLE IF NOT EXISTS letters (
     body         TEXT NOT NULL,
     described_by TEXT NOT NULL,   -- model | digest
     digest       TEXT NOT NULL,   -- the facts under the words
+    -- The letter keeps the excursions' promise (qrme/letter.py): whether
+    -- composing it sent the (sanitized) digest to an external model, and
+    -- how many private terms the sanitize pass took out first.
+    left_host    INTEGER NOT NULL DEFAULT 0,
+    redactions   INTEGER NOT NULL DEFAULT 0,
     created_at   TEXT NOT NULL
 );
 
@@ -2586,6 +2591,8 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     ("interactors", "account_id", "TEXT REFERENCES accounts(id)"),
     ("app_connectors", "authorized_at", "TEXT"),
     ("app_connectors", "secret_ref", "TEXT"),
+    ("letters", "left_host", "INTEGER NOT NULL DEFAULT 0"),
+    ("letters", "redactions", "INTEGER NOT NULL DEFAULT 0"),
 )
 
 
