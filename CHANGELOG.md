@@ -8,6 +8,24 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The stack grows ears.** A transcription sidecar joins the deploy
+  stack (`docker/ears`): a local speech-to-text model in its own
+  container, one door — `POST /transcribe {url}` answers the words
+  said in a recording, audio or video, ffmpeg making one shape of
+  either. The vault's new `fetch.listen` asks here (`PDI_EARS_URL`,
+  topology in the compose file like the eyes). The words are made on
+  the deployment's own hardware — a recording fetched on someone's
+  behalf never leaves the facility to become text — and the sidecar
+  keeps no copy: transcribed in a temp directory, deleted with it.
+  The same outward-only boundary as the renderer (private, loopback
+  and stack-internal addresses refused), a 200MB cap (an errand's
+  size, not an archive's), and the model weights baked in at build so
+  a running stack never reaches out for them. §6c documents the ears
+  beside the eyes.
+
+      asked     what was said in this recording
+      mattered  the words, made at home — never the bytes shipped out
+
 - **The study says who answered.** The excursion row was the audit
   trail for what could have left — the sanitized brief, the redaction
   count, `left_host` — but not for who wrote what came back: a study

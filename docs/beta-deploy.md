@@ -415,6 +415,32 @@ up after a deploy:
 docker compose -f docker/beta-compose.yml --env-file .env ps renderer
 ```
 
+## 6c. The ears
+
+The stack carries a transcription sidecar (`docker/ears`): a local
+speech-to-text model in its own container, one door,
+`POST /transcribe {url}` answering the words said in a recording — audio
+or video, ffmpeg makes one shape of either. The vault's `fetch.listen`
+tool asks here, named by `PDI_EARS_URL` in the compose file. The words
+are made on this machine: a recording fetched on someone's behalf never
+leaves the facility to become text, and the sidecar keeps no copy — the
+file is transcribed in a temp directory and deleted with it.
+
+The same outward-only boundary as the eyes: private, loopback and
+stack-internal addresses are refused inside the sidecar. Recordings are
+capped at 200MB — an errand's size, not an archive's.
+
+Unlike the eyes there is no fallback: the bytes of a recording are not
+its words, so on a deployment without this sidecar `fetch.listen` fails
+in words (the runs ledger carries the reason) rather than sealing
+silence. The first build downloads the model weights once
+(`base`, ~150MB — override with `EARS_MODEL`); after that the stack
+never reaches out for them. To check the ears are up after a deploy:
+
+```bash
+docker compose -f docker/beta-compose.yml --env-file .env ps ears
+```
+
 ## 7. Updating a running beta
 
 Everything above stands the beta up once. This is the other thing, and it

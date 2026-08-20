@@ -66,6 +66,11 @@ services:
       # in the environment block, because compose forwards only what a
       # service's block names. That lesson has its own changelog entry.
       PDI_RENDERER_URL: http://renderer:8400
+      # The stack's ears (the ears service below): fetch.listen asks here
+      # for the words said in a recording. Topology, not a secret, and
+      # named in this block for the same forwards-only-what-a-block-names
+      # reason as the eyes.
+      PDI_EARS_URL: http://ears:8500
     volumes:
       - pdi-data:/data
     expose:
@@ -89,6 +94,22 @@ services:
     restart: unless-stopped
     expose:
       - "8400"
+
+  # --- the ears -----------------------------------------------------------
+  # A local speech-to-text model in its own container, one door:
+  # POST /transcribe {url} answers the words said in a recording — audio
+  # or video, ffmpeg makes one shape of either. The vault's fetch.listen
+  # tool asks here, and the words are made on this machine: the recording
+  # never leaves the facility to become text. The ears listen outward
+  # only — private and stack-internal addresses are refused inside the
+  # sidecar. The model weights are baked in at build (the first build
+  # downloads them once); a running stack never reaches out for them.
+  ears:
+    build:
+      context: ${QRME_CONTEXT:-..}/docker/ears
+    restart: unless-stopped
+    expose:
+      - "8500"
 
   # --- one-shot: mint the tenant tokens ----------------------------------
   #
