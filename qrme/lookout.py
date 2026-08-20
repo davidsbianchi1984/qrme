@@ -234,6 +234,8 @@ def drop(profile_id: str, lookout_id: str, pdi=None) -> dict | None:
     """Stop the watching the whole way: the appointment, the seal, the
     row — in that order, because a row whose appointment still stands
     belongs on the list, not orphaned. None: no such lookout."""
+    from . import letter
+    letter.mark_forgotten(profile_id)
     row = _row(profile_id, lookout_id)
     if row is None:
         return None
@@ -257,6 +259,8 @@ def drop_all(profile_id: str, pdi=None) -> int | None:
     unsealed. None when the tandem could not be reached — the erasure
     answer says so, and the rows die with the profile's tables either
     way."""
+    from . import letter
+    letter.mark_forgotten(profile_id)
     rows = db.connect().execute(
         "SELECT task_id FROM lookouts WHERE profile_id=?",
         (profile_id,)).fetchall()

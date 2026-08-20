@@ -34,6 +34,10 @@ CREATE TABLE IF NOT EXISTS profiles (
     successor_owner   TEXT,                   -- legacy succession
     licensed_from     TEXT,                   -- source profile a licensed
                                               -- specialist agent was derived from
+    forgot_at         TEXT,                   -- when a forgetting door last
+                                              -- touched this profile; letters
+                                              -- built before this rebuild
+                                              -- (qrme/letter.py shelf)
     purpose           TEXT,                   -- legacy_memorial | family | creator_persona
                                               -- | social_fan | companion_coach | enterprise_agent
     maturity          TEXT NOT NULL DEFAULT 'balanced',  -- strict | balanced | open
@@ -662,6 +666,10 @@ CREATE TABLE IF NOT EXISTS letters (
     -- how many private terms the sanitize pass took out first.
     left_host    INTEGER NOT NULL DEFAULT 0,
     redactions   INTEGER NOT NULL DEFAULT 0,
+    -- When this body was last built. A letter is a cached view of its
+    -- week: profiles.forgot_at newer than this means a forgetting has
+    -- touched the profile and the body rebuilds before it is shown.
+    built_at     TEXT,
     created_at   TEXT NOT NULL
 );
 
@@ -2593,6 +2601,8 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     ("app_connectors", "secret_ref", "TEXT"),
     ("letters", "left_host", "INTEGER NOT NULL DEFAULT 0"),
     ("letters", "redactions", "INTEGER NOT NULL DEFAULT 0"),
+    ("letters", "built_at", "TEXT"),
+    ("profiles", "forgot_at", "TEXT"),
 )
 
 

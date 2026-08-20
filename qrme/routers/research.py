@@ -80,7 +80,7 @@ def letter_shelf(profile_id: str, request: Request) -> list[dict]:
     words were made from."""
     profile_or_404(profile_id)
     require_owner(profile_id, request)
-    return letter_mod.shelf(profile_id)
+    return letter_mod.shelf(profile_id, cloud=request.app.state.cloud, pdi=getattr(request.app.state, 'pdi', None))
 
 
 @router.post("/profiles/{profile_id}/lookout", status_code=201)

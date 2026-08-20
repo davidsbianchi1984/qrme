@@ -52,15 +52,16 @@ def test_the_watching_reaches_the_letter(client, profile_id):
     client.app.state.pdi = vault
     _allow_study(profile_id)
     planted = _plant(client, profile_id)
+    from qrme import db as db_mod
+    changed = db_mod.utcnow()
     vault.records[lookout.capture_key(planted["task_id"])] = json.dumps(
         {"url": "https://example.com/menu", "text": "words",
-         "fetched_at": "2999-01-01T09:00:00+00:00",
-         "changed_at": "2999-01-01T09:00:00+00:00"})
+         "fetched_at": changed, "changed_at": changed})
     r = client.post(f"/profiles/{profile_id}/letter")
     assert r.status_code == 201, r.text
     assert any(
-        "watched page https://example.com/menu changed on 2999-01-01" == line
-        for line in r.json()["digest"])
+        f"watched page https://example.com/menu changed on {changed[:10]}"
+        == line for line in r.json()["digest"])
 
 
 def test_the_chosen_voice_writes_the_letter(client, profile_id,
@@ -156,3 +157,83 @@ def test_a_voice_that_stays_home_reads_the_full_digest(client, profile_id,
     assert r.status_code == 201, r.text
     letter = r.json()
     assert letter["left_host"] is False and letter["redactions"] == 0
+
+
+def _seal_moment(profile_id, interactor_id, text="a walk in the park"):
+    from qrme import db as db_mod
+    conn = db_mod.connect()
+    rid = db_mod.new_id("rec")
+    conn.execute(
+        "INSERT INTO recollections (id, profile_id, interactor_id,"
+        " pdi_key, created_at) VALUES (?,?,?,?,?)",
+        (rid, profile_id, interactor_id, f"qrme/{profile_id}/{rid}",
+         db_mod.utcnow()))
+    conn.commit()
+    return rid
+
+
+def test_the_letter_does_not_outlive_the_memory(client, profile_id,
+                                                interactor_id):
+    """A letter is a cached view of its week: forget a moment and the
+    shelf rebuilds the letter from what the tables still hold — the
+    sealed-moment line gone, the rest of the week intact."""
+    from qrme import db as db_mod, letter as letter_mod, recollection
+    _chat(client, profile_id, interactor_id, "hello there")
+    rid = _seal_moment(profile_id, interactor_id)
+    made = client.post(f"/profiles/{profile_id}/letter").json()
+    assert any("moment" in line for line in made["digest"])
+
+    conn = db_mod.connect()
+    conn.execute("DELETE FROM recollections WHERE id=?", (rid,))
+    conn.commit()
+    # The door that unmakes a moment bumps the epoch even on a plan
+    # with no vault — the local ledger row is memory too.
+    recollection.forget(None, profile_id, interactor_id, rid)
+
+    shelf = client.get(f"/profiles/{profile_id}/letters").json()
+    assert len(shelf) == 1
+    rebuilt = shelf[0]
+    assert not any("moment" in line for line in rebuilt["digest"])
+    assert any("message" in line for line in rebuilt["digest"])
+
+
+def test_a_week_whose_facts_are_gone_loses_its_letter(client, profile_id,
+                                                      interactor_id):
+    """When everything a letter was made from has been forgotten, the
+    letter goes with it — by design, not failure."""
+    from qrme import db as db_mod, letter as letter_mod
+    rid = _seal_moment(profile_id, interactor_id)
+    client.post(f"/profiles/{profile_id}/letter")
+    conn = db_mod.connect()
+    conn.execute("DELETE FROM recollections WHERE id=?", (rid,))
+    conn.commit()
+    letter_mod.mark_forgotten(profile_id)
+    assert client.get(f"/profiles/{profile_id}/letters").json() == []
+    assert conn.execute("SELECT COUNT(*) AS n FROM letters WHERE"
+                        " profile_id=?", (profile_id,)).fetchone()["n"] == 0
+
+
+def test_an_untouched_letter_never_changes_under_the_reader(
+        client, profile_id, interactor_id):
+    """No forgetting, no rebuild: the cached body is stable even as new
+    weeks pile new data behind it."""
+    _chat(client, profile_id, interactor_id, "hello there")
+    made = client.post(f"/profiles/{profile_id}/letter").json()
+    _chat(client, profile_id, interactor_id, "and more talk after")
+    first = client.get(f"/profiles/{profile_id}/letters").json()
+    second = client.get(f"/profiles/{profile_id}/letters").json()
+    assert first[0]["body"] == made["body"] == second[0]["body"]
+    assert [l.removeprefix("- ") for l in first[0]["digest"]] \
+        == made["digest"]
+
+
+def test_every_forgetting_door_bumps_the_epoch(client, profile_id):
+    """The doors that unmake things all invalidate the letters' cache,
+    vault or no vault."""
+    from qrme import db as db_mod, lookout as lookout_mod
+    conn = db_mod.connect()
+    assert conn.execute("SELECT forgot_at FROM profiles WHERE id=?",
+                        (profile_id,)).fetchone()["forgot_at"] is None
+    lookout_mod.drop_all(profile_id, pdi=None)
+    assert conn.execute("SELECT forgot_at FROM profiles WHERE id=?",
+                        (profile_id,)).fetchone()["forgot_at"] is not None

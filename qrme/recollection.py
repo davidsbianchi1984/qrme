@@ -164,6 +164,8 @@ def forget(pdi, profile_id: str, interactor_id: str, ref: str) -> dict:
     — so a forgotten memory stops being findable, not merely stops being
     readable. The chat turn itself is not touched; striking the
     transcript stays at its own door. Non-fatal like everything here."""
+    from . import letter
+    letter.mark_forgotten(profile_id)
     if pdi is None:
         return {"forgotten": False, "why": "no vault for this plan"}
     key = _key(profile_id, interactor_id, ref)
@@ -188,6 +190,8 @@ def forget_pair(pdi, profile_id: str, interactor_id: str) -> int | None:
     could not be reached; the ledger rows are then left standing, because
     a row whose seal the vault never let go of belongs on the shelf, not
     orphaned. Each row goes only after its seal did."""
+    from . import letter
+    letter.mark_forgotten(profile_id)
     if pdi is None:
         return None
     try:
