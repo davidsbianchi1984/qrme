@@ -40,10 +40,13 @@ from qrme import i18n, llm
 
 # --- the budget ------------------------------------------------------------
 
-def test_the_budget_is_ten_times_what_it_was():
-    """The field call, kept as a number this test can name. 1024 was the old
-    wall and is the thing being multiplied."""
-    assert llm.MAX_REPLY_TOKENS == 1024 * 10
+def test_the_budget_is_five_times_what_it_was():
+    """The field call, kept as a number this test can name. 1024 was the
+    old wall and is the thing being multiplied. It went to ten for a
+    while and the field called it back down — a spoken conversation
+    waits for the whole reply before it says a word, and ten times the
+    room was minutes of orb where a talk turn wants seconds."""
+    assert llm.MAX_REPLY_TOKENS == 1024 * 5
 
 
 def test_every_provider_asks_for_the_same_room():

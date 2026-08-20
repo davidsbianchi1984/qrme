@@ -51,14 +51,18 @@ _REQUEST_KEY: ContextVar[str | None] = ContextVar("qrme_llm_request_key",
 # This was 1024 with the comment "chat replies are deliberately short", and
 # short is right for a chat turn — but the same door answers a question like
 # "write me the migration" or "explain both patents", and a long answer met the
-# wall mid-sentence and simply stopped. Ten times the room is the field call.
+# wall mid-sentence and simply stopped. Five times the room is the field call
+# — it went to ten for a while, and the field called it back down: a spoken
+# conversation waits for the whole reply before it says a word, and ten
+# times the room was minutes of orb where a talk turn wants seconds. Five
+# held both ends when it was first tried; it holds them again.
 #
 # A bigger wall is still a wall, so the second half matters more than the
 # first: when the model stops because it ran out of room rather than because it
 # finished, the reply says so. Silence at the cut is the failure — a person
 # reading a sentence that ends in the middle has no way to tell a truncation
 # from a model that lost the thread, and the two call for opposite responses.
-MAX_REPLY_TOKENS = 10240
+MAX_REPLY_TOKENS = 5120
 
 #: Appended when, and only when, the room ran out. The platform speaking, not
 #: the persona — so it is registered in `i18n._PUBLIC` and travels through
