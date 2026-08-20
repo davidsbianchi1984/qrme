@@ -122,6 +122,12 @@ function recogniserOf(): SR | undefined {
   return w.SpeechRecognition || w.webkitSpeechRecognition;
 }
 
+/** A conversation nobody has spoken into for two minutes bows out on its
+ *  own — the same number JIM's rooms settled on, for the same reason:
+ *  long enough to think or step away, short enough that an empty room
+ *  does not hold the microphone open all afternoon. */
+const CONVERSATION_IDLE_MS = 120_000;
+
 /** A voice waveform, drawn rather than found: no emoji reads as one, and
  *  the button it sits on is the door to the orb. */
 function WaveIcon() {
@@ -184,6 +190,18 @@ export function Agent({ onPlans, go }: {
   // on. iOS Safari has none: there, voice mode is the orb, spoken replies,
   // and the keyboard's own dictation key into a focused box.
   const recogniser = useRef<{ stop: () => void } | null>(null);
+  // The callbacks' view of voice mode. The recogniser's own `onend` and the
+  // utterance's `onend` outlive the render that made them, and reading the
+  // state there reads a snapshot; these refs read now.
+  const voiceOn = useRef(false);
+  const lastHeard = useRef(0);
+  // A turn in flight — model plus spoken reply. The recogniser also ends
+  // when a final result is sent, and that end must not relight the mic
+  // over the agent's own voice; the reply's end does the relighting.
+  const turning = useRef(false);
+  // The reply being spoken, for the orb's label: an orb that says
+  // "listening" while the agent talks is the orb lying twice a turn.
+  const [saying, setSaying] = useState(false);
   const [did, setDid] = useState<AgentTurn | null>(null);
   const [error, setError] = useState<unknown>(null);
   // What it stopped to ask about. Held here rather than inside `did`, because
@@ -198,13 +216,23 @@ export function Agent({ onPlans, go }: {
   }, []);
 
   function stopVoice() {
+    // The ref goes first: stopping the recogniser fires its `onend`, and
+    // an `onend` that still reads voice-on would relight what was just
+    // put out.
+    voiceOn.current = false;
     recogniser.current?.stop();
     recogniser.current = null;
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    setSaying(false);
     setVoiceMode(false);
   }
 
-  function startVoice() {
+  /** `fresh` marks a start that resets the idle clock — the person opening
+   *  the orb, or the mic relighting after a spoken reply. The relight after
+   *  a *silent* end passes false, so quiet cannot keep itself alive. */
+  function startVoice(fresh = true) {
+    voiceOn.current = true;
+    if (fresh) lastHeard.current = Date.now();
     setVoiceMode(true);
     const Rec = recogniserOf();
     if (!Rec) {
@@ -222,13 +250,25 @@ export function Agent({ onPlans, go }: {
       const words = last[0]?.transcript || "";
       setAsk(words);
       if ((last as { isFinal: boolean }).isFinal && words.trim()) {
+        lastHeard.current = Date.now();
+        turning.current = true;
         void sendSaid(words);
       }
     };
     r.onend = () => {
-      // One utterance per press keeps the mic honest: it is hot only while
-      // the orb says so, and it relights when the next turn starts.
       recogniser.current = null;
+      // A silent stretch ends the browser's recogniser on its own, and
+      // the orb used to keep saying "listening" over a dead microphone.
+      // Relight it — unless a turn is mid-flight (the reply's own end
+      // relights), the person closed the orb, or nothing has been heard
+      // for two minutes, in which case the conversation bows out quietly:
+      // leaving a room empty is not an error.
+      if (!voiceOn.current || turning.current) return;
+      if (Date.now() - lastHeard.current >= CONVERSATION_IDLE_MS) {
+        stopVoice();
+        return;
+      }
+      startVoice(false);
     };
     recogniser.current = r;
     r.start();
@@ -321,15 +361,32 @@ export function Agent({ onPlans, go }: {
         window.speechSynthesis.cancel();
         const spoken = new SpeechSynthesisUtterance(turn.reply);
         // The next turn: when the reply finishes, the mic relights — a
-        // conversation, not a dictation box with extra steps.
-        spoken.onend = () => { if (!recogniser.current) startVoice(); };
+        // conversation, not a dictation box with extra steps — and the
+        // idle clock restarts, so a long answer never eats into the
+        // person's two minutes.
+        const done = () => {
+          setSaying(false);
+          turning.current = false;
+          if (voiceOn.current && !recogniser.current) startVoice();
+        };
+        spoken.onend = done;
+        spoken.onerror = done;
+        setSaying(true);
         window.speechSynthesis.speak(spoken);
+      } else {
+        turning.current = false;
       }
       // What it may have changed is somebody's own page, so the roster is
       // re-read rather than assumed — a tool that stopped being available
       // mid-conversation should stop being offered.
       api.studioAgent().then(setReach).catch(() => undefined);
-    } catch (e) { setError(e); }
+    } catch (e) {
+      setError(e);
+      // A failed turn must not strand the orb with a dead microphone:
+      // the conversation stands, the error shows, the mic relights.
+      turning.current = false;
+      if (voiceOn.current && !recogniser.current) startVoice(false);
+    }
     finally { setAsking(false); }
   }
 
@@ -563,6 +620,7 @@ export function Agent({ onPlans, go }: {
           <span className="agent-orb-ball" aria-hidden="true" />
           <span className="small">
             {asking ? tr("agent.orb.thinking", lang)
+                    : saying ? tr("agent.orb.speaking", lang)
                     : tr("agent.orb.listening", lang)}
           </span>
         </button>

@@ -4,6 +4,41 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **The voice binds to the account that brought it.** The binding read
+  is public on purpose — a voice a stranger can hear is a voice a
+  stranger should be able to check — which put every voice id one
+  screen away from every other tester, on a deployment whose engine
+  key is shared. The warning was given the day the key went
+  deployment-wide: anyone who learns an id can bind it and speak with
+  somebody else's cloned voice. The first account to bind an id holds
+  it now — their own profiles may share it, another account is refused
+  with the reason, and unbinding everywhere releases the claim.
+
+      asked     whose voice is a bound voice
+      mattered  a claimable clone of a real throat is impersonation
+                with extra steps
+
+### Fixed
+
+- **The orb tells the truth, and the conversation bows out.** A silent
+  stretch ends the browser's recogniser on its own, and the agent's
+  orb kept saying "listening" over a dead microphone. It relights now,
+  and the conversation ends itself after two quiet minutes — the same
+  number JIM's rooms settled on — instead of holding the mic open all
+  afternoon. While the reply is being spoken the orb says so ("Speaking
+  — it listens again after", ten languages), a failed turn relights the
+  mic instead of stranding the orb, and the idle clock restarts when a
+  reply finishes, so a long answer never eats into the person's two
+  minutes.
+
+      asked     is the orb's word the microphone's state
+      mattered  a voice UI that lies about listening is unusable twice
+                over — once hot, once dead
+
 ## [0.96.0] - 2026-08-20
 
 ### Changed
@@ -13187,6 +13222,7 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.96.0...HEAD
 [0.96.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.95.0...app-v0.96.0
 [0.95.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.94.0...app-v0.95.0
 [0.94.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.93.0...app-v0.94.0

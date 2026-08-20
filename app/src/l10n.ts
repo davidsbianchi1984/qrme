@@ -8236,6 +8236,9 @@ const CHROME: Table = {
   "agent.orb.thinking": {
     en: "Thinking…", es: "Pensando…", fr: "Je réfléchis…", de: "Denke nach…", pt: "A pensar…", it: "Sto pensando…", ja: "考え中…", zh: "思考中…", hi: "सोच रहा हूँ…", ar: "أفكّر…",
   },
+  "agent.orb.speaking": {
+    en: "Speaking — it listens again after", es: "Hablando: después vuelve a escuchar", fr: "Il parle — il écoutera de nouveau ensuite", de: "Spricht — danach hört es wieder zu", pt: "A falar — depois volta a ouvir", it: "Sta parlando — poi torna in ascolto", ja: "話しています — 終わるとまた聞きます", zh: "正在说——说完继续听", hi: "बोल रहा है — इसके बाद फिर सुनेगा", ar: "يتحدث — سيستمع مجددًا بعدها",
+  },
   "agent.orb.stop": {
     en: "Stop voice mode", es: "Detener el modo voz", fr: "Arrêter le mode voix", de: "Sprachmodus beenden", pt: "Parar o modo de voz", it: "Ferma la modalità voce", ja: "音声モードを止める", zh: "停止语音模式", hi: "वॉइस मोड बंद करें", ar: "أوقف وضع الصوت",
   },

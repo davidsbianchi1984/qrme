@@ -87,6 +87,16 @@ def bind(profile_id: str, provider: str, voice_id: str,
     A reference, not an import: the voice stays governed on the provider's
     surface, where its consent and its verification live. What this row
     asserts is only *this profile speaks with that*.
+
+    And the reference is claimed. The binding read is public on purpose —
+    a voice a stranger can hear is a voice a stranger should be able to
+    check — which means every id on the deployment is one screen away
+    from every other tester, and the engine key is the deployment's, so
+    nothing at the provider stops a copied id from speaking. The warning
+    was given the day the key went deployment-wide: anyone who learns a
+    voice id can bind it. Now the first account to bind an id holds it —
+    their own profiles may share it, another account is refused by name
+    of the problem, and unbinding everywhere releases the claim.
     """
     conn = db.connect()
     if not voice_id.strip():
@@ -97,6 +107,17 @@ def bind(profile_id: str, provider: str, voice_id: str,
     if provider not in PROVIDERS:
         raise SpokenError(i18n.fill(i18n.MUST_BE_ONE_OF, field="provider",
                                     choices=", ".join(PROVIDERS)))
+    claimed = conn.execute(
+        "SELECT 1 FROM profile_voices v JOIN profiles p ON p.id=v.profile_id"
+        " WHERE v.provider=? AND v.voice_id=? AND p.owner_id !="
+        " (SELECT owner_id FROM profiles WHERE id=?) LIMIT 1",
+        (provider, voice_id.strip(), profile_id)).fetchone()
+    if claimed is not None:
+        raise SpokenError(
+            "that voice is already spoken for on this deployment — a voice "
+            "reference binds to the account that brought it, and this one "
+            "belongs to somebody else. Make your own voice on the "
+            "provider's surface and bind its id instead")
     conn.execute(
         "INSERT INTO profile_voices (profile_id, provider, voice_id, label,"
         " bound_at) VALUES (?,?,?,?,?)"
