@@ -4,6 +4,23 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **The stack grows eyes.** A rendering sidecar joins the beta stack
+  (`docker/renderer`): a real browser in its own container, one door,
+  `POST /render {url}` answering a page's text as a person meets it.
+  The vault's new `fetch.render` tool asks here, so a lookout pointed
+  at a JavaScript console stops reading as a title and a dozen
+  characters. The eyes look outward only — private, loopback and
+  stack-internal addresses are refused inside the sidecar, for the
+  target and for every subresource a page tries to load — and every
+  render starts a fresh browser, so nothing bleeds between one
+  tenant's lookout and another's. `PDI_RENDERER_URL` is named in the
+  compose file's own environment block, because compose forwards only
+  what a service's block names — that lesson already has its scar here.
+
 ## [0.92.0] - 2026-08-20
 
 ### Added
@@ -12958,6 +12975,7 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.92.0...HEAD
 [0.92.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.91.0...app-v0.92.0
 [0.91.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.90.0...app-v0.91.0
 [0.90.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.89.0...app-v0.90.0

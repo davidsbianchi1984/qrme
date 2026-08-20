@@ -391,6 +391,30 @@ Write the drill's date next to `PDI_MASTER_KEY` in the password manager.
 Run it quarterly, and after any key rotation — the two moments a stale
 copy is born.
 
+## 6b. The eyes
+
+The stack carries a rendering sidecar (`docker/renderer`): a real browser
+in its own container, one door, `POST /render {url}` answering a page's
+text as a person meets it. The vault's `fetch.render` tool asks here —
+named by `PDI_RENDERER_URL` in the compose file, topology rather than a
+secret — so a lookout pointed at a JavaScript application stops reading
+as a title and a dozen characters.
+
+Two boundaries, both enforced inside the sidecar rather than assumed:
+the eyes look outward only (private, loopback and stack-internal
+addresses are refused for the target *and* for every subresource a page
+tries to load), and every render starts a fresh browser — no cookies or
+storage bleeding between one tenant's lookout and another's.
+
+A deployment without the sidecar still answers: `fetch.render` falls
+back to the plain fetch and the seal says so (`rendered: false`, with
+the reason) — an honest shell beats a silent one. To check the eyes are
+up after a deploy:
+
+```bash
+docker compose -f docker/beta-compose.yml --env-file .env ps renderer
+```
+
 ## 7. Updating a running beta
 
 Everything above stands the beta up once. This is the other thing, and it

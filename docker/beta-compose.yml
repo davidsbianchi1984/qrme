@@ -60,6 +60,12 @@ services:
       # in-process pulse and standing tasks wait for a caller — the
       # pre-0.88 posture. 60 is the documented beta value.
       PDI_RESIDENT_PULSE: ${PDI_RESIDENT_PULSE:-}
+      # The stack's eyes (the renderer service below): fetch.render asks
+      # here for a page as a person sees it. Named in this file rather
+      # than .env because it is topology, not a secret — and named HERE,
+      # in the environment block, because compose forwards only what a
+      # service's block names. That lesson has its own changelog entry.
+      PDI_RENDERER_URL: http://renderer:8400
     volumes:
       - pdi-data:/data
     expose:
@@ -69,6 +75,20 @@ services:
       interval: 5s
       timeout: 5s
       retries: 30
+
+  # --- the eyes -----------------------------------------------------------
+  # A real browser in its own container, one door: POST /render {url}
+  # answers the page's text as a person meets it. The vault's fetch.render
+  # tool asks here, so a JavaScript console stops reading as a title and a
+  # dozen characters. The eyes look outward only — private and
+  # stack-internal addresses are refused inside the sidecar, for the
+  # target and for every subresource a page tries to load.
+  renderer:
+    build:
+      context: ${QRME_CONTEXT:-..}/docker/renderer
+    restart: unless-stopped
+    expose:
+      - "8400"
 
   # --- one-shot: mint the tenant tokens ----------------------------------
   #
