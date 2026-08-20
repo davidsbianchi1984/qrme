@@ -4,6 +4,25 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **The briefcase hears.** A read-once link that *is* a recording used
+  to fall to the plain fetch, which decodes compressed media as
+  mojibake and marks it read — a worse account than saying nothing.
+  The link goes to the stack's ears now (`scrape.fetch_transcribed`,
+  named by `QRME_EARS_URL` in the compose file), and the interactor's
+  item carries the words said in the recording. Without ears there is
+  no stand-in — the bytes of a recording are not its words — so the
+  item is *held, not read*, the same posture an uploaded video takes,
+  never junk marked read. The suffix list that decides what counts as
+  a recording lives in one place now, shared by the briefcase and the
+  lookout.
+
+      asked     what does this link say
+      mattered  the words said in it — or "held", never junk marked read
+
 ## [0.94.0] - 2026-08-20
 
 ### Added
@@ -13088,6 +13107,7 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.94.0...HEAD
 [0.94.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.93.0...app-v0.94.0
 [0.93.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.92.0...app-v0.93.0
 [0.92.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.91.0...app-v0.92.0

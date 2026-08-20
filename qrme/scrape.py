@@ -63,6 +63,57 @@ _TIMEOUT = 10.0
 _MAX_RENDERED = 20000
 
 
+#: URL suffixes that name a recording rather than a page — the canonical
+#: list; the lookout reads it from here. Deduced from the path alone
+#: (query stripped): a page that merely contains a player is still a page.
+_MEDIA_SUFFIXES = (".mp3", ".mp4", ".m4a", ".wav", ".ogg", ".webm", ".mov",
+                   ".mkv", ".flac", ".aac", ".opus")
+
+
+def is_recording(url: str) -> bool:
+    path = url.split("?", 1)[0].split("#", 1)[0].lower()
+    return path.endswith(_MEDIA_SUFFIXES)
+
+
+def fetch_transcribed(url: str, on_behalf_of: str | None = None) -> dict | None:
+    """The words said in a recording, from the stack's transcription
+    sidecar (``QRME_EARS_URL``) — or None, so the caller can decide what
+    honesty looks like without ears. For the briefcase that is *held, not
+    read*: unlike a page, where the shell the server sends is still the
+    page's own text, the bytes of a recording are not its words, and no
+    fallback fetch can stand in.
+
+    None covers every kind of missing ears the same way: no sidecar
+    configured, one that refused (it will not listen to private or
+    stack-internal addresses), one that timed out, one that heard no
+    speech. The offline gate vets the target before anything is asked —
+    the target is what leaves; the sidecar is stack infrastructure.
+    """
+    base = os.environ.get("QRME_EARS_URL", "").strip()
+    if not base:
+        return None
+    offline.allow(url, "the transcribed fetch", on_behalf_of)
+    req = urllib.request.Request(
+        base.rstrip("/") + "/transcribe",
+        data=json.dumps({"url": url}).encode("utf-8"),
+        headers={"content-type": "application/json"}, method="POST")
+    try:
+        # Downloading a recording and transcribing it on CPU takes real
+        # time — the generous timeout is the sidecar's own media cap
+        # doing the bounding, not this line.
+        with urllib.request.urlopen(req, timeout=300) as resp:
+            out = json.loads(resp.read(_MAX_BYTES * 4)
+                             .decode("utf-8", errors="replace"))
+    except Exception:  # noqa: BLE001 — missing ears are the caller's decision
+        return None
+    text = (out.get("text") or "").strip()
+    if not text:
+        return None
+    return {"text": text[:_MAX_RENDERED],
+            "duration_seconds": out.get("duration_seconds"),
+            "language": out.get("language")}
+
+
 def fetch_rendered(url: str, on_behalf_of: str | None = None) -> dict | None:
     """The page as a person meets it, from the stack's rendering sidecar
     (``QRME_RENDERER_URL``) — or None, so the caller can fall back to

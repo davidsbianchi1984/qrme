@@ -157,6 +157,9 @@ services:
       # this service's own block because compose forwards only what a
       # block names.
       QRME_RENDERER_URL: http://renderer:8400
+      # The stack's ears, for the briefcase's read-once links that are
+      # recordings — same forwards-only-what-a-block-names reason.
+      QRME_EARS_URL: http://ears:8500
       # Advertised by GET /pair, so the QR a phone scans has to point at the
       # public name rather than the container.
       QRME_PUBLIC_URL: ${QRME_PUBLIC_URL:?set QRME_PUBLIC_URL in .env}

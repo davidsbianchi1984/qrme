@@ -197,6 +197,16 @@ def read_link(url: str, on_behalf_of: str | None = None) -> tuple[str, bool, str
     if offline.enabled():
         return "", False, None
     try:
+        # A link that *is* a recording goes to the ears (qrme/scrape.py):
+        # what comes back is the words said in it. Without ears the item
+        # is held, not read — the same posture an uploaded video takes —
+        # because the plain fetch below would decode compressed media as
+        # mojibake and mark it read, which is worse than saying nothing.
+        if scrape.is_recording(url):
+            heard = scrape.fetch_transcribed(url, on_behalf_of)
+            if heard is not None:
+                return _clean(heard["text"]), True, None
+            return "", False, None
         # The rendered reading first (qrme/scrape.py): the page as a person
         # meets it, so a JavaScript application stops carrying as a title
         # and a dozen characters. A deployment without eyes answers None

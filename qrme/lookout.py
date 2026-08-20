@@ -65,18 +65,12 @@ def capture_key(task_id: str) -> str:
     return _CAPTURE.format(task_id=task_id)
 
 
-#: URL suffixes that name a recording rather than a page. Deduced from the
-#: path alone (query stripped): a page that merely *contains* a player is
-#: still a page and keeps the eyes; only a URL that is itself the media
-#: file gets the ears. Deliberately a suffix list and not a HEAD request —
-#: planting must not cost a network trip.
-_MEDIA_SUFFIXES = (".mp3", ".mp4", ".m4a", ".wav", ".ogg", ".webm", ".mov",
-                   ".mkv", ".flac", ".aac", ".opus")
-
-
 def _is_recording(url: str) -> bool:
-    path = url.split("?", 1)[0].split("#", 1)[0].lower()
-    return path.endswith(_MEDIA_SUFFIXES)
+    """What counts as a recording lives in one place (`scrape.is_recording`
+    — the briefcase reads the same list), so a suffix taught to one door
+    is taught to both."""
+    from . import scrape
+    return scrape.is_recording(url)
 
 
 def plant(profile_id: str, url: str, every_hours: float, pdi=None) -> dict:
