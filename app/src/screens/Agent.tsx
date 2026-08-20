@@ -202,6 +202,9 @@ export function Agent({ onPlans, go }: {
   // The reply being spoken, for the orb's label: an orb that says
   // "listening" while the agent talks is the orb lying twice a turn.
   const [saying, setSaying] = useState(false);
+  // The bound-voice audio mid-play, so closing the orb can stop it — the
+  // same live-handle bargain the recogniser ref makes.
+  const playing = useRef<HTMLAudioElement | null>(null);
   const [did, setDid] = useState<AgentTurn | null>(null);
   const [error, setError] = useState<unknown>(null);
   // What it stopped to ask about. Held here rather than inside `did`, because
@@ -223,8 +226,51 @@ export function Agent({ onPlans, go }: {
     recogniser.current?.stop();
     recogniser.current = null;
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    playing.current?.pause();
+    playing.current = null;
     setSaying(false);
     setVoiceMode(false);
+  }
+
+  /** Say the reply out loud — the profile's own bound voice first (the
+   *  deployment's engine, the watermark riding in the header), the
+   *  device's voice standing in when there is no binding, no engine key,
+   *  or the reply outruns the synthesis ceiling. One relight contract
+   *  either way: when the speaking ends, the mic opens again and the
+   *  idle clock restarts. Before this, a profile whose owner had made
+   *  and bound a real voice still answered the orb in the browser's
+   *  robot — the one surface where the voice mattered most. */
+  async function speakReply(reply: string) {
+    const done = () => {
+      playing.current = null;
+      setSaying(false);
+      turning.current = false;
+      if (voiceOn.current && !recogniser.current) startVoice();
+    };
+    if (session.profileId && session.ownerToken) {
+      try {
+        const blob = await api.sayInProfileVoice(
+          session.profileId, reply, session.ownerToken);
+        const audio = new Audio(URL.createObjectURL(blob));
+        playing.current = audio;
+        // `pause` is the orb being closed mid-sentence; all three are the
+        // speaking being over.
+        audio.addEventListener("ended", done, { once: true });
+        audio.addEventListener("pause", done, { once: true });
+        audio.addEventListener("error", done, { once: true });
+        await audio.play();
+        return;
+      } catch { /* the device's own voice stands in */ }
+    }
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      const spoken = new SpeechSynthesisUtterance(reply);
+      spoken.onend = done;
+      spoken.onerror = done;
+      window.speechSynthesis.speak(spoken);
+    } else {
+      done();
+    }
   }
 
   /** `fresh` marks a start that resets the idle clock — the person opening
@@ -357,22 +403,13 @@ export function Agent({ onPlans, go }: {
       // Voice mode says the reply out loud, with the device's own voice —
       // the same fallback the chat screen uses, for the same reason: it
       // works offline and costs nothing.
-      if (voiceMode && "speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
-        const spoken = new SpeechSynthesisUtterance(turn.reply);
-        // The next turn: when the reply finishes, the mic relights — a
-        // conversation, not a dictation box with extra steps — and the
-        // idle clock restarts, so a long answer never eats into the
-        // person's two minutes.
-        const done = () => {
-          setSaying(false);
-          turning.current = false;
-          if (voiceOn.current && !recogniser.current) startVoice();
-        };
-        spoken.onend = done;
-        spoken.onerror = done;
+      // The next turn: when the reply finishes, the mic relights — a
+      // conversation, not a dictation box with extra steps — and the
+      // idle clock restarts, so a long answer never eats into the
+      // person's two minutes.
+      if (voiceMode) {
         setSaying(true);
-        window.speechSynthesis.speak(spoken);
+        void speakReply(turn.reply);
       } else {
         turning.current = false;
       }

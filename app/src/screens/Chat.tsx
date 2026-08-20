@@ -61,6 +61,9 @@ export function Chat({ onPlans }: {
   // does not render on a browser without SpeechRecognition, because a
   // control that cannot work is worse than no control.
   const [speakOn, setSpeakOn] = useState(false);
+  // The bound voice mid-utterance — `speechSynthesis.speaking` cannot see
+  // an <audio> element, so the face needs its own word for it.
+  const [voicing, setVoicing] = useState(false);
   // TS's DOM lib does not ship SpeechRecognition types; the constructor is
   // feature-detected and driven through the three members every engine has.
   const Recognition: (new () => any) | undefined =
@@ -107,7 +110,9 @@ export function Chat({ onPlans }: {
   const presence = presenceOf({
     listening,
     awaiting: busy,
-    speaking: speakOn && !!window.speechSynthesis?.speaking,
+    // Two mouths, one face: the device recogniser reports through
+    // `speechSynthesis.speaking`, the bound voice through `voicing`.
+    speaking: (speakOn && !!window.speechSynthesis?.speaking) || voicing,
     working: shooting,
     failed: !!error,
   });
@@ -130,7 +135,27 @@ export function Chat({ onPlans }: {
       .then(setTalkAvatar).catch(() => setTalkAvatar(null));
   }, [session.profileId, session.ownerToken]);
 
-  function speakAloud(text: string) {
+  async function speakAloud(text: string) {
+    // The profile's own bound voice first — the person made it, bound it,
+    // and this is the screen where the profile talks back; hearing the
+    // browser's robot here was the binding not reaching the conversation.
+    // The device's voice stands in when there is no binding, no engine, or
+    // the reply outruns the synthesis ceiling.
+    const token = session.ownerToken || session.interactorToken;
+    if (session.profileId && token) {
+      try {
+        const blob = await api.sayInProfileVoice(
+          session.profileId, text, token);
+        const audio = new Audio(URL.createObjectURL(blob));
+        setVoicing(true);
+        audio.addEventListener("ended", () => setVoicing(false),
+                               { once: true });
+        audio.addEventListener("error", () => setVoicing(false),
+                               { once: true });
+        await audio.play();
+        return;
+      } catch { setVoicing(false); /* the device's voice stands in */ }
+    }
     if (!("speechSynthesis" in window)) return;
     const u = new SpeechSynthesisUtterance(text);
     u.lang = lang;
