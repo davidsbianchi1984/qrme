@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.94.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v0.95.0** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -180,6 +180,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **0.95.0** | **Everything handed over is heard** — the ears arc reaches every briefcase door: a read-once link that is a recording comes back as the words said in it (held, not read, without ears — the plain fetch never again seals media bytes as a reading), an uploaded video or .m4a memo is heard through the ears' new bytes door, and true audio files (MP3, WAV, Ogg, FLAC) stop being refused and land as a `recording` of their own; every new socket gated and witnessed, the suffix list shared by briefcase and lookout |
 | **0.94.0** | **The stack grows ears, and the lookout hears** — a transcription sidecar joins the deploy stack (a local speech-to-text model, outward-looking only, no copy kept), the vault's `fetch.listen` seals the words said in a recording, and a lookout planted on a media URL stands a listening appointment with the same change-memory the pages keep; the study says who answered on the wire and on the screens, and the letter calls a watched recording what it is |
 | **0.93.0** | **The stack grows eyes, and the letters keep every promise** — a rendering sidecar joins the deploy stack (outward-looking only, a fresh browser per render) and everything reading a page on someone's behalf uses it: the briefcase's read-once links carry the page a person meets instead of "read once — 12 characters", and the lookout twin watches rendered pages; the weekly letter is no longer the looser door (sanitized before any voice that leaves, `left_host` disclosed) and no longer outlives the memory (letters rebuild from what the tables still hold after any forgetting); a standing guard proves every documented variable reaches its container |
 | **0.92.0** | **A backup you haven't restored from is a belief** — the deploy page grows the restore drill: the newest dump booted in a scratch container, the audit chain proven intact end to end, and a record sealed before today read back through the escrowed master key — every command one short paste-safe line, field-tested live, and the drill's first run caught a wrong escrowed key while the right one still existed; the backup loop writes a freshness marker so a quietly dead loop is a line you can check, and the deploy-day gaps (the unforwarded pulse, the wrong models path) are written down as what they were |
