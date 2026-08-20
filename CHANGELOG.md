@@ -4,6 +4,39 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **The picture goes up like the camera.** Putting a picture up in a
+  room met a small circle with the buttons still showing. The photo is
+  full-bleed in the tile now, for every seat — a face is a face
+  whether pixels stream or stand still — and on your own tile the
+  controls hide behind the same double-tap or hold the camera taught,
+  with the same hint. Behind the reveal: a different photo, the
+  camera, the plain name, the masks — the four ways out a person
+  standing in the room reaches for.
+
+- **Connecting a device reads like the phone's own Bluetooth page.**
+  The wearables card was prose. It is the settings shape now: a "My
+  devices" group of rows — name, Connected or Not connected on the
+  right, an ⓘ opening the detail with the unpair door — and an "Other
+  devices" section holding the scan (the browser's own chooser; the
+  web cannot passively list what is nearby, and this page does not
+  pretend to) and the manual add. Ten languages.
+
+- **The reply ceiling comes back to five.** `MAX_REPLY_TOKENS` went
+  from 1024 to five times the room when long answers met the wall
+  mid-sentence, then to ten — and the field called ten back down: a
+  spoken conversation waits for the whole reply before it says a word,
+  and ten times the room was minutes of orb where a talk turn wants
+  seconds. Back to 5120, which held both ends when it was first tried.
+  The truncation honesty is unchanged — a reply that hits the wall
+  still says so instead of stopping mid-sentence.
+
+      asked     how long may a reply run
+      mattered  how long a person mid-conversation waits to hear it
+
 ## [0.95.0] - 2026-08-20
 
 ### Fixed
@@ -13154,6 +13187,7 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.95.0...HEAD
 [0.95.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.94.0...app-v0.95.0
 [0.94.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.93.0...app-v0.94.0
 [0.93.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.92.0...app-v0.93.0

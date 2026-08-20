@@ -2964,6 +2964,24 @@ const CHROME: Table = {
   "asst.worn": {
     en: "What it is worn on", es: "En qué se lleva", fr: "Sur quoi il se porte", de: "Worauf es getragen wird", pt: "Onde é usado", it: "Su cosa si indossa", ja: "身につける場所", zh: "佩戴之处", hi: "किस पर पहना जाता है", ar: "على ماذا يُرتدى",
   },
+  // The device list, in the shape the phone's own Bluetooth page taught
+  // everybody: My devices / Other devices, a status word per row, an ⓘ
+  // for the detail.
+  "asst.worn.my": {
+    en: "My devices", es: "Mis dispositivos", fr: "Mes appareils", de: "Meine Geräte", pt: "Os meus dispositivos", it: "I miei dispositivi", ja: "自分のデバイス", zh: "我的设备", hi: "मेरे डिवाइस", ar: "أجهزتي",
+  },
+  "asst.worn.other": {
+    en: "Other devices", es: "Otros dispositivos", fr: "Autres appareils", de: "Andere Geräte", pt: "Outros dispositivos", it: "Altri dispositivi", ja: "その他のデバイス", zh: "其他设备", hi: "अन्य डिवाइस", ar: "أجهزة أخرى",
+  },
+  "asst.worn.connected": {
+    en: "Connected", es: "Conectado", fr: "Connecté", de: "Verbunden", pt: "Ligado", it: "Connesso", ja: "接続済み", zh: "已连接", hi: "कनेक्टेड", ar: "متصل",
+  },
+  "asst.worn.notconn": {
+    en: "Not connected", es: "No conectado", fr: "Non connecté", de: "Nicht verbunden", pt: "Não ligado", it: "Non connesso", ja: "未接続", zh: "未连接", hi: "कनेक्टेड नहीं", ar: "غير متصل",
+  },
+  "asst.worn.details": {
+    en: "Details", es: "Detalles", fr: "Détails", de: "Details", pt: "Detalhes", it: "Dettagli", ja: "詳細", zh: "详细信息", hi: "विवरण", ar: "التفاصيل",
+  },
   "asst.worn.revoked": {
     en: "include ones you have unpaired — the row stays, with the date", es: "incluir los que has desemparejado — la fila permanece, con la fecha", fr: "inclure ceux que vous avez désappairés — la ligne reste, avec la date", de: "auch entkoppelte zeigen — die Zeile bleibt, mit Datum", pt: "incluir os que desemparelhou — a linha fica, com a data", it: "includi quelli disaccoppiati — la riga resta, con la data", ja: "解除したものも表示 — 行は日付と共に残ります", zh: "包括已取消配对的 — 记录保留，附日期", hi: "अलग किए गए भी दिखाएँ — पंक्ति तिथि सहित रहती है", ar: "تضمين ما ألغيت إقرانه — يبقى الصف مع التاريخ",
   },

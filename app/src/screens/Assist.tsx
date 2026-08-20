@@ -57,6 +57,9 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
   const [deviceName, setDeviceName] = useState("");
   const [deviceKind, setDeviceKind] = useState("watch");
   const [showRevoked, setShowRevoked] = useState(false);
+  // Which device row's ⓘ is open — the detail lives behind it, the way
+  // the phone's own Bluetooth page does it.
+  const [detail, setDetail] = useState<string | null>(null);
 
   const [reviews, setReviews] = useState<ReviewsView | null>(null);
   const [rating, setRating] = useState(5);
@@ -271,26 +274,49 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
                  onChange={(e) => setShowRevoked(e.target.checked)} />
           {" "}{tr("asst.worn.revoked", lang)}
         </label>
-        {devices?.wearables.filter((w) => w.paired).length === 0 && (
+        {/* The shape the phone's own Bluetooth page taught everybody: a
+            "My devices" group of rows — name, status word on the right,
+            an ⓘ that opens the detail — and an "Other devices" section
+            under it for the scan and the manual add. A field report held
+            the two screens side by side and asked why this one was prose. */}
+        <h4>{tr("asst.worn.my", lang)}</h4>
+        {(devices?.wearables ?? []).length === 0 && (
           <p className="muted small">{tr("asst.worn.none", lang)}</p>
         )}
-        {devices?.wearables.map((w) => (
-          <p className="small" key={w.id}>
-            <strong>{w.name}</strong> —{" "}
-            {fill(tr("asst.worn.over", lang),
-                  { kind: w.kind, transport: w.transport })}
-            {w.paired
-              ? <> · {fill(tr("asst.worn.showing", lang),
-                           { faces: w.faces.join(", ") })}{" "}
-                  <button className="chip" disabled={busy}
-                          onClick={act(() =>
-                            api.unpairWearable(me, w.name, token),
-                            "Unpaired.")}>{
-                            tr("asst.worn.unpair", lang)}</button></>
-              : <span className="muted"> ·{" "}
-                  {tr("asst.worn.unpaired", lang)}</span>}
-          </p>
-        ))}
+        <div className="dev-list">
+          {devices?.wearables.map((w) => (
+            <div key={w.id}>
+              <div className="dev-row">
+                <strong style={{ flex: 1 }}>{w.name}</strong>
+                <span className={w.paired ? "" : "muted"}>
+                  {w.paired ? tr("asst.worn.connected", lang)
+                            : tr("asst.worn.notconn", lang)}
+                </span>
+                <button className="chip"
+                        aria-label={tr("asst.worn.details", lang)}
+                        aria-expanded={detail === w.id}
+                        onClick={() => setDetail(
+                          detail === w.id ? null : w.id)}>ⓘ</button>
+              </div>
+              {detail === w.id && (
+                <p className="muted small">
+                  {fill(tr("asst.worn.over", lang),
+                        { kind: w.kind, transport: w.transport })}
+                  {w.paired
+                    ? <> · {fill(tr("asst.worn.showing", lang),
+                                 { faces: w.faces.join(", ") })}{" "}
+                        <button className="chip" disabled={busy}
+                                onClick={act(() =>
+                                  api.unpairWearable(me, w.name, token),
+                                  "Unpaired.")}>{
+                                  tr("asst.worn.unpair", lang)}</button></>
+                    : <> · {tr("asst.worn.unpaired", lang)}</>}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+        <h4>{tr("asst.worn.other", lang)}</h4>
         <div className="row">
           <input value={deviceName}
                  onChange={(e) => setDeviceName(e.target.value)}
