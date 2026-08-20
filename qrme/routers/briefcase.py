@@ -92,9 +92,11 @@ async def import_file(profile_id: str, request: Request,
     """A photograph, a video or a document, raw in the request body.
 
     Documents are read here and never stored as files: the words come out,
-    the bytes go no further. Pictures and video are recorded as handed over
-    and explicitly *not* read — this deployment has no eyes, and a profile
-    that describes a photograph it cannot see is the worse outcome.
+    the bytes go no further. Pictures are recorded as handed over and
+    explicitly *not* read — a profile that describes a photograph it
+    cannot see is the worse outcome. A video is heard where the stack has
+    ears (the words said in it, never the picture in the frames); without
+    them it takes the same held-not-read posture.
     """
     require_may_speak(_pair(profile_id, interactor_id))
     data = await request.body()
@@ -104,7 +106,8 @@ async def import_file(profile_id: str, request: Request,
         # `media._sniff` refuses bytes it cannot name, in a sentence that
         # lists what this deployment does take — the same refusal the wall's
         # upload door gives, because it is the same reader.
-        kind, text, was_read = briefcase.read_file(data, filename or None)
+        kind, text, was_read = briefcase.read_file(data, filename or None,
+                                                   on_behalf_of=profile_id)
     except media.MediaError as exc:
         raise HTTPException(exc.status, exc.message) from None
     name = (filename or "").strip()[:120]

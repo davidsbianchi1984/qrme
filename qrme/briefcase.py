@@ -169,17 +169,28 @@ def _zip_text(data: bytes, ext: str) -> str:
     return _clean(" ".join(parts))
 
 
-def read_file(data: bytes, name: str | None) -> tuple[str, str, bool]:
+def read_file(data: bytes, name: str | None,
+              on_behalf_of: str | None = None) -> tuple[str, str, bool]:
     """``(kind, text, read)`` for one upload.
 
     ``read`` is false when this deployment holds the bytes and cannot turn
-    them into words — a photograph, a video, a scanned PDF. The item is still
-    worth importing; the prompt block simply says so.
+    them into words — a photograph, a scanned PDF, a recording on a stack
+    without ears. The item is still worth importing; the prompt block
+    simply says so. With ears deployed a video reads as the words said in
+    it, the same account a watched recording gets.
     """
     kind, ext = media._sniff(data, name)
     if kind == "image":
         return "photo", "", False
     if kind == "video":
+        # The ears turn a handed-over recording into the words said in it
+        # (a voice memo's .m4a sniffs as video too — same ftyp box). No
+        # ears keeps the old posture: held, said so, never invented. The
+        # picture in the frames stays undescribed either way — these are
+        # ears, not eyes.
+        heard = scrape.transcribe_bytes(data, on_behalf_of)
+        if heard is not None:
+            return "video", _clean(heard["text"]), True
         return "video", "", False
     if data[:4] == b"%PDF":
         text = _pdf_text(data)

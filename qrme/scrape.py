@@ -114,6 +114,37 @@ def fetch_transcribed(url: str, on_behalf_of: str | None = None) -> dict | None:
             "language": out.get("language")}
 
 
+def transcribe_bytes(data: bytes, on_behalf_of: str | None = None) -> dict | None:
+    """The words said in a recording already in hand — an upload — via
+    the ears' bytes door, or None so the caller keeps the held-not-read
+    posture. The gate sees the sidecar's own address: a stack-internal
+    host passes even offline (the Ollama rule — nothing leaves the
+    machine), the visit is witnessed against the profile the upload
+    belongs to, and a deployment that points QRME_EARS_URL somewhere
+    that *would* leave the host is refused like any other way out.
+    """
+    base = os.environ.get("QRME_EARS_URL", "").strip()
+    if not base or not data:
+        return None
+    offline.allow(base, "the ears' bytes door", on_behalf_of)
+    req = urllib.request.Request(
+        base.rstrip("/") + "/transcribe-file", data=data,
+        headers={"content-type": "application/octet-stream"},
+        method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=300) as resp:
+            out = json.loads(resp.read(_MAX_BYTES * 4)
+                             .decode("utf-8", errors="replace"))
+    except Exception:  # noqa: BLE001 — missing ears are the caller's decision
+        return None
+    text = (out.get("text") or "").strip()
+    if not text:
+        return None
+    return {"text": text[:_MAX_RENDERED],
+            "duration_seconds": out.get("duration_seconds"),
+            "language": out.get("language")}
+
+
 def fetch_rendered(url: str, on_behalf_of: str | None = None) -> dict | None:
     """The page as a person meets it, from the stack's rendering sidecar
     (``QRME_RENDERER_URL``) — or None, so the caller can fall back to

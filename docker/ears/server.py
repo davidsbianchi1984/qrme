@@ -25,7 +25,7 @@ import tempfile
 import urllib.request
 from urllib.parse import urlparse
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -79,6 +79,27 @@ def health() -> dict:
     return {"status": "ok", "ears": True}
 
 
+def _words_from(box: str, media: str) -> dict:
+    """The shared back half of both doors: ffmpeg makes one mono 16k wav
+    out of whatever arrived — video or audio, any container — which is
+    the one shape the model reads."""
+    wav = os.path.join(box, "sound.wav")
+    pulled = subprocess.run(
+        ["ffmpeg", "-nostdin", "-y", "-i", media, "-vn", "-ac", "1",
+         "-ar", "16000", wav],
+        capture_output=True, timeout=300)
+    if pulled.returncode != 0 or not os.path.exists(wav):
+        raise HTTPException(
+            422, "the recording carries no sound ffmpeg can read")
+    segments, info = _model().transcribe(wav)
+    text = " ".join(s.text.strip() for s in segments).strip()
+    if not text:
+        raise HTTPException(422, "the recording carries no speech")
+    return {"text": text[:MAX_TEXT],
+            "duration_seconds": round(getattr(info, "duration", 0.0), 1),
+            "language": getattr(info, "language", None)}
+
+
 @app.post("/transcribe")
 def transcribe(ask: ListenAsk) -> dict:
     parsed = urlparse(ask.url)
@@ -109,20 +130,26 @@ def transcribe(ask: ListenAsk) -> dict:
             raise
         except Exception as exc:  # noqa: BLE001 — one honest reason
             raise HTTPException(502, f"could not fetch the recording: {exc}")
-        # ffmpeg makes one mono 16k wav out of whatever arrived — video or
-        # audio, any container — which is the one shape the model reads.
-        wav = os.path.join(box, "sound.wav")
-        pulled = subprocess.run(
-            ["ffmpeg", "-nostdin", "-y", "-i", media, "-vn", "-ac", "1",
-             "-ar", "16000", wav],
-            capture_output=True, timeout=300)
-        if pulled.returncode != 0 or not os.path.exists(wav):
-            raise HTTPException(
-                422, "the recording carries no sound ffmpeg can read")
-        segments, info = _model().transcribe(wav)
-        text = " ".join(s.text.strip() for s in segments).strip()
-    if not text:
-        raise HTTPException(422, "the recording carries no speech")
-    return {"url": ask.url, "text": text[:MAX_TEXT],
-            "duration_seconds": round(getattr(info, "duration", 0.0), 1),
-            "language": getattr(info, "language", None)}
+        heard = _words_from(box, media)
+    return {"url": ask.url, **heard}
+
+
+@app.post("/transcribe-file")
+async def transcribe_file(request: Request) -> dict:
+    """The same ears for bytes already in hand — an upload somebody made
+    to the stack, forwarded here as the raw body. Nothing is fetched and
+    nothing leaves; the inward gate is for outbound targets and has no
+    business on this door. The recording still touches disk only inside
+    a temp directory that dies with the request."""
+    data = await request.body()
+    if not data:
+        raise HTTPException(422, "the upload arrived empty")
+    if len(data) > MAX_MEDIA_BYTES:
+        raise HTTPException(413, "the recording is larger than the ears "
+                                 "will hold (200MB)")
+    with tempfile.TemporaryDirectory() as box:
+        media = os.path.join(box, "media")
+        with open(media, "wb") as out:
+            out.write(data)
+        heard = _words_from(box, media)
+    return heard

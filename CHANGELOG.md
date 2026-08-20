@@ -8,6 +8,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **The upload hears.** A video handed to the briefcase was still
+  told "this deployment holds the bytes and cannot turn them into
+  words" — true when it was written, untrue since the stack grew ears.
+  The ears gain a bytes door (`POST /transcribe-file`, same cap, same
+  temp-directory custody, nothing fetched so the inward gate has no
+  business on it), and `read_file`'s video branch asks it: the item
+  lands carrying the words said in the recording, `read: true`, the
+  same shape a document takes. A voice memo rides the same branch —
+  an .m4a opens with the same `ftyp` box an .mp4 does. Without ears
+  the old posture stands unchanged, and these are ears, not eyes: the
+  picture in the frames stays undescribed either way, exactly as a
+  photograph does.
+
+      asked     what does this recording say
+      mattered  the words said in it — heard at home, or honestly "held"
+
 - **The briefcase hears.** A read-once link that *is* a recording used
   to fall to the plain fetch, which decodes compressed media as
   mojibake and marks it read — a worse account than saying nothing.

@@ -428,7 +428,11 @@ file is transcribed in a temp directory and deleted with it.
 
 The same outward-only boundary as the eyes: private, loopback and
 stack-internal addresses are refused inside the sidecar. Recordings are
-capped at 200MB — an errand's size, not an archive's.
+capped at 200MB — an errand's size, not an archive's. A second door,
+`POST /transcribe-file`, takes bytes already in hand — a video handed to
+the briefcase — with the same cap and the same temp-directory custody;
+nothing is fetched on that door, so the inward gate has no business on
+it.
 
 Unlike the eyes there is no fallback: the bytes of a recording are not
 its words, so on a deployment without this sidecar `fetch.listen` fails
