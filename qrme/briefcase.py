@@ -73,7 +73,7 @@ from . import db, llm, media, offline, scrape
 
 #: Kinds a person can hand over. ``photo`` and ``video`` are stored for what
 #: the person says about them; the rest carry text this deployment can read.
-KINDS = ("link", "photo", "video", "document")
+KINDS = ("link", "photo", "video", "document", "recording")
 
 #: How much extracted text is kept per item. Generous for a filing, small
 #: enough that a briefcase is not an archive.
@@ -169,6 +169,23 @@ def _zip_text(data: bytes, ext: str) -> str:
     return _clean(" ".join(parts))
 
 
+#: Audio containers, by their leading bytes — an MP3 (ID3-tagged or a bare
+#: frame-sync), WAV, Ogg, FLAC. The `.m4a` voice memo is absent on purpose:
+#: it opens with the same `ftyp` box an .mp4 does, sniffs as video, and the
+#: video branch already hears it.
+_AUDIO_MAGIC = (
+    lambda b: b[:3] == b"ID3",
+    lambda b: b[:2] in (b"\xff\xfb", b"\xff\xf3", b"\xff\xf2"),
+    lambda b: b[:4] == b"RIFF" and b[8:12] == b"WAVE",
+    lambda b: b[:4] == b"OggS",
+    lambda b: b[:4] == b"fLaC",
+)
+
+
+def _sounds_like_audio(data: bytes) -> bool:
+    return any(test(data) for test in _AUDIO_MAGIC)
+
+
 def read_file(data: bytes, name: str | None,
               on_behalf_of: str | None = None) -> tuple[str, str, bool]:
     """``(kind, text, read)`` for one upload.
@@ -179,6 +196,18 @@ def read_file(data: bytes, name: str | None,
     simply says so. With ears deployed a video reads as the words said in
     it, the same account a watched recording gets.
     """
+    # A voice memo, by its own magic bytes — checked before `media._sniff`
+    # because that reader refuses audio outright ("unrecognized file"),
+    # and deliberately NOT added to the media store's own kinds: the wall
+    # serves images and video a profile wears; a recording handed to a
+    # pair belongs to the conversation, read here and never stored as a
+    # file. RIFF is shared ground — WAVE is a recording, WEBP stays a
+    # photograph — which is why the container's second name is checked.
+    if _sounds_like_audio(data):
+        heard = scrape.transcribe_bytes(data, on_behalf_of)
+        if heard is not None:
+            return "recording", _clean(heard["text"]), True
+        return "recording", "", False
     kind, ext = media._sniff(data, name)
     if kind == "image":
         return "photo", "", False
@@ -391,7 +420,7 @@ def holds_link(profile_id: str, interactor_id: str, message: str) -> bool:
 
 
 _LABELS = {"link": "a link", "photo": "a photograph", "video": "a video",
-           "document": "a document"}
+           "document": "a document", "recording": "a recording"}
 
 
 def block(profile_id: str, interactor_id: str) -> str | None:

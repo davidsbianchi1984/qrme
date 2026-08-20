@@ -8,6 +8,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **The voice memo lands.** A true audio file — an MP3, a WAV, an
+  Ogg, a FLAC — handed to the briefcase was refused at the door with
+  "unrecognized file", the deferred half of the upload round. It is a
+  briefcase kind of its own now, `recording`, sniffed by its magic
+  bytes before the media reader can refuse it, heard through the ears'
+  bytes door, and honestly *held* on a stack without ears — landing
+  either way beats a 422. The wall's media store is deliberately
+  unchanged: it serves images and video a profile wears; a recording
+  handed to a pair belongs to the conversation, read here and never
+  stored as a file. RIFF stays two things — WAVE is a recording, WEBP
+  a photograph.
+
+      asked     can a person hand the profile a voice memo
+      mattered  the words said in it, landing — never "unrecognized file"
+
 - **The upload hears.** A video handed to the briefcase was still
   told "this deployment holds the bytes and cannot turn them into
   words" — true when it was written, untrue since the stack grew ears.

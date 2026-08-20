@@ -89,7 +89,8 @@ def import_link(profile_id: str, body: LinkImport,
 async def import_file(profile_id: str, request: Request,
                       interactor_id: str, filename: str = "",
                       note: str = "", title: str = "") -> dict:
-    """A photograph, a video or a document, raw in the request body.
+    """A photograph, a video, a voice memo or a document, raw in the
+    request body.
 
     Documents are read here and never stored as files: the words come out,
     the bytes go no further. Pictures are recorded as handed over and

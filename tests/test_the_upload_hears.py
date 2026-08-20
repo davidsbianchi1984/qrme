@@ -78,3 +78,57 @@ def test_a_heard_upload_lands_read_on_the_pairs_list(client, profile_id,
                         params={"interactor_id": interactor_id}).json()
     item = listed["items"][0]
     assert item["read"] is True and item["kind"] == "video"
+
+
+_MP3 = b"ID3\x04\x00\x00\x00\x00\x00\x00" + b"\x00" * 48
+_WAV = b"RIFF\x24\x00\x00\x00WAVEfmt " + b"\x00" * 48
+
+
+def test_a_voice_memo_lands_as_a_heard_recording(monkeypatch):
+    """The deferred half of the upload round: a true audio file used to
+    be refused at the door ("unrecognized file"). It is a briefcase kind
+    of its own now — `recording` — and the ears hear it."""
+    monkeypatch.setattr(
+        scrape, "transcribe_bytes",
+        lambda data, on_behalf_of=None: {"text": "Rotate the keys Friday.",
+                                         "duration_seconds": 4.0,
+                                         "language": "en"})
+    kind, text, was_read = briefcase.read_file(_MP3, "memo.mp3")
+    assert (kind, was_read) == ("recording", True)
+    assert "Rotate the keys" in text
+
+
+def test_without_ears_a_voice_memo_is_held_not_refused(monkeypatch):
+    """No ears still beats the old 422: the memo lands, held, said so."""
+    monkeypatch.setattr(scrape, "transcribe_bytes",
+                        lambda data, on_behalf_of=None: None)
+    kind, text, was_read = briefcase.read_file(_WAV, "memo.wav")
+    assert (kind, text, was_read) == ("recording", "", False)
+
+
+def test_riff_stays_two_things(monkeypatch):
+    """RIFF is shared ground: WAVE is a recording; WEBP is a photograph
+    and never reaches the ears."""
+    monkeypatch.setattr(scrape, "transcribe_bytes", _never_bytes)
+    webp = b"RIFF\x24\x00\x00\x00WEBPVP8 " + b"\x00" * 48
+    kind, text, was_read = briefcase.read_file(webp, "me.webp")
+    assert (kind, text, was_read) == ("photo", "", False)
+
+
+def test_a_memo_lands_on_the_pairs_list_as_a_recording(client, profile_id,
+                                                       interactor_id,
+                                                       monkeypatch):
+    monkeypatch.setattr(
+        scrape, "transcribe_bytes",
+        lambda data, on_behalf_of=None: {"text": "Two lookouts standing.",
+                                         "duration_seconds": 3.0,
+                                         "language": "en"})
+    made = client.post(
+        f"/profiles/{profile_id}/briefcase/file",
+        params={"interactor_id": interactor_id, "filename": "memo.mp3"},
+        content=_MP3)
+    assert made.status_code == 201, made.text
+    listed = client.get(f"/profiles/{profile_id}/briefcase",
+                        params={"interactor_id": interactor_id}).json()
+    item = listed["items"][0]
+    assert item["kind"] == "recording" and item["read"] is True
