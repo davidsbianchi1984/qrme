@@ -283,7 +283,11 @@ def test_no_two_party_route_accepts_an_anonymous_caller(client):
     # The browse card carries counts and a facade, never member names or a
     # line of chat — everything a member token protects still requires one.
     OPEN = {"/exchanges/vocabulary", "/skill-grants/vocabulary",
-            "/watch-parties/public"}
+            "/watch-parties/public",
+            # Everyone-here: public like /people and made of the same
+            # already-public rows — a head count and faces, never a token's
+            # worth of anything. The private switch itself is owner-gated.
+            "/people/browse"}
     unguarded = []
     for route in walk(app.routes):
         if not any(route.path.startswith(p) for p in

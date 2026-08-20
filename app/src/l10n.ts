@@ -3070,7 +3070,7 @@ const CHROME: Table = {
     en: "it", es: "ello", fr: "lui", de: "es", pt: "ele", it: "esso", ja: "それ", zh: "它", hi: "यह", ar: "هو",
   },
   "asst.who.you": {
-    en: "you", es: "tú", fr: "vous", de: "Sie", pt: "você", it: "tu", ja: "あなた", zh: "你", hi: "आप", ar: "أنت",
+    en: "you", es: "usted", fr: "vous", de: "Sie", pt: "você", it: "tu", ja: "あなた", zh: "你", hi: "आप", ar: "أنت",
   },
   "asst.media.aimarked": {
     en: " · marked as AI-generated", es: " · marcado como generado por IA", fr: " · marqué comme généré par IA", de: " · als KI-erzeugt gekennzeichnet", pt: " · marcado como gerado por IA", it: " · contrassegnato come generato da IA", ja: " · AI生成として表示", zh: " · 已标记为AI生成", hi: " · AI-जनित के रूप में चिह्नित", ar: " · موسوم بأنه من إنتاج ذكاء اصطناعي",
@@ -9004,6 +9004,39 @@ const CHROME: Table = {
   },
   "frn.find": {
     en: "Find people", es: "Encontrar personas", fr: "Trouver des personnes", de: "Leute finden", pt: "Encontrar pessoas", it: "Trova persone", ja: "人を探す", zh: "查找用户", hi: "लोग खोजें", ar: "ابحث عن أشخاص",
+  },
+  "frn.pool": {
+    en: "Everyone here", es: "Todos los que están aquí", fr: "Tout le monde ici", de: "Alle hier", pt: "Toda a gente aqui", it: "Tutti qui", ja: "ここにいるみんな", zh: "这里的所有人", hi: "यहाँ सब लोग", ar: "الجميع هنا",
+  },
+  "frn.pool.count": {
+    en: "{n} profiles on this deployment", es: "{n} perfiles en este despliegue", fr: "{n} profils sur ce déploiement", de: "{n} Profile auf dieser Installation", pt: "{n} perfis nesta instalação", it: "{n} profili su questa installazione", ja: "この環境のプロフィールは{n}件", zh: "此部署共有 {n} 个形象", hi: "इस परिनियोजन पर {n} प्रोफ़ाइलें", ar: "{n} ملفًا على هذا النشر",
+  },
+  "frn.pool.none": {
+    en: "Nobody is listed yet", es: "Aún no hay nadie listado", fr: "Personne n'est encore listé", de: "Noch niemand gelistet", pt: "Ainda ninguém listado", it: "Nessuno è ancora elencato", ja: "まだ誰も載っていません", zh: "还没有人在列表中", hi: "अभी कोई सूचीबद्ध नहीं", ar: "لا أحد مدرج بعد",
+  },
+  "frn.pool.you": {
+    en: "you", es: "tú", fr: "vous", de: "Sie", pt: "você", it: "tu", ja: "あなた", zh: "你", hi: "आप", ar: "أنت",
+  },
+  "frn.pool.listed": {
+    en: "Your profile is listed here", es: "Tu perfil está listado aquí", fr: "Votre profil est listé ici", de: "Ihr Profil ist hier gelistet", pt: "O seu perfil está listado aqui", it: "Il tuo profilo è elencato qui", ja: "あなたのプロフィールは掲載中です", zh: "你的形象已在此列出", hi: "आपकी प्रोफ़ाइल यहाँ सूचीबद्ध है", ar: "ملفك مدرج هنا",
+  },
+  "frn.pool.private": {
+    en: "Your profile is private — not listed", es: "Tu perfil es privado: no está listado", fr: "Votre profil est privé — non listé", de: "Ihr Profil ist privat — nicht gelistet", pt: "O seu perfil é privado — não listado", it: "Il tuo profilo è privato — non elencato", ja: "あなたのプロフィールは非公開です — 掲載されていません", zh: "你的形象为私密——未列出", hi: "आपकी प्रोफ़ाइल निजी है — सूचीबद्ध नहीं", ar: "ملفك خاص — غير مدرج",
+  },
+  "frn.pool.goprivate": {
+    en: "Go private", es: "Hacerlo privado", fr: "Passer en privé", de: "Privat schalten", pt: "Tornar privado", it: "Rendi privato", ja: "非公開にする", zh: "设为私密", hi: "निजी करें", ar: "اجعله خاصًا",
+  },
+  "frn.pool.golisted": {
+    en: "List me here", es: "Listarme aquí", fr: "Me lister ici", de: "Hier listen", pt: "Listar-me aqui", it: "Elencami qui", ja: "掲載する", zh: "列出我", hi: "मुझे यहाँ सूचीबद्ध करें", ar: "أدرجني هنا",
+  },
+  "frn.kind.self": {
+    en: "real person", es: "persona real", fr: "personne réelle", de: "echte Person", pt: "pessoa real", it: "persona reale", ja: "実在の人", zh: "真人", hi: "वास्तविक व्यक्ति", ar: "شخص حقيقي",
+  },
+  "frn.kind.other_person": {
+    en: "of a real person", es: "de una persona real", fr: "d'une personne réelle", de: "einer echten Person", pt: "de uma pessoa real", it: "di una persona reale", ja: "実在の人がモデル", zh: "以真人为原型", hi: "वास्तविक व्यक्ति पर आधारित", ar: "عن شخص حقيقي",
+  },
+  "frn.kind.fictional": {
+    en: "synthetic", es: "sintético", fr: "synthétique", de: "synthetisch", pt: "sintético", it: "sintetico", ja: "合成", zh: "合成", hi: "कृत्रिम", ar: "اصطناعي",
   },
   "frn.find.ph": {
     en: "Search by name or @handle", es: "Busca por nombre o @usuario", fr: "Cherchez par nom ou @pseudo", de: "Nach Name oder @Handle suchen", pt: "Procura por nome ou @utilizador", it: "Cerca per nome o @handle", ja: "名前か@ハンドルで検索", zh: "按名字或@用户名搜索", hi: "नाम या @हैंडल से खोजें", ar: "ابحث بالاسم أو @المعرّف",

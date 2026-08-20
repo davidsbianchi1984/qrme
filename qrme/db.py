@@ -22,6 +22,9 @@ CREATE TABLE IF NOT EXISTS profiles (
     demographics      TEXT NOT NULL DEFAULT '{}',
     sources           TEXT NOT NULL DEFAULT '[]',  -- imported content sources
     anonymous         INTEGER NOT NULL DEFAULT 0,
+    unlisted          INTEGER NOT NULL DEFAULT 0,  -- out of the browse pool,
+                                              -- by the owner's own choice;
+                                              -- every profile starts listed
     adult_mode        INTEGER NOT NULL DEFAULT 0,
     interaction_scope TEXT NOT NULL DEFAULT 'reactive',  -- reactive | proactive
     moderation_mode   TEXT NOT NULL DEFAULT 'auto',      -- auto | manual
@@ -2609,6 +2612,10 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # beside what could have left. NULL on rows that predate the record —
     # absence stays absence, never a guess.
     ("excursions", "answered_by", "TEXT"),
+    # The browse pool: every profile is listed until its owner says
+    # private, so the pool default on an existing deployment matches the
+    # default a fresh one ships with.
+    ("profiles", "unlisted", "INTEGER NOT NULL DEFAULT 0"),
 )
 
 

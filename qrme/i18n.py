@@ -4935,6 +4935,7 @@ _WHERE_MARKERS = ("body", "query", "path", "header", "cookie")
 #: in `tests/field_labels_unmapped.txt`.
 _FIELD_LABELS: dict[str, dict[str, str]] = {
     'every_hours': {'en': 'Repeats every (hours)', 'es': 'Se repite cada (horas)', 'fr': 'Se répète toutes les (heures)', 'de': 'Wiederholt sich alle (Stunden)', 'pt': 'Repete-se a cada (horas)', 'it': 'Si ripete ogni (ore)', 'ja': '繰り返し間隔（時間）', 'zh': '重复间隔（小时）', 'hi': 'हर (घंटे) में दोहराए', 'ar': 'يتكرر كل (ساعات)'},
+    'listed': {'en': 'Listed in the browse pool', 'es': 'Listado en el directorio', 'fr': 'Listé dans l’annuaire', 'de': 'Im Verzeichnis gelistet', 'pt': 'Listado no diretório', 'it': 'Elencato nell’elenco', 'ja': '一覧に掲載', 'zh': '列入浏览目录', 'hi': 'ब्राउज़ सूची में सूचीबद्ध', 'ar': 'مدرج في الدليل'},
     'voice_id': {'en': 'Voice ID from the engine', 'es': 'ID de voz del motor', 'fr': 'ID de voix du moteur', 'de': 'Stimm-ID der Engine', 'pt': 'ID de voz do motor', 'it': 'ID voce del motore', 'ja': 'エンジンのボイスID', 'zh': '引擎的声音 ID', 'hi': 'इंजन की वॉइस ID', 'ar': 'معرّف الصوت من المحرّك'},
     'provider': {'en': 'Voice engine', 'es': 'Motor de voz', 'fr': 'Moteur vocal', 'de': 'Sprach-Engine', 'pt': 'Motor de voz', 'it': 'Motore vocale', 'ja': '音声エンジン', 'zh': '语音引擎', 'hi': 'वॉइस इंजन', 'ar': 'محرّك الصوت'},
     'answer': {'en': 'The answer', 'es': 'La respuesta', 'fr': 'La réponse', 'de': 'Die Antwort', 'pt': 'A resposta', 'it': 'La risposta', 'ja': '回答', 'zh': '答复', 'hi': 'उत्तर', 'ar': 'الردّ'},

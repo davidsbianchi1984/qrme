@@ -167,6 +167,26 @@
             <Border Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
                     BorderThickness="1" CornerRadius="16" Padding="16">
                 <StackPanel Spacing="8">
+                    <!-- Everyone here: the browse pool and its honest head
+                         count — every profile on the deployment, real and
+                         synthetic side by side, listed until its owner
+                         goes private. The button is this profile's own
+                         door out and back in. -->
+                    <TextBlock x:Name="PoolHead" FontSize="15" FontWeight="Bold"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="PoolCount" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <TextBlock x:Name="PoolStanding" FontSize="11" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <Button x:Name="PoolSwitchButton" Click="OnFlipListing" />
+                    <ItemsControl x:Name="PoolList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Line}" FontSize="13" TextWrapping="Wrap"
+                                           Foreground="{StaticResource QrmeTxtBrush}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                     <!-- Find people: publicly listed profiles by name or
                          handle — the door two beta testers needed to
                          become friends. -->

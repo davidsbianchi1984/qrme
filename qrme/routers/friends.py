@@ -64,6 +64,37 @@ def find_people(q: str = "") -> dict:
         raise HTTPException(422, i18n.raised(exc)) from exc
 
 
+@router.get("/people/browse")
+def browse_people() -> dict:
+    """Everyone here — the pool and the head count. Public like /people:
+    made of rows every profile already shows, with listing on by default
+    and the owner's private switch as the door out. See
+    :func:`qrme.friends.browse`."""
+    return friends.browse()
+
+
+class ListingSet(BaseModel):
+    listed: bool
+
+
+@router.get("/profiles/{profile_id}/listing")
+def get_listing(profile_id: str, request: Request) -> dict:
+    """Whether this profile stands in the browse pool. Owner's read — the
+    pool itself is the public answer to the same question."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    return friends.listing(profile_id)
+
+
+@router.put("/profiles/{profile_id}/listing")
+def set_listing(profile_id: str, body: ListingSet, request: Request) -> dict:
+    """The owner lists the profile, or takes it private — out of the
+    browse pool and the name search both, until they come back."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    return friends.set_listing(profile_id, body.listed)
+
+
 @router.get("/profiles/{profile_id}/friends/suggested")
 def suggested(profile_id: str, limit: int = 10) -> dict:
     """People this profile might want to know, and why each one.

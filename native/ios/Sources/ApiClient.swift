@@ -2346,6 +2346,34 @@ actor ApiClient {
         try await request("/people", query: ["q": q])
     }
 
+    struct BrowsePool: Decodable {
+        let profiles: [FoundPerson]
+        let head_count: Int
+        let kind_counts: [String: Int]
+    }
+    struct Listing: Decodable {
+        let profile_id: String
+        let listed: Bool
+    }
+
+    /// Everyone here: the browse pool and its honest head count — every
+    /// profile listed until its owner goes private.
+    func browsePeople() async throws -> BrowsePool {
+        try await request("/people/browse")
+    }
+
+    /// Whether this profile stands in the pool — the owner's read.
+    func listing(id: String, token: String) async throws -> Listing {
+        try await request("/profiles/\(id)/listing", token: token)
+    }
+
+    /// The owner's door out of the pool and back in, per profile.
+    func setListing(id: String, listed: Bool,
+                    token: String) async throws -> Listing {
+        try await request("/profiles/\(id)/listing", method: "PUT",
+                          body: ["listed": listed], token: token)
+    }
+
     /// Withdrawal. The samples are deleted and the print retires; the record
     /// of the withdrawal itself stays, which is why this reports counts.
     func revokeVoiceprint(id: String, token: String) async throws -> VoiceRevocation {

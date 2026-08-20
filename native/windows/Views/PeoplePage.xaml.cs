@@ -39,6 +39,7 @@ public sealed partial class PeoplePage : Page
         FindHead.Text = L10n.T("nfp.title");
         FindQBox.PlaceholderText = L10n.T("nfp.ph");
         FindButton.Content = L10n.T("nfp.title");
+        PoolHead.Text = L10n.T("frn.pool");
         VisitTheirs.Text = L10n.T("prf.theirs");
         VisitOffersLabel.Text = L10n.T("prf.offers");
         VisitSayBox.PlaceholderText = L10n.T("prf.sayhint");
@@ -641,8 +642,45 @@ public sealed partial class PeoplePage : Page
                 $"{p.Id} · {p.Body}"
                 + (p.Status == "blocked" ? $" · {L10n.T("people.blocked")}" : "")))
                 .ToList();
+            // Everyone here: the pool, its honest head count, and this
+            // profile's own listed/private standing beside the switch.
+            var pool = await ApiClient.Shared.BrowsePeople();
+            PoolCount.Text = L10n.T("frn.pool.count")
+                .Replace("{n}", pool.HeadCount.ToString());
+            PoolList.ItemsSource = pool.Profiles.Select(p => new Row(
+                $"{p.DisplayName}"
+                + (string.IsNullOrWhiteSpace(p.Handle) ? "" : $" · @{p.Handle}")
+                + (string.IsNullOrWhiteSpace(p.Kind)
+                   ? "" : $" · {L10n.T($"frn.kind.{p.Kind}")}")
+                + (p.ProfileId == s.Pid ? $" · {L10n.T("frn.pool.you")}" : "")))
+                .ToList();
+            if (s.Token is not null)
+            {
+                var listing = await ApiClient.Shared.GetListing(s.Pid, s.Token);
+                _listedHere = listing.Listed;
+                PoolStanding.Text = L10n.T(
+                    listing.Listed ? "frn.pool.listed" : "frn.pool.private");
+                PoolSwitchButton.Content = L10n.T(
+                    listing.Listed ? "frn.pool.goprivate" : "frn.pool.golisted");
+            }
         }
         catch { /* leave as-is */ }
+    }
+
+    /// The pool's own switch: out of the browse list and the name search,
+    /// or back in — per profile, reversible both ways.
+    private bool _listedHere = true;
+
+    private async void OnFlipListing(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        if (s.Pid is null || s.Token is null) return;
+        try
+        {
+            await ApiClient.Shared.SetListing(s.Pid, s.Token, !_listedHere);
+            await Load();
+        }
+        catch { /* the current standing stays on screen */ }
     }
 
     // ---- somebody else's homepage -----------------------------------------

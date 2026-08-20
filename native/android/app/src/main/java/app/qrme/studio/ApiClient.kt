@@ -2037,6 +2037,49 @@ object ApiClient {
         return VoiceSpoken(o.optString("basis", ""), o.optString("disclosure", ""))
     }
 
+    // ---- Everyone here: the browse pool, its head count, and the owner's
+    // private switch (qrme/friends.py browse/listing) ----
+
+    data class BrowsePool(val headCount: Int, val kinds: Map<String, Int>,
+                          val profiles: List<PoolPerson>)
+    data class PoolPerson(val profileId: String, val displayName: String,
+                           val handle: String, val avatar: String,
+                           val kind: String)
+    data class PoolListing(val profileId: String, val listed: Boolean)
+
+    private fun poolPersonOf(o: JSONObject) = PoolPerson(
+        o.optString("profile_id", ""), o.optString("display_name", ""),
+        o.optString("handle", ""), o.optString("avatar", ""),
+        o.optString("kind", ""))
+
+    /** Everyone here: every profile on the deployment, real and synthetic
+     *  side by side, listed until its owner goes private. */
+    suspend fun browsePeople(): BrowsePool {
+        val o = JSONObject(request("/people/browse"))
+        val arr = o.optJSONArray("profiles") ?: org.json.JSONArray()
+        val kindsObj = o.optJSONObject("kind_counts") ?: JSONObject()
+        val kinds = kindsObj.keys().asSequence()
+            .associateWith { kindsObj.optInt(it, 0) }
+        return BrowsePool(o.optInt("head_count", 0), kinds,
+            (0 until arr.length()).map { poolPersonOf(arr.getJSONObject(it)) })
+    }
+
+    /** Whether this profile stands in the pool — the owner's read. */
+    suspend fun listing(id: String, token: String): PoolListing {
+        val o = JSONObject(request("/profiles/$id/listing", token = token))
+        return PoolListing(o.optString("profile_id", ""),
+                       o.optBoolean("listed", true))
+    }
+
+    /** The owner's door out of the pool and back in, per profile. */
+    suspend fun setListing(id: String, token: String,
+                           listed: Boolean): PoolListing {
+        val o = JSONObject(request("/profiles/$id/listing", "PUT",
+            JSONObject().put("listed", listed), token))
+        return PoolListing(o.optString("profile_id", ""),
+                       o.optBoolean("listed", true))
+    }
+
     // ---- The spoken voice: a reference to a voice made on the engine's own
     // surface, and one utterance of audio back (qrme/spoken.py) ----
 

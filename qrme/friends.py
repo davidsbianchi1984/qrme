@@ -338,7 +338,12 @@ def find(q: str, limit: int = 20) -> list[dict]:
         "  FROM profiles p LEFT JOIN handles h ON h.profile_id = p.id"
         " WHERE (p.display_name LIKE ? OR h.handle LIKE ?)"
         "   AND p.status = 'active' AND p.anonymous = 0"
+        "   AND p.unlisted = 0"
         " ORDER BY p.display_name LIMIT ?", (like, like, limit)).fetchall()
+    return _public_rows(rows)
+
+
+def _public_rows(rows) -> list[dict]:
     badges = verification.statuses([r["id"] for r in rows])
     return [{
         "profile_id": r["id"],
@@ -348,6 +353,59 @@ def find(q: str, limit: int = 20) -> list[dict]:
         "kind": r["kind"],
         "verification": badges.get(r["id"], {}),
     } for r in rows]
+
+
+def browse(limit: int = 200) -> dict:
+    """Everyone here — the whole pool, and the honest head count.
+
+    The field asked for it in head-count terms: every profile made on the
+    deployment, the real people and the synthetic ones side by side, so a
+    person can see who is actually around. Listing is the default and
+    privacy is the door out — an owner who sets a profile private leaves
+    the pool (and the name search) until they come back.
+
+    Same public rows as :func:`find`, same two standing exclusions:
+    anonymous profiles never appear (anonymity a directory could pierce
+    would not be anonymity), and only active profiles greet strangers.
+    `head_count` counts the whole pool even when `limit` trims the page,
+    and `kinds` breaks it down so "how many are real" has an answer.
+    """
+    conn = db.connect()
+    where = ("p.status = 'active' AND p.anonymous = 0"
+             " AND p.unlisted = 0")
+    rows = conn.execute(
+        "SELECT p.id, p.display_name, p.avatar, p.kind, h.handle"
+        f"  FROM profiles p LEFT JOIN handles h ON h.profile_id = p.id"
+        f" WHERE {where}"
+        " ORDER BY p.created_at DESC LIMIT ?", (limit,)).fetchall()
+    kinds = {r["kind"]: r["n"] for r in conn.execute(
+        f"SELECT p.kind, COUNT(*) AS n FROM profiles p WHERE {where}"
+        " GROUP BY p.kind").fetchall()}
+    return {"profiles": _public_rows(rows),
+            "head_count": sum(kinds.values()),
+            # `kind_counts`, not `kinds`: the overlays already put a `kinds`
+            # on the wire and it is a list of overlay kinds — one name, one
+            # type, per the wire-name guard.
+            "kind_counts": kinds}
+
+
+def listing(profile_id: str) -> dict:
+    row = db.connect().execute(
+        "SELECT unlisted FROM profiles WHERE id=?",
+        (profile_id,)).fetchone()
+    return {"profile_id": profile_id,
+            "listed": bool(row) and not row["unlisted"]}
+
+
+def set_listing(profile_id: str, listed: bool) -> dict:
+    """The owner's door out of the pool, and back in. Reversible both
+    ways, per profile — the same coupling argument anonymity makes: going
+    private on one profile must not hide the others."""
+    conn = db.connect()
+    conn.execute("UPDATE profiles SET unlisted=? WHERE id=?",
+                 (0 if listed else 1, profile_id))
+    conn.commit()
+    return listing(profile_id)
 
 
 def suggestions(profile_id: str, limit: int = 10) -> list[dict]:

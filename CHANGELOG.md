@@ -8,6 +8,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Everyone here — the browse pool.** The field asked for it in
+  head-count terms: every profile made on the deployment goes on the
+  browse list under Friends, real people and synthetic ones side by
+  side, with the honest total and a per-kind breakdown. Listing is the
+  default; privacy is the door out — **Go private** takes a profile out
+  of the pool and the name search both, reversibly, per profile. The
+  two standing exclusions hold: anonymous profiles never appear, and
+  only active profiles greet strangers. The pool stands on every
+  surface: the console's Friends screen and real doors on all three
+  native shells, each in its own ten-language table.
+
+      asked     who is here
+      mattered  a deployment whose people cannot see each other is a
+                hallway of closed doors
+
 - **The voice binds to the account that brought it.** The binding read
   is public on purpose — a voice a stranger can hear is a voice a
   stranger should be able to check — which put every voice id one
@@ -23,6 +38,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
                 with extra steps
 
 ### Fixed
+
+- **The bound voice reaches the conversation.** A profile whose owner
+  had made and bound a real voice still answered the agent's orb and
+  the chat screen in the browser's robot — the binding worked
+  everywhere except where the profile talks back. Both now speak
+  through the bound voice first (the deployment's engine, the
+  watermark riding in the header), with the device's voice standing in
+  when there is no binding, no engine key, or the reply outruns the
+  synthesis ceiling; the orb's relight contract and the chat face's
+  "speaking" state carry over either mouth.
+
+      asked     whose voice answers
+      mattered  the voice somebody made, or a robot wearing their name
 
 - **The orb tells the truth, and the conversation bows out.** A silent
   stretch ends the browser's recogniser on its own, and the agent's

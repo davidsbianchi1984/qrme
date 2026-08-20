@@ -3694,6 +3694,10 @@ private fun PeoplePanel(vm: StudioViewModel) {
     var commentDraft by remember { mutableStateOf("") }
     var note by remember { mutableStateOf<String?>(null) }
     var inboxPage by remember { mutableStateOf<InboxPage?>(null) }
+    // Everyone here: the browse pool and its honest head count — every
+    // profile on the deployment, listed until its owner goes private.
+    var pool by remember { mutableStateOf<ApiClient.BrowsePool?>(null) }
+    var listedHere by remember { mutableStateOf<Boolean?>(null) }
     // Whose page is open over this one, or null. Their Top 8 walks onward by
     // reassigning this, so wandering never grows a back stack.
     var visiting by remember { mutableStateOf<String?>(null) }
@@ -3713,6 +3717,10 @@ private fun PeoplePanel(vm: StudioViewModel) {
             posts = r.getOrDefault(emptyList()) }
         vm.call({ ApiClient.inbox(vm.pid!!, vm.token!!) }) { r ->
             inboxPage = r.getOrNull() }
+        vm.call({ ApiClient.browsePeople() }) { r ->
+            pool = r.getOrNull() }
+        vm.call({ ApiClient.listing(vm.pid!!, vm.token!!) }) { r ->
+            listedHere = r.getOrNull()?.listed }
     }
     LaunchedEffect(Unit) { reload() }
 
@@ -3794,6 +3802,62 @@ private fun PeoplePanel(vm: StudioViewModel) {
                             }
                         }) { Text(L10n.t("people.add.go", lang),
                                 color = Qrme.BrandA, fontSize = 11.sp) }
+                    }
+                }
+            }
+        }
+
+        // Everyone here: real people and synthetic profiles side by side,
+        // with the honest head count — the whole pool unless an owner went
+        // private. The switch under the count is this profile's own door.
+        pool?.let { p ->
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(L10n.t("frn.pool", lang), color = Qrme.Txt,
+                    fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(L10n.t("frn.pool.count", lang)
+                        .replace("{n}", p.headCount.toString()),
+                    color = Qrme.T3, fontSize = 12.sp)
+                listedHere?.let { on ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(L10n.t(if (on) "frn.pool.listed"
+                                    else "frn.pool.private", lang),
+                            color = Qrme.T3, fontSize = 11.sp)
+                        TextButton(onClick = {
+                            vm.call({ ApiClient.setListing(vm.pid!!,
+                                vm.token!!, !on) }) { r ->
+                                r.exceptionOrNull()?.let { note = it.message }
+                                reload()
+                            }
+                        }) { Text(L10n.t(if (on) "frn.pool.goprivate"
+                                         else "frn.pool.golisted", lang),
+                                color = Qrme.BrandA, fontSize = 11.sp) }
+                    }
+                }
+                p.profiles.forEach { q ->
+                    Row(Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween) {
+                        TextButton(onClick = { visiting = q.profileId }) {
+                            Text(q.displayName, color = Qrme.Txt,
+                                fontSize = 12.sp)
+                        }
+                        Text(L10n.t("frn.kind.${q.kind}", lang),
+                            color = Qrme.T3, fontSize = 11.sp)
+                        if (q.profileId == vm.pid) {
+                            Text(L10n.t("frn.pool.you", lang),
+                                color = Qrme.T3, fontSize = 11.sp)
+                        } else if (friends.any { it.profileId == q.profileId }) {
+                            Text(L10n.t("nfp.already", lang),
+                                color = Qrme.T3, fontSize = 11.sp)
+                        } else {
+                            TextButton(onClick = {
+                                vm.call({ ApiClient.addFriend(vm.pid!!,
+                                    q.profileId, vm.token!!) }) { r ->
+                                    r.exceptionOrNull()?.let { note = it.message }
+                                    reload()
+                                }
+                            }) { Text(L10n.t("people.add.go", lang),
+                                    color = Qrme.BrandA, fontSize = 11.sp) }
+                        }
                     }
                 }
             }

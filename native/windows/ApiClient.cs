@@ -130,10 +130,20 @@ public record WebSearchAnswer(
 public record FoundPerson(
     [property: JsonPropertyName("profile_id")] string ProfileId,
     [property: JsonPropertyName("display_name")] string DisplayName,
-    [property: JsonPropertyName("handle")] string? Handle);
+    [property: JsonPropertyName("handle")] string? Handle,
+    [property: JsonPropertyName("kind")] string? Kind = null);
 
 public record FoundPeople(
     [property: JsonPropertyName("found")] FoundPerson[] Found);
+
+public record BrowsePool(
+    [property: JsonPropertyName("head_count")] int HeadCount,
+    [property: JsonPropertyName("kind_counts")] Dictionary<string, int> KindCounts,
+    [property: JsonPropertyName("profiles")] FoundPerson[] Profiles);
+
+public record PoolListing(
+    [property: JsonPropertyName("profile_id")] string ProfileId,
+    [property: JsonPropertyName("listed")] bool Listed);
 
 public record VoiceprintStatus(
     [property: JsonPropertyName("consent")] VoiceConsentState Consent,
@@ -2220,6 +2230,24 @@ public sealed class ApiClient
 
     public Task<VoiceSpoken> SpeakInVoice(string id, string token, string text) =>
         Send<VoiceSpoken>(Post($"/profiles/{id}/voiceprint/speak", new { text }, token));
+
+    // MARK: Everyone here — the browse pool, its head count, and the
+    // owner's private switch (qrme/friends.py browse/listing)
+
+    /// <summary>Everyone here: every profile on the deployment, real and
+    /// synthetic side by side, listed until its owner goes private.</summary>
+    public Task<BrowsePool> BrowsePeople() =>
+        Send<BrowsePool>(Get("/people/browse"));
+
+    /// <summary>Whether this profile stands in the pool — the owner's
+    /// read.</summary>
+    public Task<PoolListing> GetListing(string id, string token) =>
+        Send<PoolListing>(Get($"/profiles/{id}/listing", token));
+
+    /// <summary>The owner's door out of the pool and back in, per
+    /// profile.</summary>
+    public Task<PoolListing> SetListing(string id, string token, bool listed) =>
+        Send<PoolListing>(Put($"/profiles/{id}/listing", new { listed }, token));
 
     // MARK: The spoken voice — a reference to a voice made on the engine's
     // own surface, and one utterance of audio back (qrme/spoken.py)

@@ -48,6 +48,12 @@ export function Friends({ onPlans, onVisit }: {
     finally { setBusy(false); }
   }
   const [inbox, setInbox] = useState<{ events: InboxEvent[]; unseen: number } | null>(null);
+  // Everyone here: the browse pool and its head count — every profile on
+  // the deployment, real and synthetic together, listed unless its owner
+  // went private. `listed` is this profile's own switch.
+  const [pool, setPool] = useState<
+    Awaited<ReturnType<typeof api.browsePeople>> | null>(null);
+  const [listed, setListed] = useState<boolean | null>(null);
 
   function load() {
     if (!session.profileId) return;
@@ -55,12 +61,27 @@ export function Friends({ onPlans, onVisit }: {
     api.suggestedFriends(session.profileId).then((s) => {
       setSuggested(s.suggested);
     }).catch(() => setSuggested([]));
+    api.browsePeople().then(setPool).catch(() => setPool(null));
     if (session.ownerToken) {
       api.inbox(session.profileId, session.ownerToken)
         .then(setInbox).catch(() => setInbox(null));
+      api.getListing(session.profileId, session.ownerToken)
+        .then((l) => setListed(l.listed)).catch(() => setListed(null));
     }
   }
   useEffect(load, [session.profileId]);
+
+  async function flipListing() {
+    if (!session.profileId || !session.ownerToken || listed === null) return;
+    setBusy(true); setError(null);
+    try {
+      const l = await api.setListing(
+        session.profileId, !listed, session.ownerToken);
+      setListed(l.listed);
+      setPool(await api.browsePeople());
+    } catch (e) { setError(e); }
+    finally { setBusy(false); }
+  }
 
   async function markSeen() {
     if (!session.profileId || !session.ownerToken) return;
@@ -205,6 +226,70 @@ export function Friends({ onPlans, onVisit }: {
           );
         })}
       </div>
+
+      {/* Everyone here. Every profile made on this deployment stands in
+          the pool — real people and synthetic ones side by side, for an
+          honest head count — unless its owner went private. The switch
+          under the count is this profile's own door out and back in. */}
+      {pool && (
+        <div className="card">
+          <h3>{tr("frn.pool", lang)}</h3>
+          <p className="muted small">
+            {tr("frn.pool.count", lang)
+               .replace("{n}", String(pool.head_count))}
+            {" — "}
+            {Object.entries(pool.kind_counts).map(([k, n]) =>
+              `${n} ${tr(`frn.kind.${k}`, lang)}`).join(" · ")}
+          </p>
+          {listed !== null && (
+            <div className="row">
+              <span className={listed ? "chip" : "chip warn"}>
+                {listed ? tr("frn.pool.listed", lang)
+                        : tr("frn.pool.private", lang)}
+              </span>
+              <button disabled={busy} onClick={flipListing}>
+                {listed ? tr("frn.pool.goprivate", lang)
+                        : tr("frn.pool.golisted", lang)}
+              </button>
+            </div>
+          )}
+          {pool.profiles.length === 0 && (
+            <p className="muted center">{tr("frn.pool.none", lang)}</p>
+          )}
+          {pool.profiles.map((p) => {
+            const mine = (data?.friends || []).some(
+              (f) => f.profile_id === p.profile_id);
+            const me = p.profile_id === session.profileId;
+            return (
+              <div key={p.profile_id} className="friend-row">
+                {p.avatar ? (
+                  <img className="friend-photo" src={getBase() + p.avatar} alt="" />
+                ) : (
+                  <span className="friend-photo friend-initials" aria-hidden="true">
+                    {p.display_name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2)}
+                  </span>
+                )}
+                <button className="linkish friend-name"
+                        onClick={() => onVisit(p.profile_id)}>
+                  {p.display_name}
+                </button>
+                {p.handle && <span className="muted small">@{p.handle}</span>}
+                <span className="tag">{tr(`frn.kind.${p.kind}`, lang)}</span>
+                {me ? (
+                  <span className="muted small">{tr("frn.pool.you", lang)}</span>
+                ) : mine ? (
+                  <span className="muted small">{tr("frn.already", lang)}</span>
+                ) : (
+                  <button className="primary" disabled={busy}
+                          onClick={() => add(p.profile_id)}>
+                    {tr("frn.add", lang)}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <div className="card">
         {(data?.friends || []).length === 0 && (

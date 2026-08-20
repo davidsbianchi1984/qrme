@@ -31,6 +31,10 @@ struct PeopleSection: View {
     @State private var findQ = ""
     @State private var foundPeople: [ApiClient.FoundPerson] = []
     @State private var searched = false
+    // Everyone here: the browse pool and its honest head count — every
+    // profile on the deployment, listed until its owner goes private.
+    @State private var pool: ApiClient.BrowsePool?
+    @State private var listedHere: Bool?
     @State private var draft = ""
     @State private var openPost: String?
     @State private var commentDraft = ""
@@ -134,6 +138,61 @@ struct PeopleSection: View {
                 .padding(12)
                 .background(Theme.card)
                 .clipShape(RoundedRectangle(cornerRadius: 14))
+
+                // Everyone here: real people and synthetic profiles side by
+                // side, with the honest head count — the whole pool unless
+                // an owner went private. The switch below the count is this
+                // profile's own door out and back in.
+                if let pool {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(L10n.t("frn.pool", state.language))
+                            .font(.headline).foregroundStyle(Theme.txt)
+                        Text(L10n.t("frn.pool.count", state.language)
+                            .replacingOccurrences(of: "{n}",
+                                                  with: String(pool.head_count)))
+                            .font(.caption).foregroundStyle(Theme.t2)
+                        if let listedHere {
+                            HStack(spacing: 8) {
+                                Text(L10n.t(listedHere ? "frn.pool.listed"
+                                                       : "frn.pool.private",
+                                            state.language))
+                                    .font(.caption2).foregroundStyle(Theme.t2)
+                                Button(L10n.t(listedHere ? "frn.pool.goprivate"
+                                                         : "frn.pool.golisted",
+                                              state.language)) { flipListing() }
+                                    .font(.caption2).disabled(busy)
+                            }
+                        }
+                        ForEach(pool.profiles, id: \.profile_id) { p in
+                            HStack {
+                                Button(p.display_name) { visiting = p.profile_id }
+                                    .font(.caption).foregroundStyle(Theme.txt)
+                                Text(L10n.t("frn.kind.\(p.kind)",
+                                            state.language))
+                                    .font(.caption2).foregroundStyle(Theme.t3)
+                                Spacer()
+                                if p.profile_id == state.pid {
+                                    Text(L10n.t("frn.pool.you", state.language))
+                                        .font(.caption2)
+                                        .foregroundStyle(Theme.t2)
+                                } else if friends.contains(
+                                    where: { $0.profile_id == p.profile_id }) {
+                                    Text(L10n.t("nfp.already", state.language))
+                                        .font(.caption2)
+                                        .foregroundStyle(Theme.t2)
+                                } else {
+                                    Button(L10n.t("people.add",
+                                                  state.language)) {
+                                        add(p.profile_id)
+                                    }.font(.caption2).disabled(busy)
+                                }
+                            }
+                        }
+                    }
+                    .padding(12)
+                    .background(Theme.card)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                }
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text(L10n.t("people.friends", state.language))
@@ -341,9 +400,20 @@ struct PeopleSection: View {
         suggested = (try? await ApiClient.shared.suggestedFriends(
             profileId: pid)) ?? []
         posts = (try? await ApiClient.shared.wall(profileId: pid)) ?? []
+        pool = try? await ApiClient.shared.browsePeople()
         if let token = state.token {
             inboxPage = try? await ApiClient.shared.inbox(
                 profileId: pid, token: token)
+            listedHere = (try? await ApiClient.shared.listing(
+                id: pid, token: token))?.listed
+        }
+    }
+
+    private func flipListing() {
+        run {
+            _ = try await ApiClient.shared.setListing(
+                id: state.pid!, listed: !(listedHere ?? true),
+                token: state.token!)
         }
     }
 

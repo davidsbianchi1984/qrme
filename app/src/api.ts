@@ -3655,6 +3655,23 @@ export const api = {
                               kind: string;
                               verification: Record<string, unknown> }[] }>(
       `/people?q=${encodeURIComponent(q)}`),
+  // Everyone here: the browse pool and the honest head count. Every
+  // profile is listed until its owner goes private; the switch below is
+  // that door, per profile and reversible both ways.
+  browsePeople: () =>
+    req<{ profiles: { profile_id: string; display_name: string;
+                      handle: string | null; avatar: string | null;
+                      kind: string;
+                      verification: Record<string, unknown> }[];
+          head_count: number; kind_counts: Record<string, number> }>(
+      "/people/browse"),
+  getListing: (profileId: string, token: string) =>
+    req<{ profile_id: string; listed: boolean }>(
+      `/profiles/${profileId}/listing`, { token }),
+  setListing: (profileId: string, listed: boolean, token: string) =>
+    req<{ profile_id: string; listed: boolean }>(
+      `/profiles/${profileId}/listing`,
+      { method: "PUT", body: { listed }, token }),
   suggestedFriends: (profileId: string) =>
     // The key is `suggested`. Declaring `suggestions` — in both arms of a
     // union, so neither could match — meant the reader's `?? []` fired every
