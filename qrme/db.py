@@ -691,6 +691,7 @@ CREATE TABLE IF NOT EXISTS excursions (
     left_host    INTEGER NOT NULL DEFAULT 0,
     findings     TEXT,                -- general knowledge brought back
     learned_src  TEXT,                -- source_item id once folded in
+    answered_by  TEXT,                -- who actually wrote the findings
     created_at   TEXT NOT NULL
 );
 
@@ -2603,6 +2604,11 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     ("letters", "redactions", "INTEGER NOT NULL DEFAULT 0"),
     ("letters", "built_at", "TEXT"),
     ("profiles", "forgot_at", "TEXT"),
+    # The study says who answered (jim's twin has the same column): the
+    # provider that actually wrote an excursion's findings, recorded
+    # beside what could have left. NULL on rows that predate the record —
+    # absence stays absence, never a guess.
+    ("excursions", "answered_by", "TEXT"),
 )
 
 

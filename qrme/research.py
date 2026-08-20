@@ -17,6 +17,16 @@ Two guarantees make that safe:
 Findings come back as general knowledge (no private data) and can be folded into
 the profile as a learned ``knowledge`` source. The local model then answers using
 those findings together with the private context that never left.
+
+The row also says **who answered**. ``answered_by`` is the excursion's
+provenance fingerprint: the provider that actually wrote the findings — a
+registry name when that model spoke, ``vault`` when the resident did,
+:data:`qrme.llm.LOCAL_FALLBACK` when a degrade put the stub's words where a
+model's were expected, ``stub`` when the local deterministic provider was
+asked directly. It is read from the same request-scoped record the content
+provenance stamp trusts (``llm.answered_by``), never from the choice that
+was asked for — the letter's rule, applied to the study: the name on the
+record is whoever wrote the words.
 """
 
 from __future__ import annotations
@@ -97,7 +107,11 @@ def gather_inside(brief: str, pdi=None) -> str:
         except Exception:  # noqa: BLE001
             out = None
         if out and (out.get("text") or "").strip():
+            llm.note_answered_by("vault")
             return out["text"].strip()
+    # The fall to the local provider is a degrade and the record says so —
+    # an older tandem's excursion must not wear the vault's name.
+    llm.note_answered_by(llm.LOCAL_FALLBACK, degraded_from="vault")
     return llm.get_provider(None).generate(
         _RESEARCH_SYSTEM, [{"role": "user", "content": brief}])
 
@@ -113,7 +127,8 @@ def excursion(profile_id: str, topic: str, question: str,
     at the door above it.
 
     Returns the excursion id. The row is the audit trail: the sanitized brief
-    is exactly what could have left, beside the count of what was taken out.
+    is exactly what could have left, beside the count of what was taken out —
+    and ``answered_by``, who actually wrote what came back.
     """
     privileges.require(profile_id, "study_the_web")
     brief, redactions = sanitize(profile_id, f"{topic}\n{question}", private)
@@ -123,20 +138,32 @@ def excursion(profile_id: str, topic: str, question: str,
     # — the choice the owner made for conversation was a choice about
     # where this profile's words are made, and the study path is not
     # entitled to a different answer.
-    if llm.resolve_choice(llm.get_choice(profile_id)) == "vault":
-        left_host = False
-        findings = gather_inside(brief, pdi)
-    else:
-        left_host = would_leave(cloud)
-        findings = gather(brief, cloud)
+    # Who actually wrote the findings, recorded beside what could have
+    # left. The request-scoped record is cleared before the gather so an
+    # earlier degrade on this request cannot describe this study, read
+    # after it, and put back the way it was found (middleware still owns
+    # the request boundary). Nothing noted means the local deterministic
+    # provider answered directly — named as itself, never dressed up.
+    token = llm.clear_answered_by()
+    try:
+        if llm.resolve_choice(llm.get_choice(profile_id)) == "vault":
+            left_host = False
+            findings = gather_inside(brief, pdi)
+        else:
+            left_host = would_leave(cloud)
+            findings = gather(brief, cloud)
+        who = llm.answered_by()
+    finally:
+        llm.clear_answered_by(token)
+    answered = who[0] if who else "stub"
     cid = db.new_id("exc")
     conn = db.connect()
     conn.execute(
         "INSERT INTO excursions (id, profile_id, topic, brief, redactions,"
-        " left_host, findings, learned_src, created_at)"
-        " VALUES (?,?,?,?,?,?,?,NULL,?)",
+        " left_host, findings, learned_src, answered_by, created_at)"
+        " VALUES (?,?,?,?,?,?,?,NULL,?,?)",
         (cid, profile_id, topic, brief, redactions, int(left_host),
-         findings, db.utcnow()))
+         findings, answered, db.utcnow()))
     conn.commit()
     # The study writes its own ledger row into the vault's tables
     # (qrme/recollection.py → PDI resident): what was studied and what it
@@ -146,6 +173,7 @@ def excursion(profile_id: str, topic: str, question: str,
     recollection.tabulate(pdi, "qrme_studies",
                           [{"excursion": cid, "topic": topic,
                             "redactions": redactions,
-                            "left_host": int(left_host)}],
+                            "left_host": int(left_host),
+                            "answered_by": answered}],
                           source_ref=profile_id)
     return cid

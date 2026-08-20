@@ -36,6 +36,9 @@ def _out(row: dict) -> dict:
         "left_host": bool(row["left_host"]),
         "findings": row["findings"],
         "learned": row["learned_src"] is not None,
+        # Who actually wrote the findings (qrme/research.py's provenance
+        # record). None on rows that predate the column.
+        "answered_by": row["answered_by"],
     }
 
 

@@ -4,6 +4,27 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **The study says who answered.** The excursion row was the audit
+  trail for what could have left — the sanitized brief, the redaction
+  count, `left_host` — but not for who wrote what came back: a study
+  whose model degraded to the stub, or whose vault turned out to be an
+  older tandem without the voice door, was recorded exactly like one
+  the chosen model answered. Every excursion now records
+  `answered_by` — the model's registry name, `vault` for the resident,
+  `local fallback` for a degrade, `stub` for the local provider asked
+  directly — read from the same request-scoped record the content
+  provenance stamp trusts, never from the choice that was asked for.
+  The excursion endpoints carry the field, the study's ledger row in
+  the vault's tables carries it too, and rows that predate it stay
+  `null` rather than being guessed at.
+
+      asked     which model was this study sent to
+      mattered  which model actually wrote these findings
+
 ## [0.93.0] - 2026-08-20
 
 ### Added
@@ -13028,6 +13049,7 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.93.0...HEAD
 [0.93.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.92.0...app-v0.93.0
 [0.92.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.91.0...app-v0.92.0
 [0.91.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.90.0...app-v0.91.0
