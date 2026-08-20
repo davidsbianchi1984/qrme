@@ -325,21 +325,29 @@ export function Inside({ onPlans, start = "" }: {
               const wearing = scene?.wearing.find(
                 (w) => w.interactor_id === s.id);
               const camLive = isMe && face?.showing === "camera";
+              // A put-up picture behaves like the camera: full-bleed in
+              // the tile, controls hidden behind the same double-tap or
+              // hold. A field report put a photo up and met a small circle
+              // with the buttons still showing — the picture is the face
+              // now, and the face fills the frame the way the camera does.
+              const picShown = face?.showing === "photo" && !!face.media_url;
+              const picLive = isMe && picShown;
+              const faceLive = camLive || picLive;
               return (
               <div key={s.id}
                    className={"rs-tile" + (talking === s.display ? " talking" : "")
-                              + (camLive ? " rs-camtile" : "")}
-                   onDoubleClick={camLive
+                              + (camLive || picShown ? " rs-camtile" : "")}
+                   onDoubleClick={faceLive
                      ? () => setReveal((v) => !v) : undefined}
-                   onPointerDown={camLive ? () => {
+                   onPointerDown={faceLive ? () => {
                      hold.current = window.setTimeout(
                        () => setReveal((v) => !v), 550);
                    } : undefined}
-                   onPointerUp={camLive ? () => {
+                   onPointerUp={faceLive ? () => {
                      if (hold.current) window.clearTimeout(hold.current);
                      hold.current = null;
                    } : undefined}
-                   onPointerLeave={camLive ? () => {
+                   onPointerLeave={faceLive ? () => {
                      if (hold.current) window.clearTimeout(hold.current);
                      hold.current = null;
                    } : undefined}>
@@ -375,8 +383,19 @@ export function Inside({ onPlans, start = "" }: {
                     {tr("ins.face.camicon", lang)}
                   </span>
                 ) : face?.showing === "photo" && face.media_url ? (
-                  <img className="rs-photo" src={face.media_url}
-                       alt={s.display} />
+                  // Full-bleed like the camera, for every seat: a face is a
+                  // face whether pixels stream or stand still. On your own
+                  // tile the controls hide behind the same double-tap the
+                  // camera taught, and the hint says so.
+                  <>
+                    <img className="rs-photo rs-fullbleed"
+                         src={face.media_url} alt={s.display} />
+                    {picLive && !reveal && (
+                      <span className="rs-hint">
+                        {tr("ins.face.hint", lang)}
+                      </span>
+                    )}
+                  </>
                 ) : s.kind !== "user" && aiFaces[s.id]?.asset
                     && !aiFaces[s.id]?.placeholder ? (
                   // The profile's own portrait, in the same circle a person's
@@ -419,7 +438,7 @@ export function Inside({ onPlans, start = "" }: {
                     {wearing.disclosure}
                   </span>
                 )}
-                {isMe && (!camLive || reveal) && (
+                {isMe && (!faceLive || reveal) && (
                   <div className="rs-controls">
                     <button className="chip" disabled={busy}
                             aria-pressed={face?.showing === "camera"}

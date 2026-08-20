@@ -637,7 +637,8 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    the name as a chip so it stays readable over any scene. */
 .rs-camtile { padding: 0; overflow: hidden; }
 .rs-camtile.talking { padding: 0; }
-.rs-camtile .rs-live.rs-fullbleed { position: absolute; inset: 0;
+.rs-camtile .rs-live.rs-fullbleed,
+.rs-camtile .rs-photo.rs-fullbleed { position: absolute; inset: 0;
   width: 100%; height: 100%; border-radius: 15px; border: none;
   object-fit: cover; z-index: 0; }
 .rs-camtile .rs-name { position: absolute; left: 8px; bottom: 8px; z-index: 3;
