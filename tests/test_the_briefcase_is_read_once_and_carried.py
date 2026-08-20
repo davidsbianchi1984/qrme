@@ -323,3 +323,41 @@ def test_the_profile_answers_with_the_material_still_in_hand(
     # The stub does not perform a character, so the observable claim is the
     # prompt itself: the block is there for the turn that follows the import.
     assert "0246290" in briefcase.block(profile_id, interactor_id)
+
+
+def test_a_link_is_read_with_the_deployments_eyes(
+        client, profile_id, interactor_id, monkeypatch):
+    """With a renderer deployed, the read-once reading is the rendered page
+    — what a person meets — not the shell the server sends. This is the
+    'read once — 12 characters' failure, closed: the demonstration was a
+    console whose whole surface hid behind scripts a plain fetch never ran."""
+    from qrme import scrape
+    monkeypatch.setattr(
+        scrape, "fetch_rendered",
+        lambda url, on_behalf_of=None: {
+            "title": "JIM Guardian",
+            "text": "Live monitoring · baseline 66 · all calm · 3 lookouts"})
+
+    def never(url, on_behalf_of=None):
+        raise AssertionError("the plain fetch must not run when eyes read")
+    monkeypatch.setattr(scrape, "fetch", never)
+    text, was_read, title = briefcase.read_link(
+        "https://jim-mini.example/app/", "prf_x")
+    assert was_read is True and title == "JIM Guardian"
+    assert "Live monitoring" in text and len(text) > 12
+
+
+def test_without_eyes_the_plain_reading_stands_in(
+        client, profile_id, interactor_id, monkeypatch):
+    """No renderer on this deployment: fetch_rendered answers None and the
+    plain fetch carries what it can — the old behavior, kept honestly."""
+    from qrme import scrape
+    monkeypatch.setattr(scrape, "fetch_rendered",
+                        lambda url, on_behalf_of=None: None)
+    monkeypatch.setattr(
+        scrape, "fetch",
+        lambda url, on_behalf_of=None:
+            "<html><head><title>JIM Guardian</title></head><body></body></html>")
+    text, was_read, title = briefcase.read_link(
+        "https://jim-mini.example/app/", "prf_x")
+    assert title == "JIM Guardian"

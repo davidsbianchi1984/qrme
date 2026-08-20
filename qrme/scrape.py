@@ -40,6 +40,8 @@ the provenance travels with the words.
 from __future__ import annotations
 
 import html as _html
+import json
+import os
 import re
 import urllib.request
 
@@ -54,6 +56,43 @@ _MAX_BYTES = 512 * 1024
 _MAX_TEXT = 4000
 
 _TIMEOUT = 10.0
+
+#: What is kept of a *rendered* reading. Rendered pages are the point —
+#: a console's whole surface — so the cap is generous next to _MAX_TEXT,
+#: and the distiller downstream still reduces it to one digest.
+_MAX_RENDERED = 20000
+
+
+def fetch_rendered(url: str, on_behalf_of: str | None = None) -> dict | None:
+    """The page as a person meets it, from the stack's rendering sidecar
+    (``QRME_RENDERER_URL``) — or None, so the caller can fall back to
+    :func:`fetch` and carry the reading it actually got.
+
+    None covers every kind of missing eyes the same way: no sidecar
+    configured, a sidecar that refused (it will not look at private or
+    stack-internal addresses), one that timed out, one that answered
+    empty. The offline gate vets the target before anything is asked —
+    the target is what leaves; the sidecar is stack infrastructure.
+    """
+    base = os.environ.get("QRME_RENDERER_URL", "").strip()
+    if not base:
+        return None
+    offline.allow(url, "the rendered page fetch", on_behalf_of)
+    req = urllib.request.Request(
+        base.rstrip("/") + "/render",
+        data=json.dumps({"url": url}).encode("utf-8"),
+        headers={"content-type": "application/json"}, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=45) as resp:
+            out = json.loads(resp.read(_MAX_BYTES * 4)
+                             .decode("utf-8", errors="replace"))
+    except Exception:  # noqa: BLE001 — missing eyes are a fallback, not a crash
+        return None
+    text = (out.get("text") or "").strip()
+    if not text:
+        return None
+    return {"title": (out.get("title") or "").strip() or None,
+            "text": text[:_MAX_RENDERED]}
 
 
 def fetch(url: str, on_behalf_of: str | None = None) -> str:

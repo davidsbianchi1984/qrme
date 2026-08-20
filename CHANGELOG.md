@@ -8,6 +8,20 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Complete context rides the briefcase and the lookouts.** The
+  owner's instruction was a complete scrape, and the eyes now serve it
+  everywhere a page is read on someone's behalf: the briefcase's
+  read-once links take the rendered reading first (`scrape.
+  fetch_rendered`, asking the stack's renderer), so a handed console
+  stops carrying as "read once — 12 characters" and carries the page a
+  person meets; and the profile's lookout twin plants `fetch.render`
+  standing plans, watching pages instead of shells. A deployment
+  without eyes keeps the old behavior honestly — the plain fetch
+  stands in, and the character count on the item's state line is the
+  witness to which reading it was. `QRME_RENDERER_URL` is named in the
+  qrme service's own compose block, because compose forwards only what
+  a block names.
+
 - **The stack grows eyes.** A rendering sidecar joins the beta stack
   (`docker/renderer`): a real browser in its own container, one door,
   `POST /render {url}` answering a page's text as a person meets it.

@@ -197,6 +197,14 @@ def read_link(url: str, on_behalf_of: str | None = None) -> tuple[str, bool, str
     if offline.enabled():
         return "", False, None
     try:
+        # The rendered reading first (qrme/scrape.py): the page as a person
+        # meets it, so a JavaScript application stops carrying as a title
+        # and a dozen characters. A deployment without eyes answers None
+        # and the plain fetch stands in — the character count on the item's
+        # state line is the honest witness to which reading this was.
+        rendered = scrape.fetch_rendered(url, on_behalf_of)
+        if rendered is not None:
+            return _clean(rendered["text"]), True, rendered.get("title")
         page = scrape.extract(scrape.fetch(url, on_behalf_of))
     except offline.StoodDown:
         # Not a failure to reach the page — a decision not to. Reported the

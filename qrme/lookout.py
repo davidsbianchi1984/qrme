@@ -3,7 +3,7 @@
 JIM's lookout watches a page for a person; this is QRME's twin with the
 payoff turned toward conversation. An owner plants "keep an eye on this
 page" as one standing plan in the vault (PDI 0.88's appointments), whose
-single `fetch.url` step re-seals the current capture every cycle — and
+single `fetch.render` step re-seals the current capture every cycle — the page as a person meets it, not the shell the server sends — and
 the profile *answers from* that capture: the freshest reading of the
 watched pages rides the chat prompt, so a persona whose restaurant menu
 changed this morning speaks this morning's menu, not its sources'
@@ -89,7 +89,7 @@ def plant(profile_id: str, url: str, every_hours: float, pdi=None) -> dict:
     try:
         task = pdi.resident_stand(
             goal=f"lookout: {url}",
-            steps=[{"tool": "fetch.url", "args": {"url": url}}],
+            steps=[{"tool": "fetch.render", "args": {"url": url}}],
             every_hours=every_hours)
     except Exception as exc:  # noqa: BLE001 — said, never crashed through
         return {"planted": False, "why": f"{type(exc).__name__}: {exc}"[:200]}

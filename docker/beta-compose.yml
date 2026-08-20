@@ -132,6 +132,10 @@ services:
       # The agent's spoken voice (qrme/spoken.py). Optional: empty means
       # profiles bind voices and the say route refuses, naming this variable.
       ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
+      # The stack's eyes, for the briefcase's read-once links — named in
+      # this service's own block because compose forwards only what a
+      # block names.
+      QRME_RENDERER_URL: http://renderer:8400
       # Advertised by GET /pair, so the QR a phone scans has to point at the
       # public name rather than the container.
       QRME_PUBLIC_URL: ${QRME_PUBLIC_URL:?set QRME_PUBLIC_URL in .env}
