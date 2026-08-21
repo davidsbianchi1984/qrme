@@ -8,6 +8,25 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The room speaks for itself, and listens.** Field report over the
+  room screen: the hear-it-in-their-voice press was liked, and sent
+  back anyway — the room should be hearable without pressing, the
+  composer should take speech and not only typing, and a button that
+  is only a send could be a lot smaller. So: a *hear the room* toggle
+  — one press, the gesture the autoplay rules want — and after it
+  every profile turn that arrives speaks in its bound voice, one at a
+  time, backlog deliberately silent, the choice remembered by this
+  browser. A dictation microphone types speech into the box where the
+  browser ships a recogniser (absent, not disabled, where it does
+  not) and never sends on its own — the send stays a decision in a
+  room with other people in it. The send itself shrank to a glyph,
+  kept its name for screen readers, and Enter sends too.
+
+      asked     can the room be in your ears and your voice in the
+                room
+      mattered  a conversation surface that only reads and types is
+                a transcript with a delay
+
 - **§8: the vault's real voice — a local model on the box.** The
   deploy page's long-promised opt-in, written as a decision table so
   the box picks the model: measure `free -h`, take the row you can

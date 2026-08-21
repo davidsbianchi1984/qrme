@@ -8206,6 +8206,15 @@ const CHROME: Table = {
   "ins.hear": {
     en: "Hear it in their voice", es: "Óyelo con su voz", fr: "L'entendre avec sa voix", de: "In ihrer Stimme hören", pt: "Ouvir na voz deles", it: "Ascolta con la sua voce", ja: "その声で聞く", zh: "用它的声音听", hi: "उसकी आवाज़ में सुनें", ar: "اسمعها بصوته",
   },
+  "ins.hear.on": {
+    en: "hear the room", es: "oír la sala", fr: "entendre la salle", de: "den Raum hören", pt: "ouvir a sala", it: "ascolta la stanza", ja: "部屋の声を聞く", zh: "聆听房间", hi: "कमरे को सुनें", ar: "اسمع الغرفة",
+  },
+  "ins.hear.off": {
+    en: "stop hearing the room", es: "dejar de oír la sala", fr: "ne plus entendre la salle", de: "den Raum nicht mehr hören", pt: "parar de ouvir a sala", it: "smetti di ascoltare la stanza", ja: "部屋の声を止める", zh: "停止聆听房间", hi: "कमरा सुनना बंद करें", ar: "توقّف عن سماع الغرفة",
+  },
+  "ins.dictate": {
+    en: "speak into the box", es: "habla al cuadro", fr: "parlez dans la zone", de: "ins Feld sprechen", pt: "fale para a caixa", it: "parla nella casella", ja: "ボックスに話す", zh: "对着输入框说话", hi: "बॉक्स में बोलें", ar: "تحدّث في الحقل",
+  },
   "voice.spoken.title": {
     en: "Spoken voice", es: "Voz hablada", fr: "Voix parlée", de: "Sprechstimme", pt: "Voz falada", it: "Voce parlata", ja: "話す声", zh: "语音音色", hi: "बोलने की आवाज़", ar: "الصوت المنطوق",
   },

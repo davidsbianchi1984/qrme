@@ -78,6 +78,17 @@ const MASK_TREATMENTS: Record<string, string> = {
   touch_up: " rs-touchup",
 };
 
+/** The minimal face of the browser's recogniser — typed here because the
+ *  DOM lib ships none, the same bargain the Agent screen struck. */
+type SpeechRec = {
+  lang: string; interimResults: boolean; continuous: boolean;
+  onresult:
+    ((e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void)
+    | null;
+  onend: (() => void) | null;
+  start(): void; stop(): void;
+};
+
 export function Inside({ onPlans, start = "" }: {
   onPlans: () => void;
   /** A room id handed in by the Rooms screen's join — the field is
@@ -145,6 +156,23 @@ export function Inside({ onPlans, start = "" }: {
   const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  // Hear the room without pressing anything. A field report on the 🔊
+  // press-per-turn: "you should be able to hear the audio anyways without
+  // having to press the button". The toggle is still a press — the one
+  // gesture the autoplay rules want — and after it, every profile turn
+  // that ARRIVES speaks in its bound voice. Turns already on screen stay
+  // silent (switching this on is not a request to re-hear the backlog),
+  // one turn plays at a time, and the choice is this browser's to keep.
+  const [hearAll, setHearAll] = useState(
+    () => localStorage.getItem("qrme.room.hear") === "1");
+  const heardUpTo = useRef<string | null>(null);
+  const speaking = useRef(false);
+  // Dictation: speech types into the box and sends nothing — the send
+  // stays a decision. Only offered where the browser ships a recogniser
+  // (iOS Safari does not), the same bargain the Agent screen struck.
+  const [dictating, setDictating] = useState(false);
+  const dictation = useRef<{ stop: () => void } | null>(null);
 
   const open = roomId.trim();
 
@@ -284,6 +312,94 @@ export function Inside({ onPlans, start = "" }: {
     try { await fn(); if (said) setNote(said); load(); }
     catch (e) { setError(e); } finally { setBusy(false); }
   };
+
+  function flipHearAll() {
+    const v = !hearAll;
+    setHearAll(v);
+    if (v) {
+      localStorage.setItem("qrme.room.hear", "1");
+      // Everything already said stays said: the toggle speaks what comes
+      // next, not the scrollback.
+      heardUpTo.current = transcript.length > 0
+        ? transcript[transcript.length - 1].id : null;
+    } else {
+      localStorage.removeItem("qrme.room.hear");
+    }
+  }
+
+  // Speak the profile turns that arrived since the last look, one at a
+  // time. `speaking` is the queue's lock: a reload mid-playback must not
+  // start a second voice over the first.
+  useEffect(() => {
+    if (!hearAll || speaking.current || transcript.length === 0) return;
+    const start = heardUpTo.current === null ? 0
+      : transcript.findIndex((m) => m.id === heardUpTo.current) + 1;
+    const fresh = transcript.slice(Math.max(start, 0))
+      .filter((m) => m.sender_kind === "profile" && m.sender_id && m.content);
+    heardUpTo.current = transcript[transcript.length - 1].id;
+    if (fresh.length === 0) return;
+    speaking.current = true;
+    void (async () => {
+      try {
+        for (const m of fresh) {
+          const blob = await api.sayInProfileVoice(
+            m.sender_id as string, m.content || "", token);
+          const src = URL.createObjectURL(blob);
+          await new Promise<void>((done) => {
+            const sound = new Audio(src);
+            sound.onended = () => { URL.revokeObjectURL(src); done(); };
+            sound.onerror = () => { URL.revokeObjectURL(src); done(); };
+            // A rejected play (autoplay withheld after all) ends quietly —
+            // the per-turn 🔊 is still on every line.
+            sound.play().catch(() => done());
+          });
+        }
+      } catch { /* a voice that cannot be fetched leaves the text standing */ }
+      speaking.current = false;
+    })();
+    // heardUpTo/speaking are refs on purpose: the transcript is the signal.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transcript, hearAll, token]);
+
+  function flipDictation() {
+    if (dictating) {
+      dictation.current?.stop();
+      dictation.current = null;
+      setDictating(false);
+      return;
+    }
+    const w = window as unknown as {
+      SpeechRecognition?: new () => SpeechRec;
+      webkitSpeechRecognition?: new () => SpeechRec;
+    };
+    const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (!SR) return;
+    const rec = new SR();
+    rec.lang = navigator.language || "en";
+    rec.interimResults = false;
+    rec.continuous = true;
+    let seen = 0;
+    rec.onresult = (e) => {
+      const parts: string[] = [];
+      for (let i = seen; i < e.results.length; i++) {
+        parts.push(e.results[i][0].transcript);
+      }
+      seen = e.results.length;
+      const text = parts.join(" ").trim();
+      if (text) setDraft((d) => (d ? d + " " : "") + text);
+    };
+    rec.onend = () => { dictation.current = null; setDictating(false); };
+    rec.start();
+    dictation.current = { stop: () => rec.stop() };
+    setDictating(true);
+  }
+
+  const canDictate = typeof window !== "undefined"
+    && Boolean((window as unknown as { SpeechRecognition?: unknown;
+                                       webkitSpeechRecognition?: unknown })
+        .SpeechRecognition
+      || (window as unknown as { webkitSpeechRecognition?: unknown })
+        .webkitSpeechRecognition);
 
   const lentByMe = mics?.microphones_lent.some((m) => m.interactor_id === me);
 
@@ -633,7 +749,15 @@ export function Inside({ onPlans, start = "" }: {
       {open && (
         <>
           <div className="card">
-            <h3>{tr("ins.whatsaid", lang)}</h3>
+            <h3>
+              {tr("ins.whatsaid", lang)}{" "}
+              <button className={"chip" + (hearAll ? " primary" : "")}
+                      onClick={flipHearAll}
+                      title={tr(hearAll ? "ins.hear.off" : "ins.hear.on", lang)}
+                      aria-pressed={hearAll}>
+                🔊 {tr(hearAll ? "ins.hear.off" : "ins.hear.on", lang)}
+              </button>
+            </h3>
             {transcript.length === 0 && (
               <p className="muted small">{tr("ins.nothingyet", lang)}</p>
             )}
@@ -673,14 +797,43 @@ export function Inside({ onPlans, start = "" }: {
             ))}
             <div className="row">
               <input value={draft} onChange={(e) => setDraft(e.target.value)}
-                     placeholder={tr("ins.say.ph", lang)} style={{ flex: 1 }} />
-              <button disabled={busy || !token || !draft.trim()}
+                     placeholder={tr("ins.say.ph", lang)} style={{ flex: 1 }}
+                     onKeyDown={(e) => {
+                       if (e.key === "Enter" && draft.trim() && !busy && token) {
+                         void act(async () => {
+                           const text = draft;
+                           setDraft("");
+                           await api.sayInRoom(open, me, text, token);
+                         })();
+                       }
+                     }} />
+              {/* Dictation: speech types into the box. The send below stays
+                  a decision — a room has other people in it. Absent where
+                  the browser ships no recogniser, not disabled: a dead
+                  control is a broken promise drawn as a button. */}
+              {canDictate && (
+                <button className={"chip" + (dictating ? " primary" : "")}
+                        disabled={busy}
+                        aria-pressed={dictating}
+                        aria-label={tr("ins.dictate", lang)}
+                        title={tr("ins.dictate", lang)}
+                        onClick={flipDictation}>
+                  🎤
+                </button>
+              )}
+              {/* A send is a small thing now — "the button could be a lot
+                  smaller if it's only gonna be a send" — and Enter sends
+                  too. The name survives in the label for a screen reader. */}
+              <button className="chip"
+                      disabled={busy || !token || !draft.trim()}
+                      aria-label={tr("ins.sayit", lang)}
+                      title={tr("ins.sayit", lang)}
                       onClick={act(async () => {
                         const text = draft;
                         setDraft("");
                         await api.sayInRoom(open, me, text, token);
                       })}>
-                {tr("ins.sayit", lang)}
+                ➤
               </button>
               <button disabled={busy || !token}
                       onClick={act(async () => {
