@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v0.96.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v0.97.0** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -180,6 +180,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **0.97.0** | **Everyone here, in their own voice** — every profile stands on the browse pool under Friends (real and synthetic side by side, honest head count, per-kind breakdown) with Go private as the reversible door out of the pool and the name search, on the console and all three native shells; a voice id binds to the account that brought it (first bind claims, own profiles share, unbinding releases); the agent orb and the pair chat answer in the bound voice with the device's as honest fallback; and the orb stops lying — it relights over silence, says "Speaking" while the reply plays, and bows out after two quiet minutes |
 | **0.96.0** | **The picture goes up like the camera, and the reply ceiling comes home** — a photo put up in a room is full-bleed with the camera's own reveal machinery (double-tap or hold to reach the swap controls), the assist screen's wearables card takes the settings-page shape (My devices / Other devices, hairline rows, ⓘ details), and `MAX_REPLY_TOKENS` comes back down to five times the original room after the field called the ten-times wait on spoken turns |
 | **0.95.0** | **Everything handed over is heard** — the ears arc reaches every briefcase door: a read-once link that is a recording comes back as the words said in it (held, not read, without ears — the plain fetch never again seals media bytes as a reading), an uploaded video or .m4a memo is heard through the ears' new bytes door, and true audio files (MP3, WAV, Ogg, FLAC) stop being refused and land as a `recording` of their own; every new socket gated and witnessed, the suffix list shared by briefcase and lookout |
 | **0.94.0** | **The stack grows ears, and the lookout hears** — a transcription sidecar joins the deploy stack (a local speech-to-text model, outward-looking only, no copy kept), the vault's `fetch.listen` seals the words said in a recording, and a lookout planted on a media URL stands a listening appointment with the same change-memory the pages keep; the study says who answered on the wire and on the screens, and the letter calls a watched recording what it is |
