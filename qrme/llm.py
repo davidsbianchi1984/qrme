@@ -178,9 +178,13 @@ _CUSTOM_MODEL = os.environ.get("QRME_CUSTOM_LLM_MODEL", "default")
 _CUSTOM_LABEL = os.environ.get("QRME_CUSTOM_LLM_LABEL", "Your own algorithm")
 # The local model: whatever the user pulled into Ollama. deepseek-r1:1.5b
 # is small enough for most machines; QRME_OLLAMA_MODEL overrides.
-_OLLAMA_MODEL = os.environ.get("QRME_OLLAMA_MODEL", "deepseek-r1:1.5b")
-_OLLAMA_BASE = os.environ.get("QRME_OLLAMA_URL",
-                              "http://127.0.0.1:11434") + "/v1"
+# `or`, not a get() default: compose forwards these as empty strings on
+# a box whose operator left them blank in .env (§8 of the deploy page
+# fills them in), and an empty string standing in for the default is how
+# a dial connected to nothing turns into a broken door.
+_OLLAMA_MODEL = os.environ.get("QRME_OLLAMA_MODEL") or "deepseek-r1:1.5b"
+_OLLAMA_BASE = (os.environ.get("QRME_OLLAMA_URL")
+                or "http://127.0.0.1:11434") + "/v1"
 
 _TIMEOUT = int(os.environ.get("QRME_LLM_TIMEOUT", "30"))
 

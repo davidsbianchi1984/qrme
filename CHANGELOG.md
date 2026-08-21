@@ -4,6 +4,33 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **§8: the vault's real voice — a local model on the box.** The
+  deploy page's long-promised opt-in, written as a decision table so
+  the box picks the model: measure `free -h`, take the row you can
+  afford while the stack runs (the estate's own 4 GB VPS takes the
+  smallest), run one Ollama daemon on the stack's network with its
+  weights in a named volume, pull the row's model, fill four `.env`
+  lines, recreate `pdi` and `qrme`. No published port — the daemon is
+  reachable only by service name, the same standing the ears and the
+  eyes have, and PDI's offline gate resolves that to a private address
+  even with `PDI_OFFLINE` set. The section ends the way it starts:
+  measure again under load, and if the box cannot afford the row, the
+  removal lines put the honest stub back. Compose now forwards all
+  four dials (`PDI_OLLAMA_URL`, `PDI_RESIDENT_MODEL`,
+  `QRME_OLLAMA_URL`, `QRME_OLLAMA_MODEL`) — the documented-variable
+  guard holds them — and `qrme/llm.py` reads its two through `or`
+  rather than `get()` defaults, because compose forwards blanks and an
+  empty string standing in for a default is a broken door.
+
+      asked     can the box afford a voice
+      mattered  a runbook that starts with a measurement instead of an
+                instruction never asks a 4 GB box to act like a 32 GB
+                one
+
 ## [0.97.0] - 2026-08-21
 
 ### Added
@@ -13250,6 +13277,7 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.97.0...HEAD
 [0.97.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.96.0...app-v0.97.0
 [0.96.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.95.0...app-v0.96.0
 [0.95.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.94.0...app-v0.95.0

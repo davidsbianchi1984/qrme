@@ -93,6 +93,15 @@ ANTHROPIC_API_KEY=
 # From the voice engine's own dashboard. Empty means profiles can bind a
 # voice and the say route refuses, naming this variable.
 ELEVENLABS_API_KEY=
+
+# --- optional: the vault's real voice (section 8) ------------------------
+# Empty means PDI's resident answers with its honest stub and QRME's
+# offline provider points at loopback. Section 8 measures the box, picks
+# a model, runs the daemon, and fills these in.
+PDI_OLLAMA_URL=
+PDI_RESIDENT_MODEL=
+QRME_OLLAMA_URL=
+QRME_OLLAMA_MODEL=
 EOF
 
 nano .env      # paste the key on the last line
@@ -622,6 +631,138 @@ the other fields in it — `console`, `pdi`, `tandem`, `signup_key` — are
 worth a glance while you are looking anyway.
 
 ---
+
+## 8. The vault's real voice — a local model on the box
+
+PDI's resident engine plans, fetches, tabulates and searches without a
+model, and answers generation with an honest stub that says so. QRME's
+offline provider points at loopback and refuses honestly when nothing
+listens. This section is the opt-in that upgrades both: one Ollama daemon
+on the stack's own network, one pulled model, four `.env` lines.
+
+Opt-in **by capacity**, which is why it starts with a measurement instead
+of an instruction. This estate's box is the 4 GB VPS from the top of this
+page, so its row in the table below is the smallest one — but the table is
+the decision, so a bigger box someday changes the answer without changing
+the page.
+
+### 8a. Measure the box
+
+```
+free -h
+```
+
+```
+nproc
+```
+
+Read the `available` column of `free -h` — not `free`; Linux lends spare
+RAM to caches and takes it back — and pick the row you can afford **while
+the stack is running**:
+
+| `available` RAM | model to pull | what to expect |
+|---|---|---|
+| under 2 GiB | none — stop here | the stub is the honest answer for this box; a model that sends the host into swap takes the whole beta down with it |
+| 2–4 GiB | `llama3.2:1b` | short answers in seconds on 2 vCPUs; the 4 GB VPS's row |
+| 4–8 GiB | `llama3.2` (3B) | PDI's coded default; noticeably better prose, noticeably slower |
+| 8 GiB and up | `qwen2.5:7b` | a real assistant's answers, at CPU patience |
+
+CPU-only arithmetic, so nobody is surprised: a 1B model on two vCPUs
+writes a few words a second; a 7B model writes a word a second on a good
+day. The resident reads its answers into sealed records rather than a
+person's waiting eyes, which is why patience is acceptable here at all.
+
+### 8b. The daemon, on the stack's own network
+
+The stack's containers are named `docker-…-1`, so its network is
+`docker_default` — confirm rather than trust, because a renamed project
+renames the network:
+
+```
+docker network ls
+```
+
+Then run the daemon beside the stack, its weights in a named volume:
+
+```
+docker run -d --name ollama --restart unless-stopped --network docker_default -v ollama:/root/.ollama ollama/ollama
+```
+
+Pull the model the table picked (the 4 GB row shown; substitute yours):
+
+```
+docker exec ollama ollama pull llama3.2:1b
+```
+
+The pull is the slow part — a gigabyte-scale download into the volume,
+once. Prove the daemon holds it:
+
+```
+docker exec ollama ollama list
+```
+
+No port is published. The daemon is reachable only by name, only from
+containers on `docker_default` — the same standing the ears and the eyes
+have, and PDI's offline gate resolves that name to a private address and
+lets it through even with `PDI_OFFLINE` set, because nothing leaves the
+host.
+
+### 8c. Point the stack at it
+
+Open the env file (no photographs while this file is open — it holds the
+master key):
+
+```
+nano /srv/qrme/.env
+```
+
+Fill the four section-8 lines in, model name matching what you pulled:
+
+```
+PDI_OLLAMA_URL=http://ollama:11434
+```
+
+```
+PDI_RESIDENT_MODEL=llama3.2:1b
+```
+
+```
+QRME_OLLAMA_URL=http://ollama:11434
+```
+
+```
+QRME_OLLAMA_MODEL=llama3.2:1b
+```
+
+An environment change needs a recreate, not a rebuild:
+
+```
+cd /srv/qrme && docker compose -f docker/beta-compose.yml --env-file .env up -d pdi qrme
+```
+
+### 8d. Prove it end to end
+
+The daemon holding a model was proved in 8b; this proves the products
+reach it. Ask the vault something from its console (pdisystems.net → ask)
+— the answer's provenance reads `local:llama3.2:1b` instead of `stub`.
+On QRME, the model picker's offline row stops saying nothing listens.
+
+And prove the box survived it — the measurement from 8a, taken again
+under load:
+
+```
+free -h
+```
+
+If `available` went to nothing and swap grew, the box cannot afford the
+row you picked: take the smaller row, or remove the daemon —
+
+```
+docker rm -f ollama && docker volume rm ollama
+```
+
+— blank the four `.env` lines, recreate `pdi` and `qrme` again, and the
+stub resumes telling the truth.
 
 ## What this is not
 

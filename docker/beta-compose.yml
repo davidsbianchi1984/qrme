@@ -52,6 +52,12 @@ services:
     environment:
       # Whoever holds this can decrypt. PDI's own hosting doc is blunt about
       # it: "If the operator sets PDI_MASTER_KEY, the operator can decrypt."
+      # §8 of the deploy page: the vault's real voice. Empty means the
+      # resident engine answers with its honest stub and says how to add
+      # a model; the ollama container §8 runs joins this stack's network,
+      # so the URL is its service name.
+      PDI_OLLAMA_URL: ${PDI_OLLAMA_URL:-}
+      PDI_RESIDENT_MODEL: ${PDI_RESIDENT_MODEL:-}
       PDI_MASTER_KEY: ${PDI_MASTER_KEY:?set PDI_MASTER_KEY in .env}
       PDI_ADMIN_TOKEN: ${PDI_ADMIN_TOKEN:?set PDI_ADMIN_TOKEN in .env}
       PDI_PUBLIC_URL: ${PDI_PUBLIC_URL:?set PDI_PUBLIC_URL in .env}
@@ -153,6 +159,12 @@ services:
       # The agent's spoken voice (qrme/spoken.py). Optional: empty means
       # profiles bind voices and the say route refuses, naming this variable.
       ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
+      # §8: the offline provider's local model — the same daemon the
+      # vault's resident speaks through. Empty falls back to the coded
+      # defaults, which point at loopback and answer honestly when
+      # nothing listens there.
+      QRME_OLLAMA_URL: ${QRME_OLLAMA_URL:-}
+      QRME_OLLAMA_MODEL: ${QRME_OLLAMA_MODEL:-}
       # The stack's eyes, for the briefcase's read-once links — named in
       # this service's own block because compose forwards only what a
       # block names.
