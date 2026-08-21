@@ -48,6 +48,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
       mattered  a group conversation where every voice arrives
                 anonymous is three monologues interleaved
 
+- **The orb says why it cannot hear.** Field report on the agent's
+  voice mode: "Listening — say it", glowing, and nothing ever heard.
+  The recogniser had no error handler at all, so a refused
+  microphone, a missing input device, or an unreachable speech
+  service fell through to the quiet-stretch relight — error, relight,
+  error, with the orb glowing through all of it. Three actionable
+  causes are named on the orb now (microphone refused for the site /
+  no working input found / speech service unreachable — type, the
+  reply is still spoken), each stopping the relight loop; ordinary
+  quiet keeps relighting as before. The dictation mic reports through
+  the same sentences.
+
+      asked     does the orb say it is listening
+      mattered  is anything actually able to hear
+
 ### Changed
 
 - **The reply ceiling comes down to two and a half rooms.**

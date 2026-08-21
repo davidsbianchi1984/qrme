@@ -113,6 +113,7 @@ type SR = { new(): {
   continuous: boolean; interimResults: boolean; lang: string;
   onresult: ((e: { results: ArrayLike<ArrayLike<{ transcript: string }>
                              & { isFinal: boolean }> }) => void) | null;
+  onerror: ((e: { error?: string }) => void) | null;
   onend: (() => void) | null; start: () => void; stop: () => void;
 } };
 
@@ -171,6 +172,12 @@ export function Agent({ onPlans, go }: {
   // one thing.
   const [dictating, setDictating] = useState(false);
   const [micHint, setMicHint] = useState(false);
+  // Why the ear died, when it did. The recogniser had no onerror at all,
+  // so a refused microphone or an unreachable speech service fell through
+  // to onend — which relit "listening" over a dead microphone, forever.
+  // A field report watched exactly that orb. The fault is a sentence now,
+  // and a fatal error stops the relight loop instead of feeding it.
+  const [earFault, setEarFault] = useState<string | null>(null);
   // "Search the Internet": the composer becomes a search box, the answer is
   // rows with links, and none of it needs a model.
   const [searchMode, setSearchMode] = useState(false);
@@ -301,14 +308,34 @@ export function Agent({ onPlans, go }: {
         void sendSaid(words);
       }
     };
+    let fatal = false;
+    r.onerror = (e: { error?: string }) => {
+      // The three causes a person can act on, each named. Everything else
+      // (`no-speech`, `aborted`) is the ordinary end of a quiet stretch
+      // and the relight in onend is the right answer.
+      const code = e.error || "";
+      if (code === "not-allowed" || code === "service-not-allowed") {
+        fatal = true;
+        setEarFault(tr("agent.ear.blocked", lang));
+      } else if (code === "audio-capture") {
+        fatal = true;
+        setEarFault(tr("agent.ear.nomic", lang));
+      } else if (code === "network") {
+        fatal = true;
+        setEarFault(tr("agent.ear.unreachable", lang));
+      }
+    };
     r.onend = () => {
       recogniser.current = null;
       // A silent stretch ends the browser's recogniser on its own, and
       // the orb used to keep saying "listening" over a dead microphone.
-      // Relight it — unless a turn is mid-flight (the reply's own end
-      // relights), the person closed the orb, or nothing has been heard
-      // for two minutes, in which case the conversation bows out quietly:
-      // leaving a room empty is not an error.
+      // Relight it — unless the ear just failed for a reason relighting
+      // cannot fix (the fault line says which), a turn is mid-flight
+      // (the reply's own end relights), the person closed the orb, or
+      // nothing has been heard for two minutes, in which case the
+      // conversation bows out quietly: leaving a room empty is not an
+      // error.
+      if (fatal) return;
       if (!voiceOn.current || turning.current) return;
       if (Date.now() - lastHeard.current >= CONVERSATION_IDLE_MS) {
         stopVoice();
@@ -317,6 +344,7 @@ export function Agent({ onPlans, go }: {
       startVoice(false);
     };
     recogniser.current = r;
+    setEarFault(null);
     r.start();
   }
 
@@ -351,8 +379,19 @@ export function Agent({ onPlans, go }: {
       }
       setAsk(base + finals + interim);
     };
+    r.onerror = (e: { error?: string }) => {
+      const code = e.error || "";
+      if (code === "not-allowed" || code === "service-not-allowed") {
+        setEarFault(tr("agent.ear.blocked", lang));
+      } else if (code === "audio-capture") {
+        setEarFault(tr("agent.ear.nomic", lang));
+      } else if (code === "network") {
+        setEarFault(tr("agent.ear.unreachable", lang));
+      }
+    };
     r.onend = () => { dictation.current = null; setDictating(false); };
     dictation.current = r;
+    setEarFault(null);
     setDictating(true);
     r.start();
   }
@@ -656,9 +695,12 @@ export function Agent({ onPlans, go }: {
                 aria-label={tr("agent.orb.stop", lang)}>
           <span className="agent-orb-ball" aria-hidden="true" />
           <span className="small">
+            {/* A fault outranks "listening": an orb that says it hears
+                over a microphone the browser refused is the lie the
+                fault line exists to end. */}
             {asking ? tr("agent.orb.thinking", lang)
                     : saying ? tr("agent.orb.speaking", lang)
-                    : tr("agent.orb.listening", lang)}
+                    : earFault ?? tr("agent.orb.listening", lang)}
           </span>
         </button>
       )}
@@ -689,6 +731,11 @@ export function Agent({ onPlans, go }: {
           <p className="muted small agent-michint">
             {tr("agent.mic.keyboard", lang)}
           </p>
+        )}
+        {earFault && !voiceMode && (
+          // The dictation mic's failures land here — the orb is not open
+          // to carry them, and a 🎤 that dies silently reads as broken.
+          <p className="muted small agent-michint">{earFault}</p>
         )}
         <div className="agent-pill">
           <button className="agent-plusbtn" aria-label={tr("agent.plus", lang)}
