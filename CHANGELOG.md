@@ -51,6 +51,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
       asked     does each starter have a voice
       mattered  does each starter have their own kind of voice
 
+- **The shared vocabulary agrees again.** The sibling-product
+  vocabulary guard ran against a real JIM-mini checkout for the first
+  time (the two repos had never actually sat side by side where the
+  guard could see them) and found two fields drifted: `answer` reads
+  *Your answer* in every product now, and `consent` reads *Consent* —
+  one wording per shared field name, in ten languages, both sides.
+
+      asked     does a shared field read the same in every product
+      mattered  the guard that answers this had never actually run
+
 ## [0.97.0] - 2026-08-21
 
 ### Added
