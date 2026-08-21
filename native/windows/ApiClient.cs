@@ -524,7 +524,7 @@ public record RoomMsg(
 // A share landing as a room message — no replies: sharing never makes the
 // profiles speak, "Let them talk" stays the button it is.
 public record RoomShared(
-    [property: JsonPropertyName("message")] RoomMsg Message);
+    [property: JsonPropertyName("shared")] RoomMsg Shared);
 
 public record HandleClaim(
     [property: JsonPropertyName("profile_id")] string ProfileId,

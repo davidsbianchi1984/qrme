@@ -571,7 +571,7 @@ struct RoomPost: Decodable { let message: RoomMsg; let replies: [RoomMsg] }
 struct RoomAdvance: Decodable { let replies: [RoomMsg] }
 /// A share landing as a room message — no replies: sharing never makes the
 /// profiles speak, "Let them talk" stays the button it is.
-struct RoomShared: Decodable { let message: RoomMsg }
+struct RoomShared: Decodable { let shared: RoomMsg }
 
 struct HandleClaim: Decodable { let profile_id: String; let handle: String; let summon: String }
 

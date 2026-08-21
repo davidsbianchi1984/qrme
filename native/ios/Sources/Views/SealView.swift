@@ -319,7 +319,7 @@ struct RoomsSection: View {
                     roomId: roomId, interactorId: state.interactorId ?? "",
                     filename: "shared.bin", data: data,
                     token: state.interactorToken ?? "")
-                note = shared.message.from
+                note = shared.shared.from
                 share = nil
             }
         }

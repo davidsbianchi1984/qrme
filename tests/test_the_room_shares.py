@@ -45,7 +45,7 @@ def test_a_picture_lands_as_a_turn(client):
         "&filename=sunset.png&caption=look at this",
         headers=mine, content=PNG)
     assert r.status_code == 201, r.text
-    msg = r.json()["message"]
+    msg = r.json()["shared"]
     assert msg["status"] == "approved"
     assert msg["content"] == "look at this"
     assert msg["media"]["kind"] == "image"

@@ -691,7 +691,10 @@ async def share_in_room(room_id: str, request: Request,
                                     maturity=_room_maturity(
                                         _participants(room_id)))
         approved, reason = verdict.approved, verdict.reason
-    return {"message": _store_room_message(
+    # `shared`, not `message`: the wire-name guard holds one type per
+    # field name across the whole API, and `message` is already a string
+    # elsewhere on it. A share is its own thing; it gets its own name.
+    return {"shared": _store_room_message(
         room_id, "user", interactor_id, said, approved, reason,
         media_id=saved["id"])}
 

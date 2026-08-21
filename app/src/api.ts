@@ -4995,7 +4995,7 @@ export const api = {
                              body.detail ?? `share failed (${res.status})`,
                              body.message);
     }
-    return data as { message: RoomMsg };
+    return data as { shared: RoomMsg };
   },
 
   overlayCatalogue: () => req<OverlayCatalogue>("/overlays/catalogue"),

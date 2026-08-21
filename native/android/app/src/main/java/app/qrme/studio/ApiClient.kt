@@ -3709,7 +3709,7 @@ object ApiClient {
             conn.outputStream.use { it.write(bytes) }
             val text = (if (conn.responseCode < 300) conn.inputStream
                         else conn.errorStream).bufferedReader().readText()
-            JSONObject(text).optJSONObject("message")
+            JSONObject(text).optJSONObject("shared")
                 ?.optJSONObject("media")?.optString("kind") ?: ""
         }
 
