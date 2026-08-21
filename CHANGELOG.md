@@ -4,6 +4,31 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **A voice room is a voice room.** Field report, holding a `voice`
+  room up against what it drew: "this is supposed to be audio chat only
+  — we need to get rid of the type bar and the transparent chat text
+  and go back to hearing the voices." The channel was chosen on the way
+  in and then ignored: every room wore the same chat furniture, and
+  hearing was an opt-in press — so the one room whose whole pitch is
+  sound arrived silent with a keyboard in front of it. A voice room now
+  turns its own ear on (going in is itself the press the autoplay rules
+  want, so nothing else has to be tapped), drops the transparent lines
+  and the Type… pill for one control that listens, and sends what it
+  hears straight into the room: dictation's "the send stays a decision"
+  bargain belongs to a room people type in, and here speaking is the
+  medium. The 🔊 toggle stays as the way to silence a voice room, the
+  transcript keeps its card for the deliberate read, sharing and "let
+  them talk" are untouched, and a browser with no recogniser (iOS
+  Safari) gets the typed pill back with a line saying why it is the one
+  being offered.
+
+      asked     what kind of room is this
+      mattered  the room's own answer, or the same furniture everywhere
+
 ## [0.98.0] - 2026-08-21
 
 ### Fixed

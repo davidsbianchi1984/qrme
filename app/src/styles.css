@@ -1202,6 +1202,29 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 /* On the stage the strip sits above the leave button's row. */
 .room-stage .rs-chatstrip { left: 12px; right: 12px; bottom: 64px; }
 
+/* What a voice room wears instead of the chat strip: one control that
+   listens, and a line naming who is speaking. Centred rather than
+   bottom-left, because there is nothing to read here — the eye should
+   land on the talk button, not scan for text. */
+.rs-voicebar { position: absolute; left: 8px; right: 8px; bottom: 10px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  z-index: 5; pointer-events: none; }
+.rs-voicebar > * { pointer-events: auto; }
+.rs-voicenow { padding: 4px 14px; border-radius: 999px; font-size: 12px;
+  color: #fff; background: rgba(10, 12, 32, 0.55);
+  backdrop-filter: blur(6px); text-align: center; max-width: 92%; }
+.rs-voicenote { margin: 0; max-width: 92%; padding: 6px 12px;
+  border-radius: 12px; font-size: 12px; line-height: 1.35; color: #fff;
+  background: rgba(10, 12, 32, 0.55); backdrop-filter: blur(6px); }
+.rs-talk { border: none; cursor: pointer; color: #fff; font-size: 15px;
+  padding: 10px 26px; border-radius: 999px; font-weight: 600;
+  background: rgba(255, 255, 255, 0.16); backdrop-filter: blur(6px); }
+/* Live: the room is holding the microphone open, and the button says so
+   the way the tiles do — the same green that means "this one is talking",
+   so one colour carries one meaning across the room. */
+.rs-talk.live { background: rgba(123, 196, 127, 0.9); color: #08122a; }
+.room-stage .rs-voicebar { left: 12px; right: 12px; bottom: 64px; }
+
 /* A shared attachment in the transcript: the picture itself, the video
    playable, a file as a plain named link — sized to stay a turn in a
    conversation rather than a takeover of it. */

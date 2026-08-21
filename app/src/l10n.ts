@@ -8215,6 +8215,36 @@ const CHROME: Table = {
   "ins.dictate": {
     en: "speak into the box", es: "habla al cuadro", fr: "parlez dans la zone", de: "ins Feld sprechen", pt: "fale para a caixa", it: "parla nella casella", ja: "ボックスに話す", zh: "对着输入框说话", hi: "बॉक्स में बोलें", ar: "تحدّث في الحقل",
   },
+  "ins.voice.talk": {
+    en: "Talk", es: "Hablar", fr: "Parler", de: "Sprechen", pt: "Falar", it: "Parla", ja: "話す", zh: "说话", hi: "बोलें", ar: "تحدّث",
+  },
+  "ins.voice.stop": {
+    en: "Stop talking", es: "Dejar de hablar", fr: "Arrêter de parler", de: "Nicht mehr sprechen", pt: "Parar de falar", it: "Smetti di parlare", ja: "話すのをやめる", zh: "停止说话", hi: "बोलना बंद करें", ar: "توقّف عن التحدّث",
+  },
+  "ins.voice.hearing": {
+    en: "Listening — say it", es: "Escuchando — dilo", fr: "À l'écoute — dites-le", de: "Hört zu — sag es", pt: "A ouvir — diga", it: "In ascolto — dillo", ja: "聞いています — どうぞ", zh: "正在聆听 — 请说", hi: "सुन रहे हैं — कहिए", ar: "يستمع — تفضّل",
+  },
+  "ins.voice.speaking": {
+    en: "{who} is speaking", es: "{who} está hablando", fr: "{who} parle", de: "{who} spricht", pt: "{who} está a falar", it: "{who} sta parlando", ja: "{who} が話しています", zh: "{who} 正在说话", hi: "{who} बोल रहे हैं", ar: "{who} يتحدّث",
+  },
+  "ins.voice.someone": {
+    en: "Somebody", es: "Alguien", fr: "Quelqu'un", de: "Jemand", pt: "Alguém", it: "Qualcuno", ja: "誰か", zh: "有人", hi: "कोई", ar: "أحدهم",
+  },
+  "ins.voice.quiet": {
+    en: "The room is quiet. Press Talk and say something.", es: "La sala está en silencio. Pulsa Hablar y di algo.", fr: "La salle est silencieuse. Appuyez sur Parler et dites quelque chose.", de: "Der Raum ist still. Drücke Sprechen und sag etwas.", pt: "A sala está em silêncio. Toque em Falar e diga algo.", it: "La stanza è silenziosa. Premi Parla e di' qualcosa.", ja: "部屋は静かです。「話す」を押して声をかけてください。", zh: "房间很安静。按下说话，说点什么。", hi: "कमरा शांत है। बोलें दबाएँ और कुछ कहिए।", ar: "الغرفة هادئة. اضغط تحدّث وقل شيئًا.",
+  },
+  "ins.voice.notalk": {
+    en: "This browser has no speech recogniser, so talking into this room is not offered here — type instead, and the room still answers out loud.",
+    es: "Este navegador no tiene reconocimiento de voz, así que aquí no se ofrece hablar en la sala — escribe, y la sala igual responde en voz alta.",
+    fr: "Ce navigateur n'a pas de reconnaissance vocale, donc parler dans cette salle n'est pas proposé ici — écrivez, et la salle répond quand même à voix haute.",
+    de: "Dieser Browser hat keine Spracherkennung, deshalb wird hier kein Sprechen in den Raum angeboten — schreibe stattdessen, der Raum antwortet trotzdem laut.",
+    pt: "Este navegador não tem reconhecimento de fala, por isso falar nesta sala não é oferecido aqui — escreva, e a sala continua a responder em voz alta.",
+    it: "Questo browser non ha il riconoscimento vocale, quindi parlare in questa stanza non è offerto qui — scrivi, e la stanza risponde comunque ad alta voce.",
+    ja: "このブラウザには音声認識がないため、この部屋へ話しかける操作は出せません — 入力してください。部屋は変わらず声で答えます。",
+    zh: "此浏览器没有语音识别，所以这里不提供对房间说话 — 请改用输入，房间仍会出声回答。",
+    hi: "इस ब्राउज़र में वाक् पहचान नहीं है, इसलिए यहाँ कमरे में बोलने का विकल्प नहीं है — टाइप कीजिए, कमरा फिर भी बोलकर उत्तर देगा।",
+    ar: "هذا المتصفح لا يملك التعرّف على الكلام، لذا لا يُعرض التحدّث في هذه الغرفة هنا — اكتب بدلًا من ذلك، وستظل الغرفة تجيب بصوت مسموع.",
+  },
   "ins.ask.title": {
     en: "Ask somebody into the room", es: "Invita a alguien a la sala", fr: "Invitez quelqu'un dans la salle", de: "Jemanden in den Raum bitten", pt: "Convide alguém para a sala", it: "Invita qualcuno nella stanza", ja: "誰かを部屋に招く", zh: "邀请某人进入房间", hi: "किसी को कमरे में बुलाएँ", ar: "ادعُ أحدًا إلى الغرفة",
   },

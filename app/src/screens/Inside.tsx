@@ -184,6 +184,11 @@ export function Inside({ onPlans, start = "" }: {
   // (iOS Safari does not), the same bargain the Agent screen struck.
   const [dictating, setDictating] = useState(false);
   const dictation = useRef<{ stop: () => void } | null>(null);
+  // Talking INTO a voice room: the same recogniser, but what it hears is
+  // said in the room rather than typed into a box. The two cannot run at
+  // once — one microphone, one destination.
+  const [talking, setTalking] = useState(false);
+  const talkRec = useRef<{ stop: () => void } | null>(null);
   // Asking another synthetic profile into the room. The invite is consent-
   // shaped on the wire — host asks, the profile's owner accepts — and for a
   // profile this person owns, the console holds both tokens, so one press
@@ -194,6 +199,18 @@ export function Inside({ onPlans, start = "" }: {
   const sharePick = useRef<HTMLInputElement>(null);
 
   const open = roomId.trim();
+
+  // A voice room is a voice room. Field report, holding a `voice` room up
+  // against what it drew: "this is supposed to be audio chat only — we
+  // need to get rid of the type bar and the transparent chat text and go
+  // back to hearing the voices." The channel was chosen on the way in and
+  // then ignored: every room wore the chat furniture and hearing was an
+  // opt-in press, so the one room whose whole pitch is sound arrived
+  // silent with a keyboard in front of it.
+  //
+  //     asked     what kind of room is this
+  //     mattered  the room's own answer, or the same furniture everywhere
+  const spokenRoom = channel === "voice";
 
   function load() {
     if (!open || !token) return;
@@ -427,7 +444,64 @@ export function Inside({ onPlans, start = "" }: {
     nowSaying.current = null;
     dictation.current?.stop();
     dictation.current = null;
+    talkRec.current?.stop();
+    talkRec.current = null;
   }, [open]);
+
+  // A voice room arrives speaking. Going in is itself the press the
+  // autoplay rules want — the same gesture the 🔊 toggle was standing in
+  // for — so nothing else has to be tapped before the room is audible.
+  // The toggle stays, now as the way to SILENCE a voice room rather than
+  // the way to start it, and a chat room's remembered choice is untouched.
+  useEffect(() => {
+    if (spokenRoom) setHearAll(true);
+  }, [spokenRoom, open]);
+
+  /** Say something into the room out loud: the recogniser hears it and the
+   *  room receives it. Dictation's "the send stays a decision" bargain is
+   *  right for a room people TYPE in — here speaking IS the medium, and a
+   *  send button between a spoken sentence and the room is the keyboard
+   *  wearing a different hat. */
+  function flipTalking() {
+    if (talking) {
+      talkRec.current?.stop();
+      talkRec.current = null;
+      setTalking(false);
+      return;
+    }
+    const w = window as unknown as {
+      SpeechRecognition?: new () => SpeechRec;
+      webkitSpeechRecognition?: new () => SpeechRec;
+    };
+    const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
+    if (!SR) return;
+    // One microphone: dictation and talking cannot both hold it.
+    dictation.current?.stop();
+    dictation.current = null;
+    setDictating(false);
+    const rec = new SR();
+    rec.lang = navigator.language || "en";
+    rec.interimResults = false;
+    rec.continuous = true;
+    let seen = 0;
+    rec.onresult = (e) => {
+      const parts: string[] = [];
+      for (let i = seen; i < e.results.length; i++) {
+        parts.push(e.results[i][0].transcript);
+      }
+      seen = e.results.length;
+      const said = parts.join(" ").trim();
+      if (!said || !token) return;
+      // Straight into the room, one heard sentence at a time. `act` is
+      // deliberately not used: it flips `busy`, which would disable the
+      // talk button under a person mid-conversation.
+      api.sayInRoom(open, me, said, token).then(load).catch(setError);
+    };
+    rec.onend = () => { talkRec.current = null; setTalking(false); };
+    rec.start();
+    talkRec.current = { stop: () => rec.stop() };
+    setTalking(true);
+  }
 
   function flipDictation() {
     if (dictating) {
@@ -537,6 +611,53 @@ export function Inside({ onPlans, start = "" }: {
                 aria-label={tr("ins.sayit", lang)}
                 onClick={() => void sendDraft()}>➤</button>
       </div>
+    </div>
+  );
+
+  // What a voice room wears instead: no lines of text riding the scene,
+  // no Type… pill — one control that listens, and a line saying whether
+  // anybody is speaking. The transcript still exists (a room keeps its
+  // record, and a person who cannot hear needs to read it); it lives in
+  // the card below, where the reading is deliberate rather than pasted
+  // over a room somebody came here to listen to.
+  const voiceBar = (
+    <div className="rs-voicebar">
+      <div className="rs-voicenow">
+        {voicing
+          ? fill(tr("ins.voice.speaking", lang),
+                 { who: seats.find((s) => isTalking(s))?.display
+                        || tr("ins.voice.someone", lang) })
+          : talking ? tr("ins.voice.hearing", lang)
+                    : tr("ins.voice.quiet", lang)}
+      </div>
+      {canDictate ? (
+        <button className={"rs-talk" + (talking ? " live" : "")}
+                aria-pressed={talking}
+                aria-label={talking ? tr("ins.voice.stop", lang)
+                                    : tr("ins.voice.talk", lang)}
+                onClick={flipTalking}>
+          🎙 {talking ? tr("ins.voice.stop", lang)
+                      : tr("ins.voice.talk", lang)}
+        </button>
+      ) : (
+        // No recogniser here (iOS Safari ships none). A voice room with no
+        // way in is a locked door: the typed pill comes back, and the line
+        // says why it is the one being offered.
+        <>
+          <p className="rs-voicenote">{tr("ins.voice.notalk", lang)}</p>
+          <div className="rs-chatpill">
+            <input value={draft} placeholder={tr("ins.type.ph", lang)}
+                   onChange={(e) => setDraft(e.target.value)}
+                   onKeyDown={(e) => {
+                     if (e.key === "Enter") void sendDraft();
+                   }} />
+            <button className="rs-chatbtn"
+                    disabled={busy || !token || !draft.trim()}
+                    aria-label={tr("ins.sayit", lang)}
+                    onClick={() => void sendDraft()}>➤</button>
+          </div>
+        </>
+      )}
     </div>
   );
 
@@ -796,8 +917,10 @@ export function Inside({ onPlans, start = "" }: {
             {/* The conversation, worn on the room itself — the gallery's
                 design (screens 96–98, 105) the flat card below never
                 delivered until a field report held the mockups up next
-                to the live screen. */}
-            {chatStrip}
+                to the live screen. A voice room wears the talk control
+                in its place: text pasted over a room somebody came here
+                to LISTEN to is the wrong furniture, not less of it. */}
+            {spokenRoom ? voiceBar : chatStrip}
           </div>
           {scene && <p className="muted small">{scene.note}</p>}
           {/* The way into the stage, offered only in the rooms whose whole
@@ -896,9 +1019,9 @@ export function Inside({ onPlans, start = "" }: {
             })
           )}
           {/* The conversation rides the stage, so stepping in is not
-              stepping out of it — the same transparent strip the flat
-              scene wears, typing included. */}
-          {chatStrip}
+              stepping out of it — the same strip the flat scene wears,
+              which for a voice room is the talk control. */}
+          {spokenRoom ? voiceBar : chatStrip}
           <p className="stage-note">
             {channel === "ar" ? tr("ins.stage.arnote", lang)
                               : tr("ins.stage.vrnote", lang)}
@@ -983,6 +1106,14 @@ export function Inside({ onPlans, start = "" }: {
                       onClick={() => sharePick.current?.click()}>
                 📎
               </button>
+              {/* A voice room keeps its record and loses its keyboard: the
+                  typed box, the dictation mic that fills it and the send
+                  all belong to a room people write in. Sharing a picture
+                  and letting the profiles talk are not typing, so they
+                  stay. The way in is the talk control on the room itself.
+                  Where the browser ships no recogniser, `voiceBar` puts a
+                  typed pill back with a line saying why. */}
+              {!spokenRoom && (
               <input value={draft} onChange={(e) => setDraft(e.target.value)}
                      placeholder={tr("ins.say.ph", lang)} style={{ flex: 1 }}
                      onKeyDown={(e) => {
@@ -994,11 +1125,12 @@ export function Inside({ onPlans, start = "" }: {
                          })();
                        }
                      }} />
+              )}
               {/* Dictation: speech types into the box. The send below stays
                   a decision — a room has other people in it. Absent where
                   the browser ships no recogniser, not disabled: a dead
                   control is a broken promise drawn as a button. */}
-              {canDictate && (
+              {canDictate && !spokenRoom && (
                 <button className={"chip" + (dictating ? " primary" : "")}
                         disabled={busy}
                         aria-pressed={dictating}
@@ -1011,6 +1143,7 @@ export function Inside({ onPlans, start = "" }: {
               {/* A send is a small thing now — "the button could be a lot
                   smaller if it's only gonna be a send" — and Enter sends
                   too. The name survives in the label for a screen reader. */}
+              {!spokenRoom && (
               <button className="chip"
                       disabled={busy || !token || !draft.trim()}
                       aria-label={tr("ins.sayit", lang)}
@@ -1022,6 +1155,7 @@ export function Inside({ onPlans, start = "" }: {
                       })}>
                 ➤
               </button>
+              )}
               <button disabled={busy || !token}
                       onClick={act(async () => {
                         await api.advanceRoom(open, token);
