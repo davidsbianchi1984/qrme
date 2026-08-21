@@ -48,7 +48,11 @@ def test_one_voice_at_a_time():
 
 
 def test_a_withheld_autoplay_ends_quietly():
-    assert re.search(r"sound\.play\(\)\.catch\(", INSIDE), (
+    # The play call moved into the shared piece-by-piece helper
+    # (app/src/spoken.ts) when replies stopped being one utterance; the
+    # property protected here rides with it.
+    spoken = (REPO / "app/src/spoken.ts").read_text(encoding="utf-8")
+    assert re.search(r"sound\.play\(\)\.catch\(", spoken), (
         "a rejected play crashes the queue — the browser is allowed to "
         "say no, and the per-turn button is the answer when it does")
 

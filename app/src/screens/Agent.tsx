@@ -3,6 +3,7 @@ import { api, type AgentTurn, type WebSearchAnswer,
          uploadMedia } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
+import { speakInPieces, type Speaking } from "../spoken";
 import { useSession } from "../store";
 
 /**
@@ -209,9 +210,11 @@ export function Agent({ onPlans, go }: {
   // The reply being spoken, for the orb's label: an orb that says
   // "listening" while the agent talks is the orb lying twice a turn.
   const [saying, setSaying] = useState(false);
-  // The bound-voice audio mid-play, so closing the orb can stop it — the
-  // same live-handle bargain the recogniser ref makes.
-  const playing = useRef<HTMLAudioElement | null>(null);
+  // The bound-voice reply mid-play, so closing the orb can stop it — the
+  // same live-handle bargain the recogniser ref makes. A Speaking handle
+  // rather than one audio element, because the reply is spoken piece by
+  // piece and pausing only the playing piece would let the next one start.
+  const playing = useRef<Speaking | null>(null);
   const [did, setDid] = useState<AgentTurn | null>(null);
   const [error, setError] = useState<unknown>(null);
   // What it stopped to ask about. Held here rather than inside `did`, because
@@ -233,7 +236,7 @@ export function Agent({ onPlans, go }: {
     recogniser.current?.stop();
     recogniser.current = null;
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-    playing.current?.pause();
+    playing.current?.stop();
     playing.current = null;
     setSaying(false);
     setVoiceMode(false);
@@ -256,16 +259,14 @@ export function Agent({ onPlans, go }: {
     };
     if (session.profileId && session.ownerToken) {
       try {
-        const blob = await api.sayInProfileVoice(
+        // Piece by piece: the first sentence plays while the rest is
+        // still being synthesised, so the wait before the orb answers no
+        // longer grows with the length of the answer. `stop()` (the orb
+        // being closed mid-sentence) resolves `done` like playing out.
+        const s = await speakInPieces(
           session.profileId, reply, session.ownerToken);
-        const audio = new Audio(URL.createObjectURL(blob));
-        playing.current = audio;
-        // `pause` is the orb being closed mid-sentence; all three are the
-        // speaking being over.
-        audio.addEventListener("ended", done, { once: true });
-        audio.addEventListener("pause", done, { once: true });
-        audio.addEventListener("error", done, { once: true });
-        await audio.play();
+        playing.current = s;
+        void s.done.then(done);
         return;
       } catch { /* the device's own voice stands in */ }
     }

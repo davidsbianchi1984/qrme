@@ -743,9 +743,25 @@ cd /srv/qrme && docker compose -f docker/beta-compose.yml --env-file .env up -d 
 ### 8d. Prove it end to end
 
 The daemon holding a model was proved in 8b; this proves the products
-reach it. Ask the vault something from its console (pdisystems.net → ask)
-— the answer's provenance reads `local:llama3.2:1b` instead of `stub`.
-On QRME, the model picker's offline row stops saying nothing listens.
+reach it. The vault now answers this question itself — one authenticated
+read of its posture:
+
+```
+curl -s -H "Authorization: Bearer $PDI_TOKEN" https://pdisystems.net/resident | python3 -c "import sys,json; print(json.load(sys.stdin)['local_model_standing'])"
+```
+
+`{'reachable': True, ..., 'pulled': True, 'note': None}` is the whole
+proof: the daemon answered from inside the stack's network, and the
+configured model is actually pulled. Anything else, the `note` names the
+fix — `ollama pull …` when the daemon answers but the model is missing,
+or the container/network to check when it does not answer at all. (An
+ask against a dead daemon no longer raises a socket error either — it
+answers a sentence under model `local-unreachable`.)
+
+Then prove it as a person would: ask the vault something from its
+console (pdisystems.net → ask) — the answer's provenance reads
+`local:llama3.2:1b` instead of `stub`. On QRME, the model picker's
+offline row stops saying nothing listens.
 
 And prove the box survived it — the measurement from 8a, taken again
 under load:

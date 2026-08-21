@@ -4,6 +4,7 @@ import { api, getBase, type Avatar, type Briefing, type DialerPosture,
          type Escalated, type MyPerson } from "../api";
 import { Briefcase } from "../Briefcase";
 import { Refusal } from "../Refusal";
+import { speakInPieces } from "../spoken";
 import { SkinPicker } from "../SkinPicker";
 import { TalkRail } from "../TalkRail";
 import { Waveform } from "../Waveform";
@@ -144,15 +145,12 @@ export function Chat({ onPlans }: {
     const token = session.ownerToken || session.interactorToken;
     if (session.profileId && token) {
       try {
-        const blob = await api.sayInProfileVoice(
-          session.profileId, text, token);
-        const audio = new Audio(URL.createObjectURL(blob));
+        // Piece by piece: the first sentence plays while the rest is
+        // still being synthesised — the talking face lights when the
+        // first word is heard, not when the whole reply is rendered.
+        const s = await speakInPieces(session.profileId, text, token);
         setVoicing(true);
-        audio.addEventListener("ended", () => setVoicing(false),
-                               { once: true });
-        audio.addEventListener("error", () => setVoicing(false),
-                               { once: true });
-        await audio.play();
+        void s.done.then(() => setVoicing(false));
         return;
       } catch { setVoicing(false); /* the device's voice stands in */ }
     }

@@ -8,6 +8,25 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The answer begins before it ends.** Field report, and the twin
+  product's the same week: "still a long delay while waiting for a
+  response." The synthesis leg of that wait was being paid in full —
+  the whole reply became one utterance before a word of it played.
+  Every screen that speaks a profile's bound voice (the Agent orb, the
+  chat's talk overlay, the room's ear and its per-turn 🔊) now speaks
+  piece by piece: the first sentence is synthesised alone — small, so
+  it comes back fast — and every later piece is fetched while the one
+  before it plays. A side effect that is really the point: each piece
+  is far below any engine's synthesis ceiling, so a long reply no
+  longer falls out of the bound voice into the browser's robot just
+  for being long. Closing the orb still stops the whole reply, and a
+  withheld autoplay still ends quietly. §8d of the deploy runbook now
+  proves the local model with the vault's own `local_model_standing`
+  posture read instead of leaving the proof to a conversation.
+
+      asked     when does the answer start being heard
+      mattered  does the wait grow with the length of the answer
+
 - **The room speaks for itself, and listens.** Field report over the
   room screen: the hear-it-in-their-voice press was liked, and sent
   back anyway — the room should be hearable without pressing, the

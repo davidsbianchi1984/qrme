@@ -3,6 +3,7 @@ import { api, getBase, type Avatar, type MicsHere, type RoomFaces,
          type RoomMsg } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
+import { speakInPieces } from "../spoken";
 import { useSession } from "../store";
 
 /**
@@ -358,17 +359,12 @@ export function Inside({ onPlans, start = "" }: {
     void (async () => {
       try {
         for (const m of fresh) {
-          const blob = await api.sayInProfileVoice(
+          // Piece by piece: a long turn starts being heard at its first
+          // sentence. A rejected play (autoplay withheld after all) ends
+          // quietly — the per-turn 🔊 is still on every line.
+          const s = await speakInPieces(
             m.sender_id as string, m.content || "", token);
-          const src = URL.createObjectURL(blob);
-          await new Promise<void>((done) => {
-            const sound = new Audio(src);
-            sound.onended = () => { URL.revokeObjectURL(src); done(); };
-            sound.onerror = () => { URL.revokeObjectURL(src); done(); };
-            // A rejected play (autoplay withheld after all) ends quietly —
-            // the per-turn 🔊 is still on every line.
-            sound.play().catch(() => done());
-          });
+          await s.done;
         }
       } catch { /* a voice that cannot be fetched leaves the text standing */ }
       speaking.current = false;
@@ -886,15 +882,9 @@ export function Inside({ onPlans, start = "" }: {
                   <button className="chip" disabled={busy}
                           aria-label={tr("ins.hear", lang)}
                           onClick={() => {
-                            api.sayInProfileVoice(m.sender_id as string,
-                                                  m.content || "", token)
-                              .then((blob) => {
-                                const src = URL.createObjectURL(blob);
-                                const sound = new Audio(src);
-                                sound.onended = () =>
-                                  URL.revokeObjectURL(src);
-                                void sound.play();
-                              })
+                            speakInPieces(m.sender_id as string,
+                                          m.content || "", token)
+                              .then((s) => s.done)
                               .catch(setError);
                           }}>
                     🔊
