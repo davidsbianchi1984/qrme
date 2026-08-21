@@ -236,10 +236,26 @@ def test_the_screen_exists_and_calls_all_six():
 
 
 def test_the_screen_sends_the_interactor_token_not_the_owners():
-    """A room turn is spoken by a person, and the screen holds both tokens."""
+    """A room turn is spoken by a person, and the screen holds both tokens.
+
+    One exception since the ask-into-the-room card, and it is this rule's
+    own shape seen from the other side: accepting a room invite for a
+    profile you own is the *owner's* act — the server requires that token
+    exactly so a host cannot say yes for a guest. So the pin narrows to
+    what it always meant: the owner token reaches the accept door and no
+    other. Speaking, reading, advancing and the microphones stay on the
+    interactor token alone.
+    """
     src = _markup("app/src/screens/Inside.tsx")
     assert "session.interactorToken" in src
-    assert "ownerToken" not in src
+    lines = [ln for ln in src.splitlines() if "ownerToken" in ln]
+    assert lines, ("the accept door lost its owner token — an invited "
+                   "profile of your own can no longer be seated")
+    for ln in lines:
+        assert ("acceptRoomInvite" in ln
+                or "if (session.ownerToken" in ln), (
+            "the owner token reaches something other than the accept "
+            f"door:\n    {ln.strip()}")
 
 
 def test_the_screen_says_the_microphone_is_seen_by_everyone():

@@ -8215,6 +8215,36 @@ const CHROME: Table = {
   "ins.dictate": {
     en: "speak into the box", es: "habla al cuadro", fr: "parlez dans la zone", de: "ins Feld sprechen", pt: "fale para a caixa", it: "parla nella casella", ja: "ボックスに話す", zh: "对着输入框说话", hi: "बॉक्स में बोलें", ar: "تحدّث في الحقل",
   },
+  "ins.ask.title": {
+    en: "Ask somebody into the room", es: "Invita a alguien a la sala", fr: "Invitez quelqu'un dans la salle", de: "Jemanden in den Raum bitten", pt: "Convide alguém para a sala", it: "Invita qualcuno nella stanza", ja: "誰かを部屋に招く", zh: "邀请某人进入房间", hi: "किसी को कमरे में बुलाएँ", ar: "ادعُ أحدًا إلى الغرفة",
+  },
+  "ins.ask.pitch": {
+    en: "A synthetic profile you own is seated at once. Anybody else's gets an invite its owner decides on — a host cannot say yes for a guest.",
+    es: "Un perfil sintético tuyo se sienta al instante. El de otra persona recibe una invitación que decide su dueño — un anfitrión no puede decir sí por un invitado.",
+    fr: "Un profil synthétique à vous prend place aussitôt. Celui d'autrui reçoit une invitation que son propriétaire tranche — un hôte ne peut pas dire oui pour un invité.",
+    de: "Ein eigenes synthetisches Profil nimmt sofort Platz. Das von jemand anderem bekommt eine Einladung, über die sein Besitzer entscheidet — ein Gastgeber kann nicht für den Gast Ja sagen.",
+    pt: "Um perfil sintético seu senta-se de imediato. O de outra pessoa recebe um convite que o dono decide — um anfitrião não pode dizer sim por um convidado.",
+    it: "Un profilo sintetico tuo si siede subito. Quello di qualcun altro riceve un invito che decide il suo proprietario — un ospite non può dire sì per un invitato.",
+    ja: "自分のシンセティックプロフィールはすぐ着席します。他人のものには招待が届き、決めるのはその持ち主です — ホストがゲストの代わりに承諾はできません。",
+    zh: "你自己的合成档案会立即入座。别人的会收到邀请，由其所有者决定 — 主人不能替客人答应。",
+    hi: "आपका अपना सिंथेटिक प्रोफ़ाइल तुरंत बैठ जाता है। किसी और के प्रोफ़ाइल को निमंत्रण मिलता है जिस पर उसका मालिक फ़ैसला करता है — मेज़बान मेहमान की ओर से हाँ नहीं कह सकता।",
+    ar: "ملفك الاصطناعي يجلس فورًا. ملف شخص آخر يتلقى دعوة يقررها مالكه — لا يمكن للمضيف أن يقول نعم نيابةً عن الضيف.",
+  },
+  "ins.ask.ph": {
+    en: "profile id", es: "id del perfil", fr: "id du profil", de: "Profil-ID", pt: "id do perfil", it: "id del profilo", ja: "プロフィールID", zh: "档案 ID", hi: "प्रोफ़ाइल आईडी", ar: "معرّف الملف",
+  },
+  "ins.ask.go": {
+    en: "Ask them in", es: "Invítalo", fr: "Faites-les entrer", de: "Hereinbitten", pt: "Convidar", it: "Falli entrare", ja: "招き入れる", zh: "请进来", hi: "अंदर बुलाएँ", ar: "أدخِلهم",
+  },
+  "ins.ask.seated": {
+    en: "Seated — they are in the room.", es: "Sentado — ya está en la sala.", fr: "Installé — il est dans la salle.", de: "Platziert — es ist im Raum.", pt: "Sentado — já está na sala.", it: "Seduto — è nella stanza.", ja: "着席しました — 部屋にいます。", zh: "已入座 — 已在房间里。", hi: "बैठ गया — अब कमरे में है।", ar: "جلس — إنه في الغرفة الآن.",
+  },
+  "ins.type.ph": {
+    en: "Type…", es: "Escribe…", fr: "Écrivez…", de: "Tippen…", pt: "Escreva…", it: "Scrivi…", ja: "入力…", zh: "输入…", hi: "लिखें…", ar: "اكتب…",
+  },
+  "ins.ask.sent": {
+    en: "Invited — their owner will find it in the inbox and decide.", es: "Invitado — su dueño lo verá en la bandeja y decidirá.", fr: "Invité — son propriétaire le trouvera dans sa boîte et décidera.", de: "Eingeladen — der Besitzer findet es im Posteingang und entscheidet.", pt: "Convidado — o dono vai vê-lo na caixa de entrada e decidir.", it: "Invitato — il proprietario lo troverà nella posta e deciderà.", ja: "招待しました — 持ち主が受信箱で確認して決めます。", zh: "已邀请 — 其所有者会在收件箱中看到并决定。", hi: "आमंत्रित — इसका मालिक इनबॉक्स में देखकर फ़ैसला करेगा।", ar: "تمت الدعوة — سيجدها المالك في البريد ويقرر.",
+  },
   "voice.spoken.title": {
     en: "Spoken voice", es: "Voz hablada", fr: "Voix parlée", de: "Sprechstimme", pt: "Voz falada", it: "Voce parlata", ja: "話す声", zh: "语音音色", hi: "बोलने की आवाज़", ar: "الصوت المنطوق",
   },

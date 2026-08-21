@@ -27,6 +27,39 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
       mattered  a conversation surface that only reads and types is
                 a transcript with a delay
 
+- **The room knows who is talking, and who else is here.** Three
+  findings off one screenshot session. The gallery's transparent
+  chat (screens 96–98, 105) finally rides the live screen: the last
+  few turns as translucent lines over the scene and the immersive
+  stage, with the Type… pill under them — the flat card below keeps
+  the full transcript. The talking light keys on sender identity
+  now, never on display name — a person in a room with their own
+  synthetic twin shares a name with it, and the twin's square lit
+  while the person spoke. And a room stops being fixed at creation:
+  an *Ask somebody into the room* card seats a profile you own in
+  one press (invite and acceptance are both yours to give) and sends
+  anybody else's profile a real invite its owner decides on. Behind
+  it, every profile's turn is generated against a **labelled**
+  transcript with the cast named — who is a person, who is another
+  synthetic profile, and which of them said what — so two profiles
+  and a person in one room each know who they are talking to.
+
+      asked     with three speakers, does anybody know who said what
+      mattered  a group conversation where every voice arrives
+                anonymous is three monologues interleaved
+
+### Changed
+
+- **The reply ceiling comes down to two and a half rooms.**
+  `MAX_REPLY_TOKENS` went 10× → 5× last release and the same
+  reviewer sent five back too: a spoken conversation waits for the
+  whole reply before it says a word. 2.5× the original room now,
+  safe because hitting the wall is said out loud by the truncation
+  notice rather than read as a model losing the thread.
+
+      asked     how long is a turn allowed to be
+      mattered  how long a person waits before hearing it begin
+
 - **§8: the vault's real voice — a local model on the box.** The
   deploy page's long-promised opt-in, written as a decision table so
   the box picks the model: measure `free -h`, take the row you can

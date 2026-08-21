@@ -173,6 +173,11 @@ export function Inside({ onPlans, start = "" }: {
   // (iOS Safari does not), the same bargain the Agent screen struck.
   const [dictating, setDictating] = useState(false);
   const dictation = useRef<{ stop: () => void } | null>(null);
+  // Asking another synthetic profile into the room. The invite is consent-
+  // shaped on the wire — host asks, the profile's owner accepts — and for a
+  // profile this person owns, the console holds both tokens, so one press
+  // does the whole round trip and the guest is simply seated.
+  const [guestId, setGuestId] = useState("");
 
   const open = roomId.trim();
 
@@ -302,10 +307,18 @@ export function Inside({ onPlans, start = "" }: {
     </span>;
   };
 
-  // Whose square is lit: the last voice in the transcript. `from` carries
-  // the display name each seat also carries.
-  const talking = transcript.length > 0
-    ? transcript[transcript.length - 1].from : null;
+  // Whose square is lit: the last voice in the transcript — matched by
+  // WHO, never by name. It used to compare display names, and a field
+  // report caught the failure that invites: a person in a room with their
+  // own synthetic twin shares a name with it, so the profile's square lit
+  // while the person spoke. sender_kind + sender_id is an identity;
+  // "David Bianchi" is two participants.
+  const lastSaid = transcript.length > 0
+    ? transcript[transcript.length - 1] : null;
+  const isTalking = (s: { kind: string; id: string }) =>
+    lastSaid !== null
+    && (lastSaid.sender_kind === "user") === (s.kind === "user")
+    && lastSaid.sender_id === s.id;
 
   const act = (fn: () => Promise<unknown>, said?: string) => async () => {
     setError(null); setNote(null); setBusy(true);
@@ -401,6 +414,67 @@ export function Inside({ onPlans, start = "" }: {
       || (window as unknown as { webkitSpeechRecognition?: unknown })
         .webkitSpeechRecognition);
 
+  async function sendDraft() {
+    if (!draft.trim() || !token || busy) return;
+    const text = draft;
+    setDraft("");
+    await act(async () => { await api.sayInRoom(open, me, text, token); })();
+  }
+
+  // The transparent chat, exactly as the gallery drew it (screens 96–98,
+  // 105): the last few turns as translucent lines riding the scene, and
+  // the Type… pill under them — so the conversation with the profiles and
+  // the people here runs ON the room, not in a card below it. The full
+  // transcript, the hear-the-room toggle and the per-turn voices keep
+  // their card; this is the same conversation worn differently.
+  const chatStrip = (
+    <div className="rs-chatstrip">
+      {transcript.slice(-3).map((m) => (
+        <p key={m.id} className="rs-chatline">
+          <strong>{m.from}</strong> {m.content}
+        </p>
+      ))}
+      <div className="rs-chatpill">
+        {canDictate && (
+          <button className="rs-chatbtn" disabled={busy}
+                  aria-pressed={dictating}
+                  aria-label={tr("ins.dictate", lang)}
+                  onClick={flipDictation}>🎤</button>
+        )}
+        <input value={draft} placeholder={tr("ins.type.ph", lang)}
+               onChange={(e) => setDraft(e.target.value)}
+               onKeyDown={(e) => { if (e.key === "Enter") void sendDraft(); }} />
+        <button className="rs-chatbtn" disabled={busy || !token || !draft.trim()}
+                aria-label={tr("ins.sayit", lang)}
+                onClick={() => void sendDraft()}>➤</button>
+      </div>
+    </div>
+  );
+
+  async function askIn() {
+    const guest = guestId.trim();
+    if (!guest || !token) return;
+    setError(null); setNote(null); setBusy(true);
+    try {
+      await api.inviteToRoom(open, guest, token);
+      // The invite stands either way. The acceptance is the guest's own
+      // owner token saying yes — held here exactly when the guest is this
+      // person's profile. Anybody else's profile keeps its owner's choice:
+      // the refusal below downgrades the note, never the invite.
+      if (session.ownerToken) {
+        try {
+          await api.acceptRoomInvite(open, guest, session.ownerToken);
+          setNote(tr("ins.ask.seated", lang));
+          setGuestId("");
+          load();
+          return;
+        } catch { /* not this person's profile — the invite is the news */ }
+      }
+      setNote(tr("ins.ask.sent", lang));
+      setGuestId("");
+    } catch (e) { setError(e); } finally { setBusy(false); }
+  }
+
   const lentByMe = mics?.microphones_lent.some((m) => m.interactor_id === me);
 
   return (
@@ -451,7 +525,7 @@ export function Inside({ onPlans, start = "" }: {
               const faceLive = camLive || picLive;
               return (
               <div key={s.id}
-                   className={"rs-tile" + (talking === s.display ? " talking" : "")
+                   className={"rs-tile" + (isTalking(s) ? " talking" : "")
                               + (camLive || picShown ? " rs-camtile" : "")}
                    onDoubleClick={faceLive
                      ? () => setReveal((v) => !v) : undefined}
@@ -630,6 +704,11 @@ export function Inside({ onPlans, start = "" }: {
               </div>
               );
             })}
+            {/* The conversation, worn on the room itself — the gallery's
+                design (screens 96–98, 105) the flat card below never
+                delivered until a field report held the mockups up next
+                to the live screen. */}
+            {chatStrip}
           </div>
           {scene && <p className="muted small">{scene.note}</p>}
           {/* The way into the stage, offered only in the rooms whose whole
@@ -688,7 +767,7 @@ export function Inside({ onPlans, start = "" }: {
                        style={{ transform:
                          `rotateY(${a + yaw}deg) translateZ(-280px)` }}>
                     <div className={"stage-seat"
-                                    + (talking === s.display ? " talking" : "")}
+                                    + (isTalking(s) ? " talking" : "")}
                          style={{ transform: `rotateY(${-(a + yaw)}deg)` }}>
                       {stageFace(s)}
                       <span className="rs-name">{s.display}</span>
@@ -714,7 +793,7 @@ export function Inside({ onPlans, start = "" }: {
               return (
                 <div key={s.id}
                      className={"stage-seat ar"
-                                + (talking === s.display ? " talking" : "")}
+                                + (isTalking(s) ? " talking" : "")}
                      style={{ left: `${left}%`, top: `${top}%` }}>
                   {stageFace(s)}
                   <span className="rs-name">{s.display}</span>
@@ -727,14 +806,10 @@ export function Inside({ onPlans, start = "" }: {
               );
             })
           )}
-          {/* The last thing said rides the stage, so stepping in is not
-              stepping out of the conversation. */}
-          {transcript.length > 0 && (
-            <p className="stage-line">
-              <strong>{transcript[transcript.length - 1].from}</strong>
-              {": "}{transcript[transcript.length - 1].content}
-            </p>
-          )}
+          {/* The conversation rides the stage, so stepping in is not
+              stepping out of it — the same transparent strip the flat
+              scene wears, typing included. */}
+          {chatStrip}
           <p className="stage-note">
             {channel === "ar" ? tr("ins.stage.arnote", lang)
                               : tr("ins.stage.vrnote", lang)}
@@ -874,6 +949,20 @@ export function Inside({ onPlans, start = "" }: {
               )}
             </div>
             <p className="muted small">{tr("ins.micpitch", lang)}</p>
+          </div>
+
+          <div className="card">
+            <h3>{tr("ins.ask.title", lang)}</h3>
+            <p className="muted small">{tr("ins.ask.pitch", lang)}</p>
+            <div className="row">
+              <input value={guestId} style={{ flex: 1 }}
+                     placeholder={tr("ins.ask.ph", lang)}
+                     onChange={(e) => setGuestId(e.target.value)} />
+              <button disabled={busy || !token || !guestId.trim()}
+                      onClick={() => void askIn()}>
+                {tr("ins.ask.go", lang)}
+              </button>
+            </div>
           </div>
         </>
       )}

@@ -183,11 +183,19 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
             " WHERE room_id=? AND status='approved'"
             " ORDER BY created_at DESC, rowid DESC LIMIT 12",
             (room["id"],)).fetchall()
+        # Every turn that is not this profile's own arrives labelled with
+        # its speaker. A field report asked for the reason: with a person
+        # and two profiles in one room, unlabelled history collapses into
+        # one anonymous interlocutor, and a profile that cannot tell the
+        # other agent from the person cannot know who it is talking to,
+        # let alone keep up.
         turns = [
-            {"role": ("assistant" if (r["sender_kind"] == "profile"
-                                      and r["sender_id"] == profile["id"])
-                      else "user"),
-             "content": r["content"]}
+            ({"role": "assistant", "content": r["content"]}
+             if (r["sender_kind"] == "profile"
+                 and r["sender_id"] == profile["id"])
+             else {"role": "user",
+                   "content": (f"{_display(r['sender_kind'], r['sender_id'])}"
+                               f": {r['content']}")})
             for r in reversed(history)
         ] or [{"role": "user", "content": f"Let's talk about {room['topic']}."}]
         system = persona.build_system_prompt(
@@ -195,6 +203,22 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
         system += (f"\n\nYou are in a group {room['channel']} room about: "
                    f"{room['topic']} ({_CHANNEL_NOTES[room['channel']]}). "
                    "Reply with one short, in-character turn.")
+        # The cast, said outright: who else is here and what kind of
+        # speaker each one is, so the labels in the transcript resolve to
+        # somebody rather than to a name floating free.
+        others = ", ".join(
+            f"{_display(p['kind'], p['ref_id'])}"
+            + (" (a person)" if p["kind"] == "user"
+               else " (another synthetic profile)")
+            for p in participants
+            if not (p["kind"] == "profile" and p["ref_id"] == profile["id"]))
+        if others:
+            system += (
+                f"\n\nIn the room with you: {others}. Lines in the "
+                "conversation are labelled with their speaker's name; your "
+                "own earlier turns are unlabelled. Follow who said what, "
+                "answer the person or profile you mean — by name when it "
+                "helps — and never speak for anybody but yourself.")
         # A lent wearable is the only reason a profile in a voice room can
         # hear anybody, so it is stated rather than assumed — and stated with
         # its limits, because the temptation is to behave as though the whole

@@ -82,3 +82,51 @@ def test_the_send_keeps_its_name():
     assert m, (
         "the compact send lost its accessible name — smaller may not "
         "mean anonymous")
+
+
+# -- the gallery's transparent chat, delivered ------------------------------
+
+def test_the_conversation_rides_the_scene_and_the_stage():
+    """The gallery drew the chat ON the room (screens 96-98, 105) and the
+    live screen parked it in a card below — a field report held the two
+    side by side. The strip is one element worn in both places."""
+    assert INSIDE.count("{chatStrip}") == 2, (
+        "the transparent chat strip is not worn by both the flat scene "
+        "and the immersive stage")
+    assert "rs-chatstrip" in INSIDE
+    assert 'tr("ins.type.ph", lang)' in INSIDE
+
+
+def test_the_light_follows_the_speaker_not_the_name():
+    """A person in a room with their own synthetic twin shares a display
+    name with it, so the profile's square lit while the person spoke.
+    The light keys on sender identity now, and never on the name."""
+    assert "talking === s.display" not in INSIDE, (
+        "a seat is lit by display-name match again — two participants "
+        "can share a name, and one of them is a person")
+    assert INSIDE.count("isTalking(s)") >= 3
+    assert "lastSaid.sender_id === s.id" in INSIDE
+
+
+def test_a_profile_is_told_who_said_what():
+    """With a person and two profiles in one room, unlabelled history
+    collapses into one anonymous interlocutor. Every turn that is not the
+    profile's own arrives labelled with its speaker, and the cast is
+    named in the system prompt — kinds included."""
+    community = (REPO / "qrme/routers/community.py").read_text(
+        encoding="utf-8")
+    turns = community[community.index("def _profile_turns"):]
+    turns = turns[:turns.index("\n@router")]
+    assert re.search(
+        r"_display\(r\['sender_kind'\], r\['sender_id'\]\)", turns), (
+        "the history handed to a profile is unlabelled again — in a "
+        "three-party room it cannot know who it is talking to")
+    assert "another synthetic profile" in turns
+    assert "never speak for anybody but yourself" in turns
+
+
+def test_somebody_can_be_asked_in_from_the_room():
+    assert "api.inviteToRoom(" in INSIDE
+    assert "api.acceptRoomInvite(" in INSIDE, (
+        "an owned profile cannot be seated from the room screen — the "
+        "invite would be fire-and-forget even for your own profile")

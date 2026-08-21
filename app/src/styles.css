@@ -1176,3 +1176,28 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .dev-row { display: flex; align-items: center; gap: 10px;
   padding: 10px 12px; }
 .dev-list p { margin: 0; padding: 0 12px 10px; }
+
+/* The transparent chat the gallery drew on screens 96-98 and 105: the
+   conversation rides the scene and the stage, translucent over whatever
+   the room is showing, with the Type… pill under the last few lines. */
+.room-scene { position: relative; padding-bottom: 56px; }
+.rs-chatstrip { position: absolute; left: 8px; right: 8px; bottom: 6px;
+  display: flex; flex-direction: column; gap: 4px; z-index: 5;
+  pointer-events: none; }
+.rs-chatline { margin: 0; max-width: 78%; padding: 3px 10px;
+  border-radius: 12px; font-size: 12px; line-height: 1.35; color: #fff;
+  background: rgba(10, 12, 32, 0.55); backdrop-filter: blur(6px);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rs-chatline strong { opacity: 0.85; margin-right: 4px; }
+.rs-chatpill { display: flex; align-items: center; gap: 6px;
+  padding: 4px 8px; border-radius: 999px; pointer-events: auto;
+  background: rgba(10, 12, 32, 0.55); backdrop-filter: blur(6px); }
+.rs-chatpill input { flex: 1; min-width: 0; border: none; outline: none;
+  background: transparent; color: #fff; font-size: 13px; }
+.rs-chatpill input::placeholder { color: rgba(255, 255, 255, 0.55); }
+.rs-chatbtn { border: none; background: rgba(255, 255, 255, 0.12);
+  color: #fff; border-radius: 50%; width: 26px; height: 26px;
+  line-height: 1; cursor: pointer; flex: none; }
+.rs-chatbtn:disabled { opacity: 0.4; cursor: default; }
+/* On the stage the strip sits above the leave button's row. */
+.room-stage .rs-chatstrip { left: 12px; right: 12px; bottom: 64px; }

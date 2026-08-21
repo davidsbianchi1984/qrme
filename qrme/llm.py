@@ -55,14 +55,19 @@ _REQUEST_KEY: ContextVar[str | None] = ContextVar("qrme_llm_request_key",
 # — it went to ten for a while, and the field called it back down: a spoken
 # conversation waits for the whole reply before it says a word, and ten
 # times the room was minutes of orb where a talk turn wants seconds. Five
-# held both ends when it was first tried; it holds them again.
+# held for a release, and the same reviewer sent it back once more —
+# "still a long delay while waiting for a response — drop it to 2.5" —
+# so two and a half rooms is the ceiling now. The floor under this
+# staircase is the truncation notice below: shrinking the wall is safe
+# exactly because hitting it is said out loud rather than read as a
+# model losing the thread.
 #
 # A bigger wall is still a wall, so the second half matters more than the
 # first: when the model stops because it ran out of room rather than because it
 # finished, the reply says so. Silence at the cut is the failure — a person
 # reading a sentence that ends in the middle has no way to tell a truncation
 # from a model that lost the thread, and the two call for opposite responses.
-MAX_REPLY_TOKENS = 5120
+MAX_REPLY_TOKENS = 2560
 
 #: Appended when, and only when, the room ran out. The platform speaking, not
 #: the persona — so it is registered in `i18n._PUBLIC` and travels through
