@@ -8,6 +8,31 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The room keeps itself current.** The transcript refreshed only on
+  mount or after the viewer's own action — another person's turn, a
+  profile's reply to somebody else, a shared picture: none of it
+  arrived until you did something. The room now polls its transcript
+  every four seconds while open, which also means the sender's own
+  turn appears while the profiles are still writing their replies
+  (the server stores it before it starts generating), and the room's
+  ear reads new turns as they land instead of when the viewer next
+  acts. A failing poll stays quiet: the next action's own error
+  handling still says what is wrong.
+
+      asked     does the room move on its own
+      mattered  a room you have to poke to hear is not a room
+
+- **The talking light follows the voice.** Field report earlier this
+  arc: the green square should light whoever is talking, matched by
+  identity. With the room's ear reading a backlog of turns aloud one
+  by one, the transcript's last line is not who is speaking — three
+  queued turns would light the wrong square until the reading caught
+  up. The square now lights the turn actually being heard, and the
+  transcript's last line is only the fallback when no voice plays.
+
+      asked     whose square is lit
+      mattered  the voice being heard, not the line most recently typed
+
 - **The answer begins before it ends.** Field report, and the twin
   product's the same week: "still a long delay while waiting for a
   response." The synthesis leg of that wait was being paid in full —

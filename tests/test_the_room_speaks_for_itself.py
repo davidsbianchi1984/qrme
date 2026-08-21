@@ -63,6 +63,40 @@ def test_the_press_per_turn_survives():
     assert 'tr("ins.hear", lang)' in INSIDE
 
 
+def test_the_room_keeps_itself_current():
+    """Without the poll, another person's turn arrived only when the
+    viewer did something — a room you have to poke to hear is not a room.
+    The ear and the talking light both feed on the transcript, so this is
+    also what makes them live."""
+    assert re.search(
+        r"setInterval\([\s\S]{0,200}?api\.roomMessages\(open, token\)"
+        r"\.then\(setTranscript\)", INSIDE), (
+        "the transcript no longer refreshes on its own — turns from the "
+        "other people in the room wait for the viewer to act")
+    m = re.search(r"setInterval\(([\s\S]*?)\}, (\d+)\)", INSIDE)
+    assert m and "setError" not in m.group(1), (
+        "a failing poll must stay quiet — an error banner repainted every "
+        "few seconds is a nag, not a diagnosis")
+
+
+def test_the_light_follows_the_voice():
+    """While a backlog is being read aloud, the transcript's last line is
+    not who is speaking — three queued turns would light the wrong square
+    until the reading caught up. The voice being HEARD wins the light,
+    and the transcript's last line is only the fallback."""
+    assert "voicing !== null" in INSIDE, (
+        "isTalking reads only the transcript again — the talking light "
+        "drifts off the voice whenever turns queue")
+    assert re.search(
+        r"setVoicing\(\{ kind: \"profile\", id[\s\S]{0,80}?await s\.done",
+        INSIDE), (
+        "the ear's queue no longer marks whose turn it is reading before "
+        "it plays")
+    assert INSIDE.count("setVoicing(null)") >= 3, (
+        "every way a voice ends — queue drained, press played out, press "
+        "failed — must put the light back on the transcript's answer")
+
+
 def test_dictation_types_and_never_sends():
     m = re.search(r"function flipDictation\(\)(.*?)\n  \}", INSIDE, re.S)
     assert m, "flipDictation is gone from the room screen"

@@ -169,6 +169,10 @@ export function Inside({ onPlans, start = "" }: {
     () => localStorage.getItem("qrme.room.hear") === "1");
   const heardUpTo = useRef<string | null>(null);
   const speaking = useRef(false);
+  // Whose turn is being read aloud RIGHT NOW — an identity (kind + id),
+  // for the talking light. Null when no voice is playing.
+  const [voicing, setVoicing] = useState<{ kind: string; id: string } | null>(
+    null);
   // Dictation: speech types into the box and sends nothing — the send
   // stays a decision. Only offered where the browser ships a recogniser
   // (iOS Safari does not), the same bargain the Agent screen struck.
@@ -201,6 +205,24 @@ export function Inside({ onPlans, start = "" }: {
     api.roomFaces(open, token).then(setScene).catch(() => setScene(null));
   }
   useEffect(load, [open, token]);
+
+  // The room keeps itself current. Without this, the transcript refreshed
+  // only on mount or after the viewer's own action — another person's
+  // turn, a profile still writing its reply to somebody else, a shared
+  // picture: none of it arrived until you did something. A room you have
+  // to poke to hear is not a room. The sender's own turn also lands here
+  // while the profiles are still thinking, because the server stores it
+  // before it starts generating replies. Quiet on failure on purpose: a
+  // poll that can paint an error banner every four seconds is a nag, and
+  // the next action's own error handling still says what is wrong.
+  useEffect(() => {
+    if (!open || !token) return;
+    const tick = window.setInterval(() => {
+      api.roomMessages(open, token).then(setTranscript)
+        .catch(() => { /* the next poll, or the next action, will say */ });
+    }, 4000);
+    return () => window.clearInterval(tick);
+  }, [open, token]);
 
   useEffect(() => {
     api.overlayCatalogue().then((c) => setMasks(c.kinds)).catch(() => setMasks([]));
@@ -311,18 +333,25 @@ export function Inside({ onPlans, start = "" }: {
     </span>;
   };
 
-  // Whose square is lit: the last voice in the transcript — matched by
-  // WHO, never by name. It used to compare display names, and a field
-  // report caught the failure that invites: a person in a room with their
-  // own synthetic twin shares a name with it, so the profile's square lit
-  // while the person spoke. sender_kind + sender_id is an identity;
-  // "David Bianchi" is two participants.
+  // Whose square is lit: the voice actually being HEARD first, the last
+  // voice in the transcript otherwise — matched by WHO, never by name. It
+  // used to compare display names, and a field report caught the failure
+  // that invites: a person in a room with their own synthetic twin shares
+  // a name with it, so the profile's square lit while the person spoke.
+  // sender_kind + sender_id is an identity; "David Bianchi" is two
+  // participants. And when the room's ear reads a backlog of turns aloud
+  // one by one, the transcript's last line is not who is speaking — the
+  // light follows the voice, or three queued turns all light the wrong
+  // square until the reading catches up.
   const lastSaid = transcript.length > 0
     ? transcript[transcript.length - 1] : null;
   const isTalking = (s: { kind: string; id: string }) =>
-    lastSaid !== null
-    && (lastSaid.sender_kind === "user") === (s.kind === "user")
-    && lastSaid.sender_id === s.id;
+    voicing !== null
+      ? (voicing.kind === "user") === (s.kind === "user")
+        && voicing.id === s.id
+      : lastSaid !== null
+        && (lastSaid.sender_kind === "user") === (s.kind === "user")
+        && lastSaid.sender_id === s.id;
 
   const act = (fn: () => Promise<unknown>, said?: string) => async () => {
     setError(null); setNote(null); setBusy(true);
@@ -364,9 +393,13 @@ export function Inside({ onPlans, start = "" }: {
           // quietly — the per-turn 🔊 is still on every line.
           const s = await speakInPieces(
             m.sender_id as string, m.content || "", token);
+          // The light follows the voice: while a backlog is being read,
+          // the transcript's last line is not who is speaking.
+          setVoicing({ kind: "profile", id: m.sender_id as string });
           await s.done;
         }
       } catch { /* a voice that cannot be fetched leaves the text standing */ }
+      setVoicing(null);
       speaking.current = false;
     })();
     // heardUpTo/speaking are refs on purpose: the transcript is the signal.
@@ -882,10 +915,17 @@ export function Inside({ onPlans, start = "" }: {
                   <button className="chip" disabled={busy}
                           aria-label={tr("ins.hear", lang)}
                           onClick={() => {
-                            speakInPieces(m.sender_id as string,
-                                          m.content || "", token)
-                              .then((s) => s.done)
-                              .catch(setError);
+                            const id = m.sender_id as string;
+                            speakInPieces(id, m.content || "", token)
+                              .then((s) => {
+                                setVoicing({ kind: "profile", id });
+                                return s.done;
+                              })
+                              .then(() => setVoicing(null))
+                              .catch((e) => {
+                                setVoicing(null);
+                                setError(e);
+                              });
                           }}>
                     🔊
                   </button>
