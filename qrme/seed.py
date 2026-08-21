@@ -539,6 +539,13 @@ def _seed_founder(conn) -> tuple[str, str]:
 # and reused across handles freely: two professionals sharing a premade voice
 # is ordinary; a dead control is not. The two founder profiles take the
 # owner's verified professional clone.
+#
+# The reviewer's rule, added after River (the engine's androgynous premade)
+# sat on two men and a woman: a starter written as a woman takes a woman's
+# voice, a starter written as a man takes a man's, and none of them takes
+# Daniel — the voice the sibling guardian product speaks with. A starter
+# whose brief states no gender keeps the voice its portrait was decorated
+# with. See _RECAST below for how the fix reaches decks already seeded.
 STARTER_VOICES = {
     "david_bianchi_ai":  ("QkRFZOOi2WQXZ8b3eeYd", "David Bianchi voice"),
     "david_bianchi":     ("QkRFZOOi2WQXZ8b3eeYd", "David Bianchi voice"),
@@ -560,22 +567,37 @@ STARTER_VOICES = {
     "coach_dana_reyes":  ("IKne3meq5aSn9XLyUdCD", "Charlie"),
     "chef_henri_laurent": ("N2lVS1w4EtoT3dr4eOWO", "Callum"),
     "dr_sana_iqbal":     ("NP8gGMLAGXx7ddlMa06t", "Sarika"),
-    "pete_kowalski":     ("SAz9YHcvj6GT2YYXdXww", "River"),
+    "pete_kowalski":     ("pqHfZKP75CvOlQylNhV4", "Bill"),
     "grace_mwangi":      ("XrExE9yKIg1WjnnlVkGX", "Matilda"),
     "dr_felix_baum":     ("bIHbv24MWmeRgasZH58o", "Will"),
     "aisha_diallo":      ("EXAVITQu4vr4xnSDxMaL", "Sarah"),
-    "harold_jenkins":    ("SAz9YHcvj6GT2YYXdXww", "River"),
+    "harold_jenkins":    ("JBFqnCBsd6RMkjVDRZzb", "George"),
     "rosa_delgado":      ("EXAVITQu4vr4xnSDxMaL", "Sarah"),
     "cmdr_ellen_park":   ("XrExE9yKIg1WjnnlVkGX", "Matilda"),
     "mimi_beaumont":     ("cgSgspJ2msm6clMCkdW9", "Jessica"),
     "jack_osei_turner":  ("VZcBEw9QXVSghzV5UKLN", "Michael Joshua"),
-    "nadia_petrova":     ("SAz9YHcvj6GT2YYXdXww", "River"),
+    "nadia_petrova":     ("Xb7hH8MSUJpSbSDYk0k2", "Alice"),
     "bev_lindqvist":     ("hpp4J3VqNfWAUOO0d1Us", "Bella"),
     "otis_marsh":        ("CwhRBWXzGAHq8TQ4Fs17", "Roger"),
     "dr_lena_whitcomb":  ("EXAVITQu4vr4xnSDxMaL", "Sarah"),
     "dr_marcus_adeyemi": ("VZcBEw9QXVSghzV5UKLN", "Michael Joshua"),
     "dr_priya_nair":     ("NP8gGMLAGXx7ddlMa06t", "Sarika"),
     "vivienne_sable":    ("FGY2WhTYpPnrIDTdsKH5", "Laura"),
+}
+
+
+# handle -> the (voice_id, label) an earlier seed bound and this one no
+# longer would. A deployment seeded before the recast still carries the old
+# binding, and blank-only repair would honor it forever — but a binding that
+# still equals, byte for byte, what the seed itself wrote is the seed's own
+# work, not an owner's choice, and the seed may correct its own work. An
+# owner who rebound anything no longer matches and is never touched.
+_RECAST = {
+    # River, the engine's androgynous premade, recast per the reviewer's
+    # rule: a woman's voice for the women, a man's for the men.
+    "pete_kowalski":  ("elevenlabs", "SAz9YHcvj6GT2YYXdXww", "River"),
+    "harold_jenkins": ("elevenlabs", "SAz9YHcvj6GT2YYXdXww", "River"),
+    "nadia_petrova":  ("elevenlabs", "SAz9YHcvj6GT2YYXdXww", "River"),
 }
 
 
@@ -593,9 +615,18 @@ def _voice(conn, profile_id: str, handle: str) -> bool:
     chosen = STARTER_VOICES.get(handle)
     if not chosen:
         return False
-    row = conn.execute("SELECT 1 FROM profile_voices WHERE profile_id=?",
-                       (profile_id,)).fetchone()
+    row = conn.execute(
+        "SELECT provider, voice_id, label FROM profile_voices"
+        " WHERE profile_id=?", (profile_id,)).fetchone()
     if row is not None:
+        old = _RECAST.get(handle)
+        if old and (row["provider"], row["voice_id"], row["label"]) == old:
+            conn.execute(
+                "UPDATE profile_voices SET voice_id=?, label=?"
+                " WHERE profile_id=?",
+                (chosen[0], chosen[1], profile_id))
+            conn.commit()
+            return True
         return False
     voice_id, label = chosen
     conn.execute(

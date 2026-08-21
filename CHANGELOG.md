@@ -31,6 +31,26 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
                 instruction never asks a 4 GB box to act like a 32 GB
                 one
 
+### Fixed
+
+- **The starters sound like themselves.** The reviewer's call, after
+  listening to the pack: the women in the starter collection take a
+  woman's voice from the engine's own list, the men a man's — and
+  never the voice the sibling guardian product speaks with. The audit
+  found one systematic exception: River, the engine's androgynous
+  premade, sat on two men and a woman. Pete Kowalski speaks with Bill
+  now, Harold Jenkins with George, Nadia Petrova with Alice, and a
+  new guard pins every gendered brief to a matching vetted premade,
+  keeps the guardian's Daniel out of the pack entirely, and leaves
+  the few briefs that state no gender deliberately unpinned rather
+  than guessed at. Decks seeded before the recast are repaired at
+  startup — but only where the binding still equals, byte for byte,
+  what the seed itself wrote: an owner who rebound a voice keeps it,
+  whatever it is.
+
+      asked     does each starter have a voice
+      mattered  does each starter have their own kind of voice
+
 ## [0.97.0] - 2026-08-21
 
 ### Added
