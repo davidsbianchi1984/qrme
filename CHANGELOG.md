@@ -6,6 +6,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Leaving the screen ends the voices.** The twin product found it
+  first, on its conversation screens; the same defect lived here in
+  three rooms. The Agent orb's relight-after-reply contract kept
+  re-opening the recogniser under a screen that no longer exists — and
+  its dictation recogniser was never owned by `stopVoice` at all. The
+  room's ear kept reading the OLD room's turns after a switch, because
+  the queue's handle was a local in the loop; it now carries a run
+  counter, and switching rooms or leaving stops the playing turn and
+  the dictation. The chat overlay's reply — and its device-voice
+  fallback — both played on after navigation; the screen now holds the
+  handle and stops it on the way out.
+
+      asked     what happens to a playing voice when its screen goes away
+      mattered  a voice with no screen is a speaker nobody can stop
+
 ### Added
 
 - **The room keeps itself current.** The transcript refreshed only on

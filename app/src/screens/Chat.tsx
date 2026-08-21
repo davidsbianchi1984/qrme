@@ -57,6 +57,14 @@ export function Chat({ onPlans }: {
   const [rhScenario, setRhScenario] = useState("");
   const [rhOpen, setRhOpen] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
+  // The reply mid-play, so leaving the screen can stop it. Navigating
+  // away used to leave the bound voice talking with no screen behind it.
+  const saying = useRef<{ stop: () => void } | null>(null);
+  useEffect(() => () => {
+    saying.current?.stop();
+    saying.current = null;
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+  }, []);
   // Voice: replies read aloud by the device's own engine, and a microphone
   // that fills the composer. Both feature-detected — the mic button simply
   // does not render on a browser without SpeechRecognition, because a
@@ -149,8 +157,12 @@ export function Chat({ onPlans }: {
         // still being synthesised — the talking face lights when the
         // first word is heard, not when the whole reply is rendered.
         const s = await speakInPieces(session.profileId, text, token);
+        saying.current = s;
         setVoicing(true);
-        void s.done.then(() => setVoicing(false));
+        void s.done.then(() => {
+          if (saying.current === s) saying.current = null;
+          setVoicing(false);
+        });
         return;
       } catch { setVoicing(false); /* the device's voice stands in */ }
     }

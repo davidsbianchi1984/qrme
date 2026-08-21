@@ -173,6 +173,12 @@ export function Inside({ onPlans, start = "" }: {
   // for the talking light. Null when no voice is playing.
   const [voicing, setVoicing] = useState<{ kind: string; id: string } | null>(
     null);
+  // The ear's live handle and run counter. Switching rooms or leaving
+  // the screen bumps the run and stops the playing turn — without this,
+  // the queue kept reading the OLD room's turns under the new one (or
+  // under no screen at all), because the loop's handle was a local.
+  const nowSaying = useRef<{ stop: () => void } | null>(null);
+  const earRun = useRef(0);
   // Dictation: speech types into the box and sends nothing — the send
   // stays a decision. Only offered where the browser ships a recogniser
   // (iOS Safari does not), the same bargain the Agent screen struck.
@@ -385,26 +391,43 @@ export function Inside({ onPlans, start = "" }: {
     heardUpTo.current = transcript[transcript.length - 1].id;
     if (fresh.length === 0) return;
     speaking.current = true;
+    const run = earRun.current;
     void (async () => {
       try {
         for (const m of fresh) {
+          if (run !== earRun.current) break;
           // Piece by piece: a long turn starts being heard at its first
           // sentence. A rejected play (autoplay withheld after all) ends
           // quietly — the per-turn 🔊 is still on every line.
           const s = await speakInPieces(
             m.sender_id as string, m.content || "", token);
+          nowSaying.current = s;
+          if (run !== earRun.current) { s.stop(); break; }
           // The light follows the voice: while a backlog is being read,
           // the transcript's last line is not who is speaking.
           setVoicing({ kind: "profile", id: m.sender_id as string });
           await s.done;
         }
       } catch { /* a voice that cannot be fetched leaves the text standing */ }
+      nowSaying.current = null;
       setVoicing(null);
       speaking.current = false;
     })();
     // heardUpTo/speaking are refs on purpose: the transcript is the signal.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transcript, hearAll, token]);
+
+  // Switching rooms — or leaving the screen, which runs the same cleanup
+  // — silences the old room's queue and its dictation. Without this, the
+  // ear kept reading the previous room's turns into the new one, and
+  // navigating away left the voice talking with no screen behind it.
+  useEffect(() => () => {
+    earRun.current++;
+    nowSaying.current?.stop();
+    nowSaying.current = null;
+    dictation.current?.stop();
+    dictation.current = null;
+  }, [open]);
 
   function flipDictation() {
     if (dictating) {
@@ -918,6 +941,7 @@ export function Inside({ onPlans, start = "" }: {
                             const id = m.sender_id as string;
                             speakInPieces(id, m.content || "", token)
                               .then((s) => {
+                                nowSaying.current = s;
                                 setVoicing({ kind: "profile", id });
                                 return s.done;
                               })

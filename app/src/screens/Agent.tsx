@@ -242,6 +242,18 @@ export function Agent({ onPlans, go }: {
     setVoiceMode(false);
   }
 
+  // Leaving the screen ends the conversation. There was no unmount
+  // teardown at all: navigating away mid-reply left a headless loop —
+  // the voice kept talking, and the relight-after-reply contract kept
+  // re-opening the recogniser under a screen that no longer exists. The
+  // dictation recogniser is stopped too; stopVoice never owned it.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => () => {
+    stopVoice();
+    dictation.current?.stop();
+    dictation.current = null;
+  }, []);
+
   /** Say the reply out loud — the profile's own bound voice first (the
    *  deployment's engine, the watermark riding in the header), the
    *  device's voice standing in when there is no binding, no engine key,
