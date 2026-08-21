@@ -4,7 +4,7 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.98.0] - 2026-08-21
 
 ### Fixed
 
@@ -13453,7 +13453,7 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.97.0...HEAD
+[0.98.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.97.0...app-v0.98.0
 [0.97.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.96.0...app-v0.97.0
 [0.96.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.95.0...app-v0.96.0
 [0.95.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.94.0...app-v0.95.0
