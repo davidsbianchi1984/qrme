@@ -48,6 +48,24 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
       mattered  a group conversation where every voice arrives
                 anonymous is three monologues interleaved
 
+- **The room passes things around.** Field request, over a two-seat
+  room: share pictures, photos, videos, and files between the people
+  in the chat room. A 📎 on both composers (the card's and the
+  transparent strip's) hands the room anything `media.save` already
+  knows how to be careful with — kind decided by the file's own magic
+  numbers, byte caps held, safe extensions only — landing as a room
+  message readable by exactly the people the transcript answers to.
+  Whatever is typed rides along as the caption, moderated like any
+  said thing. Pictures render inline, videos play, files are a named
+  link; profiles are told *[shared a image: sunset.png]* in their
+  labelled history, so a model that cannot see pixels still knows
+  something was shown; sharing never triggers profile turns — *Let
+  them talk* stays the button it is. All three phones gained the same
+  door on their room screens.
+
+      asked     can a room hand a file around
+      mattered  under whose rules — the transcript's, or looser ones
+
 - **The orb says why it cannot hear.** Field report on the agent's
   voice mode: "Listening — say it", glowing, and nothing ever heard.
   The recogniser had no error handler at all, so a refused

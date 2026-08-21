@@ -1201,3 +1201,10 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .rs-chatbtn:disabled { opacity: 0.4; cursor: default; }
 /* On the stage the strip sits above the leave button's row. */
 .room-stage .rs-chatstrip { left: 12px; right: 12px; bottom: 64px; }
+
+/* A shared attachment in the transcript: the picture itself, the video
+   playable, a file as a plain named link — sized to stay a turn in a
+   conversation rather than a takeover of it. */
+.rm-media { display: block; max-width: min(100%, 360px); max-height: 320px;
+  border-radius: 10px; margin-top: 6px; }
+.rm-file { display: inline-block; margin-left: 6px; }

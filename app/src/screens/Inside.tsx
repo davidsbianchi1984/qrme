@@ -178,6 +178,9 @@ export function Inside({ onPlans, start = "" }: {
   // profile this person owns, the console holds both tokens, so one press
   // does the whole round trip and the guest is simply seated.
   const [guestId, setGuestId] = useState("");
+  // Sharing into the room: whatever is typed in the box rides along as
+  // the caption, so "look at this" and the picture arrive as one turn.
+  const sharePick = useRef<HTMLInputElement>(null);
 
   const open = roomId.trim();
 
@@ -421,6 +424,35 @@ export function Inside({ onPlans, start = "" }: {
     await act(async () => { await api.sayInRoom(open, me, text, token); })();
   }
 
+  async function shareFile(file: File) {
+    if (!token) return;
+    const caption = draft.trim() || undefined;
+    setDraft("");
+    await act(async () => {
+      await api.shareInRoom(open, me, file, token, caption);
+    })();
+  }
+
+  /** What a shared attachment looks like in the transcript: the picture
+   *  itself, the video playable, anything else a plain link that says its
+   *  name — never an iframe, never markup from the file. */
+  function attachment(m: RoomMsg) {
+    if (!m.media) return null;
+    const src = getBase() + m.media.url;
+    if (m.media.kind === "image") {
+      return <img className="rm-media" src={src}
+                  alt={m.media.name || tr("ins.share", lang)} />;
+    }
+    if (m.media.kind === "video") {
+      return <video className="rm-media" src={src} controls playsInline />;
+    }
+    return (
+      <a className="rm-file" href={src} target="_blank" rel="noreferrer">
+        📎 {m.media.name || m.media.url.split("/").pop()}
+      </a>
+    );
+  }
+
   // The transparent chat, exactly as the gallery drew it (screens 96–98,
   // 105): the last few turns as translucent lines riding the scene, and
   // the Type… pill under them — so the conversation with the profiles and
@@ -432,9 +464,14 @@ export function Inside({ onPlans, start = "" }: {
       {transcript.slice(-3).map((m) => (
         <p key={m.id} className="rs-chatline">
           <strong>{m.from}</strong> {m.content}
+          {m.media && <> 📎 {m.media.name || m.media.kind}</>}
         </p>
       ))}
       <div className="rs-chatpill">
+        <button className="rs-chatbtn" disabled={busy || !token}
+                aria-label={tr("ins.share", lang)}
+                title={tr("ins.share", lang)}
+                onClick={() => sharePick.current?.click()}>📎</button>
         {canDictate && (
           <button className="rs-chatbtn" disabled={busy}
                   aria-pressed={dictating}
@@ -828,9 +865,11 @@ export function Inside({ onPlans, start = "" }: {
               {tr("ins.whatsaid", lang)}{" "}
               <button className={"chip" + (hearAll ? " primary" : "")}
                       onClick={flipHearAll}
-                      title={tr(hearAll ? "ins.hear.off" : "ins.hear.on", lang)}
+                      title={hearAll ? tr("ins.hear.off", lang)
+                                     : tr("ins.hear.on", lang)}
                       aria-pressed={hearAll}>
-                🔊 {tr(hearAll ? "ins.hear.off" : "ins.hear.on", lang)}
+                🔊 {hearAll ? tr("ins.hear.off", lang)
+                            : tr("ins.hear.on", lang)}
               </button>
             </h3>
             {transcript.length === 0 && (
@@ -839,6 +878,7 @@ export function Inside({ onPlans, start = "" }: {
             {transcript.map((m) => (
               <p className="small" key={m.id}>
                 <strong>{m.from}</strong>: {m.content}
+                {attachment(m)}
                 {/* A profile turn can be heard in the voice its owner bound.
                     A press, never autoplay: the phone's rule and the room's
                     are the same — sound starts on a gesture. */}
@@ -871,6 +911,24 @@ export function Inside({ onPlans, start = "" }: {
               </p>
             ))}
             <div className="row">
+              {/* One picker for both composers — the pill on the scene and
+                  this row share it, and whatever is typed rides along as
+                  the caption. Never rendered as its own control: a bare
+                  file input beside a styled row reads as somebody else's
+                  form. */}
+              <input ref={sharePick} type="file" style={{ display: "none" }}
+                     accept="image/*,video/*,.pdf,.docx,.xlsx,.pptx,.zip,.txt"
+                     onChange={(e) => {
+                       const f = e.target.files?.[0];
+                       e.target.value = "";
+                       if (f) void shareFile(f);
+                     }} />
+              <button className="chip" disabled={busy || !token}
+                      aria-label={tr("ins.share", lang)}
+                      title={tr("ins.share", lang)}
+                      onClick={() => sharePick.current?.click()}>
+                📎
+              </button>
               <input value={draft} onChange={(e) => setDraft(e.target.value)}
                      placeholder={tr("ins.say.ph", lang)} style={{ flex: 1 }}
                      onKeyDown={(e) => {

@@ -128,6 +128,7 @@ CREATE TABLE IF NOT EXISTS room_messages (
     status      TEXT NOT NULL,   -- approved | blocked
     flag_reason TEXT,
     watermark_id TEXT,           -- synthetic-media credential for profile turns
+    media_id    TEXT REFERENCES media(id),  -- a shared picture, video or file
     created_at  TEXT NOT NULL
 );
 
@@ -2616,6 +2617,9 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # private, so the pool default on an existing deployment matches the
     # default a fresh one ships with.
     ("profiles", "unlisted", "INTEGER NOT NULL DEFAULT 0"),
+    # A room turn can carry a shared picture, video or file. NULL on
+    # every row that predates sharing — words alone stay words alone.
+    ("room_messages", "media_id", "TEXT REFERENCES media(id)"),
 )
 
 

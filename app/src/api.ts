@@ -2070,6 +2070,9 @@ export type RoomMsg = {
   from: string;
   content: string | null;
   watermark: { display?: { line?: string } } | null;
+  // A shared picture, video or file riding the turn. `url` is relative to
+  // the API base, the way every media url in this product is.
+  media?: { kind: string; url: string; name?: string | null } | null;
   created_at?: string;
 };
 
@@ -4970,6 +4973,29 @@ export const api = {
                              body.message);
     }
     return data as RoomFace;
+  },
+
+  // Hand the room a picture, video or file: raw bytes, kind decided by the
+  // backend from the magic numbers, landing as a room message everybody in
+  // the room reads. Sharing never triggers profile turns — "Let them talk"
+  // stays the button it is.
+  shareInRoom: async (roomId: string, interactorId: string, file: File,
+                      token: string, caption?: string) => {
+    const res = await fetch(getBase() +
+      `/rooms/${roomId}/share?interactor_id=${encodeURIComponent(interactorId)}` +
+      `&filename=${encodeURIComponent(file.name)}` +
+      (caption ? `&caption=${encodeURIComponent(caption)}` : ""), {
+      method: "POST", body: file,
+      headers: { authorization: `Bearer ${token}` },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const body = data as { detail?: unknown; message?: unknown };
+      throw new RequestError(res.status,
+                             body.detail ?? `share failed (${res.status})`,
+                             body.message);
+    }
+    return data as { message: RoomMsg };
   },
 
   overlayCatalogue: () => req<OverlayCatalogue>("/overlays/catalogue"),

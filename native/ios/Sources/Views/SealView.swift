@@ -152,6 +152,7 @@ struct RoomsSection: View {
     @State private var guestId = ""
     @State private var scene: RoomFaces?
     @State private var pick: PhotosPickerItem?
+    @State private var share: PhotosPickerItem?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -266,6 +267,12 @@ struct RoomsSection: View {
             PhotosPicker(selection: $pick, matching: .images) {
                 Text(L10n.t("room.face.photo", state.language)).font(.caption)
             }.disabled(busy || roomId.isEmpty || state.interactorToken == nil)
+            // Sharing INTO the room, not standing in for you: the picture
+            // or video lands as a turn everybody here reads. Same picker
+            // discipline as the face — a thing already on the phone.
+            PhotosPicker(selection: $share, matching: .any(of: [.images, .videos])) {
+                Text(L10n.t("room.share", state.language)).font(.caption)
+            }.disabled(busy || roomId.isEmpty || state.interactorToken == nil)
             if let scene {
                 // Everybody's, not just mine. A scene each person draws from
                 // their own state alone is not a scene.
@@ -301,6 +308,19 @@ struct RoomsSection: View {
                 scene = try await ApiClient.shared.roomFaces(
                     roomId: roomId, token: state.interactorToken ?? "")
                 pick = nil
+            }
+        }
+        .onChange(of: share) { item in
+            guard let item else { return }
+            run {
+                guard let data = try await item.loadTransferable(
+                    type: Data.self) else { return }
+                let shared = try await ApiClient.shared.shareInRoom(
+                    roomId: roomId, interactorId: state.interactorId ?? "",
+                    filename: "shared.bin", data: data,
+                    token: state.interactorToken ?? "")
+                note = shared.message.from
+                share = nil
             }
         }
     }

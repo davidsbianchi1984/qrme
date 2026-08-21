@@ -241,6 +241,7 @@ public sealed partial class PeoplePage : Page
         RoomFaceTitle.Text = L10n.T("room.face.title");
         RoomFaceCameraButton.Content = L10n.T("room.face.camera");
         RoomFacePhotoButton.Content = L10n.T("room.face.photo");
+        RoomShareButton.Content = L10n.T("room.share");
         RoomFacePlainButton.Content = L10n.T("room.face.plain");
         RoomFaceWhoButton.Content = L10n.T("room.face.who");
         DispTitle.Text = L10n.T("disp.title");
@@ -1923,6 +1924,32 @@ public sealed partial class PeoplePage : Page
             .Select(w => new Row(w.Disclosure ?? w.Title ?? "")));
         if (s.Note is { Length: > 0 }) rows.Add(new Row(s.Note));
         RoomList.ItemsSource = rows;
+    }
+
+    private async void OnRoomShare(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        if (RoomIdBox.Text.Trim().Length == 0) return;
+        if (s.InteractorId is not { Length: > 0 } who)
+        { StatusText.Text = L10n.T("prf.needuser"); return; }
+        try
+        {
+            // Sharing INTO the room, not standing in for you: the picture,
+            // video or file lands as a turn everybody here reads. Any kind
+            // — the backend refuses what it cannot serve, from the bytes.
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            WinRT.Interop.InitializeWithWindow.Initialize(picker,
+                WinRT.Interop.WindowNative.GetWindowHandle(App.Window));
+            picker.FileTypeFilter.Add("*");
+            var file = await picker.PickSingleFileAsync();
+            if (file is null) return;
+            var buffer = await Windows.Storage.FileIO.ReadBufferAsync(file);
+            await ApiClient.Shared.ShareInRoom(
+                RoomIdBox.Text.Trim(), who, file.Name, buffer.ToArray(),
+                s.InteractorToken!);
+            StatusText.Text = "";
+        }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
     }
 
     private async void OnRoomFacePhoto(object sender, RoutedEventArgs e)

@@ -521,6 +521,11 @@ public record RoomMsg(
     [property: JsonPropertyName("content")] string? Content,
     [property: JsonPropertyName("status")] string? Status);
 
+// A share landing as a room message — no replies: sharing never makes the
+// profiles speak, "Let them talk" stays the button it is.
+public record RoomShared(
+    [property: JsonPropertyName("message")] RoomMsg Message);
+
 public record HandleClaim(
     [property: JsonPropertyName("profile_id")] string ProfileId,
     [property: JsonPropertyName("handle")] string Handle,
@@ -4161,6 +4166,22 @@ public sealed class ApiClient
         { Content = new ByteArrayContent(bytes) };
         req.Headers.Add("authorization", $"Bearer {token}");
         return await Send<RoomFace>(req);
+    }
+
+    /// <summary>Hand the room a picture, video or file. Same raw-bytes
+    /// shape as the face upload; the share lands as a room message
+    /// everybody in the room reads, and never triggers profile turns —
+    /// "Let them talk" stays the button it is.</summary>
+    public async Task<RoomShared> ShareInRoom(string roomId,
+        string interactorId, string filename, byte[] bytes, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Post,
+            $"/rooms/{roomId}/share?interactor_id=" +
+            Uri.EscapeDataString(interactorId) + "&filename=" +
+            Uri.EscapeDataString(filename))
+        { Content = new ByteArrayContent(bytes) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return await Send<RoomShared>(req);
     }
 
     public Task<DisplayVocabulary> DisplayVocabulary() =>

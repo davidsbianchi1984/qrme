@@ -8275,6 +8275,9 @@ const CHROME: Table = {
     hi: "ब्राउज़र का पहचानकर्ता अपनी वाक् सेवा तक नहीं पहुँच सका — आप लिख सकते हैं, जवाब फिर भी बोला जाएगा",
     ar: "تعذّر على مُتعرِّف المتصفح الوصول إلى خدمة الكلام — يمكنك الكتابة، وسيظل الرد منطوقًا",
   },
+  "ins.share": {
+    en: "Share a picture, video or file", es: "Comparte una imagen, video o archivo", fr: "Partagez une image, une vidéo ou un fichier", de: "Bild, Video oder Datei teilen", pt: "Partilhe uma imagem, vídeo ou ficheiro", it: "Condividi un'immagine, un video o un file", ja: "画像・動画・ファイルを共有", zh: "分享图片、视频或文件", hi: "चित्र, वीडियो या फ़ाइल साझा करें", ar: "شارك صورة أو فيديو أو ملفًا",
+  },
   "ins.type.ph": {
     en: "Type…", es: "Escribe…", fr: "Écrivez…", de: "Tippen…", pt: "Escreva…", it: "Scrivi…", ja: "入力…", zh: "输入…", hi: "लिखें…", ar: "اكتب…",
   },

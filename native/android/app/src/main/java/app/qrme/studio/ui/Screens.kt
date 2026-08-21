@@ -5321,6 +5321,26 @@ private fun RoomsBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
             }
         }
     }
+    // Sharing INTO the room, not standing in for you: the picture, video
+    // or file lands as a turn everybody here reads. Any kind — the backend
+    // refuses what it cannot serve, from the bytes themselves.
+    val pickShare = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()) { uri ->
+        val who = vm.interactorId
+        if (uri != null && who != null && roomId.isNotBlank()) {
+            val bytes = runCatching {
+                ctx.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+            }.getOrNull()
+            if (bytes == null || bytes.isEmpty()) {
+                onNote(L10n.t("room.face.empty", lang))
+            } else {
+                vm.call({
+                    ApiClient.shareInRoom(roomId, who, "shared.bin", bytes,
+                        vm.interactorToken.orEmpty())
+                }) { r -> onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+    }
 
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(L10n.t("room.title", lang), color = Qrme.Txt, fontSize = 16.sp,
@@ -5401,6 +5421,10 @@ private fun RoomsBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
             BrandButton(L10n.t("room.face.photo", lang),
                 enabled = roomId.isNotBlank() && vm.interactorId != null) {
                 pickFace.launch("image/*")
+            }
+            BrandButton(L10n.t("room.share", lang),
+                enabled = roomId.isNotBlank() && vm.interactorId != null) {
+                pickShare.launch("*/*")
             }
             BrandButton(L10n.t("room.face.plain", lang),
                 enabled = roomId.isNotBlank() && vm.interactorId != null) {

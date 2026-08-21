@@ -569,6 +569,9 @@ struct RoomMsg: Decodable {
 
 struct RoomPost: Decodable { let message: RoomMsg; let replies: [RoomMsg] }
 struct RoomAdvance: Decodable { let replies: [RoomMsg] }
+/// A share landing as a room message — no replies: sharing never makes the
+/// profiles speak, "Let them talk" stays the button it is.
+struct RoomShared: Decodable { let message: RoomMsg }
 
 struct HandleClaim: Decodable { let profile_id: String; let handle: String; let summon: String }
 
@@ -4385,6 +4388,29 @@ extension ApiClient {
             throw ApiError.http("upload failed")
         }
         return try JSONDecoder().decode(RoomFace.self, from: out)
+    }
+
+    /// Hand the room a picture, video or file. Same raw-bytes shape as the
+    /// face upload; the backend decides the kind from the magic numbers and
+    /// the share lands as a room message everybody in the room reads.
+    func shareInRoom(roomId: String, interactorId: String,
+                     filename: String, data: Data,
+                     token: String) async throws -> RoomShared {
+        let plain = base.appendingPathComponent("/rooms/\(roomId)/share")
+        var parts = URLComponents(url: plain, resolvingAgainstBaseURL: false)
+        parts?.queryItems = [
+            URLQueryItem(name: "interactor_id", value: interactorId),
+            URLQueryItem(name: "filename", value: filename)]
+        var req = URLRequest(url: parts?.url ?? plain)
+        req.httpMethod = "POST"
+        req.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+        req.httpBody = data
+        let (out, resp) = try await dispatch(req)
+        guard let http = resp as? HTTPURLResponse,
+              (200..<300).contains(http.statusCode) else {
+            throw ApiError.http("share failed")
+        }
+        return try JSONDecoder().decode(RoomShared.self, from: out)
     }
 
     // -- the fixed screen --

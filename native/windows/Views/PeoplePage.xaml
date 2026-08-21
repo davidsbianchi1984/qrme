@@ -746,6 +746,7 @@
                                Foreground="{StaticResource QrmeTxtBrush}" />
                     <Button x:Name="RoomFaceCameraButton" Click="OnRoomFaceCamera" />
                     <Button x:Name="RoomFacePhotoButton" Click="OnRoomFacePhoto" />
+                    <Button x:Name="RoomShareButton" Click="OnRoomShare" />
                     <Button x:Name="RoomFacePlainButton" Click="OnRoomFacePlain" />
                     <Button x:Name="RoomFaceWhoButton" Click="OnRoomFaceWho" />
                 </StackPanel>

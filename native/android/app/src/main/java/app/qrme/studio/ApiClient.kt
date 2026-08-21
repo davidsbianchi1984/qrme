@@ -3689,6 +3689,30 @@ object ApiClient {
             JSONObject(text).optString("showing")
         }
 
+    /** Hand the room a picture, video or file. Same raw-bytes shape as the
+     *  face upload; the share lands as a room message everybody reads, and
+     *  never triggers profile turns — "Let them talk" stays the button. */
+    suspend fun shareInRoom(roomId: String, interactorId: String,
+                            filename: String, bytes: ByteArray,
+                            token: String): String =
+        withContext(Dispatchers.IO) {
+            val q = "?interactor_id=" +
+                java.net.URLEncoder.encode(interactorId, "UTF-8") +
+                "&filename=" + java.net.URLEncoder.encode(filename, "UTF-8")
+            val conn = (java.net.URL("$base/rooms/$roomId/share" + q)
+                .openConnection() as java.net.HttpURLConnection).apply {
+                requestMethod = "POST"
+                setRequestProperty("accept-language", L10n.deviceLanguage())
+                setRequestProperty("authorization", "Bearer $token")
+                doOutput = true
+            }
+            conn.outputStream.use { it.write(bytes) }
+            val text = (if (conn.responseCode < 300) conn.inputStream
+                        else conn.errorStream).bufferedReader().readText()
+            JSONObject(text).optJSONObject("message")
+                ?.optJSONObject("media")?.optString("kind") ?: ""
+        }
+
     /** Readable by anyone in the room — a disclosure only its subject can
      *  see is not a disclosure. */
     suspend fun roomMicDisclosure(roomId: String,

@@ -144,8 +144,26 @@ def _display(kind: str, ref_id: str) -> str:
     return interactor_or_404(ref_id)["display_name"]
 
 
+def _media_brief(media_id: str | None) -> dict | None:
+    """The shareable face of an attachment: kind, serving url, display
+    name. Never the disk path, never the uploader's raw filename beyond
+    the display copy `media.save` already trimmed."""
+    if not media_id:
+        return None
+    from .. import media as media_mod
+
+    row = db.connect().execute(
+        "SELECT id, kind, filename, name FROM media WHERE id=?",
+        (media_id,)).fetchone()
+    if row is None:
+        return None
+    return {"kind": row["kind"],
+            "url": f"{media_mod.ROUTE}/{row['filename']}",
+            "name": row["name"]}
+
+
 def _store_room_message(room_id, sender_kind, sender_id, content,
-                        approved, reason) -> dict:
+                        approved, reason, media_id=None) -> dict:
     conn = db.connect()
     message_id = db.new_id("rmg")
     # A profile's room turn is an AI render facing the whole room: stamped.
@@ -153,17 +171,19 @@ def _store_room_message(room_id, sender_kind, sender_id, content,
                   if approved and sender_kind == "profile" else None)
     conn.execute(
         "INSERT INTO room_messages (id, room_id, sender_kind, sender_id,"
-        " content, status, flag_reason, watermark_id, created_at)"
-        " VALUES (?,?,?,?,?,?,?,?,?)",
+        " content, status, flag_reason, watermark_id, media_id, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?,?)",
         (message_id, room_id, sender_kind, sender_id, content,
          "approved" if approved else "blocked", reason,
-         credential["watermark_id"] if credential else None, db.utcnow()),
+         credential["watermark_id"] if credential else None,
+         media_id, db.utcnow()),
     )
     conn.commit()
     return {"id": message_id, "sender_kind": sender_kind,
             "from": _display(sender_kind, sender_id),
             "content": content if approved else None,
             "watermark": credential,
+            "media": _media_brief(media_id) if approved else None,
             "status": "approved" if approved else "blocked"}
 
 
@@ -179,7 +199,8 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
         if profile["status"] == "departed":
             continue
         history = conn.execute(
-            "SELECT sender_kind, sender_id, content FROM room_messages"
+            "SELECT sender_kind, sender_id, content, media_id"
+            " FROM room_messages"
             " WHERE room_id=? AND status='approved'"
             " ORDER BY created_at DESC, rowid DESC LIMIT 12",
             (room["id"],)).fetchall()
@@ -189,13 +210,28 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
         # one anonymous interlocutor, and a profile that cannot tell the
         # other agent from the person cannot know who it is talking to,
         # let alone keep up.
+        def _worded(r) -> str:
+            """A turn as the model reads it. An attachment becomes a stated
+            fact — "[shared a picture: sunset.jpg]" — because a profile that
+            cannot see pixels should still know something was shown, and
+            pretending the message was empty would be the model losing the
+            thread through no fault of its own."""
+            text = r["content"] or ""
+            brief = _media_brief(r["media_id"]
+                                 if "media_id" in r.keys() else None)
+            if brief:
+                label = f"[shared a {brief['kind']}" + (
+                    f": {brief['name']}]" if brief["name"] else "]")
+                text = f"{text} {label}".strip() if text else label
+            return text
+
         turns = [
-            ({"role": "assistant", "content": r["content"]}
+            ({"role": "assistant", "content": _worded(r)}
              if (r["sender_kind"] == "profile"
                  and r["sender_id"] == profile["id"])
              else {"role": "user",
                    "content": (f"{_display(r['sender_kind'], r['sender_id'])}"
-                               f": {r['content']}")})
+                               f": {_worded(r)}")})
             for r in reversed(history)
         ] or [{"role": "user", "content": f"Let's talk about {room['topic']}."}]
         system = persona.build_system_prompt(
@@ -611,6 +647,55 @@ async def upload_room_face(room_id: str, request: Request,
                                 media_url=saved["url"])
 
 
+@router.post("/rooms/{room_id}/share", status_code=201)
+async def share_in_room(room_id: str, request: Request,
+                        interactor_id: str, filename: str | None = None,
+                        caption: str | None = None) -> dict:
+    """Hand the room a picture, a video or a file.
+
+    Raw bytes through :func:`media.save`, so the kind comes from the
+    file's own magic numbers, the byte caps hold, and the whole safe-
+    extension discipline applies — a room accepts exactly what a profile's
+    gallery accepts, nothing looser. The upload lands as a room message
+    with the attachment on it, readable by the people already entitled to
+    the transcript and nobody else.
+
+    Speaking rules are the transcript's rules: the sharer must be a user
+    participant, held by their own token — the same closed door that
+    keeps a room id on a printed sticker from being a way to speak. A
+    caption rides through moderation like any said thing; the file's own
+    admissibility was `media.save`'s decision. Sharing does not trigger
+    profile turns — "Let them talk" stays the button it is, so a person
+    can put three pictures up before inviting a word about them.
+    """
+    room = _room_or_404(room_id)
+    if room["status"] != "active":
+        raise HTTPException(409, "this room has closed")
+    require_interactor(interactor_id, request)
+    if not any(p["kind"] == "user" and p["ref_id"] == interactor_id
+               for p in _participants(room_id)):
+        raise HTTPException(403, "you are not in this room")
+
+    from .. import media as media_mod
+
+    data = await request.body()
+    try:
+        saved = media_mod.save(interactor_id, data, name=filename or None)
+    except media_mod.MediaError as exc:
+        raise HTTPException(exc.status, exc.message) from exc
+
+    said = (caption or "").strip()[:500]
+    approved, reason = True, None
+    if said:
+        verdict = moderation.review(said, None, {"birthdate": None},
+                                    maturity=_room_maturity(
+                                        _participants(room_id)))
+        approved, reason = verdict.approved, verdict.reason
+    return {"message": _store_room_message(
+        room_id, "user", interactor_id, said, approved, reason,
+        media_id=saved["id"])}
+
+
 @router.delete("/rooms/{room_id}/face")
 def clear_room_face(room_id: str, interactor_id: str,
                     request: Request) -> dict:
@@ -846,6 +931,8 @@ def room_transcript(room_id: str, request: Request) -> list[dict]:
              "from": _display(r["sender_kind"], r["sender_id"]),
              "content": r["content"],
              "watermark": watermark.brief(r["watermark_id"]),
+             "media": _media_brief(r["media_id"]
+                                   if "media_id" in r.keys() else None),
              "created_at": r["created_at"]}
             for r in rows]
 
