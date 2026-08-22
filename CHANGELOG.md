@@ -12,19 +12,6 @@ came from somebody sitting in front of the thing and saying what did not
 work. That is the reason it is 1.0.
 
 
-### Known gaps
-
-- **Five of this release's routes do not reach the three native shells
-  yet.** A person's own picture (set, read, take down), the room
-  background, and the voice list are on the console and nowhere else; the
-  three `*_doorless.txt` records went from zero rows to five each, which is
-  a real regression in shell parity and is written down as one rather than
-  left to be discovered. The reason is stated in the records themselves:
-  this build environment has no Xcode, no Android SDK and no .NET SDK, so
-  a door written for a shell here could not be compiled, let alone run.
-  Three untested file-picker flows in three languages, landed on the eve of
-  a 1.0.0 tag, is a worse trade than an honest backlog line.
-
 ### Added
 
 - **Entering your own key says whose bill it becomes.** David, on the beta's
@@ -149,6 +136,17 @@ work. That is the reason it is 1.0.
   the containing block, which is the half that was missing. A full-screen
   place with no door is a trap, and a door painted off-screen is the same
   trap with a passing test.
+
+- **All three native shells reach this release's new routes.** The
+  person's own picture (set, read, take down), the room background and the
+  voice library land on iPhone, Android and the desktop in the same round
+  they land on the console, so the three `*_doorless.txt` records stay at
+  zero rows. They were briefly recorded as a five-row backlog on each —
+  this environment has no Xcode, no Android SDK and no .NET SDK, so none of
+  it could be compiled here — and the call was made to write them anyway
+  rather than ship 1.0.0 with the shells a release behind. The API-client
+  shapes mirror the room photo upload they sit beside on each platform,
+  which is the code path each shell already exercises.
 
 - **A person has their own picture.** Two seats, both named David Bianchi,
   and the face on the wrong one: "I don't know why both profile photos

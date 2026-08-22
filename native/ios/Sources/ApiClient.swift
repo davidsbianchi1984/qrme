@@ -3577,6 +3577,32 @@ struct RoomFace: Decodable {
     let ai_marked: Bool?
 }
 
+/// A person's OWN picture — theirs, not a profile's portrait, and the same
+/// in every room they walk into. `ai_marked` is always false and is on the
+/// wire anyway: a photograph of somebody's own face is authentic media, and
+/// stamping the synthetic mark into one would be a false statement in the
+/// direction the mark exists to prevent.
+struct OwnPicture: Decodable {
+    let interactor_id: String?
+    let url: String?
+    let ai_marked: Bool?
+}
+
+/// One row of the account's real voice library, as `GET /voices` serves it.
+/// `gender` is a hint and never a gate — a profile may be a device, a
+/// drawing, an idea — and `cloned` is a label, not a gate either.
+struct SpokenVoice: Decodable {
+    let id: String
+    let name: String
+    let gender: String?
+    let note: String?
+    let cloned: Bool?
+}
+
+struct VoiceLibrary: Decodable {
+    let voices: [SpokenVoice]
+}
+
 struct RoomFaces: Decodable {
     /// Keyed on the person, and **sparse**: somebody with no entry is
     /// showing `voice`, which is a person in the room. The seats come from
@@ -4388,6 +4414,79 @@ extension ApiClient {
             throw ApiError.http("upload failed")
         }
         return try JSONDecoder().decode(RoomFace.self, from: out)
+    }
+
+    /// The picture that goes BEHIND you in this room.
+    ///
+    /// A different object from the photo that stands in FOR you: `photo`
+    /// replaces the person, a background sits under whatever the seat is
+    /// showing and leaves them on top of it. Uploading one deliberately
+    /// does not change what you are showing — putting scenery up should not
+    /// turn your camera off or take your face down.
+    func uploadRoomBackground(roomId: String, interactorId: String,
+                              filename: String, data: Data,
+                              token: String) async throws -> RoomFace {
+        let plain = base.appendingPathComponent(
+            "/rooms/\(roomId)/face/background")
+        var parts = URLComponents(url: plain, resolvingAgainstBaseURL: false)
+        parts?.queryItems = [
+            URLQueryItem(name: "interactor_id", value: interactorId),
+            URLQueryItem(name: "filename", value: filename)]
+        var req = URLRequest(url: parts?.url ?? plain)
+        req.httpMethod = "POST"
+        req.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+        req.httpBody = data
+        let (out, resp) = try await dispatch(req)
+        guard let http = resp as? HTTPURLResponse,
+              (200..<300).contains(http.statusCode) else {
+            throw ApiError.http("upload failed")
+        }
+        return try JSONDecoder().decode(RoomFace.self, from: out)
+    }
+
+    /// Your own picture, if you have put one up. Yours alone to read: a
+    /// person's photograph is not a directory anybody holding an id may page
+    /// through.
+    func ownPicture(interactorId: String,
+                    token: String) async throws -> OwnPicture {
+        try await request("/interactors/\(interactorId)/picture",
+                          method: "GET", token: token)
+    }
+
+    /// Put your own picture up — the PERSON's, not a profile's portrait.
+    /// It follows you into every room rather than being set again in each.
+    func setOwnPicture(interactorId: String, filename: String, data: Data,
+                       token: String) async throws -> OwnPicture {
+        let plain = base.appendingPathComponent(
+            "/interactors/\(interactorId)/picture")
+        var parts = URLComponents(url: plain, resolvingAgainstBaseURL: false)
+        parts?.queryItems = [URLQueryItem(name: "filename", value: filename)]
+        var req = URLRequest(url: parts?.url ?? plain)
+        req.httpMethod = "POST"
+        req.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+        req.httpBody = data
+        let (out, resp) = try await dispatch(req)
+        guard let http = resp as? HTTPURLResponse,
+              (200..<300).contains(http.statusCode) else {
+            throw ApiError.http("upload failed")
+        }
+        return try JSONDecoder().decode(OwnPicture.self, from: out)
+    }
+
+    /// Back to your initials. Taking your own face down is the one action
+    /// where keeping the file would be the surprise.
+    func clearOwnPicture(interactorId: String,
+                         token: String) async throws -> OwnPicture {
+        try await request("/interactors/\(interactorId)/picture",
+                          method: "DELETE", token: token)
+    }
+
+    /// The voices this deployment can actually offer, asked of the engine
+    /// rather than hardcoded — so the one voice an account made itself is on
+    /// the list. Falls back to a stock roster server-side when there is no
+    /// key, the key is refused, or the engine cannot be reached.
+    func voiceLibrary() async throws -> VoiceLibrary {
+        try await request("/voices", method: "GET")
     }
 
     /// Hand the room a picture, video or file. Same raw-bytes shape as the

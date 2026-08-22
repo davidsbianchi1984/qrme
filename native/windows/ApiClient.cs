@@ -4168,6 +4168,65 @@ public sealed class ApiClient
         return await Send<RoomFace>(req);
     }
 
+    /// <summary>The picture that goes BEHIND you in this room.
+    ///
+    /// A different object from the photo that stands in FOR you:
+    /// <c>photo</c> replaces the person, a background sits under whatever
+    /// the seat is showing and leaves them on top of it. Uploading one
+    /// deliberately does not change what you are showing — putting scenery
+    /// up should not turn your camera off or take your face down.</summary>
+    public async Task<RoomFace> UploadRoomBackground(string roomId,
+        string interactorId, string filename, byte[] bytes, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Post,
+            $"/rooms/{roomId}/face/background?interactor_id=" +
+            Uri.EscapeDataString(interactorId) + "&filename=" +
+            Uri.EscapeDataString(filename))
+        { Content = new ByteArrayContent(bytes) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return await Send<RoomFace>(req);
+    }
+
+    /// <summary>Your own picture, if you have put one up. Yours alone to
+    /// read: a person's photograph is not a directory anybody holding an
+    /// id may page through.</summary>
+    public Task<OwnPicture> OwnPicture(string interactorId, string token) =>
+        Send<OwnPicture>(Get($"/interactors/{interactorId}/picture", token));
+
+    /// <summary>Put your own picture up — the PERSON's, not a profile's
+    /// portrait. It follows you into every room rather than being set
+    /// again in each one, and it is never AI-marked: a photograph of your
+    /// own face is authentic media, and stamping it would be a false
+    /// statement in exactly the direction the mark exists to
+    /// prevent.</summary>
+    public async Task<OwnPicture> SetOwnPicture(string interactorId,
+        string filename, byte[] bytes, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Post,
+            $"/interactors/{interactorId}/picture?filename=" +
+            Uri.EscapeDataString(filename))
+        { Content = new ByteArrayContent(bytes) };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return await Send<OwnPicture>(req);
+    }
+
+    /// <summary>Back to your initials. Taking your own face down is the
+    /// one action where keeping the file would be the surprise.</summary>
+    public Task<OwnPicture> ClearOwnPicture(string interactorId, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete,
+            $"/interactors/{interactorId}/picture");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<OwnPicture>(req);
+    }
+
+    /// <summary>The voices this deployment can actually offer, asked of the
+    /// engine rather than hardcoded — so the one voice an account made
+    /// itself is on the list. Gender is a hint and never a gate; cloned is
+    /// a label, not a gate either.</summary>
+    public Task<VoiceLibrary> VoiceLibrary() =>
+        Send<VoiceLibrary>(Get("/voices"));
+
     /// <summary>Hand the room a picture, video or file. Same raw-bytes
     /// shape as the face upload; the share lands as a room message
     /// everybody in the room reads, and never triggers profile turns —
@@ -5000,6 +5059,25 @@ public record RoomFace(
     [property: JsonPropertyName("means")] string? Means,
     [property: JsonPropertyName("media_url")] string? MediaUrl,
     [property: JsonPropertyName("ai_marked")] bool AiMarked);
+
+/// A person's OWN picture — theirs, not a profile's portrait, and the same
+/// in every room they walk into. <c>AiMarked</c> is always false and is on
+/// the wire anyway: a photograph of somebody's own face is authentic media.
+public record OwnPicture(
+    [property: JsonPropertyName("interactor_id")] string? InteractorId,
+    [property: JsonPropertyName("url")] string? Url,
+    [property: JsonPropertyName("ai_marked")] bool AiMarked);
+
+/// One row of the account's real voice library, as GET /voices serves it.
+public record SpokenVoice(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("gender")] string? Gender,
+    [property: JsonPropertyName("note")] string? Note,
+    [property: JsonPropertyName("cloned")] bool Cloned);
+
+public record VoiceLibrary(
+    [property: JsonPropertyName("voices")] SpokenVoice[]? Voices);
 
 public record RoomFaces(
     // Keyed on the person, and sparse: somebody with no entry is showing
