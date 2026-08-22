@@ -6,6 +6,45 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The room is a card on the page again.** The ask was one thing: move the
+  transparent bar and its controls down off the faces, into the small-font
+  band below them. What got built was that *and* a full-screen place —
+  `height: 100dvh`, `max-width: none`, and a cascade of rules to make the
+  frames fill the window it had claimed: two fixed columns, `min-height: 0`
+  on the tile, portraits scaling on `13vh`, a short-window reflow to three
+  columns at `22vh`.
+
+      asked     where does the strip sit
+      mattered  did the strip have to take the window with it
+
+  Field report, holding up the screen from before the change: *"I thought I
+  asked just for the users frames in that transparent text box to drop down
+  to where that small font text is, because in this photo the frames are
+  perfect size and scale."* They were — 179px tile, 72px face, read off
+  `docs/screens/103-audio-room.svg` — and every rule that resized them
+  existed only to fill a viewport that should never have been claimed. All
+  of it is out; a seat is the same seat here as on every other screen.
+
+  The half that was right stays: the strip is a real element below the
+  seats rather than an overlay on them, so it cannot climb back onto the
+  faces however the transcript grows.
+
+- **The way out is an X.** Asked for in those words. Top-right, round, with
+  the leave text kept as its label for anybody reading the screen rather
+  than seeing it — right corner because that is where a close lives, and
+  the left is where a back arrow goes.
+
+- **Five guards were holding the mistake in place.** They asserted
+  `100dvh`, `max-width: none`, `clamp(72px, 13vh, 132px)`, `min-height: 0`
+  and the letterbox reflow — written to protect a full-screen room and
+  therefore certain to fail the moment it was taken back out. Each now
+  records what was removed and why, so it does not get restored as a fix.
+  One of them read the raw stylesheet and tripped over its own docstring
+  quoting the rule it was checking for the absence of; it reads a
+  comment-stripped view now.
+
 ### Added
 
 - **A profile composes a document and hands it over.** Field report, three

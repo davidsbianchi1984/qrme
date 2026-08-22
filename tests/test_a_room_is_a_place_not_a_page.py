@@ -42,6 +42,13 @@ REPO = Path(__file__).resolve().parents[1]
 APP = (REPO / "app/src/App.tsx").read_text(encoding="utf-8")
 INSIDE = (REPO / "app/src/screens/Inside.tsx").read_text(encoding="utf-8")
 CSS = (REPO / "app/src/styles.css").read_text(encoding="utf-8")
+#: The stylesheet with its comments taken out.
+#:
+#: A guard that greps the raw file reads its own explanation of a mistake as
+#: the mistake. This file now says `clamp(72px, 13vh, 132px)` in prose, to
+#: record what was removed and why, and the check that removal held has to
+#: look at rules rather than at the paragraph describing them.
+RULES = re.sub(r"/\*.*?\*/", "", CSS, flags=re.S)
 L10N = (REPO / "app/src/l10n.ts").read_text(encoding="utf-8")
 
 
@@ -66,12 +73,34 @@ def test_the_navigation_steps_out_of_the_way():
         "232px hole rather than giving the room the width")
 
 
-def test_the_room_is_not_capped_at_the_page_width():
-    """`.screen` is 720px, which is the box the field report photographed."""
+def test_the_room_does_not_take_the_window():
+    """A room is a card on the page, and the frames keep their own size.
+
+    This guard used to assert the opposite — `max-width: none` and
+    `100dvh` — and it was wrong about what had been asked for. The ask was
+    one thing: move the transparent bar and its controls down off the
+    faces, into the small-font band below them. What got built was that
+    AND a full-screen place, with the tiles stretched to fill whatever was
+    left over.
+
+        asked     where does the strip sit
+        mattered  did the strip have to take the window with it
+
+    Field report, holding up the screen from before the change: "I thought
+    I asked just for the users frames in that transparent text box to drop
+    down to where that small font text is, because in this photo the
+    frames are perfect size and scale." They were — they are the sizes
+    read off docs/screens/103-audio-room.svg — and stretching them was a
+    second change riding along with a first one that was right.
+    """
     block = CSS[CSS.index(".screen.room-place {"):]
     block = block[:block.index("}")]
-    assert "max-width: none" in block
-    assert "100dvh" in block, "the room does not claim the window's height"
+    assert "100dvh" not in block, (
+        "the room claims the window's height again — a card on a page is "
+        "what was asked for")
+    assert "max-width: none" not in block, (
+        "the room escapes the page width again")
+
 
 
 def test_the_shelf_copy_goes_when_the_room_arrives():
@@ -193,39 +222,58 @@ def test_fullscreen_and_the_sensors_are_still_a_press():
 
 def test_the_seats_come_first_in_the_room():
     """The participant card with its camera and mask controls is first in
-    the markup, because on a page that reads top to bottom. In a room it
-    pushed the faces below the fold, which was the whole complaint."""
+    the markup, because a page reads top to bottom. In a room it pushed the
+    faces below the fold, which was the original complaint and is still
+    worth holding — the ordering survived the full-screen build being
+    taken back out, because it was never the part that was wrong."""
     block = CSS[CSS.index(".screen.room-place > .room-stage"):]
     block = block[:block.index("}")]
     assert "order: -1" in block, (
         "the faces are still drawn under whatever the page put above them")
-    assert "flex: 1 1 auto" in block, "the stage does not take the height"
 
 
-def test_the_seats_are_two_columns_not_a_strip_of_thumbnails():
-    """`auto-fill minmax(128px)` turns six people into a row of stamps on a
-    wide window. Screen 103 draws two columns of large faces."""
-    block = CSS[CSS.index(".screen.room-place .room-scene {"):]
-    block = block[:block.index("}")]
-    assert "repeat(2, minmax(0, 1fr))" in block
-    assert "auto-fill" not in block
+
+def test_the_seats_keep_the_grid_every_other_screen_uses():
+    """No room-only column count.
+
+    Two fixed columns existed to fill a viewport the room is no longer
+    filling. `.room-scene`'s own `auto-fill minmax(128px, 1fr)` is what
+    every other surface draws, and it is what the photographed screen was
+    drawing when the frames were called perfect.
+    """
+    assert ".screen.room-place .room-scene {" not in RULES, (
+        "the room overrides the seat grid again — a seat should be the "
+        "same seat here as everywhere else")
 
 
-def test_the_face_grows_with_the_room_and_is_bounded():
-    block = CSS[CSS.index(".screen.room-place .rs-face,"):]
-    block = block[:block.index("}")]
-    assert "clamp(" in block, (
-        "the portrait is a fixed 72px, so a full-screen room draws page-"
-        "sized faces in a window ten times the area")
-    assert "13vh" in block
+
+def test_the_face_is_the_size_it_is_drawn_at():
+    """72px, everywhere.
+
+    There were rules here growing the portrait with the viewport
+    (`clamp(72px, 13vh, 132px)`) so that a full-screen room would not draw
+    page-sized faces in a window ten times the area. With the room back on
+    the page there is no such window, and the clamp made the frames the
+    thing somebody had to ask to have put back.
+    """
+    assert ".screen.room-place .rs-face," not in RULES, (
+        "the room resizes the portrait again")
+    assert "13vh" not in RULES, (
+        "the face is still scaling with the viewport")
 
 
-def test_the_tile_stops_carrying_a_pages_minimum_height():
-    block = CSS[CSS.index(".screen.room-place .rs-tile {"):]
-    block = block[:block.index("}")]
-    assert "min-height: 0" in block, (
-        "179px per tile means six people stack past the window instead of "
-        "filling it")
+
+def test_the_tile_keeps_its_height():
+    """179px, as `.rs-tile` declares it.
+
+    The overrides that took this to 150px, and to 118px on a short window,
+    existed so six seats would fit a viewport the room was filling. It is
+    not filling one, so a seat is the seat — which is what "perfect size
+    and scale" was describing.
+    """
+    assert ".screen.room-place .rs-tile {" not in RULES, (
+        "the room shrinks the seat again")
+
 
 
 def test_the_scene_heading_goes_when_the_room_arrives():
@@ -360,13 +408,21 @@ def test_a_browser_that_will_not_turn_says_so():
     assert "ins.held.turnfail" in fn
 
 
-def test_sideways_reflows_to_three_columns():
-    """Two columns of tall tiles in a short wide window is a room seen
-    through a letterbox."""
-    block = CSS[CSS.index("@media (max-height: 560px)"):]
-    block = block[:block.index("/* ---- press and hold")]
-    assert "repeat(3, minmax(0, 1fr))" in block
-    assert "22vh" in block, "the portrait does not shrink for a short window"
+def test_a_short_window_does_not_get_its_own_room():
+    """No height-driven reflow, because nothing is being fitted to a height.
+
+    Two columns of tall tiles in a short wide window was a room seen
+    through a letterbox — a real problem for a place that had claimed
+    `100dvh` and therefore could not scroll. A card on a page scrolls, so
+    the fix for a short window is the page doing what pages do, and a
+    room-only three-column reflow with `22vh` portraits is one more way for
+    the frames to stop being the size they are drawn at.
+    """
+    block = RULES[RULES.index("@media (max-height: 560px)"):]
+    block = block[:block.index("}")]
+    assert "22vh" not in block, "the portrait shrinks with the window again"
+    assert "room-scene" not in block, "the room reflows its own grid again"
+
 
 
 # -- the transcript scrolls rather than forgets -------------------------------

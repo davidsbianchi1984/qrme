@@ -1275,13 +1275,15 @@ export function Inside({ onPlans, start = "", onLeave }: {
         </div>
       )}
       {inRoom && onLeave && (
-        // The way out. The sidebar is hidden while a room owns the window,
-        // so this is the only door — which is why it is drawn before
-        // anything else in the frame rather than tucked under the fold
-        // with the room's other controls.
-        <button className="room-out"
+        // The way out, as an X. Asked for in those words — "you were just
+        // supposed to incorporate an X to close and go back to the
+        // previous window" — and an X is what a person looks for at the
+        // corner of something they are inside of. The word is still there
+        // for anybody reading the screen rather than seeing it.
+        <button className="room-out" aria-label={tr("ins.leave", lang)}
+                title={tr("ins.leave", lang)}
                 onClick={() => { setEntered(false); onLeave(); }}>
-          {tr("ins.leave", lang)}
+          ✕
         </button>
       )}
       {!inRoom && <h2>{tr("ins.title", lang)}</h2>}
