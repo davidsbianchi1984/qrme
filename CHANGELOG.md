@@ -4,6 +4,58 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **A room is entered, not fallen into.** `inRoom` was `Boolean(open)` —
+  having a room id *was* being in the room — so the moment an id existed,
+  typed or remembered or handed in by another screen, the console joined
+  and drew the faces. From a phone: "it shouldn't even be shown yet. I
+  don't think it should dive straight into the room." Having somebody's
+  address is not being in their house, and frames arriving before the
+  press made the button below them look like it had already been pressed.
+  Going in is a press now, and the join effect waits for it — which also
+  stops every keystroke in the id box trying to join a half-typed room.
+
+- **The card that asked which room now names the one you are in.** Room
+  name and Save, in place of the id box and Go in, once you are inside:
+  "that's a good place to edit your room name while you're already in."
+  New `PATCH /rooms/{id}`, authorized exactly like speaking — a
+  participant held by their own token.
+
+- **Guests are chosen before the door opens.** The invite panel moved onto
+  the way-in screen so a person picks who is coming before walking in. The
+  invite door requires the inviter to already be in the room, and
+  deliberately — *"inviting somebody somewhere you are not is how a room id
+  becomes a way to send mail"* — so the picks are queued and sent the
+  instant the join lands. The rule is untouched; only the ordering a
+  person sees has changed. The list has a way off it, because a queue you
+  cannot correct is a queue that sends the typo.
+
+### Fixed
+
+- **The strip stopped resting on the faces.** Reported three times, and
+  twice "fixed" by adjusting a number. It was absolutely positioned inside
+  the seat grid with the stage reserving a hardcoded 104px underneath —
+  right the day it was written, wrong the moment the transcript grew to
+  four scrolling rows. A reserved constant is a guess about somebody
+  else's height, and a guess drifts every time the thing it guesses about
+  changes. The strip is a sibling of the scene now and static in a room:
+  it takes the space it needs, the scene shrinks by exactly that much, and
+  no number anywhere guesses at either. Five rows before a line goes above
+  the fold, pinned to the newest.
+
+- **One control, one place.** Three cards went. "Ask somebody into the
+  room" repeated the strip's own invite; the microphone card became a
+  control in the strip beside the handover, where it belongs — both hand
+  something of yours to somebody else; and the compose row's paperclip,
+  dictation mic, type box and send were every one of them already in the
+  strip. "Let them talk" was the only control among them that was *not* a
+  duplicate, so it moved into the strip rather than out of the product:
+  deleting the only door to a capability is a different act from removing
+  a second copy of one.
+
 ## [1.0.0] - 2026-08-22
 
 One-point-oh. The version number is the only thing in this release that is
