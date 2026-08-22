@@ -6,12 +6,61 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.4.0] - 2026-08-22
 
-A slept tab does not go quietly deaf. A backgrounded page has its
-microphone stopped by the browser without an error, and every light saying
-it was listening went on saying it — the orb's caption, the room's mic
-button, the line telling you the room could hear you.
+Four things that worked and could not be seen to work. A backgrounded tab
+kept every light saying it was listening over a microphone the browser had
+stopped. A PDF that read as garbage was reported as read. An add-friend
+button that fired, refused or did nothing looked the same in all three
+cases. And the room's invite could only be aimed by typing a profile id
+nobody has.
+
+One thread runs through them: the work was done and the answer was
+dropped. A failure that is both total and unreported survives, and the
+unreported half is what lets it.
 
 ### Fixed
+
+- **A PDF comes back as words, or it comes back as nothing.** Asked three
+  times, the third with the transcript attached: the profile in the room
+  saying the filings *"came through as garbage on my end — byte soup rather
+  than claims."* It was reporting honestly. Against a real, ordinary,
+  text-bearing PDF the reader produced 1,818 characters of mojibake and
+  declared it read; the same file now reads as 4,295 characters of English.
+
+      asked     did any text come out of the PDF
+      mattered  is it text
+
+  Only zlib streams were decoded — a stream in ASCII85, which is what the
+  real file used, raised `zlib.error` and was appended **still encoded**, and
+  the scanner then matched parentheses inside compressed bytes. Hex strings
+  were not matched at all, so every generator that prefers them produced an
+  empty read. And `len(text) >= 40` stood in for *is this text*: forty
+  characters is a length, and garbage is long, so the module's own promise —
+  that a scan has no text in it to find — was never reached. Unreadable bytes
+  never came back empty; they came back as a paragraph. Filters are undone
+  properly now (Flate, ASCII85, ASCIIHex, LZW, RunLength and cascades), hex
+  and UTF-16 strings are read, and `_reads_like_language` is the gate that
+  makes the rest safe to be best-effort: anything that is not writing comes
+  back empty, so a scan or a font this reader cannot decode degrades to the
+  honest *held, and said so*. Six filter arrangements: two read before, six
+  now. No new dependencies.
+
+- **The add-friend button says what happened.** *"I tried to bring in another
+  synthetic profile in my friends list by using the add friend button and
+  it's not working."* The server was never the problem. `Profile.tsx` guarded
+  with a bare `return` — no request, no error, no note — so pressed without a
+  profile of your own it did nothing and said nothing. `Friends.tsx` asserted
+  the owner token with `!` instead of checking it, then rendered the refusal
+  at the very bottom of a screen carrying the search results, the browse
+  pool, the list and the suggestions. And `addFriend` was `req<unknown>` with
+  all three call sites dropping the reply, so the server's deliberate soft no
+  — `added: false`, already a friend — arrived as silence. `FriendRemoval`
+  has carried the same warning in a comment all along; it was never carried
+  across to the add.
+
+- **Every field a person installs carries this version.** PDI's release guard
+  caught six stale fields the bump missed, in all three repos: the numeric
+  build codes, the Windows shell manifests and the README banner. The half a
+  developer looks at had moved; the half a store reads had not.
 
 - **A microphone that has stopped is no longer drawn as listening.** A
   field report, with a photograph: tabs dropping into the background
@@ -59,6 +108,19 @@ button, the line telling you the room could hear you.
   the case where `onend` never comes.
 
 ### Added
+
+- **The room shows you who you know.** *"My friends list should appear and be
+  able to choose from the friends list to add other friends and profiles to
+  the chat."* The invite has worked since it was built — host asks, guest's
+  owner accepts — and the only way to name the guest was to type
+  `prf_3735f90003ba`. Complete and unusable, which does not look like a bug
+  from the inside: every part works, the tests pass, and the only person who
+  finds out is the one holding the phone. The panel draws your friends list
+  first now, each row inviting on press, anyone already seated shown and not
+  pressable, the id box kept second for an id from elsewhere. Inviting
+  another *person* by name is still not possible — the wire takes profiles
+  only, and people join rooms through the lobby.
+
 
 - `app/src/away.ts` — one module the whole console asks *am I away now* and
   *tell me when that changes*, so no screen has to remember the answer.
