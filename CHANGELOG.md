@@ -4,6 +4,39 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.99.1] - 2026-08-22
+
+### Fixed
+
+- **The room hears you without being asked.** A voice room already
+  arrived speaking; the other half of that press stayed. Two field
+  reports, one round: "everything seems to be working fine as long as
+  users are in the room — they shouldn't have to press the microphone
+  button", and "while speaking, we should have like 4 to 5 seconds of
+  silence will send instead of having to press this button". Being in a
+  voice room is the intent to speak in it, so the ear opens on the way in
+  and the control becomes a **mute**; what is heard rides in the box as
+  it arrives, and four and a half seconds of the person's own silence
+  commits it. Longer than JIM's 2.5 deliberately — that number ends a
+  turn in a two-way conversation, this one sends a sentence to a room
+  with other people in it. Chat rooms are untouched: there the medium is
+  typing, and an ear opening itself would be a liberty nobody asked for.
+
+      asked     can you talk in this room
+      mattered  do you have to ask permission to start, and to finish
+
+- **And it does not hear itself.** An open microphone in a room where
+  several profiles speak through one speaker is exactly the shape that
+  broke JIM's coach sphere — "it's picking up its own voice and
+  triggering itself and not letting it finish" — and one voice was enough
+  there. `app/src/echo.ts` answers the narrower question rather than the
+  easy one: going deaf while the room speaks would end the interruption a
+  voice room exists for, so what is checked is whether the words are the
+  room's own coming back. Short interjections are never echoes, however
+  well they match, because "yes", "no", "wait" and "stop" are precisely
+  the interruptions worth having. The guard is executed by its suite, not
+  pinned by a regex.
+
 ## [0.99.0] - 2026-08-21
 
 ### Fixed
@@ -13478,6 +13511,7 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
+[0.99.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.99.0...app-v0.99.1
 [0.99.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.98.0...app-v0.99.0
 [0.98.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.97.0...app-v0.98.0
 [0.97.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v0.96.0...app-v0.97.0

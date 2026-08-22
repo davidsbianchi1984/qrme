@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { isEcho, RECENT_TURNS } from "../echo";
 import { api, getBase, type Avatar, type MicsHere, type RoomFaces,
          type RoomMsg } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
@@ -89,6 +90,35 @@ type SpeechRec = {
   onend: (() => void) | null;
   start(): void; stop(): void;
 };
+
+/** How long a person's silence means they have finished saying it.
+ *
+ *  A field report, holding the send button: "while speaking, we should
+ *  have like 4 to 5 seconds of silence will send instead of having to
+ *  press this button."
+ *
+ *      asked     is the microphone open
+ *      mattered  does anything happen when you stop talking
+ *
+ *  Deliberately longer than JIM's 2.5 seconds. That number ends a TURN in
+ *  a two-way conversation, where cutting somebody off costs one
+ *  interruption. This one commits a sentence to a ROOM with other people
+ *  in it, where the same mistake sends half a thought to everybody — so
+ *  it waits nearly twice as long, at the near end of the range the report
+ *  asked for.
+ */
+const SILENCE_SENDS_MS = 4500;
+
+/** Whether this browser ships a speech recogniser at all (iOS Safari does
+ *  not). Module scope rather than a body const: the effect that opens the
+ *  standing ear runs above where this used to be declared, and a `const`
+ *  read before its line is a dead-zone crash rather than a false. */
+const canDictate = typeof window !== "undefined"
+  && Boolean((window as unknown as { SpeechRecognition?: unknown;
+                                     webkitSpeechRecognition?: unknown })
+      .SpeechRecognition
+    || (window as unknown as { webkitSpeechRecognition?: unknown })
+      .webkitSpeechRecognition);
 
 export function Inside({ onPlans, start = "" }: {
   onPlans: () => void;
@@ -189,6 +219,21 @@ export function Inside({ onPlans, start = "" }: {
   // once — one microphone, one destination.
   const [talking, setTalking] = useState(false);
   const talkRec = useRef<{ stop: () => void } | null>(null);
+  // The standing ear's own state. `wantTalking` is the person's decision,
+  // held apart from `talking` because the browser's recogniser ends itself
+  // on its own schedule — a quiet minute, a tab blur — and a standing ear
+  // that died at the platform's convenience would put the press right back
+  // where a field report just took it from.
+  const wantTalking = useRef(false);
+  // What is being heard, before it is sent. It rides in the draft box on
+  // purpose: a person talking to a room needs to see that they are being
+  // heard, and a microphone with no visible output is one people repeat
+  // themselves into.
+  const pending = useRef("");
+  const silence = useRef<number | null>(null);
+  // What the room has recently said out loud, for the echo guard. Kept as
+  // turns rather than one string so the window stays honest as it rolls.
+  const roomSaid = useRef<string[]>([]);
   // Asking another synthetic profile into the room. The invite is consent-
   // shaped on the wire — host asks, the profile's owner accepts — and for a
   // profile this person owns, the console holds both tokens, so one press
@@ -418,6 +463,11 @@ export function Inside({ onPlans, start = "" }: {
           // quietly — the per-turn 🔊 is still on every line.
           const s = await speakInPieces(
             m.sender_id as string, m.content || "", token);
+          // Remembered before it plays, not after: the microphone is open
+          // the whole time this voice is in the air, so the words have to
+          // be in the window before they can come back through it.
+          roomSaid.current = [...roomSaid.current, m.content || ""]
+            .slice(-RECENT_TURNS);
           nowSaying.current = s;
           if (run !== earRun.current) { s.stop(); break; }
           // The light follows the voice: while a backlog is being read,
@@ -444,6 +494,16 @@ export function Inside({ onPlans, start = "" }: {
     nowSaying.current = null;
     dictation.current?.stop();
     dictation.current = null;
+    // `wantTalking` first: `onend` restarts the ear while it is true, so
+    // stopping the recogniser without clearing the decision would spawn a
+    // fresh one into a room nobody is standing in any more.
+    wantTalking.current = false;
+    if (silence.current !== null) {
+      window.clearTimeout(silence.current);
+      silence.current = null;
+    }
+    pending.current = "";
+    roomSaid.current = [];
     talkRec.current?.stop();
     talkRec.current = null;
   }, [open]);
@@ -457,28 +517,67 @@ export function Inside({ onPlans, start = "" }: {
     if (spokenRoom) setHearAll(true);
   }, [spokenRoom, open]);
 
-  /** Say something into the room out loud: the recogniser hears it and the
-   *  room receives it. Dictation's "the send stays a decision" bargain is
-   *  right for a room people TYPE in — here speaking IS the medium, and a
-   *  send button between a spoken sentence and the room is the keyboard
-   *  wearing a different hat. */
-  function flipTalking() {
-    if (talking) {
-      talkRec.current?.stop();
-      talkRec.current = null;
-      setTalking(false);
+  // ...and arrives listening. The other half of the same field report:
+  // "everything seems to be working fine as long as users are in the
+  // room. They shouldn't have to press the microphone button."
+  //
+  //     asked     can you talk in this room
+  //     mattered  do you have to ask permission to start
+  //
+  // Being in a voice room IS the intent to speak in it — the press was
+  // the room asking a question it had already been answered. So the ear
+  // opens on the way in, and the control below becomes the MUTE.
+  //
+  // Only in a spoken room: a chat room's microphone stays a decision,
+  // because there the medium is typing and an ear opening itself would
+  // be the product taking a liberty nobody asked for.
+  useEffect(() => {
+    if (!spokenRoom || !canDictate) return;
+    startTalking();
+    // `open` in the deps so moving between voice rooms re-opens the ear
+    // in the new one; the teardown above has already closed the old.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spokenRoom, open, canDictate]);
+
+  /** Send what has been heard, and clear the box.
+   *
+   *  The echo guard stands here rather than at `onresult`: a person's
+   *  sentence and the room's own voice can land in the same pending
+   *  buffer, and the thing worth checking is what is about to be SAID in
+   *  the room, not each fragment on its way in. */
+  function sendPending() {
+    const said = pending.current.trim();
+    pending.current = "";
+    setDraft("");
+    if (!said || !token) return;
+    if (isEcho(said, roomSaid.current.join(" "))) {
+      // The room hearing itself. Dropped silently and the ear stays
+      // open — announcing it would be the product apologising for a
+      // microphone the person never pressed.
       return;
     }
+    // `act` is deliberately not used: it flips `busy`, which would grey
+    // out the room under somebody mid-conversation.
+    api.sayInRoom(open, me, said, token).then(load).catch(setError);
+  }
+
+  /** Start the standing ear.
+   *
+   *  Separate from the toggle so entering a voice room can open it
+   *  without pretending somebody pressed something.
+   */
+  function startTalking() {
     const w = window as unknown as {
       SpeechRecognition?: new () => SpeechRec;
       webkitSpeechRecognition?: new () => SpeechRec;
     };
     const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
-    if (!SR) return;
-    // One microphone: dictation and talking cannot both hold it.
+    if (!SR || talkRec.current) return;
+    // One microphone: dictation and the standing ear cannot both hold it.
     dictation.current?.stop();
     dictation.current = null;
     setDictating(false);
+    wantTalking.current = true;
     const rec = new SR();
     rec.lang = navigator.language || "en";
     rec.interimResults = false;
@@ -490,17 +589,46 @@ export function Inside({ onPlans, start = "" }: {
         parts.push(e.results[i][0].transcript);
       }
       seen = e.results.length;
-      const said = parts.join(" ").trim();
-      if (!said || !token) return;
-      // Straight into the room, one heard sentence at a time. `act` is
-      // deliberately not used: it flips `busy`, which would disable the
-      // talk button under a person mid-conversation.
-      api.sayInRoom(open, me, said, token).then(load).catch(setError);
+      const heard = parts.join(" ").trim();
+      if (!heard) return;
+      pending.current = (pending.current ? pending.current + " " : "") + heard;
+      // Shown as it is heard. The box is the feedback that the room is
+      // listening; without it an open microphone is indistinguishable
+      // from a broken one.
+      setDraft(pending.current);
+      if (silence.current !== null) window.clearTimeout(silence.current);
+      silence.current = window.setTimeout(sendPending, SILENCE_SENDS_MS);
     };
-    rec.onend = () => { talkRec.current = null; setTalking(false); };
+    // The browser ends recognition on its own — a quiet stretch, a
+    // backgrounded tab. A standing ear restarts, because the person's
+    // decision has not changed; only the platform's patience has.
+    rec.onend = () => {
+      talkRec.current = null;
+      if (wantTalking.current) { startTalking(); return; }
+      setTalking(false);
+    };
     rec.start();
     talkRec.current = { stop: () => rec.stop() };
     setTalking(true);
+  }
+
+  function stopTalking() {
+    wantTalking.current = false;
+    if (silence.current !== null) {
+      window.clearTimeout(silence.current);
+      silence.current = null;
+    }
+    // Anything already heard is sent rather than binned: a person who
+    // finished a sentence and reached for the button meant to say it.
+    sendPending();
+    talkRec.current?.stop();
+    talkRec.current = null;
+    setTalking(false);
+  }
+
+  /** The control is now a mute, not a trigger. */
+  function flipTalking() {
+    if (talking) stopTalking(); else startTalking();
   }
 
   function flipDictation() {
@@ -535,13 +663,6 @@ export function Inside({ onPlans, start = "" }: {
     dictation.current = { stop: () => rec.stop() };
     setDictating(true);
   }
-
-  const canDictate = typeof window !== "undefined"
-    && Boolean((window as unknown as { SpeechRecognition?: unknown;
-                                       webkitSpeechRecognition?: unknown })
-        .SpeechRecognition
-      || (window as unknown as { webkitSpeechRecognition?: unknown })
-        .webkitSpeechRecognition);
 
   async function sendDraft() {
     if (!draft.trim() || !token || busy) return;
