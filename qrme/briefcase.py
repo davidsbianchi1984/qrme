@@ -64,6 +64,7 @@ timing out mid-conversation.
 
 from __future__ import annotations
 
+import base64
 import re
 import zipfile
 import zlib
@@ -104,11 +105,6 @@ class BriefcaseError(ValueError):
 _TAGS = re.compile(r"<[^>]+>")
 _WS = re.compile(r"\s+")
 
-#: PDF text-showing operators. ``(...) Tj`` draws one string; ``[...] TJ``
-#: draws a run of them with kerning numbers interleaved.
-_PDF_STR = re.compile(rb"\((?:\\.|[^\\()])*\)", re.S)
-_PDF_STREAM = re.compile(rb"stream\r?\n(.*?)endstream", re.S)
-
 _PK_PARTS = {
     ".docx": ("word/document.xml",),
     ".pptx": ("ppt/slides/",),
@@ -120,25 +116,227 @@ def _clean(text: str) -> str:
     return _WS.sub(" ", text).strip()[:MAX_TEXT]
 
 
+#: Stream filters this reader knows how to undo. Anything outside this set —
+#: an image codec, or a filter nobody has written here yet — leaves the stream
+#: where it is, and :func:`_reads_like_language` below is what stops the
+#: leftovers being served to a profile as though they were the document.
+_TEXT_FILTERS = {
+    b"FlateDecode", b"Fl", b"ASCII85Decode", b"A85", b"ASCIIHexDecode",
+    b"AHx", b"LZWDecode", b"LZW", b"RunLengthDecode", b"RL",
+}
+
+#: A stream and, ahead of it, the dictionary that says how it is encoded.
+_PDF_STREAM = re.compile(rb"stream\r?\n(.*?)endstream", re.S)
+_FILTER = re.compile(rb"/Filter\s*(\[[^\]]*\]|/[A-Za-z0-9]+)")
+_FILTER_NAME = re.compile(rb"/([A-Za-z0-9]+)")
+
+#: PDF text-showing strings. ``(...)`` is a literal string; ``<...>`` is the
+#: same thing written in hex, which the previous reader did not match at all —
+#: so every generator that prefers hex (most of them, for anything but plain
+#: ASCII) produced a document that came back empty.
+_PDF_STR = re.compile(rb"\((?:\\.|[^\\()])*\)|<[0-9A-Fa-f\s]*>", re.S)
+
+
+def _unfilter(body: bytes, spec: bytes | None) -> bytes | None:
+    """Undo a stream's filter chain, or ``None`` if this reader cannot.
+
+    ``None`` is a real answer and the important one. The previous version had
+    no concept of it: a stream it could not inflate was appended **still
+    encoded**, and the text scanner then matched parentheses inside compressed
+    bytes. That is where the byte soup came from.
+    """
+    if spec is None:
+        return body
+    for name in _FILTER_NAME.findall(spec):
+        if name not in _TEXT_FILTERS:
+            return None                     # an image, or a filter we lack
+        try:
+            if name in (b"FlateDecode", b"Fl"):
+                body = zlib.decompress(body)
+            elif name in (b"ASCII85Decode", b"A85"):
+                body = _a85(body)
+            elif name in (b"ASCIIHexDecode", b"AHx"):
+                body = _ahx(body)
+            elif name in (b"LZWDecode", b"LZW"):
+                body = _lzw(body)
+            else:
+                body = _runlength(body)
+        except Exception:
+            return None
+    return body
+
+
+def _a85(body: bytes) -> bytes:
+    """ASCII85, with Adobe's framing optional — real files vary on whether the
+    leading ``<~`` is written, and every one of them ends with ``~>``."""
+    text = b"".join(body.split())
+    if text.startswith(b"<~"):
+        text = text[2:]
+    end = text.find(b"~>")
+    if end >= 0:
+        text = text[:end]
+    return base64.a85decode(text, adobe=False)
+
+
+def _ahx(body: bytes) -> bytes:
+    text = b"".join(body.split())
+    end = text.find(b">")
+    if end >= 0:
+        text = text[:end]
+    if len(text) % 2:
+        text += b"0"                        # the spec pads an odd tail
+    return bytes.fromhex(text.decode("ascii"))
+
+
+def _runlength(body: bytes) -> bytes:
+    out = bytearray()
+    i = 0
+    while i < len(body):
+        n = body[i]
+        if n == 128:
+            break
+        if n < 128:
+            out += body[i + 1:i + 2 + n]
+            i += 2 + n
+        else:
+            out += body[i + 1:i + 2] * (257 - n)
+            i += 2
+    return bytes(out)
+
+
+def _lzw(body: bytes) -> bytes:
+    """LZW as PDF writes it: 8-bit input, codes 9..12 bits, early change."""
+    out = bytearray()
+    table: list[bytes] = [bytes([i]) for i in range(256)] + [b"", b""]
+    width, prev = 9, None
+    buf = bits = 0
+    for byte in body:
+        buf = (buf << 8) | byte
+        bits += 8
+        while bits >= width:
+            code = (buf >> (bits - width)) & ((1 << width) - 1)
+            bits -= width
+            if code == 256:                 # clear
+                table = [bytes([i]) for i in range(256)] + [b"", b""]
+                width, prev = 9, None
+                continue
+            if code == 257:                 # end of data
+                return bytes(out)
+            if prev is None:
+                entry = table[code]
+            elif code < len(table):
+                entry = table[code]
+                table.append(prev + entry[:1])
+            else:
+                entry = prev + prev[:1]
+                table.append(entry)
+            out += entry
+            prev = entry
+            if len(table) + 1 >= (1 << width) and width < 12:
+                width += 1                  # early change
+    return bytes(out)
+
+
+def _string_text(raw: bytes) -> str:
+    """One text-showing string's bytes as characters.
+
+    Two-byte encodings are tried first where the bytes look like one. A
+    composite font writing UTF-16 reads correctly this way; a subset font
+    writing raw glyph ids does not read at all, in any encoding, without the
+    font's own map — and that is what the readability gate is for.
+    """
+    if len(raw) >= 4 and not len(raw) % 2:
+        zeros = sum(1 for i in range(0, len(raw), 2) if raw[i] == 0)
+        if zeros >= len(raw) // 4:
+            try:
+                return raw.decode("utf-16-be")
+            except UnicodeDecodeError:
+                pass
+    return raw.decode("latin-1", "replace")
+
+
 def _pdf_text(data: bytes) -> str:
     """Whatever words a PDF carries as text, ignoring what it carries as
-    pixels. A scan comes back empty on purpose — see ``read`` below."""
+    pixels, and **nothing at all** when what came out is not language.
+
+    A field report, three times: *"the synthetic profile can't read documents
+    still"*, with a transcript of the profile saying the filings *"came
+    through as garbage on my end — byte soup rather than claims"*. The profile
+    was right and was reporting honestly. It had been handed 1,818 characters
+    of mojibake and told that was the document.
+
+        asked     did any text come out of the PDF
+        mattered  is it text
+
+    The old reader inflated what it could, appended what it could not **still
+    encoded**, scanned for parentheses across both, and declared the result
+    read if it ran past forty characters. Forty characters is a length, and
+    garbage is long. So the one case the module's own header promises to
+    handle honestly — *a PDF that carries only scanned pixels has no text in
+    it to find* — was the one case it did not reach, because unreadable bytes
+    never came back empty. They came back as a paragraph.
+    """
     chunks: list[bytes] = []
-    for raw in _PDF_STREAM.findall(data):
-        try:
-            chunks.append(zlib.decompress(raw))
-        except zlib.error:
-            chunks.append(raw)          # uncompressed content stream
+    for match in _PDF_STREAM.finditer(data):
+        head = data[max(0, match.start() - 800):match.start()]
+        spec = _FILTER.findall(head)
+        body = _unfilter(match.group(1), spec[-1] if spec else None)
+        if body is not None:
+            chunks.append(body)
     if not chunks:
         chunks = [data]
     out: list[str] = []
     for chunk in b"\n".join(chunks).split(b"BT")[1:] or [b"".join(chunks)]:
         for match in _PDF_STR.findall(chunk):
-            body = match[1:-1]
-            body = re.sub(rb"\\([()\\])", rb"\1", body)
-            body = re.sub(rb"\\[0-9]{1,3}", b" ", body)
-            out.append(body.decode("latin-1", "replace"))
-    return _clean(" ".join(out))
+            if match[:1] == b"<":
+                try:
+                    body = _ahx(match[1:])
+                except ValueError:
+                    continue
+            else:
+                body = match[1:-1]
+                body = re.sub(rb"\\([()\\])", rb"\1", body)
+                body = re.sub(rb"\\[0-9]{1,3}", b" ", body)
+            out.append(_string_text(body))
+    text = _clean(" ".join(out))
+    return text if _reads_like_language(text) else ""
+
+
+#: How much of an extraction has to look like writing before it counts as
+#: having been read. Deliberately generous: a filing is full of numbers,
+#: citations and reference signs, and this is a floor against byte soup, not a
+#: taste test.
+_WORDISH = re.compile(r"[^\W\d_]{2,}")
+
+
+def _reads_like_language(text: str) -> bool:
+    """Whether an extraction is writing or wreckage.
+
+    The gate the reader never had. Everything upstream of it is best-effort —
+    filters this module implements, encodings it guesses at — and best-effort
+    is fine as long as the failures come back as failures. A profile that is
+    told plainly *this was held but could not be read* asks what is in it. A
+    profile handed mojibake describes the mojibake.
+    """
+    if len(text) < 40:
+        return False
+    letters = [ch for ch in text if ch.isalpha()]
+    if len(letters) < len(text) * 0.5:
+        return False
+    # Scripts written without spaces (Chinese, Japanese) have no words to
+    # count, so the letter share is the whole test for them.
+    if sum(1 for ch in letters if ch.isascii()) < len(letters) * 0.5:
+        return True
+    # Writing is spaced. Prose of any language that uses spaces breaks every
+    # few characters; an encoding runs on. A base64 blob is all letters and
+    # would pass every other test here on its way to a profile.
+    tokens = text.split()
+    if not tokens or len(text) / len(tokens) > 18:
+        return False
+    # The share of the text standing inside ordinary word-shaped runs. Byte
+    # soup has letters everywhere and words almost nowhere: its runs are one
+    # or two characters long, broken up by punctuation that means nothing.
+    return sum(len(w) for w in _WORDISH.findall(text)) >= len(text) * 0.45
 
 
 def _zip_text(data: bytes, ext: str) -> str:
@@ -222,13 +420,23 @@ def read_file(data: bytes, name: str | None,
             return "video", _clean(heard["text"]), True
         return "video", "", False
     if data[:4] == b"%PDF":
+        # Empty is the honest answer for a scan, and now also for a PDF this
+        # reader could open but not turn into words — see `_pdf_text`.
         text = _pdf_text(data)
-        return "document", text, len(text) >= 40
+        return "document", text, bool(text)
     if data[:4] == b"PK\x03\x04":
         text = _zip_text(data, ext)
         return "document", text, bool(text)
+    # Whatever is left is treated as plain text, and most of the time it is.
+    # But `errors="replace"` never fails, so a format nobody sniffed — an old
+    # binary .doc, an .rtf, a database file somebody dragged in — decoded into
+    # replacement characters and was handed over as though it were writing.
+    # The same gate the PDF reader uses answers it here: held, and said so.
     text = _clean(data.decode("utf-8", "replace"))
-    return "document", text, bool(text)
+    # Short enough and there is nothing to judge — "Meet me at 4" is a note,
+    # not wreckage, and a gate that called it unread would be the new bug.
+    return "document", text, bool(text) and (len(text) < 40
+                                             or _reads_like_language(text))
 
 
 def read_link(url: str, on_behalf_of: str | None = None) -> tuple[str, bool, str | None]:

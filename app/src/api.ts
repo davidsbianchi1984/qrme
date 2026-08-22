@@ -2814,6 +2814,29 @@ export type FriendRemoval = {
   reason?: string;
 };
 
+/** What befriending answers, and the half that was being thrown away.
+ *
+ *  The mirror of `FriendRemoval`, and it should have been written at the same
+ *  time. A 200 here does **not** mean a row was added: adding somebody already
+ *  on the list succeeds with `added: false` and a reason, because that is not
+ *  an error — it is the list already saying what you asked it to say.
+ *
+ *      asked     did the friendship get added
+ *      mattered  does anyone find out either way
+ *
+ *  This was `req<unknown>`, and all three screens that call it dropped the
+ *  answer on the floor. A field report: *"I tried to bring in another
+ *  synthetic profile in my friends list by using the add friend button and
+ *  it's not working."* The server had an answer the whole time. */
+export type FriendAddition = {
+  profile_id: string;
+  friend_id: string;
+  added: boolean;
+  /** True when the row existed and was revived — somebody you had removed. */
+  revived?: boolean;
+  reason?: string;
+};
+
 export type CloudStatus = {
   cloud: boolean;
   model: unknown;
@@ -3700,7 +3723,7 @@ export const api = {
           never_ranked_on: string[]; excluded: string }>(
       `/profiles/${profileId}/friends/suggested`),
   addFriend: (profileId: string, friendId: string, token: string) =>
-    req<unknown>(`/profiles/${profileId}/friends`,
+    req<FriendAddition>(`/profiles/${profileId}/friends`,
       { method: "POST", body: { friend_id: friendId }, token }),
   inbox: (profileId: string, token: string) =>
     req<{ events: InboxEvent[]; unseen: number }>(
