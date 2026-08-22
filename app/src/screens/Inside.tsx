@@ -113,6 +113,16 @@ const SILENCE_SENDS_MS = 4500;
  *  not). Module scope rather than a body const: the effect that opens the
  *  standing ear runs above where this used to be declared, and a `const`
  *  read before its line is a dead-zone crash rather than a false. */
+/** A phone, rather than a narrow window on a computer. The held overlay
+ *  exists because a phone in a full-screen room has no window edge, no tab
+ *  strip and no back button — a desktop browser has all three, and a
+ *  gesture invented to replace them there would be a gesture nobody needs
+ *  and nobody would find. Coarse pointer is the honest test: it asks about
+ *  the input, which is what the gesture is actually about. */
+const onAPhone = typeof window !== "undefined"
+  && typeof window.matchMedia === "function"
+  && window.matchMedia("(pointer: coarse)").matches;
+
 const canDictate = typeof window !== "undefined"
   && Boolean((window as unknown as { SpeechRecognition?: unknown;
                                      webkitSpeechRecognition?: unknown })
@@ -120,11 +130,15 @@ const canDictate = typeof window !== "undefined"
     || (window as unknown as { webkitSpeechRecognition?: unknown })
       .webkitSpeechRecognition);
 
-export function Inside({ onPlans, start = "" }: {
+export function Inside({ onPlans, start = "", onLeave }: {
   onPlans: () => void;
   /** A room id handed in by the Rooms screen's join — the field is
    *  prefilled so the person lands in the room they just entered. */
   start?: string;
+  /** Step back out. Required once a room owns the window: the sidebar
+   *  that used to be the way out is hidden while somebody is standing in
+   *  a room, and a full-screen place with no door is a trap. */
+  onLeave?: () => void;
 }) {
   const { session } = useSession();
   const lang = visitorLang();
@@ -239,6 +253,26 @@ export function Inside({ onPlans, start = "" }: {
   // profile this person owns, the console holds both tokens, so one press
   // does the whole round trip and the guest is simply seated.
   const [guestId, setGuestId] = useState("");
+  // Whether the guest-invite form is showing. The strip's person-plus is a
+  // shortcut to a form that already exists further down this page rather
+  // than a second way to do the same thing — one invite, one door, one
+  // place the refusal lands.
+  const [asking, setAsking] = useState(false);
+  const askCard = useRef<HTMLDivElement>(null);
+  // The held overlay — screen 104. Press and hold, or double tap, anywhere
+  // in the room and three options come up over it; tap anywhere else and
+  // they go away again.
+  //
+  //     asked     how do you get out of a full-screen room on a phone
+  //     mattered  is there anything to press, and can you find it twice
+  //
+  // Deliberately **phone only**. A computer is landscape already and has a
+  // window edge, a tab bar and a back button; putting a held overlay there
+  // would be inventing a gesture to solve a problem that screen does not
+  // have. The field report said so in one line — "that's for mobile
+  // because computer will be landscape anyways".
+  const [held, setHeld] = useState(false);
+  const holdRoom = useRef<number | null>(null);
   // Sharing into the room: whatever is typed in the box rides along as
   // the caption, so "look at this" and the picture arrive as one turn.
   const sharePick = useRef<HTMLInputElement>(null);
@@ -539,6 +573,47 @@ export function Inside({ onPlans, start = "" }: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spokenRoom, open, canDictate]);
 
+  // The strip's person-plus brings the invite into view rather than opening
+  // a second one. One invite, one door, one place a refusal lands — and in
+  // a full-screen room the form is below the faces, which is exactly where
+  // somebody who pressed a button expects not to have to go looking.
+  useEffect(() => {
+    if (!asking) return;
+    askCard.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    const t = window.setTimeout(() => setAsking(false), 1600);
+    return () => window.clearTimeout(t);
+  }, [asking]);
+
+  /** Turn the room sideways.
+   *
+   *  Orientation can only be locked from fullscreen — that is the
+   *  platform's rule, not a preference — so the press does both. This is
+   *  the one place in this screen that asks for fullscreen, and it is a
+   *  press that says the word: a person tapping "Landscape" has asked for
+   *  exactly this.
+   *
+   *  It fails on iOS, which does not implement the lock at all. Said out
+   *  loud rather than swallowed: a button that does nothing and reports
+   *  nothing is the thing people press four times before giving up.
+   */
+  async function goSideways() {
+    const el = document.documentElement as HTMLElement & {
+      webkitRequestFullscreen?: () => Promise<void>;
+    };
+    const orient = screen.orientation as ScreenOrientation & {
+      lock?: (o: string) => Promise<void>;
+    };
+    try {
+      if (!document.fullscreenElement) {
+        await (el.requestFullscreen?.() ?? el.webkitRequestFullscreen?.());
+      }
+      if (!orient?.lock) throw new Error("no lock");
+      await orient.lock("landscape");
+    } catch {
+      setNote(tr("ins.held.turnfail", lang));
+    }
+  }
+
   /** Send what has been heard, and clear the box.
    *
    *  The echo guard stands here rather than at `onresult`: a person's
@@ -732,6 +807,60 @@ export function Inside({ onPlans, start = "" }: {
                 aria-label={tr("ins.sayit", lang)}
                 onClick={() => void sendDraft()}>➤</button>
       </div>
+      {/* The round controls screen 103 draws along the bottom.
+       *
+       *      asked     which buttons does the drawing have
+       *      mattered  which of them can actually do anything
+       *
+       *  Five, and every one of them now has a door. The drawing's fifth
+       *  was a heart, and the field report threw it out on the way past:
+       *  "who all is gonna like the chat, just the people in the chat" —
+       *  which is exactly right. A like is for an audience that is not in
+       *  the room, and everybody here is. The slot became the files
+       *  button, which is a thing people in a room actually do.
+       *
+       *  So: a link, a file, the microphone, an invitation, and the way to
+       *  hand somebody the room. Nothing here lights up without changing
+       *  something somebody else can see. */}
+      <div className="rs-strip">
+        <button className="rs-round link" disabled={busy || !token}
+                aria-label={tr("ins.link", lang)}
+                title={tr("ins.link", lang)}
+                onClick={() => {
+                  const url = window.prompt(tr("ins.link.ask", lang)) || "";
+                  const clean = url.trim();
+                  if (clean) setDraft((d) => (d ? d + " " : "") + clean);
+                }}>🔗</button>
+        <button className="rs-round files" disabled={busy || !token}
+                aria-label={tr("ins.files", lang)}
+                title={tr("ins.files", lang)}
+                onClick={() => sharePick.current?.click()}>📎</button>
+        {canDictate && spokenRoom && (
+          <button className={"rs-round mic" + (talking ? " live" : "")}
+                  aria-pressed={talking}
+                  aria-label={talking ? tr("ins.mute", lang)
+                                      : tr("ins.unmute", lang)}
+                  title={talking ? tr("ins.mute", lang)
+                                 : tr("ins.unmute", lang)}
+                  onClick={flipTalking}>{talking ? "🎙" : "🔇"}</button>
+        )}
+        <button className="rs-round invite" disabled={busy || !token}
+                aria-label={tr("ins.ask.title", lang)}
+                title={tr("ins.ask.title", lang)}
+                onClick={() => setAsking(true)}>👤+</button>
+        <button className="rs-round share" disabled={!open}
+                aria-label={tr("ins.handover", lang)}
+                title={tr("ins.handover", lang)}
+                onClick={() => {
+                  // The room itself, handed to somebody who is not in it.
+                  // The id is what the join screen takes, so the id is what
+                  // goes on the clipboard — a URL would be this console's
+                  // address, which is not necessarily theirs.
+                  void navigator.clipboard?.writeText(open)
+                    .then(() => setNote(tr("ins.handover.done", lang)))
+                    .catch(() => setNote(open));
+                }}>↗</button>
+      </div>
     </div>
   );
 
@@ -808,10 +937,93 @@ export function Inside({ onPlans, start = "" }: {
 
   const lentByMe = mics?.microphones_lent.some((m) => m.interactor_id === me);
 
+  // A room is a place, not a page.
+  //
+  // Field report, twice, the second time with the gallery's own screen 105
+  // held up beside a screenshot: "when you enter a room, you should leave
+  // the homepage and enter a full-blown screen like this second photo not
+  // like the first one" — and later, "the chat becomes the full screen
+  // instead of in a little blue box".
+  //
+  //     asked     is the room on screen
+  //     mattered  is the room the screen
+  //
+  // Both were true of the console and neither was the point. `.screen` is
+  // capped at 720px and sits in a padded column beside the sidebar, which
+  // is right for every settings page in this product and wrong for the one
+  // surface that is somewhere you ARE. Once you are in a room, the room is
+  // the whole window: the faces fill it, the sidebar steps out of the way,
+  // and the composer is the slim strip along the bottom that screen 105
+  // draws rather than the middle of the page.
+  //
+  // The title and the pitch go with it. They are shelf copy — what this
+  // screen is for, read by somebody deciding whether to open it — and a
+  // person already standing in the room has decided.
+  const inRoom = Boolean(open);
+
   return (
-    <div className="screen">
-      <h2>{tr("ins.title", lang)}</h2>
-      <p className="muted small">{tr("ins.pitch", lang)}</p>
+    <div className={"screen" + (inRoom ? " room-place" : "")}>
+      {inRoom && onAPhone && (
+        // The gestures. Both, because neither is discoverable and two
+        // chances beat one — the same reasoning the camera controls on
+        // this screen already use, and the same pair screen 104 names.
+        <div className="room-gestures"
+             onDoubleClick={() => setHeld(true)}
+             onTouchStart={() => {
+               holdRoom.current = window.setTimeout(() => setHeld(true), 550);
+             }}
+             onTouchEnd={() => {
+               if (holdRoom.current !== null) {
+                 window.clearTimeout(holdRoom.current);
+                 holdRoom.current = null;
+               }
+             }}
+             onTouchMove={() => {
+               // A drag is a scroll, not a press. Without this, reading the
+               // transcript brings the overlay up under your thumb.
+               if (holdRoom.current !== null) {
+                 window.clearTimeout(holdRoom.current);
+                 holdRoom.current = null;
+               }
+             }} />
+      )}
+      {held && (
+        // Tap anywhere else to go back — the scrim IS the way out, which is
+        // why it is the element that carries the handler rather than a
+        // fourth button that would need explaining.
+        <div className="room-held" onClick={() => setHeld(false)}>
+          <p className="rh-title">{tr("ins.held.title", lang)}</p>
+          <div className="rh-row" onClick={(e) => e.stopPropagation()}>
+            <button className="rh-opt help"
+                    onClick={() => { setHeld(false); setNote(tr("ins.held.helptext", lang)); }}>
+              <span className="rh-glyph">?</span>
+              {tr("ins.held.help", lang)}
+            </button>
+            <button className="rh-opt turn"
+                    onClick={() => { setHeld(false); void goSideways(); }}>
+              <span className="rh-glyph">⟳</span>
+              {tr("ins.held.landscape", lang)}
+            </button>
+            <button className="rh-opt back"
+                    onClick={() => { setHeld(false); onLeave?.(); }}>
+              <span className="rh-glyph">↩</span>
+              {tr("ins.held.back", lang)}
+            </button>
+          </div>
+          <p className="rh-note">{tr("ins.held.tapaway", lang)}</p>
+        </div>
+      )}
+      {inRoom && onLeave && (
+        // The way out. The sidebar is hidden while a room owns the window,
+        // so this is the only door — which is why it is drawn before
+        // anything else in the frame rather than tucked under the fold
+        // with the room's other controls.
+        <button className="room-out" onClick={onLeave}>
+          {tr("ins.leave", lang)}
+        </button>
+      )}
+      {!inRoom && <h2>{tr("ins.title", lang)}</h2>}
+      {!inRoom && <p className="muted small">{tr("ins.pitch", lang)}</p>}
 
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
@@ -837,8 +1049,12 @@ export function Inside({ onPlans, start = "" }: {
         // square of whoever spoke last wears the light. The transcript
         // stays below — the scene is where you are, the transcript is
         // what was said.
-        <div className="card">
-          <h3>{tr("ins.scene", lang)}</h3>
+        <div className={"card" + (inRoom ? " room-stage" : "")}>
+          {/* In a room the faces ARE the screen, so the heading goes: it
+              labels a section on a page, and there is no page left to be a
+              section of. Outside a room — the same component, no room open
+              — it still says what it is. */}
+          {!inRoom && <h3>{tr("ins.scene", lang)}</h3>}
           <div className="room-scene">
             {seats.map((s) => {
               const face = scene?.faces[s.id];
@@ -949,6 +1165,42 @@ export function Inside({ onPlans, start = "" }: {
                 ) : (
                   <span className="rs-ai" title={tr("ins.seat.profile", lang)}>
                     {tr("ins.seat.aimark", lang)}
+                  </span>
+                )}
+                {/* The two corner marks screen 103 draws, and only where
+                    this deployment actually knows the fact.
+
+                        asked     whose camera and microphone are on
+                        mattered  which of those does anybody here know
+
+                    **Camera, top left, for everybody.** `showing` is a real
+                    per-seat field — voice, photo or camera — so a seat with
+                    a live camera can be marked truthfully on anyone's tile.
+
+                    **Microphone, top right, on your own seat only.** There
+                    is no per-seat mute in this product: `microphones_lent`
+                    is a *borrowed wearable*, which is a different fact and
+                    not its opposite. Drawing a red slash on somebody else's
+                    tile would be a badge for something nobody tracks — the
+                    same defect as a roster row printing a permission as a
+                    sensor. Your own is real, because the standing ear on
+                    this screen is the thing being reported. Until the
+                    server learns the rest, the other tiles stay honest by
+                    staying blank. */}
+                {face?.showing === "camera" && (
+                  <span className="rs-mark rs-oncamera"
+                        title={tr("ins.mark.camera", lang)}>
+                    <span className="sr-only">
+                      {tr("ins.mark.camera", lang)}
+                    </span>
+                  </span>
+                )}
+                {isMe && spokenRoom && !talking && (
+                  <span className="rs-mark rs-micoff"
+                        title={tr("ins.mark.micoff", lang)}>
+                    <span className="sr-only">
+                      {tr("ins.mark.micoff", lang)}
+                    </span>
                   </span>
                 )}
                 {/* The mask disclosure, on the face it is about. It rides with
@@ -1318,7 +1570,8 @@ export function Inside({ onPlans, start = "" }: {
             <p className="muted small">{tr("ins.micpitch", lang)}</p>
           </div>
 
-          <div className="card">
+          <div className={"card" + (asking ? " asked-for" : "")}
+               ref={askCard}>
             <h3>{tr("ins.ask.title", lang)}</h3>
             <p className="muted small">{tr("ins.ask.pitch", lang)}</p>
             <div className="row">

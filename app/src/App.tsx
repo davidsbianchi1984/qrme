@@ -158,6 +158,19 @@ export function App() {
   const toPlans = () => setTab("plans");
   // A join on the Rooms screen lands the person Inside, on that room.
   const [insideRoom, setInsideRoom] = useState("");
+  // Whether a room is open and therefore owns the window.
+  //
+  // A room is the one screen in this console that is a PLACE rather than a
+  // page, and a field report asked twice for it to behave like one: the
+  // faces fill the frame, and the navigation that got you here steps out
+  // of the way while you are standing in it. Screen 105 in the gallery is
+  // the drawing of that.
+  //
+  // Held here rather than inside the room because the sidebar is the
+  // shell's, not the room's — and the room reaching up to hide somebody
+  // else's chrome would be the kind of reach that is impossible to find
+  // later.
+  const inRoom = tab === "inside" && Boolean(insideRoom);
   // Whose homepage is open, and where pressing Back should return to. The
   // trail is a stack rather than a single id because their Top 8 is eight
   // more doors: walking friend-to-friend and pressing Back should retrace
@@ -251,7 +264,7 @@ export function App() {
   }
 
   return (
-    <div className="app">
+    <div className={"app" + (inRoom ? " in-room" : "")}>
       <VersionGuard />
       <Footsteps />
       <button className="menu-fab" aria-label={t("nav.menu", lang)}
@@ -366,7 +379,8 @@ export function App() {
         {tab === "reaching" && <Reaching onPlans={toPlans} />}
         {tab === "leaving" && <Leaving onPlans={toPlans} />}
         {tab === "selling" && <Selling onPlans={toPlans} />}
-        {tab === "inside" && <Inside onPlans={toPlans} start={insideRoom} />}
+        {tab === "inside" && <Inside onPlans={toPlans} start={insideRoom}
+                                   onLeave={() => { setInsideRoom(""); setTab("home"); }} />}
         {tab === "signing" && <Signing />}
         {tab === "visiting" && <Visiting />}
         {tab === "allowed" && <Allowed />}

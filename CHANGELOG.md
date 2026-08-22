@@ -8,6 +8,56 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **A room is a place, not a page.** Asked twice, the second time with the
+  gallery's own screen 103 held up beside a screenshot: "when you enter a
+  room, you should leave the homepage and enter a full-blown screen", and
+  "the chat becomes the full screen instead of in a little blue box".
+  Every other screen in this console is a page — a 720px column of cards
+  beside the sidebar — which is right for settings and rosters and wrong
+  for the one surface that is somewhere you *are*. A room takes the window
+  now: the navigation steps aside, the faces come first and largest, and
+  the room grows its own door because a full-screen place without one is a
+  trap. The seats stopped being `auto-fill minmax(128px)`, which turned six
+  people into a strip of thumbnails on a wide window, and became the two
+  columns the drawing has; the portrait scales with the viewport, bounded
+  at both ends. Nothing here calls the Fullscreen API or touches a sensor —
+  those stay a deliberate press, because going fullscreen and turning a
+  camera on are decisions a person makes.
+
+      asked     is the room on screen
+      mattered  is the room the screen
+
+- **And on a phone it answers "how do I get out of this".** A phone in a
+  full-screen room has no window edge, no tab strip and no back button, so
+  the room grew screen 104's own answer: press and hold — or double tap,
+  because neither gesture is discoverable and two chances beat one — and
+  Help, Landscape and Back to app come up over it, with tapping anywhere
+  else as the way back. A drag cancels the press, so reading the transcript
+  no longer pops the overlay up under a thumb. Tilting reflows to the three
+  columns screen 105 draws, driven by the window's *height* rather than its
+  width: it is the shortness that makes a tall column wrong. Phone only, and
+  the test is `pointer: coarse` rather than a screen size, because the
+  gesture is about the input — "that's for mobile because computer will be
+  landscape anyways". Landscape asks for fullscreen because orientation can
+  only be locked from it, which is the platform's rule and the one press on
+  this screen that says the word; on iOS, which does not implement the lock
+  at all, it says so instead of doing nothing quietly.
+
+- **And the strip along the bottom does something.** The drawing's five
+  round controls are built, and each has a door: a link, an attachment
+  (photos, video and files through one picker rather than three buttons),
+  the microphone as a mute for the standing ear, an invitation, and the way
+  to hand somebody the room. The fifth in the drawing was a heart, and the
+  field report threw it out on the way past — "who all is gonna like the
+  chat, just the people in the chat" — which is right twice over: a like is
+  for an audience that is not in the room, and there was no reaction door,
+  table or count behind one anyway. It became the paperclip. Two corner
+  marks join the seats on the same terms: a camera mark for anybody,
+  because `showing` is a real per-seat field, and a mic-off mark on your own
+  tile only, because `microphones_lent` is a borrowed wearable rather than
+  the opposite of muted, and a badge for a fact nobody tracks is the defect
+  this estate keeps finding in itself.
+
 - **The room hears you without being asked.** A voice room already
   arrived speaking; the other half of that press stayed. Two field
   reports, one round: "everything seems to be working fine as long as

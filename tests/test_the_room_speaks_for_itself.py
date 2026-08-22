@@ -93,13 +93,24 @@ def test_a_voice_room_arrives_speaking():
 def test_talking_into_a_voice_room_reaches_the_room():
     """Dictation's "the send stays a decision" bargain is right for a room
     people TYPE in. Here speaking IS the medium, and a send button between
-    a spoken sentence and the room is the keyboard wearing a hat."""
-    m = re.search(r"function flipTalking\(\)([\s\S]*?)\n  \}", INSIDE)
-    assert m, "the talk control is gone from the room screen"
-    body = m.group(1)
-    assert "api.sayInRoom(" in body, (
+    a spoken sentence and the room is the keyboard wearing a hat.
+
+    Re-pointed when the ear became a STANDING one. The claim is unchanged
+    and still the point — what the recogniser hears reaches the room — but
+    it is no longer one function's job: `startTalking` opens the ear and
+    `sendPending` commits what it heard after the person's silence, so
+    `flipTalking` is now a two-line mute. A guard pinned to the old shape
+    was testing the shape rather than the claim.
+    """
+    start = re.search(r"function startTalking\(\)([\s\S]*?)\n  \}", INSIDE)
+    assert start, "the talk control is gone from the room screen"
+    send = re.search(r"function sendPending\(\)([\s\S]*?)\n  \}", INSIDE)
+    assert send, "nothing commits what the ear heard"
+    assert "api.sayInRoom(" in send.group(1), (
         "what the recogniser hears must reach the room, not a draft box")
-    assert "dictation.current?.stop()" in body, (
+    assert "sendPending" in start.group(1), (
+        "the ear hears and nothing carries it to the room")
+    assert "dictation.current?.stop()" in start.group(1), (
         "one microphone: starting to talk must stop dictation, or two "
         "recognisers fight over it")
 

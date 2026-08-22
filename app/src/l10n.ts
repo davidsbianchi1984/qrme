@@ -8470,6 +8470,57 @@ const CHROME: Table = {
   "ins.stage.vr": {
     en: "Step in (VR)", es: "Entrar (RV)", fr: "Entrer (RV)", de: "Eintreten (VR)", pt: "Entrar (RV)", it: "Entra (VR)", ja: "入る（VR）", zh: "走进（VR）", hi: "अंदर आएँ (VR)", ar: "ادخل (VR)",
   },
+  "ins.link": {
+    en: "Drop a link", es: "Poner un enlace", fr: "Déposer un lien", de: "Link einfügen", pt: "Colocar uma ligação", it: "Inserisci un link", ja: "リンクを貼る", zh: "放个链接", hi: "लिंक डालें", ar: "أضف رابطًا",
+  },
+  "ins.link.ask": {
+    en: "Paste the link", es: "Pega el enlace", fr: "Collez le lien", de: "Link einfügen", pt: "Cole a ligação", it: "Incolla il link", ja: "リンクを貼り付けてください", zh: "粘贴链接", hi: "लिंक चिपकाएँ", ar: "الصق الرابط",
+  },
+  "ins.files": {
+    en: "Attach a photo, a video or a file", es: "Adjunta una foto, un vídeo o un archivo", fr: "Joindre une photo, une vidéo ou un fichier", de: "Foto, Video oder Datei anhängen", pt: "Anexar uma foto, um vídeo ou um ficheiro", it: "Allega una foto, un video o un file", ja: "写真・動画・ファイルを添付", zh: "添加照片、视频或文件", hi: "फ़ोटो, वीडियो या फ़ाइल जोड़ें", ar: "أرفق صورة أو فيديو أو ملفًا",
+  },
+  "ins.mute": {
+    en: "Mute your microphone", es: "Silencia tu micrófono", fr: "Couper votre micro", de: "Mikrofon stummschalten", pt: "Silenciar o seu microfone", it: "Disattiva il microfono", ja: "マイクをミュート", zh: "关闭你的麦克风", hi: "अपना माइक्रोफ़ोन बंद करें", ar: "اكتم الميكروفون",
+  },
+  "ins.unmute": {
+    en: "Turn your microphone back on", es: "Vuelve a encender tu micrófono", fr: "Rallumer votre micro", de: "Mikrofon wieder einschalten", pt: "Voltar a ligar o seu microfone", it: "Riattiva il microfono", ja: "マイクをオンに戻す", zh: "重新打开你的麦克风", hi: "अपना माइक्रोफ़ोन फिर चालू करें", ar: "أعد تشغيل الميكروفون",
+  },
+  "ins.handover": {
+    en: "Hand somebody this room", es: "Dale esta sala a alguien", fr: "Donner cette salle à quelqu’un", de: "Diesen Raum weitergeben", pt: "Dar esta sala a alguém", it: "Passa questa stanza a qualcuno", ja: "この部屋を誰かに渡す", zh: "把这个房间给别人", hi: "किसी को यह कमरा दें", ar: "أعطِ هذه الغرفة لشخص ما",
+  },
+  "ins.handover.done": {
+    en: "The room is on your clipboard — paste it to whoever should join.", es: "La sala está en tu portapapeles: pégala a quien deba unirse.", fr: "La salle est dans votre presse-papiers — collez-la à qui doit rejoindre.", de: "Der Raum liegt in Ihrer Zwischenablage — fügen Sie ihn für alle ein, die beitreten sollen.", pt: "A sala está na sua área de transferência — cole-a a quem deva juntar-se.", it: "La stanza è negli appunti: incollala a chi deve entrare.", ja: "部屋の情報をクリップボードにコピーしました。参加してほしい相手に貼り付けてください。", zh: "房间已复制到剪贴板——粘贴给要加入的人。", hi: "कमरा आपके क्लिपबोर्ड पर है — जिसे शामिल होना है उसे चिपकाएँ।", ar: "الغرفة في الحافظة — الصقها لمن تريد انضمامه.",
+  },
+  "ins.mark.camera": {
+    en: "Their camera is on", es: "Su cámara está encendida", fr: "Sa caméra est allumée", de: "Ihre Kamera ist an", pt: "A câmara está ligada", it: "La sua fotocamera è accesa", ja: "カメラがオンです", zh: "他们的摄像头已打开", hi: "इनका कैमरा चालू है", ar: "كاميرته مفتوحة",
+  },
+  "ins.mark.micoff": {
+    en: "Your microphone is off", es: "Tu micrófono está apagado", fr: "Votre micro est coupé", de: "Ihr Mikrofon ist aus", pt: "O seu microfone está desligado", it: "Il tuo microfono è spento", ja: "マイクがオフです", zh: "你的麦克风已关闭", hi: "आपका माइक्रोफ़ोन बंद है", ar: "الميكروفون مغلق",
+  },
+  "ins.held.title": {
+    en: "PRESS AND HOLD", es: "MANTÉN PULSADO", fr: "APPUI LONG", de: "GEDRÜCKT HALTEN", pt: "MANTENHA PREMIDO", it: "TIENI PREMUTO", ja: "長押し", zh: "按住", hi: "दबाकर रखें", ar: "اضغط مطولًا",
+  },
+  "ins.held.help": {
+    en: "What is this?", es: "¿Qué es esto?", fr: "Qu’est-ce que c’est ?", de: "Was ist das?", pt: "O que é isto?", it: "Che cos’è?", ja: "これは何？", zh: "这是什么？", hi: "यह क्या है?", ar: "ما هذا؟",
+  },
+  "ins.held.landscape": {
+    en: "Landscape", es: "Horizontal", fr: "Paysage", de: "Querformat", pt: "Horizontal", it: "Orizzontale", ja: "横向き", zh: "横屏", hi: "लैंडस्केप", ar: "أفقي",
+  },
+  "ins.held.back": {
+    en: "Back to app", es: "Volver a la app", fr: "Retour à l’app", de: "Zurück zur App", pt: "Voltar à app", it: "Torna all’app", ja: "アプリに戻る", zh: "返回应用", hi: "ऐप पर वापस", ar: "العودة إلى التطبيق",
+  },
+  "ins.held.tapaway": {
+    en: "tap anywhere else to go back", es: "toca en otro sitio para volver", fr: "touchez ailleurs pour revenir", de: "woanders tippen, um zurückzugehen", pt: "toque noutro sítio para voltar", it: "tocca altrove per tornare", ja: "他の場所をタップで戻ります", zh: "点击其他地方即可返回", hi: "वापस जाने के लिए कहीं और टैप करें", ar: "انقر في أي مكان آخر للعودة",
+  },
+  "ins.held.helptext": {
+    en: "Everyone here is in their own square, and the square of whoever is speaking wears the light. The strip along the bottom holds a link, an attachment, your microphone, an invitation, and the way to hand somebody this room.", es: "Cada persona tiene su propio cuadro, y el de quien habla lleva la luz. La franja inferior tiene un enlace, un adjunto, tu micrófono, una invitación y la forma de dar esta sala a alguien.", fr: "Chacun a son carré, et celui de la personne qui parle porte la lumière. La bande du bas contient un lien, une pièce jointe, votre micro, une invitation et de quoi donner cette salle à quelqu’un.", de: "Alle haben ihr eigenes Feld, und das Feld der sprechenden Person leuchtet. Die Leiste unten enthält einen Link, einen Anhang, Ihr Mikrofon, eine Einladung und den Weg, diesen Raum weiterzugeben.", pt: "Cada pessoa tem o seu quadrado, e o de quem fala fica iluminado. A faixa em baixo tem uma ligação, um anexo, o seu microfone, um convite e a forma de dar esta sala a alguém.", it: "Ognuno ha il suo riquadro, e quello di chi parla si illumina. La striscia in basso contiene un link, un allegato, il tuo microfono, un invito e il modo di passare questa stanza a qualcuno.", ja: "全員がそれぞれの枠にいて、話している人の枠が光ります。下の帯にはリンク、添付、マイク、招待、そしてこの部屋を誰かに渡す方法があります。", zh: "每个人都在自己的方块里，正在说话的人的方块会亮起。底部的条上有链接、附件、你的麦克风、邀请，以及把这个房间给别人的方式。", hi: "हर कोई अपने वर्ग में है, और जो बोल रहा है उसका वर्ग रोशन होता है। नीचे की पट्टी में लिंक, अटैचमेंट, आपका माइक्रोफ़ोन, निमंत्रण, और यह कमरा किसी को देने का तरीका है।", ar: "كل شخص في مربعه، ومربع المتحدث يضيء. الشريط السفلي يحوي رابطًا ومرفقًا وميكروفونك ودعوة وطريقة لإعطاء هذه الغرفة لشخص ما.",
+  },
+  "ins.held.turnfail": {
+    en: "This browser will not turn the screen for you — tilt the phone instead, and the room will follow.", es: "Este navegador no girará la pantalla por ti: inclina el teléfono y la sala te seguirá.", fr: "Ce navigateur ne fera pas pivoter l’écran — inclinez le téléphone et la salle suivra.", de: "Dieser Browser dreht den Bildschirm nicht — neigen Sie das Telefon, der Raum folgt.", pt: "Este navegador não roda o ecrã por si — incline o telemóvel e a sala acompanha.", it: "Questo browser non ruota lo schermo — inclina il telefono e la stanza seguirà.", ja: "このブラウザでは画面を回転できません。端末を傾ければ部屋も追従します。", zh: "此浏览器不会为你旋转屏幕——把手机横过来，房间会跟着转。", hi: "यह ब्राउज़र स्क्रीन नहीं घुमाएगा — फ़ोन को झुकाएँ, कमरा साथ चलेगा।", ar: "هذا المتصفح لن يدير الشاشة — أمِل الهاتف وستتبعه الغرفة.",
+  },
+  "ins.leave": {
+    en: "Leave the room", es: "Salir de la sala", fr: "Quitter la salle", de: "Raum verlassen", pt: "Sair da sala", it: "Esci dalla stanza", ja: "部屋を出る", zh: "离开房间", hi: "कमरे से बाहर जाएँ", ar: "غادر الغرفة",
+  },
   "ins.stage.leave": {
     en: "Step out", es: "Salir del escenario", fr: "Sortir de la scène", de: "Bühne verlassen", pt: "Sair do palco", it: "Esci dal palco", ja: "ステージを出る", zh: "走出舞台", hi: "मंच से बाहर आएँ", ar: "اخرج من المسرح",
   },
