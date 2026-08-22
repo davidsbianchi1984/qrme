@@ -4,7 +4,15 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.1.0] - 2026-08-22
+
+A room somebody sat in, taken apart and put back the way they described it.
+Every entry below is one sentence a person said in front of the thing, and
+the through-line is that the room had been built as a page: an id in a box
+meant you were already inside, controls lived wherever there was space, and
+the space under the faces was a number somebody had guessed once. Going in
+is a press now, the controls are one band along the bottom, and no constant
+anywhere guesses at anybody else's height.
 
 ### Changed
 
@@ -34,6 +42,28 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   cannot correct is a queue that sends the typo.
 
 ### Fixed
+
+- **The room's new name reaches the phones.** `renameRoom` reached all
+  three shells and none of them drew a control, so `PATCH /rooms/{id}`
+  counted as doored on iOS, Android and Windows while being reachable on
+  none — which is the whole reason a binding is not a door. Each shell has
+  the field and the Save beside its join now, placed there rather than by
+  the id box on purpose: the route authorizes like speaking, a participant
+  held by their own token, so naming a room you are not in is not offered.
+  The wording is copied from the console's table rather than translated
+  again, because shell and console drifting apart on one control is a
+  defect this round already produced once.
+
+- **A refusal nobody had decided about.** The 422 on a blank rename —
+  *a room's name is the words in it* — was raised in English and
+  translated nowhere, which makes it a sentence somebody reads in a
+  language they did not choose. It is in `_REFUSALS` now.
+
+- **Four keys translated into ten languages and read by nothing.** The
+  invite card, the microphone card and the compose row went; their words
+  stayed. `ins.ask.go`, `ins.micline`, `ins.microphones` and `ins.say.ph`
+  were dead rows the completeness checks kept certifying as complete —
+  two guards already assert those keys are not looked up any more.
 
 - **The strip stopped resting on the faces.** Reported three times, and
   twice "fixed" by adjusting a number. It was absolutely positioned inside
