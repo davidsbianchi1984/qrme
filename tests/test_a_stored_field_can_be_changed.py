@@ -124,9 +124,16 @@ def test_the_record_only_shrinks():
 
 
 def test_every_recorded_column_says_why():
+    """A number here would be a floor nothing ever compares against what it
+    measures, which is the whole subject of tests/ratchets.py — so the claim
+    is made structurally instead: a reason is prose, and prose has more than
+    one word in it and finishes its sentence."""
     for name, reason in _recorded().items():
-        assert len(reason) > 40, (
-            f"{name} is recorded as doorless with no real reason")
+        assert reason, f"{name} is recorded as doorless with no reason at all"
+        assert " " in reason.strip(), (
+            f"{name}'s reason is a single word rather than an explanation")
+        assert reason.rstrip().endswith("."), (
+            f"{name}'s reason trails off instead of finishing")
 
 
 def test_the_own_door_modules_still_hold_those_doors():

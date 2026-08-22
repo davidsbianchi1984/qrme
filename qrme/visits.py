@@ -91,6 +91,11 @@ UNATTRIBUTED = {
                           "its own brief and redaction count",
     "the local model daemon": "loopback — never recorded at all, see is_local",
     "the sign-in provider": "reached before anybody is a profile yet",
+    "listing the voices this deployment can offer": "the roster belongs to "
+        "the deployment's own engine account, and the person reading it is "
+        "choosing a voice for a profile that may not exist yet — there is no "
+        "profile to attribute the call to, and inventing one would be a "
+        "guess written into the ledger",
 }
 
 

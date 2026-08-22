@@ -12,6 +12,19 @@ came from somebody sitting in front of the thing and saying what did not
 work. That is the reason it is 1.0.
 
 
+### Known gaps
+
+- **Five of this release's routes do not reach the three native shells
+  yet.** A person's own picture (set, read, take down), the room
+  background, and the voice list are on the console and nowhere else; the
+  three `*_doorless.txt` records went from zero rows to five each, which is
+  a real regression in shell parity and is written down as one rather than
+  left to be discovered. The reason is stated in the records themselves:
+  this build environment has no Xcode, no Android SDK and no .NET SDK, so
+  a door written for a shell here could not be compiled, let alone run.
+  Three untested file-picker flows in three languages, landed on the eve of
+  a 1.0.0 tag, is a worse trade than an honest backlog line.
+
 ### Added
 
 - **Entering your own key says whose bill it becomes.** David, on the beta's

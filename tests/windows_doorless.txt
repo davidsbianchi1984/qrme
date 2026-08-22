@@ -1,0 +1,20 @@
+# Routes this shell cannot reach yet, with the reason. A ratchet: it may
+# shrink and must not grow past the ceiling in
+# test_the_phone_is_a_client_too.py.
+#
+# All five arrived in 1.0.0 and are reachable on the console today. They are
+# recorded rather than built here for one reason, stated plainly: this
+# container has no Xcode, no Android SDK (dl.google.com is blocked by the
+# agent proxy) and no .NET SDK, so a door written for this shell now could
+# not be compiled, let alone run. Three untested file-picker flows in three
+# languages, landed on the eve of a 1.0.0 tag, is a worse trade than an
+# honest backlog line — the console proves the routes work, and the shells
+# get them in a round where the build can be exercised.
+#
+# Tracked as its own task; see the CHANGELOG entry for 1.0.0.
+
+DELETE /interactors/{interactor_id}/picture
+GET /interactors/{interactor_id}/picture
+GET /voices
+POST /interactors/{interactor_id}/picture
+POST /rooms/{room_id}/face/background

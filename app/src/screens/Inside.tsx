@@ -1494,6 +1494,21 @@ export function Inside({ onPlans, start = "", onLeave }: {
                                })();
                              }
                            }} />
+                    {/* Taking your own picture down. Offered only when
+                        there is one, and separate from the room's own
+                        "back to a name in a box" — that clears what you
+                        are showing HERE, this clears who you are in every
+                        room, and conflating them would take a face off
+                        four rooms when somebody meant one. */}
+                    {ownPic(me) && (
+                      <button className="chip" disabled={busy}
+                              onClick={act(async () => {
+                                await api.clearOwnPicture(me, token);
+                                load();
+                              })}>
+                        {tr("ins.face.mineoff", lang)}
+                      </button>
+                    )}
                     {/* The background — behind you rather than instead of
                         you. Its own button because `photo` REPLACES the
                         person: somebody who wanted a room behind them and

@@ -8248,6 +8248,9 @@ const CHROME: Table = {
     hi: "इस ब्राउज़र में वाक् पहचान नहीं है, इसलिए यहाँ कमरे में बोलने का विकल्प नहीं है — टाइप कीजिए, कमरा फिर भी बोलकर उत्तर देगा।",
     ar: "هذا المتصفح لا يملك التعرّف على الكلام، لذا لا يُعرض التحدّث في هذه الغرفة هنا — اكتب بدلًا من ذلك، وستظل الغرفة تجيب بصوت مسموع.",
   },
+  "ins.ask.send": {
+    en: "Send the invitation", es: "Enviar la invitación", fr: "Envoyer l'invitation", de: "Einladung senden", pt: "Enviar o convite", it: "Invia l'invito", ja: "招待を送る", zh: "发送邀请", hi: "निमंत्रण भेजें", ar: "إرسال الدعوة",
+  },
   "ins.ask.title": {
     en: "Ask somebody into the room", es: "Invita a alguien a la sala", fr: "Invitez quelqu'un dans la salle", de: "Jemanden in den Raum bitten", pt: "Convide alguém para a sala", it: "Invita qualcuno nella stanza", ja: "誰かを部屋に招く", zh: "邀请某人进入房间", hi: "किसी को कमरे में बुलाएँ", ar: "ادعُ أحدًا إلى الغرفة",
   },
@@ -8358,6 +8361,30 @@ const CHROME: Table = {
   },
   "idn.rated.why": {
     en: "The checks on this setting run when a profile is created: the owner is a verified adult, the profile is never a rated likeness of another real person, and the plan can hold rated content. A switch here would go around all three, so there isn't one. To change it, create a new profile.", es: "Las comprobaciones se hacen al crear el perfil: el dueño es un adulto verificado, el perfil nunca es una imagen calificada de otra persona real y el plan admite contenido para adultos. Un interruptor aquí las evitaría las tres, así que no existe. Para cambiarlo, crea un perfil nuevo.", fr: "Les vérifications ont lieu à la création : le propriétaire est un adulte vérifié, le profil n'est jamais une image classée d'une autre personne réelle, et l'offre autorise ce contenu. Un interrupteur ici contournerait les trois : il n'y en a pas. Pour changer, créez un nouveau profil.", de: "Die Prüfungen laufen beim Erstellen: Der Besitzer ist ein verifizierter Erwachsener, das Profil ist nie ein Abbild einer anderen realen Person mit Altersfreigabe, und der Tarif erlaubt solche Inhalte. Ein Schalter hier würde alle drei umgehen — deshalb gibt es keinen. Zum Ändern ein neues Profil anlegen.", pt: "As verificações acontecem na criação: o dono é um adulto verificado, o perfil nunca é uma imagem classificada de outra pessoa real e o plano suporta esse conteúdo. Um botão aqui contornaria as três, por isso não existe. Para mudar, crie um novo perfil.", it: "I controlli avvengono alla creazione: il proprietario è un adulto verificato, il profilo non è mai l'immagine classificata di un'altra persona reale e il piano può ospitare quel contenuto. Un interruttore qui aggirerebbe tutti e tre, quindi non c'è. Per cambiare, crea un nuovo profilo.", ja: "この設定の確認は作成時に行われます。所有者が確認済みの成人であること、他の実在人物の年齢制限つき肖像でないこと、プランがその内容を扱えること。ここにスイッチがあれば三つとも迂回できてしまうため、ありません。変更するには新しいプロフィールを作成してください。", zh: "相关检查在创建时进行：所有者为已验证的成年人、该形象绝不是另一真人的分级肖像、且套餐可承载此类内容。此处若有开关，会绕过全部三项，所以没有。如需更改，请新建一个形象。", hi: "इस सेटिंग की जाँच प्रोफ़ाइल बनाते समय होती है: मालिक एक सत्यापित वयस्क हो, प्रोफ़ाइल किसी अन्य वास्तविक व्यक्ति की रेटेड छवि कभी न हो, और प्लान ऐसी सामग्री रख सके। यहाँ स्विच होने से तीनों टल जातीं, इसलिए कोई स्विच नहीं है। बदलने के लिए नई प्रोफ़ाइल बनाएँ।", ar: "تُجرى الفحوص عند الإنشاء: المالك بالغ موثَّق، والملف ليس أبدًا صورة مصنَّفة لشخص حقيقي آخر، والخطة تسمح بهذا المحتوى. أي مفتاح هنا سيتجاوز الثلاثة جميعًا، لذلك لا يوجد. للتغيير، أنشئ ملفًا جديدًا.",
+  },
+  "ins.face.mineoff": {
+    en: "Take my picture down", es: "Quitar mi foto", fr: "Retirer ma photo", de: "Mein Bild entfernen", pt: "Remover a minha foto", it: "Togli la mia foto", ja: "自分の写真を外す", zh: "撤下我的照片", hi: "मेरी तस्वीर हटाएँ", ar: "إزالة صورتي",
+  },
+  "idn.mypic": {
+    en: "My own picture", es: "Mi propia foto", fr: "Ma propre photo", de: "Mein eigenes Bild", pt: "A minha própria foto", it: "La mia foto", ja: "自分の写真", zh: "我自己的照片", hi: "मेरी अपनी तस्वीर", ar: "صورتي الخاصة",
+  },
+  "idn.mypic.lead": {
+    en: "Yours, not a profile's portrait. It follows you into every room you join, and it is never marked as AI — a photograph of your own face is an authentic picture.", es: "Tuya, no el retrato de un perfil. Te acompaña a cada sala y nunca se marca como IA: una foto de tu propia cara es una imagen auténtica.", fr: "La vôtre, pas le portrait d'un profil. Elle vous suit dans chaque salon et n'est jamais marquée comme IA : une photo de votre propre visage est une image authentique.", de: "Deins, nicht das Porträt eines Profils. Es begleitet dich in jeden Raum und wird nie als KI markiert — ein Foto deines eigenen Gesichts ist ein echtes Bild.", pt: "Sua, não o retrato de um perfil. Acompanha-o em cada sala e nunca é marcada como IA: uma foto do seu próprio rosto é uma imagem autêntica.", it: "Tua, non il ritratto di un profilo. Ti segue in ogni stanza e non viene mai marcata come IA: una foto del tuo volto è un'immagine autentica.", ja: "プロフィールの肖像ではなく、あなた自身の写真です。参加するすべての部屋に付いていき、AIの印は決して付きません。自分の顔の写真は本物の画像だからです。", zh: "这是你自己的，不是形象的肖像。它会跟随你进入每个房间，且永远不会被标记为 AI — 你自己面孔的照片是真实影像。", hi: "यह आपकी है, किसी प्रोफ़ाइल का चित्र नहीं। यह हर कमरे में आपके साथ जाती है और कभी AI चिह्नित नहीं होती — आपके अपने चेहरे की तस्वीर एक प्रामाणिक छवि है।", ar: "صورتك أنت، لا صورة ملف. ترافقك إلى كل غرفة ولا تُوسم أبدًا كذكاء اصطناعي — صورة وجهك صورة أصلية.",
+  },
+  "idn.mypic.add": {
+    en: "Add a picture", es: "Añadir una foto", fr: "Ajouter une photo", de: "Bild hinzufügen", pt: "Adicionar uma foto", it: "Aggiungi una foto", ja: "写真を追加", zh: "添加照片", hi: "तस्वीर जोड़ें", ar: "إضافة صورة",
+  },
+  "idn.mypic.replace": {
+    en: "Replace it", es: "Reemplazarla", fr: "La remplacer", de: "Ersetzen", pt: "Substituir", it: "Sostituiscila", ja: "差し替える", zh: "替换", hi: "बदलें", ar: "استبدالها",
+  },
+  "idn.mypic.remove": {
+    en: "Take it down", es: "Quitarla", fr: "La retirer", de: "Entfernen", pt: "Remover", it: "Toglila", ja: "外す", zh: "撤下", hi: "हटाएँ", ar: "إزالتها",
+  },
+  "idn.mypic.saved": {
+    en: "Saved.", es: "Guardada.", fr: "Enregistrée.", de: "Gespeichert.", pt: "Guardada.", it: "Salvata.", ja: "保存しました。", zh: "已保存。", hi: "सहेजी गई।", ar: "تم الحفظ.",
+  },
+  "idn.mypic.gone": {
+    en: "Taken down.", es: "Quitada.", fr: "Retirée.", de: "Entfernt.", pt: "Removida.", it: "Rimossa.", ja: "外しました。", zh: "已撤下。", hi: "हटा दी गई।", ar: "تمت الإزالة.",
   },
   "ins.type.ph": {
     en: "Type…", es: "Escribe…", fr: "Écrivez…", de: "Tippen…", pt: "Escreva…", it: "Scrivi…", ja: "入力…", zh: "输入…", hi: "लिखें…", ar: "اكتب…",

@@ -193,6 +193,20 @@ export function Identity({ onPlans, onPassing }: {
   // Shown, never set from here. Null until the profile is read, so an
   // unknown state reads as unknown rather than as "off".
   const [rated, setRated] = useState<boolean | null>(null);
+  // Your own picture — the PERSON's, not this profile's portrait. Read
+  // here as well as in a room, because until this card the only way to
+  // put a face on your own seat was to already be sitting in one.
+  const [myPic, setMyPic] = useState<string | null>(null);
+  const myPicker = useRef<HTMLInputElement | null>(null);
+  const iAm = session.interactorId || "";
+  const myToken = session.interactorToken || "";
+  function reloadMyPic() {
+    if (!iAm || !myToken) return;
+    api.ownPicture(iAm, myToken)
+      .then((r) => setMyPic(r.url))
+      .catch(() => setMyPic(null));
+  }
+  useEffect(reloadMyPic, [iAm, myToken]);
   const [confirmEnd, setConfirmEnd] = useState<"" | "sunset" | "delete">("");
 
   const fail = (e: unknown) => setError(e);
@@ -679,6 +693,55 @@ export function Identity({ onPlans, onPassing }: {
        * somebody who cannot tell what their own profile is set to cannot
        * check it, and a setting nobody can see is a setting nobody can
        * audit. So the state is on screen and the control is not. */}
+      {/* A person's own picture, reachable without being in a room.
+       *
+       *     asked     can a person put a face on themselves
+       *     mattered  do they have to be in a room to do it
+       *
+       * They did. The upload lived only in the room seat's controls, so
+       * setting your own face meant joining something first — and the
+       * read door existed with nothing calling it, which is how a binding
+       * ends up unused: the surface it was built for was never drawn. */}
+      {iAm && myToken && (
+        <div className="card">
+          <h3>{tr("idn.mypic", lang)}</h3>
+          <p className="muted small">{tr("idn.mypic.lead", lang)}</p>
+          {myPic && (
+            <img className="idn-mypic" alt={tr("idn.mypic", lang)}
+                 src={myPic.startsWith("http") ? myPic : getBase() + myPic} />
+          )}
+          <div className="row">
+            <button onClick={() => myPicker.current?.click()}>
+              {myPic ? tr("idn.mypic.replace", lang)
+                     : tr("idn.mypic.add", lang)}
+            </button>
+            {myPic && (
+              <button onClick={async () => {
+                setError(null); setNote(null);
+                try {
+                  await api.clearOwnPicture(iAm, myToken);
+                  setMyPic(null);
+                  setNote(tr("idn.mypic.gone", lang));
+                } catch (e) { fail(e); }
+              }}>{tr("idn.mypic.remove", lang)}</button>
+            )}
+          </div>
+          <input ref={myPicker} type="file" accept="image/*"
+                 style={{ display: "none" }}
+                 onChange={async (e) => {
+                   const file = e.target.files?.[0];
+                   e.target.value = "";
+                   if (!file) return;
+                   setError(null); setNote(null);
+                   try {
+                     const r = await api.setOwnPicture(iAm, file, myToken);
+                     setMyPic(r.url);
+                     setNote(tr("idn.mypic.saved", lang));
+                   } catch (err) { fail(err); }
+                 }} />
+        </div>
+      )}
+
       <div className="card">
         <h3>{tr("idn.rated", lang)}</h3>
         <p className="muted small">
