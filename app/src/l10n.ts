@@ -8317,6 +8317,12 @@ const CHROME: Table = {
   "ins.file.unread": {
     en: "held, not read — nobody here can see inside it", es: "guardado, sin leer — nadie aquí ve su interior", fr: "conservé, non lu — personne ici n'en voit le contenu", de: "vorhanden, ungelesen — niemand hier sieht hinein", pt: "guardado, não lido — ninguém aqui vê o interior", it: "conservato, non letto — nessuno qui ne vede il contenuto", ja: "保持のみ、未読 — 中身は誰にも見えません", zh: "已保存，未读取 — 这里没有人能看到里面", hi: "रखा गया, पढ़ा नहीं — यहाँ कोई इसके भीतर नहीं देख सकता", ar: "محفوظ وغير مقروء — لا أحد هنا يرى ما بداخله",
   },
+  "ins.face.mine": {
+    en: "My own picture", es: "Mi propia foto", fr: "Ma propre photo", de: "Mein eigenes Bild", pt: "A minha própria foto", it: "La mia foto", ja: "自分の写真", zh: "我自己的照片", hi: "मेरी अपनी तस्वीर", ar: "صورتي الخاصة",
+  },
+  "ins.face.background": {
+    en: "Background", es: "Fondo", fr: "Arrière-plan", de: "Hintergrund", pt: "Fundo", it: "Sfondo", ja: "背景", zh: "背景", hi: "पृष्ठभूमि", ar: "الخلفية",
+  },
   "ins.type.ph": {
     en: "Type…", es: "Escribe…", fr: "Écrivez…", de: "Tippen…", pt: "Escreva…", it: "Scrivi…", ja: "入力…", zh: "输入…", hi: "लिखें…", ar: "اكتب…",
   },

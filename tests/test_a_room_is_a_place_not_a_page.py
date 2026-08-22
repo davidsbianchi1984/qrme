@@ -108,6 +108,37 @@ def test_the_door_is_drawn_before_the_room():
         "the way out is drawn after the room's own furniture")
 
 
+def test_the_door_is_painted_inside_the_room():
+    """The guards above all passed while there was no way out of a room.
+
+    `.room-out` is `position: absolute`, and `.screen.room-place` carried
+    no `position` — so the button resolved against whatever was positioned
+    further up the tree and painted itself outside the room entirely. The
+    element existed, `onLeave` was wired, the click worked, and a person in
+    a full-screen room could not get out: "there's no close button to take
+    you back to the main menu."
+
+        asked     is there a door
+        mattered  is the door where a person can reach it
+
+    Existing in the JSX is not the claim worth guarding. Being reachable
+    is. The same defect `.rs-chatstrip` had, fixed on the stage and not
+    looked for on its sibling — so this checks the containing block rather
+    than the element, which is the half that was actually missing.
+    """
+    block = CSS[CSS.index(".screen.room-place {"):]
+    block = block[:block.index("}")]
+    assert "position: relative" in block, (
+        "the room is not a containing block, so its absolutely positioned "
+        "door lands outside it")
+    door = CSS[CSS.index(".room-out {"):]
+    door = door[:door.index("}")]
+    assert "position: absolute" in door, (
+        "the door moved off absolute positioning — if so, the containing "
+        "block above is no longer what makes it reachable, and this guard "
+        "needs rewriting rather than deleting")
+
+
 def test_the_door_actually_leaves():
     assert re.search(r"onLeave=\{\(\) => \{ setInsideRoom\(\"\"\); "
                      r"setTab\(\"home\"\); \}\}", APP), (

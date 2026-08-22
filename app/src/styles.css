@@ -1281,6 +1281,22 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   gap: 10px;
   padding: 14px 16px 10px;
   overflow-y: auto;
+  /* The containing block for the way out.
+   *
+   *     asked     is there a door
+   *     mattered  is the door where a person can reach it
+   *
+   * `.room-out` is `position: absolute`, and this screen was never
+   * positioned — so the button resolved against whatever was positioned
+   * further up the tree and painted itself outside the room entirely.
+   * The element existed, `onLeave` was wired, the click worked, and there
+   * was no way out of a full-screen room: "there's no close button to take
+   * you back to the main menu."
+   *
+   * The same defect `.rs-chatstrip` had, fixed on the stage and not looked
+   * for on its sibling. A full-screen place with no door is a trap, and a
+   * door painted off-screen is the same trap with a passing guard. */
+  position: relative;
 }
 /* The seats take the room, and take it FIRST.
  *
@@ -1574,3 +1590,11 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   gap: 6px; }
 .rm-read { font-size: 11px; opacity: 0.75; }
 .rm-read.yes { color: var(--good, #7fd6a2); opacity: 0.9; }
+
+/* What is behind a person, as distinct from what stands in for them.
+ * Drawn under everything else in the tile and never on a live camera:
+ * cutting somebody out of their own video frame needs real segmentation,
+ * and a background pasted behind an uncut frame is a picture nobody sees. */
+.rs-behind { position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: 0; opacity: 0.9; }
+.rs-tile > *:not(.rs-behind) { position: relative; z-index: 1; }

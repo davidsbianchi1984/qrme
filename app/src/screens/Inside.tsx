@@ -206,6 +206,10 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // hide — and a double-tap or a long press brings them back. Both gestures,
   // because neither is discoverable and two chances beat one.
   const [reveal, setReveal] = useState(false);
+  // Three pickers, three different destinations: the room's photo, the
+  // person's own picture, and the background behind them.
+  const mePicker = useRef<HTMLInputElement | null>(null);
+  const bgPicker = useRef<HTMLInputElement | null>(null);
   const hold = useRef<number | null>(null);
   // The local preview. Rendering is the device's, exactly as `overlays` says —
   // what the backend holds is the fact that a camera is on, which is what
@@ -834,6 +838,15 @@ export function Inside({ onPlans, start = "", onLeave }: {
     })();
   }
 
+  /** A person's own picture, absolute — theirs, and the same in every room
+   *  they walk into. Sparse by design: a person who has not put one up has
+   *  no entry, and the seat falls through to their initials. */
+  function ownPic(interactorId: string): string | null {
+    const url = scene?.pictures?.[interactorId];
+    if (!url) return null;
+    return url.startsWith("http") ? url : getBase() + url;
+  }
+
   /** What a shared attachment looks like in the transcript: the picture
    *  itself, the video playable, anything else a plain link that says its
    *  name — never an iframe, never markup from the file. */
@@ -1217,6 +1230,14 @@ export function Inside({ onPlans, start = "", onLeave }: {
             {seats.map((s) => {
               const face = scene?.faces[s.id];
               const isMe = s.kind === "user" && s.id === me;
+              // What is BEHIND this person, which is a different object
+              // from what stands in FOR them: `photo` replaces the person,
+              // a background sits under whatever the seat is showing and
+              // leaves them on top of it.
+              const behind = face?.background_url
+                ? (face.background_url.startsWith("http")
+                     ? face.background_url : getBase() + face.background_url)
+                : null;
               const wearing = scene?.wearing.find(
                 (w) => w.interactor_id === s.id);
               const camLive = isMe && face?.showing === "camera";
@@ -1232,35 +1253,70 @@ export function Inside({ onPlans, start = "", onLeave }: {
               <div key={s.id}
                    className={"rs-tile" + (isTalking(s) ? " talking" : "")
                               + (camLive || picShown ? " rs-camtile" : "")}
-                   onDoubleClick={faceLive
+                   /* The gesture that opens your own seat's options, and it
+                    * has to work on an EMPTY seat.
+                    *
+                    *     asked     can you get at your seat's controls
+                    *     mattered  can you get at them when there is nothing
+                    *               in the seat yet
+                    *
+                    * It was gated on `faceLive` — a camera or a picture
+                    * ALREADY showing — so the one state where you need the
+                    * options was the one state where the handler was
+                    * `undefined` and the tap did nothing. Field report:
+                    * "it's not letting me double tap to open up the windows
+                    * to add a photo as my background or turn on my camera."
+                    *
+                    * Own seat, always. Somebody else's seat has no controls
+                    * of yours on it, and never did. */
+                   onDoubleClick={isMe
                      ? () => setReveal((v) => !v) : undefined}
-                   onPointerDown={faceLive ? () => {
+                   onPointerDown={isMe ? () => {
                      hold.current = window.setTimeout(
                        () => setReveal((v) => !v), 550);
                    } : undefined}
-                   onPointerUp={faceLive ? () => {
+                   onPointerUp={isMe ? () => {
                      if (hold.current) window.clearTimeout(hold.current);
                      hold.current = null;
                    } : undefined}
-                   onPointerLeave={faceLive ? () => {
+                   onPointerLeave={isMe ? () => {
                      if (hold.current) window.clearTimeout(hold.current);
                      hold.current = null;
                    } : undefined}>
+                {/* What is behind the person, drawn first so everything
+                    else sits on top of it. Never on a seat showing a live
+                    camera: cutting somebody out of their own video frame
+                    needs real segmentation, and a background pasted behind
+                    an uncut frame is just a picture nobody can see. */}
+                {behind && face?.showing !== "camera" && (
+                  <img className="rs-behind" src={behind} alt=""
+                       aria-hidden="true" />
+                )}
                 {/* What is in the box. A camera, a picture, or the initials —
                     and the box is the same size in all three, because the
                     quiet person is as present as the talking one. */}
-                {isMe && !face?.showing && myFace?.asset
-                 && !myFace.asset_marked && myFace.likeness?.real_person ? (
-                  // My own seat, wearing my own profile's picture. Only a
-                  // real photograph: `likeness.real_person` says the
-                  // portrait is of an actual person and `asset_marked`
-                  // says whether it carries the AI mark, so a generated
-                  // portrait stays off a human seat rather than passing
-                  // unmarked as somebody's face.
-                  <img className="rs-photo" alt={s.display}
-                       src={(myFace.asset as string).startsWith("http")
-                              ? (myFace.asset as string)
-                              : getBase() + myFace.asset} />
+                {s.kind === "user" && !face?.showing && ownPic(s.id) ? (
+                  // The person's OWN picture — theirs, not a profile's.
+                  //
+                  //     asked     can a person show a face
+                  //     mattered  whose face is it
+                  //
+                  // This used to borrow the portrait of the profile bound
+                  // to the session, gated on `likeness.real_person`, which
+                  // is false for any profile whose kind is "fictional" —
+                  // and kind DEFAULTS to fictional. So the gate refused,
+                  // the seat drew initials, and the borrowed picture
+                  // appeared on the synthetic seat beside it instead:
+                  // "one says You with a Y on it, it should be my image".
+                  //
+                  // A person's face belongs to the person. It comes from
+                  // the room's own `pictures` map, so it is drawn for
+                  // EVERY human seat rather than only for your own, and it
+                  // fills the frame the way the camera and the put-up
+                  // photo do — "the pictures they upload will fill the
+                  // whole frame".
+                  <img className="rs-photo rs-fullbleed" alt={s.display}
+                       src={ownPic(s.id) as string} />
                 ) : isMe && face?.showing === "camera" ? (
                   <>
                     <video ref={mine}
@@ -1414,6 +1470,49 @@ export function Inside({ onPlans, start = "", onLeave }: {
                              if (file) {
                                act(async () => {
                                  await api.uploadRoomFace(open, me, file, token);
+                               })();
+                             }
+                           }} />
+                    {/* Your own picture — the PERSON's, not this room's.
+                        Two pictures, two buttons, and the difference is
+                        which one follows you out of here: the one above is
+                        what you are showing in THIS room, this is who you
+                        are in all of them. */}
+                    <button className="chip" disabled={busy}
+                            onClick={() => mePicker.current?.click()}>
+                      {tr("ins.face.mine", lang)}
+                    </button>
+                    <input ref={mePicker} type="file" accept="image/*"
+                           style={{ display: "none" }}
+                           onChange={(e) => {
+                             const file = e.target.files?.[0];
+                             e.target.value = "";
+                             if (file) {
+                               act(async () => {
+                                 await api.setOwnPicture(me, file, token);
+                                 load();
+                               })();
+                             }
+                           }} />
+                    {/* The background — behind you rather than instead of
+                        you. Its own button because `photo` REPLACES the
+                        person: somebody who wanted a room behind them and
+                        pressed the only picture button available replaced
+                        themselves with it. */}
+                    <button className="chip" disabled={busy}
+                            onClick={() => bgPicker.current?.click()}>
+                      {tr("ins.face.background", lang)}
+                    </button>
+                    <input ref={bgPicker} type="file" accept="image/*"
+                           style={{ display: "none" }}
+                           onChange={(e) => {
+                             const file = e.target.files?.[0];
+                             e.target.value = "";
+                             if (file) {
+                               act(async () => {
+                                 await api.uploadRoomBackground(
+                                   open, me, file, token);
+                                 load();
                                })();
                              }
                            }} />

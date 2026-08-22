@@ -713,6 +713,54 @@ async def upload_room_face(room_id: str, request: Request,
                                 media_url=saved["url"])
 
 
+@router.post("/rooms/{room_id}/face/background", status_code=201)
+async def upload_room_background(room_id: str, request: Request,
+                                 interactor_id: str,
+                                 filename: str | None = None) -> dict:
+    """The picture that goes BEHIND you here.
+
+        asked     what is in your box
+        mattered  what is IN it, and what is BEHIND it
+
+    A different object from the photo that stands in for you, and the whole
+    reason it needed its own door: `photo` REPLACES the person, so a person
+    who wanted a room behind them and pressed the only picture button
+    available replaced themselves with it. Field request: "I still wanna
+    allow users to change the photo not just of their picture but of the
+    background".
+
+    Same bytes discipline as the portrait — magic numbers decide the kind,
+    pictures only, a box is not a place to serve a PDF — and **never
+    AI-marked**, for the same reason: it is the person's own picture.
+
+    Unlike the portrait, uploading does not change what you are showing. A
+    background is scenery; putting scenery up should not turn your camera
+    off or take your face down.
+    """
+    room = _room_or_404(room_id)
+    if room["status"] != "active":
+        raise HTTPException(409, "this room has closed")
+    require_interactor(interactor_id, request)
+    if not any(p["kind"] == "user" and p["ref_id"] == interactor_id
+               for p in _participants(room_id)):
+        raise HTTPException(403, "you are not in this room")
+
+    from .. import media as media_mod, roomface
+
+    data = await request.body()
+    try:
+        saved = media_mod.save(interactor_id, data, name=filename or None)
+    except media_mod.MediaError as exc:
+        raise HTTPException(exc.status, exc.message) from exc
+    if saved["kind"] not in roomface.FACE_KINDS:
+        raise HTTPException(
+            422, "a background is a picture — JPEG, PNG, GIF or WebP")
+    current = roomface.one(room_id, interactor_id)
+    return roomface.set_showing(room_id, interactor_id, current["showing"],
+                                background_id=saved["id"],
+                                background_url=saved["url"])
+
+
 @router.post("/rooms/{room_id}/share", status_code=201)
 async def share_in_room(room_id: str, request: Request,
                         interactor_id: str, filename: str | None = None,

@@ -41,6 +41,73 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   refuses nobody. And **cloned is a label, not a gate**: a cloned voice is
   marked as one and available like any other. "Shared with all!"
 
+- **There is a way out of a room again.** "There's no close button to take
+  you back to the main menu." There was one — the element was in the frame,
+  `onLeave` was wired from the app shell, and pressing it would have left.
+  It was painted where nobody could reach it: `.room-out` is
+  `position: absolute` and `.screen.room-place` carried no `position`, so
+  the button resolved against whatever was positioned further up the tree
+  and landed outside the room entirely.
+
+      asked     is there a door
+      mattered  is the door where a person can reach it
+
+  Exactly the defect `.rs-chatstrip` had one round earlier, fixed on the
+  stage and not looked for on its sibling. Three guards covered this door
+  and all three passed throughout, because each asked whether the button
+  exists rather than whether it can be reached — so the guard now checks
+  the containing block, which is the half that was missing. A full-screen
+  place with no door is a trap, and a door painted off-screen is the same
+  trap with a passing test.
+
+- **A person has their own picture.** Two seats, both named David Bianchi,
+  and the face on the wrong one: "I don't know why both profile photos
+  don't show up, one says You with a Y on it. It should be my image that I
+  have on my profile photo." One root under it — only *profiles* had
+  portraits. A human seat had a display name and two initials, and the only
+  way to put a face on one was to borrow the portrait of the profile bound
+  to the session. That borrow was gated on `avatars.likeness().real_person`,
+  which is false for any profile whose `kind` is `"fictional"` — and `kind`
+  defaults to fictional, with only onboarding setting `"self"`. So the gate
+  refused, the seat drew initials, and the borrowed picture appeared on the
+  *synthetic* seat beside it instead.
+
+      asked     can a person show a face
+      mattered  whose face is it
+
+  The gate was right and the borrow was wrong: a generated portrait passing
+  unmarked as a human's face is precisely what that check exists to prevent,
+  and a fictional-by-default profile is exactly the case it guards. So a
+  person now holds their own picture, on the person — their own upload,
+  read and take-down doors, never AI-marked, because a photograph of your
+  own face is authentic media and stamping it would be a false statement in
+  the direction the mark exists to prevent. It follows them into every room
+  rather than being set again in each one, the room hands out every seat's
+  picture so a face is drawn for *everyone* and not only for yourself, and
+  it fills the frame the way the camera does.
+
+- **A background is behind you, not instead of you.** "I still wanna allow
+  users to change the photo not just of their picture but of the
+  background." There was no such state to change: `SHOWING` offered
+  `voice`, `photo` and `camera`, and `photo` *replaces* the person — so
+  somebody who wanted a room behind them and pressed the only picture
+  button available replaced themselves with it. A background is now its own
+  object on its own columns, with its own door, drawn under whatever the
+  seat is showing and leaving the person on top of it. Putting scenery up
+  does not turn your camera off or take your face down, and it survives a
+  camera going on and off, on the same argument the portrait already had:
+  a state change is not a deletion. Not applied over a live camera —
+  cutting somebody out of their own video frame needs real segmentation,
+  and a background pasted behind an uncut frame is a picture nobody can
+  see.
+
+- **The seat's controls open on an empty seat.** "It's not letting me
+  double tap to open up the windows to add a photo as my background or turn
+  on my camera." The gesture was gated on `faceLive` — a camera or picture
+  *already showing* — so the one state where a person needs the options was
+  the one state where the handler was `undefined` and the tap did nothing.
+  Own seat, always, whatever is or is not in it.
+
 - **The room reads what you hand it.** A PDF landed in a room and the
   profile said so itself: "I can see them land, but I can't read them
   from where I'm standing — I don't get to open attachments and pretend

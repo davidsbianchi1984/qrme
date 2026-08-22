@@ -114,6 +114,82 @@ def create_interactor(body: InteractorCreate) -> dict:
             "token": token}
 
 
+@router.get("/interactors/{interactor_id}/picture")
+def get_own_picture(interactor_id: str, request: Request) -> dict:
+    """Your own picture, if you have put one up.
+
+    Yours alone to read: a person's photograph is not a directory anybody
+    with an id may page through. The room draws it from the seat state,
+    which the people in that room already share.
+    """
+    interactor_or_404(interactor_id)
+    require_interactor(interactor_id, request)
+    row = db.connect().execute(
+        "SELECT * FROM interactors WHERE id=?", (interactor_id,)).fetchone()
+    keys = row.keys()
+    return {"interactor_id": interactor_id,
+            "url": row["avatar_url"] if "avatar_url" in keys else None,
+            # Never. A photograph of your own face is authentic media, and
+            # stamping the synthetic-media mark into it would be a false
+            # statement in exactly the direction the mark exists to prevent.
+            "ai_marked": False}
+
+
+@router.post("/interactors/{interactor_id}/picture", status_code=201)
+async def set_own_picture(interactor_id: str, request: Request,
+                          filename: str | None = None) -> dict:
+    """Your own picture — the person's, not a profile's.
+
+        asked     can a person show a face
+        mattered  whose face is it
+
+    Until this door, only PROFILES had portraits. A human in a room got a
+    display name and two initials, and the only way to show a face was to
+    borrow the portrait of a profile — which put the same picture on the
+    human seat and the synthetic seat beside it, on the one screen where
+    telling the two apart is the entire point. Field report: "I don't know
+    why both profile photos don't show up, one says You with a Y on it, it
+    should be my image that I have on my profile photo."
+
+    A person's face belongs to the person. It travels with them into every
+    room rather than being set again in each one, and it is **never
+    AI-marked** — `media.py` states the rule and this is exactly the case
+    it was written for.
+    """
+    interactor_or_404(interactor_id)
+    require_interactor(interactor_id, request)
+    from .. import media as media_mod, roomface
+
+    data = await request.body()
+    try:
+        saved = media_mod.save(interactor_id, data, name=filename or None)
+    except media_mod.MediaError as exc:
+        raise HTTPException(exc.status, exc.message) from exc
+    if saved["kind"] not in roomface.FACE_KINDS:
+        raise HTTPException(
+            422, "a picture of you is a picture — JPEG, PNG, GIF or WebP")
+    conn = db.connect()
+    conn.execute("UPDATE interactors SET avatar_id=?, avatar_url=? WHERE id=?",
+                 (saved["id"], saved["url"], interactor_id))
+    conn.commit()
+    return {"interactor_id": interactor_id, "url": saved["url"],
+            "ai_marked": False}
+
+
+@router.delete("/interactors/{interactor_id}/picture")
+def clear_own_picture(interactor_id: str, request: Request) -> dict:
+    """Back to your initials. Taking your own face down is the one action
+    where keeping the file would be the surprise."""
+    interactor_or_404(interactor_id)
+    require_interactor(interactor_id, request)
+    conn = db.connect()
+    conn.execute(
+        "UPDATE interactors SET avatar_id=NULL, avatar_url=NULL WHERE id=?",
+        (interactor_id,))
+    conn.commit()
+    return {"interactor_id": interactor_id, "url": None, "ai_marked": False}
+
+
 @router.put("/interactors/{interactor_id}/quiet-hours")
 def set_quiet_hours(interactor_id: str, body: QuietHoursSet,
                     request: Request) -> dict:

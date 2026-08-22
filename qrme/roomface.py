@@ -70,7 +70,9 @@ class RoomFaceError(ValueError):
 
 def set_showing(room_id: str, interactor_id: str, showing: str,
                 media_id: str | None = None,
-                media_url: str | None = None) -> dict:
+                media_url: str | None = None,
+                background_id: str | None = None,
+                background_url: str | None = None) -> dict:
     """Decide what your box holds. Yours alone — the route authorizes it.
 
     ``photo`` needs a picture, and the check is here rather than at the route
@@ -78,6 +80,19 @@ def set_showing(room_id: str, interactor_id: str, showing: str,
     Switching to ``voice`` or ``camera`` keeps the picture on the row: somebody
     who turns their camera on and off again should find their photo where they
     left it, and a state change is not a deletion.
+
+    A **background** is kept the same way and is a different object from the
+    picture that stands in for you.
+
+        asked     what is in your box
+        mattered  what is IN it, and what is BEHIND it
+
+    `photo` replaces the person; a background sits under whatever the box is
+    already showing and leaves the person on top. Field request: "I still
+    wanna allow users to change the photo not just of their picture but of
+    the background". Keeping it on its own pair of columns means turning a
+    camera off does not throw away the room you chose to sit in, the same
+    argument the portrait already had.
     """
     if showing not in SHOWING:
         raise RoomFaceError(
@@ -88,11 +103,21 @@ def set_showing(room_id: str, interactor_id: str, showing: str,
         "SELECT * FROM room_faces WHERE room_id=? AND interactor_id=?",
         (room_id, interactor_id)).fetchone()
 
-    if media_id or media_url:
-        keep_id, keep_url = media_id, media_url
-    else:
-        keep_id = row["media_id"] if row else None
-        keep_url = row["media_url"] if row else None
+    def _kept(new_id, new_url, id_col, url_col):
+        """A new picture wins; no new picture keeps the one already there.
+        `row.keys()` is checked because a database that predates the
+        background columns still answers this query."""
+        if new_id or new_url:
+            return new_id, new_url
+        if row is None:
+            return None, None
+        keys = row.keys()
+        return (row[id_col] if id_col in keys else None,
+                row[url_col] if url_col in keys else None)
+
+    keep_id, keep_url = _kept(media_id, media_url, "media_id", "media_url")
+    back_id, back_url = _kept(background_id, background_url,
+                              "background_id", "background_url")
 
     if showing == "photo" and not keep_url:
         raise RoomFaceError(
@@ -103,13 +128,17 @@ def set_showing(room_id: str, interactor_id: str, showing: str,
     if row is None:
         conn.execute(
             "INSERT INTO room_faces (room_id, interactor_id, showing,"
-            " media_id, media_url, updated_at) VALUES (?,?,?,?,?,?)",
-            (room_id, interactor_id, showing, keep_id, keep_url, now))
+            " media_id, media_url, background_id, background_url,"
+            " updated_at) VALUES (?,?,?,?,?,?,?,?)",
+            (room_id, interactor_id, showing, keep_id, keep_url,
+             back_id, back_url, now))
     else:
         conn.execute(
             "UPDATE room_faces SET showing=?, media_id=?, media_url=?,"
+            " background_id=?, background_url=?,"
             " updated_at=? WHERE room_id=? AND interactor_id=?",
-            (showing, keep_id, keep_url, now, room_id, interactor_id))
+            (showing, keep_id, keep_url, back_id, back_url, now,
+             room_id, interactor_id))
     conn.commit()
     return one(room_id, interactor_id)
 
@@ -132,7 +161,8 @@ def one(room_id: str, interactor_id: str) -> dict:
     if row is None:
         return {"room_id": room_id, "interactor_id": interactor_id,
                 "showing": DEFAULT, "means": SHOWING[DEFAULT],
-                "media_url": None, "media_id": None, "ai_marked": False}
+                "media_url": None, "media_id": None,
+                "background_url": None, "ai_marked": False}
     return _read(row)
 
 
@@ -144,6 +174,11 @@ def _read(row) -> dict:
         "means": SHOWING[row["showing"]],
         "media_id": row["media_id"],
         "media_url": row["media_url"],
+        # What is behind you, when you have chosen anything. Its own field
+        # rather than folded into `media_url`, because a client has to know
+        # which of the two to draw underneath the other.
+        "background_url": (row["background_url"]
+                           if "background_url" in row.keys() else None),
         # A person's own photograph, and a person's own camera. Neither is
         # synthetic media and neither carries the mark. The profiles sharing
         # this room do carry theirs, from `avatars` — the mark belongs to what
@@ -151,6 +186,29 @@ def _read(row) -> dict:
         "ai_marked": False,
         "since": row["updated_at"],
     }
+
+
+def pictures_in(room_id: str) -> dict:
+    """Each person's OWN picture, for the people in this room.
+
+        asked     can a person show a face
+        mattered  whose face is it, and does it follow them
+
+    A room face is per-room and per-state — what you are showing HERE. A
+    person's picture is neither: it is theirs, it follows them into every
+    room, and until it existed the only way a human seat could hold a face
+    was to borrow a profile's portrait onto it.
+
+    Scoped to the people actually seated here. A person's photograph is not
+    a directory anybody holding a room id may page through, and the room
+    read is already the narrower door — these are the people who can see
+    each other's names and camera states anyway.
+    """
+    rows = db.connect().execute(
+        "SELECT i.id AS id, i.avatar_url AS url FROM interactors i"
+        " JOIN room_participants p ON p.ref_id = i.id"
+        " WHERE p.room_id=? AND p.kind='user'", (room_id,)).fetchall()
+    return {r["id"]: r["url"] for r in rows if r["url"]}
 
 
 def showing_in(room_id: str) -> dict:
@@ -168,6 +226,11 @@ def showing_in(room_id: str) -> dict:
     return {
         "room_id": room_id,
         "faces": faces,
+        # Each person's own picture, keyed the same way, so a seat showing
+        # nothing in particular still shows the person rather than two
+        # initials. Separate from `faces` on purpose: one is what you chose
+        # for this room, the other is who you are in all of them.
+        "pictures": pictures_in(room_id),
         "default": DEFAULT,
         "vocabulary": [{"showing": k, "means": v} for k, v in SHOWING.items()],
         "on_camera": on_camera,

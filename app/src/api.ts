@@ -2150,6 +2150,9 @@ export type RoomFace = {
   /** The person's own words for it, from the backend's vocabulary. */
   means: string;
   media_id: string | null; media_url: string | null;
+  /** What is BEHIND you, which is a different object from what stands in
+   *  FOR you: `photo` replaces the person, a background sits under them. */
+  background_url?: string | null;
   ai_marked: boolean;
   since?: string;
 };
@@ -2159,6 +2162,10 @@ export type RoomFaces = {
   /** Keyed on the person, and **sparse**: somebody with no entry is showing
    *  `voice`, which is a person in the room. The seats come from the join. */
   faces: Record<string, RoomFace>;
+  /** Each person's OWN picture, keyed the same way. A room face is what you
+   *  are showing HERE; this is who you are in every room, so a seat with no
+   *  face set still shows the person rather than two initials. */
+  pictures?: Record<string, string>;
   default: "voice";
   vocabulary: { showing: string; means: string }[];
   on_camera: number;
@@ -4985,6 +4992,55 @@ export const api = {
     }
     return data as RoomFace;
   },
+
+  // The picture that goes BEHIND you here. A separate door from the portrait
+  // because `photo` REPLACES you — a person who wanted a room behind them and
+  // pressed the only picture button available replaced themselves with it.
+  // Putting scenery up does not turn your camera off or take your face down.
+  uploadRoomBackground: async (roomId: string, interactorId: string,
+                               file: File, token: string) => {
+    const res = await fetch(getBase() +
+      `/rooms/${roomId}/face/background?interactor_id=${encodeURIComponent(interactorId)}` +
+      `&filename=${encodeURIComponent(file.name)}`, {
+      method: "POST", body: file,
+      headers: { authorization: `Bearer ${token}` },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const body = data as { detail?: unknown; message?: unknown };
+      throw new RequestError(res.status,
+                             body.detail ?? `upload failed (${res.status})`,
+                             body.message);
+    }
+    return data as RoomFace;
+  },
+
+  // Your OWN picture — the person's, not a profile's. It travels with you
+  // into every room rather than being set again in each one, and it is never
+  // AI-marked: a photograph of your own face is authentic media.
+  ownPicture: (interactorId: string, token: string) =>
+    req<{ interactor_id: string; url: string | null; ai_marked: boolean }>(
+      `/interactors/${interactorId}/picture`, { token }),
+  setOwnPicture: async (interactorId: string, file: File, token: string) => {
+    const res = await fetch(getBase() +
+      `/interactors/${encodeURIComponent(interactorId)}/picture` +
+      `?filename=${encodeURIComponent(file.name)}`, {
+      method: "POST", body: file,
+      headers: { authorization: `Bearer ${token}` },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const body = data as { detail?: unknown; message?: unknown };
+      throw new RequestError(res.status,
+                             body.detail ?? `upload failed (${res.status})`,
+                             body.message);
+    }
+    return data as { interactor_id: string; url: string | null;
+                     ai_marked: boolean };
+  },
+  clearOwnPicture: (interactorId: string, token: string) =>
+    req<{ interactor_id: string; url: string | null }>(
+      `/interactors/${interactorId}/picture`, { method: "DELETE", token }),
 
   // Hand the room a picture, video or file: raw bytes, kind decided by the
   // backend from the magic numbers, landing as a room message everybody in

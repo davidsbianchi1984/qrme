@@ -352,6 +352,13 @@ CREATE TABLE IF NOT EXISTS room_faces (
     -- so turning a camera off does not throw away the picture underneath.
     media_id      TEXT,
     media_url     TEXT,
+    -- What is BEHIND you, which is a different object from what stands in
+    -- FOR you. `photo` replaces the person; a background sits under a
+    -- portrait and leaves the person on top of it. Kept on its own pair of
+    -- columns for the same reason the photo is kept across a switch: taking
+    -- your camera off should not throw away the room you chose to sit in.
+    background_id  TEXT,
+    background_url TEXT,
     updated_at    TEXT NOT NULL,
     PRIMARY KEY (room_id, interactor_id)
 );
@@ -1730,6 +1737,12 @@ CREATE TABLE IF NOT EXISTS interactors (
     -- for as long as their device holds the id. Binding is what an account
     -- adds, not what a conversation requires.
     account_id   TEXT REFERENCES accounts(id),
+    -- Your own picture. Not a profile's portrait borrowed onto your seat —
+    -- yours, the same in every room you walk into, and never AI-marked,
+    -- because a photograph of your own face is an authentic picture and
+    -- stamping it would be a false statement (see qrme/media.py).
+    avatar_id    TEXT,
+    avatar_url   TEXT,
     created_at   TEXT NOT NULL
 );
 
@@ -2628,6 +2641,20 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # profile is told the file is unreadable rather than handed a guess.
     ("room_messages", "media_text", "TEXT"),
     ("room_messages", "media_digest", "TEXT"),
+    # What is behind you in a room, as distinct from what stands in for you.
+    # NULL on every row that predates backgrounds — no background is a
+    # background of nothing, not an empty picture.
+    ("room_faces", "background_id", "TEXT"),
+    ("room_faces", "background_url", "TEXT"),
+    # A person's own picture, on the person rather than on a profile.
+    #
+    # Until this column, only PROFILES had portraits: a human in a room had
+    # a display name and initials, and the only way to show a face was to
+    # borrow the portrait of a profile — which put the same picture on the
+    # human seat and the synthetic one beside it. A person's face belongs
+    # to the person.
+    ("interactors", "avatar_id", "TEXT"),
+    ("interactors", "avatar_url", "TEXT"),
 )
 
 
