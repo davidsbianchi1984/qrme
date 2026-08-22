@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type VoiceprintStatus , type ProfileVoice } from "../api";
 import { Refusal } from "../Refusal";
+import { playClip } from "../spoken";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { useSession } from "../store";
 
@@ -291,10 +292,12 @@ export function Voice({ onPlans }: {
                         const blob = await api.sayInProfileVoice(
                           pid as string, tr("voice.spoken.bound", lang),
                           session.ownerToken as string);
-                        const src = URL.createObjectURL(blob);
-                        const sound = new Audio(src);
-                        sound.onended = () => URL.revokeObjectURL(src);
-                        void sound.play();
+                        // Through the ear a press opened, not a fresh
+                        // element: the press that asked to hear this is
+                        // over by the time the synthesis comes back, and
+                        // a phone refuses an element with no grant of its
+                        // own. `run` surfaces the refusal if there is one.
+                        await playClip(blob);
                       })}>
                 {tr("voice.spoken.test", lang)}
               </button>

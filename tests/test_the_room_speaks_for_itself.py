@@ -47,14 +47,38 @@ def test_one_voice_at_a_time():
         "second voice over the first")
 
 
-def test_a_withheld_autoplay_ends_quietly():
-    # The play call moved into the shared piece-by-piece helper
-    # (app/src/spoken.ts) when replies stopped being one utterance; the
-    # property protected here rides with it.
+def test_a_withheld_autoplay_is_not_mistaken_for_a_reply():
+    """A refused play must not read as a reply that was heard.
+
+    This guard used to say the opposite. It was written as
+    `test_a_withheld_autoplay_ends_quietly` and it required
+    `play().catch(...)` to swallow the refusal — the reasoning being that
+    the browser is allowed to say no and the per-turn 🔊 is the answer when
+    it does. Half of that is still true: the browser is allowed to say no,
+    and the button is still there.
+
+    The wrong half was *quietly*. Swallowing made the loop resolve like a
+    reply that had played, so the screens' device-voice fallback could
+    never run — a caller cannot fall back from a success. On a phone,
+    where a refusal is not the exception but every single piece, the room
+    said nothing at all and reported nothing at all. The rule that was
+    supposed to keep one refused clip from crashing a queue is the rule
+    that made a whole platform silent.
+
+        asked     may the browser refuse
+        mattered  may the refusal go unmentioned
+
+    So: still no crash, and still a per-turn button — but the refusal
+    reaches the caller instead of being dropped on the floor.
+    """
     spoken = (REPO / "app/src/spoken.ts").read_text(encoding="utf-8")
-    assert re.search(r"sound\.play\(\)\.catch\(", spoken), (
-        "a rejected play crashes the queue — the browser is allowed to "
-        "say no, and the per-turn button is the answer when it does")
+    assert re.search(r"\.play\(\)\.catch\(", spoken), (
+        "nothing catches a rejected play — one clip the browser refuses "
+        "would take the whole queue down with it")
+    assert "refused(" in spoken and "throw why" in spoken, (
+        "a rejected play is caught and then dropped. It has to reach the "
+        "caller: every screen that speaks has a device-voice fallback, and "
+        "a resolve tells it there was nothing to fall back from")
 
 
 def test_the_press_per_turn_survives():

@@ -610,8 +610,10 @@ export function Inside({ onPlans, start = "", onLeave }: {
         for (const m of fresh) {
           if (run !== earRun.current) break;
           // Piece by piece: a long turn starts being heard at its first
-          // sentence. A rejected play (autoplay withheld after all) ends
-          // quietly — the per-turn 🔊 is still on every line.
+          // sentence. A first piece the platform refuses now REJECTS
+          // rather than resolving as a reply that was heard, so the catch
+          // below leaves the text standing instead of the room going
+          // silently deaf — the per-turn 🔊 is still on every line.
           const s = await speakInPieces(
             m.sender_id as string, m.content || "", token);
           // Remembered before it plays, not after: the microphone is open

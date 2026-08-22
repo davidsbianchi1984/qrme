@@ -4,6 +4,53 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **The bound voice is heard on a phone.** Field report, from the device
+  this gets used on most: "I'm pretty sure on the mobile device it's not
+  playing voice audio whatsoever." Not the wrong voice, not a delay —
+  nothing, and no error anywhere saying so.
+
+      asked     did the platform play this
+      mattered  does anybody find out when it did not
+
+  Two things together, and each alone would have been survivable. A phone
+  withholds autoplay unless the playback descends from a real press, and
+  the grant lands on the **element** a person started rather than on the
+  page. Every piece here was a fresh `new Audio()`, built *after* the
+  await on the synthesis fetch — so the press that began the turn was long
+  over and each new element carried no permission of its own. There is now
+  one element, opened on the first press anywhere on the page and reused
+  for every piece after it.
+
+  The second half is why it was invisible. `play().catch(() => over())`
+  treated *the platform refused* as *this piece is finished*: the loop
+  walked every sentence, played none, and resolved like a reply that had
+  been heard — so the three screens' device-voice fallback, which exists
+  for exactly this, was unreachable. **A caller cannot fall back from a
+  success.** A first piece the platform refuses now rejects, the same
+  signal as one that could not be fetched, because to a listener they are
+  the same event.
+
+  Arming is on the first press anywhere rather than wired into each
+  screen's handlers. Three screens speak and each has several ways in —
+  the room's Go in, its send, its microphone; the chat's send; the agent's
+  orb — and a list of gesture sites that must all remember to call
+  something is a list with one missing entry, which here means one screen
+  silent on a phone and nowhere else.
+
+- **The *test this voice* button had the same defect in one line.** On the
+  settings screen, `new Audio(src)` after the await: on a laptop it spoke
+  and on a phone the button did nothing at all — which is a poor way to
+  find out whether the voice you just bound is the one you wanted.
+
+- **A reply no longer keeps every clip it played.** Found while fixing the
+  above: nine sentences made nine blob URLs and released none, and a blob
+  whose URL is still alive cannot be collected. A standing conversation
+  held every clip until the tab closed.
+
 ## [1.1.0] - 2026-08-22
 
 A room somebody sat in, taken apart and put back the way they described it.
