@@ -8386,6 +8386,30 @@ const CHROME: Table = {
   "idn.mypic.gone": {
     en: "Taken down.", es: "Quitada.", fr: "Retirée.", de: "Entfernt.", pt: "Removida.", it: "Rimossa.", ja: "外しました。", zh: "已撤下。", hi: "हटा दी गई।", ar: "تمت الإزالة.",
   },
+  "ins.roomname": {
+    en: "Room name", es: "Nombre de la sala", fr: "Nom du salon", de: "Raumname", pt: "Nome da sala", it: "Nome della stanza", ja: "ルーム名", zh: "房间名称", hi: "कमरे का नाम", ar: "اسم الغرفة",
+  },
+  "ins.roomname.ph": {
+    en: "What this room is called", es: "Cómo se llama esta sala", fr: "Le nom de ce salon", de: "Wie dieser Raum heißt", pt: "Como se chama esta sala", it: "Come si chiama questa stanza", ja: "この部屋の名前", zh: "这个房间叫什么", hi: "इस कमरे को क्या कहते हैं", ar: "اسم هذه الغرفة",
+  },
+  "ins.roomname.save": {
+    en: "Save", es: "Guardar", fr: "Enregistrer", de: "Speichern", pt: "Guardar", it: "Salva", ja: "保存", zh: "保存", hi: "सहेजें", ar: "حفظ",
+  },
+  "ins.roomname.saved": {
+    en: "Name saved.", es: "Nombre guardado.", fr: "Nom enregistré.", de: "Name gespeichert.", pt: "Nome guardado.", it: "Nome salvato.", ja: "名前を保存しました。", zh: "名称已保存。", hi: "नाम सहेजा गया।", ar: "تم حفظ الاسم.",
+  },
+  "ins.ask.add": {
+    en: "Add to the list", es: "Añadir a la lista", fr: "Ajouter à la liste", de: "Zur Liste hinzufügen", pt: "Adicionar à lista", it: "Aggiungi all'elenco", ja: "リストに追加", zh: "加入名单", hi: "सूची में जोड़ें", ar: "أضف إلى القائمة",
+  },
+  "ins.ask.drop": {
+    en: "Take off the list", es: "Quitar de la lista", fr: "Retirer de la liste", de: "Von der Liste nehmen", pt: "Retirar da lista", it: "Togli dall'elenco", ja: "リストから外す", zh: "从名单移除", hi: "सूची से हटाएँ", ar: "احذف من القائمة",
+  },
+  "ins.ask.queued": {
+    en: "{count} will be asked in the moment you go in.", es: "Se invitará a {count} en cuanto entres.", fr: "{count} seront invités dès que vous entrerez.", de: "{count} werden eingeladen, sobald du hineingehst.", pt: "{count} serão convidados assim que entrar.", it: "{count} saranno invitati appena entri.", ja: "入室した時点で {count} 名を招待します。", zh: "你进入房间时会邀请 {count} 位。", hi: "आपके अंदर जाते ही {count} को बुलाया जाएगा।", ar: "سيُدعى {count} بمجرد دخولك.",
+  },
+  "ins.ask.queued.sent": {
+    en: "Asked in: {count}.", es: "Invitados: {count}.", fr: "Invités : {count}.", de: "Eingeladen: {count}.", pt: "Convidados: {count}.", it: "Invitati: {count}.", ja: "招待しました: {count}。", zh: "已邀请：{count}。", hi: "बुलाए गए: {count}।", ar: "تمت دعوة: {count}.",
+  },
   "ins.type.ph": {
     en: "Type…", es: "Escribe…", fr: "Écrivez…", de: "Tippen…", pt: "Escreva…", it: "Scrivi…", ja: "入力…", zh: "输入…", hi: "लिखें…", ar: "اكتب…",
   },

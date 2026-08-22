@@ -4168,6 +4168,20 @@ public sealed class ApiClient
         return await Send<RoomFace>(req);
     }
 
+    /// <summary>The room's name, changed from inside it. Authorized like
+    /// speaking: a participant held by their own token.</summary>
+    public Task<RoomNamed> RenameRoom(string roomId, string interactorId,
+        string topic, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Patch, $"/rooms/{roomId}")
+        {
+            Content = JsonContent.Create(
+                new { interactor_id = interactorId, topic }),
+        };
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<RoomNamed>(req);
+    }
+
     /// <summary>The picture that goes BEHIND you in this room.
     ///
     /// A different object from the photo that stands in FOR you:
@@ -5063,6 +5077,10 @@ public record RoomFace(
 /// A person's OWN picture — theirs, not a profile's portrait, and the same
 /// in every room they walk into. <c>AiMarked</c> is always false and is on
 /// the wire anyway: a photograph of somebody's own face is authentic media.
+public record RoomNamed(
+    [property: JsonPropertyName("id")] string? Id,
+    [property: JsonPropertyName("topic")] string? Topic);
+
 public record OwnPicture(
     [property: JsonPropertyName("interactor_id")] string? InteractorId,
     [property: JsonPropertyName("url")] string? Url,

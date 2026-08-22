@@ -3689,6 +3689,15 @@ object ApiClient {
             JSONObject(text).optString("showing")
         }
 
+    /** The room's name, changed from inside it. Authorized like speaking:
+     *  a participant held by their own token. */
+    suspend fun renameRoom(roomId: String, interactorId: String,
+                           topic: String, token: String): String =
+        JSONObject(request("/rooms/$roomId", "PATCH",
+                           JSONObject().put("interactor_id", interactorId)
+                               .put("topic", topic),
+                           token = token)).optString("topic")
+
     /** The picture that goes BEHIND you in this room.
      *
      *  A different object from the photo that stands in FOR you: `photo`

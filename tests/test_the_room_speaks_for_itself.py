@@ -77,8 +77,14 @@ def test_a_voice_room_is_a_voice_room():
     assert INSIDE.count("spokenRoom ? voiceBar : chatStrip") == 2, (
         "the flat scene and the stage must agree — stepping onto the "
         "stage is not stepping back into a chat room")
-    assert "{!spokenRoom && (" in INSIDE, (
-        "the card's typed composer is offered in a voice room")
+    # The card's typed composer is gone entirely — it duplicated the strip
+    # that rides the room, and the duplicate is what a field report asked
+    # to be removed. The claim it carried (a voice room grows no keyboard)
+    # now rests wholly on the line above: `spokenRoom` picks `voiceBar`,
+    # which has no type box unless the browser ships no recogniser at all.
+    assert 'placeholder={tr("ins.say.ph", lang)}' not in INSIDE, (
+        "the card's second typed composer is back, and in a voice room it "
+        "is the keyboard this room is supposed not to have")
 
 
 def test_a_voice_room_arrives_speaking():

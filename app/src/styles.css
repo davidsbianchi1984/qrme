@@ -1180,7 +1180,11 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 /* The transparent chat the gallery drew on screens 96-98 and 105: the
    conversation rides the scene and the stage, translucent over whatever
    the room is showing, with the Type… pill under the last few lines. */
-.room-scene { position: relative; padding-bottom: 56px; }
+.room-scene { padding-bottom: 0; }
+/* The strip is a sibling of the scene now, so on the flat page it
+   positions against the card — which keeps the gallery's ride-over-the-
+   scene design (screens 96-98) exactly as it was. */
+.card:has(> .room-scene) { position: relative; padding-bottom: 62px; }
 .rs-chatstrip { position: absolute; left: 8px; right: 8px; bottom: 6px;
   display: flex; flex-direction: column; gap: 4px; z-index: 5;
   pointer-events: none; }
@@ -1189,7 +1193,11 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    padding and the gaps each row carries. `overscroll-behavior` keeps a
    flick at the top of the log from dragging the screen behind it. */
 .rs-chatlog { display: flex; flex-direction: column; gap: 4px;
-  max-height: 108px; overflow-y: auto; overscroll-behavior: contain;
+  /* Five rows, then the sixth pushes the first out of sight — not out of
+     the room. "Max lines of five before the text starts vanishing, always
+     pinning to the bottom." 5 x 1.35 line-height x 12px, plus each row's
+     padding and the gaps between them. */
+  max-height: 135px; overflow-y: auto; overscroll-behavior: contain;
   scrollbar-width: thin;
   /* The box itself stays transparent to the finger — it spans the whole
      width, and a rectangle of dead air over the seat tiles would eat the
@@ -1322,11 +1330,26 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    * The stage becomes the positioned ancestor and reserves the space
    * itself, so the scene — `flex: 1` — shrinks by exactly what the strip
    * occupies and the tiles can never sit under it. */
-  position: relative; padding-bottom: 104px; }
+  position: relative; }
 .screen.room-place > .room-stage > .room-scene { flex: 1 1 auto; min-height: 0;
   position: static; padding-bottom: 0; }
+/* In a room the strip is a normal flex child at the bottom of the stage,
+   not an overlay.
+ *
+ *     asked     where does the strip sit
+ *     mattered  can it ever sit on top of the faces
+ *
+ * It was absolute, and the stage reserved a hardcoded 104px underneath —
+ * a guess about the strip's height that was right the day it was written
+ * and wrong the moment the transcript grew to four scrolling rows.
+ * Reported three times, each time as the bar "resting on top of the
+ * frames". Static, it takes the room it actually needs and the scene
+ * (flex: 1) shrinks by exactly that much, so they cannot overlap however
+ * either one grows later. */
 .screen.room-place .rs-chatstrip,
-.screen.room-place .rs-voicebar { left: 10px; right: 10px; bottom: 10px; }
+.screen.room-place .rs-voicebar {
+  position: static; left: auto; right: auto; bottom: auto;
+  flex: 0 0 auto; padding: 0 2px; }
 
 /* Two columns, as drawn — not `auto-fill`, which on a wide window turns
  * six people into a strip of thumbnails. Three when the window is wide
@@ -1602,3 +1625,13 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    to be looked at rather than the size a thumbnail fits in. */
 .idn-mypic { width: 120px; height: 120px; object-fit: cover;
   border-radius: 50%; display: block; margin: 8px 0; }
+/* Lending your microphone: the sixth control, beside the handover it sits
+   next to in meaning. Lit while it is lent, because an open microphone
+   somebody else can hear through is the state worth seeing across a room. */
+.rs-round.lend { border-color: rgba(255, 255, 255, 0.16); }
+.rs-round.lend.live { border-color: rgba(126, 231, 175, 0.85);
+  box-shadow: 0 0 0 2px rgba(126, 231, 175, 0.25); }
+/* Letting the profiles talk: the seventh control. It had a wide labelled
+   button on the card below; here it is the same door at the size the strip
+   gives everything else. */
+.rs-round.talkers { border-color: rgba(255, 255, 255, 0.16); }

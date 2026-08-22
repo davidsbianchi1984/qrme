@@ -4416,6 +4416,19 @@ extension ApiClient {
         return try JSONDecoder().decode(RoomFace.self, from: out)
     }
 
+    /// The room's name, changed from inside it. Authorized like speaking:
+    /// a participant held by their own token — naming somebody else's room
+    /// from outside it is not a thing this product offers.
+    func renameRoom(roomId: String, interactorId: String, topic: String,
+                    token: String) async throws -> String {
+        struct Out: Decodable { let topic: String? }
+        let out: Out = try await request("/rooms/\(roomId)", method: "PATCH",
+                                         body: ["interactor_id": interactorId,
+                                                "topic": topic],
+                                         token: token)
+        return out.topic ?? topic
+    }
+
     /// The picture that goes BEHIND you in this room.
     ///
     /// A different object from the photo that stands in FOR you: `photo`

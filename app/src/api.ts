@@ -3995,6 +3995,15 @@ export const api = {
     req<{ id: string; topic?: string | null; channel: string;
           participants: { kind: string; id: string; display: string }[] }>(
       `/rooms/${roomId}/join`, { method: "POST", token }),
+  // The room's name, changed from inside it. Authorized like speaking: a
+  // participant, held by their own token — naming somebody else's room
+  // from outside it is not a thing this product offers.
+  renameRoom: (roomId: string, interactorId: string, topic: string,
+               token: string) =>
+    req<{ id: string; topic: string }>(`/rooms/${roomId}`, {
+      method: "PATCH", token,
+      body: { interactor_id: interactorId, topic },
+    }),
   // Step into a standing room — the room, not a copy of it: joins the
   // live one with a seat left, opens it fresh only when nobody is there.
   openStandingRoom: (key: string, profileId: string, token: string) =>

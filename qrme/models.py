@@ -311,6 +311,15 @@ class RoomInvite(BaseModel):
     profile_id: str
 
 
+class RoomRename(BaseModel):
+    """The room's name, changed from inside it. `interactor_id` is checked
+    against the token rather than believed — the same shape every other
+    in-room action takes."""
+
+    interactor_id: str
+    topic: str
+
+
 class RoomFace(BaseModel):
     """What your box in the room scene holds.
 

@@ -301,7 +301,48 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // rather than a page. Declared beside `open` because effects far above
   // the render read it — a `const` read before its line is a dead-zone
   // crash, not a false.
-  const inRoom = Boolean(open);
+  // Going in is a press, not a consequence of knowing an id.
+  //
+  //     asked     do you have a room id
+  //     mattered  have you gone in
+  //
+  // `inRoom` was `Boolean(open)`, so the moment a room id existed — typed,
+  // remembered, or handed in by another screen — this component joined the
+  // room and drew the faces. Field report, from a phone: "it shouldn't
+  // even be shown yet. I don't think it should dive straight into the
+  // room." Having somebody's address is not the same as being in their
+  // house, and the frames arriving before the press made the button that
+  // follows them look like it had already been pressed.
+  const [entered, setEntered] = useState(false);
+  // Who is coming, picked before the door opens.
+  //
+  //     asked     can you invite somebody
+  //     mattered  can you decide who is coming BEFORE you walk in
+  //
+  // `POST /rooms/{id}/invite` requires the inviter to already be in the
+  // room, and deliberately: "inviting somebody somewhere you are not is
+  // how a room id becomes a way to send mail." That rule is not worth
+  // loosening for an ordering preference, so the picks are gathered here
+  // and sent the moment the join lands. From the outside it is choosing
+  // your guests before you go in; underneath, you are in the room by the
+  // time a single invite leaves.
+  const [guestList, setGuestList] = useState<string[]>([]);
+  const inRoom = entered && Boolean(open);
+  // Read by the strip, which is built long before the cards that used
+  // to be the only reader. Declared with `inRoom` for that reason —
+  // this is the third dead-zone crash on this screen from a const
+  // sitting below its first use.
+  const lentByMe = mics?.microphones_lent.some((m) => m.interactor_id === me);
+  // The room's name, read off the join answer and editable in place.
+  const [roomName, setRoomName] = useState("");
+  async function saveName() {
+    const want = roomName.trim();
+    if (!want || !token || busy) return;
+    await act(async () => {
+      await api.renameRoom(open, me, want, token);
+      setNote(tr("ins.roomname.saved", lang));
+    })();
+  }
 
   // A voice room is a voice room. Field report, holding a `voice` room up
   // against what it drew: "this is supposed to be audio chat only — we
@@ -324,13 +365,23 @@ export function Inside({ onPlans, start = "", onLeave }: {
     // rather than leaving you on the same form, which a field report
     // described as "it just stayed here in the same menu".
     api.joinRoom(open, token)
-      .then((r) => { setSeats(r.participants); setChannel(r.channel); })
+      .then((r) => {
+        setSeats(r.participants);
+        setChannel(r.channel);
+        // The name, so the box shows what the room is called rather than
+        // an empty field somebody has to guess the current value of.
+        setRoomName(r.topic || "");
+      })
       .catch(() => setSeats([]));
     // What is in the seats, and who is wearing what — one call, because a
     // second one would draw a frame with a face and no disclosure on it.
     api.roomFaces(open, token).then(setScene).catch(() => setScene(null));
   }
-  useEffect(load, [open, token]);
+  // Loads when you go IN, not when an id appears. The dependency was
+  // `[open, token]`, which is exactly the dive this screen was reported
+  // for — and it also meant every keystroke in the id box tried to join a
+  // half-typed room.
+  useEffect(() => { if (entered) load(); }, [entered, open, token]);
 
   // The transcript box follows the newest line, unless you have scrolled
   // up to read — then it stays where you put it, and follows again once
@@ -993,6 +1044,44 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 aria-label={tr("ins.ask.title", lang)}
                 title={tr("ins.ask.title", lang)}
                 onClick={() => setAsking(true)}>👤+</button>
+        {/* Lending the profiles your microphone — a sixth control, beside
+         * the handover it sits next to in meaning: both hand something of
+         * yours to somebody else. It had a whole card explaining itself,
+         * which is the right amount of words and the wrong place for
+         * them; the sentence stays as the button's title, where somebody
+         * reaching for it will actually meet it.
+         *
+         * Two states, not one, because lending and taking back are
+         * different acts and a toggle that says "microphone" for both
+         * tells you nothing about which way it is pointing. */}
+        <button className={"rs-round lend" + (lentByMe ? " live" : "")}
+                disabled={busy || !token || !me || !open}
+                aria-pressed={lentByMe}
+                aria-label={lentByMe ? tr("ins.takeback", lang)
+                                     : tr("ins.lendmic", lang)}
+                title={tr("ins.micpitch", lang)}
+                onClick={act(async () => {
+                  if (lentByMe) {
+                    await api.takeBackMicInRoom(open, me, token);
+                  } else {
+                    await api.lendMicInRoom(open, me, token);
+                  }
+                }, lentByMe ? tr("ins.takenback", lang)
+                            : tr("ins.lent", lang))}>
+          {lentByMe ? "🎧" : "🎚"}
+        </button>
+        {/* Letting the profiles talk without you saying anything. The one
+         * control on the card below that was NOT a duplicate, so it moved
+         * here rather than out of the product — deleting the only door to
+         * a capability is a different act from removing a second copy of
+         * one. Sending a message already makes them reply; this is for
+         * when you want to hear them without adding a line. */}
+        <button className="rs-round talkers" disabled={busy || !token || !open}
+                aria-label={tr("ins.letthemtalk", lang)}
+                title={tr("ins.letthemtalk", lang)}
+                onClick={act(async () => {
+                  await api.advanceRoom(open, token);
+                })}>💬</button>
         <button className="rs-round share" disabled={!open}
                 aria-label={tr("ins.handover", lang)}
                 title={tr("ins.handover", lang)}
@@ -1080,7 +1169,6 @@ export function Inside({ onPlans, start = "", onLeave }: {
     } catch (e) { setError(e); } finally { setBusy(false); }
   }
 
-  const lentByMe = mics?.microphones_lent.some((m) => m.interactor_id === me);
 
   // A room is a place, not a page.
   //
@@ -1189,7 +1277,8 @@ export function Inside({ onPlans, start = "", onLeave }: {
         // so this is the only door — which is why it is drawn before
         // anything else in the frame rather than tucked under the fold
         // with the room's other controls.
-        <button className="room-out" onClick={onLeave}>
+        <button className="room-out"
+                onClick={() => { setEntered(false); onLeave(); }}>
           {tr("ins.leave", lang)}
         </button>
       )}
@@ -1199,23 +1288,113 @@ export function Inside({ onPlans, start = "", onLeave }: {
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
+      {/* One card, two jobs, decided by whether you are in a room yet.
+       *
+       *     asked     which room do you want
+       *     mattered  and once you are in it, what is it called
+       *
+       * Outside: the id box and Go in, as before. Inside: the same place
+       * becomes the room's NAME and the button becomes Save — which is
+       * where a person already is when they notice the name is wrong.
+       * Field request: "that's a good place to edit your room name while
+       * you're already in, and the button that says Go in — I just need to
+       * say Save and it'll save the name." */}
       <div className="card">
-        <h3>{tr("ins.whichroom", lang)}</h3>
+        <h3>{inRoom ? tr("ins.roomname", lang) : tr("ins.whichroom", lang)}</h3>
         <div className="row">
-          <input value={roomId} onChange={(e) => setRoomId(e.target.value)}
-                 placeholder={tr("ins.roomid.ph", lang)} style={{ flex: 1 }} />
-          <button disabled={busy || !open || !token} onClick={act(async () => {
-            load();
-          })}>
-            {tr("ins.goin", lang)}
-          </button>
+          {inRoom ? (
+            <input value={roomName}
+                   onChange={(e) => setRoomName(e.target.value)}
+                   onKeyDown={(e) => { if (e.key === "Enter") void saveName(); }}
+                   placeholder={tr("ins.roomname.ph", lang)}
+                   style={{ flex: 1 }} />
+          ) : (
+            <input value={roomId} onChange={(e) => setRoomId(e.target.value)}
+                   placeholder={tr("ins.roomid.ph", lang)} style={{ flex: 1 }} />
+          )}
+          {inRoom ? (
+            <button disabled={busy || !token || !roomName.trim()}
+                    onClick={() => void saveName()}>
+              {tr("ins.roomname.save", lang)}
+            </button>
+          ) : (
+            <button disabled={busy || !open || !token} onClick={act(async () => {
+              setEntered(true);
+              load();
+              // The join is what makes the invites legal, so they go after
+              // it and never before. One failure does not take the others
+              // down: an id that is not a profile is that guest's problem,
+              // not the room's.
+              for (const guest of guestList) {
+                try { await api.inviteToRoom(open, guest, token); }
+                catch { /* said in the note below, not thrown away */ }
+              }
+              if (guestList.length) {
+                // `fill` returns nodes for rendering; a note is a string.
+                setNote(tr("ins.ask.queued.sent", lang)
+                          .replace("{count}", String(guestList.length)));
+                setGuestList([]);
+              }
+            })}>
+              {tr("ins.goin", lang)}
+            </button>
+          )}
         </div>
         {!token && (
           <p className="muted small">{tr("ins.signinperson", lang)}</p>
         )}
       </div>
 
-      {open && seats.length > 0 && (
+      {/* Who is coming, chosen on the way in rather than after arriving.
+       *
+       * Only before you enter: once you are inside, the strip's 👤+ is the
+       * invite and a second copy would be the duplication two other cards
+       * were just removed for. */}
+      {!inRoom && (
+        <div className="card">
+          <h3>{tr("ins.ask.title", lang)}</h3>
+          <p className="muted small">{tr("ins.ask.pitch", lang)}</p>
+          <div className="row">
+            <input value={guestId} style={{ flex: 1 }}
+                   placeholder={tr("ins.ask.ph", lang)}
+                   onChange={(e) => setGuestId(e.target.value)}
+                   onKeyDown={(e) => {
+                     if (e.key !== "Enter") return;
+                     const g = guestId.trim();
+                     if (!g || guestList.includes(g)) return;
+                     setGuestList((l) => [...l, g]);
+                     setGuestId("");
+                   }} />
+            <button disabled={!guestId.trim()
+                              || guestList.includes(guestId.trim())}
+                    onClick={() => {
+                      setGuestList((l) => [...l, guestId.trim()]);
+                      setGuestId("");
+                    }}>
+              {tr("ins.ask.add", lang)}
+            </button>
+          </div>
+          {/* The list, with a way off it. A queue you cannot correct is a
+              queue that sends the typo. */}
+          {guestList.map((g) => (
+            <p className="small" key={g}>
+              <code>{g}</code>{" "}
+              <button className="chip"
+                      aria-label={tr("ins.ask.drop", lang)}
+                      onClick={() => setGuestList(
+                        (l) => l.filter((x) => x !== g))}>✕</button>
+            </p>
+          ))}
+          {guestList.length > 0 && (
+            <p className="muted small">
+              {fill(tr("ins.ask.queued", lang),
+                    { count: String(guestList.length) })}
+            </p>
+          )}
+        </div>
+      )}
+
+      {inRoom && seats.length > 0 && (
         // The scene: everyone in the room in their own square, and the
         // square of whoever spoke last wears the light. The transcript
         // stays below — the scene is where you are, the transcript is
@@ -1577,8 +1756,23 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 to the live screen. A voice room wears the talk control
                 in its place: text pasted over a room somebody came here
                 to LISTEN to is the wrong furniture, not less of it. */}
-            {spokenRoom ? voiceBar : chatStrip}
           </div>
+          {/* A SIBLING of the scene, not a child of it.
+           *
+           *     asked     where does the strip sit
+           *     mattered  can it ever sit on top of the faces
+           *
+           * It used to live inside `.room-scene`, absolutely positioned,
+           * with the stage reserving a hardcoded 104px underneath. That
+           * number was right the day it was written and wrong the moment
+           * the transcript grew to four scrolling rows — reported three
+           * times, each time as the bar "resting on top of the frames".
+           *
+           * A reserved constant is a guess about somebody else's height.
+           * As a sibling it takes the space it actually needs and the
+           * scene shrinks by exactly that much, so the two cannot overlap
+           * whatever either of them grows into later. */}
+          {spokenRoom ? voiceBar : chatStrip}
           {/* "nobody here has turned a camera on" — true, and said to
               somebody looking at a room full of faces who can see that for
               themselves. Kept on the wire, where other readers use it;
@@ -1696,7 +1890,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
         </div>
       )}
 
-      {open && (
+      {inRoom && (
         <>
           <div className="card">
             <h3>
@@ -1750,130 +1944,48 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 )}
               </p>
             ))}
-            <div className="row">
-              {/* One picker for both composers — the pill on the scene and
-                  this row share it, and whatever is typed rides along as
-                  the caption. Never rendered as its own control: a bare
-                  file input beside a styled row reads as somebody else's
-                  form. */}
-              <input ref={sharePick} type="file" style={{ display: "none" }}
-                     accept="image/*,video/*,.pdf,.docx,.xlsx,.pptx,.zip,.txt"
-                     onChange={(e) => {
-                       const f = e.target.files?.[0];
-                       e.target.value = "";
-                       if (f) void shareFile(f);
-                     }} />
-              <button className="chip" disabled={busy || !token}
-                      aria-label={tr("ins.share", lang)}
-                      title={tr("ins.share", lang)}
-                      onClick={() => sharePick.current?.click()}>
-                📎
-              </button>
-              {/* A voice room keeps its record and loses its keyboard: the
-                  typed box, the dictation mic that fills it and the send
-                  all belong to a room people write in. Sharing a picture
-                  and letting the profiles talk are not typing, so they
-                  stay. The way in is the talk control on the room itself.
-                  Where the browser ships no recogniser, `voiceBar` puts a
-                  typed pill back with a line saying why. */}
-              {!spokenRoom && (
-              <input value={draft} onChange={(e) => setDraft(e.target.value)}
-                     placeholder={tr("ins.say.ph", lang)} style={{ flex: 1 }}
-                     onKeyDown={(e) => {
-                       if (e.key === "Enter" && draft.trim() && !busy && token) {
-                         void act(async () => {
-                           const text = draft;
-                           setDraft("");
-                           await api.sayInRoom(open, me, text, token);
-                         })();
-                       }
-                     }} />
-              )}
-              {/* Dictation: speech types into the box. The send below stays
-                  a decision — a room has other people in it. Absent where
-                  the browser ships no recogniser, not disabled: a dead
-                  control is a broken promise drawn as a button. */}
-              {canDictate && !spokenRoom && (
-                <button className={"chip" + (dictating ? " primary" : "")}
-                        disabled={busy}
-                        aria-pressed={dictating}
-                        aria-label={tr("ins.dictate", lang)}
-                        title={tr("ins.dictate", lang)}
-                        onClick={flipDictation}>
-                  🎤
-                </button>
-              )}
-              {/* A send is a small thing now — "the button could be a lot
-                  smaller if it's only gonna be a send" — and Enter sends
-                  too. The name survives in the label for a screen reader. */}
-              {!spokenRoom && (
-              <button className="chip"
-                      disabled={busy || !token || !draft.trim()}
-                      aria-label={tr("ins.sayit", lang)}
-                      title={tr("ins.sayit", lang)}
-                      onClick={act(async () => {
-                        const text = draft;
-                        setDraft("");
-                        await api.sayInRoom(open, me, text, token);
-                      })}>
-                ➤
-              </button>
-              )}
-              <button disabled={busy || !token}
-                      onClick={act(async () => {
-                        await api.advanceRoom(open, token);
-                      })}>
-                {tr("ins.letthemtalk", lang)}
-              </button>
-            </div>
+            {/* The compose row that used to sit here is gone.
+             *
+             *     asked     can you say something
+             *     mattered  is there more than one place to say it
+             *
+             * A paperclip, a dictation mic, a type box and a send —
+             * every one of them already in the strip that rides the room
+             * itself, so this card offered a second, worse copy of the
+             * same conversation. Field report: "I thought we had gotten
+             * rid of this series of buttons and secondary text bar... we
+             * can get rid of all those."
+             *
+             * The one control here that was NOT a duplicate — letting the
+             * profiles talk without you saying anything — moved into the
+             * strip rather than out of the product, because deleting the
+             * only door to a capability is a different act from removing
+             * a second copy of one. This card is the record now, and a
+             * record is for reading. */}
+            {/* The file picker stays: the strip's own attach button
+                clicks it, so it is this row's one surviving job. */}
+            <input ref={sharePick} type="file" style={{ display: "none" }}
+                   accept="image/*,video/*,.pdf,.docx,.xlsx,.pptx,.zip,.txt"
+                   onChange={(e) => {
+                     const f = e.target.files?.[0];
+                     e.target.value = "";
+                     if (f) void shareFile(f);
+                   }} />
             <p className="muted small">{tr("ins.watermarked", lang)}</p>
           </div>
 
-          <div className="card">
-            <h3>{tr("ins.microphones", lang)}</h3>
-            {mics && <p className="muted small">{mics.note}</p>}
-            {mics?.microphones_lent.map((m) => (
-              <p className="small" key={m.interactor_id}>
-                {fill(tr("ins.micline", lang), {
-                  who: <code>{m.interactor_id}</code>, device: m.device,
-                  hears: m.hears, when: m.since,
-                })}
-              </p>
-            ))}
-            <div className="row">
-              {!lentByMe ? (
-                <button disabled={busy || !token || !me}
-                        onClick={act(async () => {
-                          await api.lendMicInRoom(open, me, token);
-                        }, tr("ins.lent", lang))}>
-                  {tr("ins.lendmic", lang)}
-                </button>
-              ) : (
-                <button disabled={busy || !token}
-                        onClick={act(async () => {
-                          await api.takeBackMicInRoom(open, me, token);
-                        }, tr("ins.takenback", lang))}>
-                  {tr("ins.takeback", lang)}
-                </button>
-              )}
-            </div>
-            <p className="muted small">{tr("ins.micpitch", lang)}</p>
-          </div>
-
-          <div className={"card" + (asking ? " asked-for" : "")}
-               ref={askCard}>
-            <h3>{tr("ins.ask.title", lang)}</h3>
-            <p className="muted small">{tr("ins.ask.pitch", lang)}</p>
-            <div className="row">
-              <input value={guestId} style={{ flex: 1 }}
-                     placeholder={tr("ins.ask.ph", lang)}
-                     onChange={(e) => setGuestId(e.target.value)} />
-              <button disabled={busy || !token || !guestId.trim()}
-                      onClick={() => void askIn()}>
-                {tr("ins.ask.go", lang)}
-              </button>
-            </div>
-          </div>
+          {/* Two cards left this screen here.
+           *
+           *     asked     is the control on screen
+           *     mattered  is it on screen TWICE
+           *
+           * "Ask somebody into the room" repeated the strip's 👤+, and
+           * "Lend them my microphone" is now a control in the strip beside
+           * the handover arrow. A second copy of a button is not more
+           * discoverable, it is one more thing to read past — and the
+           * strip is where a person's hand already is. The doors both
+           * cards opened are unchanged; only these copies of them are
+           * gone. */}
         </>
       )}
     </div>

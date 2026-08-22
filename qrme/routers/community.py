@@ -31,7 +31,7 @@ from ..common import (age_of, interactor_or_404, profile_or_404,
 from ..models import (
     HandoffCreate, ListingCreate, ListingPlace, MarketAssist, MarketPrefs,
     ProviderCreate, ReferralPrepare, ReferralRelease, ReferralReply,
-    RoomCreate, RoomFace, RoomInvite, RoomMessage, RoomMicLend,
+    RoomCreate, RoomFace, RoomInvite, RoomMessage, RoomMicLend, RoomRename,
 )
 
 router = APIRouter()
@@ -684,6 +684,42 @@ def set_room_face(room_id: str, body: RoomFace, request: Request) -> dict:
                                     media_url=body.media_url)
     except roomface.RoomFaceError as exc:
         raise HTTPException(422, str(exc)) from exc
+
+
+@router.patch("/rooms/{room_id}")
+def rename_room(room_id: str, body: RoomRename, request: Request) -> dict:
+    """Give the room its name, from inside it.
+
+        asked     what is this room called
+        mattered  can you change it while you are standing in it
+
+    The name lived only in the create call, so getting it wrong meant
+    leaving and opening another one. Field request: "that's a good place to
+    edit your room name while you're already in, and the button that says
+    Go in — I just need to say Save and it'll save the name."
+
+    Authorized exactly like speaking: a user participant, held by their own
+    token. That is the same closed door `share_in_room` draws, and for the
+    same reason — a room id rides on printed stickers, and naming somebody
+    else's room from outside it is not a thing this product offers.
+    Deliberately any participant rather than a creator: a room has no owner
+    field, and inventing one here to gate a label would be a bigger claim
+    than the feature makes.
+    """
+    room = _room_or_404(room_id)
+    if room["status"] != "active":
+        raise HTTPException(409, "this room has closed")
+    require_interactor(body.interactor_id, request)
+    if not any(p["kind"] == "user" and p["ref_id"] == body.interactor_id
+               for p in _participants(room_id)):
+        raise HTTPException(403, "you are not in this room")
+    topic = (body.topic or "").strip()
+    if not topic:
+        raise HTTPException(422, "a room's name is the words in it")
+    conn = db.connect()
+    conn.execute("UPDATE rooms SET topic=? WHERE id=?", (topic[:120], room_id))
+    conn.commit()
+    return {"id": room_id, "topic": topic[:120]}
 
 
 @router.post("/rooms/{room_id}/face/photo", status_code=201)

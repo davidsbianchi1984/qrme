@@ -102,3 +102,34 @@ def test_a_profile_is_told_something_was_shown():
     assert "[shared a" in turns, (
         "a shared attachment reaches the model as an empty message — "
         "the turn should state that something was shown")
+
+
+# -- the room's name, changed from inside it ---------------------------------
+
+def test_a_participant_can_name_the_room(client):
+    user, room = _room(client)
+    r = client.patch(f"/rooms/{room['id']}", headers=as_interactor(user),
+                     json={"interactor_id": user, "topic": "Tuesday call"})
+    assert r.status_code == 200, r.text
+    assert r.json()["topic"] == "Tuesday call"
+    back = client.post(f"/rooms/{room['id']}/join",
+                       headers=as_interactor(user)).json()
+    assert back["topic"] == "Tuesday call", "the name did not survive"
+
+
+def test_a_stranger_with_the_room_id_cannot_name_it(client):
+    """The same closed door speaking uses: a room id rides on printed
+    stickers, and naming somebody else's room from outside is not a thing
+    this product offers."""
+    user, room = _room(client)
+    outsider = make_interactor(client, "Nosy")
+    r = client.patch(f"/rooms/{room['id']}", headers=as_interactor(outsider),
+                     json={"interactor_id": outsider, "topic": "mine now"})
+    assert r.status_code == 403
+
+
+def test_a_room_is_not_named_nothing(client):
+    user, room = _room(client)
+    r = client.patch(f"/rooms/{room['id']}", headers=as_interactor(user),
+                     json={"interactor_id": user, "topic": "   "})
+    assert r.status_code == 422

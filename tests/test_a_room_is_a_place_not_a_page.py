@@ -82,9 +82,35 @@ def test_the_shelf_copy_goes_when_the_room_arrives():
         in INSIDE
 
 
-def test_being_in_a_room_is_having_one_open():
-    assert "const inRoom = Boolean(open);" in INSIDE, (
-        "the room's own idea of being in a room is not the room being open")
+def test_being_in_a_room_is_going_in():
+    """This guard's claim was replaced on purpose, and the old one is
+    written down rather than quietly dropped.
+
+    It used to assert `inRoom = Boolean(open)` — having a room id WAS
+    being in the room. So the moment an id existed, typed or remembered or
+    handed in by another screen, this component joined and drew the faces.
+    Field report, from a phone: "it shouldn't even be shown yet. I don't
+    think it should dive straight into the room."
+
+        asked     do you have a room id
+        mattered  have you gone in
+
+    Having somebody's address is not being in their house, and frames that
+    arrive before the press make the button below them look like it has
+    already been pressed. Going in is now a press.
+    """
+    assert "const inRoom = entered && Boolean(open);" in INSIDE, (
+        "an id is being treated as arrival again")
+    assert "setEntered(true)" in INSIDE, "nothing ever goes in"
+    assert "setEntered(false)" in INSIDE, "nothing ever comes back out"
+
+
+def test_nothing_joins_a_room_you_have_not_entered():
+    """The dive had a second cost: the join effect ran on `[open, token]`,
+    so every keystroke in the id box tried to join a half-typed room."""
+    block = INSIDE[INSIDE.index("useEffect(() => { if (entered) load(); }"):]
+    block = block[:block.index(";")]
+    assert "if (entered)" in block
 
 
 # -- and it has a door -------------------------------------------------------
@@ -235,7 +261,12 @@ def test_every_control_in_the_strip_does_something():
     strip = INSIDE[INSIDE.index('<div className="rs-strip">'):]
     strip = strip[:strip.index("      </div>")]
     for wired in ("setDraft(", "sharePick.current?.click()", "flipTalking",
-                  "setAsking(true)", "clipboard"):
+                  "setAsking(true)", "clipboard",
+                  # Lending the profiles your microphone. It had a card of
+                  # its own; the card is gone and the door is here, beside
+                  # the handover it sits next to in meaning — both hand
+                  # something of yours to somebody else.
+                  "api.lendMicInRoom(", "api.takeBackMicInRoom("):
         assert wired in strip, f"the strip has a control with no {wired}"
 
 
@@ -385,3 +416,144 @@ def test_the_transcript_box_does_not_eat_the_double_tap():
     block = CSS[CSS.index(".rs-chatlog {"):]
     block = block[:block.index(".rs-chatline {")]
     assert "pointer-events: none" in block
+
+
+# -- the strip sits under the faces, not on them -----------------------------
+
+def test_the_strip_is_a_sibling_of_the_scene_not_a_child():
+    """Reported three times, each time as the bar "resting on top of the
+    frames" — and twice "fixed" by adjusting a reserved constant.
+
+        asked     where does the strip sit
+        mattered  can it ever sit on top of the faces
+
+    It lived inside `.room-scene`, absolutely positioned, with the stage
+    reserving a hardcoded 104px underneath. That number was right the day
+    it was written and wrong the moment the transcript grew to four
+    scrolling rows: a reserved constant is a guess about somebody else's
+    height, and a guess drifts every time the thing it guesses about
+    changes. As a sibling the strip takes the room it needs and the scene
+    shrinks by exactly that much, so the two cannot overlap however either
+    one grows later.
+    """
+    start = INSIDE.index('<div className="room-scene">')
+    # Walk the tags and find where the scene actually closes, rather than
+    # counting them — a count says nothing about order, and order is the
+    # whole claim.
+    depth, closed_at, i = 0, None, start
+    while i < len(INSIDE):
+        opened = INSIDE.find("<div", i)
+        shut = INSIDE.find("</div>", i)
+        if shut == -1:
+            break
+        if opened != -1 and opened < shut:
+            depth += 1
+            i = opened + 4
+            continue
+        depth -= 1
+        i = shut + 6
+        if depth == 0:
+            closed_at = shut
+            break
+    assert closed_at is not None, "the room scene never closes"
+    strip = INSIDE.index("{spokenRoom ? voiceBar : chatStrip}", start)
+    assert strip > closed_at, (
+        "the strip is still inside the scene it is supposed to sit below")
+
+
+def test_the_room_reserves_no_guessed_height():
+    """The constant is the defect, not its value."""
+    block = CSS[CSS.index(".screen.room-place > .room-stage {"):]
+    block = block[:block.index("}")]
+    assert "padding-bottom: 104px" not in block, (
+        "the stage is guessing the strip's height again")
+
+
+def test_the_strip_stops_floating_in_a_room():
+    block = CSS[CSS.index(".screen.room-place .rs-chatstrip,"):]
+    block = block[:block.index("}")]
+    assert "position: static" in block, (
+        "the strip is still an overlay in a room, so it can ride up over "
+        "the seats when it grows")
+    assert "flex: 0 0 auto" in block, (
+        "the strip can be squeezed by the scene instead of the other way "
+        "round")
+
+
+def test_the_flat_page_keeps_its_containing_block():
+    """The strip riding the scene is the gallery's design on the flat page
+    (screens 96-98) and is deliberately kept. Now that the strip is a
+    sibling, the card has to be what it positions against — otherwise it
+    resolves further up the tree and lands outside, which is exactly how
+    the way out of a room went missing."""
+    assert ".card:has(> .room-scene)" in CSS
+    block = CSS[CSS.index(".card:has(> .room-scene)"):]
+    block = block[:block.index("}")]
+    assert "position: relative" in block
+
+
+# -- the room's name, from inside it -----------------------------------------
+
+def test_the_room_can_be_named_from_inside_it():
+    """"That's a good place to edit your room name while you're already
+    in, and the button that says Go in — I just need to say Save."" """
+    assert "ins.roomname" in INSIDE
+    assert "api.renameRoom(" in INSIDE, "the Save button saves nothing"
+
+
+def test_the_same_card_does_both_jobs():
+    """Outside a room it asks which one; inside it names the one you are
+    in. One place, because that is where a person already is when they
+    notice the name is wrong."""
+    block = INSIDE[INSIDE.index('{inRoom ? tr("ins.roomname"'):]
+    block = block[:block.index("{!token && (")]
+    assert 'tr("ins.whichroom"' in block
+    assert 'tr("ins.goin"' in block, "the way into a room was replaced"
+    assert 'tr("ins.roomname.save"' in block
+
+
+def test_the_name_box_shows_the_name_it_will_replace():
+    """An empty field asks somebody to guess the current value."""
+    assert "setRoomName(r.topic" in INSIDE
+
+
+# -- one control, one place --------------------------------------------------
+
+def test_no_control_is_offered_twice():
+    """Two cards repeated buttons the strip already carries: "Ask somebody
+    into the room" duplicated 👤+, and the microphone card duplicated what
+    is now the lend control.
+
+        asked     is the control on screen
+        mattered  is it on screen TWICE
+
+    A second copy of a button is not more discoverable, it is one more
+    thing to read past — and the strip is where a person's hand already
+    is. The doors are unchanged; only the copies are gone.
+    """
+    assert 'tr("ins.ask.go"' not in INSIDE, (
+        "the invite card is back, beside the strip's own invite")
+    assert 'tr("ins.microphones"' not in INSIDE, (
+        "the microphone card is back, beside the strip's own lend control")
+    # The doors themselves must survive the cards being removed.
+    for door in ("api.inviteToRoom(", "api.lendMicInRoom(",
+                 "api.takeBackMicInRoom("):
+        assert door in INSIDE, f"{door} left with the card that held it"
+
+
+def test_lending_says_which_way_it_points():
+    """Lending and taking back are different acts, and one label for both
+    tells you nothing about which way the microphone is currently
+    pointing."""
+    block = INSIDE[INSIDE.index('className={"rs-round lend"'):]
+    block = block[:block.index("</button>")]
+    assert 'tr("ins.takeback"' in block and 'tr("ins.lendmic"' in block
+    assert "aria-pressed={lentByMe}" in block
+
+
+def test_a_lent_microphone_is_visible_across_the_room():
+    """The same argument the mute mark makes: an open microphone somebody
+    else can hear through is the state worth seeing without asking."""
+    block = CSS[CSS.index(".rs-round.lend.live"):]
+    block = block[:block.index("}")]
+    assert "box-shadow" in block or "border-color" in block
