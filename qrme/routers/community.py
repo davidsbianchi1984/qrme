@@ -144,10 +144,16 @@ def _display(kind: str, ref_id: str) -> str:
     return interactor_or_404(ref_id)["display_name"]
 
 
-def _media_brief(media_id: str | None) -> dict | None:
+def _media_brief(media_id: str | None, read: bool = False) -> dict | None:
     """The shareable face of an attachment: kind, serving url, display
-    name. Never the disk path, never the uploader's raw filename beyond
-    the display copy `media.save` already trimmed."""
+    name, and whether the words in it were read. Never the disk path,
+    never the uploader's raw filename beyond the display copy
+    `media.save` already trimmed.
+
+    `read` is on the wire because the alternative is a person guessing.
+    A photograph and a scanned filing land the same way a readable one
+    does, and only the deployment knows which of them the profiles in
+    this room can actually discuss."""
     if not media_id:
         return None
     from .. import media as media_mod
@@ -159,11 +165,53 @@ def _media_brief(media_id: str | None) -> dict | None:
         return None
     return {"kind": row["kind"],
             "url": f"{media_mod.ROUTE}/{row['filename']}",
-            "name": row["name"]}
+            "name": row["name"],
+            "read": read}
+
+
+def _read_share(data: bytes, name: str | None,
+                on_behalf_of: str | None) -> tuple[str, str]:
+    """The words in a shared file, and the reading carried thereafter.
+
+        asked     can a profile read what somebody hands the room
+        mattered  or does it only learn that a file arrived
+
+    It only learned that a file arrived. `_worded` turned an attachment
+    into "[shared a file: Response 1.pdf]" and stopped, so a profile in a
+    room with a document could name it and nothing else. Field report,
+    from the profile's own mouth: "I can see them land, but I can't read
+    them from where I'm standing" — which was honest, and was the bug.
+
+    The reader is `briefcase.read_file`, already built for the one-to-one
+    conversation: PDF, the zip-family office documents, plain text, and a
+    recording through the ears. Nothing new is invented here; the room
+    simply gets the reading the pair has had all along.
+
+    Two things it deliberately is not. It is **not** a briefcase row — a
+    briefcase belongs to one pair, and the next visitor does not inherit
+    it; this belongs to the room, where everybody present already sees the
+    file itself. And it is **not** load-bearing: anything that fails to
+    read comes back empty, the attachment still lands, and the prompt says
+    the file could not be read rather than filling the hole with a guess.
+    """
+    from .. import briefcase
+
+    try:
+        _kind, text, read = briefcase.read_file(data, name, on_behalf_of)
+    except Exception:                                   # pragma: no cover
+        return "", ""
+    if not read or not text.strip():
+        return "", ""
+    try:
+        digest = briefcase.distill(text, name or "a shared file")
+    except Exception:                                   # pragma: no cover
+        digest = text[:600]
+    return text, digest
 
 
 def _store_room_message(room_id, sender_kind, sender_id, content,
-                        approved, reason, media_id=None) -> dict:
+                        approved, reason, media_id=None,
+                        media_text="", media_digest="") -> dict:
     conn = db.connect()
     message_id = db.new_id("rmg")
     # A profile's room turn is an AI render facing the whole room: stamped.
@@ -171,19 +219,21 @@ def _store_room_message(room_id, sender_kind, sender_id, content,
                   if approved and sender_kind == "profile" else None)
     conn.execute(
         "INSERT INTO room_messages (id, room_id, sender_kind, sender_id,"
-        " content, status, flag_reason, watermark_id, media_id, created_at)"
-        " VALUES (?,?,?,?,?,?,?,?,?,?)",
+        " content, status, flag_reason, watermark_id, media_id, media_text,"
+        " media_digest, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
         (message_id, room_id, sender_kind, sender_id, content,
          "approved" if approved else "blocked", reason,
          credential["watermark_id"] if credential else None,
-         media_id, db.utcnow()),
+         media_id, media_text or None, media_digest or None, db.utcnow()),
     )
     conn.commit()
     return {"id": message_id, "sender_kind": sender_kind,
             "from": _display(sender_kind, sender_id),
             "content": content if approved else None,
             "watermark": credential,
-            "media": _media_brief(media_id) if approved else None,
+            "media": (_media_brief(media_id, bool(media_digest))
+                      if approved else None),
             "status": "approved" if approved else "blocked"}
 
 
@@ -199,7 +249,7 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
         if profile["status"] == "departed":
             continue
         history = conn.execute(
-            "SELECT sender_kind, sender_id, content, media_id"
+            "SELECT sender_kind, sender_id, content, media_id, media_digest"
             " FROM room_messages"
             " WHERE room_id=? AND status='approved'"
             " ORDER BY created_at DESC, rowid DESC LIMIT 12",
@@ -211,17 +261,33 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
         # other agent from the person cannot know who it is talking to,
         # let alone keep up.
         def _worded(r) -> str:
-            """A turn as the model reads it. An attachment becomes a stated
-            fact — "[shared a picture: sunset.jpg]" — because a profile that
-            cannot see pixels should still know something was shown, and
-            pretending the message was empty would be the model losing the
-            thread through no fault of its own."""
+            """A turn as the model reads it.
+
+            An attachment becomes a stated fact — "[shared a picture:
+            sunset.jpg]" — because a profile that cannot see pixels should
+            still know something was shown, and pretending the message was
+            empty would be the model losing the thread through no fault of
+            its own.
+
+            When the file was **read**, the reading rides with it, and the
+            profile can discuss the document rather than only its name.
+            When it was not, the label says so outright. Both halves
+            matter: a profile that is handed nothing and told nothing
+            invents, and a profile that is told a photograph is
+            unreadable describes what it can actually account for."""
             text = r["content"] or ""
-            brief = _media_brief(r["media_id"]
-                                 if "media_id" in r.keys() else None)
+            keys = r.keys()
+            digest = (r["media_digest"] or "") if "media_digest" in keys else ""
+            brief = _media_brief(r["media_id"] if "media_id" in keys else None,
+                                 bool(digest))
             if brief:
                 label = f"[shared a {brief['kind']}" + (
-                    f": {brief['name']}]" if brief["name"] else "]")
+                    f": {brief['name']}" if brief["name"] else "")
+                if digest:
+                    label += f" — it reads: {digest}]"
+                else:
+                    label += " — this deployment could not turn it into "\
+                             "words, so you have not read it]"
                 text = f"{text} {label}".strip() if text else label
             return text
 
@@ -667,6 +733,13 @@ async def share_in_room(room_id: str, request: Request,
     admissibility was `media.save`'s decision. Sharing does not trigger
     profile turns — "Let them talk" stays the button it is, so a person
     can put three pictures up before inviting a word about them.
+
+    The file is also **read** on the way in, through the same
+    `briefcase.read_file` the one-to-one conversation has always used, so
+    the profiles in this room can discuss the document rather than only
+    its filename. What cannot be turned into words — a photograph, a
+    scanned filing — comes back empty and is labelled unread, in the
+    transcript and in the prompt alike.
     """
     room = _room_or_404(room_id)
     if room["status"] != "active":
@@ -684,6 +757,11 @@ async def share_in_room(room_id: str, request: Request,
     except media_mod.MediaError as exc:
         raise HTTPException(exc.status, exc.message) from exc
 
+    # Read before storing, so the very first profile turn after the share
+    # already has the document. Reading after would leave a one-turn hole
+    # in which the profile says it cannot see the thing it can see.
+    words, digest = _read_share(data, filename or None, interactor_id)
+
     said = (caption or "").strip()[:500]
     approved, reason = True, None
     if said:
@@ -696,7 +774,7 @@ async def share_in_room(room_id: str, request: Request,
     # elsewhere on it. A share is its own thing; it gets its own name.
     return {"shared": _store_room_message(
         room_id, "user", interactor_id, said, approved, reason,
-        media_id=saved["id"])}
+        media_id=saved["id"], media_text=words, media_digest=digest)}
 
 
 @router.delete("/rooms/{room_id}/face")
@@ -934,8 +1012,10 @@ def room_transcript(room_id: str, request: Request) -> list[dict]:
              "from": _display(r["sender_kind"], r["sender_id"]),
              "content": r["content"],
              "watermark": watermark.brief(r["watermark_id"]),
-             "media": _media_brief(r["media_id"]
-                                   if "media_id" in r.keys() else None),
+             "media": _media_brief(
+                 r["media_id"] if "media_id" in r.keys() else None,
+                 bool(r["media_digest"]
+                      if "media_digest" in r.keys() else None)),
              "created_at": r["created_at"]}
             for r in rows]
 

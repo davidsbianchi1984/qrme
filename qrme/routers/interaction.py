@@ -1296,6 +1296,24 @@ def profile_voice(profile_id: str) -> dict:
     return spoken.bound(profile_id)
 
 
+@router.get("/voices")
+def voice_library() -> dict:
+    """The voices a profile can be pointed at.
+
+    Binding was an opaque id typed by hand — true to how the provider
+    works, and not something a person building a profile can do without
+    already knowing the id. This is the list that makes the binding door
+    usable.
+
+    No authentication: these are the voices this deployment offers to
+    everybody who builds here, the same shape the avatar catalogue is
+    public in. Nothing here is anybody's private property — the key stays
+    on the server and no credential rides the answer.
+    """
+    from .. import spoken
+    return {"voices": spoken.library()}
+
+
 @router.put("/profiles/{profile_id}/voice")
 def bind_profile_voice(profile_id: str, body: VoiceBind,
                        request: Request) -> dict:

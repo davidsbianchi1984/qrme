@@ -34,6 +34,19 @@ export function Voice({ onPlans }: {
 
   const pid = session.profileId;
 
+  // The voices on offer. Fetched once for the screen rather than per
+  // profile: they are the deployment's, not this profile's, and the server
+  // caches them anyway. A failure leaves the list empty and the typed
+  // field is still there — the picker is a convenience over the id, never
+  // a replacement for it.
+  const [library, setLibrary] = useState<
+    { id: string; name: string; gender: string; note: string;
+      cloned: boolean }[]>([]);
+  useEffect(() => {
+    api.voiceLibrary().then((r) => setLibrary(r.voices || []))
+      .catch(() => setLibrary([]));
+  }, []);
+
   async function load() {
     if (!pid) return;
     try { setState(await api.voiceprint(pid)); }
@@ -211,6 +224,39 @@ export function Voice({ onPlans }: {
             {tr("voice.spoken.bound", lang)}{" "}
             <strong>{bound.label || bound.voice_id}</strong>
           </p>
+        )}
+        {/* The picker. Binding was an opaque id typed by hand — true to how
+            the provider works, and not something a person building a
+            profile can do without already knowing the id, so the voices
+            actually available to them were invisible.
+
+                asked     can a profile be pointed at a voice
+                mattered  can its owner see which voices there are
+
+            Gender rides along as a hint and nothing filters on it: a
+            profile here can be a device, a drawing, an invention or an
+            idea, and a voice with no stated gender is as bindable as any
+            other. `cloned` is shown for the same reason the AI mark is —
+            somebody choosing a real person's enrolled voice should be
+            able to see that is what it is — and it restricts nobody. */}
+        {library.length > 0 && (
+          <select value={voiceId}
+                  onChange={(e) => {
+                    const v = library.find((x) => x.id === e.target.value);
+                    setVoiceId(e.target.value);
+                    if (v && !voiceLabel.trim()) setVoiceLabel(v.name);
+                  }}
+                  style={{ width: "100%", marginBottom: 8 }}>
+            <option value="">{tr("voice.spoken.pick", lang)}</option>
+            {library.map((v) => (
+              <option key={v.id} value={v.id}>
+                {v.name}
+                {v.gender ? ` · ${v.gender}` : ""}
+                {v.cloned ? ` · ${tr("voice.spoken.isclone", lang)}` : ""}
+                {v.note ? ` — ${v.note}` : ""}
+              </option>
+            ))}
+          </select>
         )}
         <div className="row">
           <input value={voiceId} placeholder={tr("voice.spoken.id.ph", lang)}

@@ -129,6 +129,8 @@ CREATE TABLE IF NOT EXISTS room_messages (
     flag_reason TEXT,
     watermark_id TEXT,           -- synthetic-media credential for profile turns
     media_id    TEXT REFERENCES media(id),  -- a shared picture, video or file
+    media_text  TEXT,            -- the words in it, for a person to read back
+    media_digest TEXT,           -- the reading every later turn carries
     created_at  TEXT NOT NULL
 );
 
@@ -2620,6 +2622,12 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # A room turn can carry a shared picture, video or file. NULL on
     # every row that predates sharing — words alone stay words alone.
     ("room_messages", "media_id", "TEXT REFERENCES media(id)"),
+    # A shared document, read. NULL on every row that predates the reading
+    # and on every attachment this deployment holds but cannot turn into
+    # words — a photograph, a scanned filing. Absence stays absence: a
+    # profile is told the file is unreadable rather than handed a guess.
+    ("room_messages", "media_text", "TEXT"),
+    ("room_messages", "media_digest", "TEXT"),
 )
 
 

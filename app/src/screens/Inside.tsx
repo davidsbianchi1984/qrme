@@ -107,7 +107,7 @@ type SpeechRec = {
  *  it waits nearly twice as long, at the near end of the range the report
  *  asked for.
  */
-const SILENCE_SENDS_MS = 4500;
+const SILENCE_SENDS_MS = 5000;
 
 /** Whether this browser ships a speech recogniser at all (iOS Safari does
  *  not). Module scope rather than a body const: the effect that opens the
@@ -182,6 +182,21 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // existed a profile seat drew two initials while the platform held a whole
   // portrait for it, which read as "my agent has no avatar".
   const [aiFaces, setAiFaces] = useState<Record<string, Avatar>>({});
+  // My own profile's portrait, for my own seat.
+  //
+  // A person's seat drew initials while the platform held their picture —
+  // the same defect the note above describes for profile seats, never
+  // fixed for the other half. Field report, looking at a room holding both
+  // of his: "I don't know why both profile photos don't show up, one says
+  // You with a Y on it. It should be my image that I have on my profile."
+  //
+  //     asked     does this seat belong to a profile
+  //     mattered  is there a face for whoever is in it
+  //
+  // Portraits belong to profiles here, not to people, so a person's seat
+  // has nothing of its own to fetch. Their own profile's is the honest
+  // stand-in — with a rule attached, below.
+  const [myFace, setMyFace] = useState<Avatar | null>(null);
   const picker = useRef<HTMLInputElement>(null);
   // Which of the device's cameras. "user" is the selfie side; flipping asks
   // for the other and the effect below re-acquires the stream.
@@ -278,6 +293,11 @@ export function Inside({ onPlans, start = "", onLeave }: {
   const sharePick = useRef<HTMLInputElement>(null);
 
   const open = roomId.trim();
+  // Whether a room is open, and therefore whether this screen is a PLACE
+  // rather than a page. Declared beside `open` because effects far above
+  // the render read it — a `const` read before its line is a dead-zone
+  // crash, not a false.
+  const inRoom = Boolean(open);
 
   // A voice room is a voice room. Field report, holding a `voice` room up
   // against what it drew: "this is supposed to be audio chat only — we
@@ -308,6 +328,24 @@ export function Inside({ onPlans, start = "", onLeave }: {
   }
   useEffect(load, [open, token]);
 
+  // The transcript box follows the newest line, unless you have scrolled
+  // up to read — then it stays where you put it, and follows again once
+  // you come back to the bottom. Without the second half, reading an
+  // older turn is impossible in a room that is still talking: every poll
+  // would yank you back down.
+  const chatLog = useRef<HTMLDivElement | null>(null);
+  const pinned = useRef(true);
+  function watchScroll() {
+    const box = chatLog.current;
+    if (!box) return;
+    pinned.current =
+      box.scrollHeight - box.scrollTop - box.clientHeight < 24;
+  }
+  useEffect(() => {
+    const box = chatLog.current;
+    if (box && pinned.current) box.scrollTop = box.scrollHeight;
+  }, [transcript]);
+
   // The room keeps itself current. Without this, the transcript refreshed
   // only on mount or after the viewer's own action — another person's
   // turn, a profile still writing its reply to somebody else, a shared
@@ -329,6 +367,13 @@ export function Inside({ onPlans, start = "", onLeave }: {
   useEffect(() => {
     api.overlayCatalogue().then((c) => setMasks(c.kinds)).catch(() => setMasks([]));
   }, []);
+
+  useEffect(() => {
+    const mine = session.profileId;
+    if (!mine || !token || myFace) return;
+    api.avatar(mine, token).then(setMyFace).catch(() => setMyFace(null));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session.profileId, token]);
 
   useEffect(() => {
     for (const seat of seats) {
@@ -416,6 +461,23 @@ export function Inside({ onPlans, start = "", onLeave }: {
     const face = scene?.faces[s.id];
     if (face?.showing === "photo" && face.media_url) {
       return <img className="rs-photo" src={face.media_url} alt={s.display} />;
+    }
+    // My own seat, wearing my own profile's picture.
+    //
+    // Only a real photograph, and the two flags decide it rather than a
+    // guess: `likeness.real_person` says the portrait is of an actual
+    // person and `asset_marked` says whether it carries the AI mark. A
+    // generated portrait stays off a human seat — a synthetic image
+    // passing unmarked as somebody's face is the one thing this codebase
+    // refuses to build, and the mark belongs to the profile seat where it
+    // is already drawn.
+    if (s.kind === "user" && s.id === me && myFace?.asset
+        && !myFace.asset_marked
+        && myFace.likeness?.real_person) {
+      return <img className="rs-photo" alt={s.display}
+                  src={(myFace.asset as string).startsWith("http")
+                         ? (myFace.asset as string)
+                         : getBase() + myFace.asset} />;
     }
     if (s.kind !== "user" && aiFaces[s.id]?.asset
         && !aiFaces[s.id]?.placeholder) {
@@ -573,16 +635,33 @@ export function Inside({ onPlans, start = "", onLeave }: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spokenRoom, open, canDictate]);
 
-  // The strip's person-plus brings the invite into view rather than opening
-  // a second one. One invite, one door, one place a refusal lands — and in
-  // a full-screen room the form is below the faces, which is exactly where
-  // somebody who pressed a button expects not to have to go looking.
+  // The strip's person-plus. Outside a room the invite form is a card on
+  // the page and scrolling to it is right; inside one the page is a place
+  // and the card is below the fold, so scrolling to it looked exactly like
+  // a button that does nothing.
+  //
+  //     asked     did the button fire
+  //     mattered  did anything happen where the person was looking
+  //
+  // Field report on the deployed room: "the add friend or synthetic
+  // profile button is not working". It was working. It scrolled a
+  // full-screen room to a form nobody could see move.
   useEffect(() => {
-    if (!asking) return;
+    if (!asking || inRoom) return;
     askCard.current?.scrollIntoView({ behavior: "smooth", block: "center" });
     const t = window.setTimeout(() => setAsking(false), 1600);
     return () => window.clearTimeout(t);
-  }, [asking]);
+  }, [asking, inRoom]);
+
+  // What the room has to say, said IN the room. `note` renders as a card
+  // near the top of the page, which in a full-screen room is somewhere
+  // nobody is looking — the same reason the share arrow read as broken:
+  // it copied the room and announced it off-screen.
+  useEffect(() => {
+    if (!note || !inRoom) return;
+    const t = window.setTimeout(() => setNote(null), 3200);
+    return () => window.clearTimeout(t);
+  }, [note, inRoom]);
 
   /** Turn the room sideways.
    *
@@ -768,10 +847,25 @@ export function Inside({ onPlans, start = "", onLeave }: {
     if (m.media.kind === "video") {
       return <video className="rm-media" src={src} controls playsInline />;
     }
+    // A document says whether the room could read it.
+    //
+    //     asked     did the file arrive
+    //     mattered  can the profiles in here discuss it
+    //
+    // Field report, in the profile's own words: "I can see them land, but
+    // I can't read them from where I'm standing". It was right, and the
+    // person sharing had no way to know that before they asked. So the
+    // answer is on the attachment itself, before the question is put.
     return (
-      <a className="rm-file" href={src} target="_blank" rel="noreferrer">
-        📎 {m.media.name || m.media.url.split("/").pop()}
-      </a>
+      <span className="rm-fileline">
+        <a className="rm-file" href={src} target="_blank" rel="noreferrer">
+          📎 {m.media.name || m.media.url.split("/").pop()}
+        </a>
+        <span className={"rm-read" + (m.media.read ? " yes" : "")}>
+          {m.media.read ? tr("ins.file.read", lang)
+                        : tr("ins.file.unread", lang)}
+        </span>
+      </span>
     );
   }
 
@@ -783,12 +877,35 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // their card; this is the same conversation worn differently.
   const chatStrip = (
     <div className="rs-chatstrip">
-      {transcript.slice(-3).map((m) => (
-        <p key={m.id} className="rs-chatline">
-          <strong>{m.from}</strong> {m.content}
-          {m.media && <> 📎 {m.media.name || m.media.kind}</>}
-        </p>
-      ))}
+      {/* Four rows of back-and-forth, and the rest above them.
+       *
+       *     asked     what happens to a line once it is not the newest
+       *     mattered  is it gone, or is it above you
+       *
+       * It used to be gone: the strip drew `transcript.slice(-3)`, so the
+       * fourth-newest turn left the DOM, and a line longer than the strip
+       * was cut off mid-sentence by an ellipsis with nowhere to go. Field
+       * report: "when it goes past the first line as it's talking it just
+       * doesn't keep scrolling... I want at least three or four rows of
+       * back-and-forth text but I want them to start vanishing on the
+       * fifth, users can scroll up and down if they want to see it".
+       *
+       * So the last thirty turns are all here, in a box four rows tall
+       * that scrolls. Vanishing above the fold and vanishing out of the
+       * record are different things, and only the first one was wanted.
+       * A long line wraps now instead of being clipped. */}
+      <div className="rs-chatlog" ref={chatLog} onScroll={watchScroll}>
+        {transcript.slice(-30).map((m) => (
+          <p key={m.id} className="rs-chatline">
+            <strong>{m.from}</strong> {m.content}
+            {/* The real attachment, not a filename in an emoji. The strip
+                printed `📎 name` as text, so in a full-screen room a
+                shared picture was a word and a shared document was a word
+                you could not open. Same renderer as the card below. */}
+            {attachment(m)}
+          </p>
+        ))}
+      </div>
       <div className="rs-chatpill">
         <button className="rs-chatbtn" disabled={busy || !token}
                 aria-label={tr("ins.share", lang)}
@@ -835,7 +952,22 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 aria-label={tr("ins.files", lang)}
                 title={tr("ins.files", lang)}
                 onClick={() => sharePick.current?.click()}>📎</button>
-        {canDictate && spokenRoom && (
+        {/* The microphone, in every room.
+         *
+         * It was offered only in voice rooms, on the reasoning that a chat
+         * room's medium is typing and an ear opening itself there would be
+         * a liberty nobody asked for. The first half of that still holds —
+         * nothing opens on its own here — but the second half was wrong:
+         * a person PRESSING a microphone has asked for it, in any room.
+         *
+         *     asked     should a chat room start listening by itself
+         *     mattered  may somebody in one choose to talk
+         *
+         * Field report, from a chat room: "it should stay illuminated if
+         * it stays on when you just click that and it's illuminated you
+         * should be able to just speak". So: press to open, it stays lit
+         * while it listens, and five seconds of silence sends. */}
+        {canDictate && (
           <button className={"rs-round mic" + (talking ? " live" : "")}
                   aria-pressed={talking}
                   aria-label={talking ? tr("ins.mute", lang)
@@ -959,8 +1091,6 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // The title and the pitch go with it. They are shelf copy — what this
   // screen is for, read by somebody deciding whether to open it — and a
   // person already standing in the room has decided.
-  const inRoom = Boolean(open);
-
   return (
     <div className={"screen" + (inRoom ? " room-place" : "")}>
       {inRoom && onAPhone && (
@@ -986,6 +1116,34 @@ export function Inside({ onPlans, start = "", onLeave }: {
                  holdRoom.current = null;
                }
              }} />
+      )}
+      {inRoom && note && (
+        // Said in the room, because the room is where the person is. The
+        // page's own note card is still there for the roomless case; this
+        // is the same sentence delivered somewhere it can be read.
+        <p className="room-said" role="status">{note}</p>
+      )}
+      {inRoom && asking && (
+        // The invitation, in the room. Outside one it is a card on the
+        // page and scrolling to it is right; here the page IS the room, so
+        // the form comes to the person rather than the person going to the
+        // form. Same door, same refusal, same single place a failure lands
+        // — only the furniture moved.
+        <div className="room-scrim" onClick={() => setAsking(false)}>
+          <div className="rh-panel" onClick={(e) => e.stopPropagation()}>
+            <p className="rh-title">{tr("ins.ask.title", lang)}</p>
+            <p className="rh-note">{tr("ins.ask.pitch", lang)}</p>
+            <input value={guestId} autoFocus
+                   placeholder={tr("ins.ask.ph", lang)}
+                   onChange={(e) => setGuestId(e.target.value)}
+                   style={{ width: "100%" }} />
+            <button className="primary"
+                    disabled={busy || !token || !guestId.trim()}
+                    onClick={() => { setAsking(false); void askIn(); }}>
+              {tr("ins.ask.send", lang)}
+            </button>
+          </div>
+        </div>
       )}
       {held && (
         // Tap anywhere else to go back — the scrim IS the way out, which is
@@ -1091,7 +1249,19 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 {/* What is in the box. A camera, a picture, or the initials —
                     and the box is the same size in all three, because the
                     quiet person is as present as the talking one. */}
-                {isMe && face?.showing === "camera" ? (
+                {isMe && !face?.showing && myFace?.asset
+                 && !myFace.asset_marked && myFace.likeness?.real_person ? (
+                  // My own seat, wearing my own profile's picture. Only a
+                  // real photograph: `likeness.real_person` says the
+                  // portrait is of an actual person and `asset_marked`
+                  // says whether it carries the AI mark, so a generated
+                  // portrait stays off a human seat rather than passing
+                  // unmarked as somebody's face.
+                  <img className="rs-photo" alt={s.display}
+                       src={(myFace.asset as string).startsWith("http")
+                              ? (myFace.asset as string)
+                              : getBase() + myFace.asset} />
+                ) : isMe && face?.showing === "camera" ? (
                   <>
                     <video ref={mine}
                            className={"rs-live rs-fullbleed"
@@ -1195,7 +1365,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
                     </span>
                   </span>
                 )}
-                {isMe && spokenRoom && !talking && (
+                {isMe && !talking && (
                   <span className="rs-mark rs-micoff"
                         title={tr("ins.mark.micoff", lang)}>
                     <span className="sr-only">
@@ -1295,7 +1465,13 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 to LISTEN to is the wrong furniture, not less of it. */}
             {spokenRoom ? voiceBar : chatStrip}
           </div>
-          {scene && <p className="muted small">{scene.note}</p>}
+          {/* "nobody here has turned a camera on" — true, and said to
+              somebody looking at a room full of faces who can see that for
+              themselves. Kept on the wire, where other readers use it;
+              taken off the room, where it is furniture. */}
+          {scene && !inRoom && (
+            <p className="muted small">{scene.note}</p>
+          )}
           {/* The way into the stage, offered only in the rooms whose whole
               pitch is being a place. Flat rooms stay flat; nothing here
               turns a chat room into a headset demand. */}

@@ -44,6 +44,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 import urllib.error
 import urllib.request
 
@@ -61,6 +62,96 @@ _MODEL = "eleven_multilingual_v2"
 
 class SpokenError(ValueError):
     """A binding or synthesis refusal, in a sentence a person can act on."""
+
+
+#: The voices this deployment can offer when the provider cannot be asked.
+#: Public-library ids, every one of which has been spoken — the same set
+#: jim/voice.py keeps, for the same reason: a picker that empties itself
+#: because somebody's service is having an afternoon is worse than one
+#: showing a stale few.
+FALLBACK_VOICES = [
+    {"id": "onwK4e9ZLuTAKqWW03F9", "name": "Daniel", "gender": "male",
+     "note": "warm, measured British", "cloned": False},
+    {"id": "pNInz6obpgDQGcFmaJgB", "name": "Adam", "gender": "male",
+     "note": "deep, steady American", "cloned": False},
+    {"id": "JBFqnCBsd6RMkjVDRZzb", "name": "George", "gender": "male",
+     "note": "older, calm, unhurried", "cloned": False},
+    {"id": "EXAVITQu4vr4xnSDxMaL", "name": "Sarah", "gender": "female",
+     "note": "soft, reassuring", "cloned": False},
+    {"id": "XrExE9yKIg1WjnnlVkGX", "name": "Matilda", "gender": "female",
+     "note": "warm, friendly", "cloned": False},
+]
+
+_LIBRARY_TTL = 300.0
+_library_cache: dict[str, tuple[float, list[dict]]] = {}
+
+
+def _as_voice(v: dict) -> dict:
+    """One provider row in the shape this product's pickers read.
+
+    `gender` is a **hint**, and empty is a real answer. A profile here can
+    be a device, a drawing, an invention or an idea — `qrme/seed.py`
+    already carries a rule for a brief that states no gender — so a voice
+    whose labels say nothing keeps an empty string and stays selectable by
+    anybody. Nothing filters on this; it sorts and suggests.
+
+    `cloned` is a **label, not a gate**. The provider marks a voice cloned
+    when somebody enrolled a real person's, and a person choosing one
+    should be able to see that is what it is — the same disclosure
+    instinct as the AI mark on generated media. It does not restrict who
+    may bind it: that question was asked directly and answered, and the
+    answer was that every voice on this deployment's account is shared.
+    """
+    labels = v.get("labels") or {}
+    gender = str(labels.get("gender") or "").strip().lower()
+    note = ", ".join(
+        str(labels[k]) for k in ("accent", "age", "description", "use case")
+        if labels.get(k))
+    return {
+        "id": v.get("voice_id", ""),
+        "name": v.get("name") or v.get("voice_id", ""),
+        "gender": gender if gender in ("male", "female") else "",
+        "note": note or str(v.get("description") or "").strip(),
+        "cloned": v.get("category") in ("cloned", "professional"),
+    }
+
+
+def library() -> list[dict]:
+    """The voices on this deployment's account.
+
+    Binding a voice was `PUT /profiles/{id}/voice` with an opaque
+    `voice_id` — "the owner points the profile at a voice made on the
+    provider's own surface" — which is true and is not a picker. A person
+    building a profile had to already know a twenty-character id, so the
+    voices actually available to them were invisible.
+
+        asked     can a profile be pointed at a voice
+        mattered  can its owner see which voices there are
+
+    Falls back rather than failing, and caches for five minutes: opening
+    the screen is not a request per render, and a provider having an
+    afternoon must not empty the list somebody is choosing from.
+    """
+    key = os.environ.get("ELEVENLABS_API_KEY", "").strip()
+    if not key or offline.enabled():
+        return FALLBACK_VOICES
+    now = time.monotonic()
+    hit = _library_cache.get(key)
+    if hit and now - hit[0] < _LIBRARY_TTL:
+        return hit[1]
+    url = f"{_HOST}/v1/voices"
+    try:
+        offline.allow(url, "listing the voices this deployment can offer")
+        req = urllib.request.Request(url, headers={"xi-api-key": key})
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            rows = (json.loads(resp.read() or b"{}") or {}).get("voices") or []
+    except Exception:
+        return FALLBACK_VOICES
+    voices = [_as_voice(v) for v in rows if v.get("voice_id")]
+    if not voices:
+        return FALLBACK_VOICES
+    _library_cache[key] = (now, voices)
+    return voices
 
 
 def bound(profile_id: str) -> dict:

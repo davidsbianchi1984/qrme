@@ -2071,8 +2071,12 @@ export type RoomMsg = {
   content: string | null;
   watermark: { display?: { line?: string } } | null;
   // A shared picture, video or file riding the turn. `url` is relative to
-  // the API base, the way every media url in this product is.
-  media?: { kind: string; url: string; name?: string | null } | null;
+  // the API base, the way every media url in this product is. `read` says
+  // whether the deployment turned the file into words — which is the
+  // difference between a profile that can discuss your document and one
+  // that can only tell you it arrived.
+  media?: { kind: string; url: string; name?: string | null;
+            read?: boolean } | null;
   created_at?: string;
 };
 
@@ -3706,6 +3710,13 @@ export const api = {
   // The spoken voice: a reference to a voice made on the provider's own
   // surface, and one utterance of audio back. The blob path is hand-rolled
   // like uploadMedia's, because req() speaks JSON and this answer is sound.
+  /** The voices this deployment can offer, so binding is a choice rather
+   *  than a twenty-character id somebody has to already know. `gender` may
+   *  be empty — a voice for a device, a drawing or an idea has none, and
+   *  nothing filters on it. `cloned` is a label, not a gate. */
+  voiceLibrary: () =>
+    req<{ voices: { id: string; name: string; gender: string; note: string;
+                    cloned: boolean }[] }>("/voices"),
   profileVoice: (profileId: string) =>
     req<ProfileVoice>(`/profiles/${profileId}/voice`),
   setProfileVoice: (profileId: string,

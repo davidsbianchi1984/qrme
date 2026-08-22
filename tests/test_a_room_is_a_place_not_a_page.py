@@ -228,9 +228,11 @@ def test_the_seat_marks_are_only_drawn_where_the_fact_exists():
     """Camera is a real per-seat field. Mute is not — `microphones_lent` is
     a borrowed wearable, which is a different fact and not its opposite."""
     assert 'face?.showing === "camera" && (' in INSIDE
-    assert "isMe && spokenRoom && !talking && (" in INSIDE, (
+    assert "isMe && !talking && (" in INSIDE, (
         "a mic-off badge is being drawn for seats whose microphone state "
         "this deployment does not know")
+    assert 'const isMe = s.kind === "user" && s.id === me;' in INSIDE, (
+        "the mic-off badge is no longer anchored to your own seat")
 
 
 # -- press and hold, on a phone ----------------------------------------------
@@ -303,3 +305,52 @@ def test_sideways_reflows_to_three_columns():
     block = block[:block.index("/* ---- press and hold")]
     assert "repeat(3, minmax(0, 1fr))" in block
     assert "22vh" in block, "the portrait does not shrink for a short window"
+
+
+# -- the transcript scrolls rather than forgets -------------------------------
+
+def test_the_older_lines_go_above_the_fold_not_out_of_the_room():
+    """`slice(-3)` did not hide the fourth turn, it deleted it — there was
+    nothing to scroll back to. Field report: "I want at least three or four
+    rows of back-and-forth text but I want them to start vanishing on the
+    fifth, users can scroll up and down if they want to see it"."""
+    assert "{transcript.slice(-3).map(" not in INSIDE, (
+        "the strip is still dropping older turns instead of scrolling them")
+    assert "{transcript.slice(-30).map(" in INSIDE
+    block = CSS[CSS.index(".rs-chatlog {"):]
+    block = block[:block.index(".rs-chatline {")]
+    assert "overflow-y: auto" in block, "the transcript box does not scroll"
+    assert "max-height" in block, (
+        "the transcript box has no height, so it cannot have a fold")
+
+
+def test_a_long_line_wraps_instead_of_being_clipped():
+    """The other half of the same report — "when it goes past the first
+    line as it's talking it just doesn't keep scrolling". It was
+    `white-space: nowrap` with an ellipsis, so a sentence ended in a dot
+    and stayed there."""
+    block = CSS[CSS.index(".rs-chatline {"):]
+    block = block[:block.index("}")]
+    assert "nowrap" not in block, "a spoken line is still cut off mid-sentence"
+    assert "text-overflow" not in block
+
+
+def test_the_newest_line_stays_in_view_unless_you_are_reading():
+    """It has to follow the speaker, and it has to stop following the
+    moment somebody scrolls up — otherwise the four-second poll yanks the
+    reader back down every time anybody says anything."""
+    assert "box.scrollTop = box.scrollHeight" in INSIDE, (
+        "the transcript does not follow the newest line")
+    fn = INSIDE[INSIDE.index("function watchScroll()"):]
+    fn = fn[:fn.index("useEffect")]
+    assert "pinned.current" in fn, (
+        "scrolling up does not stop the box from being pulled to the bottom")
+
+
+def test_the_transcript_box_does_not_eat_the_double_tap():
+    """This estate's own regression, once already: an overlay spanning the
+    scene with `pointer-events` on swallows the gesture that opens a
+    camera. The lines take the touch; the box around them does not."""
+    block = CSS[CSS.index(".rs-chatlog {"):]
+    block = block[:block.index(".rs-chatline {")]
+    assert "pointer-events: none" in block

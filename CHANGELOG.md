@@ -4,6 +4,102 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Entering your own key says whose bill it becomes.** David, on the beta's
+  arrangement: "allowing users for the time being to use my API keys and
+  password for beta testing... notified them that they will be charging
+  their own accounts instead of using these free API keys and passwords
+  that I'm letting them use to pay a test on my dollar." The default is
+  deliberate and stays — this deployment's keys, spent by its owner, so a
+  tester can try the thing without producing a card. What was missing was
+  the sentence saying what changes the moment somebody types their own key
+  in, because the bill moved to them silently. It now sits under the input
+  it is about, in all ten languages, at **both** key boxes on the screen —
+  the model's and the voice's. A person who reads the notice at one and
+  not the other has been told half of what changed.
+
+      asked     can somebody use their own key
+      mattered  do they know what changes when they do
+
+- **A voice is chosen, not typed.** "I have ElevenLabs ticked and API key
+  plugged in manually with several names listed available, I don't see my
+  name among them." The names on that screen were a hardcoded roster — five
+  rows of stock voices that had nothing to do with the account whose key
+  was in the box, which is why the one voice its owner actually made was
+  missing from it. `GET /voices` now asks the engine for the account's own
+  library and hands back what is really there, cloned voices included,
+  cached briefly per key and falling back to the stock roster when there is
+  no key, the key is refused, or the engine cannot be reached. The console
+  picks from a list instead of asking somebody to paste an identifier.
+
+  Two rules the list keeps. **Gender is a hint, never a gate**: a profile
+  may be a device, a drawing, an idea, and `qrme/seed.py` has always
+  handled a brief that states no gender — the picker offers the hint and
+  refuses nobody. And **cloned is a label, not a gate**: a cloned voice is
+  marked as one and available like any other. "Shared with all!"
+
+- **The room reads what you hand it.** A PDF landed in a room and the
+  profile said so itself: "I can see them land, but I can't read them
+  from where I'm standing — I don't get to open attachments and pretend
+  I've examined them." That was honest, and it was the bug. A shared file
+  reached the model as `[shared a file: Response 1.pdf]` and stopped
+  there, so a profile in a room with a document could name it and nothing
+  else. Nothing new was invented to fix it: `briefcase.read_file` has read
+  PDFs, the zip-family office documents, plain text and — with ears
+  deployed — recordings since the one-to-one conversation grew a
+  briefcase. The room simply was not calling it. Now the share door reads
+  on the way in, distils once, keeps the words and the reading on the room
+  message, and every later profile turn carries the reading without paying
+  for the file again. Deliberately not a briefcase row: a briefcase
+  belongs to one pair and the next visitor does not inherit it, and this
+  belongs to the room, where everybody present is already looking at the
+  file.
+
+      asked     did the file arrive
+      mattered  can the profiles in here read it
+
+  What cannot be turned into words — a photograph, a scanned filing, a
+  recording on a stack with no ears — is labelled unread, in the prompt
+  and on the attachment itself. A profile confidently summarising a
+  document nobody read is worse than the bug, so the hole is stated rather
+  than filled, and the person sharing can see which it was without having
+  to ask a profile and be told no.
+
+### Fixed
+
+- **The transcript scrolls instead of forgetting.** "When it goes past the
+  first line as it's talking it just doesn't keep scrolling… I want at
+  least three or four rows of back-and-forth text but I want them to start
+  vanishing on the fifth, users can scroll up and down if they want to see
+  it." Two defects under one report. The strip drew the last three turns,
+  so the fourth-newest left the DOM entirely — there was nothing to scroll
+  back to, because the line was gone rather than above the fold. And a
+  line longer than the strip was `white-space: nowrap` with an ellipsis,
+  so a sentence ended in a dot mid-thought and stayed there while the
+  profile went on talking. The last thirty turns now live in a box four
+  rows tall that scrolls, lines wrap, and the box follows the newest line
+  as it arrives — but stops following the moment somebody scrolls up to
+  read, and resumes when they come back to the bottom, because the
+  four-second poll would otherwise yank a reader down every time anybody
+  said anything. The box itself stays transparent to touch: it spans the
+  scene, and a rectangle of dead air over the seat tiles would eat the
+  double-tap that opens a camera — a regression this screen has already
+  had once.
+
+- **An attachment in a full-screen room is the thing, not its filename.**
+  The chat strip printed `📎 name` as text while the card below it rendered
+  the same attachment properly, so in a room that takes the window a shared
+  picture was a word and a shared document was a word you could not open.
+  Both now use the one renderer.
+
+- **The mic-off mark on your own seat.** Anchored to your own seat rather
+  than to the kind of room you are in — `microphones_lent` is a borrowed
+  wearable, which is a different fact and not the opposite of muted, so
+  the badge is still drawn only where the fact exists.
+
 ## [0.99.1] - 2026-08-22
 
 ### Fixed
