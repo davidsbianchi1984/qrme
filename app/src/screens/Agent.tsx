@@ -5,6 +5,7 @@ import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { speakInPieces, type Speaking } from "../spoken";
 import { useSession } from "../store";
+import { putAway, whenPutAway } from "../away";
 
 /**
  * The Agent — the collaborator, with its own front door.
@@ -207,6 +208,17 @@ export function Agent({ onPlans, go }: {
   // when a final result is sent, and that end must not relight the mic
   // over the agent's own voice; the reply's end does the relighting.
   const turning = useRef(false);
+  // The orb, put away. A backgrounded tab has its recogniser ended by the
+  // browser with no error and no notice, and `onend` relit it — into a page
+  // that cannot hear, immediately ending again, for as long as the tab
+  // stayed in the background. The orb said "listening" throughout.
+  //
+  //     asked     does the orb stop hearing when the tab sleeps
+  //     mattered  does it stop saying it hears
+  //
+  // Down while away, back up on return: the person did not close the orb,
+  // so the orb is not closed — it is asleep, and it says so.
+  const dozing = useRef(false);
   // The reply being spoken, for the orb's label: an orb that says
   // "listening" while the agent talks is the orb lying twice a turn.
   const [saying, setSaying] = useState(false);
@@ -233,6 +245,10 @@ export function Agent({ onPlans, go }: {
     // an `onend` that still reads voice-on would relight what was just
     // put out.
     voiceOn.current = false;
+    // Closing the orb is not falling asleep: the doze's own sentence goes
+    // with it, or it would sit under the bar as a hint about a microphone
+    // nobody asked for any more.
+    if (dozing.current) { dozing.current = false; setEarFault(null); }
     recogniser.current?.stop();
     recogniser.current = null;
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
@@ -253,6 +269,28 @@ export function Agent({ onPlans, go }: {
     dictation.current?.stop();
     dictation.current = null;
   }, []);
+
+  // Put away and brought back. Both microphones go down — the orb's and
+  // dictation's — because one microphone that keeps a dead handle is the
+  // same defect as six. Only the orb stands itself back up: it was a
+  // standing conversation, and the person never ended it. Dictation was a
+  // press, and a press does not survive being put away.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => whenPutAway(
+    () => {
+      stopDictation();
+      if (!voiceOn.current || dozing.current) return;
+      dozing.current = true;
+      recogniser.current?.stop();
+      recogniser.current = null;
+      setEarFault(tr("agent.ear.asleep", lang));
+    },
+    () => {
+      if (!dozing.current) return;
+      dozing.current = false;
+      setEarFault(null);
+      if (voiceOn.current && !recogniser.current) startVoice(false);
+    }), [lang]);
 
   /** Say the reply out loud — the profile's own bound voice first (the
    *  deployment's engine, the watermark riding in the header), the
@@ -307,6 +345,13 @@ export function Agent({ onPlans, go }: {
       askBox.current?.focus();
       return;
     }
+    if (putAway()) {
+      // Relit from a spoken reply that finished after the tab went away.
+      // Starting here would be the loop the doze exists to end.
+      dozing.current = true;
+      setEarFault(tr("agent.ear.asleep", lang));
+      return;
+    }
     const r = new Rec();
     r.continuous = false;
     r.interimResults = true;
@@ -349,6 +394,7 @@ export function Agent({ onPlans, go }: {
       // conversation bows out quietly: leaving a room empty is not an
       // error.
       if (fatal) return;
+      if (dozing.current) return;
       if (!voiceOn.current || turning.current) return;
       if (Date.now() - lastHeard.current >= CONVERSATION_IDLE_MS) {
         stopVoice();

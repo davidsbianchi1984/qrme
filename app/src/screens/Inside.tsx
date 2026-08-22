@@ -6,6 +6,7 @@ import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { speakInPieces } from "../spoken";
 import { useSession } from "../store";
+import { putAway, whenPutAway } from "../away";
 
 /**
  * Inside a room.
@@ -258,6 +259,20 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // that died at the platform's convenience would put the press right back
   // where a field report just took it from.
   const wantTalking = useRef(false);
+  // Put away, not switched off. That comment above says the recogniser dies
+  // at "a tab blur" and the standing ear restarts — which was true, and was
+  // the bug: it restarted into a page the browser had stopped running, over
+  // and over, while the mic button stayed lit and the line still read that
+  // the room was being heard. A person talking into that gets no hint that
+  // nothing is arriving.
+  //
+  //     asked     does the room stop hearing when the tab sleeps
+  //     mattered  does the light go out with it
+  //
+  // So the ear comes down and says so, and it stands back up on return
+  // because the decision behind it never changed.
+  const dozing = useRef(false);
+  const [dozed, setDozed] = useState(false);
   // What is being heard, before it is sent. It rides in the draft box on
   // purpose: a person talking to a room needs to see that they are being
   // heard, and a microphone with no visible output is one people repeat
@@ -661,6 +676,38 @@ export function Inside({ onPlans, start = "", onLeave }: {
     talkRec.current = null;
   }, [open]);
 
+  // The room, put away. Both microphones go down — the standing ear and
+  // dictation — and only the standing ear comes back, because it was a
+  // decision and dictation was a press. Whatever the ear had already heard
+  // is sent before it goes: a person who finished a sentence and then
+  // switched tabs meant to say it, which is the same bargain the button's
+  // own stop makes.
+  useEffect(() => whenPutAway(
+    () => {
+      dictation.current?.stop();
+      dictation.current = null;
+      setDictating(false);
+      if (!wantTalking.current || dozing.current) return;
+      dozing.current = true;
+      setDozed(true);
+      if (silence.current !== null) {
+        window.clearTimeout(silence.current);
+        silence.current = null;
+      }
+      sendPending();
+      talkRec.current?.stop();
+      talkRec.current = null;
+      setTalking(false);
+    },
+    () => {
+      if (!dozing.current) return;
+      dozing.current = false;
+      setDozed(false);
+      if (wantTalking.current) startTalking();
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []);
+
   // A voice room arrives speaking. Going in is itself the press the
   // autoplay rules want — the same gesture the 🔊 toggle was standing in
   // for — so nothing else has to be tapped before the room is audible.
@@ -784,11 +831,19 @@ export function Inside({ onPlans, start = "", onLeave }: {
     };
     const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
     if (!SR || talkRec.current) return;
+    wantTalking.current = true;
+    if (putAway()) {
+      // Restarted by `onend` on a page already in the background, or asked
+      // for by a room opened into a hidden tab. Starting here is the loop.
+      dozing.current = true;
+      setDozed(true);
+      setTalking(false);
+      return;
+    }
     // One microphone: dictation and the standing ear cannot both hold it.
     dictation.current?.stop();
     dictation.current = null;
     setDictating(false);
-    wantTalking.current = true;
     const rec = new SR();
     rec.lang = navigator.language || "en";
     rec.interimResults = false;
@@ -815,6 +870,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
     // decision has not changed; only the platform's patience has.
     rec.onend = () => {
       talkRec.current = null;
+      if (dozing.current) return;
       if (wantTalking.current) { startTalking(); return; }
       setTalking(false);
     };
@@ -825,6 +881,8 @@ export function Inside({ onPlans, start = "", onLeave }: {
 
   function stopTalking() {
     wantTalking.current = false;
+    dozing.current = false;
+    setDozed(false);
     if (silence.current !== null) {
       window.clearTimeout(silence.current);
       silence.current = null;
@@ -1113,6 +1171,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
           ? fill(tr("ins.voice.speaking", lang),
                  { who: seats.find((s) => isTalking(s))?.display
                         || tr("ins.voice.someone", lang) })
+          : dozed ? tr("ins.voice.asleep", lang)
           : talking ? tr("ins.voice.hearing", lang)
                     : tr("ins.voice.quiet", lang)}
       </div>

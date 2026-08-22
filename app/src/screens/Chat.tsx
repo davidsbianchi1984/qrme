@@ -10,6 +10,7 @@ import { TalkRail } from "../TalkRail";
 import { Waveform } from "../Waveform";
 import { presenceOf, presenceKey, animatedIn } from "../presence";
 import { useSession } from "../store";
+import { putAway, whenPutAway } from "../away";
 
 interface Doc { id: string; name: string | null; url: string;
                 ai_marked: boolean }
@@ -83,6 +84,12 @@ export function Chat({ onPlans }: {
   const Recognition: (new () => any) | undefined =
     (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
   const [listening, setListening] = useState(false);
+  // The live recogniser, so the page being put away can put it down. It had
+  // no handle at all: the overlay relied on `onend` firing to drop the
+  // light, and a frozen tab is exactly the case where `onend` never comes —
+  // so the caption said the profile was listening to a microphone the
+  // browser had already stopped.
+  const talkRec = useRef<{ stop: () => void } | null>(null);
   // The talk surface: a full listening overlay in the sibling product's
   // shape — except this product's speaker has a face. The profile's avatar
   // is what you look at while it listens and answers; the abstract orb only
@@ -191,7 +198,7 @@ export function Chat({ onPlans }: {
   // transcript is shown while it is being heard, so the surface never
   // swallows words silently.
   function talkListen() {
-    if (!Recognition) return;
+    if (!Recognition || putAway()) return;
     const rec = new Recognition();
     rec.lang = lang;
     rec.onresult = (e: any) => {
@@ -199,11 +206,23 @@ export function Chat({ onPlans }: {
       setHeard(text);
       setInput(text);
     };
-    rec.onend = () => setListening(false);
-    rec.onerror = () => setListening(false);
+    const done = () => { talkRec.current = null; setListening(false); };
+    rec.onend = done;
+    rec.onerror = done;
+    talkRec.current = { stop: () => rec.stop() };
     setListening(true);
     rec.start();
   }
+
+  // Put away mid-listen: the microphone goes down and the caption with it.
+  // Nothing stands back up here — this overlay listens one turn at a time,
+  // started by a press, and a press is not a thing to replay on somebody's
+  // behalf when they come back.
+  useEffect(() => whenPutAway(() => {
+    talkRec.current?.stop();
+    talkRec.current = null;
+    setListening(false);
+  }), []);
 
   async function send() {
     const message = input.trim();

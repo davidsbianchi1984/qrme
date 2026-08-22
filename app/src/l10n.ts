@@ -8224,6 +8224,18 @@ const CHROME: Table = {
   "ins.voice.stop": {
     en: "Stop talking", es: "Dejar de hablar", fr: "Arrêter de parler", de: "Nicht mehr sprechen", pt: "Parar de falar", it: "Smetti di parlare", ja: "話すのをやめる", zh: "停止说话", hi: "बोलना बंद करें", ar: "توقّف عن التحدّث",
   },
+  "ins.voice.asleep": {
+    en: "this tab is in the background — the room starts hearing you again when you come back to it",
+    es: "esta pestaña está en segundo plano — la sala vuelve a oírte cuando regreses a ella",
+    fr: "cet onglet est en arrière-plan — la salle vous réentend dès que vous y revenez",
+    de: "dieser Tab läuft im Hintergrund — der Raum hört dich wieder, sobald du zurückkommst",
+    pt: "este separador está em segundo plano — a sala volta a ouvir-te quando voltares a ele",
+    it: "questa scheda è in secondo piano — la stanza torna a sentirti quando ci torni",
+    ja: "このタブはバックグラウンドです — 戻るとルームはまたあなたの声を聞き取ります",
+    zh: "此标签页在后台 — 回到它时房间会重新听你说话",
+    hi: "यह टैब पृष्ठभूमि में है — जब आप लौटेंगे तो कमरा फिर से आपको सुनने लगेगा",
+    ar: "هذه التبويبة في الخلفية — تعود الغرفة لسماعك حين ترجع إليها",
+  },
   "ins.voice.hearing": {
     en: "Listening — say it", es: "Escuchando — dilo", fr: "À l'écoute — dites-le", de: "Hört zu — sag es", pt: "A ouvir — diga", it: "In ascolto — dillo", ja: "聞いています — どうぞ", zh: "正在聆听 — 请说", hi: "सुन रहे हैं — कहिए", ar: "يستمع — تفضّل",
   },
@@ -8271,6 +8283,18 @@ const CHROME: Table = {
   },
   "ins.ask.seated": {
     en: "Seated — they are in the room.", es: "Sentado — ya está en la sala.", fr: "Installé — il est dans la salle.", de: "Platziert — es ist im Raum.", pt: "Sentado — já está na sala.", it: "Seduto — è nella stanza.", ja: "着席しました — 部屋にいます。", zh: "已入座 — 已在房间里。", hi: "बैठ गया — अब कमरे में है।", ar: "جلس — إنه في الغرفة الآن.",
+  },
+  "agent.ear.asleep": {
+    en: "this tab is in the background — the microphone starts again when you come back to it",
+    es: "esta pestaña está en segundo plano — el micrófono vuelve a empezar cuando regreses a ella",
+    fr: "cet onglet est en arrière-plan — le microphone reprend dès que vous y revenez",
+    de: "dieser Tab läuft im Hintergrund — das Mikrofon beginnt wieder, sobald du zurückkommst",
+    pt: "este separador está em segundo plano — o microfone recomeça quando voltares a ele",
+    it: "questa scheda è in secondo piano — il microfono riparte quando ci torni",
+    ja: "このタブはバックグラウンドです — 戻るとマイクはまた聞き始めます",
+    zh: "此标签页在后台 — 回到它时麦克风会重新开始",
+    hi: "यह टैब पृष्ठभूमि में है — जब आप लौटेंगे तो माइक्रोफ़ोन फिर से सुनने लगेगा",
+    ar: "هذه التبويبة في الخلفية — يعود الميكروفون للاستماع حين ترجع إليها",
   },
   "agent.ear.blocked": {
     en: "the microphone was refused — allow it for this site in the browser, then try the mic again",

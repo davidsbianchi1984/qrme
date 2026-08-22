@@ -4,6 +4,65 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-08-22
+
+A slept tab does not go quietly deaf. A backgrounded page has its
+microphone stopped by the browser without an error, and every light saying
+it was listening went on saying it — the orb's caption, the room's mic
+button, the line telling you the room could hear you.
+
+### Fixed
+
+- **A microphone that has stopped is no longer drawn as listening.** A
+  field report, with a photograph: tabs dropping into the background
+  mid-conversation. What happens underneath is not a crash. The browser
+  throttles a hidden page's timers, suspends its audio, and ends its speech
+  recogniser; a frozen tab stops running at all. None of that arrives as an
+  error, so the console kept every light it had lit over a microphone that
+  had stopped minutes ago.
+
+      asked     does the console stop listening when it is put away
+      mattered  does it stop *saying* it is listening
+
+  The first half already happened, without being asked and without being
+  reported. The second was the defect: silence and deafness look identical
+  on screen and are opposite facts — one means nobody spoke, the other
+  means nobody could be heard. There was not a single `visibilitychange`
+  handler in the console, so a backgrounded page could not know it had been
+  suspended, let alone say so.
+
+- **Two relight loops stop restarting into a sleeping tab.** The studio
+  agent's orb and the room's standing ear both relight on `onend`, on
+  purpose: a browser ends a recogniser on its own schedule and the person's
+  decision has not changed. A backgrounded tab is not that. Relighting
+  there stood a fresh recogniser into a page that could not run one, which
+  ended immediately, which relit — for as long as the tab stayed away, with
+  the surface saying it was listening throughout. The room's own comment
+  named the case ("a tab blur") and treated it as the ordinary one. Both
+  now ask before they restart, and both come back up on return.
+
+- **The surfaces say which of the two happened.** The orb's caption and the
+  room's voice line read *this tab is in the background — it starts hearing
+  you again when you come back to it*, in all ten languages. A person who
+  was talking and got nothing back needs a sentence with something to do
+  about it; an empty caption is not one.
+
+- **A press is not replayed on somebody's behalf.** Dictation goes down
+  with everything else when the tab sleeps and stays down — it was a press
+  into a text box, and re-opening a microphone nobody asked for a second
+  time, while they are looking at another tab, is the opposite failure to
+  the one being fixed. The standing ears come back because they were a
+  decision, not a press.
+
+- **The chat overlay's microphone got a handle at all.** It relied on
+  `onend` firing to drop its listening light, and a frozen tab is exactly
+  the case where `onend` never comes.
+
+### Added
+
+- `app/src/away.ts` — one module the whole console asks *am I away now* and
+  *tell me when that changes*, so no screen has to remember the answer.
+
 ## [1.3.0] - 2026-08-22
 
 A profile hands you a page. It could always write; what it could not do was
