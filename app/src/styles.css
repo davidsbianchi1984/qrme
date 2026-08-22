@@ -1635,3 +1635,11 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    button on the card below; here it is the same door at the size the strip
    gives everything else. */
 .rs-round.talkers { border-color: rgba(255, 255, 255, 0.16); }
+
+/* One conversation's worth of what a person holds, on the Identity screen.
+   Spaced rather than boxed: this is somebody's own words being read back,
+   and a card inside a card reads like a form. */
+.idn-mymem-talk { margin-top: 10px; padding-top: 8px;
+  border-top: 1px solid var(--line); }
+.idn-mymem-talk h4 { margin: 0 0 4px; font-size: 0.95rem; }
+.idn-mymem-talk p { margin: 2px 0; overflow-wrap: anywhere; }

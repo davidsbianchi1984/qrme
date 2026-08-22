@@ -237,6 +237,39 @@ def vault_for(plan: str, pdi):
     return pdi if is_private(plan) else None
 
 
+def memory_for(plan: str, pdi):
+    """Where a person's memory of a conversation goes, and under what.
+
+    Returns `(destination, posture)`. The destination is the tandem for a
+    private plan and None for platform custody; the posture is the word
+    written on the row.
+
+    `vault_for` answers a different question — *may this account's work be
+    sealed under a key it holds* — and answering it for a memory produced
+    the wrong outcome twice over. A free account got no memory at all, so a
+    profile forgot everybody who was not paying, which is a product nobody
+    comes back to; and the question was being asked about the profile's
+    owner rather than the person whose words they were.
+
+        asked     may this be sealed
+        mattered  where does it go when it may not
+
+    Free is hosted: this deployment's own database, operated by whoever runs
+    it, contributed to the shared model as the tier's terms say. Not a
+    lesser vault — a different arrangement, named as one, and the row keeps
+    the name.
+
+    A visitor with no account gets None for both. There is no account for
+    the memory to belong to, and manufacturing a home for somebody who has
+    not asked for one is not a kindness.
+    """
+    if plan == "visitor":
+        return None, None
+    if is_private(plan):
+        return (pdi, "vault") if pdi is not None else (None, None)
+    return None, "open_cloud"
+
+
 def is_private(plan: str) -> bool:
     return POSTURES[posture_of(plan)]["private"]
 

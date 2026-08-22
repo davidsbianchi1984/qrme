@@ -248,6 +248,10 @@ public sealed partial class PeoplePage : Page
         RoomFaceMineButton.Content = L10n.T("room.face.mine");
         RoomFaceMineOffButton.Content = L10n.T("room.face.mineoff");
         RoomVoicesButton.Content = L10n.T("room.voices");
+        HeldButton.Content = L10n.T("me.held");
+        GiveLead.Text = L10n.T("me.give.lead");
+        GiveButton.Content = L10n.T("me.give");
+        GiveStopButton.Content = L10n.T("me.give.stop");
         RoomShareButton.Content = L10n.T("room.share");
         RoomFacePlainButton.Content = L10n.T("room.face.plain");
         RoomFaceWhoButton.Content = L10n.T("room.face.who");
@@ -2085,6 +2089,52 @@ public sealed partial class PeoplePage : Page
             var lib = await ApiClient.Shared.VoiceLibrary();
             RoomList.ItemsSource = (lib.Voices ?? [])
                 .Select(v => new Row($"{v.Name} · {v.Note}")).ToList();
+        });
+
+    private async void OnGive(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var giving = await ApiClient.Shared.OwnContribution(
+                AppState.Current.InteractorId ?? "",
+                AppState.Current.InteractorToken ?? AppState.Current.Token!);
+            RoomList.ItemsSource = new List<Row>
+            {
+                new(giving.Contributes == true
+                    ? $"{L10n.T("me.give.on")} {giving.ContributedCount ?? 0}"
+                    : L10n.T("me.give.off")),
+            };
+        });
+
+    private async void OnGiveStop(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var out_ = await ApiClient.Shared.StopOwnContribution(
+                AppState.Current.InteractorId ?? "",
+                AppState.Current.InteractorToken ?? AppState.Current.Token!);
+            RoomList.ItemsSource = new List<Row>
+            {
+                new(out_.DeletedAtGateway == true
+                    ? $"{L10n.T("me.give.off")} {out_.RevokedCount ?? 0}"
+                    : L10n.T("me.give.off")),
+            };
+        });
+
+    // The only other way to read a memory begins by looking a profile up,
+    // which is no way in at all once that profile has deleted itself.
+    private async void OnHeld(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var mine = await ApiClient.Shared.OwnMemories(
+                AppState.Current.InteractorId ?? "",
+                AppState.Current.InteractorToken ?? AppState.Current.Token!);
+            var rows = new List<Row>();
+            foreach (var talk in mine.Conversations ?? [])
+            {
+                rows.Add(new Row(talk.DisplayName ?? L10n.T("me.held.gone")));
+                foreach (var moment in talk.Memories ?? [])
+                    rows.Add(new Row(moment.Line ?? "—"));
+            }
+            RoomList.ItemsSource = rows;
         });
 
     private async void OnDispRules(object sender, RoutedEventArgs e) =>

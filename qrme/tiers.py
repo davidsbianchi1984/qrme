@@ -240,6 +240,32 @@ def plan_of_profile(profile_id: str) -> str:
     return plan_of(row["owner_id"]) if row else "visitor"
 
 
+def plan_of_interactor(interactor_id: str) -> str:
+    """The plan governing what this *person* stores — their own.
+
+    The twin of `plan_of_profile`, and the one that governs a memory of a
+    conversation. Which of the two is asked decides whose account a
+    remembered turn lives in, and for a while the answer was the wrong one:
+    a memory was gated on the profile owner's plan and sealed under their
+    key, so whether your conversation was kept depended on whether somebody
+    else was paying, and the record sat somewhere you could not reach.
+
+        asked     may this be remembered
+        mattered  whose is it
+
+    An interactor with no account behind it — somebody talking to a profile
+    without signing in — holds no membership, so this returns "visitor" and
+    `vault_for` hands back no vault. That is the honest answer rather than a
+    gap: there is no account for the memory to belong to yet.
+    """
+    row = db.connect().execute(
+        "SELECT account_id FROM interactors WHERE id=?",
+        (interactor_id,)).fetchone()
+    if row is None or not row["account_id"]:
+        return "visitor"
+    return plan_of(row["account_id"])
+
+
 def entitles(plan: str, capability: str) -> bool:
     """Whether a plan reaches a capability. Pure — no database, so the pricing
     page and the gate cannot disagree about what a plan includes."""

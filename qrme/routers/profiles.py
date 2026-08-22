@@ -621,19 +621,18 @@ def delete_profile(profile_id: str, request: Request) -> dict:
     vaulted += [r["vault_key"] for r in conn.execute(
         "SELECT vault_key FROM finetune_runs WHERE profile_id=?"
         " AND vault_key IS NOT NULL", (profile_id,)).fetchall()]
-    # The recollection ledger (qrme/recollection.py): every sealed memory's
-    # key, written beside the seal precisely so this line could exist.
-    vaulted += [r["pdi_key"] for r in conn.execute(
-        "SELECT pdi_key FROM recollections WHERE profile_id=?",
-        (profile_id,)).fetchall()]
+    # The recollection ledger is NOT swept here, and that is the change.
+    # Those seals hold what a person said, in their vault, under their key
+    # — see ERASE_KEEPS. Deleting a profile takes the profile's words, not
+    # the other party's record of having spoken.
     if vaulted:
         deleted["pdi_records"] = sum(
             1 for key in vaulted if pdi is not None and pdi.delete(key))
-    # And the vectors (qrme/recollection.py): a memory's embedding ranks
-    # even after its seal is gone, so erasure takes the whole shelf in one
-    # call. None means the tandem was unreached, and the answer says so.
-    from .. import recollection
-    deleted["memory_vectors"] = recollection.forget_profile(pdi, profile_id)
+    # The memory vectors stay with the seals they index, for the same
+    # reason: they are the person's. `recollection.forget_profile` still
+    # exists and still works — it is what the person's own erase-all calls
+    # — but a profile's deletion is no longer the thing that fires it.
+    deleted["memory_vectors"] = 0
     # The lookouts (qrme/lookout.py): each is a standing appointment in
     # the vault and a sealed capture under the task's key — both outside
     # the pdi_key ledgers, so the sweep names them itself. None means the

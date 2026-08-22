@@ -139,7 +139,7 @@ def test_a_profile_answers_grounded_in_the_pairs_seals(client, profile_id,
     assert answered["provenance"]["grounded_in_vault"] is True
     ask = vault.asked[-1]
     assert ask["question"] == "what should I cook when my sister arrives"
-    assert ask["prefix"] == f"qrme/{profile_id}/memory/{interactor_id}/"
+    assert ask["prefix"] == f"qrme/{interactor_id}/memory/{profile_id}/"
     assert ask["system"], "the persona was dropped on the way to the vault"
     # And recall stepped aside: the resident reads the same seals, so
     # fetching the lines here too would say them twice.
@@ -154,7 +154,7 @@ def test_grounding_is_pair_scoped(client, profile_id, interactor_id):
     bob = _second_interactor(client)
     _chat(client, profile_id, bob, "hello from Bob")
     assert vault.asked[-1]["prefix"] == \
-        f"qrme/{profile_id}/memory/{bob}/"
+        f"qrme/{bob}/memory/{profile_id}/"
 
 
 def test_an_older_pdi_speaks_ungrounded_and_says_so(client, profile_id,

@@ -5296,6 +5296,8 @@ private fun RoomsBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
     var rows by remember { mutableStateOf<List<String>>(emptyList()) }
     var guestId by remember { mutableStateOf("") }
     var roomName by remember { mutableStateOf("") }
+    var held by remember { mutableStateOf<List<String>>(emptyList()) }
+    var giving by remember { mutableStateOf<Pair<Boolean, Int>?>(null) }
     var scene by remember { mutableStateOf<List<String>>(emptyList()) }
     // Who you are in every room, and the account's real voices. Both read
     // rather than assumed: a picker that shows what it wishes were stored
@@ -5521,7 +5523,47 @@ private fun RoomsBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
             // The voices this account can actually offer, asked of the
             // engine rather than hardcoded — so the one voice somebody made
             // themselves is on the list.
-            BrandButton(L10n.t("room.voices", lang)) {
+            // What YOU hold, across every profile you have talked to. A memory
+        // is what you said, in your vault on your plan, so a profile's
+        // deletion no longer takes it — and the only other way to read one
+        // begins by looking a profile up, which is no way in once it is gone.
+        BrandButton(L10n.t("me.held", lang),
+            enabled = vm.interactorToken != null) {
+            vm.call({ ApiClient.ownMemories(vm.interactorId.orEmpty(),
+                vm.interactorToken.orEmpty(),
+                L10n.t("me.held.gone", lang)) }) { r ->
+                held = r.getOrDefault(emptyList())
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        held.forEach { Text(it, color = Qrme.T3, fontSize = 11.sp) }
+
+        // Hosted storage and contribution are one bargain, said here rather
+        // than buried. Nothing sealed in a vault is ever contributed
+        // whatever this says.
+        Text(L10n.t("me.give.lead", lang), color = Qrme.T3, fontSize = 11.sp)
+        BrandButton(L10n.t("me.give", lang),
+            enabled = vm.interactorToken != null) {
+            vm.call({ ApiClient.ownContribution(vm.interactorId.orEmpty(),
+                vm.interactorToken.orEmpty()) }) { r ->
+                giving = r.getOrNull()
+                onNote(r.exceptionOrNull()?.message) }
+        }
+        giving?.let { (on, count) ->
+            Text(if (on) "${L10n.t("me.give.on", lang)} $count"
+                 else L10n.t("me.give.off", lang),
+                 color = Qrme.T3, fontSize = 11.sp)
+            if (on) {
+                BrandButton(L10n.t("me.give.stop", lang)) {
+                    vm.call({ ApiClient.stopOwnContribution(
+                        vm.interactorId.orEmpty(),
+                        vm.interactorToken.orEmpty()) }) { r ->
+                        if (r.isSuccess) giving = false to 0
+                        onNote(r.exceptionOrNull()?.message) }
+                }
+            }
+        }
+
+        BrandButton(L10n.t("room.voices", lang)) {
                 vm.call({ ApiClient.voiceLibrary() }) { r ->
                     voices = r.getOrDefault(emptyList())
                     onNote(r.exceptionOrNull()?.message) }

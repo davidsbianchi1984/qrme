@@ -4207,6 +4207,30 @@ public sealed class ApiClient
     public Task<OwnPicture> OwnPicture(string interactorId, string token) =>
         Send<OwnPicture>(Get($"/interactors/{interactorId}/picture", token));
 
+    /// <summary>Whether your hosted memories feed the shared model, and
+    /// how many have gone.</summary>
+    public Task<GivingBack> OwnContribution(string interactorId, string token) =>
+        Send<GivingBack>(Get($"/interactors/{interactorId}/contribution", token));
+
+    /// <summary>Off, and the past pulled back with it — the refs carry no
+    /// identity, so the gateway drops each item without ever being told
+    /// whose it was.</summary>
+    public Task<GivingBack> StopOwnContribution(string interactorId, string token)
+    {
+        var req = new HttpRequestMessage(
+            HttpMethod.Delete, $"/interactors/{interactorId}/contribution");
+        req.Headers.Add("authorization", $"Bearer {token}");
+        return Send<GivingBack>(req);
+    }
+
+    /// <summary>Everything YOU hold, across every profile you have talked
+    /// to. A memory is what you said, sealed in your vault on your plan,
+    /// so a profile's deletion no longer takes it — and the only other way
+    /// to read one begins by looking a profile up, which is no way in at
+    /// all once that profile is gone.</summary>
+    public Task<HeldRecord> OwnMemories(string interactorId, string token) =>
+        Send<HeldRecord>(Get($"/interactors/{interactorId}/memories", token));
+
     /// <summary>Put your own picture up — the PERSON's, not a profile's
     /// portrait. It follows you into every room rather than being set
     /// again in each one, and it is never AI-marked: a photograph of your
@@ -5077,6 +5101,22 @@ public record RoomFace(
 /// A person's OWN picture — theirs, not a profile's portrait, and the same
 /// in every room they walk into. <c>AiMarked</c> is always false and is on
 /// the wire anyway: a photograph of somebody's own face is authentic media.
+public record HeldTalk(
+    [property: JsonPropertyName("profile_id")] string? ProfileId,
+    [property: JsonPropertyName("display_name")] string? DisplayName,
+    [property: JsonPropertyName("gone")] bool? Gone,
+    [property: JsonPropertyName("memories")] RecolledMomentOut[]? Memories);
+
+public record GivingBack(
+    [property: JsonPropertyName("contributes")] bool? Contributes,
+    [property: JsonPropertyName("contributed_count")] int? ContributedCount,
+    [property: JsonPropertyName("revoked_count")] int? RevokedCount,
+    [property: JsonPropertyName("deleted_at_gateway")] bool? DeletedAtGateway);
+
+public record HeldRecord(
+    [property: JsonPropertyName("conversations")] HeldTalk[]? Conversations,
+    [property: JsonPropertyName("readable")] bool? Readable);
+
 public record RoomNamed(
     [property: JsonPropertyName("id")] string? Id,
     [property: JsonPropertyName("topic")] string? Topic);

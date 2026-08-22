@@ -208,6 +208,21 @@ export function Identity({ onPlans, onPassing }: {
   }
   useEffect(reloadMyPic, [iAm, myToken]);
   const [confirmEnd, setConfirmEnd] = useState<"" | "sunset" | "delete">("");
+  // Everything this person holds, across every profile they have talked
+  // to. Loaded on a press rather than on mount: it is the single most
+  // private read in this product, and a screen that fetches somebody's
+  // whole record just for being opened is a screen that decided for them.
+  const [mine, setMine] = useState<Awaited<
+    ReturnType<typeof api.ownMemories>> | null>(null);
+  // The bargain the free tier is, and the switch that makes "you can turn
+  // it off" a fact rather than a sentence. Read on mount, unlike the
+  // memories themselves: this is a setting, not somebody's words.
+  const [giving, setGiving] = useState<Awaited<
+    ReturnType<typeof api.ownContribution>> | null>(null);
+  useEffect(() => {
+    if (!iAm || !myToken) return;
+    api.ownContribution(iAm, myToken).then(setGiving).catch(() => undefined);
+  }, [iAm, myToken]);
 
   const fail = (e: unknown) => setError(e);
 
@@ -739,6 +754,82 @@ export function Identity({ onPlans, onPassing }: {
                      setNote(tr("idn.mypic.saved", lang));
                    } catch (err) { fail(err); }
                  }} />
+        </div>
+      )}
+
+      {/* Hosted storage and contribution are one bargain, said here rather
+        * than buried. On for the free tier because it is what the tier is;
+        * off is one press, and the press reaches backwards. Nothing sealed
+        * in a vault is ever contributed whatever this says. */}
+      {iAm && myToken && giving && (
+        <div className="card">
+          <h3>{tr("idn.give", lang)}</h3>
+          <p className="muted small">{tr("idn.give.lead", lang)}</p>
+          <p className="small">
+            {giving.contributes
+              ? fill(tr("idn.give.on", lang),
+                     { count: String(giving.contributed_count) })
+              : tr("idn.give.off", lang)}
+          </p>
+          {giving.contributes && (
+            <div className="row">
+              <button onClick={async () => {
+                setError(null); setNote(null);
+                try {
+                  const out = await api.stopOwnContribution(iAm, myToken);
+                  setGiving({ contributes: false, contributed_count: 0 });
+                  // `.replace` rather than `fill`: fill returns ReactNode[]
+                  // for interpolating into JSX, and a note is a string.
+                  setNote(out.deleted_at_gateway
+                    ? tr("idn.give.stopped", lang)
+                        .replace("{count}", String(out.revoked_count))
+                    : tr("idn.give.stopped.partly", lang));
+                } catch (e) { fail(e); }
+              }}>{tr("idn.give.stop", lang)}</button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* What you hold, not what a profile holds about you.
+        *
+        * A memory is what YOU said — only a person's own turns are ever
+        * sealed — and it lives in your vault, on your plan. Deleting a
+        * profile no longer takes it, which left this missing: the only
+        * way to read a memory back began by looking the profile up, so a
+        * record that outlived the profile had no door at all. Keeping
+        * somebody's words where they cannot reach them is the opposite
+        * of the promise. */}
+      {iAm && myToken && (
+        <div className="card">
+          <h3>{tr("idn.mymem", lang)}</h3>
+          <p className="muted small">{tr("idn.mymem.lead", lang)}</p>
+          <div className="row">
+            <button onClick={async () => {
+              setError(null); setNote(null);
+              try { setMine(await api.ownMemories(iAm, myToken)); }
+              catch (e) { fail(e); }
+            }}>{tr("idn.mymem.show", lang)}</button>
+          </div>
+          {mine && mine.conversations.length === 0 && (
+            <p className="muted small">{tr("idn.mymem.none", lang)}</p>
+          )}
+          {mine && !mine.readable && (
+            <p className="muted small">{tr("idn.mymem.unreadable", lang)}</p>
+          )}
+          {mine?.conversations.map((c) => (
+            <div key={c.profile_id} className="idn-mymem-talk">
+              <h4>
+                {c.display_name || c.profile_id}
+                {c.gone && (
+                  <span className="muted small"> — {tr("idn.mymem.gone", lang)}</span>
+                )}
+              </h4>
+              {c.memories.map((m) => (
+                <p key={m.ref} className="small">{m.line || "—"}</p>
+              ))}
+            </div>
+          ))}
         </div>
       )}
 

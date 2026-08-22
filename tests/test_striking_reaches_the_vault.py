@@ -28,7 +28,7 @@ from tests.test_the_profile_remembers_by_meaning import (
 
 
 def _pair_key(profile_id, interactor_id, ref):
-    return f"qrme/{profile_id}/memory/{interactor_id}/{ref}"
+    return f"qrme/{interactor_id}/memory/{profile_id}/{ref}"
 
 
 def _interactor_turn(profile_id, interactor_id, words):
@@ -116,7 +116,7 @@ def test_forget_by_words_takes_the_seal_too(client, profile_id,
                     json={"about": "lake house"})
     assert r.status_code == 200, r.text
     assert r.json()["sealed_forgotten"] == 1
-    prefix = f"qrme/{profile_id}/memory/{interactor_id}/"
+    prefix = f"qrme/{interactor_id}/memory/{profile_id}/"
     assert not any(k.startswith(prefix) for k in vault.embedded)
     assert not any(k.startswith(prefix) for k in vault.records)
 
@@ -144,27 +144,41 @@ def test_editing_reseals_the_new_words(client, profile_id, interactor_id):
         (ref,)).fetchone()["n"] == 1
 
 
-def test_editing_on_a_planless_vault_ends_the_memory(client, profile_id,
-                                                     interactor_id,
-                                                     monkeypatch):
-    """Writes are plan-gated where deletes are not: a member who moved to
-    Free can still take the old seal away, and the rewrite is simply not
-    sealed — old words that stayed findable would betray the edit."""
+def test_editing_after_a_move_to_free_rekeeps_it_hosted(client, profile_id,
+                                                        interactor_id,
+                                                        monkeypatch):
+    """The old seal goes, and the rewrite is kept under the new arrangement.
+
+    Deletes are never plan-gated, so a member who moved to Free can still
+    take the old seal away — and must, because old words that stayed
+    findable would betray the edit. That half is unchanged.
+
+    What follows the delete changed. The rewrite used to be kept nowhere,
+    because Free meant no memory; Free is hosted now, so the new words are
+    kept in this deployment's own database and the row says so. The seal is
+    gone from the vault either way, which is the property that mattered.
+    """
     vault = FakeResidentVault()
     client.app.state.pdi = vault
     _chat(client, profile_id, interactor_id, "my dog is called Biscuit")
     ref = _interactor_turn(profile_id, interactor_id, "Biscuit")
-    monkeypatch.setattr(storage, "vault_for", lambda plan, pdi: None)
+    monkeypatch.setattr(storage, "memory_for",
+                        lambda plan, pdi: (None, "open_cloud"))
     r = client.put(
         f"/profiles/{profile_id}/memory/{interactor_id}/turns/{ref}",
         json={"content": "my cat is called Biscuit"})
     assert r.status_code == 200, r.text
-    assert r.json()["memory_resealed"] is False
+    assert r.json()["memory_resealed"] is True
     key = _pair_key(profile_id, interactor_id, ref)
-    assert key not in vault.records and key not in vault.embedded
-    assert db.connect().execute(
-        "SELECT COUNT(*) AS n FROM recollections WHERE id=?",
-        (ref,)).fetchone()["n"] == 0
+    assert key not in vault.records and key not in vault.embedded, (
+        "the old seal survived the edit — findable old words undo it")
+    row = db.connect().execute(
+        "SELECT posture, line, pdi_key FROM recollections WHERE id=?",
+        (ref,)).fetchone()
+    assert row is not None, "the rewrite was not kept at all"
+    assert row["posture"] == "open_cloud"
+    assert row["line"] == "my cat is called Biscuit"
+    assert row["pdi_key"] == "", "a hosted memory claims a vault key"
 
 
 # -- erase-all ---------------------------------------------------------------
@@ -180,7 +194,7 @@ def test_clearing_a_memory_sweeps_the_pair_and_only_the_pair(client,
     _chat(client, profile_id, bob, "I collect vintage radios")
     r = client.delete(f"/profiles/{profile_id}/memory/{interactor_id}")
     assert r.status_code == 204, r.text
-    pair = f"qrme/{profile_id}/memory/{interactor_id}/"
+    pair = f"qrme/{interactor_id}/memory/{profile_id}/"
     assert not any(k.startswith(pair) for k in vault.embedded)
     assert not any(k.startswith(pair) for k in vault.records)
     assert db.connect().execute(
@@ -188,7 +202,7 @@ def test_clearing_a_memory_sweeps_the_pair_and_only_the_pair(client,
         " AND interactor_id=?", (profile_id, interactor_id)).fetchone()["n"] \
         == 0
     # Bob's memory of his own conversation stands untouched.
-    assert any(k.startswith(f"qrme/{profile_id}/memory/{bob}/")
+    assert any(k.startswith(f"qrme/{bob}/memory/{profile_id}/")
                for k in vault.embedded)
 
 

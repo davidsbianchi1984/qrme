@@ -3732,6 +3732,50 @@ object ApiClient {
         JSONObject(request("/interactors/$interactorId/picture",
                            token = token)).optString("url")
 
+    /** Whether this person's hosted memories feed the shared model, and
+     *  how many have gone. */
+    suspend fun ownContribution(interactorId: String,
+                                token: String): Pair<Boolean, Int> {
+        val o = JSONObject(request("/interactors/$interactorId/contribution",
+                                   token = token))
+        return o.optBoolean("contributes") to o.optInt("contributed_count")
+    }
+
+    /** Off, and the past pulled back with it. */
+    suspend fun stopOwnContribution(interactorId: String,
+                                    token: String): Pair<Int, Boolean> {
+        val o = JSONObject(request("/interactors/$interactorId/contribution",
+                                   "DELETE", token = token))
+        return o.optInt("revoked_count") to o.optBoolean("deleted_at_gateway")
+    }
+
+    /** Everything YOU hold, across every profile you have talked to.
+     *
+     *  A memory is what you said, sealed in your vault on your plan, so a
+     *  profile's deletion no longer takes it. Flattened to one line per
+     *  moment, with the profile's name — or the fact that it is gone —
+     *  standing at the head of its group. */
+    suspend fun ownMemories(interactorId: String, token: String,
+                            goneLabel: String): List<String> {
+        val out = JSONObject(request("/interactors/$interactorId/memories",
+                                     token = token))
+        val talks = out.optJSONArray("conversations") ?: return emptyList()
+        val lines = mutableListOf<String>()
+        for (i in 0 until talks.length()) {
+            val talk = talks.getJSONObject(i)
+            // A deleted profile has no name to show: the name was one of
+            // its own words, and erasure took it. The screen supplies the
+            // sentence for that, in the reader's language — the shell does
+            // not get to invent one, and a dash is an invented one.
+            lines += talk.optString("display_name").ifBlank { goneLabel }
+            val moments = talk.optJSONArray("memories") ?: continue
+            for (j in 0 until moments.length()) {
+                lines += moments.getJSONObject(j).optString("line")
+            }
+        }
+        return lines
+    }
+
     /** Put your own picture up — the PERSON's, not a profile's portrait. It
      *  follows you into every room rather than being set again in each one,
      *  and it is never AI-marked: a photograph of your own face is authentic

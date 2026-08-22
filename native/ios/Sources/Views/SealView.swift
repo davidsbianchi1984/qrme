@@ -161,6 +161,8 @@ struct RoomsSection: View {
     @State private var myPicture: String?
     @State private var voices: [SpokenVoice] = []
     @State private var roomName = ""
+    @State private var held: [HeldTalk] = []
+    @State private var giving: GivingBack?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -333,6 +335,61 @@ struct RoomsSection: View {
             }.font(.caption).disabled(busy)
             ForEach(voices, id: \.id) { v in
                 Text(v.name).font(.caption2).foregroundStyle(Theme.t2)
+            }
+
+            // What YOU hold, across every profile you have talked to. A
+            // memory is what you said, in your vault on your plan, so a
+            // profile's deletion no longer takes it — and the only other
+            // way to read one begins by looking a profile up, which is no
+            // way in at all once that profile is gone.
+            Divider().overlay(Theme.line)
+            Button(L10n.t("me.held", state.language)) {
+                run {
+                    held = try await ApiClient.shared.ownMemories(
+                        interactorId: state.interactorId ?? "",
+                        token: state.interactorToken ?? "")
+                        .conversations ?? []
+                }
+            }.font(.caption).disabled(busy || state.interactorToken == nil)
+            ForEach(held) { talk in
+                Text(talk.display_name
+                     ?? L10n.t("me.held.gone", state.language))
+                    .font(.caption).foregroundStyle(Theme.txt)
+                ForEach(talk.memories ?? [], id: \.ref) { moment in
+                    Text(moment.line ?? "—")
+                        .font(.caption2).foregroundStyle(Theme.t2)
+                }
+            }
+
+            // Hosted storage and contribution are one bargain, said here
+            // rather than buried. Nothing sealed in a vault is ever
+            // contributed whatever this says.
+            Divider().overlay(Theme.line)
+            Text(L10n.t("me.give.lead", state.language))
+                .font(.caption2).foregroundStyle(Theme.t2)
+            Button(L10n.t("me.give", state.language)) {
+                run {
+                    giving = try await ApiClient.shared.ownContribution(
+                        interactorId: state.interactorId ?? "",
+                        token: state.interactorToken ?? "")
+                }
+            }.font(.caption).disabled(busy || state.interactorToken == nil)
+            if let giving {
+                Text(giving.contributes == true
+                     ? "\(L10n.t("me.give.on", state.language)) "
+                       + "\(giving.contributed_count ?? 0)"
+                     : L10n.t("me.give.off", state.language))
+                    .font(.caption2).foregroundStyle(Theme.t2)
+                if giving.contributes == true {
+                    Button(L10n.t("me.give.stop", state.language)) {
+                        run {
+                            self.giving = try await ApiClient.shared
+                                .stopOwnContribution(
+                                    interactorId: state.interactorId ?? "",
+                                    token: state.interactorToken ?? "")
+                        }
+                    }.font(.caption).disabled(busy)
+                }
             }
 
             if let scene {

@@ -125,7 +125,7 @@ def test_forgetting_one_moment_unmakes_it_the_whole_way(client, profile_id,
         f"{doomed['ref']}", headers=interactor_head)
     assert r.status_code == 200, r.text
     assert r.json() == {"forgotten": True, "vectors_removed": 1}
-    key = f"qrme/{profile_id}/memory/{interactor_id}/{doomed['ref']}"
+    key = f"qrme/{interactor_id}/memory/{profile_id}/{doomed['ref']}"
     assert key not in vault.embedded, "the vector survived"
     assert key not in vault.records, "the seal survived"
     left = _shelf(client, profile_id, interactor_id, interactor_head)

@@ -46,9 +46,41 @@ def profile_id(client):
 
 @pytest.fixture()
 def interactor_id(client):
+    """Sam — an ordinary signed-in person, with an account and a plan.
+
+    The account is not decoration. A memory of a conversation belongs to
+    the **person** now rather than to the profile they were talking to, so
+    whether one is kept is a fact about *their* plan. Sam without an
+    account is a visitor, and a visitor's turn is not sealed into a vault
+    nobody holds a key to.
+
+    This fixture used to make an accountless interactor, and every memory
+    test still passed — because the gate asked about the profile OWNER's
+    plan, so a signed-out stranger's words were kept in the member's vault.
+    The fixture agreeing with the product is the point: use
+    `visitor_interactor` for somebody who really has not signed in.
+    """
     response = client.post(
         "/interactors",
         json={"display_name": "Sam", "birthdate": "2000-01-15"},
+    )
+    assert response.status_code == 201, response.text
+    who = response.json()["id"]
+    enrol(who)
+    return who
+
+
+@pytest.fixture()
+def visitor_interactor(client):
+    """Somebody talking to a profile without signing in.
+
+    No account, so no plan, so nowhere of their own for a memory to live.
+    Deliberately separate from `interactor_id` so a test that means
+    "signed out" has to say so.
+    """
+    response = client.post(
+        "/interactors",
+        json={"display_name": "Wren", "birthdate": "1996-07-02"},
     )
     assert response.status_code == 201, response.text
     return response.json()["id"]
@@ -68,3 +100,34 @@ def interactor_head(client, interactor_id):
         return {"authorization": f"Bearer {row.json()['token']}"}
     from qrme import auth
     return {"authorization": f"Bearer {auth.issue('interactor', interactor_id)}"}
+
+def enrol(interactor_id: str, plan: str = "pro") -> str:
+    """Give this person an account on a plan, and hand back the account id.
+
+    A memory of a conversation belongs to the **person** now, not to the
+    profile they were talking to, so whether one is kept is a fact about
+    *their* plan. An interactor with no account behind it is a visitor, and
+    a visitor's turn is not sealed into a vault nobody holds a key to.
+
+    That is a real change in who gets remembered, and it is why so many
+    tests reach for this: they were written when the gate asked about the
+    profile owner, so a signed-out stranger talking to a paying member's
+    profile had their words kept in the member's vault. Tests that want a
+    memory now have to say whose it is.
+    """
+    from qrme import db, tiers
+
+    account = f"acct-{interactor_id}"
+    tiers.subscribe(account, plan)
+    conn = db.connect()
+    conn.execute("UPDATE interactors SET account_id=? WHERE id=?",
+                 (account, interactor_id))
+    conn.commit()
+    return account
+
+
+@pytest.fixture()
+def paying_interactor(client, interactor_id):
+    """`interactor_id`, enrolled — the ordinary signed-in person."""
+    enrol(interactor_id)
+    return interactor_id

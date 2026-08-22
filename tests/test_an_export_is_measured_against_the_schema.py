@@ -58,10 +58,18 @@ from .test_an_erase_is_measured_against_the_schema import (
 
 
 def test_the_export_reaches_every_table_the_schema_scopes(client, profile_id):
-    """The completeness half."""
+    """The completeness half.
+
+    `ERASE_KEEPS` is skipped here for the same reason the erase skips it,
+    and the guard below holds the two in step. A table in that set is not
+    the profile's — it is somebody else's words that happen to carry this
+    profile's id — so it is neither the profile's to erase nor the
+    profile's to be handed in a bundle that gets mailed and copied.
+    """
     conn = db.connect()
     planted = [t for t in _scoped_from_the_schema(conn)
-               if t != "profiles" and _plant(conn, t, profile_id)]
+               if t != "profiles" and t not in common.ERASE_KEEPS
+               and _plant(conn, t, profile_id)]
     conn.commit()
     assert len(planted) >= ratchets.floor("erase.tables_planted"), (
         f"only planted rows in {len(planted)} tables — the planter is failing "
@@ -132,7 +140,8 @@ def test_the_export_and_the_erase_reach_the_same_tables(client, profile_id):
     """
     conn = db.connect()
     planted = {t for t in _scoped_from_the_schema(conn)
-               if t != "profiles" and _plant(conn, t, profile_id)}
+               if t != "profiles" and t not in common.ERASE_KEEPS
+               and _plant(conn, t, profile_id)}
     conn.commit()
     shown = set(client.get(f"/profiles/{profile_id}/export")
                 .json()["tables"]) & planted

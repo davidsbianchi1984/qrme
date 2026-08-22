@@ -8362,6 +8362,45 @@ const CHROME: Table = {
   "ins.face.mineoff": {
     en: "Take my picture down", es: "Quitar mi foto", fr: "Retirer ma photo", de: "Mein Bild entfernen", pt: "Remover a minha foto", it: "Togli la mia foto", ja: "自分の写真を外す", zh: "撤下我的照片", hi: "मेरी तस्वीर हटाएँ", ar: "إزالة صورتي",
   },
+  "idn.give": {
+    en: "Giving back", es: "Devolver algo", fr: "Rendre la pareille", de: "Etwas zurückgeben", pt: "Retribuir", it: "Ricambiare", ja: "還元する", zh: "回馈", hi: "कुछ लौटाना", ar: "ردّ الجميل",
+  },
+  "idn.give.lead": {
+    en: "On the free plan your memories are kept by whoever runs this deployment, and they help improve the shared model. That is what the free plan is. Anything sealed in a vault is never used this way.", es: "En el plan gratuito, quien opera esta instalación guarda tus recuerdos, y estos ayudan a mejorar el modelo compartido. Eso es el plan gratuito. Lo que está sellado en una bóveda nunca se usa así.", fr: "Avec le forfait gratuit, vos souvenirs sont conservés par l'exploitant de cette installation et servent à améliorer le modèle partagé. C'est cela, le forfait gratuit. Ce qui est scellé dans un coffre n'est jamais utilisé ainsi.", de: "Im kostenlosen Tarif bewahrt der Betreiber dieser Installation deine Erinnerungen auf, und sie helfen, das gemeinsame Modell zu verbessern. Genau das ist der kostenlose Tarif. Was in einem Tresor versiegelt ist, wird nie so verwendet.", pt: "No plano gratuito, as suas memórias são guardadas por quem opera esta instalação e ajudam a melhorar o modelo partilhado. É isso que o plano gratuito é. O que está selado num cofre nunca é usado assim.", it: "Nel piano gratuito i tuoi ricordi sono conservati da chi gestisce questa installazione e aiutano a migliorare il modello condiviso. Il piano gratuito è questo. Ciò che è sigillato in una cassaforte non viene mai usato così.", ja: "無料プランでは、あなたの記憶はこの環境の運営者が保管し、共有モデルの改善に役立てられます。それが無料プランというものです。保管庫に封じられたものが、こう使われることはありません。", zh: "在免费方案里，你的记忆由运营这套部署的人保存，并用于改进共享模型。免费方案就是这个意思。封存在保管库里的内容永远不会这样被使用。", hi: "मुफ़्त प्लान में आपकी यादें इस तैनाती को चलाने वाले के पास रहती हैं और साझा मॉडल को बेहतर बनाने में मदद करती हैं। मुफ़्त प्लान यही है। तिजोरी में सील की गई कोई भी चीज़ इस तरह कभी इस्तेमाल नहीं होती।", ar: "في الخطة المجانية يحتفظ مشغّل هذا النظام بذكرياتك، وتساعد في تحسين النموذج المشترك. هذا هو معنى الخطة المجانية. أما ما خُتم في خزنة فلا يُستخدم هكذا أبدًا.",
+  },
+  "idn.give.on": {
+    en: "On — {count} so far.", es: "Activado — {count} hasta ahora.", fr: "Activé — {count} jusqu'ici.", de: "An — bisher {count}.", pt: "Ativado — {count} até agora.", it: "Attivo — {count} finora.", ja: "オン — これまでに {count} 件。", zh: "已开启 — 目前 {count} 条。", hi: "चालू — अब तक {count}।", ar: "مُفعّل — {count} حتى الآن.",
+  },
+  "idn.give.off": {
+    en: "Off. Nothing of yours is going.", es: "Desactivado. No se envía nada tuyo.", fr: "Désactivé. Rien de vous ne part.", de: "Aus. Von dir geht nichts raus.", pt: "Desativado. Nada de seu está a sair.", it: "Disattivo. Non parte nulla di tuo.", ja: "オフ。あなたのものは何も出ていきません。", zh: "已关闭。你的内容不会外传。", hi: "बंद। आपका कुछ नहीं जा रहा।", ar: "مُعطّل. لا يخرج أي شيء يخصّك.",
+  },
+  "idn.give.stop": {
+    en: "Turn it off", es: "Desactivarlo", fr: "Le désactiver", de: "Ausschalten", pt: "Desativar", it: "Disattiva", ja: "オフにする", zh: "关闭", hi: "बंद करें", ar: "أوقِفه",
+  },
+  "idn.give.stopped": {
+    en: "Off, and {count} already sent were deleted.", es: "Desactivado, y se borraron {count} ya enviados.", fr: "Désactivé, et {count} déjà envoyés ont été supprimés.", de: "Aus, und {count} bereits gesendete wurden gelöscht.", pt: "Desativado, e {count} já enviados foram apagados.", it: "Disattivo, e {count} già inviati sono stati cancellati.", ja: "オフにしました。すでに送られていた {count} 件も削除しました。", zh: "已关闭，并删除了已发送的 {count} 条。", hi: "बंद कर दिया, और पहले भेजे गए {count} मिटा दिए गए।", ar: "أوقِف، وحُذف {count} مما سبق إرساله.",
+  },
+  "idn.give.stopped.partly": {
+    en: "Off. What was already sent could not be reached just now — it stays queued for deletion.", es: "Desactivado. Lo ya enviado no se pudo alcanzar ahora; queda en cola para borrarse.", fr: "Désactivé. Ce qui était déjà parti n'a pas pu être atteint pour l'instant — sa suppression reste en attente.", de: "Aus. Bereits Gesendetes war gerade nicht erreichbar — es bleibt zum Löschen vorgemerkt.", pt: "Desativado. O que já foi enviado não pôde ser alcançado agora — fica na fila para ser apagado.", it: "Disattivo. Ciò che era già partito non è raggiungibile ora: resta in coda per la cancellazione.", ja: "オフにしました。すでに送られたものには今は届きませんでした — 削除待ちのままです。", zh: "已关闭。已发送的内容此刻无法触达 — 仍在等待删除。", hi: "बंद कर दिया। जो पहले भेजा जा चुका था, उस तक अभी नहीं पहुँच सके — वह मिटाने की कतार में है।", ar: "أوقِف. تعذّر الوصول الآن إلى ما سبق إرساله — يبقى في قائمة الحذف.",
+  },
+  "idn.mymem": {
+    en: "What you hold", es: "Lo que guardas", fr: "Ce que vous gardez", de: "Was du behältst", pt: "O que você guarda", it: "Ciò che conservi", ja: "あなたが持っているもの", zh: "你保存的内容", hi: "आपके पास क्या है", ar: "ما تحتفظ به",
+  },
+  "idn.mymem.lead": {
+    en: "Your own words, from every profile you have talked to. They live on your side, on your plan — deleting a profile does not take them.", es: "Tus propias palabras, de cada perfil con el que has hablado. Viven de tu lado, en tu plan: borrar un perfil no se las lleva.", fr: "Vos propres mots, de chaque profil avec qui vous avez parlé. Ils vivent de votre côté, sur votre forfait — supprimer un profil ne les emporte pas.", de: "Deine eigenen Worte, aus jedem Profil, mit dem du gesprochen hast. Sie liegen auf deiner Seite, in deinem Tarif — ein gelöschtes Profil nimmt sie nicht mit.", pt: "As suas próprias palavras, de cada perfil com quem falou. Vivem do seu lado, no seu plano — apagar um perfil não as leva.", it: "Le tue parole, da ogni profilo con cui hai parlato. Stanno dalla tua parte, sul tuo piano: cancellare un profilo non se le porta via.", ja: "あなたが話したすべてのプロフィールでの、あなた自身の言葉です。あなたの側に、あなたのプランで残ります — プロフィールを削除しても持っていかれません。", zh: "你和每一个档案说过的、你自己的话。它们留在你这边、你的方案里 — 删除档案不会带走它们。", hi: "हर उस प्रोफ़ाइल से आपके अपने शब्द जिनसे आपने बात की। वे आपकी तरफ़, आपके प्लान पर रहते हैं — प्रोफ़ाइल मिटाने से वे नहीं जाते।", ar: "كلماتك أنت، من كل ملف تحدثت إليه. تبقى في جهتك، ضمن خطتك — وحذف ملف لا يأخذها.",
+  },
+  "idn.mymem.show": {
+    en: "Show me", es: "Mostrármelo", fr: "Me les montrer", de: "Zeig es mir", pt: "Mostrar-me", it: "Mostrameli", ja: "見せて", zh: "显示", hi: "मुझे दिखाएँ", ar: "أرِني",
+  },
+  "idn.mymem.none": {
+    en: "Nothing held yet.", es: "Todavía no hay nada.", fr: "Rien pour l'instant.", de: "Noch nichts.", pt: "Ainda nada.", it: "Ancora niente.", ja: "まだ何もありません。", zh: "还没有内容。", hi: "अभी कुछ नहीं।", ar: "لا شيء بعد.",
+  },
+  "idn.mymem.unreadable": {
+    en: "Held, but not readable right now — the vault could not be reached.", es: "Guardado, pero ahora no se puede leer: no se pudo contactar la bóveda.", fr: "Conservé, mais illisible pour l'instant — le coffre est injoignable.", de: "Vorhanden, aber gerade nicht lesbar — der Tresor war nicht erreichbar.", pt: "Guardado, mas ilegível agora — não foi possível contactar o cofre.", it: "Conservato, ma ora illeggibile: la cassaforte non è raggiungibile.", ja: "保管されていますが、今は読めません — 保管庫に接続できませんでした。", zh: "已保存，但此刻读不出来 — 无法连接保管库。", hi: "रखा है, पर अभी पढ़ा नहीं जा सकता — तिजोरी तक नहीं पहुँच सके।", ar: "محفوظ، لكنه غير قابل للقراءة الآن — تعذّر الوصول إلى الخزنة.",
+  },
+  "idn.mymem.gone": {
+    en: "this profile has been deleted", es: "este perfil fue borrado", fr: "ce profil a été supprimé", de: "dieses Profil wurde gelöscht", pt: "este perfil foi apagado", it: "questo profilo è stato cancellato", ja: "このプロフィールは削除されました", zh: "该档案已被删除", hi: "यह प्रोफ़ाइल मिटा दी गई है", ar: "حُذف هذا الملف",
+  },
   "idn.mypic": {
     en: "My own picture", es: "Mi propia foto", fr: "Ma propre photo", de: "Mein eigenes Bild", pt: "A minha própria foto", it: "La mia foto", ja: "自分の写真", zh: "我自己的照片", hi: "मेरी अपनी तस्वीर", ar: "صورتي الخاصة",
   },

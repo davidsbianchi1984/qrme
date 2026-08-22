@@ -664,7 +664,13 @@ CREATE TABLE IF NOT EXISTS recollections (
     profile_id    TEXT NOT NULL REFERENCES profiles(id),
     interactor_id TEXT NOT NULL,
     pdi_key       TEXT NOT NULL,
-    created_at    TEXT NOT NULL
+    created_at    TEXT NOT NULL,
+    -- Which arrangement this memory landed under, kept per row. See the
+    -- note in _ADDED_COLUMNS: a plan changes and a row's posture does not.
+    posture       TEXT NOT NULL DEFAULT 'vault',
+    -- The words, for platform custody only. NULL on a vaulted row, whose
+    -- content lives sealed under pdi_key.
+    line          TEXT
 );
 
 CREATE TABLE IF NOT EXISTS letters (
@@ -1103,6 +1109,9 @@ CREATE TABLE IF NOT EXISTS license_leases (
 CREATE TABLE IF NOT EXISTS contribution_log (
     ref            TEXT PRIMARY KEY,   -- opaque id sent with the payload
     profile_id     TEXT NOT NULL REFERENCES profiles(id),
+    -- Whose it was, when the contributed item is somebody's memory rather
+    -- than a profile's rated exchange. NULL means the latter.
+    interactor_id  TEXT,
     payload        TEXT NOT NULL,      -- the exact JSON that was sent
     revoked        INTEGER NOT NULL DEFAULT 0,
     contributed_at TEXT NOT NULL
@@ -1733,9 +1742,15 @@ CREATE TABLE IF NOT EXISTS interactors (
     --
     -- Nullable, and that is not a shortcut: an accountless visitor is a
     -- first-class case in this product — a stranger scanning a beacon has no
-    -- account and still gets a conversation, and still gets it remembered
-    -- for as long as their device holds the id. Binding is what an account
+    -- account and still gets a conversation. Binding is what an account
     -- adds, not what a conversation requires.
+    --
+    -- What it no longer gets is a memory. That used to say "and still gets
+    -- it remembered for as long as their device holds the id", which was
+    -- true while a memory belonged to the profile and was kept on the
+    -- owner's plan. A memory belongs to the person now, and a person with
+    -- no account has nowhere of their own for one to live — inventing a
+    -- home for somebody who has not asked for one is not a kindness.
     account_id   TEXT REFERENCES accounts(id),
     -- Your own picture. Not a profile's portrait borrowed onto your seat —
     -- yours, the same in every room you walk into, and never AI-marked,
@@ -1743,6 +1758,16 @@ CREATE TABLE IF NOT EXISTS interactors (
     -- stamping it would be a false statement (see qrme/media.py).
     avatar_id    TEXT,
     avatar_url   TEXT,
+    -- Whether this person's HOSTED memories feed the shared model.
+    --
+    -- On by default, which is the free tier's terms rather than an
+    -- assumption made on somebody's behalf: hosted storage and
+    -- contribution are one bargain, said plainly where it applies, and
+    -- this column is what makes "you can turn it off" a fact instead of a
+    -- sentence. Nothing sealed in a vault is ever contributed whatever
+    -- this says — a private plan is private, and the switch is about the
+    -- arrangement that is not.
+    contributes  INTEGER NOT NULL DEFAULT 1,
     created_at   TEXT NOT NULL
 );
 
@@ -2616,6 +2641,39 @@ def db_path() -> str:
 #: considered migration with a backup, not in a startup path that runs on
 #: every connection.
 _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
+    # What a memory landed under, and — when the arrangement is platform
+    # custody — the words themselves.
+    #
+    # `posture` is recorded PER ROW rather than read from the plan when the
+    # row is shown, and that is the whole point of it. Somebody on free this
+    # year and basic next year has rows that were genuinely hosted and
+    # contributed; deriving posture from their current plan would describe
+    # those retroactively as sealed and private, which is a claim about the
+    # past that upgrading does not make true. Upgrading changes what happens
+    # next, never what already happened.
+    #
+    # `line` carries the words for open_cloud rows, whose content has no
+    # vault to be sealed in. A vaulted row leaves it NULL: its content lives
+    # under `pdi_key` and putting a plaintext copy beside the seal would
+    # undo the sealing. `pdi_key` is "" on a hosted row for the same reason
+    # in reverse — the column is NOT NULL and this schema has no migrations,
+    # so the empty string means "no vault involved" and `posture` is what
+    # anything actually branches on.
+    ("recollections", "posture", "TEXT NOT NULL DEFAULT 'vault'"),
+    ("recollections", "line", "TEXT"),
+    # Whether this person's hosted memories feed the shared model.
+    #
+    # Default 1, and that is the tier's terms rather than an assumption:
+    # hosted storage and contribution are the same bargain, stated at the
+    # point it matters, and this column is the switch that makes "you can
+    # turn it off" a fact rather than a sentence. Nothing sealed in a vault
+    # is ever contributed whatever this says — a private plan is private.
+    ("interactors", "contributes", "INTEGER NOT NULL DEFAULT 1"),
+    # Whose contribution a logged item was. NULL on every row written
+    # before memories could be contributed, which is exactly right: those
+    # were a profile's rated exchanges, revocable by its owner, and they
+    # are not somebody's memory of a conversation.
+    ("contribution_log", "interactor_id", "TEXT"),
     ("interactors", "account_id", "TEXT REFERENCES accounts(id)"),
     ("app_connectors", "authorized_at", "TEXT"),
     ("app_connectors", "secret_ref", "TEXT"),

@@ -3588,6 +3588,33 @@ struct OwnPicture: Decodable {
     let ai_marked: Bool?
 }
 
+/// One conversation's worth of what a person holds, as
+/// `GET /interactors/{id}/memories` serves it. `gone` is a profile that has
+/// deleted itself — not an error, and the case this door exists for: the
+/// person's own words are still their own words.
+struct HeldTalk: Decodable, Identifiable {
+    let profile_id: String
+    let display_name: String?
+    let gone: Bool?
+    let memories: [ApiClient.RecolledMoment]?
+    var id: String { profile_id }
+}
+
+/// Whether a person's hosted memories feed the shared model, and how many
+/// have gone. The count is part of the answer because "you can turn it off"
+/// and "you can see what it did" are two different promises.
+struct GivingBack: Decodable {
+    let contributes: Bool?
+    let contributed_count: Int?
+    let revoked_count: Int?
+    let deleted_at_gateway: Bool?
+}
+
+struct HeldRecord: Decodable {
+    let conversations: [HeldTalk]?
+    let readable: Bool?
+}
+
 /// One row of the account's real voice library, as `GET /voices` serves it.
 /// `gender` is a hint and never a gate — a profile may be a device, a
 /// drawing, an idea — and `cloned` is a label, not a gate either.
@@ -4463,6 +4490,32 @@ extension ApiClient {
     func ownPicture(interactorId: String,
                     token: String) async throws -> OwnPicture {
         try await request("/interactors/\(interactorId)/picture",
+                          method: "GET", token: token)
+    }
+
+    /// Whether your hosted memories feed the shared model.
+    func ownContribution(interactorId: String,
+                         token: String) async throws -> GivingBack {
+        try await request("/interactors/\(interactorId)/contribution",
+                          method: "GET", token: token)
+    }
+
+    /// Off, and the past pulled back with it. The refs carry no identity,
+    /// so the gateway drops each item without being told whose it was.
+    func stopOwnContribution(interactorId: String,
+                             token: String) async throws -> GivingBack {
+        try await request("/interactors/\(interactorId)/contribution",
+                          method: "DELETE", token: token)
+    }
+
+    /// Everything YOU hold, across every profile you have talked to.
+    ///
+    /// A memory is what you said, sealed in your vault on your plan, so a
+    /// profile's deletion no longer takes it. The only other way in reads
+    /// a profile first, which is no way in at all once the profile is gone.
+    func ownMemories(interactorId: String,
+                     token: String) async throws -> HeldRecord {
+        try await request("/interactors/\(interactorId)/memories",
                           method: "GET", token: token)
     }
 

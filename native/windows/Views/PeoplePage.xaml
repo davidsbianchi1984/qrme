@@ -764,6 +764,17 @@
                     <Button x:Name="RoomFaceMineOffButton"
                             Click="OnRoomFaceMineOff" />
                     <Button x:Name="RoomVoicesButton" Click="OnRoomVoices" />
+                    <!-- What YOU hold, across every profile you have
+                         talked to. A memory is what you said, in your
+                         vault on your plan, so a profile's deletion no
+                         longer takes it. -->
+                    <Button x:Name="HeldButton" Click="OnHeld" />
+                    <!-- Hosted storage and contribution are one bargain,
+                         said here rather than buried. Nothing sealed in a
+                         vault is ever contributed whatever this says. -->
+                    <TextBlock x:Name="GiveLead" TextWrapping="Wrap" />
+                    <Button x:Name="GiveButton" Click="OnGive" />
+                    <Button x:Name="GiveStopButton" Click="OnGiveStop" />
                     <Button x:Name="RoomFacePlainButton" Click="OnRoomFacePlain" />
                     <Button x:Name="RoomFaceWhoButton" Click="OnRoomFaceWho" />
                 </StackPanel>

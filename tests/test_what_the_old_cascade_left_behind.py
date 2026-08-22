@@ -60,9 +60,30 @@ def _strand(conn, subject: str) -> list[str]:
     the twenty-four listed tables cleared, everything else untouched. The
     reconstruction plants everywhere and deletes only the profile, which is
     the same residue with a bigger tail.
+
+    `ERASE_KEEPS` is the one thing this borrows from the code under test,
+    against the rule stated in the module docstring, and the exception is
+    bounded rather than waved through. Those tables are not residue: a row
+    in one of them **is supposed to** outlive the profile, because it holds
+    what the other person said and their record does not end when the
+    profile does. Surveying them as strandage would have the maintenance
+    command offer to delete somebody's own words.
+
+        asked     what did the old cascade leave behind
+        mattered  is it leftovers, or is it somebody else's
+
+    The borrowing cannot be used to narrow this test into silence: the
+    assertion below bounds how much may be exempt, and the sibling guard
+    `test_what_is_kept_is_named_and_reasoned` requires every entry to be a
+    real scoped table put there deliberately.
     """
+    assert len(common.ERASE_KEEPS) <= 3, (
+        f"{len(common.ERASE_KEEPS)} tables are exempt from the sweep. This "
+        "test skips them, so a growing exemption list is a shrinking test — "
+        "which is the exact failure the module docstring refuses to allow.")
     planted = [t for t in _scoped_from_the_schema(conn)
-               if t != "profiles" and _plant(conn, t, subject)]
+               if t != "profiles" and t not in common.ERASE_KEEPS
+               and _plant(conn, t, subject)]
     conn.execute("DELETE FROM profiles WHERE id=?", (subject,))
     conn.commit()
     return planted

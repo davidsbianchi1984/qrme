@@ -505,7 +505,36 @@ def content_provenance(profile: dict, sources: list[dict],
 #: a sentence beside it naming whose promise and why — the sibling vault keeps
 #: its hash-chained audit log for exactly that reason and nothing here has the
 #: same standing.
-ERASE_KEEPS: frozenset[str] = frozenset()
+#: Tables that are not the profile's — walked past by BOTH the erasure
+#: sweep and the owner's export, because those are the same question asked
+#: twice: *is this the profile's to take, and is it the profile's to be
+#: handed?*
+#:
+#: One entry, and it is a decision rather than an oversight. `recollections`
+#: holds what a **person** said — only their own turns are ever sealed, never
+#: the profile's replies — and since 1.2.0 those live in their vault, under
+#: their key, gated on their plan. Deleting a profile must not reach into
+#: somebody else's account and take their record of a conversation they had.
+#:
+#: David, ruling on it directly: *the user's record survives, profile erasure
+#: redacts its own words.* Both halves are here. The redaction needs no pass
+#: of its own — none of the profile's words are in this table — and what IS
+#: the profile's goes with the sweep: its replies in `messages`, its distilled
+#: view of the conversation in `remembrances`, its persona, its sources.
+#:
+#:     asked     did we delete every trace of the profile
+#:     mattered  did we delete somebody else's record while we were in there
+#:
+#: The erasure right is not weakened by this. It is a right over the
+#: profile's own words, and it still takes every one of them.
+#:
+#: The export side was found by the guard that holds those two in step
+#: (`test_the_export_and_the_erase_reach_the_same_tables`), and it was the
+#: sharper of the two: a profile's owner downloading their bundle was being
+#: handed every interactor's memories — other people's words, in a file that
+#: gets mailed and copied. Exempting one side and not the other would have
+#: left that standing.
+ERASE_KEEPS: frozenset[str] = frozenset({"recollections"})
 
 
 def profile_scoped_tables() -> list[str]:
@@ -569,6 +598,8 @@ def export_rows(profile_id: str) -> dict[str, list[dict]]:
     conn = db.connect()
     out: dict[str, list[dict]] = {}
     for table in profile_scoped_tables():
+        if table in ERASE_KEEPS:
+            continue          # not the profile's to be handed — see above
         rows = conn.execute(f"SELECT * FROM {table} WHERE profile_id=?",
                             (profile_id,)).fetchall()
         if not rows:

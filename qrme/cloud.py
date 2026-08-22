@@ -7,11 +7,28 @@ When a Cloud Model Gateway is configured (`QRME_CLOUD_URL` +
 - **use a greater model** — inference routes to the gateway's hosted tier
   (the latest, most capable model, e.g. `claude-fable-5`) with automatic
   fallback to the local provider if the gateway is unreachable; and
-- **contribute to it** — strictly opt-in per profile
-  (`cloud_contribution`): positively-rated, anonymized exchanges are sent to
-  the gateway's contribution intake to improve the shared model. No profile
-  ids, owner ids, or display names ever leave; consent is revocable and
-  turning it off stops all future contributions.
+- **contribute to it** — anonymized material is sent to the gateway's
+  contribution intake to improve the shared model. Two kinds, consented two
+  different ways, and the difference is worth stating rather than averaging:
+
+  * **a profile's positively-rated exchanges** — strictly opt-in per profile
+    (`cloud_contribution`), off until an owner turns it on;
+  * **a person's hosted memories** — the free tier's own terms. Hosted
+    storage and contribution are one bargain there: the operator keeps the
+    words, and they improve the shared model. It is on by default for that
+    tier (`interactors.contributes`) because it is what the tier *is*, said
+    where it applies rather than buried, and off is one press away.
+
+  A memory sealed in a vault is **never** contributed, whatever any switch
+  says. That is the whole of what a private plan buys, and it is enforced by
+  posture rather than by the flag: `recollection.contribute` runs only for
+  `open_cloud` rows.
+
+  No profile ids, owner ids, interactor ids, or display names ever leave in
+  either case. Consent is revocable on both, and revoking reaches backwards:
+  the refs are meaningless at the gateway and meaningful only in this
+  deployment's `contribution_log`, so an item can be deleted there without
+  the gateway ever being told whose it was.
 
 The gateway contract is documented in ``docs/cloud-model.md`` and is shared
 by QRME, JIM-mini, and PDI (whose encrypted vault serves as the audited

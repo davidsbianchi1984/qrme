@@ -4,7 +4,152 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.2.0] - 2026-08-22
+
+Whose memory it is. A conversation's record used to live in the synthetic
+profile's account, gated on the profile owner's plan — so whether you were
+remembered depended on whether somebody else was paying, and the record sat
+where you could not read it or take it. It is yours now: your plan decides,
+your key seals it, your door opens it, and deleting the profile does not
+take it. What the free plan gets instead of a vault is stated rather than
+implied, along with what that costs.
+
+### Changed
+
+- **A person's memory moves to their own side.** David, on finding that a
+  profile's memories sat in the profile's account: *"I don't think the data
+  should be stored in the synthetic profile's account. I think it should go
+  to the user that's engaging with a synthetic profile's account. Because
+  that would be useless data if the user never returns."*
+
+      asked     may this be remembered
+      mattered  whose is it
+
+  A memory holds what the **person** said — only their own turns are ever
+  sealed, never the profile's replies — and it was gated on the profile
+  owner's plan and sealed under their key. Three things at once, all wrong:
+  whether your conversation was remembered depended on whether somebody
+  else was paying; the record lived in their account where you could not
+  read it or take it; and it died the day they stopped paying. It is gated
+  on your plan now and sealed under `qrme/{you}/memory/{profile}/`.
+
+  **Nothing reads that shape.** The `recollections` ledger records every key
+  as its seal is cut, so it is already a complete index of which key belongs
+  to which pair — recall filters against it, both erasures walk it. That is
+  what lets the shape change without stranding one conversation this product
+  has already had: old keys are in the ledger too. The single exception is
+  the vault-grounded generation path, which hands a prefix to the provider;
+  memories sealed before the move are not grounded on, which is a thinner
+  answer for those turns and never a wrong one.
+
+- **Deleting a profile no longer takes the other party's record.** The
+  erasure right is a right over the profile's *own* words, and it still
+  takes every one of them — its replies, its distilled view of the
+  conversation, its persona, its sources. What it was also taking was your
+  record of having spoken. David, ruling on it: *the user's record survives,
+  profile erasure redacts its own words.*
+
+  The guard that holds the erase and the export in step found the sharper
+  half: a profile's owner downloading their bundle was being handed every
+  interactor's memories — other people's words, in a file that gets mailed
+  and copied. Both sides read one list now, because *is this the profile's
+  to take* and *is this the profile's to be handed* are the same question.
+
+- **The free tier is hosted, not forgotten.** David: *"we will use the
+  cloud contributor version and I host that data."* Gating memory on a
+  private vault meant a profile forgot everybody who was not paying, and a
+  memory is only worth keeping because the person comes back — a free plan
+  that remembers nothing is a product nobody returns to.
+
+  `storage.memory_for` replaces `vault_for` at the two memory writes and
+  answers a different question. `vault_for` asks *may this be sealed under
+  a key the account holds*; this one asks *where does it go when it may
+  not*. Free is platform custody: the words in this deployment's own
+  database, operated by whoever runs it. basic and pro are unchanged — both
+  were already `vault` in `BY_PLAN`, so nobody paying loses anything.
+
+  **The arrangement is written on the row, not read from the plan.**
+  Somebody on free this year and basic next year has rows that were
+  genuinely hosted; deriving the posture from their current plan would
+  describe those retroactively as sealed and private, which upgrading does
+  not make true. Upgrading changes what happens next. A conversation that
+  spans the change says both, because one badge over the lot would be false
+  about half of it in whichever direction it leaned.
+
+  Hosting the words costs nothing the person can feel: the resident index
+  stores a hash of the text and never the text, so a hosted memory is found
+  by meaning exactly like a sealed one — and it stays readable when the
+  tandem is down, because its words are in the database rather than behind
+  the vault.
+
+- **Contribution wired, and the promise rewritten to match.** David, on how
+  the hosted tier is consented: *the tier's terms are the consent.* Hosted
+  storage and contribution are one bargain — the operator keeps the words,
+  and they improve the shared model — said at the point it applies rather
+  than buried, and off is one press.
+
+      asked     may this improve the shared model
+      mattered  is anybody who did not choose it caught by it
+
+  `qrme/cloud.py` said contribution was *strictly opt-in per profile*, and
+  that would have stopped being true. The docstring is rewritten rather than
+  left contradicting the code: there are two kinds now, consented two
+  different ways, and the difference is stated instead of averaged.
+
+  **A memory sealed in a vault is never contributed, whatever the switch
+  says** — enforced by the row's posture, not by the flag, so a paying
+  member with `contributes=1` still contributes nothing. The test for that
+  leaves the flag at its default on purpose; gating on the flag would pass a
+  test that named it.
+
+  What leaves is the sentence and an opaque ref. No profile id, owner id,
+  interactor id or display name — asserted over the whole payload rather
+  than by listing the fields that should be absent, because a check that
+  names what must not leave stops being true the day somebody adds a field
+  it does not know to look for.
+
+- **The off switch reaches backwards.** *From now on* is the weaker half of
+  the promise. `DELETE /interactors/{id}/contribution` turns it off and asks
+  the gateway to drop everything already sent — the refs are meaningless
+  there and meaningful only in this deployment's log, so the past is pulled
+  back without the gateway ever being told whose it was. The flag goes down
+  even when the gateway cannot be reached, and the answer says plainly that
+  the past was not reached rather than claiming it was. On all four
+  surfaces, with the count beside the switch: *you can turn it off* and
+  *you can see what it did* are two different promises.
+
+- **A signed-out visitor is not remembered, and is told why.** The honest
+  end of the same rule: no account means nowhere of their own for a memory
+  to live, and the reason is returned rather than left blank. *We did not
+  keep this* and *we kept this somewhere you cannot see* are the two answers
+  a person deserves to be able to tell apart.
+
+### Added
+
+- **A door on the person: everything you hold, across every profile.**
+  Sparing the record from a profile's erasure is only half a promise — the
+  only way in was `GET /profiles/{id}/memory/{who}`, which begins by looking
+  the profile up, so a record that outlived the profile had no door at all.
+  Keeping somebody's words where they cannot reach them is the opposite of
+  the promise. `GET /interactors/{id}/memories`, guarded by their own token,
+  grouped by conversation, each saying whether that profile still exists.
+  A deleted profile's name is omitted rather than invented, because the name
+  was one of its own words. On all four surfaces.
+
+### Fixed
+
+- **Two erasures that would have failed silently.** Both the same species,
+  both found while moving the key. `forget()` *recomputed* the key rather
+  than reading it, so after the move it would have deleted a key that does
+  not exist, returned `forgotten: True`, and left the real seal standing —
+  every memory sealed before this change unforgettable, while reporting
+  success. And `forget_profile` swept a profile prefix; after the move that
+  matches nothing, and `resident_forget` returning 0 reads exactly like a
+  clean sweep. An erasure that quietly erases nothing is worse than one that
+  fails loudly, because the second gets fixed.
+
+- **The reseal after an edit was gated on the wrong plan too**, which would
+  have moved a memory into a different account on an edit.
 
 ### Fixed
 

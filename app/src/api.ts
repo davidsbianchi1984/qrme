@@ -5029,6 +5029,35 @@ export const api = {
     return data as RoomFace;
   },
 
+  // Whether your hosted memories feed the shared model, and how much has
+  // gone. The count is here because "you can turn it off" is a different
+  // promise from "you can see what it did".
+  ownContribution: (interactorId: string, token: string) =>
+    req<{ contributes: boolean; contributed_count: number }>(
+      `/interactors/${interactorId}/contribution`, { token }),
+  // Off, and the past pulled back with it — the refs carry no identity, so
+  // the gateway drops each item without ever being told whose it was.
+  stopOwnContribution: (interactorId: string, token: string) =>
+    req<{ contributes: boolean; revoked_count: number;
+          deleted_at_gateway: boolean }>(
+      `/interactors/${interactorId}/contribution`,
+      { method: "DELETE", token }),
+
+  // Everything YOU hold, across every profile you have talked to —
+  // including ones that no longer exist. A memory is what you said, in
+  // your vault, on your plan, so deleting a profile no longer takes it;
+  // this is the door that makes that true rather than merely accurate.
+  ownMemories: (interactorId: string, token: string) =>
+    req<{
+      readable: boolean;
+      conversations: {
+        profile_id: string;
+        display_name: string | null;
+        gone: boolean;
+        memories: { ref: string; line: string | null; at: string | null }[];
+      }[];
+    }>(`/interactors/${interactorId}/memories`, { token }),
+
   // Your OWN picture — the person's, not a profile's. It travels with you
   // into every room rather than being set again in each one, and it is never
   // AI-marked: a photograph of your own face is authentic media.

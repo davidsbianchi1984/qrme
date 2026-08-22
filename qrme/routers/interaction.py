@@ -135,6 +135,72 @@ def get_own_picture(interactor_id: str, request: Request) -> dict:
             "ai_marked": False}
 
 
+@router.get("/interactors/{interactor_id}/contribution")
+def own_contribution(interactor_id: str, request: Request) -> dict:
+    """Whether your hosted memories feed the shared model, and how much has
+    gone.
+
+    The count is here because *you can turn it off* is a different promise
+    from *you can see what it did*, and a switch with no number beside it
+    asks somebody to take the first on faith.
+    """
+    interactor_or_404(interactor_id)
+    require_interactor(interactor_id, request)
+    from .. import recollection
+    return recollection.contribution_state(interactor_id)
+
+
+@router.delete("/interactors/{interactor_id}/contribution")
+def stop_own_contribution(interactor_id: str, request: Request) -> dict:
+    """Turn it off, and ask the gateway to drop everything already sent.
+
+        asked     can this be turned off
+        mattered  does turning it off reach what already left
+
+    A switch that only means *from now on* is the weaker half of the
+    promise. The refs carry no identity, so the past can be pulled back
+    without the gateway ever being told whose it was.
+
+    Deliberately a DELETE and not a PATCH taking `false`: this ends
+    something and removes what it produced, and a route that only ever
+    goes one way should be spelled the way it behaves. Turning it back on
+    is signing up again, at the door that says what the tier means.
+    """
+    interactor_or_404(interactor_id)
+    require_interactor(interactor_id, request)
+    from .. import recollection
+    return recollection.stop_contributing(request.app.state.cloud,
+                                          interactor_id)
+
+
+@router.get("/interactors/{interactor_id}/memories")
+def own_memories(interactor_id: str, request: Request) -> dict:
+    """Everything you hold, across every profile you have talked to.
+
+        asked     does the person's record outlive the profile
+        mattered  can they still get to it
+
+    A memory holds what **you** said — only a person's own turns are ever
+    sealed — and since the record moved to your side it lives in your
+    vault, under your key, on your plan. Deleting a profile no longer
+    takes it: the erasure right is a right over the profile's own words.
+
+    Which left this missing. The only way to read a memory back was
+    `GET /profiles/{id}/memory/{who}`, and that begins by looking the
+    profile up, so a record that survived the profile had no door at all.
+    Keeping somebody's words somewhere they cannot reach them is not the
+    promise; it is the opposite of it.
+
+    Your own token, and only yours. This is the whole of one person's
+    record in one answer — the single most private read in this product —
+    so it is guarded exactly like the picture that has your face on it.
+    """
+    interactor_or_404(interactor_id)
+    require_interactor(interactor_id, request)
+    from .. import recollection
+    return recollection.theirs(request.app.state.pdi, interactor_id)
+
+
 @router.post("/interactors/{interactor_id}/picture", status_code=201)
 async def set_own_picture(interactor_id: str, request: Request,
                           filename: str | None = None) -> dict:
@@ -307,11 +373,28 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     # and embedded, so a later reply can find this moment by meaning. Plan-
     # gated like every seal point, and non-fatal — a turn that lands and is
     # not remembered beats a turn refused because the tandem was down.
+    #
+    # Gated on the PERSON's plan, not the profile's. It was the profile's,
+    # which meant whether your conversation was remembered depended on
+    # whether somebody else was paying for it, and the record lived in
+    # their account under their key — where you could not read it, could
+    # not take it, and would lose it if they stopped paying. A memory of a
+    # conversation is worth having because the person comes back; it
+    # belongs on the side of the person who might.
     from .. import recollection, storage as storage_mod, tiers as tiers_mod
-    memory_vault = storage_mod.vault_for(
-        tiers_mod.plan_of_profile(profile_id), pdi)
-    recollection.remember(memory_vault, profile_id, body.interactor_id,
-                          interactor_msg_id, body.message)
+    memory_vault, memory_posture = storage_mod.memory_for(
+        tiers_mod.plan_of_interactor(body.interactor_id), pdi)
+    if memory_posture:
+        recollection.remember(memory_vault or pdi, profile_id,
+                              body.interactor_id, interactor_msg_id,
+                              body.message, posture=memory_posture)
+        # Hosted only, and only while the person leaves it on. A sealed
+        # memory is never contributed whatever any switch says — that is
+        # the whole of what a private plan buys.
+        if memory_posture == "open_cloud":
+            recollection.contribute(request.app.state.cloud, profile_id,
+                                    body.interactor_id, interactor_msg_id,
+                                    body.message)
 
     engagement_state = engagement.record_message(
         profile_id, body.interactor_id, body.message)
@@ -495,9 +578,17 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
                    "other ongoing relationship(s). If asked, acknowledge "
                    "this truthfully and kindly — never deny it.")
     # The pair's memory prefix rides the generation: the vault provider
-    # may ground on these seals and no others.
+    # may ground on these seals and no others. Person-first, matching the
+    # key a memory is sealed under now — the isolation this enforces is
+    # unchanged, since that prefix is still exactly one pair.
+    #
+    # This is the one place key shape is still load-bearing, because it is
+    # handed to a provider as a prefix rather than resolved through the
+    # ledger. A memory sealed before the shape changed is therefore not
+    # grounded on. That is a thinner answer for those turns, never a wrong
+    # one, and it is why nothing else here reads shape.
     ground = llm.ground_on(
-        f"qrme/{profile_id}/memory/{body.interactor_id}/"
+        f"qrme/{body.interactor_id}/memory/{profile_id}/"
         if vault_grounds else None)
     try:
         reply = provider.generate(system, llm_messages)
@@ -1226,11 +1317,16 @@ def edit_turn(profile_id: str, interactor_id: str, message_id: str,
         gone = recollection.forget(request.app.state.pdi, profile_id,
                                    interactor_id, message_id)
         if gone["forgotten"]:
-            vault = storage_mod.vault_for(
-                tiers_mod.plan_of_profile(profile_id), request.app.state.pdi)
-            resealed = recollection.remember(
-                vault, profile_id, interactor_id, message_id,
-                content)["remembered"]
+            # The person's plan, like every other keeping of a
+            # conversation: a reseal is a write, and it must land in the
+            # same account and under the same arrangement the original did,
+            # or an edit quietly moves somebody's memory somewhere else.
+            vault, posture = storage_mod.memory_for(
+                tiers_mod.plan_of_interactor(interactor_id),
+                request.app.state.pdi)
+            resealed = bool(posture) and recollection.remember(
+                vault or request.app.state.pdi, profile_id, interactor_id,
+                message_id, content, posture=posture)["remembered"]
     turn = message_out(dict(conn.execute(
         "SELECT * FROM messages WHERE id=?", (message_id,)).fetchone()))
     turn.edited = True
