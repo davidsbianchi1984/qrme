@@ -8260,6 +8260,18 @@ const CHROME: Table = {
     hi: "इस ब्राउज़र में वाक् पहचान नहीं है, इसलिए यहाँ कमरे में बोलने का विकल्प नहीं है — टाइप कीजिए, कमरा फिर भी बोलकर उत्तर देगा।",
     ar: "هذا المتصفح لا يملك التعرّف على الكلام، لذا لا يُعرض التحدّث في هذه الغرفة هنا — اكتب بدلًا من ذلك، وستظل الغرفة تجيب بصوت مسموع.",
   },
+  "ins.ask.yours": {
+    en: "Your friends", es: "Tus amistades", fr: "Vos amis", de: "Deine Freund:innen", pt: "Os teus amigos", it: "I tuoi amici", ja: "あなたの友だち", zh: "你的好友", hi: "आपके मित्र", ar: "أصدقاؤك",
+  },
+  "ins.ask.here": {
+    en: "already here", es: "ya está aquí", fr: "déjà présent", de: "schon hier", pt: "já está aqui", it: "già qui", ja: "すでに参加中", zh: "已在房间", hi: "पहले से यहाँ", ar: "موجود بالفعل",
+  },
+  "ins.ask.nofriends": {
+    en: "Your list is empty so far — add somebody on the Friends screen, or paste a profile id below.", es: "Tu lista está vacía por ahora: añade a alguien en la pantalla Amistades o pega abajo un id de perfil.", fr: "Votre liste est encore vide — ajoutez quelqu'un depuis l'écran Amis, ou collez un identifiant de profil ci-dessous.", de: "Deine Liste ist noch leer — füge jemanden im Freunde-Bildschirm hinzu oder füge unten eine Profil-ID ein.", pt: "A tua lista ainda está vazia — adiciona alguém no ecrã Amigos, ou cola abaixo um id de perfil.", it: "La tua lista è ancora vuota: aggiungi qualcuno dalla schermata Amici, oppure incolla sotto un id profilo.", ja: "リストはまだ空です。「友だち」画面で追加するか、下にプロフィール ID を貼り付けてください。", zh: "你的列表还是空的 — 请在“好友”页面添加，或在下方粘贴档案 ID。", hi: "आपकी सूची अभी खाली है — मित्र स्क्रीन से किसी को जोड़ें, या नीचे प्रोफ़ाइल आईडी चिपकाएँ।", ar: "قائمتك فارغة حتى الآن — أضف أحدًا من شاشة الأصدقاء، أو ألصق مُعرّف ملف بالأسفل.",
+  },
+  "ins.ask.orid": {
+    en: "Or paste a profile id", es: "O pega un id de perfil", fr: "Ou collez un identifiant de profil", de: "Oder füge eine Profil-ID ein", pt: "Ou cola um id de perfil", it: "Oppure incolla un id profilo", ja: "またはプロフィール ID を貼り付け", zh: "或粘贴档案 ID", hi: "या प्रोफ़ाइल आईडी चिपकाएँ", ar: "أو ألصق مُعرّف ملف",
+  },
   "ins.ask.send": {
     en: "Send the invitation", es: "Enviar la invitación", fr: "Envoyer l'invitation", de: "Einladung senden", pt: "Enviar o convite", it: "Invia l'invito", ja: "招待を送る", zh: "发送邀请", hi: "निमंत्रण भेजें", ar: "إرسال الدعوة",
   },

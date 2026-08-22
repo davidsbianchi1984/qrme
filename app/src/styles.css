@@ -1599,6 +1599,33 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   border: 1px solid var(--line);
 }
 
+/* Your friends list, inside the room's invite panel.
+ *
+ *     asked     can you ask somebody into the room
+ *     mattered  can you ask somebody whose id you do not know
+ *
+ * The panel used to be a text box wanting a profile id. Scrolls rather than
+ * grows, because a list of forty is still a panel and not a page, and the
+ * id box underneath has to stay reachable. */
+.rh-list {
+  display: flex; flex-direction: column; gap: 4px;
+  max-height: 40vh; overflow-y: auto;
+  margin: 0 -4px; padding: 0 4px;
+}
+.rh-friend {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; padding: 6px 8px; text-align: left;
+  border-radius: 10px; border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+}
+.rh-friend:disabled { opacity: 0.55; }
+/* Somebody already seated is shown, not offered: the row says why it does
+   not press rather than vanishing, so the list matches the list you know. */
+.rh-friend:not(:disabled):hover { background: rgba(255, 255, 255, 0.08); }
+.rh-friend .friend-photo { width: 26px; height: 26px; flex: 0 0 auto; }
+.rh-friend-name { flex: 1 1 auto; font-size: 12px; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 /* A shared document, and whether the room could read it.
  *
  *     asked     did the file arrive

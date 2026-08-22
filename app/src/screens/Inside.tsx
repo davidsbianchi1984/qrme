@@ -292,6 +292,21 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // than a second way to do the same thing — one invite, one door, one
   // place the refusal lands.
   const [asking, setAsking] = useState(false);
+  // Your friends list, in the room, because a text box asking for a profile
+  // id is a door with the key filed off.
+  //
+  //     asked     can you ask somebody into the room
+  //     mattered  can you ask somebody whose id you do not know
+  //
+  // Field report: "my friends list should appear and be able to choose from
+  // the friends list to add other friends and profiles to the chat." The
+  // invite has worked all along — host asks, the guest's owner accepts —
+  // and the only way to name the guest was to type `prf_3735f90003ba`,
+  // which nobody has and nothing on screen showed. The list is the same
+  // rows the Friends screen draws, read from the same door.
+  const [myFriends, setMyFriends] = useState<
+    { profile_id: string; display_name: string;
+      avatar?: string | null; handle?: string | null }[] | null>(null);
   const askCard = useRef<HTMLDivElement>(null);
   // The held overlay — screen 104. Press and hold, or double tap, anywhere
   // in the room and three options come up over it; tap anywhere else and
@@ -1206,8 +1221,21 @@ export function Inside({ onPlans, start = "", onLeave }: {
     </div>
   );
 
-  async function askIn() {
-    const guest = guestId.trim();
+  /** Read the list when the panel opens, not on every room render.
+   *
+   *  A failure here leaves `mine` as an empty list rather than an error:
+   *  the id box below still works, and a friends list that would not load
+   *  is not a reason to refuse the invite that does. */
+  useEffect(() => {
+    if (!asking || myFriends !== null || !session.profileId) return;
+    api.friends(session.profileId)
+      .then((r) => setMyFriends(r.friends))
+      .catch(() => setMyFriends([]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [asking, session.profileId]);
+
+  async function askIn(who?: string) {
+    const guest = (who ?? guestId).trim();
     if (!guest || !token) return;
     setError(null); setNote(null); setBusy(true);
     try {
@@ -1295,7 +1323,55 @@ export function Inside({ onPlans, start = "", onLeave }: {
           <div className="rh-panel" onClick={(e) => e.stopPropagation()}>
             <p className="rh-title">{tr("ins.ask.title", lang)}</p>
             <p className="rh-note">{tr("ins.ask.pitch", lang)}</p>
-            <input value={guestId} autoFocus
+
+            {/* The list first, because it is the answer for everybody who
+                does not already know an id — which is everybody. Anyone
+                already seated is shown and not pressable: a row that
+                re-invites somebody sitting in the room is a press that
+                cannot mean anything. */}
+            {myFriends !== null && myFriends.length > 0 && (
+              <>
+                <p className="rh-note">{tr("ins.ask.yours", lang)}</p>
+                <div className="rh-list">
+                  {myFriends.map((f) => {
+                    const seated = seats.some((s) => s.id === f.profile_id);
+                    return (
+                      <button key={f.profile_id} className="rh-friend"
+                              disabled={busy || !token || seated}
+                              onClick={() => {
+                                setAsking(false); void askIn(f.profile_id);
+                              }}>
+                        {f.avatar ? (
+                          <img className="friend-photo"
+                               src={getBase() + f.avatar} alt="" />
+                        ) : (
+                          <span className="friend-photo friend-initials"
+                                aria-hidden="true">
+                            {f.display_name.split(/\s+/)
+                              .map((w) => w[0]).join("").slice(0, 2)}
+                          </span>
+                        )}
+                        <span className="rh-friend-name">{f.display_name}</span>
+                        {seated && (
+                          <span className="muted small">
+                            {tr("ins.ask.here", lang)}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+            {myFriends !== null && myFriends.length === 0 && (
+              <p className="rh-note">{tr("ins.ask.nofriends", lang)}</p>
+            )}
+
+            {/* Still here, and deliberately second: an id from somewhere
+                else is a real way in, and the list not covering it is not a
+                reason to take the box away. */}
+            <p className="rh-note">{tr("ins.ask.orid", lang)}</p>
+            <input value={guestId}
                    placeholder={tr("ins.ask.ph", lang)}
                    onChange={(e) => setGuestId(e.target.value)}
                    style={{ width: "100%" }} />
