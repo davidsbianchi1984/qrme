@@ -145,13 +145,31 @@ export function Profile({ profileId, onBack, onPlans, onVisit, onInside }: {
     finally { setBusy(false); }
   }
 
+  /** Add them to this profile's list.
+   *
+   *  The guard used to be a bare `return`: no request, no error, no note.
+   *  Pressed without a profile of your own — which is every visitor, and
+   *  anybody signed in as a person rather than as one of their profiles —
+   *  the button did nothing and said nothing, and the field report was the
+   *  only way anyone found out. Discover's identical guard has always said
+   *  which; this one learned it late.
+   *
+   *      asked     did the friendship get added
+   *      mattered  does anyone find out either way
+   *
+   *  And a 200 is not a yes: adding somebody already on the list answers
+   *  `added: false` on purpose. That answer was being dropped too. */
   async function befriend() {
-    if (!session.profileId || !session.ownerToken) return;
-    setBusy(true); setError(null);
+    if (!session.profileId || !session.ownerToken) {
+      setNote(tr("prf.needprofile", lang)); return;
+    }
+    setBusy(true); setError(null); setNote(null);
     try {
-      await api.addFriend(session.profileId, profileId, session.ownerToken);
+      const said = await api.addFriend(
+        session.profileId, profileId, session.ownerToken);
       setBefriended((ids) => [...ids, profileId]);
-      setNote(fill(tr("prf.befriended", lang), { name }));
+      setNote(fill(tr(said.added ? "prf.befriended" : "prf.alreadyfriend",
+                      lang), { name }));
     } catch (e) { setError(e); }
     finally { setBusy(false); }
   }

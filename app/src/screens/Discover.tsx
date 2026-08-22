@@ -47,8 +47,12 @@ export function Discover({ onPlans, onVisit }: {
     }
     setBusy(true); setError(null);
     try {
-      await api.addFriend(session.profileId, profileId, session.ownerToken);
-      setNote(tr("dsc.added", lang));
+      const said = await api.addFriend(
+        session.profileId, profileId, session.ownerToken);
+      // A 200 is not a yes — see `FriendAddition`. Somebody already on the
+      // list answers `added: false`, and reporting that as "Added" is the
+      // console telling a person something it was told was not true.
+      setNote(tr(said.added ? "dsc.added" : "dsc.already", lang));
     } catch (e) { setError(e); }
     finally { setBusy(false); }
   }

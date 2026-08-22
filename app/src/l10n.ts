@@ -8990,6 +8990,12 @@ const CHROME: Table = {
   "prf.befriend": {
     en: "Add them as a friend", es: "Añadirlos como amigo", fr: "Les ajouter en ami", de: "Als Freund hinzufügen", pt: "Adicioná-los como amigo", it: "Aggiungili agli amici", ja: "フレンドに追加する", zh: "把他们加为好友", hi: "उन्हें दोस्त बनाएँ", ar: "أضفهم كصديق",
   },
+  "prf.alreadyfriend": {
+    en: "{name} was already on your list.", es: "{name} ya estaba en tu lista.", fr: "{name} figurait déjà dans votre liste.", de: "{name} stand bereits auf deiner Liste.", pt: "{name} já estava na tua lista.", it: "{name} era già nella tua lista.", ja: "{name} はすでにリストにいます。", zh: "{name} 本来就在你的列表里。", hi: "{name} पहले से आपकी सूची में थे।", ar: "{name} كان بالفعل في قائمتك.",
+  },
+  "prf.needprofile": {
+    en: "A friends list belongs to a profile — open or make one of your own first.", es: "Una lista de amistades pertenece a un perfil: abre o crea uno tuyo primero.", fr: "Une liste d'amis appartient à un profil — ouvrez ou créez le vôtre d'abord.", de: "Eine Freundesliste gehört zu einem Profil — öffne oder erstelle zuerst dein eigenes.", pt: "Uma lista de amigos pertence a um perfil — abre ou cria o teu primeiro.", it: "Una lista di amici appartiene a un profilo: aprine o creane uno tuo prima.", ja: "友だちリストはプロフィールに属します。まず自分のものを開くか作成してください。", zh: "好友列表属于某个档案 — 请先打开或创建你自己的。", hi: "मित्र सूची किसी प्रोफ़ाइल की होती है — पहले अपनी कोई खोलें या बनाएँ।", ar: "قائمة الأصدقاء تخصّ ملفًا — افتح أو أنشئ ملفك أولًا.",
+  },
   "prf.befriended": {
     en: "{name} is on your list now, and they have been told. Messages open when they add you back.", es: "{name} ya está en tu lista y se le ha avisado. Los mensajes se abren cuando te añada de vuelta.", fr: "{name} figure maintenant dans votre liste et en a été informé. Les messages s'ouvrent quand cette personne vous ajoute en retour.", de: "{name} steht jetzt auf deiner Liste und wurde benachrichtigt. Nachrichten öffnen sich, wenn du zurück hinzugefügt wirst.", pt: "{name} já está na tua lista e foi avisado. As mensagens abrem quando te adicionarem de volta.", it: "{name} ora è nella tua lista ed è stato avvisato. I messaggi si aprono quando ti aggiunge a sua volta.", ja: "{name} をリストに追加し、相手にも通知しました。相手があなたを追加し返すとメッセージが開きます。", zh: "{name} 已在你的列表里，对方也收到了通知。等对方也把你加上，私信就会打开。", hi: "{name} अब आपकी सूची में हैं और उन्हें बता दिया गया है। जब वे आपको जोड़ेंगे, तब संदेश खुलेंगे।", ar: "{name} الآن في قائمتك وقد أُخبروا. تُفتح الرسائل حين يضيفونك بدورهم.",
   },
@@ -9151,6 +9157,9 @@ const CHROME: Table = {
   },
   "dsc.signin": {
     en: "Sign in first.", es: "Inicia sesión primero.", fr: "Connectez-vous d'abord.", de: "Melden Sie sich zuerst an.", pt: "Inicie sessão primeiro.", it: "Accedi prima.", ja: "先にサインインしてください。", zh: "请先登录。", hi: "पहले साइन इन करें।", ar: "سجّل الدخول أولًا.",
+  },
+  "dsc.already": {
+    en: "They were already on your friends list.", es: "Ya estaban en tu lista de amistades.", fr: "Cette personne figurait déjà dans votre liste d'amis.", de: "Sie standen bereits auf deiner Freundesliste.", pt: "Já estavam na tua lista de amigos.", it: "Erano già nella tua lista di amici.", ja: "すでに友だちリストにいます。", zh: "对方本来就在你的好友列表里。", hi: "वे पहले से आपकी मित्र सूची में थे।", ar: "كانوا بالفعل في قائمة أصدقائك.",
   },
   "dsc.added": {
     en: "Added to your friends.", es: "Añadido a tus amistades.", fr: "Ajouté à vos amis.", de: "Zu Ihren Freund:innen hinzugefügt.", pt: "Adicionado aos seus amigos.", it: "Aggiunto ai tuoi amici.", ja: "友だちに追加しました。", zh: "已加入你的好友。", hi: "आपके मित्रों में जोड़ दिया गया।", ar: "أُضيف إلى أصدقائك.",
@@ -9367,6 +9376,15 @@ const CHROME: Table = {
   },
   "frn.found.none": {
     en: "Nobody found by that name — ask them for their @handle", es: "No se encontró a nadie con ese nombre — pídeles su @usuario", fr: "Personne trouvée à ce nom — demandez-leur leur @pseudo", de: "Niemanden mit diesem Namen gefunden — frag nach dem @Handle", pt: "Ninguém encontrado com esse nome — pede-lhes o @utilizador", it: "Nessuno trovato con quel nome — chiedi il loro @handle", ja: "その名前では見つかりませんでした — 相手に@ハンドルを聞いてください", zh: "没找到这个名字——问问对方的@用户名", hi: "उस नाम से कोई नहीं मिला — उनसे उनका @हैंडल पूछें", ar: "لم يُعثر على أحد بهذا الاسم — اطلب منهم @المعرّف",
+  },
+  "frn.added": {
+    en: "{name} is on your list now.", es: "{name} ya está en tu lista.", fr: "{name} figure maintenant dans votre liste.", de: "{name} steht jetzt auf deiner Liste.", pt: "{name} já está na tua lista.", it: "{name} ora è nella tua lista.", ja: "{name} をリストに追加しました。", zh: "{name} 已在你的列表里。", hi: "{name} अब आपकी सूची में हैं।", ar: "{name} الآن في قائمتك.",
+  },
+  "frn.alreadythere": {
+    en: "{name} was already on your list — nothing changed.", es: "{name} ya estaba en tu lista: nada cambió.", fr: "{name} figurait déjà dans votre liste — rien n'a changé.", de: "{name} stand bereits auf deiner Liste — nichts hat sich geändert.", pt: "{name} já estava na tua lista — nada mudou.", it: "{name} era già nella tua lista: non è cambiato nulla.", ja: "{name} はすでにリストにいます。変更はありません。", zh: "{name} 本来就在你的列表里 — 没有变化。", hi: "{name} पहले से आपकी सूची में थे — कुछ नहीं बदला।", ar: "{name} كان بالفعل في قائمتك — لم يتغيّر شيء.",
+  },
+  "frn.needprofile": {
+    en: "A friends list belongs to a profile — open or make one of your own first.", es: "Una lista de amistades pertenece a un perfil: abre o crea uno tuyo primero.", fr: "Une liste d'amis appartient à un profil — ouvrez ou créez le vôtre d'abord.", de: "Eine Freundesliste gehört zu einem Profil — öffne oder erstelle zuerst dein eigenes.", pt: "Uma lista de amigos pertence a um perfil — abre ou cria o teu primeiro.", it: "Una lista di amici appartiene a un profilo: aprine o creane uno tuo prima.", ja: "友だちリストはプロフィールに属します。まず自分のものを開くか作成してください。", zh: "好友列表属于某个档案 — 请先打开或创建你自己的。", hi: "मित्र सूची किसी प्रोफ़ाइल की होती है — पहले अपनी कोई खोलें या बनाएँ।", ar: "قائمة الأصدقاء تخصّ ملفًا — افتح أو أنشئ ملفك أولًا.",
   },
   "frn.already": {
     en: "Already friends", es: "Ya son amigos", fr: "Déjà amis", de: "Schon befreundet", pt: "Já são amigos", it: "Già amici", ja: "すでに友だち", zh: "已是好友", hi: "पहले से मित्र", ar: "أصدقاء بالفعل",

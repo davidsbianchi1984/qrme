@@ -115,10 +115,24 @@ export function Friends({ onPlans, onVisit }: {
     </div>;
   }
 
-  async function add(profileId: string) {
+  /** Add somebody, and say what happened.
+   *
+   *  Both halves were missing. The token was asserted with `!` rather than
+   *  checked, so a session holding a profile id without an owner token sent
+   *  an unauthenticated request and collected a refusal; and the answer was
+   *  discarded, so the one verdict the server takes care to distinguish —
+   *  `added: false`, already on the list — arrived as a reload and nothing
+   *  else. Both look identical from the button: nothing happened. */
+  async function add(profileId: string, name: string) {
+    if (!session.profileId || !session.ownerToken) {
+      setError(tr("frn.needprofile", lang)); return;
+    }
     setBusy(true); setError(null); setNote(null);
     try {
-      await api.addFriend(session.profileId!, profileId, session.ownerToken!);
+      const said = await api.addFriend(
+        session.profileId, profileId, session.ownerToken);
+      setNote(tr(said.added ? "frn.added" : "frn.alreadythere", lang)
+        .replace("{name}", name));
       load();
     } catch (e) { setError(e); }
     finally { setBusy(false); }
@@ -149,6 +163,14 @@ export function Friends({ onPlans, onVisit }: {
       <header className="screen-head">
         <h2>{tr("frn.title", lang)}</h2>
       </header>
+
+      {/* The verdict, at the top, because that is where the press was.
+          These two lived at the very bottom of the screen — under the
+          search results, the whole browse pool, the list itself and the
+          suggestions — so an Add pressed on the first row answered
+          somewhere nobody was looking, and the button read as dead. */}
+      {note && <p className="muted small">{note}</p>}
+      <Refusal error={error} onPlans={onPlans} variant="inline" />
 
       {inbox && inbox.events.length > 0 && (
         <div className="card">
@@ -218,7 +240,7 @@ export function Friends({ onPlans, onVisit }: {
                 <span className="muted small">{tr("frn.already", lang)}</span>
               ) : (
                 <button className="primary" disabled={busy}
-                        onClick={() => add(p.profile_id)}>
+                        onClick={() => add(p.profile_id, p.display_name)}>
                   {tr("frn.add", lang)}
                 </button>
               )}
@@ -281,7 +303,7 @@ export function Friends({ onPlans, onVisit }: {
                   <span className="muted small">{tr("frn.already", lang)}</span>
                 ) : (
                   <button className="primary" disabled={busy}
-                          onClick={() => add(p.profile_id)}>
+                          onClick={() => add(p.profile_id, p.display_name)}>
                     {tr("frn.add", lang)}
                   </button>
                 )}
@@ -341,7 +363,7 @@ export function Friends({ onPlans, onVisit }: {
             <div key={s.profile_id} className="friend-row">
               <b>{s.display_name}</b>
               <button className="primary" disabled={busy}
-                      onClick={() => add(s.profile_id)}>
+                      onClick={() => add(s.profile_id, s.display_name)}>
                 {tr("frn.add", lang)}
               </button>
             </div>
@@ -349,8 +371,6 @@ export function Friends({ onPlans, onVisit }: {
         </div>
       )}
 
-      {note && <p className="muted small">{note}</p>}
-      <Refusal error={error} onPlans={onPlans} variant="inline" />
     </div>
   );
 }
