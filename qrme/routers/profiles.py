@@ -402,9 +402,70 @@ def memorial_view(profile_id: str) -> dict:
 @router.patch("/profiles/{profile_id}", response_model=ProfileOut)
 def update_profile(profile_id: str, body: ProfileUpdate,
                    request: Request) -> ProfileOut:
+    """Owner control: edit the profile anytime.
+
+    ## Changing what kind of thing a profile is
+
+    `kind` had no update site anywhere in this codebase — set once at
+    creation and never again — and it defaults to `"fictional"`. It decides
+    `avatars.likeness().real_person`, so a digital twin made outside the
+    onboarding flow was permanently recorded as an invented character whose
+    portrait depicts nobody, and every surface that checks that record
+    refused to draw it as a person's face.
+
+        asked     can an owner correct what their profile is
+        mattered  or is a creation-time default permanent
+
+    Changing it changes the rights claim the profile carries, so each
+    transition is answered rather than waved through, and the answers are
+    the same ones `create_profile` gives:
+
+    * **to `hybrid`** — refused. A hybrid is born from its constituents
+      through `POST /profiles/composite`, which validates every source and
+      records the blend; typed free-hand it would be a claim about people
+      nobody checked.
+    * **to `other_person`** — a consent record is required, exactly as at
+      creation, and refused outright while `adult_mode` is on. That second
+      one is the hard line `test_a_real_likeness_can_never_be_rated`
+      guards, and an update path that skipped it would be a way around it.
+    * **to `self`** — the owner attests about their own likeness, so the
+      record is filled in here rather than demanded from the caller. There
+      is nobody else to ask.
+    * **to `fictional`** — allowed, and it **clears** the consent record.
+      An invented character has no rights holder, and leaving a real
+      person's attestation attached to one would leave a false claim on the
+      row saying somebody consented to something that no longer exists.
+    """
     profile_or_404(profile_id)
     require_owner(profile_id, request)
     updates = {k: v for k, v in body.model_dump().items() if v is not None}
+    consent = updates.pop("consent", None)
+    kind = updates.get("kind")
+    if kind is not None:
+        current = profile_or_404(profile_id)
+        if kind == "hybrid":
+            raise HTTPException(
+                422, "hybrid profiles are created via POST "
+                     "/profiles/composite, from at least two source profiles")
+        if kind == "other_person":
+            if current["adult_mode"]:
+                # Checked before anything else, and never a price: the same
+                # ordering argument `create_profile` records at length.
+                raise HTTPException(
+                    403, "adult mode is never available for a profile of "
+                         "another real person")
+            if consent is None:
+                raise HTTPException(
+                    422, "profiles of another real person require a "
+                         "consent/rights record")
+            updates["consent_basis"] = consent["basis"]
+            updates["consent_attestor"] = consent["attestor"]
+        elif kind == "self":
+            updates["consent_basis"] = "subject_consent"
+            updates["consent_attestor"] = current["owner_id"]
+        elif kind == "fictional":
+            updates["consent_basis"] = ""
+            updates["consent_attestor"] = ""
     if updates:
         conn = db.connect()
         assignments = ", ".join(f"{k}=?" for k in updates)

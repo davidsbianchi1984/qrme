@@ -1,0 +1,18 @@
+# Profile columns an owner ought to be able to change and cannot.
+#
+# One line per column: NAME  reason.
+#
+# This record may only SHRINK. A column arriving here is a column somebody
+# stored and gave no way to set — which is how `kind` sat unchangeable
+# since the first migration, defaulting to "fictional", quietly deciding
+# that a person's own digital twin depicted nobody.
+#
+# Not listed, and not defects: columns the system owns and nobody edits
+# (id, owner_id, created_at, status, ...), and columns with a dedicated
+# door of their own rather than a field on PATCH /profiles/{id} —
+# `anonymous` has the anonymity route, `sources` has the sources route,
+# `avatar` and `watermark_design` belong to the avatar and watermark
+# modules, `unlisted` to the browse pool, `demographics` to steering.
+# The guard knows about both groups; see the test for the lists.
+
+adult_mode  Every guard on this flag lives in create_profile: a verified adult owner, never a rated persona of another real person (test_a_real_likeness_can_never_be_rated), and a plan that can hold rated content. A PATCH field would be a way around all three, so this gets its own door with those checks restated, or it stays shut. Shut is the safe half of that pair and is where it stays until the door is written.

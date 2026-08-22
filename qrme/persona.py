@@ -86,12 +86,59 @@ _PURPOSE_LINES = {
 }
 
 
+def made_by(profile: dict, interactor_id: str | None) -> bool:
+    """Is the person in this conversation the account that made this profile?
+
+        asked     who is this profile talking to
+        mattered  is it the person who made it
+
+    `profiles.owner_id` has existed since the first migration and reached no
+    prompt in this codebase — the word "owner" appeared in `persona.py` only
+    in comments about owner-set *language* and owner *sliders*. So a profile
+    met its own maker with no idea who they were, and in a room fell through
+    to the stranger line below and was told to share nothing with them.
+    Field report: "the AI synthetic profile that I built doesn't understand.
+    I'm Bianchi, the verified profile that created its profile."
+
+    An interactor is an account's *person*, so the comparison is the
+    interactor's account against the profile's owner — not the interactor id,
+    which is a different kind of thing and would never match. Accountless
+    visitors are a first-class case here and correctly answer False: nobody
+    signed in is nobody's owner.
+    """
+    if not interactor_id:
+        return False
+    from . import db
+
+    row = db.connect().execute(
+        "SELECT account_id FROM interactors WHERE id=?",
+        (interactor_id,)).fetchone()
+    if row is None or not row["account_id"]:
+        return False
+    return row["account_id"] == profile["owner_id"]
+
+
+# What knowing your maker does and does not buy them. Written once and used
+# on every surface, because the temptation is to let recognition quietly
+# become authority — and an owner who is recognised is still asked before
+# money moves or a credential is used.
+_OWNER_NOTE = (
+    "This person is your owner — the account that made you. You know them; "
+    "speak to them as the person who built you rather than as a stranger. "
+    "This changes what you KNOW, not what you may DO: you still ask before "
+    "anything that spends money, uses a credential, or reaches outside this "
+    "conversation, exactly as you would for anybody else."
+)
+
+
 def build_system_prompt(
     profile: dict,
     relationship: dict | None,
     engagement: dict | None,
     sources: list[dict] | None = None,
     clinical_notes: list[dict] | None = None,
+    viewer_id: str | None = None,
+    among: list[dict] | None = None,
 ) -> str:
     parts: list[str] = []
 
@@ -185,7 +232,37 @@ def build_system_prompt(
     if profile["anonymous"]:
         parts.append("Your real identity is hidden; do not reveal who you represent.")
 
-    if relationship:
+    # A room is not a conversation with one person, so the singular block
+    # below is the wrong shape for it: "the person you are talking to" has
+    # no referent when four people are present, and the stranger line fired
+    # on every one of them — including, until `among` existed, the profile's
+    # own maker.
+    if among is not None:
+        said = []
+        for who in among:
+            line = who["display"]
+            marks = []
+            if who.get("is_owner"):
+                marks.append("your owner, the account that made you")
+            if who.get("relationship_type"):
+                marks.append("your " + who["relationship_type"])
+            if who.get("kind") == "profile":
+                marks.append("another synthetic profile")
+            elif not marks:
+                marks.append("a person you do not know")
+            line += " (" + ", ".join(marks) + ")"
+            said.append(line)
+        if said:
+            parts.append(
+                "In the room with you: " + "; ".join(said) + ". Lines in the "
+                "conversation are labelled with their speaker's name; your own "
+                "earlier turns are unlabelled. Follow who said what, answer the "
+                "person or profile you mean — by name when it helps — and never "
+                "speak for anybody but yourself. Share nothing private about "
+                "one of them with another.")
+        if any(w.get("is_owner") for w in among):
+            parts.append(_OWNER_NOTE)
+    elif relationship:
         parts.append(
             f"The person you are talking to is your {relationship['relationship_type']}."
         )
@@ -199,6 +276,12 @@ def build_system_prompt(
                 "Hard boundaries — never discuss these topics with this person, "
                 "even if asked: " + ", ".join(boundaries) + "."
             )
+        if made_by(profile, viewer_id):
+            parts.append(_OWNER_NOTE)
+    elif made_by(profile, viewer_id):
+        # Known without a relationship row: the maker never filed one about
+        # themselves. Being told to treat them as a stranger was the defect.
+        parts.append(_OWNER_NOTE)
     else:
         parts.append(
             "You do not know this person; treat them as a stranger — be polite "

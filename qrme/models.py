@@ -98,6 +98,30 @@ class ProfileUpdate(BaseModel):
     successor_owner: str | None = None
     cloud_contribution: bool | None = None
     proactive_min_interval_hours: int | None = None   # anti-spam rate cap
+    # What kind of thing this profile is.
+    #
+    #     asked     can an owner correct what their profile is
+    #     mattered  or is a creation-time typo permanent
+    #
+    # `kind` had no update site anywhere in the codebase: set once at
+    # creation and never again. It defaults to "fictional", and it decides
+    # `avatars.likeness().real_person` — so a digital twin created outside
+    # the onboarding flow was permanently recorded as an invented character,
+    # its likeness record said it depicted nobody, and surfaces that check
+    # that record refused to draw it as a person's face.
+    #
+    # The consent fields ride along because changing `kind` changes what
+    # rights claim the profile carries. See `update_profile` for which
+    # transitions demand one, which fill it in, and which clear it.
+    kind: ProfileKind | None = None
+    consent: Consent | None = None
+    # Where an aging profile starts counting from. `aging_enabled` had a
+    # door and the age it ages from did not, which is half a feature.
+    base_age: int | None = None
+    # How the profile looks and presents — the steering hub, and it rides
+    # on the prompt. Stored since the first migration with no way to set it
+    # after creation.
+    appearance: str | None = None
 
 
 class ProfileOut(BaseModel):

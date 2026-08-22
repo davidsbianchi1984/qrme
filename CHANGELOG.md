@@ -41,6 +41,68 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   refuses nobody. And **cloned is a label, not a gate**: a cloned voice is
   marked as one and available like any other. "Shared with all!"
 
+- **A profile knows its own maker.** Signed out, signed back in on another
+  device: "the AI synthetic profile that I built doesn't understand. I'm
+  Bianchi, the verified profile that created its profile." `owner_id` has
+  been in the schema since the first migration and reached **no prompt** —
+  the word "owner" appeared in `persona.py` only in comments about
+  owner-set *language* and owner *sliders*, and nothing anywhere compared
+  `interactors.account_id` against it.
+
+  It was worse than absent. The relationship block ends in an `else` that
+  says *"You do not know this person; treat them as a stranger — be polite
+  but reserved, and share nothing private."* In a room `relationship` was
+  **always** `None`, because `_profile_turns` called
+  `build_system_prompt(profile, None, None, …)` — so that line fired for
+  every seat at the table, and a profile was actively instructed to be
+  reserved with the account that made it.
+
+      asked     who is this profile talking to
+      mattered  is it the person who made it
+
+  A profile is now told who its owner is, on both paths, and a room gets a
+  cast that says *how* it knows each seat — owner, a named relationship,
+  another synthetic profile, or somebody it does not know — instead of a
+  flat list of names with the stranger line underneath. Recognition is
+  knowledge and not authority, and the prompt says so outright: being the
+  maker changes what the profile KNOWS, never what it may DO. Money,
+  credentials and anything reaching outside the conversation stay ask-first
+  for the owner exactly as for a stranger.
+
+  Not the sign-in, checked rather than assumed: `accounts.interactor_for`
+  is idempotent per account and hands back the same person every time, so
+  the Android sign-in had been the same person to that profile all along.
+
+- **A field somebody stored is a field somebody can change.** "If users
+  modify the synthetic profiles in any way, the return visit will render
+  those modifications." Storage was never the problem; doors were.
+  `ProfileUpdate` exposed ten fields against thirty columns, and three —
+  `kind`, `base_age` and `adult_mode` — had **no update site anywhere in
+  the codebase**, set once at creation and never again.
+
+  `kind` is the one that bit, and it is the same root as the picture
+  defect above: it defaults to `"fictional"`, only the guided setup sets
+  `"self"`, and it decides `avatars.likeness().real_person`. A digital
+  twin made any other way was recorded permanently as an invented
+  character whose portrait depicts nobody. It has a door now, on the
+  Identity screen, and each transition is answered rather than waved
+  through — a hybrid is still born from its constituents rather than
+  typed, another real person still needs a consent record and is still
+  refused outright while `adult_mode` is on, becoming yourself fills the
+  attestation in because there is nobody else to ask, and becoming
+  fictional **clears** it, because leaving a real person's consent
+  attached to an invented character is a false claim sitting on the row.
+  `base_age` and `appearance` got doors too — `aging_enabled` was settable
+  while the age it ages from was not, which is half a feature.
+
+  `adult_mode` deliberately did **not** get one. Every guard on it lives in
+  `create_profile`, and a PATCH field would be a way around all three of
+  them; it is written down in `tests/profile_columns_doorless.txt` with
+  that reason, on a ratchet that only shrinks. A new guard now sorts every
+  profile column into one of four things — settable, holder of its own
+  door, system-owned, or recorded with a reason — so the next `kind` is
+  caught the week it lands rather than a year later.
+
 - **There is a way out of a room again.** "There's no close button to take
   you back to the main menu." There was one — the element was in the frame,
   `onLeave` was wired from the app shell, and pressing it would have left.

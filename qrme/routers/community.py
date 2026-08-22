@@ -300,27 +300,43 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
                                f": {_worded(r)}")})
             for r in reversed(history)
         ] or [{"role": "user", "content": f"Let's talk about {room['topic']}."}]
+        # Who else is here, and how this profile knows each of them.
+        #
+        #     asked     who is in the room
+        #     mattered  which of them does this profile already know
+        #
+        # It knew none of them. `build_system_prompt(profile, None, None)`
+        # left `relationship` empty for every seat, so the stranger branch
+        # fired on all of them — including the profile's own maker, who was
+        # told to be "polite but reserved, and share nothing private".
+        among = []
+        for participant in participants:
+            if (participant["kind"] == "profile"
+                    and participant["ref_id"] == profile["id"]):
+                continue
+            row = {"display": _display(participant["kind"],
+                                       participant["ref_id"]),
+                   "kind": participant["kind"]}
+            if participant["kind"] == "user":
+                row["is_owner"] = persona.made_by(profile,
+                                                  participant["ref_id"])
+                rel = conn.execute(
+                    "SELECT relationship_type FROM relationships"
+                    " WHERE profile_id=? AND interactor_id=?",
+                    (profile["id"], participant["ref_id"])).fetchone()
+                if rel:
+                    row["relationship_type"] = rel["relationship_type"]
+            among.append(row)
         system = persona.build_system_prompt(
-            profile, None, None, sources=source_items(profile["id"], pdi))
+            profile, None, None, sources=source_items(profile["id"], pdi),
+            among=among)
         system += (f"\n\nYou are in a group {room['channel']} room about: "
                    f"{room['topic']} ({_CHANNEL_NOTES[room['channel']]}). "
                    "Reply with one short, in-character turn.")
-        # The cast, said outright: who else is here and what kind of
-        # speaker each one is, so the labels in the transcript resolve to
-        # somebody rather than to a name floating free.
-        others = ", ".join(
-            f"{_display(p['kind'], p['ref_id'])}"
-            + (" (a person)" if p["kind"] == "user"
-               else " (another synthetic profile)")
-            for p in participants
-            if not (p["kind"] == "profile" and p["ref_id"] == profile["id"]))
-        if others:
-            system += (
-                f"\n\nIn the room with you: {others}. Lines in the "
-                "conversation are labelled with their speaker's name; your "
-                "own earlier turns are unlabelled. Follow who said what, "
-                "answer the person or profile you mean — by name when it "
-                "helps — and never speak for anybody but yourself.")
+        # The cast used to be appended here as a flat list of names. It now
+        # rides `among` above, because naming somebody and saying how you
+        # know them is one sentence rather than two, and the second one was
+        # missing.
         # A lent wearable is the only reason a profile in a voice room can
         # hear anybody, so it is stated rather than assumed — and stated with
         # its limits, because the temptation is to behave as though the whole

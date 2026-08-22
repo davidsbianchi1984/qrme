@@ -237,8 +237,21 @@ def test_a_profile_is_told_who_said_what():
         r"_display\(r\['sender_kind'\], r\['sender_id'\]\)", turns), (
         "the history handed to a profile is unlabelled again — in a "
         "three-party room it cannot know who it is talking to")
-    assert "another synthetic profile" in turns
-    assert "never speak for anybody but yourself" in turns
+    # The cast moved into `persona.build_system_prompt` under `among`, where
+    # naming somebody and saying how the profile knows them is one sentence
+    # instead of two — the second one (owner, friend, stranger) was missing
+    # entirely while this guard passed. The claim is unchanged: the room's
+    # cast reaches the prompt, kinds included. Only its address changed.
+    assert "among=among" in turns, (
+        "the cast no longer reaches the system prompt")
+    assert '"kind": participant["kind"]' in turns, (
+        "the cast reaches the prompt without saying which of them are "
+        "profiles — the one distinction this screen exists to draw")
+    persona_src = (REPO / "qrme/persona.py").read_text(encoding="utf-8")
+    assert "another synthetic profile" in persona_src
+    # The phrase is split across source lines by string concatenation, so
+    # the match is on the half that is not split.
+    assert "speak for anybody but yourself" in persona_src
 
 
 def test_somebody_can_be_asked_in_from_the_room():

@@ -397,7 +397,11 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     notes = referral.notes_for(speaking_profile["id"], body.interactor_id, pdi)
     system = persona.build_system_prompt(
         speaking_profile, relationship if handoff is None else None,
-        engagement_state, sources=sources, clinical_notes=notes)
+        engagement_state, sources=sources, clinical_notes=notes,
+        # Who is on the other side, so a profile meeting its own maker is
+        # not told to treat them as a stranger. Knowledge, never authority —
+        # `_OWNER_NOTE` says so in the prompt itself.
+        viewer_id=body.interactor_id)
     provider = llm.provider_for_profile(profile_id, cloud=cloud)
     # The remembrance: turns older than the window, folded down and carried,
     # so a friendship does not reset at message thirty-one. Distilled by the

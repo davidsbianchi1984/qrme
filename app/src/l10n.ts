@@ -8323,6 +8323,24 @@ const CHROME: Table = {
   "ins.face.background": {
     en: "Background", es: "Fondo", fr: "Arrière-plan", de: "Hintergrund", pt: "Fundo", it: "Sfondo", ja: "背景", zh: "背景", hi: "पृष्ठभूमि", ar: "الخلفية",
   },
+  "idn.kind": {
+    en: "What this profile is", es: "Qué es este perfil", fr: "Ce qu'est ce profil", de: "Was dieses Profil ist", pt: "O que é este perfil", it: "Che cosa è questo profilo", ja: "このプロフィールの種類", zh: "这个形象是什么", hi: "यह प्रोफ़ाइल क्या है", ar: "ما هذا الملف",
+  },
+  "idn.kind.lead": {
+    en: "This decides whether the portrait is treated as a real person's face. A profile created outside the guided setup starts as an invented character.", es: "Esto decide si el retrato se trata como la cara de una persona real. Un perfil creado fuera de la configuración guiada empieza como personaje inventado.", fr: "Ceci décide si le portrait est traité comme le visage d'une personne réelle. Un profil créé hors de la configuration guidée démarre comme personnage inventé.", de: "Das entscheidet, ob das Porträt als Gesicht einer realen Person behandelt wird. Ein außerhalb der geführten Einrichtung erstelltes Profil beginnt als erfundene Figur.", pt: "Isto decide se o retrato é tratado como o rosto de uma pessoa real. Um perfil criado fora da configuração guiada começa como personagem inventada.", it: "Questo decide se il ritratto è trattato come il volto di una persona reale. Un profilo creato fuori dalla configurazione guidata parte come personaggio inventato.", ja: "肖像を実在の人物の顔として扱うかどうかを決めます。ガイド付き設定以外で作られたプロフィールは架空の人物として始まります。", zh: "这决定肖像是否被当作真人的面孔。在引导式设置之外创建的形象，起始为虚构角色。", hi: "यह तय करता है कि चित्र को किसी वास्तविक व्यक्ति का चेहरा माना जाए या नहीं। निर्देशित सेटअप के बाहर बनी प्रोफ़ाइल काल्पनिक पात्र के रूप में शुरू होती है।", ar: "هذا يحدّد ما إذا كانت الصورة تُعامل كوجه شخص حقيقي. الملف المُنشأ خارج الإعداد الموجّه يبدأ كشخصية متخيَّلة.",
+  },
+  "idn.kind.self": {
+    en: "Me — this is my own likeness", es: "Yo — es mi propia imagen", fr: "Moi — c'est ma propre image", de: "Ich — mein eigenes Abbild", pt: "Eu — é a minha própria imagem", it: "Io — è la mia immagine", ja: "自分 — 自分自身の似姿です", zh: "我本人 — 这是我自己的形象", hi: "मैं — यह मेरी अपनी छवि है", ar: "أنا — هذه صورتي أنا",
+  },
+  "idn.kind.fictional": {
+    en: "An invented character", es: "Un personaje inventado", fr: "Un personnage inventé", de: "Eine erfundene Figur", pt: "Uma personagem inventada", it: "Un personaggio inventato", ja: "架空の人物", zh: "虚构角色", hi: "एक काल्पनिक पात्र", ar: "شخصية متخيَّلة",
+  },
+  "idn.kind.other": {
+    en: "Somebody else, with their say-so on record", es: "Otra persona, con su permiso registrado", fr: "Quelqu'un d'autre, avec son accord enregistré", de: "Jemand anderes, mit erfasster Zustimmung", pt: "Outra pessoa, com o consentimento registado", it: "Qualcun altro, con il suo consenso registrato", ja: "他の人物 — 本人の同意が記録済み", zh: "另一个人 — 其许可已备案", hi: "कोई और, जिसकी सहमति दर्ज है", ar: "شخص آخر، بموافقته المسجَّلة",
+  },
+  "idn.kind.saved": {
+    en: "Saved.", es: "Guardado.", fr: "Enregistré.", de: "Gespeichert.", pt: "Guardado.", it: "Salvato.", ja: "保存しました。", zh: "已保存。", hi: "सहेजा गया।", ar: "تم الحفظ.",
+  },
   "ins.type.ph": {
     en: "Type…", es: "Escribe…", fr: "Écrivez…", de: "Tippen…", pt: "Escreva…", it: "Scrivi…", ja: "入力…", zh: "输入…", hi: "लिखें…", ar: "اكتب…",
   },

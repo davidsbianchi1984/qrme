@@ -186,6 +186,10 @@ export function Identity({ onPlans, onPassing }: {
   const [attestor, setAttestor] = useState("");
   const [method, setMethod] = useState("");
   const [name, setName] = useState("");
+  // What kind of thing this profile is, read back from the profile itself
+  // rather than assumed — the picker must show what is stored, not what
+  // the last press asked for.
+  const [kind, setKind] = useState("fictional");
   const [confirmEnd, setConfirmEnd] = useState<"" | "sunset" | "delete">("");
 
   const fail = (e: unknown) => setError(e);
@@ -207,6 +211,7 @@ export function Identity({ onPlans, onPassing }: {
     api.verifiable(me, token).then(setVerifiable).catch(() => setVerifiable(null));
     api.anonymity(me, token).then(setAnon).catch(fail);
     api.avatar(me, token).then(setAvatar).catch(() => setAvatar(null));
+    api.getProfile(me).then((p) => setKind(p.kind)).catch(() => undefined);
     // 409 while the profile is active, which is the ordinary case rather
     // than a failure worth a banner.
     api.memorial(me).then(setMemorial).catch(() => setMemorial(null));
@@ -610,6 +615,44 @@ export function Identity({ onPlans, onPassing }: {
             } catch (e) { fail(e); }
           }}>{tr("idn.rename.save", lang)}</button>
         </div>
+      </div>
+
+      {/* What kind of thing this profile is.
+       *
+       *     asked     can an owner correct what their profile is
+       *     mattered  or is a creation-time default permanent
+       *
+       * It was permanent. `kind` had no update site anywhere, defaults to
+       * "fictional", and decides `likeness().real_person` — so a digital
+       * twin made outside the onboarding flow was recorded forever as an
+       * invented character whose portrait depicts nobody, and every
+       * surface reading that record refused to draw it as a face.
+       *
+       * "Somebody else, with their say-so" is offered but sends the
+       * caller to the consent record it requires, because a rights claim
+       * about a real third party is not a dropdown. Rated profiles of
+       * another real person are refused outright at the door, whatever
+       * this picker sends. */}
+      <div className="card">
+        <h3>{tr("idn.kind", lang)}</h3>
+        <p className="muted small">{tr("idn.kind.lead", lang)}</p>
+        <select value={kind} disabled={!token}
+                onChange={async (e) => {
+                  const want = e.target.value;
+                  setKind(want);
+                  setError(null); setNote(null);
+                  try {
+                    await api.editProfile(me, { kind: want }, token);
+                    setNote(tr("idn.kind.saved", lang));
+                    reload();
+                  } catch (err) { fail(err); }
+                }}>
+          <option value="self">{tr("idn.kind.self", lang)}</option>
+          <option value="fictional">{tr("idn.kind.fictional", lang)}</option>
+          <option value="other_person">
+            {tr("idn.kind.other", lang)}
+          </option>
+        </select>
       </div>
 
       <div className="card">
