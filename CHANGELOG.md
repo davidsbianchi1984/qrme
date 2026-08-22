@@ -4,7 +4,16 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.3.0] - 2026-08-22
+
+A profile hands you a page. It could always write; what it could not do was
+give you anything — a report arrived as a wall of chat and was gone up the
+scroll on the next turn. Ask for a document now and one arrives: a real
+file, marked as the synthetic media it is, on a card you can open and keep.
+
+And the room is a card on the page again. The last round moved the
+transparent bar down off the faces, which was asked for, and made the room
+full-screen, which was not — the frames were the right size all along.
 
 ### Fixed
 
