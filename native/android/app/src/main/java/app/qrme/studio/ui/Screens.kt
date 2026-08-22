@@ -5296,6 +5296,22 @@ private fun RoomsBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
     var rows by remember { mutableStateOf<List<String>>(emptyList()) }
     var guestId by remember { mutableStateOf("") }
     var scene by remember { mutableStateOf<List<String>>(emptyList()) }
+    // Who you are in every room, and the account's real voices. Both read
+    // rather than assumed: a picker that shows what it wishes were stored
+    // is worse than one that shows nothing.
+    var myPicture by remember { mutableStateOf("") }
+    var voices by remember { mutableStateOf<List<String>>(emptyList()) }
+    // Read on the way in, so the take-down button appears only when there
+    // is something to take down. A control offered for a picture that does
+    // not exist is a control that does nothing when pressed.
+    LaunchedEffect(vm.interactorId) {
+        val who = vm.interactorId
+        if (who != null) {
+            myPicture = runCatching {
+                ApiClient.ownPicture(who, vm.interactorToken.orEmpty())
+            }.getOrDefault("")
+        }
+    }
     val ctx = LocalContext.current
     // A real chooser rather than a filename box. The picture this asks for
     // is one already on the phone, and typing its name is not how anybody
@@ -5317,6 +5333,51 @@ private fun RoomsBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
                     ApiClient.roomFaces(roomId, vm.interactorToken.orEmpty())
                 }) { r ->
                     scene = r.getOrDefault(emptyList())
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+    }
+    // Behind you rather than instead of you. Its own chooser for the same
+    // reason it is its own route: `photo` above REPLACES the person, so
+    // pressing the only picture button available and being replaced by the
+    // scenery is what happened before this existed.
+    val pickBackdrop = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()) { uri ->
+        val who = vm.interactorId
+        if (uri != null && who != null && roomId.isNotBlank()) {
+            val bytes = runCatching {
+                ctx.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+            }.getOrNull()
+            if (bytes == null || bytes.isEmpty()) {
+                onNote(L10n.t("room.face.empty", lang))
+            } else {
+                vm.call({
+                    ApiClient.uploadRoomBackground(roomId, who,
+                        "background.jpg", bytes, vm.interactorToken.orEmpty())
+                    ApiClient.roomFaces(roomId, vm.interactorToken.orEmpty())
+                }) { r ->
+                    scene = r.getOrDefault(emptyList())
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+        }
+    }
+    // Your own picture — the PERSON's, not this room's. It follows you into
+    // every room rather than being set again in each one.
+    val pickMine = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()) { uri ->
+        val who = vm.interactorId
+        if (uri != null && who != null) {
+            val bytes = runCatching {
+                ctx.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+            }.getOrNull()
+            if (bytes == null || bytes.isEmpty()) {
+                onNote(L10n.t("room.face.empty", lang))
+            } else {
+                vm.call({
+                    ApiClient.setOwnPicture(who, "me.jpg", bytes,
+                        vm.interactorToken.orEmpty())
+                }) { r ->
+                    myPicture = r.getOrDefault("")
                     onNote(r.exceptionOrNull()?.message) }
             }
         }
@@ -5422,6 +5483,34 @@ private fun RoomsBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
                 enabled = roomId.isNotBlank() && vm.interactorId != null) {
                 pickFace.launch("image/*")
             }
+            BrandButton(L10n.t("room.face.background", lang),
+                enabled = roomId.isNotBlank() && vm.interactorId != null) {
+                pickBackdrop.launch("image/*")
+            }
+            BrandButton(L10n.t("room.face.mine", lang),
+                enabled = vm.interactorId != null) {
+                pickMine.launch("image/*")
+            }
+            if (myPicture.isNotBlank()) {
+                BrandButton(L10n.t("room.face.mineoff", lang),
+                    enabled = vm.interactorId != null) {
+                    vm.call({
+                        ApiClient.clearOwnPicture(vm.interactorId!!,
+                            vm.interactorToken.orEmpty())
+                    }) { r ->
+                        myPicture = ""
+                        onNote(r.exceptionOrNull()?.message) }
+                }
+            }
+            // The voices this account can actually offer, asked of the
+            // engine rather than hardcoded — so the one voice somebody made
+            // themselves is on the list.
+            BrandButton(L10n.t("room.voices", lang)) {
+                vm.call({ ApiClient.voiceLibrary() }) { r ->
+                    voices = r.getOrDefault(emptyList())
+                    onNote(r.exceptionOrNull()?.message) }
+            }
+            voices.forEach { Text(it, color = Qrme.T3, fontSize = 11.sp) }
             BrandButton(L10n.t("room.share", lang),
                 enabled = roomId.isNotBlank() && vm.interactorId != null) {
                 pickShare.launch("*/*")

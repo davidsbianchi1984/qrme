@@ -8378,7 +8378,7 @@ const CHROME: Table = {
     en: "Replace it", es: "Reemplazarla", fr: "La remplacer", de: "Ersetzen", pt: "Substituir", it: "Sostituiscila", ja: "差し替える", zh: "替换", hi: "बदलें", ar: "استبدالها",
   },
   "idn.mypic.remove": {
-    en: "Take it down", es: "Quitarla", fr: "La retirer", de: "Entfernen", pt: "Remover", it: "Toglila", ja: "外す", zh: "撤下", hi: "हटाएँ", ar: "إزالتها",
+    en: "Remove my picture", es: "Quitar mi foto", fr: "Retirer ma photo", de: "Mein Bild entfernen", pt: "Remover a minha foto", it: "Togli la mia foto", ja: "自分の写真を外す", zh: "撤下我的照片", hi: "मेरी तस्वीर हटाएँ", ar: "إزالة صورتي",
   },
   "idn.mypic.saved": {
     en: "Saved.", es: "Guardada.", fr: "Enregistrée.", de: "Gespeichert.", pt: "Guardada.", it: "Salvata.", ja: "保存しました。", zh: "已保存。", hi: "सहेजी गई।", ar: "تم الحفظ.",

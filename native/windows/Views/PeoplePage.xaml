@@ -747,6 +747,16 @@
                     <Button x:Name="RoomFaceCameraButton" Click="OnRoomFaceCamera" />
                     <Button x:Name="RoomFacePhotoButton" Click="OnRoomFacePhoto" />
                     <Button x:Name="RoomShareButton" Click="OnRoomShare" />
+                    <!-- Behind you rather than instead of you: `photo`
+                         above REPLACES the person, this sits under them. -->
+                    <Button x:Name="RoomFaceBackgroundButton"
+                            Click="OnRoomFaceBackground" />
+                    <!-- Your own picture — the person's, not this room's.
+                         It follows you into every room you join. -->
+                    <Button x:Name="RoomFaceMineButton" Click="OnRoomFaceMine" />
+                    <Button x:Name="RoomFaceMineOffButton"
+                            Click="OnRoomFaceMineOff" />
+                    <Button x:Name="RoomVoicesButton" Click="OnRoomVoices" />
                     <Button x:Name="RoomFacePlainButton" Click="OnRoomFacePlain" />
                     <Button x:Name="RoomFaceWhoButton" Click="OnRoomFaceWho" />
                 </StackPanel>

@@ -153,6 +153,13 @@ struct RoomsSection: View {
     @State private var scene: RoomFaces?
     @State private var pick: PhotosPickerItem?
     @State private var share: PhotosPickerItem?
+    // What goes BEHIND you, and who you are in every room — two more
+    // pickers, because they are two more destinations. `photo` above
+    // replaces the person; these do not.
+    @State private var backdrop: PhotosPickerItem?
+    @State private var mine: PhotosPickerItem?
+    @State private var myPicture: String?
+    @State private var voices: [SpokenVoice] = []
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -273,6 +280,39 @@ struct RoomsSection: View {
             PhotosPicker(selection: $share, matching: .any(of: [.images, .videos])) {
                 Text(L10n.t("room.share", state.language)).font(.caption)
             }.disabled(busy || roomId.isEmpty || state.interactorToken == nil)
+            // Behind you rather than instead of you. Its own picker for the
+            // same reason it is its own route: pressing the only picture
+            // button available and being replaced by the scenery is what
+            // happened before this existed.
+            PhotosPicker(selection: $backdrop, matching: .images) {
+                Text(L10n.t("room.face.background", state.language))
+                    .font(.caption)
+            }.disabled(busy || roomId.isEmpty || state.interactorToken == nil)
+            // Your own picture — the person's, not this room's. It follows
+            // you into every room rather than being set again in each one.
+            PhotosPicker(selection: $mine, matching: .images) {
+                Text(L10n.t("room.face.mine", state.language)).font(.caption)
+            }.disabled(busy || state.interactorToken == nil)
+            if myPicture != nil {
+                Button(L10n.t("room.face.mineoff", state.language)) {
+                    run {
+                        _ = try await ApiClient.shared.clearOwnPicture(
+                            interactorId: state.interactorId ?? "",
+                            token: state.interactorToken ?? "")
+                        myPicture = nil
+                    }
+                }.font(.caption).disabled(busy)
+            }
+            // The voices this account can actually offer, asked of the
+            // engine rather than hardcoded — gender is a hint and never a
+            // gate, cloned is a label and not one either.
+            Button(L10n.t("room.voices", state.language)) {
+                run { voices = try await ApiClient.shared.voiceLibrary().voices }
+            }.font(.caption).disabled(busy)
+            ForEach(voices, id: \.id) { v in
+                Text(v.name).font(.caption2).foregroundStyle(Theme.t2)
+            }
+
             if let scene {
                 // Everybody's, not just mine. A scene each person draws from
                 // their own state alone is not a scene.
@@ -309,6 +349,39 @@ struct RoomsSection: View {
                     roomId: roomId, token: state.interactorToken ?? "")
                 pick = nil
             }
+        }
+        .onChange(of: backdrop) { item in
+            guard let item else { return }
+            run {
+                guard let data = try await item.loadTransferable(
+                    type: Data.self) else { return }
+                _ = try await ApiClient.shared.uploadRoomBackground(
+                    roomId: roomId, interactorId: state.interactorId ?? "",
+                    filename: "background.jpg", data: data,
+                    token: state.interactorToken ?? "")
+                scene = try await ApiClient.shared.roomFaces(
+                    roomId: roomId, token: state.interactorToken ?? "")
+                backdrop = nil
+            }
+        }
+        .onChange(of: mine) { item in
+            guard let item else { return }
+            run {
+                guard let data = try await item.loadTransferable(
+                    type: Data.self) else { return }
+                let up = try await ApiClient.shared.setOwnPicture(
+                    interactorId: state.interactorId ?? "",
+                    filename: "me.jpg", data: data,
+                    token: state.interactorToken ?? "")
+                myPicture = up.url
+                mine = nil
+            }
+        }
+        .task {
+            guard let token = state.interactorToken,
+                  let who = state.interactorId else { return }
+            myPicture = try? await ApiClient.shared
+                .ownPicture(interactorId: who, token: token).url
         }
         .onChange(of: share) { item in
             guard let item else { return }

@@ -241,6 +241,10 @@ public sealed partial class PeoplePage : Page
         RoomFaceTitle.Text = L10n.T("room.face.title");
         RoomFaceCameraButton.Content = L10n.T("room.face.camera");
         RoomFacePhotoButton.Content = L10n.T("room.face.photo");
+        RoomFaceBackgroundButton.Content = L10n.T("room.face.background");
+        RoomFaceMineButton.Content = L10n.T("room.face.mine");
+        RoomFaceMineOffButton.Content = L10n.T("room.face.mineoff");
+        RoomVoicesButton.Content = L10n.T("room.voices");
         RoomShareButton.Content = L10n.T("room.share");
         RoomFacePlainButton.Content = L10n.T("room.face.plain");
         RoomFaceWhoButton.Content = L10n.T("room.face.who");
@@ -1981,6 +1985,92 @@ public sealed partial class PeoplePage : Page
         }
         catch (Exception ex) { StatusText.Text = ex.Message; }
     }
+
+    /// <summary>The picture that goes BEHIND you here. Its own button for
+    /// the same reason it is its own route: <c>photo</c> replaces the
+    /// person, and somebody who wanted a room behind them and pressed the
+    /// only picture button available replaced themselves with it.</summary>
+    private async void OnRoomFaceBackground(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        if (RoomIdBox.Text.Trim().Length == 0) return;
+        if (s.InteractorId is not { Length: > 0 } who)
+        { StatusText.Text = L10n.T("prf.needuser"); return; }
+        try
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            WinRT.Interop.InitializeWithWindow.Initialize(picker,
+                WinRT.Interop.WindowNative.GetWindowHandle(App.Window));
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            picker.FileTypeFilter.Add(".png");
+            picker.FileTypeFilter.Add(".gif");
+            picker.FileTypeFilter.Add(".webp");
+            var file = await picker.PickSingleFileAsync();
+            if (file is null) return;
+            var buffer = await Windows.Storage.FileIO.ReadBufferAsync(file);
+            await ApiClient.Shared.UploadRoomBackground(
+                RoomIdBox.Text.Trim(), who, file.Name, buffer.ToArray(),
+                s.InteractorToken!);
+            await ShowRoomFaces();
+        }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
+    }
+
+    /// <summary>Your own picture — the PERSON's, not a profile's portrait.
+    /// It follows you into every room rather than being set again in each
+    /// one, and it is never AI-marked: a photograph of your own face is
+    /// authentic media.</summary>
+    private async void OnRoomFaceMine(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        if (s.InteractorId is not { Length: > 0 } who)
+        { StatusText.Text = L10n.T("prf.needuser"); return; }
+        try
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            WinRT.Interop.InitializeWithWindow.Initialize(picker,
+                WinRT.Interop.WindowNative.GetWindowHandle(App.Window));
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            picker.FileTypeFilter.Add(".png");
+            picker.FileTypeFilter.Add(".gif");
+            picker.FileTypeFilter.Add(".webp");
+            var file = await picker.PickSingleFileAsync();
+            if (file is null) return;
+            var buffer = await Windows.Storage.FileIO.ReadBufferAsync(file);
+            var up = await ApiClient.Shared.SetOwnPicture(
+                who, file.Name, buffer.ToArray(), s.InteractorToken!);
+            StatusText.Text = up.Url ?? "";
+        }
+        catch (Exception ex) { StatusText.Text = ex.Message; }
+    }
+
+    /// <summary>Back to your initials. Taking your own face down is the one
+    /// action where keeping the file would be the surprise.</summary>
+    private async void OnRoomFaceMineOff(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var s = AppState.Current;
+            if (s.InteractorId is not { Length: > 0 } who)
+            { StatusText.Text = L10n.T("prf.needuser"); return; }
+            var now = await ApiClient.Shared.OwnPicture(
+                who, s.InteractorToken!);
+            if (now.Url is not { Length: > 0 }) return;
+            await ApiClient.Shared.ClearOwnPicture(who, s.InteractorToken!);
+            StatusText.Text = "";
+        });
+
+    /// <summary>The voices this account can actually offer, asked of the
+    /// engine rather than hardcoded — gender is a hint and never a gate,
+    /// and cloned is a label rather than one either.</summary>
+    private async void OnRoomVoices(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var lib = await ApiClient.Shared.VoiceLibrary();
+            RoomList.ItemsSource = (lib.Voices ?? [])
+                .Select(v => new Row($"{v.Name} · {v.Note}")).ToList();
+        });
 
     private async void OnDispRules(object sender, RoutedEventArgs e) =>
         await Try(async () =>
