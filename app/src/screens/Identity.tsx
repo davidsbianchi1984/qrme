@@ -190,6 +190,9 @@ export function Identity({ onPlans, onPassing }: {
   // rather than assumed — the picker must show what is stored, not what
   // the last press asked for.
   const [kind, setKind] = useState("fictional");
+  // Shown, never set from here. Null until the profile is read, so an
+  // unknown state reads as unknown rather than as "off".
+  const [rated, setRated] = useState<boolean | null>(null);
   const [confirmEnd, setConfirmEnd] = useState<"" | "sunset" | "delete">("");
 
   const fail = (e: unknown) => setError(e);
@@ -211,7 +214,10 @@ export function Identity({ onPlans, onPassing }: {
     api.verifiable(me, token).then(setVerifiable).catch(() => setVerifiable(null));
     api.anonymity(me, token).then(setAnon).catch(fail);
     api.avatar(me, token).then(setAvatar).catch(() => setAvatar(null));
-    api.getProfile(me).then((p) => setKind(p.kind)).catch(() => undefined);
+    api.getProfile(me).then((p) => {
+      setKind(p.kind);
+      setRated(!!p.adult_mode);
+    }).catch(() => undefined);
     // 409 while the profile is active, which is the ordinary case rather
     // than a failure worth a banner.
     api.memorial(me).then(setMemorial).catch(() => setMemorial(null));
@@ -653,6 +659,38 @@ export function Identity({ onPlans, onPassing }: {
             {tr("idn.kind.other", lang)}
           </option>
         </select>
+      </div>
+
+      {/* Adult mode: shown, and shut.
+       *
+       *     asked     can an owner see what this profile is set to
+       *     mattered  can they change it here
+       *
+       * Seen and not settable, which is a deliberate pair rather than an
+       * unfinished one. Every guard on this flag lives in
+       * `create_profile`: a verified adult owner, never a rated persona of
+       * another real person (the hard line
+       * `test_a_real_likeness_can_never_be_rated` holds), and a plan that
+       * can hold rated content. A field on PATCH would be a way around all
+       * three, so there is no field — and `tests/profile_columns_doorless.txt`
+       * records that with its reason.
+       *
+       * Hiding the state as well as the switch would be the worse version:
+       * somebody who cannot tell what their own profile is set to cannot
+       * check it, and a setting nobody can see is a setting nobody can
+       * audit. So the state is on screen and the control is not. */}
+      <div className="card">
+        <h3>{tr("idn.rated", lang)}</h3>
+        <p className="muted small">
+          {rated === null ? tr("idn.rated.unknown", lang)
+                          : rated ? tr("idn.rated.on", lang)
+                                  : tr("idn.rated.off", lang)}
+        </p>
+        <label className="muted small">
+          <input type="checkbox" checked={!!rated} disabled readOnly />
+          {" "}{tr("idn.rated.shut", lang)}
+        </label>
+        <p className="muted small">{tr("idn.rated.why", lang)}</p>
       </div>
 
       <div className="card">

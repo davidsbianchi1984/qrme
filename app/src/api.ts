@@ -1191,6 +1191,11 @@ export interface Profile {
   kind: string;
   purpose?: string;
   status?: string;
+  /** Shown on the Identity screen and settable nowhere. Every guard on it
+   *  lives at creation — a verified adult owner, never a rated persona of
+   *  another real person, a plan that can hold rated content — so there is
+   *  no field to change it and the state is displayed read-only. */
+  adult_mode?: boolean;
   owner_token?: string;
 }
 export interface Stats {

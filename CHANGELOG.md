@@ -95,10 +95,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `base_age` and `appearance` got doors too — `aging_enabled` was settable
   while the age it ages from was not, which is half a feature.
 
-  `adult_mode` deliberately did **not** get one. Every guard on it lives in
-  `create_profile`, and a PATCH field would be a way around all three of
-  them; it is written down in `tests/profile_columns_doorless.txt` with
-  that reason, on a ratchet that only shrinks. A new guard now sorts every
+  `adult_mode` is **shown, and shut** — a deliberate pair rather than an
+  unfinished one. Every guard on it lives in `create_profile` (a verified
+  adult owner, never a rated likeness of another real person, a plan that
+  can hold rated content), and a PATCH field would be a way around all
+  three, so there is no field. But hiding the *state* along with the
+  switch would be the worse version: an owner who cannot tell what their
+  own profile is set to cannot check it, and a setting nobody can see is a
+  setting nobody can audit. So the Identity screen displays it read-only
+  and names all three checks as the reason it cannot be changed there — a
+  refusal that says only "not here" teaches nothing. It stays written down
+  in `tests/profile_columns_doorless.txt` with that reason, on a ratchet
+  that only shrinks, and a guard asserts no live field ever appears behind
+  the disabled control. A new guard now sorts every
   profile column into one of four things — settable, holder of its own
   door, system-owned, or recorded with a reason — so the next `kind` is
   caught the week it lands rather than a year later.

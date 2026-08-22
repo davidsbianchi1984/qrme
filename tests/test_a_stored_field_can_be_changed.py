@@ -235,3 +235,55 @@ def test_the_change_survives_the_return_visit(client):
         (dana["id"],)).fetchone()
     assert row["appearance"] == "silver hair, denim"
     assert row["base_age"] == 41
+
+
+# -- adult mode: shown, and shut ---------------------------------------------
+
+IDENTITY = (ROOT / "app/src/screens/Identity.tsx").read_text(encoding="utf-8")
+
+
+def test_the_rated_setting_is_on_screen():
+    """Shown, because a setting nobody can see is a setting nobody can
+    audit — an owner who cannot tell what their own profile is set to
+    cannot check it."""
+    assert "idn.rated" in IDENTITY, (
+        "adult mode is invisible as well as unchangeable")
+    assert "idn.rated.on" in IDENTITY and "idn.rated.off" in IDENTITY, (
+        "the screen shows the setting exists without saying which way it "
+        "is set")
+
+
+def test_the_rated_control_is_shut():
+    """And shut, because every guard on it lives at creation. Shown and
+    shut is a deliberate pair, not an unfinished one."""
+    block = IDENTITY[IDENTITY.index('<h3>{tr("idn.rated"'):]
+    block = block[:block.index("</div>")]
+    assert "disabled" in block and "readOnly" in block, (
+        "the adult-mode control can be operated")
+    assert "onChange" not in block, (
+        "the adult-mode control is wired to something")
+    assert "idn.rated.why" in block, (
+        "the control is shut and does not say why, which reads as a bug "
+        "rather than a decision")
+
+
+def test_the_reason_names_all_three_checks():
+    """A refusal that says 'not here' teaches nothing. The copy names what
+    is actually being protected."""
+    row = (ROOT / "app/src/l10n.ts").read_text(encoding="utf-8")
+    row = row[row.index('"idn.rated.why"'):]
+    row = row[:row.index("},")]
+    said = re.search(r'en: "([^"]+)"', row).group(1).lower()
+    assert "verified adult" in said
+    assert "another real person" in said
+    assert "plan" in said
+
+
+def test_no_field_stands_behind_the_shut_control():
+    """The half that matters. A visible-but-disabled control with a live
+    PATCH field behind it is worse than no control at all."""
+    assert "adult_mode" not in _patchable(), (
+        "adult_mode became settable on PATCH — the checks that live in "
+        "create_profile would be routed around")
+    assert "adult_mode" in _recorded(), (
+        "adult_mode left the doorless record without gaining a door")
