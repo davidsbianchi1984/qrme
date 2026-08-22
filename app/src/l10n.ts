@@ -8269,9 +8269,6 @@ const CHROME: Table = {
   "ins.ask.ph": {
     en: "profile id", es: "id del perfil", fr: "id du profil", de: "Profil-ID", pt: "id do perfil", it: "id del profilo", ja: "プロフィールID", zh: "档案 ID", hi: "प्रोफ़ाइल आईडी", ar: "معرّف الملف",
   },
-  "ins.ask.go": {
-    en: "Ask them in", es: "Invítalo", fr: "Faites-les entrer", de: "Hereinbitten", pt: "Convidar", it: "Falli entrare", ja: "招き入れる", zh: "请进来", hi: "अंदर बुलाएँ", ar: "أدخِلهم",
-  },
   "ins.ask.seated": {
     en: "Seated — they are in the room.", es: "Sentado — ya está en la sala.", fr: "Installé — il est dans la salle.", de: "Platziert — es ist im Raum.", pt: "Sentado — já está na sala.", it: "Seduto — è nella stanza.", ja: "着席しました — 部屋にいます。", zh: "已入座 — 已在房间里。", hi: "बैठ गया — अब कमरे में है।", ar: "جلس — إنه في الغرفة الآن.",
   },
@@ -8536,9 +8533,6 @@ const CHROME: Table = {
   "ins.nothingyet": {
     en: "Nothing yet.", es: "Nada todavía.", fr: "Rien pour l'instant.", de: "Noch nichts.", pt: "Nada ainda.", it: "Ancora niente.", ja: "まだ何もありません。", zh: "还没有内容。", hi: "अभी कुछ नहीं।", ar: "لا شيء بعد.",
   },
-  "ins.say.ph": {
-    en: "say something", es: "di algo", fr: "dites quelque chose", de: "sagen Sie etwas", pt: "diga algo", it: "di' qualcosa", ja: "何か言う", zh: "说点什么", hi: "कुछ कहिए", ar: "قل شيئًا",
-  },
   "ins.sayit": {
     en: "Say it", es: "Decirlo", fr: "Le dire", de: "Sagen", pt: "Dizer", it: "Dillo", ja: "言う", zh: "说出来", hi: "कह दीजिए", ar: "قُلها",
   },
@@ -8547,12 +8541,6 @@ const CHROME: Table = {
   },
   "ins.watermarked": {
     en: "Everything a profile says here is watermarked as synthetic media, at the moment it is said. A room with anybody under 18 in it runs strict moderation for everyone.", es: "Todo lo que un perfil dice aquí lleva marca de agua como medio sintético, en el momento en que se dice. Una sala con alguien menor de 18 dentro aplica moderación estricta para todos.", fr: "Tout ce qu'un profil dit ici est filigrané comme média synthétique, au moment même où c'est dit. Une salle où se trouve une personne de moins de 18 ans applique une modération stricte pour tout le monde.", de: "Alles, was ein Profil hier sagt, wird als synthetisches Medium mit einem Wasserzeichen versehen, im Moment des Sagens. Ein Raum, in dem jemand unter 18 ist, läuft für alle mit strenger Moderation.", pt: "Tudo o que um perfil diz aqui leva marca de água como meio sintético, no momento em que é dito. Uma sala com alguém com menos de 18 anos aplica moderação estrita para todos.", it: "Tutto ciò che un profilo dice qui viene filigranato come media sintetico, nel momento in cui viene detto. Una stanza in cui c'è qualcuno sotto i 18 anni applica moderazione severa per tutti.", ja: "ここでプロフィールが言うことはすべて、言われたその瞬間に合成メディアとして電子透かしが入ります。18 歳未満の人がいる部屋では、全員に対して厳格なモデレーションが働きます。", zh: "档案在这里说的每一句话，都会在出口的那一刻被打上合成媒体的水印。只要房间里有未满 18 岁的人，对所有人都会启用严格审核。", hi: "यहाँ कोई प्रोफ़ाइल जो भी कहती है, कहे जाने के उसी क्षण उस पर कृत्रिम माध्यम का वॉटरमार्क लग जाता है। जिस कमरे में 18 से कम उम्र का कोई हो, वहाँ सबके लिए सख़्त मॉडरेशन चलता है।", ar: "كل ما يقوله ملف هنا يُوسم بعلامة مائية بوصفه وسيطًا اصطناعيًا، لحظة قوله. وأي غرفة فيها من هو دون الثامنة عشرة تعمل بمراجعة صارمة على الجميع.",
-  },
-  "ins.microphones": {
-    en: "Microphones", es: "Micrófonos", fr: "Microphones", de: "Mikrofone", pt: "Microfones", it: "Microfoni", ja: "マイク", zh: "麦克风", hi: "माइक्रोफ़ोन", ar: "الميكروفونات",
-  },
-  "ins.micline": {
-    en: "{who} · {device} · {hears} · since {when}", es: "{who} · {device} · {hears} · desde {when}", fr: "{who} · {device} · {hears} · depuis {when}", de: "{who} · {device} · {hears} · seit {when}", pt: "{who} · {device} · {hears} · desde {when}", it: "{who} · {device} · {hears} · da {when}", ja: "{who} · {device} · {hears} · {when} から", zh: "{who} · {device} · {hears} · 自 {when}", hi: "{who} · {device} · {hears} · {when} से", ar: "{who} · {device} · {hears} · منذ {when}",
   },
   "ins.lendmic": {
     en: "Lend them my microphone", es: "Prestarles mi micrófono", fr: "Leur prêter mon microphone", de: "Ihnen mein Mikrofon leihen", pt: "Emprestar-lhes o meu microfone", it: "Presta loro il mio microfono", ja: "自分のマイクを貸す", zh: "把我的麦克风借给他们", hi: "अपना माइक्रोफ़ोन उन्हें उधार दूँ", ar: "أعِرهم ميكروفوني",

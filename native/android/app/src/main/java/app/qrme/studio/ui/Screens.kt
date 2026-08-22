@@ -5295,6 +5295,7 @@ private fun RoomsBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
     var roomId by remember { mutableStateOf("") }
     var rows by remember { mutableStateOf<List<String>>(emptyList()) }
     var guestId by remember { mutableStateOf("") }
+    var roomName by remember { mutableStateOf("") }
     var scene by remember { mutableStateOf<List<String>>(emptyList()) }
     // Who you are in every room, and the account's real voices. Both read
     // rather than assumed: a picker that shows what it wishes were stored
@@ -5422,6 +5423,21 @@ private fun RoomsBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
         // room id alone is not being here.
         BrandButton(L10n.t("room.join", lang), enabled = roomId.isNotBlank()) {
             vm.call({ ApiClient.joinRoom(roomId, vm.interactorToken.orEmpty()) }) { r ->
+                onNote(r.exceptionOrNull()?.message) }
+        }
+
+        // Naming the room from inside it. Authorized like speaking — a
+        // participant held by their own token — so it sits after the join
+        // rather than beside the id box: having somebody's address is not
+        // being in their house, which is the same thing the console had to
+        // learn this round.
+        Text(L10n.t("room.name.title", lang), color = Qrme.Txt, fontSize = 14.sp)
+        labeledField(L10n.t("room.name.ph", lang), roomName, "") { roomName = it }
+        BrandButton(L10n.t("room.name.save", lang),
+            enabled = roomId.isNotBlank() && roomName.isNotBlank()) {
+            vm.call({ ApiClient.renameRoom(roomId, vm.interactorId.orEmpty(),
+                roomName, vm.interactorToken ?: vm.token.orEmpty()) }) { r ->
+                r.getOrNull()?.let { roomName = it }
                 onNote(r.exceptionOrNull()?.message) }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

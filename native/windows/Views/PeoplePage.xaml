@@ -731,6 +731,13 @@
                     <!-- The list used to show rooms nobody could enter — the
                          door in was frozen at creation. -->
                     <Button x:Name="RoomJoinButton" Click="OnRoomJoin" />
+                    <!-- Naming the room from inside it. Authorized like
+                         speaking — a participant held by their own token —
+                         so it sits after the join rather than beside the id
+                         box: having somebody's address is not being in their
+                         house. -->
+                    <TextBox x:Name="RoomNameBox" />
+                    <Button x:Name="RoomNameSaveButton" Click="OnRoomNameSave" />
                     <Button x:Name="RoomMicLendButton" Click="OnRoomMicLend" />
                     <Button x:Name="RoomMicBackButton" Click="OnRoomMicBack" />
                     <Button x:Name="RoomMicWhoButton" Click="OnRoomMicWho" />

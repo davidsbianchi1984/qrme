@@ -160,6 +160,7 @@ struct RoomsSection: View {
     @State private var mine: PhotosPickerItem?
     @State private var myPicture: String?
     @State private var voices: [SpokenVoice] = []
+    @State private var roomName = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -185,6 +186,27 @@ struct RoomsSection: View {
                     roomId: roomId, token: state.interactorToken ?? "") }
             }.font(.caption).disabled(busy || roomId.isEmpty
                                       || state.interactorToken == nil)
+
+            // Naming the room from inside it. Authorized like speaking — a
+            // participant held by their own token — so it sits after the
+            // join rather than beside the id box: having somebody's address
+            // is not being in their house, which is the same thing the
+            // console had to learn this round.
+            Divider().overlay(Theme.line)
+            Text(L10n.t("room.name.title", state.language))
+                .font(.subheadline).foregroundStyle(Theme.txt)
+            TextField(L10n.t("room.name.ph", state.language), text: $roomName)
+                .textFieldStyle(.roundedBorder)
+            Button(L10n.t("room.name.save", state.language)) {
+                run {
+                    roomName = try await ApiClient.shared.renameRoom(
+                        roomId: roomId, interactorId: state.interactorId ?? "",
+                        topic: roomName,
+                        token: state.interactorToken ?? state.token ?? "")
+                }
+            }.font(.caption).disabled(
+                busy || roomId.isEmpty
+                || roomName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             HStack {
                 Button(L10n.t("room.mic.lend", state.language)) {
                     run { try await ApiClient.shared.lendRoomMic(

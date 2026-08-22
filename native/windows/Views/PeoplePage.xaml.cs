@@ -231,6 +231,9 @@ public sealed partial class PeoplePage : Page
         RoomsTitle.Text = L10n.T("room.title");
         RoomsListButton.Content = L10n.T("room.list");
         RoomIdBox.Header = L10n.T("room.id");
+        RoomNameBox.Header = L10n.T("room.name.title");
+        RoomNameBox.PlaceholderText = L10n.T("room.name.ph");
+        RoomNameSaveButton.Content = L10n.T("room.name.save");
         RoomJoinButton.Content = L10n.T("room.join");
         RoomMicLendButton.Content = L10n.T("room.mic.lend");
         RoomMicBackButton.Content = L10n.T("room.mic.back");
@@ -1846,6 +1849,18 @@ public sealed partial class PeoplePage : Page
     private async void OnRoomJoin(object sender, RoutedEventArgs e) =>
         await Try(async () => await ApiClient.Shared.JoinRoom(
             RoomIdBox.Text.Trim(), AppState.Current.InteractorToken!));
+
+    // The name is the words in it, so a blank one is refused at the door
+    // rather than quietly storing an empty string.
+    private async void OnRoomNameSave(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var named = await ApiClient.Shared.RenameRoom(
+                RoomIdBox.Text.Trim(), AppState.Current.InteractorId ?? "",
+                RoomNameBox.Text.Trim(),
+                AppState.Current.InteractorToken ?? AppState.Current.Token!);
+            RoomNameBox.Text = named.Topic ?? RoomNameBox.Text;
+        });
 
     private async void OnRoomMicLend(object sender, RoutedEventArgs e) =>
         await Try(async () => await ApiClient.Shared.LendRoomMic(

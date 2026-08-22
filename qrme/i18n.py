@@ -1351,6 +1351,18 @@ _PUBLIC.update(_PRIVILEGE_SENTENCES)
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    "a room's name is the words in it": {
+        'es': 'el nombre de una sala son las palabras que lleva',
+        'fr': "le nom d'une salle, ce sont les mots qui la composent",
+        'de': 'der Name eines Raums sind die Worte darin',
+        'pt': 'o nome de uma sala são as palavras que ela tem',
+        'it': 'il nome di una stanza sono le parole che contiene',
+        'ja': '部屋の名前は、そこに書かれた言葉そのものです',
+        'zh': '房间的名字就是里面的那些字',
+        'hi': 'कमरे का नाम उसमें लिखे शब्द ही होते हैं',
+        'ar': 'اسم الغرفة هو الكلمات التي فيه',
+    },
+
     'an empty week writes no letter': {
         'es': 'una semana vacía no escribe carta',
         'fr': "une semaine vide n'écrit pas de lettre",
