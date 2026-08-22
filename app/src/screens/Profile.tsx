@@ -168,8 +168,13 @@ export function Profile({ profileId, onBack, onPlans, onVisit, onInside }: {
       const said = await api.addFriend(
         session.profileId, profileId, session.ownerToken);
       setBefriended((ids) => [...ids, profileId]);
-      setNote(fill(tr(said.added ? "prf.befriended" : "prf.alreadyfriend",
-                      lang), { name }));
+      // Each key inside its own `tr(`, not chosen inside the call. A key
+      // picked by a ternary in the argument is invisible to the lookup
+      // scanner, which then reads it as translated-and-never-used — and the
+      // check is right to say so: it cannot tell that case apart from a
+      // string nobody renders, which is the English still being read.
+      setNote(fill(said.added ? tr("prf.befriended", lang)
+                              : tr("prf.alreadyfriend", lang), { name }));
     } catch (e) { setError(e); }
     finally { setBusy(false); }
   }

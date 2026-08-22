@@ -52,7 +52,8 @@ export function Discover({ onPlans, onVisit }: {
       // A 200 is not a yes — see `FriendAddition`. Somebody already on the
       // list answers `added: false`, and reporting that as "Added" is the
       // console telling a person something it was told was not true.
-      setNote(tr(said.added ? "dsc.added" : "dsc.already", lang));
+      setNote(said.added ? tr("dsc.added", lang)
+                         : tr("dsc.already", lang));
     } catch (e) { setError(e); }
     finally { setBusy(false); }
   }

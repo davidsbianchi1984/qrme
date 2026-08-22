@@ -131,7 +131,8 @@ export function Friends({ onPlans, onVisit }: {
     try {
       const said = await api.addFriend(
         session.profileId, profileId, session.ownerToken);
-      setNote(tr(said.added ? "frn.added" : "frn.alreadythere", lang)
+      setNote((said.added ? tr("frn.added", lang)
+                          : tr("frn.alreadythere", lang))
         .replace("{name}", name));
       load();
     } catch (e) { setError(e); }
