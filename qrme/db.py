@@ -1591,6 +1591,18 @@ CREATE TABLE IF NOT EXISTS media (
     filename   TEXT NOT NULL,      -- on disk: {id}{whitelisted ext}
     name       TEXT,               -- the uploader's own display name
     bytes      INTEGER NOT NULL,
+    -- Whether this file is synthetic media, decided where it is made.
+    --
+    -- 0 for everything a person uploads, and that is the rule rather than
+    -- the default: a photograph of somebody's own face is authentic, and
+    -- stamping it would be a false statement in exactly the direction the
+    -- mark exists to prevent. 1 for a document a profile composed, which
+    -- is synthetic outright.
+    --
+    -- The API has carried an `ai_marked` field since media existed and it
+    -- was the constant False in every path, because nothing in the product
+    -- generated a file. This is the column that makes it a fact.
+    ai_marked  INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL
 );
 
@@ -1882,6 +1894,12 @@ CREATE TABLE IF NOT EXISTS messages (
     status        TEXT NOT NULL,   -- approved | pending | rejected
     flag_reason   TEXT,
     watermark_id  TEXT,            -- synthetic-media credential for profile turns
+    -- A turn can hand over a document (qrme/composing.py). NULL on every
+    -- turn that is only words, which is nearly all of them. The room's
+    -- turns have carried media since 1.0.0; this is the same thing on the
+    -- one-to-one side, and it is what makes "prepare me a document" end in
+    -- a file rather than a wall of chat.
+    media_id      TEXT REFERENCES media(id),
     created_at    TEXT NOT NULL
 );
 
@@ -2674,6 +2692,10 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # were a profile's rated exchanges, revocable by its owner, and they
     # are not somebody's memory of a conversation.
     ("contribution_log", "interactor_id", "TEXT"),
+    # Synthetic media, marked where it is made. See the note on the media
+    # table: 0 for an upload, 1 for a document a profile composed.
+    ("media", "ai_marked", "INTEGER NOT NULL DEFAULT 0"),
+    ("messages", "media_id", "TEXT REFERENCES media(id)"),
     ("interactors", "account_id", "TEXT REFERENCES accounts(id)"),
     ("app_connectors", "authorized_at", "TEXT"),
     ("app_connectors", "secret_ref", "TEXT"),

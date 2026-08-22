@@ -122,8 +122,15 @@ def _sniff(data: bytes, name: str | None = None) -> tuple[str, str]:
 
 
 def save(profile_id: str, data: bytes, name: str | None = None,
-         alt: str | None = None) -> dict:
-    """Store one upload for this profile and return its serving facts."""
+         alt: str | None = None, ai_marked: bool = False) -> dict:
+    """Store one file for this profile and return its serving facts.
+
+    `ai_marked` defaults to False because the overwhelming majority of what
+    lands here is somebody's upload, and marking an authentic photograph is
+    a false statement in the direction the mark exists to prevent. It is
+    passed True by exactly one caller: a document a profile composed, which
+    is synthetic media outright and is marked at the moment it is made.
+    """
     if not data:
         raise MediaError(422, "the upload arrived empty")
     kind, ext = _sniff(data, name)
@@ -143,9 +150,9 @@ def save(profile_id: str, data: bytes, name: str | None = None,
     conn = db.connect()
     conn.execute(
         "INSERT INTO media (id, profile_id, kind, filename, name, bytes,"
-        " created_at) VALUES (?,?,?,?,?,?,?)",
+        " ai_marked, created_at) VALUES (?,?,?,?,?,?,?,?)",
         (media_id, profile_id, kind, filename, display, len(data),
-         db.utcnow()))
+         1 if ai_marked else 0, db.utcnow()))
     if description:
         conn.execute(
             "INSERT INTO media_alt (media_id, alt, created_at)"
@@ -153,7 +160,7 @@ def save(profile_id: str, data: bytes, name: str | None = None,
     conn.commit()
     return {"id": media_id, "kind": kind, "url": f"{ROUTE}/{filename}",
             "name": display, "bytes": len(data), "alt": description,
-            "ai_marked": False}
+            "ai_marked": bool(ai_marked)}
 
 
 def check_owned(profile_id: str, media_ids: list[str]) -> None:
@@ -188,11 +195,16 @@ def attach(post_id: str, profile_id: str, media_ids: list[str]) -> list[dict]:
 
 
 def row_facade(row) -> dict:
+    keys = row.keys()
     return {"id": row["id"], "kind": row["kind"],
             "url": f"{ROUTE}/{row['filename']}",
             "name": row["name"],
-            "alt": row["alt"] if "alt" in row.keys() else None,
-            "ai_marked": False}
+            "alt": row["alt"] if "alt" in keys else None,
+            # Read, not assumed. This was the literal False, which was true
+            # of everything that could reach it and stopped being true the
+            # day a profile could compose a file.
+            "ai_marked": bool(row["ai_marked"]) if "ai_marked" in keys
+            else False}
 
 
 def gallery(profile_id: str, kind: str | None = None,

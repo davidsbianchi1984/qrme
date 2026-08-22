@@ -4,6 +4,53 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **A profile composes a document and hands it over.** Field report, three
+  questions in one breath: *"I'm asking him to prepare me a document. How
+  was he supposed to send it, and how am I supposed to receive it, and how
+  does it render on the screen?"*
+
+      asked     can a profile write something
+      mattered  can it hand it over
+
+  It always could write. What it could not do was hand anything over — a
+  profile emits text into a bubble, so a report arrived as a wall of chat
+  that was gone up the scroll on the next turn. The reading half of this
+  pipe has existed since 1.0.0: hand a room a PDF and the profiles there
+  discuss it. This is the same pipe pointed the other way.
+
+  **Through the channel that exists, not a new one.** The provider contract
+  is `generate(system, messages) -> str`; every provider here implements
+  exactly that, the offline stub and the vault's resident included. A tool
+  channel would mean changing all of them for a payload that is text the
+  model already knows how to write. So the profile is told it may fence a
+  composition, and the fence is taken out of what the person reads and
+  becomes the file. A model that never uses it has lost nothing.
+
+  **The split happens before moderation, and the body is reviewed with the
+  words.** Splitting after would let a document past a check its covering
+  sentence had to pass. An unapproved turn writes no file: a refused reply
+  does not get to leave something behind that outlives the refusal.
+
+  `messages` carries `media_id` now, the way room turns have since 1.0.0,
+  and a turn hands back the document's **card rather than its body** — a
+  transcript is polled, and a document in every poll is the document sent
+  again on every poll.
+
+### Changed
+
+- **`ai_marked` stopped being a constant.** It has been a field in this API
+  since media existed and the literal `False` in every path, because
+  nothing in the product generated a file. `media.py` already states the
+  rule it was half of: a person's own photograph is **never** marked,
+  because stamping an authentic picture is a false statement in exactly the
+  direction the mark exists to prevent. A document a profile composed is
+  the mirror — synthetic outright — and is marked at the moment it is made.
+  Both directions are held by tests.
+
 ## [1.2.0] - 2026-08-22
 
 Whose memory it is. A conversation's record used to live in the synthetic

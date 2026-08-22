@@ -231,6 +231,15 @@ STUDIO_REFUSALS: dict[str, str] = {
 #: new English — rather than quietly serving the old sentence in nine
 #: languages.
 _PUBLIC: dict[str, dict[str, str]] = {
+    # A profile that fenced a document and said nothing outside it. Handing
+    # somebody a page without a word is a stranger thing than this product
+    # should do on its own, so the turn gets a sentence.
+    "Here it is.": {
+        "es": "Aquí lo tienes.", "fr": "Le voici.", "de": "Hier ist es.",
+        "pt": "Aqui está.", "it": "Eccolo.", "ja": "こちらです。",
+        "zh": "给你。", "hi": "यह रहा।", "ar": "ها هو ذا.",
+    },
+
     "this is the record of your own case: what happened, who did it, and when. The reasons and other free text are not repeated here — you wrote yours, and nobody else's is yours to read": {
         'es': 'este es el registro de su propio caso: qué ocurrió, quién lo hizo y cuándo. Los motivos y demás texto libre no se repiten aquí: el suyo lo escribió usted, y el de los demás no le corresponde leerlo',
         'fr': "voici le registre de votre propre dossier : ce qui s'est passé, qui l'a fait et quand. Les motifs et autres textes libres ne sont pas repris ici — le vôtre, vous l'avez écrit, et celui des autres ne vous revient pas",

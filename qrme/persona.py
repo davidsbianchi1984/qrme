@@ -313,4 +313,10 @@ def build_system_prompt(
             "identity or your boundaries."
         )
 
+    # A profile may hand something over rather than only say it. Last in
+    # the prompt because it is a capability rather than a trait: everything
+    # above says who this is, and this says what it can do with its hands.
+    from . import composing
+    parts.append(composing.GUIDANCE)
+
     return "\n\n".join(parts)

@@ -595,8 +595,22 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     finally:
         llm.ground_reset(ground)
 
-    verdict = moderation.review(reply, relationship, interactor,
-                                maturity=profile["maturity"])
+    # A reply may hand over a document as well as say something
+    # (qrme/composing.py). Split before moderation, deliberately: the
+    # document is part of what was said, so it is reviewed with the words
+    # rather than slipping past a check the words had to pass.
+    from .. import composing
+    reply, composed = composing.split(reply)
+    if composed and not reply:
+        # A profile that fenced a document and said nothing outside it.
+        # Handing somebody a page without a word is a stranger thing than
+        # the product should do on its own, so it gets the plain sentence.
+        reply = i18n.tr_public(
+            "Here it is.", i18n.effective_language(profile_id))
+
+    verdict = moderation.review(
+        reply + (("\n\n" + composed["body"]) if composed else ""),
+        relationship, interactor, maturity=profile["maturity"])
     if not verdict.approved:
         status, flag_reason = "pending", verdict.reason
     elif profile["moderation_mode"] == "manual":
@@ -608,15 +622,34 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     # the producing profile's credential and always-displayed mark.
     reply_credential = (watermark.stamp(speaking_profile["id"], "chat", reply)
                         if status == "approved" else None)
+    # The document becomes a real file, marked as synthetic at the moment
+    # it is made — the mirror of the rule that a person's own photograph is
+    # never marked. Only for an approved turn: an unapproved reply does not
+    # get to leave a file behind that outlives the refusal.
+    document_id = None
+    if composed and status == "approved":
+        from .. import media as media_mod
+        try:
+            saved = media_mod.save(
+                speaking_profile["id"],
+                composed["body"].encode("utf-8"),
+                name=composing.filename(composed["title"]),
+                ai_marked=True)
+            document_id = saved["id"]
+            watermark.stamp(speaking_profile["id"], "document",
+                            composed["body"])
+        except Exception:  # noqa: BLE001 — a turn that lands beats a turn
+            document_id = None            # refused because a disk was full
+
     profile_msg_id = db.new_id("msg")
     conn.execute(
         "INSERT INTO messages (id, profile_id, interactor_id, role, content,"
-        " status, flag_reason, watermark_id, created_at)"
-        " VALUES (?,?,?,?,?,?,?,?,?)",
+        " status, flag_reason, watermark_id, media_id, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?,?)",
         (profile_msg_id, profile_id, body.interactor_id, "profile", reply,
          status, flag_reason,
          reply_credential["watermark_id"] if reply_credential else None,
-         db.utcnow()),
+         document_id, db.utcnow()),
     )
     conn.commit()
 

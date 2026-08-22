@@ -375,7 +375,27 @@ def message_out(row: dict) -> MessageOut:
         # owner-designable) alongside the verifiable credential.
         watermark=(watermark.brief(row["watermark_id"])
                    if visible and "watermark_id" in keys else None),
+        # What the turn handed over, if it handed anything over. Hidden
+        # with the words when a turn is not visible: a document made by an
+        # unapproved turn is that turn, in a file.
+        document=(_document_brief(row["media_id"])
+                  if visible and "media_id" in keys and row["media_id"]
+                  else None),
     )
+
+
+def _document_brief(media_id: str) -> dict | None:
+    """The card a composed document renders as — never its whole body.
+
+    A chat turn's answer carries the handle, not the file. The body can be
+    a hundred thousand characters and the transcript is polled; putting it
+    in the turn would send the document again on every poll.
+    """
+    from . import media as media_mod
+
+    row = db.connect().execute(
+        "SELECT * FROM media WHERE id=?", (media_id,)).fetchone()
+    return media_mod.row_facade(row) if row is not None else None
 
 
 def source_items(profile_id: str, pdi=None) -> list[dict]:

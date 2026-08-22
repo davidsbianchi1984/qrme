@@ -851,6 +851,10 @@ class MessageOut(BaseModel):
     # A rewritten turn says so — the fact of the edit is part of the
     # record even though the earlier words are not. Set on memory reads.
     edited: bool = False
+    # What this turn handed over, when a profile composed something
+    # (qrme/composing.py). The card, never the body: a transcript is
+    # polled, and a document in every poll is the document sent again.
+    document: dict | None = None
 
 
 class LookoutCreate(BaseModel):
