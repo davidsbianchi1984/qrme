@@ -402,6 +402,20 @@ struct ChatView: View {
                     messages.append(Bubble(
                         mine: false, text: content, pending: false,
                         mark: p.watermark?.display?.line ?? "✦ AI"))
+                    // A document the profile composed and handed over. Its
+                    // own line rather than a suffix on the reply: the words
+                    // are what was said, and this is what was given.
+                    if let doc = p.document {
+                        messages.append(Bubble(
+                            mine: false,
+                            text: "📄 " + (doc.name ?? L10n.t("chat.doc",
+                                                             state.language))
+                                  + (doc.ai_marked == true
+                                     ? " · " + L10n.t("chat.doc.ai",
+                                                      state.language)
+                                     : ""),
+                            pending: true))
+                    }
                     if let rc = reply.role_context {
                         messages.append(Bubble(
                             mine: false,

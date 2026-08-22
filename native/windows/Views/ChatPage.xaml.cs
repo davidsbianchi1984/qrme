@@ -328,6 +328,14 @@ public sealed partial class ChatPage : Page
                 _messages.Add(new BubbleRow(
                     p.Watermark?.Display?.Line ?? "✦ AI",
                     HorizontalAlignment.Left));
+            // A document the profile composed and handed over. Its own row:
+            // the words are what was said, this is what was given.
+            if (p.Status == "approved" && p.Document is { } doc)
+                _messages.Add(new BubbleRow(
+                    "📄 " + (doc.Name ?? L10n.T("chat.doc"))
+                          + (doc.AiMarked == true
+                             ? " · " + L10n.T("chat.doc.ai") : ""),
+                    HorizontalAlignment.Left));
             if (p.Status == "approved" && reply.RoleContext is { } rc)
                 _messages.Add(new BubbleRow(
                     $"◈ worked as {rc.Role} ({rc.How})",

@@ -352,6 +352,20 @@ struct ChatMessage: Decodable {
     let status: String
     let flag_reason: String?
     let watermark: WatermarkBrief?
+    /// What this turn handed over, when the profile composed something
+    /// (qrme/composing.py). The card, never the body: a transcript is
+    /// polled, and a document in every poll is the document sent again.
+    let document: ComposedDoc?
+}
+
+/// A document a profile wrote and handed over. `ai_marked` is true on every
+/// one of these — a composition is synthetic media outright, the mirror of
+/// a person's own photograph never being marked.
+struct ComposedDoc: Decodable {
+    let id: String
+    let name: String?
+    let url: String
+    let ai_marked: Bool?
 }
 
 /// The visible mark riding on every AI render (always displayed).

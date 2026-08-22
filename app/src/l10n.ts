@@ -8362,6 +8362,12 @@ const CHROME: Table = {
   "ins.face.mineoff": {
     en: "Take my picture down", es: "Quitar mi foto", fr: "Retirer ma photo", de: "Mein Bild entfernen", pt: "Remover a minha foto", it: "Togli la mia foto", ja: "自分の写真を外す", zh: "撤下我的照片", hi: "मेरी तस्वीर हटाएँ", ar: "إزالة صورتي",
   },
+  "chat.doc": {
+    en: "Document", es: "Documento", fr: "Document", de: "Dokument", pt: "Documento", it: "Documento", ja: "ドキュメント", zh: "文档", hi: "दस्तावेज़", ar: "مستند",
+  },
+  "chat.doc.ai": {
+    en: "AI-made", es: "hecho por IA", fr: "fait par IA", de: "KI-erstellt", pt: "feito por IA", it: "fatto dall'IA", ja: "AI作成", zh: "AI 生成", hi: "AI द्वारा बनाया", ar: "من صنع الذكاء الاصطناعي",
+  },
   "idn.give": {
     en: "Giving back", es: "Devolver algo", fr: "Rendre la pareille", de: "Etwas zurückgeben", pt: "Retribuir", it: "Ricambiare", ja: "還元する", zh: "回馈", hi: "कुछ लौटाना", ar: "ردّ الجميل",
   },

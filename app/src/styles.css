@@ -1640,3 +1640,20 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   border-top: 1px solid var(--line); }
 .idn-mymem-talk h4 { margin: 0 0 4px; font-size: 0.95rem; }
 .idn-mymem-talk p { margin: 2px 0; overflow-wrap: anywhere; }
+
+/* A document a profile handed over, inside its turn.
+ *
+ * A card rather than a link in a sentence: the thing was composed for you
+ * and is yours to keep, and a bare underlined filename reads as a citation.
+ * The AI mark rides on it because a composed document is synthetic media —
+ * the mirror of the rule that a person's own photograph is never marked. */
+.bubble-doc { display: flex; align-items: center; gap: 8px; margin-top: 8px;
+  padding: 8px 10px; border-radius: 10px; text-decoration: none;
+  border: 1px solid var(--line); background: rgba(255, 255, 255, 0.06);
+  color: inherit; }
+.bubble-doc:hover { background: rgba(255, 255, 255, 0.12); }
+.bubble-doc-icon { font-size: 16px; flex: none; }
+.bubble-doc-name { flex: 1; min-width: 0; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.bubble-doc-ai { flex: none; font-size: 10px; padding: 2px 6px;
+  border-radius: 999px; background: rgba(123, 92, 255, 0.28); }

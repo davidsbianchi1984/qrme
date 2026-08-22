@@ -11,7 +11,12 @@ import { Waveform } from "../Waveform";
 import { presenceOf, presenceKey, animatedIn } from "../presence";
 import { useSession } from "../store";
 
+interface Doc { id: string; name: string | null; url: string;
+                ai_marked: boolean }
 interface Msg { who: "you" | "assistant"; text: string; note?: string;
+                /** A document this turn handed over (qrme/composing.py) —
+                 *  the card, never the body. */
+                doc?: Doc | null;
                 /** Set when the model the owner chose did not answer and
                  *  the local fallback wrote this instead. */
                 degradedFrom?: string | null }
@@ -266,7 +271,10 @@ export function Chat({ onPlans }: {
       // model is a lie the reader has no way to detect from the words alone —
       // the sibling product's Coach screen has said so in amber for releases.
       const degradedFrom = reply.provenance?.degraded_from ?? null;
-      setMsgs((m) => [...m, { who: "assistant", text, note, degradedFrom }]);
+      // What the turn handed over, if it handed anything over.
+      const doc = (pm as { document?: Doc | null }).document ?? null;
+      setMsgs((m) => [...m, { who: "assistant", text, note, degradedFrom,
+                              doc }]);
       if ((speakOn || talking) && pm.status === "approved") speakAloud(text);
     } catch (e) {
       setError(e);
@@ -304,6 +312,24 @@ export function Chat({ onPlans }: {
         {msgs.map((m, i) => (
           <div key={i} className={"bubble " + m.who}>
             {m.text}
+            {/* A document, as a card you can open and keep — the whole
+              * point of the round: "how am I supposed to receive it and
+              * how does it render on the screen?" The AI mark rides on it
+              * because a composed document is synthetic media, which is
+              * the mirror of a person's own photograph never being
+              * marked. */}
+            {m.doc && (
+              <a className="bubble-doc" href={getBase() + m.doc.url}
+                 target="_blank" rel="noreferrer" download={m.doc.name ?? true}>
+                <span className="bubble-doc-icon" aria-hidden="true">📄</span>
+                <span className="bubble-doc-name">
+                  {m.doc.name || tr("chat.doc", lang)}
+                </span>
+                {m.doc.ai_marked && (
+                  <span className="bubble-doc-ai">{tr("chat.doc.ai", lang)}</span>
+                )}
+              </a>
+            )}
             {m.note && <div className="bubble-note">{m.note}</div>}
             {m.degradedFrom && (
               <div className="degraded">

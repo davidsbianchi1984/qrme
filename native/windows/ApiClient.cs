@@ -371,11 +371,22 @@ public record RelationshipState(
     [property: JsonPropertyName("nickname")] string? Nickname,
     [property: JsonPropertyName("tone")] string? Tone);
 
+/// <summary>A document a profile wrote and handed over. Always AI-marked:
+/// a composition is synthetic media outright, which is the mirror of a
+/// person's own photograph never being marked.</summary>
+public record ComposedDoc(
+    [property: JsonPropertyName("id")] string Id,
+    [property: JsonPropertyName("name")] string? Name,
+    [property: JsonPropertyName("url")] string Url,
+    [property: JsonPropertyName("ai_marked")] bool? AiMarked);
+
 public record ChatMessage(
     [property: JsonPropertyName("content")] string? Content,
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("flag_reason")] string? FlagReason,
-    [property: JsonPropertyName("watermark")] WatermarkBrief? Watermark);
+    [property: JsonPropertyName("watermark")] WatermarkBrief? Watermark,
+    // What the turn handed over. The card, never the body.
+    [property: JsonPropertyName("document")] ComposedDoc? Document);
 
 public record ChatReply(
     [property: JsonPropertyName("profile_message")] ChatMessage ProfileMessage,

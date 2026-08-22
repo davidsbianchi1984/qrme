@@ -38,7 +38,16 @@ data class ChatMessage(val content: String?, val status: String, val flagReason:
                        val provenance: Provenance? = null, val watermarkLine: String? = null,
                        // Spec clauses 2/12: which way the profile worked, and
                        // whether the owner declared it or the wording implied it.
-                       val role: String? = null, val roleHow: String? = null)
+                       val role: String? = null, val roleHow: String? = null,
+                       // What the turn handed over, when the profile composed
+                       // something (qrme/composing.py). The card, never the
+                       // body — a transcript is polled.
+                       val document: ComposedDoc? = null)
+/** A document a profile wrote and handed over. Always AI-marked: a
+ *  composition is synthetic media outright, which is the mirror of a
+ *  person's own photograph never being marked. */
+data class ComposedDoc(val id: String, val name: String?, val url: String,
+                       val aiMarked: Boolean)
 /** Extract and reconstruct: whose work is this, from the text alone. */
 /** The count, and the three things it refuses to be. The refusals arrive as
  *  fields rather than prose so a screen renders them beside the number

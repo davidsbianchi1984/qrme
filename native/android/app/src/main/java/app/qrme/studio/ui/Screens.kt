@@ -1697,6 +1697,16 @@ fun ChatScreen(vm: StudioViewModel) {
                     listOfNotNull(
                         Bubble(false, reply.content, false,
                                mark = reply.watermarkLine ?: "\u2726 AI"),
+                        // A document the profile composed and handed over.
+                        // Its own line: the words are what was said, this
+                        // is what was given.
+                        reply.document?.let { doc ->
+                            Bubble(false, "\uD83D\uDCC4 " +
+                                (doc.name ?: L10n.t("chat.doc", vm.language)) +
+                                (if (doc.aiMarked)
+                                    " · " + L10n.t("chat.doc.ai", vm.language)
+                                 else ""), true)
+                        },
                         reply.role?.let { r0 ->
                             Bubble(false, "◈ worked as $r0" +
                                 (reply.roleHow?.let { " ($it)" } ?: ""), true)

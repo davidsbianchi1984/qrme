@@ -79,6 +79,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   transcript is polled, and a document in every poll is the document sent
   again on every poll.
 
+- **The document renders, on all four surfaces.** The third of the three
+  questions — *"how does it render on the screen?"* — answered as a card
+  rather than a link in a sentence: the thing was composed for you and is
+  yours to keep, and a bare underlined filename reads as a citation. The
+  console draws it openable and savable; each shell draws its name and its
+  mark. On every one it gets its own row rather than being appended to the
+  reply, because the words are what was said and the file is what was
+  given.
+
 ### Changed
 
 - **`ai_marked` stopped being a constant.** It has been a field in this API
