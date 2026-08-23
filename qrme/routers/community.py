@@ -877,6 +877,60 @@ async def share_in_room(room_id: str, request: Request,
         media_id=saved["id"], media_text=words, media_digest=digest)}
 
 
+@router.post("/rooms/{room_id}/heard")
+async def heard_in_room(room_id: str, request: Request,
+                        interactor_id: str) -> dict:
+    """Recorded speech in, words out. The audio is not stored.
+
+    The door an iPhone needs. The room has listened through the browser's
+    own recogniser and nothing else, and on iOS that constructor exists and
+    the service always refuses — so a person holding the phone this product
+    is mostly used on could hear a room and never speak in one. Reported
+    twice, and 1.4.1 could only make the refusal say its own name.
+
+        asked     can this browser hear you
+        mattered  can this browser reach a transcriber
+
+    Deliberately **only** the hearing. What comes back goes through
+    ``POST /rooms/{id}/say`` like anything else said here, so moderation,
+    the echo window and the speaking rules stay in the one place that
+    already owns them; a route that heard and said in one breath would be a
+    second door into the transcript with its own copy of those rules to
+    drift out of step.
+
+    Gated exactly like sharing a file: the speaker must be a user
+    participant, held by their own token. A room id on a printed sticker is
+    not a way to put words in the transcript, and it is not a way to spend
+    the deployment's transcription either.
+
+    A deployment with no ears answers 503 with the reason rather than an
+    empty string. Silence here would be read as "it didn't hear me" by
+    somebody who has just spoken into their phone, and the true answer —
+    that this deployment has nowhere to send the audio — is one an owner
+    can act on and a guest cannot guess.
+    """
+    room = _room_or_404(room_id)
+    if room["status"] != "active":
+        raise HTTPException(409, "this room has closed")
+    require_interactor(interactor_id, request)
+    if not any(p["kind"] == "user" and p["ref_id"] == interactor_id
+               for p in _participants(room_id)):
+        raise HTTPException(403, "you are not in this room")
+
+    from .. import scrape
+
+    data = await request.body()
+    if not data:
+        raise HTTPException(422, "no audio")
+    heard = scrape.transcribe_bytes(data, interactor_id)
+    if heard is None:
+        raise HTTPException(
+            503, "this deployment has no transcription service, so recorded "
+                 "speech cannot be turned into words — set QRME_EARS_URL, or "
+                 "type instead")
+    return {"text": heard["text"]}
+
+
 @router.delete("/rooms/{room_id}/face")
 def clear_room_face(room_id: str, interactor_id: str,
                     request: Request) -> dict:

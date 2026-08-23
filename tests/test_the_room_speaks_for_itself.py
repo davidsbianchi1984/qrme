@@ -134,7 +134,12 @@ def test_talking_into_a_voice_room_reaches_the_room():
     """
     start = re.search(r"function startTalking\(\)([\s\S]*?)\n  \}", INSIDE)
     assert start, "the talk control is gone from the room screen"
-    send = re.search(r"function sendPending\(\)([\s\S]*?)\n  \}", INSIDE)
+    # `\(\)` again. This guard's own note above says a guard pinned to the
+    # old shape tests the shape rather than the claim, and it was pinned to
+    # an empty parameter list — so it failed the moment `sendPending` took
+    # an argument saying which ear brought the words. The claim never
+    # mentioned how many parameters it has.
+    send = re.search(r"function sendPending\([^)]*\)([\s\S]*?)\n  \}", INSIDE)
     assert send, "nothing commits what the ear heard"
     assert "api.sayInRoom(" in send.group(1), (
         "what the recogniser hears must reach the room, not a draft box")

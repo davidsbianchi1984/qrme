@@ -7,6 +7,7 @@ import { Refusal } from "../Refusal";
 import { speakInPieces } from "../spoken";
 import { useSession } from "../store";
 import { putAway, whenPutAway } from "../away";
+import { canRecord, recordTurn, type Recording } from "../roomear";
 
 /**
  * Inside a room.
@@ -130,12 +131,29 @@ const onAPhone = typeof window !== "undefined"
   && typeof window.matchMedia === "function"
   && window.matchMedia("(pointer: coarse)").matches;
 
-const canDictate = typeof window !== "undefined"
+/** Whether this browser has a recogniser at all.
+ *
+ *  Kept as its own fact because it is a real one, and because it is NOT the
+ *  question the microphone button should be asking. On iOS this is true and
+ *  the service refuses every time — a binding is not a door, which this
+ *  console has learned in three separate places now. */
+const hasRecogniser = typeof window !== "undefined"
   && Boolean((window as unknown as { SpeechRecognition?: unknown;
                                      webkitSpeechRecognition?: unknown })
       .SpeechRecognition
     || (window as unknown as { webkitSpeechRecognition?: unknown })
       .webkitSpeechRecognition);
+
+/** Whether there is any way for this browser to hear you.
+ *
+ *      asked     does this browser have a recogniser
+ *      mattered  can this person speak in the room
+ *
+ *  Two ears, and the button appears if either can stand. An iPhone has no
+ *  usable recogniser and can record perfectly well, and it was being shown
+ *  a room it could not talk in because the control asked the first question
+ *  instead of the second. */
+const canDictate = hasRecogniser || canRecord();
 
 export function Inside({ onPlans, start = "", onLeave }: {
   onPlans: () => void;
@@ -278,6 +296,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // So the ear comes down and says so, and it stands back up on return
   // because the decision behind it never changed.
   const dozing = useRef(false);
+  /** A recording in flight, where this console records rather than relying
+   *  on a recogniser the browser may not really have. */
+  const taping = useRef<Recording | null>(null);
+  /** Set once this platform has refused its own recogniser, so the next
+   *  press does not spend another round trip discovering it again. */
+  const recorderOnly = useRef(false);
   const [dozed, setDozed] = useState(false);
   // Why the ear died, when it did.
   //
@@ -871,7 +895,20 @@ export function Inside({ onPlans, start = "", onLeave }: {
    *  sentence and the room's own voice can land in the same pending
    *  buffer, and the thing worth checking is what is about to be SAID in
    *  the room, not each fragment on its way in. */
-  function sendPending() {
+  /** Send what was heard.
+   *
+   *  `barged` says the words came from the recorded ear, which has an
+   *  analyser in front of it and already decided: a peak that cleared
+   *  `BARGE_PEAK` while the room was speaking is a person leaning into the
+   *  microphone, not a speaker across the table. The time gate exists
+   *  because the recogniser has no analyser and cannot tell those apart;
+   *  applying it to an ear that CAN tell would throw away the interruption
+   *  it just correctly recognised.
+   *
+   *      asked     was that the room's own voice
+   *      mattered  which ear is being asked
+   */
+  function sendPending(barged = false) {
     const said = pending.current.trim();
     pending.current = "";
     setDraft("");
@@ -881,7 +918,8 @@ export function Inside({ onPlans, start = "", onLeave }: {
     // clean echo that arrived after the tail, and it stays because the two
     // fail in different directions: a text match misses a mangled echo, and
     // a clock misses a late one.
-    if (speaking.current || Date.now() < disbelieveUntil.current) return;
+    if (!barged && (speaking.current
+                    || Date.now() < disbelieveUntil.current)) return;
     if (isEcho(said, roomSaid.current.join(" "))) {
       // The room hearing itself. Dropped silently and the ear stays
       // open — announcing it would be the product apologising for a
@@ -891,6 +929,64 @@ export function Inside({ onPlans, start = "", onLeave }: {
     // `act` is deliberately not used: it flips `busy`, which would grey
     // out the room under somebody mid-conversation.
     api.sayInRoom(open, me, said, token).then(load).catch(setError);
+  }
+
+  /** The recorded ear, standing.
+   *
+   *  One turn at a time: open the microphone, wait for the silence that
+   *  means the sentence is over, post the audio, put the words in. Then do
+   *  it again, because the person's decision has not changed — the same
+   *  contract the recogniser's `onend` has, with a mechanism that does not
+   *  depend on what speech service the browser ships.
+   *
+   *  Every failure ends the loop rather than feeding it. A microphone that
+   *  keeps reopening into a refusal is the defect this room has already had
+   *  twice, once per ear.
+   */
+  async function standRecordedEar() {
+    if (!token || taping.current) return;
+    while (wantTalking.current && !dozing.current) {
+      let turn: Recording;
+      try {
+        turn = await recordTurn(open, me, token,
+                                () => speaking.current, undefined);
+      } catch {
+        // The microphone itself was refused. Nothing to retry into.
+        setEarFault(tr("ins.ear.blocked", lang));
+        wantTalking.current = false;
+        setTalking(false);
+        return;
+      }
+      taping.current = turn;
+      setTalking(true);
+      let said = "";
+      try {
+        said = await turn.done;
+      } catch (e) {
+        const why = (e as Error).message || "";
+        // Quiet is not a failure: a turn nobody spoke into simply opens
+        // the microphone again, which is what a standing ear is for.
+        if (why !== "nothing was heard in that"
+            && why !== "nothing was recorded") {
+          // Everything else is the door refusing — most often a deployment
+          // with no transcriber, which is a sentence its owner can act on
+          // and no amount of pressing will change.
+          setError(e);
+          wantTalking.current = false;
+          taping.current = null;
+          setTalking(false);
+          return;
+        }
+      }
+      taping.current = null;
+      if (said) {
+        pending.current = said;
+        setDraft(said);
+        // `true`: the analyser already ruled on this one.
+        sendPending(true);
+      }
+    }
+    setTalking(false);
   }
 
   /** Start the standing ear.
@@ -904,14 +1000,27 @@ export function Inside({ onPlans, start = "", onLeave }: {
       webkitSpeechRecognition?: new () => SpeechRec;
     };
     const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
-    if (!SR || talkRec.current) return;
+    if (talkRec.current || taping.current) return;
     wantTalking.current = true;
     if (putAway()) {
-      // Restarted by `onend` on a page already in the background, or asked
-      // for by a room opened into a hidden tab. Starting here is the loop.
       dozing.current = true;
       setDozed(true);
       setTalking(false);
+      return;
+    }
+    // No recogniser, or one this platform has already refused: record and
+    // send instead. Chosen by what works rather than by hope — on iOS the
+    // constructor exists and the service always refuses, so "is there a
+    // constructor" was never the question worth asking.
+    if (!SR || recorderOnly.current) {
+      if (!canRecord()) {
+        setEarFault(tr("ins.ear.platform", lang));
+        wantTalking.current = false;
+        setTalking(false);
+        return;
+      }
+      setEarFault(null);
+      void standRecordedEar();
       return;
     }
     // One microphone: dictation and the standing ear cannot both hold it.
@@ -954,6 +1063,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
       const code = e.error || "";
       if (code === "not-allowed") {
         fatal = true; setEarFault(tr("ins.ear.blocked", lang));
+      } else if (code === "service-not-allowed" && canRecord()) {
+        // The platform refusing its own recogniser — iOS, every time. There
+        // is a second ear, so this is a fork in the road rather than a dead
+        // end, and the person is told nothing because nothing was lost.
+        recorderOnly.current = true;
+        fatal = true;
       } else if (code === "service-not-allowed") {
         // The platform refusing, rather than the person. No setting on the
         // phone changes it and no number of presses will either, so the
@@ -971,7 +1086,17 @@ export function Inside({ onPlans, start = "", onLeave }: {
       // A fault relighting cannot fix ends the ear rather than feeding the
       // loop. `wantTalking` goes with it: leaving the decision standing
       // would have the next press restart straight back into the refusal.
-      if (fatal) { wantTalking.current = false; setTalking(false); return; }
+      if (fatal) {
+        // A fault with somewhere to go hands the ear over; one without
+        // ends it. Either way the loop never restarts into the refusal.
+        if (recorderOnly.current && wantTalking.current) {
+          void standRecordedEar();
+          return;
+        }
+        wantTalking.current = false;
+        setTalking(false);
+        return;
+      }
       if (wantTalking.current) { startTalking(); return; }
       setTalking(false);
     };
@@ -985,6 +1110,11 @@ export function Inside({ onPlans, start = "", onLeave }: {
     wantTalking.current = false;
     dozing.current = false;
     setDozed(false);
+    // Whichever ear is standing. `stop` on a recording ends the turn and
+    // sends what it already has, the same bargain the recogniser's stop
+    // makes with a finished sentence.
+    taping.current?.stop();
+    taping.current = null;
     if (silence.current !== null) {
       window.clearTimeout(silence.current);
       silence.current = null;

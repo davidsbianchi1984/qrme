@@ -5131,6 +5131,33 @@ export const api = {
     return data as { shared: RoomMsg };
   },
 
+  /** Recorded speech in, words out. The audio is not stored.
+   *
+   *  The path an iPhone needs. The room's other ear is the browser's own
+   *  recogniser, and on iOS that constructor exists while the service
+   *  always refuses — so this posts the bytes instead and lets the
+   *  deployment's transcriber answer.
+   *
+   *  Raw body like `shareInRoom`, for the same reason: the audio is a file
+   *  of bytes, and base64 through JSON would cost a third more of somebody's
+   *  data for nothing. 503 is a real answer here (no ears configured) and
+   *  reaches the caller as a `RequestError` with the sentence to show. */
+  heardInRoom: async (roomId: string, interactorId: string, audio: Blob,
+                      token: string) => {
+    const res = await fetch(getBase() +
+      `/rooms/${roomId}/heard?interactor_id=${encodeURIComponent(interactorId)}`,
+      { method: "POST", body: audio,
+        headers: { authorization: `Bearer ${token}` } });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const body = data as { detail?: unknown; message?: unknown };
+      throw new RequestError(res.status,
+                             body.detail ?? `could not hear that (${res.status})`,
+                             body.message);
+    }
+    return data as { text: string };
+  },
+
   overlayCatalogue: () => req<OverlayCatalogue>("/overlays/catalogue"),
 
   wearOverlay: (surface: string, surfaceId: string, body: {
