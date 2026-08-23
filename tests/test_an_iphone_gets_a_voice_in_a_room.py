@@ -214,9 +214,15 @@ def test_a_recorded_turn_keeps_its_barge_in() -> None:
     assert send.group(1).strip(), (
         "sendPending cannot tell which ear brought the words, so the "
         "recorded ear's barge-in is dropped by a gate written for the other")
-    assert re.search(r"!barged\s*&&", send.group(2)), (
-        "the time gate is applied to every ear, including the one with an "
-        "analyser in front of it")
+    # By the parameter's own name, whatever it is called. This asserted
+    # `!barged &&` and failed when the parameter was renamed to `fromEar`
+    # to make room for a second, separate fact — the meter's verdict. The
+    # claim was never about the spelling: the gate must not apply to the ear
+    # that already ruled.
+    which = send.group(1).split("=")[0].strip()
+    assert re.search(r"!%s\s*&&" % re.escape(which), send.group(2)), (
+        f"the time gate is applied to every ear, including `{which}` — the "
+        "one with an analyser in front of it that has already ruled")
     assert "isEcho(" in send.group(2), (
         "the text net was dropped — it still catches what the clock misses")
 
