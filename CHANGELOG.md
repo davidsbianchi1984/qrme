@@ -4,6 +4,60 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-08-23
+
+An iPhone gets a voice in a room.
+
+### Added
+
+- **A second ear this console owns.** The room has listened through the
+  browser's own recogniser and nothing else. On iOS that constructor exists
+  and the service always refuses, so the phone this product is mostly used on
+  had a microphone button and no way to speak. Reported twice; 1.4.1 could
+  only make the refusal say its own name, which is honest and is not a voice.
+
+      asked     does this browser have a recogniser
+      mattered  can this person speak in the room
+
+  iOS answers yes to the first and no to the second, and every control here
+  was reading the first — the same *a binding is not a door* mistake this
+  console has now made in three places. `POST /rooms/{id}/heard` takes
+  recorded audio and answers with words, gated exactly like sharing a file:
+  the speaker must be a user participant held by their own token, because a
+  room id on a printed sticker is not a way to put words in a transcript and
+  not a way to spend somebody's transcription either. The audio is not
+  stored. Deliberately **only** the hearing — what comes back goes through
+  the existing say door, so moderation and the echo rules stay in the one
+  place that owns them rather than being copied into a second one that goes
+  stale.
+
+  Neither ear replaces the other. The recogniser is live, free, needs no key
+  and no round trip, and stays the ordinary way in everywhere it works; the
+  recorded ear stands when there is none, or when the platform has already
+  refused the one there is — remembered, so the next press does not pay to
+  discover it again.
+
+  A deployment with no transcriber answers 503 naming `QRME_EARS_URL` and
+  says that typing still works. Silence there would be read as *it didn't
+  hear me* by somebody who has just spoken into their phone.
+
+### Fixed
+
+- **Barge-in comes back.** 1.4.1 traded it away to stop the room prompting
+  itself, and said so at the time. The trade was forced: a recogniser has no
+  analyser, so there was no way to tell a person leaning into the microphone
+  from a speaker across the table, and the only certain signal left was the
+  clock. A recorded turn has an analyser and a raised bar while the room is
+  speaking, so `sendPending` now asks **which ear** brought the words —
+  applying the clock to an ear that already ruled would throw away the
+  interruption it just correctly recognised.
+
+- **The echo defence finally works on sound.** The room had a
+  70%-word-overlap text match, which misses a misheard echo, and a clock,
+  which misses a late one. A recorded stream asks for `echoCancellation` by
+  name — the browser's own AEC, and the only one of the three that is about
+  the actual problem rather than a proxy for it.
+
 ## [1.4.1] - 2026-08-23
 
 Three things the room did wrong, all reported from a device rather than
