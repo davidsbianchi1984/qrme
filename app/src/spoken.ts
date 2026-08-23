@@ -50,6 +50,20 @@ export interface Speaking {
   done: Promise<void>;
   /** Cut it off: the playing piece pauses and the rest are dropped. */
   stop: () => void;
+  /** How much of it was actually heard, as text.
+   *
+   *  A reply is spoken sentence by sentence, so an interruption lands at a
+   *  known place: everything before the piece in the air was heard, and
+   *  everything after it was not. Somebody who cuts a profile off has heard
+   *  a prefix of what it said, and the profile answering them next needs to
+   *  know WHICH prefix — otherwise it carries on from a point the person
+   *  never reached, or repeats what they already sat through.
+   *
+   *  The piece being played when the stop lands counts as heard: it started,
+   *  so some of it reached the room. Rounding the other way would have the
+   *  profile re-say a sentence the person interrupted precisely because
+   *  they had heard enough of it. */
+  heard: () => string;
 }
 
 /** A 44-byte WAV with no samples. Playing it is inaudible and instant;
@@ -171,7 +185,7 @@ export async function speakInPieces(
 ): Promise<Speaking> {
   const pieces = spokenPieces(text);
   if (pieces.length === 0) {
-    return { done: Promise.resolve(), stop: () => {} };
+    return { done: Promise.resolve(), stop: () => {}, heard: () => "" };
   }
   // Awaited before the handle exists: a caller that cannot get even the
   // first piece should take its fallback path, not hold a dead handle.
@@ -182,6 +196,10 @@ export async function speakInPieces(
   if (!ear) ear = new Audio();
   const el = ear;
   let stopped = false;
+  // Pieces that began playing. The first is counted where it starts below,
+  // not here: this is a record of what reached the room, so a piece the
+  // platform refused must not be in it.
+  let said = 0;
 
   // The first piece is played before the handle exists, for the same
   // reason the first piece is fetched before it: a refusal here has to
@@ -192,6 +210,7 @@ export async function speakInPieces(
     // Started, not finished — awaiting the whole piece would put the
     // caller's "it is speaking" light on a sentence late.
     await Promise.race([playing, started(el)]);
+    said = 1;
   } catch (why) {
     URL.revokeObjectURL(firstSrc);
     throw why;
@@ -210,6 +229,7 @@ export async function speakInPieces(
           : Promise.resolve(null);
         const src = URL.createObjectURL(blob);
         playing = playPiece(el, src);
+        said = i + 1;
         try {
           await playing;
         } catch {
@@ -229,6 +249,7 @@ export async function speakInPieces(
   return {
     done,
     stop: () => { stopped = true; el.pause(); },
+    heard: () => pieces.slice(0, said).join(" "),
   };
 }
 

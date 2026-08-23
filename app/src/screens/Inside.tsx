@@ -415,53 +415,6 @@ export function Inside({ onPlans, start = "", onLeave }: {
 
   /** And stopped. The tail covers the speaker still decaying and the
    *  recogniser delivering a result it formed a moment ago. */
-  /** The person is taking the turn, now, and the room stops talking.
-   *
-   *      asked     did the person say something
-   *      mattered  is the profile still talking over it
-   *
-   *  Sending IS an interruption. Somebody who typed a sentence and pressed
-   *  send while a profile was mid-answer has said, as plainly as it can be
-   *  said, that they are done listening to that one — and the reply they
-   *  get back arrives underneath a voice still finishing the previous
-   *  thought. The voice-level meter catches this when they speak up; this
-   *  catches it when they do not have to.
-   *
-   *  Deliberately not conditional on the room being audible: `stop()` on a
-   *  voice that is not playing costs nothing, and a condition here is a
-   *  second thing to keep true.
-   */
-  function personTakesTheTurn() {
-    nowSaying.current?.stop();
-    nowSaying.current = null;
-    setVoicing(null);
-    roomFellQuiet();
-  }
-
-  /** The person is taking the turn, now, and the room stops talking.
-   *
-   *      asked     did the person say something
-   *      mattered  is the profile still talking over it
-   *
-   *  Sending IS the interruption. Somebody who spoke on purpose, or typed a
-   *  sentence and pressed send, has said as plainly as it can be said that
-   *  they are done listening to this answer — often because it is heading
-   *  somewhere they want to stop. Waiting for the paragraph to finish first
-   *  makes the correction arrive after the thing it was meant to prevent.
-   *
-   *  `stop()` cuts the sentence in the air rather than the queue behind it:
-   *  it pauses the element, so the voice ends mid-word if that is where the
-   *  person spoke. Nothing here is conditional on the room being audible —
-   *  stopping a voice that is not playing costs nothing, and a condition
-   *  would be a second thing to keep true.
-   */
-  function personTakesTheTurn() {
-    nowSaying.current?.stop();
-    nowSaying.current = null;
-    setVoicing(null);
-    roomFellQuiet();
-  }
-
   /** The person has taken the turn. The speaker stops; the words stay.
    *
    *      asked     did the person say something
@@ -482,6 +435,21 @@ export function Inside({ onPlans, start = "", onLeave }: {
    *  is not deleting what it said.
    */
   function personTakesTheTurn() {
+    // The QUEUE first, not just the sentence.
+    //
+    //     asked     did the voice in the air stop
+    //     mattered  did the next one start
+    //
+    // `stop()` pauses the piece being played, which resolves `s.done`, which
+    // lets the backlog loop move straight on to the following message and
+    // begin speaking that. So an interruption ended one sentence and bought
+    // the next paragraph — reported exactly that way: "it won't stop, you
+    // have to wait for a paragraph or two to finish."
+    //
+    // `earRun` is the loop's own break, and it was only ever bumped when
+    // somebody left the room. A person interrupting is the same fact:
+    // whatever was queued is not what they want to hear now.
+    earRun.current++;
     nowSaying.current?.stop();
     nowSaying.current = null;
     setVoicing(null);
@@ -1202,7 +1170,21 @@ export function Inside({ onPlans, start = "", onLeave }: {
       // Gated here rather than only at the send, so the room's own words
       // never reach the draft box either — watching the profile type its
       // last sentence into your composer is the same bug with a worse view.
-      if (speaking.current || Date.now() < disbelieveUntil.current) return;
+      //
+      // But NOT past somebody interrupting. This gate is why barge-in could
+      // not work on a browser with a recogniser: it dropped everything heard
+      // while the room spoke, at the ear, so the words never reached the
+      // send and the meter's verdict had nothing left to be applied to. A
+      // person talking over a profile got silence twice — the voice did not
+      // stop, and what they said was thrown away.
+      //
+      //     asked     is the room speaking
+      //     mattered  is somebody speaking over it on purpose
+      //
+      // `barged` is the meter's answer to the second question, and it is the
+      // only thing that can tell an interruption from an echo on this path.
+      if (!barged.current
+          && (speaking.current || Date.now() < disbelieveUntil.current)) return;
       pending.current = (pending.current ? pending.current + " " : "") + heard;
       // Shown as it is heard. The box is the feedback that the room is
       // listening; without it an open microphone is indistinguishable
@@ -1328,8 +1310,6 @@ export function Inside({ onPlans, start = "", onLeave }: {
     if (!draft.trim() || !token || busy) return;
     const text = draft;
     setDraft("");
-    personTakesTheTurn();
-    personTakesTheTurn();
     personTakesTheTurn();
     await act(async () => { await api.sayInRoom(open, me, text, token); })();
   }

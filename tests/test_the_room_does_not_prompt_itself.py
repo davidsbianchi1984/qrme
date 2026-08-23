@@ -235,3 +235,46 @@ def test_the_meter_never_opens_a_microphone_nobody_asked_for() -> None:
         "the meter opens a microphone for somebody who never pressed one — "
         "a recording light nobody asked for, to solve a problem they do not "
         "have")
+
+
+def test_interrupting_stops_the_queue_and_not_just_the_sentence() -> None:
+    """"It won't stop and you have to wait for a paragraph or two to
+    finish."
+
+        asked     did the voice in the air stop
+        mattered  did the next one start
+
+    The backlog speaks a QUEUE of messages. `stop()` pauses the piece being
+    played, which resolves the `done` the loop is awaiting, which lets it
+    move on to the following message and begin speaking that. So an
+    interruption ended one sentence and bought the next paragraph.
+
+    `earRun` is the loop's own break and was bumped only when somebody left
+    the room. Interrupting is the same fact about what is wanted next.
+    """
+    code = _stripped()
+    turn = re.search(r"function personTakesTheTurn\(\)\s*\{(.*?)\n  \}",
+                     code, re.S)
+    assert turn, "personTakesTheTurn moved — this guard reads it by name"
+    body = turn.group(1)
+    assert "earRun.current++" in body, (
+        "interrupting stops the sentence in the air and lets the queue "
+        "behind it carry on — the next message starts speaking")
+    assert "nowSaying.current?.stop()" in body, (
+        "the voice already playing is not stopped at all")
+    # Order matters: bump first, so the loop's own check has already flipped
+    # by the time `stop()` resolves what it is awaiting.
+    assert body.index("earRun.current++") < body.index("nowSaying.current?.stop()"), (
+        "the queue is broken after the sentence is stopped, which is a race "
+        "the loop can win")
+
+
+def test_the_typed_send_interrupts_too() -> None:
+    """Somebody who types while a profile talks has said what they want as
+    plainly as speaking it."""
+    code = _stripped()
+    send = re.search(r"async function sendDraft\(\)(.*?)\n  \}", code, re.S)
+    assert send, "sendDraft moved — this guard reads it by name"
+    assert "personTakesTheTurn()" in send.group(1), (
+        "sending typed text leaves the profile talking over the reply it is "
+        "about to get")
