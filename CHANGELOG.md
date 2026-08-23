@@ -8,6 +8,25 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **A visitor is refused in their own language now, not just an owner.** The
+  refusal ledger stood at 109 English-only sentences. Twenty-five of them are
+  gone, and they were not an arbitrary twenty-five: they are the ones a
+  *visitor* hits. A room that has closed, a party whose host has left, a game
+  session that ended, a comment on a post, a friend request to a profile that
+  is not yours, a microphone you were not lent.
+
+      asked     is the sentence translated
+      mattered  who is standing in front of it
+
+  The eleven already translated are the ones an **owner** meets — credentials,
+  ownership, subscription. An owner has an account, a chosen language, a
+  console. A visitor scanning a code has none of that: they arrive through a
+  link, in whatever language their phone is set to, and the one sentence this
+  product ever says to them may well be a refusal. Handing that person English
+  because the untranslated backlog happened to be sorted by module is the
+  wrong order to have worked in. These twenty-five come first now, across all
+  nine languages. Eighty-four English rows remain, all of them behind a login.
+
 - **A person's own words stop being cut mid-sentence.** The last two silent
   slices in this product were what somebody typed, and both reach a prompt:
   the **note** on a document arrives as *"They said: …"* under the item it

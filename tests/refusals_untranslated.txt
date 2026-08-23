@@ -1,4 +1,4 @@
-# status: backlog — 109 rows
+# status: backlog — 84 rows
 #
 # English refusals — the sentences this product says when it says no.
 # Checked by test_the_platform_refuses_in_one_language.py, both directions,
@@ -109,7 +109,6 @@ CloudModelClient needs base_url or a client
 PDIClient needs base_url or an injected client
 a beacon needs a label so its owner can tell their codes apart once several are printed and stuck to different doors
 a beacon needs the whole surface — a QR on a strip is too small for a phone to read, and an unscannable code looks broken rather than missing
-a comment needs something in it
 a delegation policy needs at least one phase
 a desk claims a real person staffs it, so it cannot be opened without recording who attests that and on what basis
 a device name is at most 60 characters
@@ -125,8 +124,6 @@ a pane with no faces is the helper button on its own — set the state to 'handl
 a place needs a locality — 'somewhere' is what leaving it unset already means
 a position cannot be negative
 a post can only promote its own profile's listing
-a post needs something in it
-a profile cannot be its own friend
 a rated listing cannot carry a location: where a performer physically is has nothing to do with browsing them, and a place filter is a way of asking
 a rated profile can never be blended into a hybrid
 a rated profile cannot staff a department
@@ -150,47 +147,27 @@ coordination takes at least two departments — add another before asking them t
 delegating `research` requires a grant: without one the phase reads every source item on the profile
 give it a name — it is what the other people are shown
 hand over a card: `card` as JSON, or `content` as a base64 PNG with one embedded
-join the party before talking in it
 name what is being connected — a machine, a program, a screen
 no campaigns on a rated profile — tips to a performer go through the age-gated gift, never an open donation page
 no character card is embedded in this image — the PNG has no chara/ccv3 text chunk
 no department has an agent able to contribute — every one of them has departed, been terminated, or is under objection
 no such caller — sessions are with a real interactor, not a free-typed name
-no such comment
 no such department in this organization
 no such device
-no such game session
-no such room
 no such screen
 no such subscription
-no such watch party
 no voice consent on record for this profile
 no voice consent on record for this profile — grant it first (PUT /profiles/{id}/voiceprint/consent)
 no voiceprint for this profile — build one first
 not a PNG — a card image starts with the PNG signature
-not subscribed
-not your comment
-nothing to say
-only a participant can lend a microphone
-only the holder or the viewer can end this
-only the host ends the party
-only the host moves the room's position
-only your own turn can be edited — a profile's reply is not yours to rewrite
 remote control needs a written scope: what on the machine may be touched, in words the caller will be shown
-say something
-say what you are trying to find, in your own words
 say where the money goes first — designate loved ones or organizations (PUT /profiles/{id}/proceeds) before asking anyone for it
 scope 'locality' needs a locality
 scope 'locality' needs a locality to be near
 scope 'region' needs a region
 shown_name needs the profile id to build an anonymous name — pass profile_id when the row does not carry one
 that is somebody else's likeness. An anonymous profile wearing another person's face is impersonation with a layer of deniability on top
-that post already has a video
-that post has no video to watch
 that post is not visible, so it cannot be watched together
-that profile is not yours
-that room has closed
-that session has ended
 that signature authorises something else — a referral is released only by the signature raised for it
 the card carries no identity — description, personality and scenario are all empty
 the card names nobody — `data.name` is empty
@@ -198,7 +175,6 @@ the department's agent must be a profile this organization's owner holds
 the founder is a fixed friend on every profile and cannot be removed
 the image carries a card chunk that does not decode as one
 the image could not be read — it is not base64
-the same friend twice is still one friend
 there is nothing to refer yet — this releases your sessions with the specialist, and there are none
 this campaign has reached today's donation count — the tokenless door is rate-limited so it can never become a ledger-spam hose; give again tomorrow
 this deployment is reachable beyond localhost but has no QRME_ADMIN_TOKEN configured — objection review and succession stay closed until it is
@@ -213,4 +189,3 @@ upload a picture first — 'photo' is a box with a picture in it, and there is n
 voiceprint enrollment requires attesting the voice is your own — QRME will not clone a voice on somebody else's behalf
 workflow is not awaiting input
 you already have a hand up on this stream — one at a time, so a host reading the queue sees people rather than repeats
-you have no verified profile to move
