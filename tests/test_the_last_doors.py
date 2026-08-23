@@ -208,13 +208,67 @@ def test_the_senses_answer_and_the_cv_form_refuses_by_name(client):
 # -- the doors and their languages ------------------------------------------
 
 def test_no_route_in_the_table_lacks_a_door_anywhere(client):
-    """The record itself: every per-shell doorless file is empty."""
+    """No route is unreachable from EVERY surface, and every shell's
+    deferral is a real route with a reason.
+
+    This asserted the three per-shell files were empty, which is what they
+    were when the round that wrote it finished. It stopped being true the
+    day a route was legitimately deferred — `POST /rooms/{room_id}/heard`,
+    which takes recorded audio and answers with words, and which none of
+    the shells has a caller for. The web console does.
+
+        asked     is every per-shell record empty
+        mattered  is any route unreachable from everywhere
+
+    Two guards already contradicted each other here.
+    `test_every_route_has_a_door.py` states in its own words that adding a
+    line to a doorless file **is allowed** — "a backlog is not an approval,
+    and there are legitimate reasons to defer" — and
+    `test_the_phone_is_a_client_too.py` holds the ratchet that stops one
+    growing (309/311/309, currently one row each). Between them, deferring
+    is already a deliberate edit that shows in a diff and cannot widen. An
+    assertion of emptiness on top of that is not a third protection; it is
+    a claim about a finished state, and the day it stops being true it
+    reports a decision as a defect.
+
+    So this keeps the part that is still a promise and drops the part that
+    was a snapshot. The union is what matters — a route no client anywhere
+    can reach is a capability that shipped and cannot be used — and a
+    deferral has to be a real route, named exactly, with the reason written
+    above it. A typo'd row defers nothing and hides the gap it claims to
+    record, which is the failure mode of a backlog nobody parses.
+    """
+    # `clientpaths.all_routes`, not `app.routes`: FastAPI wraps each
+    # `include_router` in a delegating object that carries no path of its
+    # own, so the top level alone sees eight of QRME's routes against more
+    # than two hundred real ones. That module documents the trap; this is
+    # not the place to fall into it again.
+    from qrme.api import app as served_app
+
+    served = {f"{method} {route.path}"
+              for route in clientpaths.all_routes(served_app)
+              for method in (route.methods - {"HEAD", "OPTIONS"})}
     for shell in ("ios", "android", "windows"):
-        rows = [l for l in
-                (REPO / f"tests/{shell}_doorless.txt")
-                .read_text(encoding="utf-8").splitlines()
+        text = (REPO / f"tests/{shell}_doorless.txt").read_text(
+            encoding="utf-8")
+        rows = [l.strip() for l in text.splitlines()
                 if l.strip() and not l.startswith("#")]
-        assert rows == [], f"{shell}: the record is not empty: {rows[:3]}"
+        for row in rows:
+            assert row in served, (
+                f"{shell}: {row!r} is recorded as doorless and is not a "
+                "route this backend serves — a row nothing matches defers "
+                "nothing and hides the gap it claims to record"
+            )
+            assert row.split(" ", 1)[1] in text.replace("#", ""), row
+            # The reason, which is the whole point of the file over a count.
+            assert text.index("#") < text.index(row), (
+                f"{shell}: {row!r} is recorded with no reason above it"
+            )
+    # The promise that never stopped being one: nothing is doorless
+    # everywhere. The console holds the door for anything the shells defer.
+    assert clientpaths.doorless(served_app) == [], (
+        "a route is reachable from no client at all"
+    )
     for lang in clientpaths.NATIVE:
         made = clientpaths.calls(lang)
         assert ("POST", "/profiles/genesis") in made, \

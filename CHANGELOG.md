@@ -87,6 +87,19 @@ An iPhone gets a voice in a room.
   map behind a compressed `/Type /ObjStm`, where every recent generator puts
   its dictionaries and where a byte scan cannot see at all.
 
+  **And the other half of the same problem, which is the more dangerous
+  half.** A composite font writing glyph ids produces bytes that are
+  obviously not language, so the gate catches them and the item is reported
+  unread — an honest failure somebody reports. A *simple* font with a
+  re-arranged `/Differences` encoding produces bytes that ARE letters: the
+  wrong ones. `[169 /section]` means byte 169 is a section sign; read as
+  Latin-1 it is a copyright sign, and "See © 2.14 of the specification, and
+  the caf¨ clause" passes every readability test there is and arrives as a
+  document somebody believes. That array is followed too now, with unlisted
+  codes keeping their ordinary character — it is a patch on the standard
+  encoding and lists only what changed — and glyph names this reader does not
+  know left alone rather than replaced with a plausible letter.
+
   Two smaller things fell out of it. A `/ToUnicode` CMap **is** a stream, full
   of `<0041>` tokens that look exactly like hex strings on a page, so scanning
   every stream in the file was reading the map as though it were the document
@@ -107,6 +120,33 @@ An iPhone gets a voice in a room.
   stopping at the apology. Only documents get one: a photograph is not a
   failure of this reader, and dressing that up as a diagnosis would bury the
   one case where the reason tells somebody what to do.
+
+  Both doors and both screens. The pair's briefcase and a room share run
+  through the same reader, and only the first was saying anything — a fix
+  that reaches one of two paths looks exactly like a fix, which this round
+  has now caught three times. It shows under the item in the briefcase panel
+  and on the attachment line in the room, which is the line the field report
+  was a photograph of. Stored as a key rather than a sentence, so the console
+  says it in its own ten languages while the prompt says it in English; there
+  is no way back from a sentence to the fact it states.
+
+- **Two door guards that contradicted each other.** One states in its own
+  words that recording a deferred route **is allowed** — "a backlog is not an
+  approval, and there are legitimate reasons to defer" — and a ratchet
+  already stops such a record growing. A third asserted the per-shell records
+  were *empty*, which is what they were on the day it was written, and which
+  stopped being true the moment a route was legitimately deferred. It had
+  been reporting that decision as a defect ever since.
+
+      asked     is every per-shell record empty
+      mattered  is any route unreachable from everywhere
+
+  The snapshot is gone and the promise is kept, with more teeth than before:
+  nothing is doorless on every surface at once, every recorded deferral names
+  a route this backend actually serves, and each one carries its reason. A
+  typo'd row defers nothing and hides the gap it claims to record, which is
+  the failure mode of a backlog nobody parses — and that is now a failing
+  test rather than a silent hole.
 
 - **Whatever you put up in a room, you can take back down again.** The chip
   labelled "Just my name" was taken out on request earlier in this round — it

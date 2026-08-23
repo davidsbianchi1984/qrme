@@ -1171,6 +1171,11 @@ export interface BriefcaseItem {
   id: string; kind: "link" | "photo" | "video" | "document";
   title: string; note?: string | null; source?: string | null;
   read: boolean; digest: string; chars: number; digest_chars: number;
+  /** Why it could not be read, as a KEY — "scanned" | "locked" |
+   *  "unmapped" — never as a sentence, because this console says it in ten
+   *  languages and the profile's prompt says it in one. Absent when the
+   *  item read, and for kinds that never claimed to. */
+  unread_why?: string | null;
   bytes?: number | null; created_at: string;
 }
 export interface WallPost {
@@ -2081,7 +2086,10 @@ export type RoomMsg = {
   // difference between a profile that can discuss your document and one
   // that can only tell you it arrived.
   media?: { kind: string; url: string; name?: string | null;
-            read?: boolean } | null;
+            read?: boolean;
+            /** Why it could not be read, as a key — see `BriefcaseItem`.
+             *  Absent when it read, and for kinds that never claimed to. */
+            unread_why?: string | null } | null;
   created_at?: string;
 };
 

@@ -57,6 +57,17 @@ says plainly that the profile has *not* seen it and must not describe it.
 A profile that invents the contents of a picture it was handed is worse than
 one that says "tell me what's in it".
 
+And it says **which** kind of failure, because three of them wore one
+sentence: a scan needs somebody's eyes, a locked file needs its password, and
+a font this reader cannot follow is a gap in this code rather than a limit of
+the format. Told only "could not open it", nobody could tell a limit from a
+bug without opening the file by hand — which is a large part of why the same
+report arrived four times.
+
+The reason is stored as a **key**, never as a sentence. The prompt block is
+written in English and the console is written in ten languages, and there is
+no way back from a sentence to the fact it states.
+
 Offline deployments do not fetch links, the same switch every other outbound
 path honours, and the item records that it could not be read rather than
 timing out mid-conversation.
@@ -282,6 +293,109 @@ _CODESPACE = re.compile(rb"begincodespacerange(.*?)endcodespacerange", re.S)
 _TF = re.compile(rb"/([A-Za-z0-9#]+)\s+[-\d.]+\s+Tf")
 
 
+#: Glyph names a `/Differences` array can hand back, to the character each
+#: one is. Not the whole Adobe glyph list — that is four thousand entries and
+#: most of a filing is ASCII — but every name a Western document actually
+#: reaches for, which is the punctuation and the accents. Anything outside it
+#: is handled by the `uniXXXX` and `gNN` conventions below, and anything
+#: outside THOSE is left alone rather than guessed at.
+_GLYPH_NAMES = {
+    "space": " ", "exclam": "!", "quotedbl": '"', "numbersign": "#",
+    "dollar": "$", "percent": "%", "ampersand": "&", "quotesingle": "'",
+    "parenleft": "(", "parenright": ")", "asterisk": "*", "plus": "+",
+    "comma": ",", "hyphen": "-", "period": ".", "slash": "/",
+    "zero": "0", "one": "1", "two": "2", "three": "3", "four": "4",
+    "five": "5", "six": "6", "seven": "7", "eight": "8", "nine": "9",
+    "colon": ":", "semicolon": ";", "less": "<", "equal": "=",
+    "greater": ">", "question": "?", "at": "@", "bracketleft": "[",
+    "backslash": "\\", "bracketright": "]", "asciicircum": "^",
+    "underscore": "_", "grave": "`", "braceleft": "{", "bar": "|",
+    "braceright": "}", "asciitilde": "~",
+    # The ones a filing is actually full of.
+    "section": "\u00a7", "paragraph": "\u00b6", "degree": "\u00b0",
+    "plusminus": "\u00b1", "copyright": "\u00a9", "registered": "\u00ae",
+    "trademark": "\u2122", "bullet": "\u2022", "endash": "\u2013",
+    "emdash": "\u2014", "quoteleft": "\u2018", "quoteright": "\u2019",
+    "quotedblleft": "\u201c", "quotedblright": "\u201d",
+    "ellipsis": "\u2026", "dagger": "\u2020", "daggerdbl": "\u2021",
+    "fi": "fi", "fl": "fl", "ff": "ff", "ffi": "ffi", "ffl": "ffl",
+    "minus": "\u2212", "multiply": "\u00d7", "divide": "\u00f7",
+    "mu": "\u00b5", "sterling": "\u00a3", "yen": "\u00a5",
+    "euro": "\u20ac", "cent": "\u00a2", "currency": "\u00a4",
+    "onehalf": "\u00bd", "onequarter": "\u00bc", "threequarters": "\u00be",
+    "guillemotleft": "\u00ab", "guillemotright": "\u00bb",
+    "quotesinglbase": "\u201a", "quotedblbase": "\u201e",
+    "fraction": "\u2044", "perthousand": "\u2030",
+}
+#: Accented letters, built rather than listed: the names are regular.
+for _base, _ch in (("A", "A"), ("E", "E"), ("I", "I"), ("O", "O"),
+                   ("U", "U"), ("a", "a"), ("e", "e"), ("i", "i"),
+                   ("o", "o"), ("u", "u"), ("y", "y"), ("n", "n"),
+                   ("N", "N"), ("c", "c"), ("C", "C")):
+    for _mark, _combining in (("acute", "\u0301"), ("grave", "\u0300"),
+                              ("circumflex", "\u0302"), ("tilde", "\u0303"),
+                              ("dieresis", "\u0308"), ("cedilla", "\u0327"),
+                              ("ring", "\u030a"), ("caron", "\u030c")):
+        import unicodedata as _ud
+        _GLYPH_NAMES.setdefault(
+            _base + _mark, _ud.normalize("NFC", _ch + _combining))
+del _base, _ch, _mark, _combining
+
+_DIFFERENCES = re.compile(rb"/Differences\s*\[(.*?)\]", re.S)
+_DIFF_TOKEN = re.compile(rb"(\d+)|/([A-Za-z0-9._]+)")
+_UNI_NAME = re.compile(r"^uni([0-9A-Fa-f]{4,6})$")
+
+
+def _glyph_char(name: str) -> str | None:
+    """One glyph name as the character it stands for, or `None`.
+
+    `None` matters: a name this does not know is left for the readability
+    gate to judge rather than replaced with a plausible letter. A document
+    rendered in *nearly* the right characters is worse than one that comes
+    back empty — the empty one gets reported, and the nearly-right one gets
+    believed.
+    """
+    got = _GLYPH_NAMES.get(name)
+    if got is not None:
+        return got
+    if len(name) == 1:
+        return name
+    hexed = _UNI_NAME.match(name)
+    if hexed:
+        try:
+            return chr(int(hexed.group(1), 16))
+        except (ValueError, OverflowError):
+            return None
+    return None
+
+
+def _differences_map(font: bytes) -> _Cmap | None:
+    """A simple font's `/Differences` array as a one-byte map.
+
+    The other half of the same problem `/ToUnicode` solves, and the more
+    dangerous half. A composite font writing glyph ids produces bytes that
+    are obviously not language, so the gate catches them and the item is
+    reported unread. A simple font with a re-arranged encoding produces
+    bytes that ARE letters — the wrong ones. `[169 /section]` means byte 169
+    is a section sign; read as Latin-1 it is `©`. That passes every
+    readability test there is and arrives as a document somebody trusts.
+    """
+    array = _DIFFERENCES.search(font)
+    if array is None:
+        return None
+    table: dict[int, str] = {}
+    code = 0
+    for number, name in _DIFF_TOKEN.findall(array.group(1)):
+        if number:
+            code = int(number)
+            continue
+        char = _glyph_char(name.decode("latin-1"))
+        if char is not None:
+            table[code] = char
+        code += 1
+    return _Cmap(1, table, over_base=True) if table else None
+
+
 class _Cmap:
     """One font's `/ToUnicode`: glyph code in, characters out.
 
@@ -292,11 +406,20 @@ class _Cmap:
     reads as wreckage exactly like the problem it was meant to fix.
     """
 
-    __slots__ = ("width", "table")
+    __slots__ = ("width", "table", "over_base")
 
-    def __init__(self, width: int, table: dict[int, str]):
+    def __init__(self, width: int, table: dict[int, str],
+                 over_base: bool = False):
         self.width = width
         self.table = table
+        #: Whether unlisted codes mean their ordinary character or mean
+        #: nothing. A `/ToUnicode` CMap is the WHOLE map — a code it does not
+        #: carry is a code this reader cannot read. A `/Differences` array is
+        #: a patch on the standard encoding and lists only what CHANGED, so
+        #: its unlisted codes are ordinary Latin-1 and always were. Reading
+        #: the second like the first turns a page into two mapped characters
+        #: and fifty spaces, which is a map that then declines to be used.
+        self.over_base = over_base
 
     def decode(self, raw: bytes) -> str | None:
         """The string as characters, or `None` when this map does not cover
@@ -306,13 +429,17 @@ class _Cmap:
         out: list[str] = []
         hit = 0
         for i in range(0, len(raw) - self.width + 1, self.width):
-            code = int.from_bytes(raw[i:i + self.width], "big")
+            chunk = raw[i:i + self.width]
+            code = int.from_bytes(chunk, "big")
             got = self.table.get(code)
-            if got is None:
-                out.append(" ")
-            else:
+            if got is not None:
                 out.append(got)
                 hit += 1
+            elif self.over_base:
+                out.append(chunk.decode("latin-1", "replace"))
+                hit += 1
+            else:
+                out.append(" ")
         if not out or hit < len(out) * 0.6:
             return None
         return "".join(out)
@@ -450,20 +577,24 @@ def _font_maps(data: bytes) -> dict[str, _Cmap]:
                 font = objects.get(int(ref))
                 if font is None:
                     continue
+                cmap = None
                 to_unicode = _TOUNICODE.search(font)
-                if to_unicode is None:
-                    continue
-                holder = objects.get(int(to_unicode.group(1)))
-                if holder is None:
-                    continue
-                stream = _PDF_STREAM.search(holder)
-                if stream is None:
-                    continue
-                spec = _FILTER.findall(holder[:stream.start()])
-                plain = _unfilter(stream.group(1), spec[-1] if spec else None)
-                if plain is None:
-                    continue
-                cmap = _parse_cmap(plain)
+                if to_unicode is not None:
+                    holder = objects.get(int(to_unicode.group(1)))
+                    stream = (_PDF_STREAM.search(holder)
+                              if holder is not None else None)
+                    if stream is not None:
+                        spec = _FILTER.findall(holder[:stream.start()])
+                        plain = _unfilter(stream.group(1),
+                                          spec[-1] if spec else None)
+                        if plain is not None:
+                            cmap = _parse_cmap(plain)
+                if cmap is None:
+                    # `/ToUnicode` first, because it is the font's own answer
+                    # to this exact question. `/Differences` is a rendering
+                    # instruction that happens to imply one, and a font that
+                    # carries both means the first.
+                    cmap = _differences_map(font)
                 if cmap is not None:
                     maps.setdefault(name.decode("latin-1"), cmap)
     return maps
@@ -729,7 +860,15 @@ def _sounds_like_audio(data: bytes) -> bool:
 
 
 def why_unread(data: bytes, kind: str, was_read: bool) -> str | None:
-    """The sentence to keep beside an item nothing could be read from.
+    """Which kind of unreadable an item is, as a KEY — 'scanned', 'locked',
+    'unmapped' — never as a sentence.
+
+    A key because the two readers of this want different words for the same
+    fact. The prompt block is written in English and hands the model
+    `_PDF_WHY`; the console is written in ten languages and looks the same
+    fact up in its own. Storing the English sentence would have given a
+    Japanese-speaking person an English diagnosis under a Japanese heading,
+    and there is no way back from a sentence to the fact it states.
 
     Only PDFs get one. A photograph and a video are not failures of this
     reader — this deployment has ears and no eyes, which the prompt block
@@ -738,7 +877,8 @@ def why_unread(data: bytes, kind: str, was_read: bool) -> str | None:
     """
     if was_read or kind != "document" or data[:4] != b"%PDF":
         return None
-    return _PDF_WHY.get(_why_unread(data))
+    why = _why_unread(data)
+    return why if why in _PDF_WHY else None
 
 
 def read_file(data: bytes, name: str | None,
@@ -1026,8 +1166,8 @@ def block(profile_id: str, interactor_id: str) -> str | None:
             # follow, and a person told only that has no idea whether to
             # export it differently or give up. The profile that can say
             # which one it was is the profile that can suggest the next move.
-            why = (row["unread_why"]
-                   if "unread_why" in row.keys() else None)
+            why = _PDF_WHY.get(row["unread_why"]
+                               if "unread_why" in row.keys() else None)
             because = f" You could not read it because {why}." if why else ""
             unread.append(
                 f"{head} — you have NOT seen its contents.{because}{said}")

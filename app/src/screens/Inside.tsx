@@ -156,6 +156,22 @@ const hasRecogniser = typeof window !== "undefined"
  *  instead of the second. */
 const canDictate = hasRecogniser || canRecord();
 
+/** Why a shared file could not be read, in the reader's word for it, as a
+ *  short clause in this person's language — see `whySays` in Briefcase.tsx
+ *  for the same shape and the same reason. Branches with the key written out
+ *  at each `tr`, because both a key table and a `${key}` template are
+ *  invisible to the lookup scanner.
+ *
+ *  `null` for anything it does not recognise, so the line falls back to the
+ *  plain wording rather than putting a missing-translation placeholder in
+ *  the middle of somebody's conversation. */
+function fileWhy(key: string | null | undefined, lang: string): string | null {
+  if (key === "scanned") return tr("ins.file.why.scanned", lang);
+  if (key === "locked") return tr("ins.file.why.locked", lang);
+  if (key === "unmapped") return tr("ins.file.why.unmapped", lang);
+  return null;
+}
+
 export function Inside({ onPlans, start = "", onLeave }: {
   onPlans: () => void;
   /** A room id handed in by the Rooms screen's join — the field is
@@ -1383,8 +1399,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
           📎 {m.media.name || m.media.url.split("/").pop()}
         </a>
         <span className={"rm-read" + (m.media.read ? " yes" : "")}>
-          {m.media.read ? tr("ins.file.read", lang)
-                        : tr("ins.file.unread", lang)}
+          {m.media.read
+            ? tr("ins.file.read", lang)
+            : (fileWhy(m.media.unread_why, lang)
+                ? tr("ins.file.unread", lang) + " — "
+                  + fileWhy(m.media.unread_why, lang)
+                : tr("ins.file.unread", lang))}
         </span>
       </span>
     );

@@ -28,7 +28,9 @@ dictionaries and where a byte scan cannot see them at all.
 
 from __future__ import annotations
 
+import re
 import zlib
+from pathlib import Path
 
 import pytest
 
@@ -183,6 +185,92 @@ def test_nothing_unprintable_survives_into_the_text():
     assert got and not any(ord(c) < 32 for c in got)
 
 
+# -- the other half of the same problem, and the dangerous half -----------
+#
+# A composite font writing glyph ids produces bytes that are obviously not
+# language, so the gate catches them and the item is reported unread. A
+# SIMPLE font with a re-arranged `/Differences` encoding produces bytes that
+# ARE letters — the wrong ones. `[169 /section]` means byte 169 is a section
+# sign; read as Latin-1 it is a copyright sign. That passes every readability
+# test there is, and arrives as a document somebody believes.
+
+def _differences_pdf() -> bytes:
+    """A filing whose font re-points two bytes: a section sign and an
+    accented letter, both of which a filing is full of."""
+    content = (b"BT /F1 11 Tf 72 700 Td (See \xa9 2.14 of the specification, "
+               b"and the caf\xa8 clause.) Tj ET")
+    font = (b"<< /Type /Font /Subtype /TrueType /BaseFont /CCCCCC+Times"
+            b" /Encoding << /Type /Encoding /Differences"
+            b" [169 /section 168 /eacute] >> >>")
+    parts = [_obj(1, b"<< /Type /Catalog /Pages 2 0 R >>"),
+             _obj(2, b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>"),
+             _obj(3, b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792]"
+                     b" /Resources << /Font << /F1 5 0 R >> >>"
+                     b" /Contents 4 0 R >>"),
+             _obj(4, _stream(b"<< >>", content)),
+             _obj(5, font)]
+    return (b"%PDF-1.4\n" + b"".join(parts)
+            + b"trailer\n<< /Root 1 0 R >>\n%%EOF\n")
+
+
+def test_a_rearranged_encoding_reads_as_the_characters_it_means():
+    got = _pdf_text(_differences_pdf())
+    assert "See \u00a7 2.14" in got
+    assert "caf\u00e9 clause" in got
+
+
+def test_without_it_the_same_page_is_wrong_rather_than_empty(monkeypatch):
+    """The reason this one matters more than the composite case: the
+    failure is not an empty answer somebody reports, it is a plausible
+    answer somebody believes."""
+    from qrme import briefcase
+
+    monkeypatch.setattr(briefcase, "_font_maps", lambda data: {})
+    got = briefcase._pdf_text(_differences_pdf())
+    assert got, "the wrong-characters case comes back readable, not empty"
+    assert "\u00a9 2.14" in got and "\u00a7" not in got
+
+
+def test_unlisted_codes_keep_their_ordinary_character():
+    """A `/Differences` array is a patch on the standard encoding and lists
+    only what CHANGED. Read as though it were the whole map, a page becomes
+    two mapped characters and fifty spaces — a map that then declines to be
+    used, which is how this looked before the distinction existed."""
+    from qrme.briefcase import _differences_map, _font_maps
+
+    cmap = _font_maps(_differences_pdf())["F1"]
+    assert cmap.over_base is True
+    assert cmap.decode(b"abc") == "abc"
+    # And a `/ToUnicode` map is the whole map, so it must NOT do this.
+    assert _font_maps(_identity_pdf())["F1"].over_base is False
+    assert _differences_map(b"<< /Type /Font >>") is None
+
+
+def test_a_glyph_name_this_reader_does_not_know_is_left_alone():
+    """Not replaced with a plausible letter. A document rendered in NEARLY
+    the right characters is worse than one that comes back empty: the empty
+    one gets reported and the nearly-right one gets believed."""
+    from qrme.briefcase import _glyph_char
+
+    assert _glyph_char("section") == "\u00a7"
+    assert _glyph_char("eacute") == "\u00e9"
+    assert _glyph_char("uni00A7") == "\u00a7"
+    assert _glyph_char("gremlin") is None
+
+
+def test_the_fonts_own_answer_wins_over_the_rendering_instruction():
+    """`/ToUnicode` is the font's answer to exactly this question.
+    `/Differences` is a rendering instruction that happens to imply one, so
+    a font carrying both means the first."""
+    from qrme.briefcase import _font_maps
+
+    both = _identity_pdf().replace(
+        b"/Encoding /Identity-H",
+        b"/Encoding << /Differences [65 /section] >>")
+    cmap = _font_maps(both)["F1"]
+    assert cmap.width == 2 and cmap.over_base is False
+
+
 # -- and when it genuinely cannot be read ---------------------------------
 
 def test_a_scan_says_it_is_a_scan():
@@ -191,7 +279,13 @@ def test_a_scan_says_it_is_a_scan():
     assert _why_unread(data) == "scanned"
     kind, text, read = read_file(data, "US 2025 0265659 A1.pdf")
     assert read is False
-    assert "no text layer" in (why_unread(data, kind, read) or "")
+    # A key, never a sentence: the prompt block is written in English and the
+    # console is written in ten languages, and they need different words for
+    # the same fact. There is no way back from a sentence to what it states.
+    assert why_unread(data, kind, read) == "scanned"
+    from qrme.briefcase import _PDF_WHY
+
+    assert "no text layer" in _PDF_WHY["scanned"]
 
 
 def test_a_locked_file_says_it_is_locked():
@@ -217,3 +311,206 @@ def test_only_a_document_gets_a_reason():
     somebody what to do next."""
     assert why_unread(b"\x89PNG\r\n\x1a\n", "photo", False) is None
     assert why_unread(_identity_pdf(), "document", True) is None
+
+
+# -- and the room, which is the other half of the same door ----------------
+#
+# The pair's briefcase and a room share run through one reader,
+# `briefcase.read_file`, and until now only the briefcase said which kind of
+# unreadable it was. A fix that reaches one of two paths looks exactly like a
+# fix — this session has already caught that shape twice — so the room is
+# read here by taking a real share and reading the transcript the model gets.
+
+def _share(client, room_id, interactor, data, name):
+    from tests.test_capabilities import as_interactor
+
+    return client.post(
+        f"/rooms/{room_id}/share?interactor_id={interactor}"
+        f"&filename={name}&caption=have a look",
+        headers=as_interactor(interactor), content=data)
+
+
+def test_a_room_share_says_which_kind_of_unread(client, monkeypatch):
+    from tests.test_capabilities import (as_interactor, make_interactor,
+                                         make_profile)
+    from qrme.routers import community
+
+    user = make_interactor(client, "Theo", "1990-01-01")
+    dana = make_profile(client)
+    room = client.post("/rooms", json={"channel": "chat", "participants": [
+        {"kind": "user", "id": user},
+        {"kind": "profile", "id": dana["id"]}]}).json()["id"]
+
+    r = _share(client, room, user, _scanned_pdf(), "US 2025 0265659 A1.pdf")
+    assert r.status_code in (200, 201), r.text
+
+    seen: list = []
+
+    class Provider:
+        def generate(self, system, turns):
+            seen.append(turns)
+            return "Noted."
+
+    monkeypatch.setattr(community.llm, "get_provider",
+                        lambda *a, **k: Provider())
+    advanced = client.post(f"/rooms/{room}/advance",
+                           headers=as_interactor(user))
+    assert advanced.status_code in (200, 201), advanced.text
+    assert seen, "no profile turn was taken"
+    handed = " ".join(t["content"] for t in seen[-1])
+    assert "no text layer" in handed, (
+        "a room share that could not be read still says only that it could "
+        "not be read — the reason reaches the pair's briefcase and not here"
+    )
+
+
+# -- and on screen, where the person who uploaded it is looking ------------
+
+CONSOLE = (Path(__file__).resolve().parents[1] / "app" / "src")
+BRIEFCASE_TSX = (CONSOLE / "Briefcase.tsx").read_text(encoding="utf-8")
+L10N = (CONSOLE / "l10n.ts").read_text(encoding="utf-8")
+
+#: The file with its comments taken out. A guard that forbids a pattern has
+#: to read past the note explaining why the pattern is not used, or it trips
+#: on its own reasoning — which is a guard that punishes writing the reason
+#: down, and this session has done it three times.
+CODE_ONLY = re.sub(r"/\*.*?\*/|//[^\n]*", "", BRIEFCASE_TSX, flags=re.S)
+
+
+def _looked_up(source: str, prefix: str) -> set[str]:
+    """The keys under `prefix` this file actually hands to `tr`.
+
+    Matched at the `tr` call, which is the only shape the console's own
+    lookup scanner can see — and therefore the only shape that proves a
+    translated string is being read rather than sitting unread while the
+    English shows. Pinning where the key is *stored* instead is what these
+    guards did first, and they broke the moment the storage got better.
+    """
+    return set(re.findall(rf'tr\("({re.escape(prefix)}[a-z]+)"', source))
+
+
+def test_every_reason_the_reader_gives_has_a_line_on_screen():
+    """The two halves cannot drift. A reader that learns a fourth kind of
+    unreadable and a console that knows three would put a filing under a
+    blank line — which is where this started."""
+    from qrme.briefcase import _PDF_WHY
+
+    # `empty` is the catch-all; it has no advice to give, so no line.
+    named = {k for k in _PDF_WHY if k != "empty"}
+    for source, prefix in ((BRIEFCASE_TSX, "prf.bc.why."),
+                           (INSIDE_TSX, "ins.file.why.")):
+        shown = {k.rsplit(".", 1)[-1] for k in _looked_up(source, prefix)}
+        assert named <= shown, (
+            f"{prefix}: the reader gives {sorted(named - shown)} and this "
+            "screen says nothing for them"
+        )
+        for key in named:
+            assert f'"{prefix}{key}"' in L10N, prefix + key
+
+
+def test_the_keys_are_written_out_rather_than_assembled():
+    """A key built inside the call — `prf.bc.why.${...}` — is invisible to
+    the lookup scanner, so the guard that proves every key has ten
+    languages behind it cannot see it. This console has shipped that
+    mistake in both of its shapes: a template, and a table of key strings
+    the scanner reads as data rather than as a lookup."""
+    for source, prefix in ((CODE_ONLY, "prf.bc.why."),
+                           (INSIDE_CODE, "ins.file.why.")):
+        assert prefix + "${" not in source, (
+            f"{prefix}: the key is assembled at run time, so nothing "
+            "checks it has translations"
+        )
+        assert _looked_up(source, prefix), (
+            f"{prefix}: no key reaches `tr` as a literal, so the lookup "
+            "scanner cannot see these strings being read at all"
+        )
+
+
+def test_the_reason_is_shown_only_where_there_is_one():
+    """An item that read has no reason, and an unknown key renders nothing
+    rather than a missing-translation placeholder under somebody's
+    filing."""
+    assert "!item.read && whySays(item.unread_why" in CODE_ONLY
+    assert "return null;" in CODE_ONLY, (
+        "an unrecognised reason has no way to render nothing"
+    )
+
+
+# -- and in the room, on the attachment itself -----------------------------
+#
+# The field report was a photograph of exactly this line: "US 2025 0265659
+# A1.pdf  held, not read — nobody here can see inside it". True, and it is
+# the sentence that sent the same report back four times, because it is the
+# same sentence for a scan, a locked file and a font this reader could not
+# follow — and only one of those is worth trying a different export for.
+
+INSIDE_TSX = (CONSOLE / "screens" / "Inside.tsx").read_text(encoding="utf-8")
+INSIDE_CODE = re.sub(r"/\*.*?\*/|//[^\n]*", "", INSIDE_TSX, flags=re.S)
+
+
+def test_the_room_puts_the_reason_on_the_wire(client):
+    """Taken off a real share and a real transcript read, because
+    `_media_brief` is what every room surface goes through — the store, the
+    transcript and the share reply — and a fact added to one of them is a
+    fact the other two do not have."""
+    from tests.test_capabilities import (as_interactor, make_interactor,
+                                         make_profile)
+
+    user = make_interactor(client, "Theo", "1990-01-01")
+    dana = make_profile(client)
+    room = client.post("/rooms", json={"channel": "chat", "participants": [
+        {"kind": "user", "id": user},
+        {"kind": "profile", "id": dana["id"]}]}).json()["id"]
+
+    posted = _share(client, room, user, _scanned_pdf(),
+                    "US 2025 0265659 A1.pdf")
+    assert posted.status_code in (200, 201), posted.text
+    assert posted.json()["shared"]["media"]["unread_why"] == "scanned"
+
+    seen = client.get(f"/rooms/{room}/messages",
+                      headers=as_interactor(user)).json()
+    attached = [m["media"] for m in seen if m.get("media")]
+    assert attached and attached[-1]["unread_why"] == "scanned", (
+        "the share reply says why and a reload does not — the person who "
+        "comes back to the room sees the sentence that sent this report "
+        "back four times"
+    )
+
+
+def test_a_read_file_carries_no_reason(client):
+    """There is nothing to explain about a file that read, and a leftover
+    key under one would be a diagnosis nobody made."""
+    from tests.test_capabilities import make_interactor, make_profile
+
+    user = make_interactor(client, "Sam", "1990-01-01")
+    dana = make_profile(client)
+    room = client.post("/rooms", json={"channel": "chat", "participants": [
+        {"kind": "user", "id": user},
+        {"kind": "profile", "id": dana["id"]}]}).json()["id"]
+
+    posted = _share(client, room, user,
+                    b"Claim 1. A method of regulating thermal transfer in a "
+                    b"sealed enclosure, comprising a first conduit disposed "
+                    b"along the interior wall of the enclosure.",
+                    "claims.txt")
+    media = posted.json()["shared"]["media"]
+    assert media["read"] is True
+    assert media["unread_why"] is None
+
+
+def test_the_room_line_says_which_kind():
+    """The attachment line the field report was a photograph of."""
+    assert _looked_up(INSIDE_CODE, "ins.file.why.") == {
+        "ins.file.why.scanned", "ins.file.why.locked",
+        "ins.file.why.unmapped"}
+    assert "fileWhy(m.media.unread_why" in INSIDE_CODE, (
+        "the room still shows one sentence for all three failures"
+    )
+
+
+def test_an_unknown_reason_falls_back_rather_than_showing_a_placeholder():
+    """A reader that learns a fourth kind must not put a missing-translation
+    key in the middle of somebody's conversation."""
+    assert ': tr("ins.file.unread", lang))' in INSIDE_CODE, (
+        "there is no plain fallback for a reason this console does not know"
+    )

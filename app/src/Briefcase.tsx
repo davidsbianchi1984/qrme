@@ -32,6 +32,25 @@ import { fill, t as tr, visitorLang } from "./l10n";
 // session: the pair is the whole scope of a briefcase, and a component that
 // looked it up itself could not be used for a conversation between two
 // parties it was not expecting.
+/** Why a document could not be read, in the reader's word for it, as a
+ *  sentence in this person's language.
+ *
+ *  Branches with the key written out at each `tr` rather than a table of key
+ *  strings or a `prf.bc.why.${key}` template. Both of those are invisible to
+ *  the lookup scanner — the guard that proves no translated string is going
+ *  unread sees a literal inside a `tr` call and nothing else — and this
+ *  console has now made that mistake in both of its shapes.
+ *
+ *  `null` for a key it does not recognise, so a reader that learns a fourth
+ *  kind of unreadable puts nothing under somebody's filing rather than a
+ *  missing-translation placeholder. */
+function whySays(key: string | null | undefined, lang: string): string | null {
+  if (key === "scanned") return tr("prf.bc.why.scanned", lang);
+  if (key === "locked") return tr("prf.bc.why.locked", lang);
+  if (key === "unmapped") return tr("prf.bc.why.unmapped", lang);
+  return null;
+}
+
 export function Briefcase({ profileId, interactorId, name, onError }: {
   /** Whose conversation this is — your own profile or somebody else's. */
   profileId: string;
@@ -130,6 +149,14 @@ export function Briefcase({ profileId, interactorId, name, onError }: {
                       digest: String(item.digest_chars) })
                   : fill(tr("prf.bc.unread", lang), { name })}
               </p>
+              {/* And WHY, where the reader knows. "Not opened" is true of a
+                  scan, a locked file and a font this reader cannot follow,
+                  and only one of those is something the person can act on —
+                  a different export, a password, or nothing. Four field
+                  reports arrived without this line. */}
+              {!item.read && whySays(item.unread_why, lang) && (
+                <p className="muted small">{whySays(item.unread_why, lang)}</p>
+              )}
               <div className="pp-buttons">
                 {item.read && (
                   <button className="chip small" disabled={busy}

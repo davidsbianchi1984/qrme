@@ -144,7 +144,8 @@ def _display(kind: str, ref_id: str) -> str:
     return interactor_or_404(ref_id)["display_name"]
 
 
-def _media_brief(media_id: str | None, read: bool = False) -> dict | None:
+def _media_brief(media_id: str | None, read: bool = False,
+                 why: str | None = None) -> dict | None:
     """The shareable face of an attachment: kind, serving url, display
     name, and whether the words in it were read. Never the disk path,
     never the uploader's raw filename beyond the display copy
@@ -153,7 +154,13 @@ def _media_brief(media_id: str | None, read: bool = False) -> dict | None:
     `read` is on the wire because the alternative is a person guessing.
     A photograph and a scanned filing land the same way a readable one
     does, and only the deployment knows which of them the profiles in
-    this room can actually discuss."""
+    this room can actually discuss.
+
+    `why` is the same fact one step finer, as a KEY rather than a sentence
+    so the console can say it in its own ten languages: a scan, a locked
+    file, or a font this reader could not follow. The person who shared it
+    was reading "held, not read" and had no way to tell whether a different
+    export would help — which is the question anybody actually has."""
     if not media_id:
         return None
     from .. import media as media_mod
@@ -166,7 +173,8 @@ def _media_brief(media_id: str | None, read: bool = False) -> dict | None:
     return {"kind": row["kind"],
             "url": f"{media_mod.ROUTE}/{row['filename']}",
             "name": row["name"],
-            "read": read}
+            "read": read,
+            "unread_why": None if read else (why or None)}
 
 
 def _read_share(data: bytes, name: str | None,
@@ -197,21 +205,24 @@ def _read_share(data: bytes, name: str | None,
     from .. import briefcase
 
     try:
-        _kind, text, read = briefcase.read_file(data, name, on_behalf_of)
+        kind, text, read = briefcase.read_file(data, name, on_behalf_of)
     except Exception:                                   # pragma: no cover
-        return "", ""
+        return "", "", ""
     if not read or not text.strip():
-        return "", ""
+        # Not read, and WHICH kind of not read. The pair's briefcase gained
+        # this first and the room is the other half of the same door — a fix
+        # that reaches one of two paths looks exactly like a fix.
+        return "", "", briefcase.why_unread(data, kind, read) or ""
     try:
         digest = briefcase.distill(text, name or "a shared file")
     except Exception:                                   # pragma: no cover
         digest = text[:600]
-    return text, digest
+    return text, digest, ""
 
 
 def _store_room_message(room_id, sender_kind, sender_id, content,
                         approved, reason, media_id=None,
-                        media_text="", media_digest="") -> dict:
+                        media_text="", media_digest="", media_why="") -> dict:
     conn = db.connect()
     message_id = db.new_id("rmg")
     # A profile's room turn is an AI render facing the whole room: stamped.
@@ -220,25 +231,27 @@ def _store_room_message(room_id, sender_kind, sender_id, content,
     conn.execute(
         "INSERT INTO room_messages (id, room_id, sender_kind, sender_id,"
         " content, status, flag_reason, watermark_id, media_id, media_text,"
-        " media_digest, created_at)"
-        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+        " media_digest, media_why, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (message_id, room_id, sender_kind, sender_id, content,
          "approved" if approved else "blocked", reason,
          credential["watermark_id"] if credential else None,
-         media_id, media_text or None, media_digest or None, db.utcnow()),
+         media_id, media_text or None, media_digest or None,
+         media_why or None, db.utcnow()),
     )
     conn.commit()
     return {"id": message_id, "sender_kind": sender_kind,
             "from": _display(sender_kind, sender_id),
             "content": content if approved else None,
             "watermark": credential,
-            "media": (_media_brief(media_id, bool(media_digest))
+            "media": (_media_brief(media_id, bool(media_digest), media_why)
                       if approved else None),
             "status": "approved" if approved else "blocked"}
 
 
 def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dict]:
     """Every profile participant takes one moderated turn."""
+    from .. import briefcase
     maturity = _room_maturity(participants)
     conn = db.connect()
     produced = []
@@ -250,7 +263,7 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
             continue
         history = conn.execute(
             "SELECT sender_kind, sender_id, content, media_id, media_digest,"
-            "       heard"
+            "       media_why, heard"
             " FROM room_messages"
             " WHERE room_id=? AND status='approved'"
             " ORDER BY created_at DESC, rowid DESC LIMIT 12",
@@ -287,8 +300,15 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
                 if digest:
                     label += f" — it reads: {digest}]"
                 else:
-                    label += " — this deployment could not turn it into "\
-                             "words, so you have not read it]"
+                    why = briefcase._PDF_WHY.get(
+                        (r["media_why"] or "") if "media_why" in keys else "")
+                    # The reason, where the reader knows one. "Could not turn
+                    # it into words" is true of a scan, a locked file and a
+                    # font this code cannot follow, and only the first of
+                    # those is something the person can do anything about.
+                    label += (f" — {why}, so you have not read it]" if why
+                              else " — this deployment could not turn it "
+                                   "into words, so you have not read it]")
                 text = f"{text} {label}".strip() if text else label
             # Interrupted, and by how much. Said as a fact about the turn,
             # in the same shape an attachment is: the model reads what
@@ -872,7 +892,7 @@ async def share_in_room(room_id: str, request: Request,
     # Read before storing, so the very first profile turn after the share
     # already has the document. Reading after would leave a one-turn hole
     # in which the profile says it cannot see the thing it can see.
-    words, digest = _read_share(data, filename or None, interactor_id)
+    words, digest, why = _read_share(data, filename or None, interactor_id)
 
     said = (caption or "").strip()[:500]
     approved, reason = True, None
@@ -886,7 +906,8 @@ async def share_in_room(room_id: str, request: Request,
     # elsewhere on it. A share is its own thing; it gets its own name.
     return {"shared": _store_room_message(
         room_id, "user", interactor_id, said, approved, reason,
-        media_id=saved["id"], media_text=words, media_digest=digest)}
+        media_id=saved["id"], media_text=words, media_digest=digest,
+        media_why=why)}
 
 
 @router.post("/rooms/{room_id}/heard")
@@ -1191,7 +1212,8 @@ def room_transcript(room_id: str, request: Request) -> list[dict]:
              "media": _media_brief(
                  r["media_id"] if "media_id" in r.keys() else None,
                  bool(r["media_digest"]
-                      if "media_digest" in r.keys() else None)),
+                      if "media_digest" in r.keys() else None),
+                 r["media_why"] if "media_why" in r.keys() else None),
              "created_at": r["created_at"]}
             for r in rows]
 

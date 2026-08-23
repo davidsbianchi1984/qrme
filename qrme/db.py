@@ -131,6 +131,11 @@ CREATE TABLE IF NOT EXISTS room_messages (
     media_id    TEXT REFERENCES media(id),  -- a shared picture, video or file
     media_text  TEXT,            -- the words in it, for a person to read back
     media_digest TEXT,           -- the reading every later turn carries
+    -- WHY it could not be read, when it could not. "This deployment could not
+    -- turn it into words" is true of a scan, a locked file and a font this
+    -- code cannot follow, and a profile told only that cannot suggest which
+    -- of the three the person should do something about. NULL when it read.
+    media_why   TEXT,
     -- How much of this turn was actually heard, when somebody cut it off
     -- mid-sentence. NULL is the ordinary case: it played out, or nobody was
     -- listening to it aloud at all.
@@ -2732,6 +2737,7 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # profile is told the file is unreadable rather than handed a guess.
     ("room_messages", "media_text", "TEXT"),
     ("room_messages", "media_digest", "TEXT"),
+    ("room_messages", "media_why", "TEXT"),
     # What a person actually heard of a turn they interrupted. A profile
     # answering next has to know WHICH part reached them: continuing from a
     # point they never got to, or repeating what they cut off precisely

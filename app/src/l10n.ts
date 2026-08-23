@@ -8365,6 +8365,15 @@ const CHROME: Table = {
   "ins.file.unread": {
     en: "held, not read — nobody here can see inside it", es: "guardado, sin leer — nadie aquí ve su interior", fr: "conservé, non lu — personne ici n'en voit le contenu", de: "vorhanden, ungelesen — niemand hier sieht hinein", pt: "guardado, não lido — ninguém aqui vê o interior", it: "conservato, non letto — nessuno qui ne vede il contenuto", ja: "保持のみ、未読 — 中身は誰にも見えません", zh: "已保存，未读取 — 这里没有人能看到里面", hi: "रखा गया, पढ़ा नहीं — यहाँ कोई इसके भीतर नहीं देख सकता", ar: "محفوظ وغير مقروء — لا أحد هنا يرى ما بداخله",
   },
+  "ins.file.why.scanned": {
+    en: "it is a scan, with no text inside", es: "es un escaneo, sin texto dentro", fr: "c'est un scan, sans texte à l'intérieur", de: "es ist ein Scan, ohne Text darin", pt: "é uma digitalização, sem texto lá dentro", it: "è una scansione, senza testo all'interno", ja: "スキャンで、中に文字がありません", zh: "这是扫描件，里面没有文字", hi: "यह एक स्कैन है, अंदर कोई टेक्स्ट नहीं", ar: "إنه مسح ضوئي، بلا نص بداخله",
+  },
+  "ins.file.why.locked": {
+    en: "it is password-protected", es: "está protegido con contraseña", fr: "il est protégé par mot de passe", de: "sie ist passwortgeschützt", pt: "está protegido por palavra-passe", it: "è protetto da password", ja: "パスワードで保護されています", zh: "它有密码保护", hi: "यह पासवर्ड से सुरक्षित है", ar: "إنه محمي بكلمة مرور",
+  },
+  "ins.file.why.unmapped": {
+    en: "its fonts could not be followed", es: "no se pudieron interpretar sus fuentes", fr: "ses polices n'ont pas pu être suivies", de: "seinen Schriften konnte nicht gefolgt werden", pt: "não foi possível seguir os seus tipos de letra", it: "non è stato possibile seguire i suoi caratteri", ja: "フォントを追うことができませんでした", zh: "无法解读它的字体", hi: "इसके फ़ॉन्ट पढ़े नहीं जा सके", ar: "تعذّر تتبّع خطوطه",
+  },
   "ins.face.mine": {
     en: "My own picture", es: "Mi propia foto", fr: "Ma propre photo", de: "Mein eigenes Bild", pt: "A minha própria foto", it: "La mia foto", ja: "自分の写真", zh: "我自己的照片", hi: "मेरी अपनी तस्वीर", ar: "صورتي الخاصة",
   },
@@ -8595,9 +8604,6 @@ const CHROME: Table = {
   },
   "ins.face.photo": {
     en: "Put a picture up", es: "Poner una foto", fr: "Mettre une photo", de: "Bild hochladen", pt: "Pôr uma foto", it: "Metti una foto", ja: "写真を出す", zh: "放一张照片", hi: "एक तस्वीर लगाएँ", ar: "ضع صورة",
-  },
-  "ins.face.plain": {
-    en: "Just my name", es: "Solo mi nombre", fr: "Juste mon nom", de: "Nur mein Name", pt: "Só o meu nome", it: "Solo il mio nome", ja: "名前だけにする", zh: "只显示名字", hi: "सिर्फ़ मेरा नाम", ar: "اسمي فقط",
   },
   "ins.face.nomask": {
     en: "No mask", es: "Sin máscara", fr: "Sans masque", de: "Keine Maske", pt: "Sem máscara", it: "Nessuna maschera", ja: "マスクなし", zh: "不戴面具", hi: "कोई मुखौटा नहीं", ar: "بلا قناع",
@@ -8987,6 +8993,15 @@ const CHROME: Table = {
   },
   "prf.bc.unread": {
     en: "kept, but not opened — {name} has not seen what is inside it", es: "conservado, pero no abierto: {name} no ha visto lo que hay dentro", fr: "conservé, mais non ouvert — {name} n'a pas vu ce qu'il contient", de: "behalten, aber nicht geöffnet — {name} hat den Inhalt nicht gesehen", pt: "guardado, mas não aberto — {name} não viu o que está lá dentro", it: "conservato, ma non aperto — {name} non ha visto cosa contiene", ja: "受け取りましたが開けていません — {name} は中身を見ていません", zh: "已收下，但未打开——{name} 没有看到里面的内容", hi: "रखा गया, पर खोला नहीं — {name} ने इसके भीतर का कुछ नहीं देखा", ar: "محفوظ لكنه لم يُفتح — لم يرَ {name} ما بداخله",
+  },
+  "prf.bc.why.scanned": {
+    en: "It is a scan — pictures of pages, with no text in the file to read.", es: "Es un escaneo: imágenes de páginas, sin texto dentro del archivo.", fr: "C'est un scan — des images de pages, sans texte à lire dans le fichier.", de: "Es ist ein Scan — Bilder von Seiten, ohne Text in der Datei.", pt: "É uma digitalização: imagens de páginas, sem texto no ficheiro.", it: "È una scansione: immagini di pagine, senza testo nel file.", ja: "スキャンです。ページの画像だけで、ファイルの中に読める文字がありません。", zh: "这是扫描件——只有页面图像，文件里没有可读的文字。", hi: "यह एक स्कैन है — पन्नों की तस्वीरें, फ़ाइल में पढ़ने लायक कोई टेक्स्ट नहीं।", ar: "إنه مسح ضوئي — صور للصفحات، دون نص داخل الملف يمكن قراءته.",
+  },
+  "prf.bc.why.locked": {
+    en: "It is password-protected, so nothing inside it can be opened.", es: "Está protegido con contraseña, así que no se puede abrir nada dentro.", fr: "Il est protégé par mot de passe : rien à l'intérieur ne peut être ouvert.", de: "Sie ist passwortgeschützt, daher lässt sich nichts darin öffnen.", pt: "Está protegido por palavra-passe, por isso nada lá dentro pode ser aberto.", it: "È protetto da password, quindi non si può aprire nulla al suo interno.", ja: "パスワードで保護されているため、中身を開くことができません。", zh: "它有密码保护，里面的内容无法打开。", hi: "यह पासवर्ड से सुरक्षित है, इसलिए इसके अंदर कुछ भी नहीं खोला जा सकता।", ar: "إنه محمي بكلمة مرور، فلا يمكن فتح أي شيء بداخله.",
+  },
+  "prf.bc.why.unmapped": {
+    en: "Its text is written in embedded fonts this reader could not follow.", es: "Su texto usa fuentes incrustadas que este lector no pudo interpretar.", fr: "Son texte utilise des polices intégrées que ce lecteur n'a pas su suivre.", de: "Sein Text nutzt eingebettete Schriften, denen dieser Leser nicht folgen konnte.", pt: "O texto usa tipos de letra incorporados que este leitor não conseguiu seguir.", it: "Il testo usa caratteri incorporati che questo lettore non ha saputo seguire.", ja: "本文が埋め込みフォントで書かれており、この読み取りでは追えませんでした。", zh: "它的文字使用了嵌入字体，本阅读器无法解读。", hi: "इसका टेक्स्ट ऐसे एम्बेडेड फ़ॉन्ट में है जिसे यह रीडर पढ़ नहीं सका।", ar: "نصّه مكتوب بخطوط مضمّنة لم يستطع هذا القارئ تتبّعها.",
   },
   "prf.bc.show": {
     en: "What they took from it", es: "Lo que sacaron de ello", fr: "Ce qu'ils en ont retenu", de: "Was sie daraus mitgenommen haben", pt: "O que retiraram daí", it: "Che cosa ne hanno tratto", ja: "そこから読み取った内容", zh: "他们从中读到的内容", hi: "उन्होंने इससे क्या लिया", ar: "ما استخلصوه منه",
