@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-08-23
+
 ### Fixed
 
 - **A transient mail outage could lock an address out of signup.** The account
@@ -14787,7 +14789,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.6.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.6.1...HEAD
+[1.6.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.6.0...app-v1.6.1
 [1.6.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.5.0...app-v1.6.0
 [1.5.0]: https://github.com/davidsbianchi1984/qrme/commit/3e8ed32
 [1.4.1]: https://github.com/davidsbianchi1984/qrme/commit/977978d

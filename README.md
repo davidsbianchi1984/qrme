@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v1.6.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v1.6.1** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -180,6 +180,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **1.6.1** | **A transient mail outage could lock an address out of signup** — the account row commits before the verification code is sent, and that send was never wrapped, so a refusal 500'd while the pending account survived; the next attempt from that address was then turned away as already pending, naming a code nobody ever received. Signup, resend and password reset all answer now instead of raising |
 | **1.6.0** | **A visitor is refused in their own language** — the twenty-five refusals a visitor actually hits (a room that closed, a party whose host left, a comment, a friend request) leave the English-only ledger, 109 rows down to 84; and nothing assembled into a prompt is cut inside a word any more — a person's own note and caption, a clinician's letter, and a filing whose cap was three times too small to hold one |
 | **1.5.0** | **An iPhone gets a voice in a room** — the room listened through the browser's own recogniser and nothing else, and on iOS that constructor exists while the service always refuses, so the phone this product is mostly used on had a microphone button and no way to speak; `POST /rooms/{id}/heard` takes recorded audio and answers with words, gated like sharing a file and storing nothing, with the say door still owning moderation and the echo rules. Recording also brings the browser's own echo cancellation — the one defence that works on sound rather than on words or on clocks — and an analyser, which gives back the barge-in 1.4.1 had to trade away |
 | **1.4.1** | **Three things the room did wrong**, all reported from a device rather than found by a test — the profile's own voice coming out of the speaker was picked up by the microphone and sent back as a prompt, because the 70%-word-overlap echo guard cannot recognise a *misheard* echo and nothing checked the one certain signal, which is that the room was speaking at the time; the conversation piling up to five rows pushed the Type pill and the seven round controls 135px down the page and off the bottom of a phone, because the log was capped rather than fixed; and the room's recogniser had no `onerror` at all, so on iOS — where the constructor exists and the service always refuses — the mic lit, the refusal fell through to `onend`, and `onend` stood another recogniser forever |
