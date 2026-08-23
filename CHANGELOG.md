@@ -10,6 +10,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **The two prompt caps have names, and the test compares them.** The life-entry
+  cap (160) and the clinician's-letter cap (1200) were literals at their call
+  sites, and the test that holds the letter to more room than the entry asserted
+  against a third number — a bare `400` that belonged to neither.
+
+      asked     is the letter longer than 400 characters
+      mattered  does the letter get more room than a life entry
+
+  `tests/ratchets.py` calls that shape out by name: a floor with no attached
+  measurement cannot be audited, and 91 numbers in this product had drifted to a
+  fiftieth of what they measured before anything noticed. This one was caught by
+  that guard as an unregistered floor. The caps are `LIFE_SNIPPET_CHARS` and
+  `CLINICAL_LETTER_CHARS` now, and the test asserts the relationship between
+  them, which is what the claim was the whole time.
+
 - **170 of 256 released versions rendered as literal text.** A Keep a
   Changelog heading is a reference link: `## [1.5.0]` renders as the characters
   `[1.5.0]` unless a definition sits at the bottom of the file. Every version

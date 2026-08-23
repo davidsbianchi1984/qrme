@@ -20,6 +20,16 @@ from . import common
 # across all of them.
 _EMBODIMENT_FORMS = "text, voice, feed, AR/VR, a speaker, a hologram, or a robot"
 
+# How much of a piece of material reaches the prompt. Named rather than
+# written into the two call sites, because the *relationship* between them is
+# the claim: a life entry is one of eight and is a prompt for recall, so a
+# fragment of one costs little; a clinician's letter is a named human's words
+# about the person in the conversation, where a cut can invert the sentence.
+# A test asserting the letter gets more room than the entry should compare
+# these, not repeat a number that drifts away from them.
+LIFE_SNIPPET_CHARS = 160
+CLINICAL_LETTER_CHARS = 1200
+
 
 def _shown_name(profile) -> str:
     from . import identity
@@ -187,7 +197,8 @@ def build_system_prompt(
             # Cut at a boundary and SAY so. 160 characters of a life-material
             # item is a sentence fragment, and one that ended mid-word read as
             # the profile's own memory of itself trailing off.
-            snippet, shortened = common.clipped(item.get("content") or "", 160)
+            snippet, shortened = common.clipped(item.get("content") or "",
+                                                LIFE_SNIPPET_CHARS)
             if shortened:
                 snippet += " … (this entry continues)"
             title = item.get("title") or item["kind"]
@@ -208,7 +219,8 @@ def build_system_prompt(
         # does the work, and it is written to be impossible to read past.
         lines = []
         for n in clinical_notes[:4]:
-            body, shortened = common.clipped(n["content"] or "", 1200)
+            body, shortened = common.clipped(n["content"] or "",
+                                             CLINICAL_LETTER_CHARS)
             if shortened:
                 body += (" […THE REST OF THIS LETTER IS NOT SHOWN. Treat what "
                          "you have as an opening fragment: a qualification, a "

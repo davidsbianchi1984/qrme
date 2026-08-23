@@ -129,9 +129,13 @@ def test_the_clinical_letter_gets_more_room_than_a_life_entry(client):
     said = _prompt(client, clinical_notes=[{"from": "Dr Okafor", "at": "2026-08-01",
                                     "content": NOTE}])
     body = said[said.index("Dr Okafor"):]
-    assert len(body) > 400, (
+    # Not a number of its own: the claim is the *relationship* between the two
+    # caps, so it is asserted against them. A bare 400 here would be a floor
+    # nothing compares against what it measures — see tests/ratchets.py.
+    assert len(body) > persona.LIFE_SNIPPET_CHARS, (
         "a clinician's letter is still held to the life-entry ceiling"
     )
+    assert persona.CLINICAL_LETTER_CHARS > persona.LIFE_SNIPPET_CHARS
 
 
 # -- and the person's own words, which are the last two ---------------------
