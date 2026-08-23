@@ -4,6 +4,37 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **A guard that nothing a profile does on its own can reach money.** This
+  round went looking for somewhere to put an ask-first confirmation in front
+  of a profile spending, and found nothing to put one in front of. Every path
+  that moves money starts at an HTTP route holding a person's token, and none
+  of them is reachable from the code a profile runs — computed rather than
+  read, over the transitive import closure of five roots: the multi-phase
+  agent, the profile reaching into somebody's day, the watched pages woken by
+  the vault's own scheduler, a workflow somebody else delegated, and the
+  persona every turn's prompt is built from.
+
+      asked     is there an ask-first gate in front of the profile's spending
+      mattered  can a profile reach money at all
+
+  The property is worth a guard precisely BECAUSE nothing enforces it. It is
+  true by the shape of the code rather than by a check, so no single line has
+  to be deleted for it to stop being true: somebody adds a workflow phase
+  that buys the thing it drafted, or a lookout that renews a subscription it
+  noticed lapsing, and the money surface has grown a door with nobody having
+  decided that. Now that is a failing test on the day it happens.
+
+  Money is read as *calls* rather than as a list of module names, because a
+  list is a second place to update and the day somebody forgets is the day
+  the guard stops covering the module that grew a credit. Two liveness checks
+  ride along, since the failure mode of a guard like this is passing for the
+  wrong reason: the roots must still exist and still import something, and
+  the money calls must still appear somewhere in the product.
+
 ## [1.5.0] - 2026-08-23
 
 An iPhone gets a voice in a room.
