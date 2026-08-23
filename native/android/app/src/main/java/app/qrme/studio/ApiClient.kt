@@ -3855,6 +3855,39 @@ object ApiClient {
                 ?.optJSONObject("media")?.optString("kind") ?: ""
         }
 
+    /** Recorded speech in, words out. The audio is not stored.
+     *
+     *  What comes back goes through `sayInRoom` like anything else said in
+     *  the room — the transcript's rules live behind that door and nowhere
+     *  else, and a second way in would carry its own copy of them.
+     *
+     *  A deployment with no transcriber answers 503 with a sentence naming
+     *  what is missing. It is carried up rather than replaced with one of
+     *  ours: the far end knows which of the two failures this was.
+     */
+    suspend fun heardInRoom(roomId: String, interactorId: String,
+                            bytes: ByteArray, token: String): String =
+        withContext(Dispatchers.IO) {
+            val q = "?interactor_id=" +
+                java.net.URLEncoder.encode(interactorId, "UTF-8")
+            val conn = (java.net.URL("$base/rooms/$roomId/heard" + q)
+                .openConnection() as java.net.HttpURLConnection).apply {
+                requestMethod = "POST"
+                setRequestProperty("accept-language", L10n.deviceLanguage())
+                setRequestProperty("authorization", "Bearer $token")
+                doOutput = true
+            }
+            conn.outputStream.use { it.write(bytes) }
+            val text = (if (conn.responseCode < 300) conn.inputStream
+                        else conn.errorStream).bufferedReader().readText()
+            if (conn.responseCode >= 300) {
+                throw java.io.IOException(
+                    JSONObject(text).optString("message").ifEmpty {
+                        JSONObject(text).optString("detail") })
+            }
+            JSONObject(text).optString("text")
+        }
+
     /** Readable by anyone in the room — a disclosure only its subject can
      *  see is not a disclosure. */
     suspend fun roomMicDisclosure(roomId: String,

@@ -4592,6 +4592,36 @@ extension ApiClient {
         return try JSONDecoder().decode(RoomShared.self, from: out)
     }
 
+    /// Recorded speech in, words out. The audio is not stored.
+    ///
+    /// The door this shell needs most: it runs on the platform whose own
+    /// speech service refuses every time, so posting the audio is not a
+    /// fallback here, it is the way in. What comes back goes through
+    /// `sayInRoom` like anything else said in the room — the transcript's
+    /// rules live behind that door and nowhere else.
+    func heardInRoom(roomId: String, interactorId: String, audio: Data,
+                     token: String) async throws -> String {
+        let plain = base.appendingPathComponent("/rooms/\(roomId)/heard")
+        var parts = URLComponents(url: plain, resolvingAgainstBaseURL: false)
+        parts?.queryItems = [
+            URLQueryItem(name: "interactor_id", value: interactorId)]
+        var req = URLRequest(url: parts?.url ?? plain)
+        req.httpMethod = "POST"
+        req.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+        req.httpBody = audio
+        let (out, resp) = try await dispatch(req)
+        guard let http = resp as? HTTPURLResponse,
+              (200..<300).contains(http.statusCode) else {
+            // 503 is a real answer: a deployment with no transcriber. The
+            // sentence it sends names what is missing, so it is carried
+            // rather than replaced with one of ours.
+            throw ApiError.http(String(data: out, encoding: .utf8)
+                                ?? "could not hear that")
+        }
+        struct Heard: Decodable { let text: String }
+        return try JSONDecoder().decode(Heard.self, from: out).text
+    }
+
     // -- the fixed screen --
 
     func displayRules() async throws -> [String] {

@@ -1360,6 +1360,46 @@ _PUBLIC.update(_PRIVILEGE_SENTENCES)
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'no audio': {
+        'es': 'no hay audio',
+        'fr': 'aucun son',
+        'de': 'kein Ton',
+        'pt': 'sem áudio',
+        'it': 'nessun audio',
+        'ja': '音声がありません',
+        'zh': '没有音频',
+        'hi': 'कोई ऑडियो नहीं',
+        'ar': 'لا يوجد صوت',
+    },
+
+    'this deployment has no transcription service, so recorded speech cannot '
+    'be turned into words — set QRME_EARS_URL, or type instead': {
+        'es': 'esta instalación no tiene servicio de transcripción, así que el '
+              'audio grabado no puede convertirse en palabras: define '
+              'QRME_EARS_URL, o escribe en su lugar',
+        'fr': "ce déploiement n'a pas de service de transcription, la parole "
+              'enregistrée ne peut donc pas devenir du texte — définissez '
+              'QRME_EARS_URL, ou écrivez à la place',
+        'de': 'diese Installation hat keinen Transkriptionsdienst, aufgenommene '
+              'Sprache kann also nicht zu Worten werden — setze QRME_EARS_URL, '
+              'oder tippe stattdessen',
+        'pt': 'esta instalação não tem serviço de transcrição, por isso a fala '
+              'gravada não pode virar palavras — define QRME_EARS_URL, ou '
+              'escreve em vez disso',
+        'it': 'questa installazione non ha un servizio di trascrizione, quindi '
+              'il parlato registrato non può diventare parole: imposta '
+              'QRME_EARS_URL, oppure scrivi',
+        'ja': 'この導入には文字起こしサービスがないため、録音した音声を言葉に'
+              'できません。QRME_EARS_URL を設定するか、入力してください',
+        'zh': '此部署没有转写服务，因此无法把录音变成文字 — 请设置 '
+              'QRME_EARS_URL，或改为打字',
+        'hi': 'इस परिनियोजन में प्रतिलेखन सेवा नहीं है, इसलिए रिकॉर्ड की गई '
+              'बोली शब्दों में नहीं बदल सकती — QRME_EARS_URL सेट करें, या '
+              'टाइप करें',
+        'ar': 'لا تملك هذه النسخة خدمة تفريغ، لذا لا يمكن تحويل الكلام المسجَّل '
+              'إلى نص — اضبط QRME_EARS_URL، أو اكتب بدلًا من ذلك',
+    },
+
     "a room's name is the words in it": {
         'es': 'el nombre de una sala son las palabras que lleva',
         'fr': "le nom d'une salle, ce sont les mots qui la composent",
