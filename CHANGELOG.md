@@ -8,6 +8,36 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Nothing assembled into a prompt is cut inside a word, and a cut says so.**
+  This product had already learned this and applied it in one place: `wall.parts`
+  states outright that *a cut inside a word is what was reported and is the one
+  outcome this refuses*. Everything building a PROMPT went on slicing with a bare
+  `[:n]` — the same defect facing the model instead of a reader, and worse there,
+  because a reader sees a word end mid-air and distrusts it while a model reads
+  straight on.
+
+      asked     does the text fit
+      mattered  what does the part that fits say
+
+  Two places in the profile's own prompt, not equally serious. **Life material**
+  was cut at 160 characters — a sentence fragment, ending mid-word, read as the
+  profile's memory of itself trailing off. **A clinician's letter** was cut at
+  400, and that is the one place in the whole prompt where a truncation can
+  INVERT what was written: four hundred characters can land inside *no history
+  of cardiac arrhythmia* and hand the profile the opposite of the sentence,
+  under a heading telling it it is already up to speed.
+
+  A word boundary does not fix the second one — *"no history of"* is itself a
+  clean whole-word cut — so the boundary is the smaller half and the marker does
+  the work. The letter now says plainly that a qualification, a negation or a
+  caveat may sit in the part nobody can see, and to ask rather than conclude. It
+  also gets 1,200 characters rather than 400, because it is a document somebody
+  wrote about a person and not one of eight prompts for recall.
+
+  `common.clipped` walks the same boundary ladder `wall.parts` already used, and
+  returns *whether* it cut rather than wording it — only the caller knows how to
+  say that for where the text is going.
+
 - **The cap holds a filing now.** `MAX_TEXT` said *generous for a filing* and
   was not. A US patent application runs to forty thousand characters and often
   past a hundred thousand, so at 20,000 this read the first third of exactly

@@ -626,3 +626,46 @@ def export_rows(profile_id: str) -> dict[str, list[dict]]:
             continue
         out[table] = [_public(r) for r in rows]
     return out
+
+
+# --------------------------------------------------------------------------- #
+# Cutting text without cutting a word in half
+# --------------------------------------------------------------------------- #
+
+#: The boundaries to prefer when text has to be shortened, largest first.
+#: The same ladder `wall.parts` walks, and for the same finding: a cut inside
+#: a word is what got reported, and a cut inside a sentence is merely unlovely.
+_CLIP_BREAKS = ("\n\n", "\n", ". ", " ")
+
+
+def clipped(text: str, cap: int) -> tuple[str, bool]:
+    """`(text, was_cut)` — shortened at a boundary, never inside a word.
+
+    `wall.parts` learned this for posts somebody writes. Everything that
+    assembles a PROMPT went on slicing with a bare `[:n]`, which is the same
+    defect facing the model instead of a reader — and worse there, because a
+    reader sees a word end mid-air and distrusts it while a model reads on.
+
+        asked     does the text fit
+        mattered  what does the part that fits say
+
+    A clinician's note cut at 400 characters can land inside *no history of*
+    and hand a profile the opposite of what was written. That is the reason
+    this refuses a mid-word cut rather than tidying one up afterwards.
+
+    The flag is the other half. Something has to SAY it was shortened, and
+    only the caller knows how to word that for where it is going — a source
+    item and a clinician's letter want different sentences.
+    """
+    text = (text or "").strip()
+    if len(text) <= cap:
+        return text, False
+    window = text[:cap]
+    for mark in _CLIP_BREAKS:
+        cut = window.rfind(mark)
+        if cut > cap // 2:          # not so early that nothing useful is left
+            return window[:cut].rstrip(), True
+    # One unbroken run longer than the cap — a URL, a chemical name, an
+    # identifier. Cutting at the ceiling is the only option left, and the
+    # caller's marker is what keeps it honest.
+    return window.rstrip(), True

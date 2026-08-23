@@ -14,6 +14,8 @@ import hashlib
 import json
 from datetime import datetime, timezone
 
+from . import common
+
 # Surfaces / embodiments a profile can inhabit — its identity is invariant
 # across all of them.
 _EMBODIMENT_FORMS = "text, voice, feed, AR/VR, a speaker, a hologram, or a robot"
@@ -182,7 +184,12 @@ def build_system_prompt(
                  else "Life material you draw on (recall naturally when relevant)")
         lines = []
         for item in sources[:8]:
-            snippet = (item.get("content") or "")[:160]
+            # Cut at a boundary and SAY so. 160 characters of a life-material
+            # item is a sentence fragment, and one that ended mid-word read as
+            # the profile's own memory of itself trailing off.
+            snippet, shortened = common.clipped(item.get("content") or "", 160)
+            if shortened:
+                snippet += " … (this entry continues)"
             title = item.get("title") or item["kind"]
             lines.append(f"- [{item['kind']}] {title}: {snippet}")
         parts.append(label + ":\n" + "\n".join(lines))
@@ -193,8 +200,21 @@ def build_system_prompt(
         # a named human clinician's words about the person in the conversation.
         # The point of carrying them is that the patient should not have to
         # retell everything — not that the profile acquires a clinical opinion.
-        lines = [f"- {n['from']} ({n['at'][:10]}): {n['content'][:400]}"
-                 for n in clinical_notes[:4]]
+        # A clinician's letter, cut. This is the one place in the prompt where
+        # a truncation can INVERT what was written: 400 characters can land
+        # inside "no history of cardiac arrhythmia" and hand the profile the
+        # opposite of the sentence. A word boundary does not save it either —
+        # "no history of" is itself a whole-word cut — so the marker is what
+        # does the work, and it is written to be impossible to read past.
+        lines = []
+        for n in clinical_notes[:4]:
+            body, shortened = common.clipped(n["content"] or "", 1200)
+            if shortened:
+                body += (" […THE REST OF THIS LETTER IS NOT SHOWN. Treat what "
+                         "you have as an opening fragment: a qualification, a "
+                         "negation or a caveat may sit in the part you cannot "
+                         "see. Ask rather than conclude.]")
+            lines.append(f"- {n['from']} ({n['at'][:10]}): {body}")
         parts.append(
             "A real clinician has written to you about this person, so you "
             "are already up to speed and they need not explain it again:\n"
