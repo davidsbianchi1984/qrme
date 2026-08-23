@@ -415,6 +415,79 @@ export function Inside({ onPlans, start = "", onLeave }: {
 
   /** And stopped. The tail covers the speaker still decaying and the
    *  recogniser delivering a result it formed a moment ago. */
+  /** The person is taking the turn, now, and the room stops talking.
+   *
+   *      asked     did the person say something
+   *      mattered  is the profile still talking over it
+   *
+   *  Sending IS an interruption. Somebody who typed a sentence and pressed
+   *  send while a profile was mid-answer has said, as plainly as it can be
+   *  said, that they are done listening to that one — and the reply they
+   *  get back arrives underneath a voice still finishing the previous
+   *  thought. The voice-level meter catches this when they speak up; this
+   *  catches it when they do not have to.
+   *
+   *  Deliberately not conditional on the room being audible: `stop()` on a
+   *  voice that is not playing costs nothing, and a condition here is a
+   *  second thing to keep true.
+   */
+  function personTakesTheTurn() {
+    nowSaying.current?.stop();
+    nowSaying.current = null;
+    setVoicing(null);
+    roomFellQuiet();
+  }
+
+  /** The person is taking the turn, now, and the room stops talking.
+   *
+   *      asked     did the person say something
+   *      mattered  is the profile still talking over it
+   *
+   *  Sending IS the interruption. Somebody who spoke on purpose, or typed a
+   *  sentence and pressed send, has said as plainly as it can be said that
+   *  they are done listening to this answer — often because it is heading
+   *  somewhere they want to stop. Waiting for the paragraph to finish first
+   *  makes the correction arrive after the thing it was meant to prevent.
+   *
+   *  `stop()` cuts the sentence in the air rather than the queue behind it:
+   *  it pauses the element, so the voice ends mid-word if that is where the
+   *  person spoke. Nothing here is conditional on the room being audible —
+   *  stopping a voice that is not playing costs nothing, and a condition
+   *  would be a second thing to keep true.
+   */
+  function personTakesTheTurn() {
+    nowSaying.current?.stop();
+    nowSaying.current = null;
+    setVoicing(null);
+    roomFellQuiet();
+  }
+
+  /** The person has taken the turn. The speaker stops; the words stay.
+   *
+   *      asked     did the person say something
+   *      mattered  is the profile still talking over it
+   *
+   *  Sending IS the interruption. Somebody who spoke on purpose, or typed
+   *  and pressed send while a profile was mid-answer, has said as plainly
+   *  as it can be said that they want this one to stop — usually because it
+   *  is heading somewhere they are trying to head off. Waiting for the
+   *  paragraph to finish delivers the correction after the thing it was
+   *  meant to prevent.
+   *
+   *  What stops is the AUDIO and only the audio. `stop()` pauses the
+   *  element, so the voice ends on the word it is on rather than at the end
+   *  of the sentence or the queue. The reply itself is untouched: the
+   *  transcript comes from the room's own record, so the full text stays on
+   *  screen to be read, scrolled back to and answered. Cutting a voice off
+   *  is not deleting what it said.
+   */
+  function personTakesTheTurn() {
+    nowSaying.current?.stop();
+    nowSaying.current = null;
+    setVoicing(null);
+    roomFellQuiet();
+  }
+
   function roomFellQuiet() {
     speaking.current = false;
     disbelieveUntil.current = Date.now() + ECHO_TAIL_MS;
@@ -1000,6 +1073,18 @@ export function Inside({ onPlans, start = "", onLeave }: {
       // microphone the person never pressed.
       return;
     }
+    // Past both nets, so these are somebody's own words rather than the
+    // room's — which makes them a turn, and a turn stops the voice that
+    // was still finishing the last one.
+    personTakesTheTurn();
+    // Past both nets, so these are somebody's own words and not the room's
+    // — which makes them a turn, and a turn stops the voice still finishing
+    // the last one.
+    personTakesTheTurn();
+    // Past both nets, so these are somebody's own words and not the room's
+    // — which makes them a turn, and a turn stops the voice that is still
+    // finishing the last one.
+    personTakesTheTurn();
     // `act` is deliberately not used: it flips `busy`, which would grey
     // out the room under somebody mid-conversation.
     api.sayInRoom(open, me, said, token).then(load).catch(setError);
@@ -1243,6 +1328,9 @@ export function Inside({ onPlans, start = "", onLeave }: {
     if (!draft.trim() || !token || busy) return;
     const text = draft;
     setDraft("");
+    personTakesTheTurn();
+    personTakesTheTurn();
+    personTakesTheTurn();
     await act(async () => { await api.sayInRoom(open, me, text, token); })();
   }
 

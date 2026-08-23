@@ -40,15 +40,23 @@ from qrme import i18n, llm
 
 # --- the budget ------------------------------------------------------------
 
-def test_the_budget_is_two_and_a_half_times_what_it_was():
-    """The field call, kept as a number this test can name. 1024 was the
-    old wall and is the thing being multiplied. It went to ten for a
-    while and the field called it back down to five; the same reviewer
-    sent five back too — "still a long delay while waiting for a
-    response — drop it to 2.5" — because a spoken conversation waits for
-    the whole reply before it says a word. The truncation notice below
-    is what makes each shrink safe: hitting the wall is said out loud."""
-    assert llm.MAX_REPLY_TOKENS == int(1024 * 2.5)
+def test_the_budget_is_one_room():
+    """The field call, kept as a number this test can name.
+
+    A staircase, every step of it a field report. 1024 was the old wall.
+    It went to ten times that for a while; the field called it back to
+    five; the same reviewer sent five back too — "still a long delay
+    while waiting for a response — drop it to 2.5" — and then, having
+    lived with 2.5, sent that back as well: "can we reduce the ceiling
+    2.5X, it's still a little long-winded".
+
+    So: back to 1024, which is where it started. The whole staircase was
+    somebody reading real replies and saying they were too long, and the
+    truncation notice below is what made every step safe — hitting the
+    wall is said out loud, so a shorter wall costs a sentence and never
+    costs the reader the knowledge that there was more.
+    """
+    assert llm.MAX_REPLY_TOKENS == 1024
 
 
 def test_every_provider_asks_for_the_same_room():

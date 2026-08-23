@@ -67,7 +67,12 @@ _REQUEST_KEY: ContextVar[str | None] = ContextVar("qrme_llm_request_key",
 # finished, the reply says so. Silence at the cut is the failure — a person
 # reading a sentence that ends in the middle has no way to tell a truncation
 # from a model that lost the thread, and the two call for opposite responses.
-MAX_REPLY_TOKENS = 2560
+# Cut by two and a half again on a field report — "it's still a little
+# long-winded". The same argument as the paragraph above, run the other
+# way: the ceiling is safe to move because hitting it is SAID, so the only
+# question left is what length reads as a person talking rather than an
+# essay arriving. Two and a half rooms was still an essay.
+MAX_REPLY_TOKENS = 1024
 
 #: Appended when, and only when, the room ran out. The platform speaking, not
 #: the persona — so it is registered in `i18n._PUBLIC` and travels through
