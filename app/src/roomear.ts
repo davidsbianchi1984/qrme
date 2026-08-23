@@ -154,3 +154,73 @@ export async function recordTurn(
     done,
   };
 }
+
+/** Listen for somebody leaning in while the room is speaking.
+ *
+ *  The gap the recorded ear does not cover. On a browser with a working
+ *  recogniser — Chrome, Edge, everything but Safari — the room listens
+ *  through that recogniser, which has no analyser behind it and cannot tell
+ *  a person raising their voice from the speaker across the table. So the
+ *  echo fix had to drop EVERYTHING heard while the room was speaking, and
+ *  barge-in went with it. That trade was reported the same day it shipped:
+ *  the profile keeps talking over you.
+ *
+ *      asked     was that sound the room's own voice
+ *      mattered  or somebody interrupting it
+ *
+ *  A meter answers it. This opens a microphone stream purely to measure
+ *  level — nothing is recorded, nothing is sent — for exactly as long as the
+ *  room's voice is in the air, and reports the moment somebody clears the
+ *  bar an echo does not. The recogniser keeps doing the hearing; this only
+ *  decides whether to believe it.
+ *
+ *  Returns a closer. Call it when the voice stops: a meter left open is a
+ *  microphone light nobody asked to leave on.
+ */
+export async function meterWhileSpeaking(
+  onBargeIn: () => void,
+): Promise<() => void> {
+  if (!canRecord()) return () => {};
+  const w = window as unknown as {
+    AudioContext?: typeof AudioContext;
+    webkitAudioContext?: typeof AudioContext;
+  };
+  const Ctx = w.AudioContext ?? w.webkitAudioContext;
+  if (!Ctx) return () => {};
+
+  let stream: MediaStream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      // Echo cancellation here too, and for the sharper reason: without it
+      // the speaker's own output is what the meter would measure, and every
+      // sentence the room said would read as an interruption.
+      audio: { echoCancellation: true, noiseSuppression: true },
+    });
+  } catch {
+    return () => {};          // refused: no meter, and no barge-in either
+  }
+
+  const ctx = new Ctx();
+  const analyser = ctx.createAnalyser();
+  analyser.fftSize = 1024;
+  ctx.createMediaStreamSource(stream).connect(analyser);
+  const wave = new Uint8Array(analyser.fftSize);
+  let fired = false;
+  const watcher = window.setInterval(() => {
+    analyser.getByteTimeDomainData(wave);
+    let peak = 0;
+    for (let i = 0; i < wave.length; i++) {
+      const dev = Math.abs(wave[i] - 128);
+      if (dev > peak) peak = dev;
+    }
+    // Once per turn. A person who interrupts has interrupted; saying so
+    // forty times a second would be the same fact over and over.
+    if (!fired && peak > BARGE_PEAK) { fired = true; onBargeIn(); }
+  }, 100);
+
+  return () => {
+    window.clearInterval(watcher);
+    stream.getTracks().forEach((t) => t.stop());
+    void ctx.close().catch(() => {});
+  };
+}

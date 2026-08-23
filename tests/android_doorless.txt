@@ -1,5 +1,14 @@
 # Routes this shell cannot reach, with the reason. A ratchet: it may shrink
 # and must not grow past the ceiling in test_the_phone_is_a_client_too.py.
 #
-# Empty, and kept empty. Every route the backend serves is reachable from
-# this shell.
+# One row, and it says why. Every other route the backend serves is
+# reachable from this shell.
+#
+#
+# POST /rooms/{room_id}/heard — the route takes recorded audio and answers
+# with words. This shell has no recorder wired to it yet (AVAudioRecorder /
+# MediaRecorder / NAudio), and adding a binding with no caller would take the
+# route off this backlog while building nothing — the exact failure
+# unused_native_bindings.txt was written to catch. The web console has the
+# door; these three do not, and this row says so until they do.
+POST /rooms/{room_id}/heard

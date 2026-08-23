@@ -7,7 +7,8 @@ import { Refusal } from "../Refusal";
 import { speakInPieces } from "../spoken";
 import { useSession } from "../store";
 import { putAway, whenPutAway } from "../away";
-import { canRecord, recordTurn, type Recording } from "../roomear";
+import { canRecord, meterWhileSpeaking, recordTurn, type Recording }
+  from "../roomear";
 
 /**
  * Inside a room.
@@ -348,6 +349,65 @@ export function Inside({ onPlans, start = "", onLeave }: {
    *  delivering a result it formed a moment ago. */
   const ECHO_TAIL_MS = 900;
   const disbelieveUntil = useRef(0);
+
+  /** The room started saying something out loud.
+   *
+   *  Called by EVERY path that puts a voice in this room, which is the
+   *  whole point of it existing. There were two — the 🔊 toggle that reads
+   *  the backlog, and the 🔊 on each line — and the first release of this
+   *  guard set the flag inside the first one only. So a person using the
+   *  per-line button had no time gate AND no `roomSaid` window, which means
+   *  both echo nets were blind at once and the profile's own speech walked
+   *  into the room as a prompt. Reported from a Windows handheld, where the
+   *  recogniser works perfectly and heard the speaker beautifully.
+   *
+   *      asked     is the room speaking
+   *      mattered  which button started it
+   *
+   *  The answer must not depend on the second question. A comment two
+   *  screens up already said "the per-turn 🔊 is still on every line" — the
+   *  code named the other speaker and the fix gated one of them.
+   */
+  /** Somebody spoke up while the room was talking, loudly enough that a
+   *  speaker across the table would not have. Believed for exactly one
+   *  turn: interrupting is a thing you do, not a state you enter. */
+  const barged = useRef(false);
+  const closeMeter = useRef<(() => void) | null>(null);
+
+  function roomSpeaks(said: string) {
+    speaking.current = true;
+    // The meter runs only while the voice is in the air. On a browser with
+    // a recogniser this is the ONLY thing that can tell an interruption
+    // from an echo — the recogniser has no analyser, which is why the echo
+    // fix had to drop everything and took barge-in with it.
+    if (!closeMeter.current) {
+      barged.current = false;
+      void meterWhileSpeaking(() => {
+        barged.current = true;
+        // Barging in IS a turn. Believing the words and letting the profile
+        // keep talking over them is half an interruption, which is the
+        // half nobody asked for.
+        nowSaying.current?.stop();
+      })
+        .then((close) => {
+          // The voice may have finished while the microphone was opening.
+          if (speaking.current) closeMeter.current = close; else close();
+        });
+    }
+    // Remembered before it plays, not after: the microphone is open the
+    // whole time this voice is in the air, so the words have to be in the
+    // window before they can come back through it.
+    roomSaid.current = [...roomSaid.current, said].slice(-RECENT_TURNS);
+  }
+
+  /** And stopped. The tail covers the speaker still decaying and the
+   *  recogniser delivering a result it formed a moment ago. */
+  function roomFellQuiet() {
+    speaking.current = false;
+    disbelieveUntil.current = Date.now() + ECHO_TAIL_MS;
+    closeMeter.current?.();
+    closeMeter.current = null;
+  }
   // What is being heard, before it is sent. It rides in the draft box on
   // purpose: a person talking to a room needs to see that they are being
   // heard, and a microphone with no visible output is one people repeat
@@ -708,7 +768,6 @@ export function Inside({ onPlans, start = "", onLeave }: {
       .filter((m) => m.sender_kind === "profile" && m.sender_id && m.content);
     heardUpTo.current = transcript[transcript.length - 1].id;
     if (fresh.length === 0) return;
-    speaking.current = true;
     const run = earRun.current;
     void (async () => {
       try {
@@ -721,11 +780,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
           // silently deaf — the per-turn 🔊 is still on every line.
           const s = await speakInPieces(
             m.sender_id as string, m.content || "", token);
-          // Remembered before it plays, not after: the microphone is open
-          // the whole time this voice is in the air, so the words have to
-          // be in the window before they can come back through it.
-          roomSaid.current = [...roomSaid.current, m.content || ""]
-            .slice(-RECENT_TURNS);
+          roomSpeaks(m.content || "");
           nowSaying.current = s;
           if (run !== earRun.current) { s.stop(); break; }
           // The light follows the voice: while a backlog is being read,
@@ -736,9 +791,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
       } catch { /* a voice that cannot be fetched leaves the text standing */ }
       nowSaying.current = null;
       setVoicing(null);
-      speaking.current = false;
-      // The voice has stopped; the room has not gone quiet yet.
-      disbelieveUntil.current = Date.now() + ECHO_TAIL_MS;
+      roomFellQuiet();
     })();
     // heardUpTo/speaking are refs on purpose: the transcript is the signal.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -766,6 +819,10 @@ export function Inside({ onPlans, start = "", onLeave }: {
     roomSaid.current = [];
     talkRec.current?.stop();
     talkRec.current = null;
+    // The barge-in meter is a microphone too. Leaving a room with one open
+    // is the light nobody asked to leave on.
+    closeMeter.current?.();
+    closeMeter.current = null;
   }, [open]);
 
   // The room, put away. Both microphones go down — the standing ear and
@@ -908,7 +965,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
    *      asked     was that the room's own voice
    *      mattered  which ear is being asked
    */
-  function sendPending(barged = false) {
+  function sendPending(fromEar = false) {
     const said = pending.current.trim();
     pending.current = "";
     setDraft("");
@@ -918,8 +975,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
     // clean echo that arrived after the tail, and it stays because the two
     // fail in different directions: a text match misses a mangled echo, and
     // a clock misses a late one.
-    if (!barged && (speaking.current
-                    || Date.now() < disbelieveUntil.current)) return;
+    // Three ways to be believed: the recorded ear already ruled (`fromEar`),
+    // the meter heard somebody lean in, or the room was not speaking.
+    const interrupted = barged.current;
+    barged.current = false;
+    if (!fromEar && !interrupted
+        && (speaking.current || Date.now() < disbelieveUntil.current)) return;
     if (isEcho(said, roomSaid.current.join(" "))) {
       // The room hearing itself. Dropped silently and the ear stays
       // open — announcing it would be the product apologising for a
@@ -2072,16 +2133,10 @@ export function Inside({ onPlans, start = "", onLeave }: {
                                })();
                              }
                            }} />
-                    {/* Off, back to a name in a box — which is still a box.
-                        Offered only when there is something to take down. */}
-                    {face && face.showing !== "voice" && (
-                      <button className="chip" disabled={busy}
-                              onClick={act(async () => {
-                                await api.clearRoomFace(open, me, token);
-                              })}>
-                        {tr("ins.face.plain", lang)}
-                      </button>
-                    )}
+                    {/* "Just my name" used to sit here — taken out on
+                        request. The way back to a name in a box is the
+                        camera control, which sets `showing` to voice and
+                        lands in the same place. */}
                     {/* The masks. Two records, not one: taking a mask off and
                         turning a camera off are different actions, so this
                         sits beside the three above rather than among them. */}
@@ -2281,15 +2336,24 @@ export function Inside({ onPlans, start = "", onLeave }: {
                           aria-label={tr("ins.hear", lang)}
                           onClick={() => {
                             const id = m.sender_id as string;
+                            // Announced before a note of it plays, and
+                            // through the same door the backlog uses. This
+                            // button put the profile's voice in the room
+                            // with neither echo net watching.
+                            roomSpeaks(m.content || "");
                             speakInPieces(id, m.content || "", token)
                               .then((s) => {
                                 nowSaying.current = s;
                                 setVoicing({ kind: "profile", id });
                                 return s.done;
                               })
-                              .then(() => setVoicing(null))
+                              .then(() => { setVoicing(null); roomFellQuiet(); })
                               .catch((e) => {
                                 setVoicing(null);
+                                // Quiet again even when the voice failed:
+                                // a flag left standing would deafen the
+                                // room until it was reloaded.
+                                roomFellQuiet();
                                 setError(e);
                               });
                           }}>

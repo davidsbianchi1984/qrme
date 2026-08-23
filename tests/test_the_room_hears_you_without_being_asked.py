@@ -162,11 +162,25 @@ def test_the_guard_stands_between_the_words_and_the_room():
 
 def test_the_room_remembers_what_it_said_before_it_says_it():
     """The microphone is open the whole time a voice is in the air, so the
-    words must be in the window before they can come back through it."""
+    words must be in the window before they can come back through it.
+
+    Read through `roomSpeaks` rather than by looking for the assignment
+    inline. This guard used to require `roomSaid.current = [` inside the
+    playback block and failed the moment that line moved into the one
+    function every playback path now calls — which was the fix for a REAL
+    version of this bug, where the per-line 🔊 button announced nothing at
+    all. A guard that fails when the claim gets safer is reading the shape.
+    """
+    announce = re.search(r"function roomSpeaks\([^)]*\)\s*\{(.*?)\n  \}",
+                         INSIDE, re.S)
+    assert announce, "roomSpeaks is gone — nothing records what the room said"
+    assert "roomSaid.current = [" in announce.group(1), (
+        "the room's own words never enter the echo window")
     play = INSIDE[INSIDE.index("const s = await speakInPieces"):]
     play = play[:play.index("await s.done")]
-    assert "roomSaid.current = [" in play
-    assert play.index("roomSaid.current") < play.index("setVoicing"), (
+    assert "roomSpeaks(" in play, (
+        "the backlog plays a turn without recording that the room said it")
+    assert play.index("roomSpeaks(") < play.index("setVoicing"), (
         "the room starts playing a turn before it remembers saying it")
 
 

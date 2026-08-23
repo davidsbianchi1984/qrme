@@ -673,3 +673,35 @@ def test_a_short_conversation_sits_next_to_the_pill() -> None:
     assert "justify-content: flex-end" not in block, (
         "flex-end on a scrolling column can strand the oldest lines out of "
         "reach above the top — which is exactly what must stay reachable")
+
+
+def test_the_seats_controls_never_change_the_seat() -> None:
+    """Three reports, one bug.
+
+    "The buttons at the bottom disappear mid conversation." "The frames get
+    smaller" when the controls are hidden. The strip cropped on a handheld.
+    All the same thing: `.rs-controls` was a normal flex child, so seven
+    chips and a mask picker wrapped onto three rows and the TILE grew by
+    them — measured in a browser at 132px on a 1280x800 handheld and 148px
+    on a phone, with the composer and the seven round controls moving down
+    by exactly as much. The frames were never small; they had been inflated.
+
+        asked     do the controls fit
+        mattered  does the tile change size when they appear
+
+    The camera tile has always overlaid its own controls. The fix existed
+    in this file and the ordinary tile never got it.
+    """
+    block = re.search(
+        r"\.screen\.room-place \.rs-tile \.rs-controls\s*\{([^}]*)\}", RULES)
+    assert block, (
+        "the seat's controls are back in the tile's flow, so opening them "
+        "resizes the seat and everything under it moves")
+    said = block.group(1)
+    assert "position: absolute" in said, (
+        "the controls take room in the tile rather than riding over it")
+    # Taller than the tile must scroll, not stretch: the one thing this rule
+    # may never do is change the tile's height again.
+    assert "max-height" in said and "overflow-y" in said, (
+        "a control strip taller than the tile would stretch it, which is the "
+        "bug wearing the fix's clothes")

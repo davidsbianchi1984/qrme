@@ -95,3 +95,112 @@ def test_the_text_net_is_still_there() -> None:
     front of it."""
     assert "isEcho(" in _stripped(), (
         "the text guard was removed — a late echo has nothing to stop it")
+
+
+def test_every_voice_in_the_room_goes_through_the_same_door() -> None:
+    """The miss that made the first fix look like it worked.
+
+    The room has two ways to put a profile's voice in the air: the 🔊 toggle
+    that reads the backlog, and the 🔊 on every line. The first release of
+    this guard set the flag inside the backlog path only — so a person using
+    the per-line button had no time gate AND no `roomSaid` window, which is
+    both nets blind at once, and the profile's own speech walked back in as
+    a prompt. Reported from a Windows handheld where the recogniser works
+    perfectly and heard the speaker beautifully.
+
+        asked     is the room speaking
+        mattered  which button started it
+
+    The answer must not depend on the second question. So this counts the
+    `speakInPieces` call sites and requires every one of them to announce
+    itself — a third way to speak cannot be added without tripping here.
+    """
+    code = _stripped()
+    plays = [m.start() for m in re.finditer(r"speakInPieces\(", code)]
+    assert len(plays) >= 2, (
+        "the room has fewer voices than it used to — read the shape again "
+        "before deleting this guard")
+    for at in plays:
+        window = code[max(0, at - 600):at + 600]
+        assert "roomSpeaks(" in window, (
+            "a `speakInPieces` call puts a voice in the room without saying "
+            "so, so the microphone hears it with nothing in the way")
+
+
+def test_the_room_falls_quiet_even_when_the_voice_failed() -> None:
+    """A flag left standing deafens the room until it is reloaded.
+
+    Worse than the bug it guards against: that one lets an echo in, this
+    one would drop everything a person says for the rest of the session.
+    """
+    code = _stripped()
+    for at in [m.start() for m in re.finditer(r"\.catch\(", code)]:
+        window = code[at:at + 400]
+        if "roomSpeaks(" in code[max(0, at - 900):at] and "setVoicing" in window:
+            assert "roomFellQuiet()" in window, (
+                "a voice that failed leaves the room marked as speaking, so "
+                "nothing the person says afterwards is believed")
+
+
+# --- the half the echo fix took away, given back --------------------------
+
+def test_a_person_can_still_interrupt_the_room() -> None:
+    """The cost 1.4.1 paid, and the reason it does not have to be paid.
+
+    Dropping everything heard while the room speaks is the only safe rule
+    for an ear with no analyser — a recogniser cannot tell somebody leaning
+    into the microphone from a speaker across the table. So barge-in went
+    with the echo, and the profile talks over you.
+
+        asked     was that sound the room's own voice
+        mattered  or somebody interrupting it
+
+    A meter answers it, and it costs nothing to run: it is open only while
+    the voice is in the air, records nothing, and sends nothing.
+    """
+    code = _stripped()
+    assert "meterWhileSpeaking(" in code, (
+        "nothing measures the room while it speaks, so every sound during a "
+        "profile's turn is treated as its echo — including you")
+    speaks = re.search(r"function roomSpeaks\([^)]*\)\s*\{(.*?)\n  \}",
+                       code, re.S)
+    assert speaks and "meterWhileSpeaking(" in speaks.group(1), (
+        "the meter is not opened where the room starts speaking, so it "
+        "listens at the wrong times or not at all")
+    quiet = re.search(r"function roomFellQuiet\(\)\s*\{(.*?)\n  \}", code, re.S)
+    assert quiet and "closeMeter" in quiet.group(1), (
+        "the meter outlives the voice — a microphone left open after the "
+        "room went quiet")
+
+
+def test_the_send_believes_an_interruption() -> None:
+    """A meter that reports and is not read is a microphone open for
+    nothing."""
+    code = _stripped()
+    send = re.search(r"function sendPending\([^)]*\)(.*?)\n  \}", code, re.S)
+    assert send, "sendPending moved — this guard reads it by name"
+    assert "barged.current" in send.group(1), (
+        "the send never asks whether somebody interrupted, so the meter "
+        "changes nothing")
+    assert "barged.current = false" in send.group(1), (
+        "the interruption is not spent, so one raised voice would make the "
+        "room believe every echo that followed it")
+
+
+def test_barging_in_stops_the_voice() -> None:
+    """Believing the words while the profile keeps talking over them is
+    half an interruption, and the half nobody asked for."""
+    code = _stripped()
+    meter = re.search(r"meterWhileSpeaking\(\(\) => \{(.*?)\}\)", code, re.S)
+    assert meter, "the barge-in handler moved — this guard reads it by name"
+    assert "nowSaying.current?.stop()" in meter.group(1), (
+        "somebody interrupts and the profile carries on speaking")
+
+
+def test_the_meter_goes_down_when_you_leave() -> None:
+    """A microphone open in a room nobody is standing in."""
+    code = _stripped()
+    teardown = code[code.index("earRun.current++"):]
+    teardown = teardown[:teardown.index("}, [open])")]
+    assert "closeMeter" in teardown, (
+        "leaving the room leaves the barge-in meter holding the microphone")

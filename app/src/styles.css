@@ -648,6 +648,31 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   background: linear-gradient(transparent, rgba(5,3,15,0.8)); }
 .rs-camtile .rs-worn { position: absolute; left: 8px; right: 8px; top: 26px;
   z-index: 3; text-shadow: 0 1px 4px rgba(5,3,15,0.9); }
+/* In a room the seat's controls ride OVER the tile, never inside it.
+ *
+ *     asked     do the controls fit
+ *     mattered  does the tile change size when they appear
+ *
+ * They were a normal flex child with `margin-top: auto`, so seven chips and
+ * a mask picker wrapped onto three rows and the TILE grew by exactly that
+ * much — which grew the seats row, which pushed the composer and the seven
+ * round controls off the bottom of the screen. Three separate reports, all
+ * one bug: "the buttons at the bottom disappear", "the frames get smaller"
+ * when the controls are hidden (they were never small, they had been
+ * inflated), and the strip cropped on a handheld.
+ *
+ * The camera tile has always done it this way — `.rs-camtile .rs-controls`
+ * is absolute a few lines up. The fix already existed in this file and the
+ * ordinary tile never got it. */
+.screen.room-place .rs-tile .rs-controls {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 4;
+  margin: 0; padding: 10px 6px 8px;
+  /* Taller than the tile is a scroll, not a stretch: the one thing this
+     rule may never do is change the tile's height again. */
+  max-height: 100%; overflow-y: auto;
+  border-radius: 0 0 16px 16px;
+  background: linear-gradient(transparent 0, rgba(5, 3, 15, 0.88) 22px); }
+
 .rs-hint { position: absolute; top: 8px; right: 8px; z-index: 3;
   font-size: 8px; letter-spacing: .04em; color: #efecff; opacity: .75;
   background: rgba(5,3,15,0.45); border-radius: 7px; padding: 2px 6px; }

@@ -537,11 +537,6 @@ public record RoomMsg(
 public record RoomShared(
     [property: JsonPropertyName("shared")] RoomMsg Shared);
 
-// Words heard, and nothing else: the audio that carried them is not stored
-// and there is no message here, because hearing does not say.
-public record RoomHeard(
-    [property: JsonPropertyName("text")] string text);
-
 public record HandleClaim(
     [property: JsonPropertyName("profile_id")] string ProfileId,
     [property: JsonPropertyName("handle")] string Handle,
@@ -4295,25 +4290,6 @@ public sealed class ApiClient
         { Content = new ByteArrayContent(bytes) };
         req.Headers.Add("authorization", $"Bearer {token}");
         return await Send<RoomShared>(req);
-    }
-
-    /// <summary>Recorded speech in, words out. The audio is not stored.</summary>
-    /// <remarks>
-    /// What comes back goes through <c>SayInRoom</c> like anything else said
-    /// in the room: the transcript's rules live behind that door and nowhere
-    /// else. A deployment with no transcriber answers 503, and
-    /// <c>Send</c> carries that sentence up rather than replacing it — the
-    /// reason names what is missing and only the far end knows it.
-    /// </remarks>
-    public async Task<string> HeardInRoom(string roomId, string interactorId,
-                                          byte[] audio, string token)
-    {
-        var req = new HttpRequestMessage(HttpMethod.Post,
-            $"/rooms/{roomId}/heard?interactor_id=" +
-            Uri.EscapeDataString(interactorId))
-        { Content = new ByteArrayContent(audio) };
-        req.Headers.Add("authorization", $"Bearer {token}");
-        return (await Send<RoomHeard>(req)).text ?? "";
     }
 
     public Task<DisplayVocabulary> DisplayVocabulary() =>
