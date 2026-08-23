@@ -42,15 +42,18 @@ ITEM = ("A long entry about the years spent restoring wooden boats on the "
 # -- the clipper ----------------------------------------------------------
 
 def test_a_word_is_never_cut_in_half():
-    text = "supercalifragilistic expialidocious and then some more words here"
-    out, cut = clipped(text, 30)
-    assert cut is True
-    assert not text[len(out):len(out) + 1].isalpha() or out.endswith(
-        text[:len(out)].rsplit(" ", 1)[0][-1:]), out
-    assert " ".join(out.split()) == out
-    assert text.startswith(out)
-    # The real claim, stated directly: what came back ends where a word ends.
-    assert text[len(out)] in " ." or out == text.strip()
+    """Swept across every cap rather than checked at one.
+
+    A single cap tests the sentence as much as the code: the first version
+    of this picked one number, and the number happened to land on a space,
+    so it passed against a build with the boundary search taken out. The
+    sweep has nowhere to be lucky.
+    """
+    line = "The patient reports no history of arrhythmia and slept well."
+    for cap in range(10, len(line)):
+        out, cut = clipped(line, cap)
+        assert cut is True and line.startswith(out), cap
+        assert line[len(out)] in " .", f"cap {cap} cut inside a word: {out!r}"
 
 
 def test_text_that_fits_is_returned_untouched():

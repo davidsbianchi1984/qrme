@@ -661,10 +661,20 @@ def clipped(text: str, cap: int) -> tuple[str, bool]:
     if len(text) <= cap:
         return text, False
     window = text[:cap]
-    for mark in _CLIP_BREAKS:
-        cut = window.rfind(mark)
-        if cut > cap // 2:          # not so early that nothing useful is left
-            return window[:cut].rstrip(), True
+    # Two passes. The first prefers a boundary in the second half, so what
+    # comes back is not a stub. The second accepts a boundary ANYWHERE,
+    # because a short honest clip beats a broken word — this is a clip, not
+    # a split into parts, and nothing downstream needs the piece to be a
+    # certain size. Written as two passes after a sweep across every cap
+    # caught the single-pass version cutting "The patien" out of "The
+    # patient": with no space past the halfway mark it fell straight through
+    # to the raw cut, so the guarantee this function is named for was false
+    # exactly where the text was shortest.
+    for floor in (cap // 2, -1):
+        for mark in _CLIP_BREAKS:
+            cut = window.rfind(mark)
+            if cut > floor:
+                return window[:cut].rstrip(), True
     # One unbroken run longer than the cap — a URL, a chemical name, an
     # identifier. Cutting at the ceiling is the only option left, and the
     # caller's marker is what keeps it honest.
