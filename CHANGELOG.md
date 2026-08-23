@@ -4,6 +4,67 @@ All notable changes to QRME are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2026-08-23
+
+Three things the room did wrong, all reported from a device rather than
+found by a test.
+
+### Fixed
+
+- **The room stops prompting itself.** *"The voice that's coming from my
+  speaker, that is the synthetic profile talking to me, is being picked up on
+  my microphone as a prompt."* Reported from Windows, after the text guard
+  had already shipped.
+
+      asked     did the room hear something
+      mattered  was it somebody in it
+
+  `isEcho` needs 70% of the words to line up with what the room just said.
+  That catches a clean echo. It does not catch a misheard one — the
+  microphone hears the speaker across the room, the recogniser guesses at it,
+  and a guess about a sentence is not 70% the same sentence. The mangled
+  version cleared the guard and was sent as though a person had said it, so
+  the profile answered itself in a conversation about somebody's psychiatric
+  care. The certain test is not what the words were, it is **when they
+  arrived**: `speaking` says exactly that and was sitting in the component
+  unread. Gated at the ear rather than only at the send, so the room's own
+  words never reach the draft box either, with a 900ms tail for a speaker
+  still decaying. Both nets stay — a text match misses a mangled echo, a
+  clock misses a late one. The cost, said plainly: speaking over the profile
+  no longer interrupts it, because the room has no analyser to tell a person
+  leaning in from a speaker across the table.
+
+- **The log stops growing and the strip stops moving.** *"The buttons at the
+  bottom I have circled disappear mid conversation"* — then, self-diagnosed:
+  *"as the conversation starts to pile up five rows it pushes down the
+  buttons."* The log was already capped at five rows and the cap was doing
+  its job; a maximum stops the log growing and not the strip moving. Measured
+  in a browser rather than argued about: empty it is 0px, full it is 135px,
+  so the Type pill and the seven round controls travelled 135px down the page
+  between the first turn and the fifth — off the bottom of a phone. A fixed
+  height holds the strip in one place from the empty room onwards. The oldest
+  line fades at the top edge through a mask rather than being cut square, and
+  still scrolls back: 330px of history above the fold, driven and checked.
+
+- **The room's ear says why it cannot hear.** *"I can mute the mic and unmute
+  the mic, and I can tap into the text bar, but it's not picking up my
+  voice"* — from an iPhone, with the mic lit gold. `startTalking` set
+  `onresult` and `onend` and had no error handler at all. On iOS the
+  `webkitSpeechRecognition` constructor exists, so the button renders and
+  `start()` succeeds and the mic lights; the service then refuses, the
+  refusal fell through to `onend`, and `onend` stood another recogniser,
+  forever. A lit microphone that cannot hear is worse than no microphone,
+  because the person keeps talking to it. Four causes named with what to do
+  about each, a fatal fault ends the ear instead of feeding the loop, and the
+  voice line shows the fault above everything else it could say. `onerror`
+  was missing from the hand-written `SpeechRec` type too, which is why no
+  caller wrote one — the type was the shape of the bug.
+
+  This does **not** give an iPhone a voice in a room. iOS has no working
+  speech recogniser, so the honest message is the whole of the fix; a
+  record-and-send path to server transcription, which JIM has and this does
+  not, is the only thing that would.
+
 ## [1.4.0] - 2026-08-22
 
 Four things that worked and could not be seen to work. A backgrounded tab
