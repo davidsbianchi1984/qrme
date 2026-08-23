@@ -145,7 +145,8 @@ def _display(kind: str, ref_id: str) -> str:
 
 
 def _media_brief(media_id: str | None, read: bool = False,
-                 why: str | None = None) -> dict | None:
+                 why: str | None = None, whole: int | None = None,
+                 kept: int | None = None) -> dict | None:
     """The shareable face of an attachment: kind, serving url, display
     name, and whether the words in it were read. Never the disk path,
     never the uploader's raw filename beyond the display copy
@@ -174,7 +175,13 @@ def _media_brief(media_id: str | None, read: bool = False,
             "url": f"{media_mod.ROUTE}/{row['filename']}",
             "name": row["name"],
             "read": read,
-            "unread_why": None if read else (why or None)}
+            "unread_why": None if read else (why or None),
+            # How much of it is here, when the cap kept less, and how much
+            # there was. Both on the wire because the client cannot derive
+            # the first: the cap is a server constant, and a console that
+            # hard-coded it would print a stale number the day it changes.
+            "chars": (kept or None) if read else None,
+            "full_chars": (whole or None) if read else None}
 
 
 def _read_share(data: bytes, name: str | None,
@@ -250,7 +257,8 @@ def _store_room_message(room_id, sender_kind, sender_id, content,
             "from": _display(sender_kind, sender_id),
             "content": content if approved else None,
             "watermark": credential,
-            "media": (_media_brief(media_id, bool(media_digest), media_why)
+            "media": (_media_brief(media_id, bool(media_digest), media_why,
+                                   media_full, len(media_text or ""))
                       if approved else None),
             "status": "approved" if approved else "blocked"}
 
@@ -1228,7 +1236,10 @@ def room_transcript(room_id: str, request: Request) -> list[dict]:
                  r["media_id"] if "media_id" in r.keys() else None,
                  bool(r["media_digest"]
                       if "media_digest" in r.keys() else None),
-                 r["media_why"] if "media_why" in r.keys() else None),
+                 r["media_why"] if "media_why" in r.keys() else None,
+                 r["media_full"] if "media_full" in r.keys() else None,
+                 len(r["media_text"] or "")
+                 if "media_text" in r.keys() else None),
              "created_at": r["created_at"]}
             for r in rows]
 

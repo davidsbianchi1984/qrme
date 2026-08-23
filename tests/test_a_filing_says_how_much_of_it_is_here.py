@@ -177,3 +177,79 @@ def test_the_room_does_not_keep_a_whole_filing_in_a_transcript_row(client):
     assert len(words) == MAX_TEXT
     assert whole == len(FILING.strip())
     assert not why
+
+
+# -- and on both screens, where the person who uploaded it is looking ------
+#
+# The profile being told is half of it. A person reading "read once — 20,000
+# characters" beside a filing three times that length has been handed the
+# kept length wearing the document's name, and nothing on screen distinguishes
+# the two. Both surfaces say it now: the briefcase panel and the room's
+# attachment line.
+
+from pathlib import Path  # noqa: E402
+
+CONSOLE = Path(__file__).resolve().parents[1] / "app" / "src"
+BRIEFCASE_TSX = (CONSOLE / "Briefcase.tsx").read_text(encoding="utf-8")
+INSIDE_TSX = (CONSOLE / "screens" / "Inside.tsx").read_text(encoding="utf-8")
+L10N = (CONSOLE / "l10n.ts").read_text(encoding="utf-8")
+
+
+def _looked_up(source: str) -> set[str]:
+    return set(re.findall(r'tr\("([a-z.]+\.part(?:\.why)?)"', source))
+
+
+def test_both_screens_say_it_when_a_document_was_cut():
+    """One surface saying it is the failure this round has now caught four
+    times: a fix that reaches one of two paths looks exactly like a fix."""
+    assert "prf.bc.part" in _looked_up(BRIEFCASE_TSX), (
+        "the briefcase panel still prints the kept length as the document's"
+    )
+    assert "ins.file.part" in _looked_up(INSIDE_TSX), (
+        "the room's attachment line still prints the kept length as the "
+        "document's"
+    )
+    for key in ("prf.bc.part", "prf.bc.part.why", "ins.file.part"):
+        assert f'"{key}"' in L10N, key
+
+
+def test_a_whole_document_still_reads_as_whole_on_both():
+    """The old wording has to survive, or every short note acquires a
+    truncation notice about nothing."""
+    for source, key in ((BRIEFCASE_TSX, "prf.bc.read"),
+                        (INSIDE_TSX, "ins.file.read")):
+        assert f'tr("{key}", lang)' in source, key
+
+
+def test_the_kept_length_comes_from_the_server():
+    """The cap is a server constant. A console that hard-coded it would
+    print a stale number the day it moves, and the number is the whole
+    content of the sentence."""
+    assert "m.media.chars" in INSIDE_TSX, (
+        "the room derives the kept length instead of reading it"
+    )
+    from qrme.routers.community import _media_brief
+
+    assert "kept" in _media_brief.__code__.co_varnames
+
+
+def test_the_room_puts_both_numbers_on_the_wire(client):
+    from tests.test_capabilities import as_interactor  # noqa: F811
+
+    user = make_interactor(client, "Ada", "1990-01-01")
+    dana = make_profile(client)
+    room = client.post("/rooms", json={"channel": "chat", "participants": [
+        {"kind": "user", "id": user},
+        {"kind": "profile", "id": dana["id"]}]}).json()["id"]
+    posted = client.post(
+        f"/rooms/{room}/share?interactor_id={user}&filename=filing.txt",
+        headers=as_interactor(user), content=FILING.encode())
+    media = posted.json()["shared"]["media"]
+    assert media["chars"] == MAX_TEXT
+    assert media["full_chars"] == len(FILING.strip())
+
+    # And on a reload, not only in the reply to the share.
+    seen = client.get(f"/rooms/{room}/messages",
+                      headers=as_interactor(user)).json()
+    last = [m["media"] for m in seen if m.get("media")][-1]
+    assert last["chars"] == MAX_TEXT and last["full_chars"] == len(FILING.strip())

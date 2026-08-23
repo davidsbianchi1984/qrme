@@ -1176,6 +1176,10 @@ export interface BriefcaseItem {
    *  languages and the profile's prompt says it in one. Absent when the
    *  item read, and for kinds that never claimed to. */
   unread_why?: string | null;
+  /** The document's OWN length, when the cap kept less than all of it.
+   *  Absent when nothing was cut, which is most items — `chars` is then the
+   *  whole thing. Present, it means `chars` is a PREFIX. */
+  full_chars?: number | null;
   bytes?: number | null; created_at: string;
 }
 export interface WallPost {
@@ -2089,7 +2093,14 @@ export type RoomMsg = {
             read?: boolean;
             /** Why it could not be read, as a key — see `BriefcaseItem`.
              *  Absent when it read, and for kinds that never claimed to. */
-            unread_why?: string | null } | null;
+            unread_why?: string | null;
+            /** The document's own length, when the cap kept less. Present,
+             *  it means what the profiles hold is a PREFIX. */
+            full_chars?: number | null;
+            /** How much of it was kept. On the wire rather than derived,
+             *  because the cap is a server constant and a console that
+             *  hard-coded it would print a stale number the day it moves. */
+            chars?: number | null } | null;
   created_at?: string;
 };
 

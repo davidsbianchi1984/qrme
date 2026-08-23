@@ -1400,7 +1400,13 @@ export function Inside({ onPlans, start = "", onLeave }: {
         </a>
         <span className={"rm-read" + (m.media.read ? " yes" : "")}>
           {m.media.read
-            ? tr("ins.file.read", lang)
+            // A prefix, said as one — the same fact the profiles are told,
+            // on the line the person who shared it is reading.
+            ? (m.media.full_chars
+                ? fill(tr("ins.file.part", lang), {
+                    chars: (m.media.chars || 0).toLocaleString(),
+                    whole: m.media.full_chars.toLocaleString() })
+                : tr("ins.file.read", lang))
             : (fileWhy(m.media.unread_why, lang)
                 ? tr("ins.file.unread", lang) + " — "
                   + fileWhy(m.media.unread_why, lang)

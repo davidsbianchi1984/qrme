@@ -144,11 +144,26 @@ export function Briefcase({ profileId, interactorId, name, onError }: {
               </div>
               <p className="muted small">
                 {item.read
-                  ? fill(tr("prf.bc.read", lang), {
-                      chars: String(item.chars),
-                      digest: String(item.digest_chars) })
+                  // A prefix, said as one. "read once — 20,000 characters"
+                  // for a 70,000-character filing is the KEPT length wearing
+                  // the document's name, and the person who uploaded it has
+                  // no way to tell the two apart.
+                  ? (item.full_chars
+                      ? fill(tr("prf.bc.part", lang), {
+                          chars: item.chars.toLocaleString(),
+                          whole: item.full_chars.toLocaleString(),
+                          digest: String(item.digest_chars) })
+                      : fill(tr("prf.bc.read", lang), {
+                          chars: String(item.chars),
+                          digest: String(item.digest_chars) }))
                   : fill(tr("prf.bc.unread", lang), { name })}
               </p>
+              {/* And what to do about it. A number alone tells somebody
+                  their filing was cut and leaves them there; the next move
+                  is to paste the part that matters. */}
+              {item.read && item.full_chars ? (
+                <p className="muted small">{tr("prf.bc.part.why", lang)}</p>
+              ) : null}
               {/* And WHY, where the reader knows. "Not opened" is true of a
                   scan, a locked file and a font this reader cannot follow,
                   and only one of those is something the person can act on —
