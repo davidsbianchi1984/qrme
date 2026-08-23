@@ -8,6 +8,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **A person's own words stop being cut mid-sentence.** The last two silent
+  slices in this product were what somebody typed, and both reach a prompt:
+  the **note** on a document arrives as *"They said: …"* under the item it
+  describes, and the **caption** on a room share lands in the transcript every
+  profile in the room reads. Cut bare at 400 and 500 characters they ended
+  mid-word, which reads to a model as somebody trailing off rather than as a
+  sentence this product shortened.
+
+      asked     does the text fit
+      mattered  whose sentence is being ended
+
+  A clinician's letter and a life entry are material *about* somebody. These
+  two are the person's own writing, and quietly truncating your sentence and
+  then showing it to a model as though you had stopped there is worse than
+  losing the text. Both clip at a boundary now and say plainly that more was
+  written.
+
 - **Nothing assembled into a prompt is cut inside a word, and a cut says so.**
   This product had already learned this and applied it in one place: `wall.parts`
   states outright that *a cut inside a word is what was reported and is the one

@@ -132,3 +132,60 @@ def test_the_clinical_letter_gets_more_room_than_a_life_entry(client):
     assert len(body) > 400, (
         "a clinician's letter is still held to the life-entry ceiling"
     )
+
+
+# -- and the person's own words, which are the last two ---------------------
+#
+# A clinician's letter and a life entry are material ABOUT somebody. These two
+# are what the person themselves typed, and both reach a prompt: the note
+# arrives as "They said: …" under the document it describes, and the caption
+# lands in the transcript every profile in the room reads. Cut bare they ended
+# mid-word, which reads to a model as somebody trailing off rather than as a
+# sentence this product shortened.
+
+import inspect  # noqa: E402
+import re  # noqa: E402
+
+from qrme import briefcase  # noqa: E402
+from qrme.routers import community  # noqa: E402
+
+#: A slice with a number big enough to be prose. `at[:10]` is an ISO date;
+#: `note[:400]` is a person's sentence being guillotined.
+_BARE_SLICE = re.compile(r"\[:\s*(\d{2,})\s*\]")
+_NOT_PROSE = {10, 160}   # a date; and `title[:160]`, which is a filename
+
+
+def test_the_note_on_a_document_is_not_cut_bare():
+    source = inspect.getsource(briefcase.add)
+    bare = [int(n) for n in _BARE_SLICE.findall(source)
+            if int(n) not in _NOT_PROSE]
+    assert not bare, f"a person's note is cut with a bare slice at {bare}"
+    assert "clipped(" in source
+
+
+def test_a_long_note_says_they_wrote_more(client):
+    item = briefcase.add("p1", "i1", kind="document", title="Filing",
+                         text="Some text.", read=True,
+                         note="It matters because " * 60)
+    assert item["note"].endswith("(they wrote more than is kept here)")
+    assert not item["note"].split("…")[0].rstrip().endswith("becaus")
+
+
+def test_a_short_note_is_left_exactly_alone(client):
+    said = "The second application, filed last March."
+    item = briefcase.add("p1", "i1", kind="document", title="Filing",
+                         text="Some text.", read=True, note=said)
+    assert item["note"] == said
+
+
+def test_the_caption_on_a_share_is_not_cut_bare():
+    source = inspect.getsource(community.share_into_room) if hasattr(
+        community, "share_into_room") else None
+    if source is None:
+        # The route is named differently; read the module and find the caption
+        # handling rather than guessing at a function name.
+        source = (community.__file__ and open(community.__file__).read())
+    assert 'clipped(caption or ""' in source, (
+        "a person's caption on a share is still cut with a bare slice"
+    )
+    assert "they wrote more than the room kept" in source

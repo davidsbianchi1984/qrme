@@ -81,7 +81,7 @@ import zipfile
 import zlib
 from io import BytesIO
 
-from . import db, llm, media, offline, scrape
+from . import common, db, llm, media, offline, scrape
 
 #: Kinds a person can hand over. ``photo`` and ``video`` are stored for what
 #: the person says about them; the rest carry text this deployment can read.
@@ -1093,7 +1093,14 @@ def add(profile_id: str, interactor_id: str, *, kind: str, title: str,
             422, f"this conversation already carries {MAX_ITEMS} imported "
                  "items — remove one before adding another")
     title = (title or "").strip()[:160] or "Untitled"
-    note = (note or "").strip()[:400] or None
+    # The person's OWN words about what they handed over, and they reach the
+    # prompt as "They said: …". Cut bare at 400 they ended mid-word, which
+    # reads to the model as somebody trailing off rather than as a sentence
+    # that was shortened by us.
+    note, note_cut = common.clipped(note or "", 400)
+    if note_cut:
+        note += " … (they wrote more than is kept here)"
+    note = note or None
     # The cut happens here, where its cost can be written down beside it.
     # Tidied first so the two numbers are comparable: `read_file` hands over
     # tidied text already and this is a no-op for it, but a direct caller

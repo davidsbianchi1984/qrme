@@ -25,7 +25,7 @@ from fastapi import APIRouter, HTTPException, Request
 from .. import (auth, db, engagement, identity, inbox, llm, marketplace,
                 moderation, persona, referral, roommic, storage, tiers,
                 watermark)
-from ..common import (age_of, interactor_or_404, profile_or_404,
+from ..common import (age_of, clipped, interactor_or_404, profile_or_404,
                       require_interactor, require_owner_or_interactor,
                       source_items)
 from ..models import (
@@ -917,7 +917,12 @@ async def share_in_room(room_id: str, request: Request,
     words, digest, why, whole = _read_share(data, filename or None,
                                             interactor_id)
 
-    said = (caption or "").strip()[:500]
+    # The person's own words on the share, and they land in the transcript
+    # every profile in the room reads. Cut bare they ended mid-word, which
+    # reads as somebody trailing off rather than as us shortening them.
+    said, said_cut = clipped(caption or "", 500)
+    if said_cut:
+        said += " … (they wrote more than the room kept)"
     approved, reason = True, None
     if said:
         verdict = moderation.review(said, None, {"birthdate": None},
