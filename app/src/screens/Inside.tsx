@@ -300,6 +300,30 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // The sibling screen already carries this fix and the comment explaining
   // it. This room never got it.
   const [earFault, setEarFault] = useState<string | null>(null);
+  /** Until when the ear disbelieves itself.
+   *
+   *  Field report, from Windows this time and after the text guard had
+   *  already shipped: "the voice that's coming from my speaker, that is the
+   *  synthetic profile talking to me, is being picked up on my microphone as
+   *  a prompt."
+   *
+   *      asked     did the room hear something
+   *      mattered  was it somebody in it
+   *
+   *  `isEcho` compares what was heard against what the room just said and
+   *  needs 70% of the words to line up. That catches a clean echo. It does
+   *  not catch a misheard one — the microphone hears the speaker through the
+   *  room, the recogniser guesses at it, and a guess about a sentence is not
+   *  70% the same sentence. So the mangled version cleared the guard and was
+   *  sent as though somebody had said it.
+   *
+   *  The certain test is not what the words were, it is when they arrived: a
+   *  microphone open while this room's own voice is in the air has nothing
+   *  to offer. `speaking` says exactly that and was sitting right here
+   *  unread. The tail covers the speaker still decaying and the recogniser
+   *  delivering a result it formed a moment ago. */
+  const ECHO_TAIL_MS = 900;
+  const disbelieveUntil = useRef(0);
   // What is being heard, before it is sent. It rides in the draft box on
   // purpose: a person talking to a room needs to see that they are being
   // heard, and a microphone with no visible output is one people repeat
@@ -689,6 +713,8 @@ export function Inside({ onPlans, start = "", onLeave }: {
       nowSaying.current = null;
       setVoicing(null);
       speaking.current = false;
+      // The voice has stopped; the room has not gone quiet yet.
+      disbelieveUntil.current = Date.now() + ECHO_TAIL_MS;
     })();
     // heardUpTo/speaking are refs on purpose: the transcript is the signal.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -850,6 +876,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
     pending.current = "";
     setDraft("");
     if (!said || !token) return;
+    // Two nets, and this is the second one. The first is time — nothing
+    // heard while the room was speaking got this far. This one catches a
+    // clean echo that arrived after the tail, and it stays because the two
+    // fail in different directions: a text match misses a mangled echo, and
+    // a clock misses a late one.
+    if (speaking.current || Date.now() < disbelieveUntil.current) return;
     if (isEcho(said, roomSaid.current.join(" "))) {
       // The room hearing itself. Dropped silently and the ear stays
       // open — announcing it would be the product apologising for a
@@ -899,6 +931,10 @@ export function Inside({ onPlans, start = "", onLeave }: {
       seen = e.results.length;
       const heard = parts.join(" ").trim();
       if (!heard) return;
+      // Gated here rather than only at the send, so the room's own words
+      // never reach the draft box either — watching the profile type its
+      // last sentence into your composer is the same bug with a worse view.
+      if (speaking.current || Date.now() < disbelieveUntil.current) return;
       pending.current = (pending.current ? pending.current + " " : "") + heard;
       // Shown as it is heard. The box is the feedback that the room is
       // listening; without it an open microphone is indistinguishable
