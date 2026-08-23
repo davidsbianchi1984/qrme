@@ -118,6 +118,10 @@ async def import_file(profile_id: str, request: Request,
             title=(title or "").strip() or name or kind.capitalize(),
             text=text, read=was_read, note=note, source=name or None,
             size=len(data),
+            # Not "could not open it" — WHICH of the three. Read from the
+            # bytes rather than inferred from the emptiness, so a scan and a
+            # font this reader cannot follow stop arriving as one sentence.
+            unread_why=briefcase.why_unread(data, kind, was_read),
             provider=llm.provider_for_profile(
                 profile_id, cloud=request.app.state.cloud))
     except briefcase.BriefcaseError as exc:

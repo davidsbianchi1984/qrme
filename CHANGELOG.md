@@ -64,6 +64,50 @@ An iPhone gets a voice in a room.
 
 ### Fixed
 
+- **A filing written in embedded fonts arrives as words, not as a filename.**
+  The fourth report of the same thing, with two USPTO applications held and
+  unread and the profile saying so plainly: *"this setup couldn't turn either
+  PDF into text, so I genuinely haven't read a word of them."* It was telling
+  the truth. The gate that makes it tell the truth went in on the third report
+  and it works; what it could not do was read.
+
+      asked     can these bytes be decoded as characters
+      mattered  whose characters are they
+
+  `_string_text` had already named the reason in its own docstring — *a
+  subset font writing raw glyph ids does not read at all, in any encoding,
+  without the font's own map*. A composite font with `/Encoding /Identity-H`,
+  which is what a generator reaches for the moment a document is not plain
+  ASCII and what a filing full of section signs and inventor names always is,
+  writes GLYPH NUMBERS in its own subset. Glyph 3 is the third glyph of that
+  subset and nothing else. `/ToUnicode` is the map back and these files carry
+  it, because it is what makes them searchable in a reader; following it is
+  the whole difference. Both structures, because handling one is handling
+  half the files: the map reachable by a scan of the file's own bytes, and the
+  map behind a compressed `/Type /ObjStm`, where every recent generator puts
+  its dictionaries and where a byte scan cannot see at all.
+
+  Two smaller things fell out of it. A `/ToUnicode` CMap **is** a stream, full
+  of `<0041>` tokens that look exactly like hex strings on a page, so scanning
+  every stream in the file was reading the map as though it were the document
+  — invisible while those letters were NULs, obvious the moment the fonts
+  started working. Only the pages' own content streams are read now. And
+  nothing unprintable survives into the text, because a NUL counts toward
+  length in the readability gate and reads as nothing at all on screen.
+
+- **"Held, not read" says which kind of unread.** Three failures wore one
+  sentence and want three different answers: a scan needs somebody's eyes, a
+  font this reader cannot follow is a gap in this code, and a locked file
+  needs its password. Nothing in the answer distinguished *there is no text in
+  this file* from *there is text and I failed at it*, which is a large part of
+  why the same report could arrive four times — there was no way to tell a
+  limit from a bug without opening the file by hand. Read off the file's own
+  structure rather than guessed from the emptiness, kept beside the item, and
+  said by the profile, so the reply can suggest the next move instead of
+  stopping at the apology. Only documents get one: a photograph is not a
+  failure of this reader, and dressing that up as a diagnosis would bury the
+  one case where the reason tells somebody what to do.
+
 - **Whatever you put up in a room, you can take back down again.** The chip
   labelled "Just my name" was taken out on request earlier in this round — it
   was a display toggle on a strip that was cropping, and the way back to a

@@ -639,6 +639,12 @@ CREATE TABLE IF NOT EXISTS briefcase_items (
     text          TEXT,            -- extracted once, kept for reading back
     digest        TEXT,            -- what every turn carries
     was_read      INTEGER NOT NULL DEFAULT 1,
+    -- WHY it could not be read, when it could not: 'scanned', 'unmapped',
+    -- 'locked'. Three failures wore one sentence, and they want three
+    -- different answers — a scan needs somebody's eyes, an unfollowable font
+    -- is a gap in this code, a locked file needs its password. NULL for
+    -- anything that read, and for kinds that never claimed to.
+    unread_why    TEXT,
     bytes         INTEGER,
     created_at    TEXT NOT NULL
 );
@@ -2663,6 +2669,7 @@ def db_path() -> str:
 #: considered migration with a backup, not in a startup path that runs on
 #: every connection.
 _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
+    ("briefcase_items", "unread_why", "TEXT"),
     # What a memory landed under, and — when the arrangement is platform
     # custody — the words themselves.
     #

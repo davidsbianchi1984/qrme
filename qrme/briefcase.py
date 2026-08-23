@@ -112,8 +112,15 @@ _PK_PARTS = {
 }
 
 
+#: Control characters that are not whitespace. A glyph map can hand back a
+#: NUL for an unmapped slot and a broken decode can hand back worse; neither
+#: is writing, and both count toward length in the readability gate below
+#: while reading as nothing at all on screen.
+_CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+
+
 def _clean(text: str) -> str:
-    return _WS.sub(" ", text).strip()[:MAX_TEXT]
+    return _WS.sub(" ", _CONTROL.sub(" ", text)).strip()[:MAX_TEXT]
 
 
 #: Stream filters this reader knows how to undo. Anything outside this set —
@@ -237,6 +244,281 @@ def _lzw(body: bytes) -> bytes:
     return bytes(out)
 
 
+# --------------------------------------------------------------------------- #
+# The font's own map
+# --------------------------------------------------------------------------- #
+#
+# A fourth field report, with two USPTO filings held and unread. The gate
+# below was doing its job — it refused to serve wreckage as a document — but
+# refusing honestly is not reading, and `_string_text` already named the
+# reason in its own docstring: *a subset font writing raw glyph ids does not
+# read at all, in any encoding, without the font's own map*.
+#
+#     asked     can these bytes be decoded as characters
+#     mattered  whose characters are they
+#
+# They are the font's. A composite font with `/Encoding /Identity-H` — which
+# is what every generator reaches for the moment a document is not plain
+# ASCII, and what a filing full of section signs and accented inventor names
+# always is — writes GLYPH NUMBERS in its own subset, not Unicode. Glyph 3 is
+# whatever the third glyph of that particular subset happens to be. There is
+# no encoding under which those bytes are language, and the reader was right
+# that they were not; it was simply reading the wrong thing.
+#
+# `/ToUnicode` is the map back, and PDFs that use these fonts carry it,
+# because it is what makes them searchable and copy-pasteable. Following it is
+# the difference between a filing that arrives as words and one that arrives
+# as a filename.
+
+_OBJ = re.compile(rb"(\d+)\s+(\d+)\s+obj\b(.*?)\bendobj", re.S)
+_TOUNICODE = re.compile(rb"/ToUnicode\s+(\d+)\s+\d+\s+R")
+_FONT_RES = re.compile(rb"/Font\s*<<(.*?)>>", re.S)
+_FONT_REF = re.compile(rb"/([A-Za-z0-9#]+)\s+(\d+)\s+\d+\s+R")
+_BFCHAR = re.compile(rb"beginbfchar(.*?)endbfchar", re.S)
+_BFRANGE = re.compile(rb"beginbfrange(.*?)endbfrange", re.S)
+_HEXTOK = re.compile(rb"<([0-9A-Fa-f\s]*)>")
+_CODESPACE = re.compile(rb"begincodespacerange(.*?)endcodespacerange", re.S)
+#: `/F1 12 Tf` — which font the strings after it are written in.
+_TF = re.compile(rb"/([A-Za-z0-9#]+)\s+[-\d.]+\s+Tf")
+
+
+class _Cmap:
+    """One font's `/ToUnicode`: glyph code in, characters out.
+
+    `width` is how many bytes make one code, taken from the CMap's own
+    codespace range and falling back to the width the mappings are written
+    at. It has to be read rather than assumed: a two-byte map applied a byte
+    at a time turns a document into twice as many wrong characters, which
+    reads as wreckage exactly like the problem it was meant to fix.
+    """
+
+    __slots__ = ("width", "table")
+
+    def __init__(self, width: int, table: dict[int, str]):
+        self.width = width
+        self.table = table
+
+    def decode(self, raw: bytes) -> str | None:
+        """The string as characters, or `None` when this map does not cover
+        it — an unmapped run is not something to paper over with a
+        replacement character, because a page of those still passes for
+        length and never for language."""
+        out: list[str] = []
+        hit = 0
+        for i in range(0, len(raw) - self.width + 1, self.width):
+            code = int.from_bytes(raw[i:i + self.width], "big")
+            got = self.table.get(code)
+            if got is None:
+                out.append(" ")
+            else:
+                out.append(got)
+                hit += 1
+        if not out or hit < len(out) * 0.6:
+            return None
+        return "".join(out)
+
+
+def _hex_chars(token: bytes) -> str:
+    """A `<...>` destination, which is UTF-16BE and may be several
+    characters — a ligature maps one glyph onto `fi`."""
+    text = b"".join(token.split())
+    if len(text) % 2:
+        text += b"0"
+    try:
+        return bytes.fromhex(text.decode("ascii")).decode("utf-16-be", "ignore")
+    except ValueError:
+        return ""
+
+
+def _parse_cmap(body: bytes) -> _Cmap | None:
+    """A `/ToUnicode` CMap, as far as this reader follows it.
+
+    `bfchar` maps one code; `bfrange` maps a run, either onto a run of
+    characters or onto an explicit array of them. Both forms appear in
+    ordinary files, and a reader that handles only the first loses most of
+    the alphabet from the second.
+    """
+    table: dict[int, str] = {}
+    width = 0
+    space = _CODESPACE.search(body)
+    if space:
+        first = _HEXTOK.search(space.group(1))
+        if first:
+            width = max(1, len(b"".join(first.group(1).split())) // 2)
+    for block in _BFCHAR.findall(body):
+        tokens = _HEXTOK.findall(block)
+        for i in range(0, len(tokens) - 1, 2):
+            src = b"".join(tokens[i].split())
+            if not width:
+                width = max(1, len(src) // 2)
+            try:
+                code = int(src, 16)
+            except ValueError:
+                continue
+            char = _hex_chars(tokens[i + 1])
+            if char:
+                table[code] = char
+    for block in _BFRANGE.findall(body):
+        for line in block.split(b"\n"):
+            arrays = re.findall(rb"\[(.*?)\]", line, re.S)
+            tokens = _HEXTOK.findall(re.sub(rb"\[.*?\]", b"", line, flags=re.S))
+            if len(tokens) < 2:
+                continue
+            try:
+                lo = int(b"".join(tokens[0].split()), 16)
+                hi = int(b"".join(tokens[1].split()), 16)
+            except ValueError:
+                continue
+            if not width:
+                width = max(1, len(b"".join(tokens[0].split())) // 2)
+            if hi < lo or hi - lo > 65535:
+                continue
+            if arrays:
+                for offset, token in enumerate(_HEXTOK.findall(arrays[0])):
+                    char = _hex_chars(token)
+                    if char:
+                        table[lo + offset] = char
+            elif len(tokens) >= 3:
+                start = _hex_chars(tokens[2])
+                if not start:
+                    continue
+                base = ord(start[-1])
+                head = start[:-1]
+                for offset in range(hi - lo + 1):
+                    if base + offset > 0x10FFFF:
+                        break
+                    table[lo + offset] = head + chr(base + offset)
+    if not table:
+        return None
+    return _Cmap(width or 2, table)
+
+
+def _objects(data: bytes) -> dict[int, bytes]:
+    """Every indirect object's body, including the ones packed inside object
+    streams.
+
+    A PDF written to any recent version keeps most of its dictionaries — font
+    dictionaries among them — inside a compressed `/Type /ObjStm`, where a
+    scan of the file's own bytes cannot see them. Skipping that step finds the
+    content streams and none of the fonts, which is a reader that knows there
+    is a map and cannot reach it.
+    """
+    found: dict[int, bytes] = {}
+    for num, _gen, body in _OBJ.findall(data):
+        try:
+            found.setdefault(int(num), body)
+        except ValueError:
+            continue
+    for body in list(found.values()):
+        if b"/ObjStm" not in body:
+            continue
+        stream = _PDF_STREAM.search(body)
+        if stream is None:
+            continue
+        spec = _FILTER.findall(body[:stream.start()])
+        plain = _unfilter(stream.group(1), spec[-1] if spec else None)
+        if plain is None:
+            continue
+        first = re.search(rb"/First\s+(\d+)", body)
+        count = re.search(rb"/N\s+(\d+)", body)
+        if not (first and count):
+            continue
+        start = int(first.group(1))
+        pairs = plain[:start].split()
+        for i in range(0, min(len(pairs) - 1, int(count.group(1)) * 2), 2):
+            try:
+                num, offset = int(pairs[i]), int(pairs[i + 1])
+            except ValueError:
+                continue
+            found.setdefault(num, plain[start + offset:start + offset + 4096])
+    return found
+
+
+def _font_maps(data: bytes) -> dict[str, _Cmap]:
+    """Resource name — `/F1`, `/TT2` — to the map its font carries.
+
+    Keyed on the name rather than on the page, because a content stream names
+    its font and nothing else, and following the name back through each
+    page's own resource dictionary buys accuracy this reader has no use for:
+    the fonts in one document are one document's fonts.
+    """
+    objects = _objects(data)
+    maps: dict[str, _Cmap] = {}
+    for body in objects.values():
+        for res in _FONT_RES.findall(body):
+            for name, ref in _FONT_REF.findall(res):
+                font = objects.get(int(ref))
+                if font is None:
+                    continue
+                to_unicode = _TOUNICODE.search(font)
+                if to_unicode is None:
+                    continue
+                holder = objects.get(int(to_unicode.group(1)))
+                if holder is None:
+                    continue
+                stream = _PDF_STREAM.search(holder)
+                if stream is None:
+                    continue
+                spec = _FILTER.findall(holder[:stream.start()])
+                plain = _unfilter(stream.group(1), spec[-1] if spec else None)
+                if plain is None:
+                    continue
+                cmap = _parse_cmap(plain)
+                if cmap is not None:
+                    maps.setdefault(name.decode("latin-1"), cmap)
+    return maps
+
+
+_PAGE = re.compile(rb"/Type\s*/Page\b")
+_CONTENTS = re.compile(rb"/Contents\s*(\[[^\]]*\]|\d+\s+\d+\s+R)")
+_REF = re.compile(rb"(\d+)\s+\d+\s+R")
+#: A stream that is a font's map rather than a page's words.
+_IS_CMAP = re.compile(rb"begincmap|beginbfchar|beginbfrange|/CIDInit")
+
+
+def _page_streams(data: bytes) -> list[bytes] | None:
+    """The decoded content streams of the document's pages, in page order,
+    or `None` when the structure could not be followed.
+
+    Scanning every stream in the file instead is what the reader did, and it
+    is wrong in a way that only showed once the glyph maps started working:
+    a `/ToUnicode` CMap **is** a stream, full of `<0041>` tokens that look
+    exactly like hex strings, so the map got read as though it were the page
+    and every mapped letter arrived twice. It was there before and passed as
+    NULs; decoding the fonts is what turned it into visible nonsense.
+
+        asked     which streams have text in them
+        mattered  which streams are the PAGE
+
+    `None` rather than an empty list when there are no pages to follow, so
+    the caller falls back to the old sweep — a file this cannot parse is
+    better read loosely than not at all.
+    """
+    objects = _objects(data)
+    refs: list[int] = []
+    for body in objects.values():
+        if not _PAGE.search(body) or b"/Pages" in body[:40]:
+            continue
+        found = _CONTENTS.search(body)
+        if found:
+            refs.extend(int(n) for n in _REF.findall(found.group(1)))
+    if not refs:
+        return None
+    out: list[bytes] = []
+    for ref in refs:
+        holder = objects.get(ref)
+        if holder is None:
+            continue
+        stream = _PDF_STREAM.search(holder)
+        if stream is None:
+            continue
+        spec = _FILTER.findall(holder[:stream.start()])
+        plain = _unfilter(stream.group(1), spec[-1] if spec else None)
+        if plain is not None:
+            out.append(plain)
+    return out or None
+
+
 def _string_text(raw: bytes) -> str:
     """One text-showing string's bytes as characters.
 
@@ -253,6 +535,44 @@ def _string_text(raw: bytes) -> str:
             except UnicodeDecodeError:
                 pass
     return raw.decode("latin-1", "replace")
+
+
+#: Why a PDF came back with nothing, in words a person can act on.
+#:
+#: Three failures wear the same face — "held, not read" — and want three
+#: different answers. A scan needs somebody's eyes or an OCR pass; a font this
+#: reader cannot follow is a gap in this code; a locked file needs the
+#: password. Reporting them as one sentence is what made the same field report
+#: arrive four times: nothing in the answer distinguished "there is no text in
+#: this file" from "there is text and I failed at it", so there was no way to
+#: tell a limit from a bug without opening the file by hand.
+_PDF_WHY = {
+    "locked": "it is password-protected, so nothing inside it can be opened",
+    "scanned": "it is a scan — pictures of pages, with no text layer in it "
+               "at all, so there are no words in the file to read",
+    "unmapped": "its text is written in embedded fonts whose character map "
+                "this reader could not follow",
+    "empty": "no text came out of it",
+}
+
+
+def _why_unread(data: bytes) -> str:
+    """Which kind of unreadable a PDF is.
+
+    Read off the file's own structure rather than guessed from the emptiness:
+    a locked file says so in its trailer, a scan has pages and no text-showing
+    operators in them, and a file with `Tj` operators that still yields
+    nothing had text this reader could not decode.
+    """
+    if re.search(rb"/Encrypt\b", data):
+        return "locked"
+    chunks = _page_streams(data) or []
+    if not chunks:
+        return "empty"
+    joined = b"\n".join(chunks)
+    if not re.search(rb"\bT[Jj]\b|\bBT\b", joined):
+        return "scanned"
+    return "unmapped"
 
 
 def _pdf_text(data: bytes) -> str:
@@ -276,18 +596,37 @@ def _pdf_text(data: bytes) -> str:
     it to find* — was the one case it did not reach, because unreadable bytes
     never came back empty. They came back as a paragraph.
     """
-    chunks: list[bytes] = []
-    for match in _PDF_STREAM.finditer(data):
-        head = data[max(0, match.start() - 800):match.start()]
-        spec = _FILTER.findall(head)
-        body = _unfilter(match.group(1), spec[-1] if spec else None)
-        if body is not None:
-            chunks.append(body)
-    if not chunks:
-        chunks = [data]
+    chunks = _page_streams(data)
+    if chunks is None:
+        chunks = []
+        for match in _PDF_STREAM.finditer(data):
+            head = data[max(0, match.start() - 800):match.start()]
+            spec = _FILTER.findall(head)
+            body = _unfilter(match.group(1), spec[-1] if spec else None)
+            # A font's map is not a page. Cheap to spot by its own opening
+            # words, and the loose sweep is exactly where that mistake used
+            # to be made, so the guard belongs here too.
+            if body is not None and not _IS_CMAP.search(body[:4096]):
+                chunks.append(body)
+        if not chunks:
+            chunks = [data]
+    fonts = _font_maps(data)
     out: list[str] = []
     for chunk in b"\n".join(chunks).split(b"BT")[1:] or [b"".join(chunks)]:
-        for match in _PDF_STR.findall(chunk):
+        # The font in force, carried across the pieces of one text object.
+        # A `Tf` inside the block switches it; the block inherits whatever
+        # the page set before `BT`, which is why the search runs from the
+        # start of the chunk rather than only over what follows.
+        cmap = None
+        for token in re.finditer(
+                rb"/[A-Za-z0-9#]+\s+[-\d.]+\s+Tf|\((?:\\.|[^\\()])*\)"
+                rb"|<[0-9A-Fa-f\s]*>", chunk, re.S):
+            match = token.group(0)
+            if match.endswith(b"Tf"):
+                named = _TF.match(match)
+                if named:
+                    cmap = fonts.get(named.group(1).decode("latin-1"))
+                continue
             if match[:1] == b"<":
                 try:
                     body = _ahx(match[1:])
@@ -297,7 +636,12 @@ def _pdf_text(data: bytes) -> str:
                 body = match[1:-1]
                 body = re.sub(rb"\\([()\\])", rb"\1", body)
                 body = re.sub(rb"\\[0-9]{1,3}", b" ", body)
-            out.append(_string_text(body))
+            # The font's own map first, and only where it actually covers the
+            # bytes. A map that misses most of a string is a different font's
+            # map, or a code width read wrong, and guessing there would trade
+            # honest wreckage for confident nonsense.
+            mapped = cmap.decode(body) if cmap is not None else None
+            out.append(mapped if mapped is not None else _string_text(body))
     text = _clean(" ".join(out))
     return text if _reads_like_language(text) else ""
 
@@ -382,6 +726,19 @@ _AUDIO_MAGIC = (
 
 def _sounds_like_audio(data: bytes) -> bool:
     return any(test(data) for test in _AUDIO_MAGIC)
+
+
+def why_unread(data: bytes, kind: str, was_read: bool) -> str | None:
+    """The sentence to keep beside an item nothing could be read from.
+
+    Only PDFs get one. A photograph and a video are not failures of this
+    reader — this deployment has ears and no eyes, which the prompt block
+    already says in its own words — and dressing them up as diagnoses would
+    bury the one case where the reason is actionable.
+    """
+    if was_read or kind != "document" or data[:4] != b"%PDF":
+        return None
+    return _PDF_WHY.get(_why_unread(data))
 
 
 def read_file(data: bytes, name: str | None,
@@ -543,7 +900,7 @@ def _count(profile_id: str, interactor_id: str) -> int:
 def add(profile_id: str, interactor_id: str, *, kind: str, title: str,
         text: str, read: bool, note: str | None = None,
         source: str | None = None, size: int | None = None,
-        provider=None) -> dict:
+        provider=None, unread_why: str | None = None) -> dict:
     if kind not in KINDS:
         raise BriefcaseError(422, f"kind is one of {', '.join(KINDS)}")
     if _count(profile_id, interactor_id) >= MAX_ITEMS:
@@ -557,10 +914,11 @@ def add(profile_id: str, interactor_id: str, *, kind: str, title: str,
     conn = db.connect()
     conn.execute(
         "INSERT INTO briefcase_items (id, profile_id, interactor_id, kind,"
-        " title, note, source, text, digest, was_read, bytes, created_at)"
-        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+        " title, note, source, text, digest, was_read, unread_why, bytes,"
+        " created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (item_id, profile_id, interactor_id, kind, title, note, source,
-         text or None, digest or None, 1 if read else 0, size, db.utcnow()))
+         text or None, digest or None, 1 if read else 0,
+         None if read else (unread_why or None), size, db.utcnow()))
     conn.commit()
     return facade(conn.execute("SELECT * FROM briefcase_items WHERE id=?",
                                (item_id,)).fetchone())
@@ -575,6 +933,11 @@ def facade(row) -> dict:
     return {"id": row["id"], "kind": row["kind"], "title": row["title"],
             "note": row["note"], "source": row["source"],
             "read": bool(row["was_read"]), "digest": digest,
+            # Shown to the person too, not only to the profile. Somebody who
+            # uploads a filing and is told "held, not read" wants to know
+            # whether to try a different export or stop trying.
+            "unread_why": (row["unread_why"]
+                           if "unread_why" in row.keys() else None),
             "chars": len(text), "digest_chars": len(digest),
             "bytes": row["bytes"], "created_at": row["created_at"]}
 
@@ -658,7 +1021,16 @@ def block(profile_id: str, interactor_id: str) -> str | None:
             lines.append(f"{head}\n  {body}")
         else:
             said = f" They said it is: {row['note']}." if row["note"] else ""
-            unread.append(f"{head} — you have NOT seen its contents.{said}")
+            # And WHY, where the reader knows. "You could not open it" is
+            # true of a scan, a locked file and a font this code cannot
+            # follow, and a person told only that has no idea whether to
+            # export it differently or give up. The profile that can say
+            # which one it was is the profile that can suggest the next move.
+            why = (row["unread_why"]
+                   if "unread_why" in row.keys() else None)
+            because = f" You could not read it because {why}." if why else ""
+            unread.append(
+                f"{head} — you have NOT seen its contents.{because}{said}")
     parts = ["This person has handed you material to read, and you have read "
              "it. Draw on it naturally when it is relevant; never invent "
              "details it does not carry, and say plainly when it does not "
