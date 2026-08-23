@@ -88,6 +88,12 @@ type SpeechRec = {
   onresult:
     ((e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void)
     | null;
+  // `onerror` was missing from this type, which is why no caller wrote one.
+  // A hand-written shape describes what the code is allowed to notice, and
+  // this one quietly said failure was not among those things — so a refused
+  // microphone had nowhere to be heard and fell through to `onend`, which
+  // relit it. The type was the shape of the bug.
+  onerror: ((e: { error?: string }) => void) | null;
   onend: (() => void) | null;
   start(): void; stop(): void;
 };
@@ -273,6 +279,27 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // because the decision behind it never changed.
   const dozing = useRef(false);
   const [dozed, setDozed] = useState(false);
+  // Why the ear died, when it did.
+  //
+  //     asked     is the microphone on
+  //     mattered  can it hear you
+  //
+  // Field report from an iPhone, with the strip's mic lit gold: "the audio
+  // on the mobile version isn't working in the chat room. I can mute the mic
+  // and unmute the mic, and I can tap into the text bar, but it's not
+  // picking up my voice."
+  //
+  // `startTalking` set `onresult` and `onend` and had NO `onerror` at all.
+  // On iOS the `webkitSpeechRecognition` constructor exists — so `canDictate`
+  // is true and the button renders — and the service then refuses. The
+  // refusal fell through to `onend`, which read `wantTalking` as still true
+  // and stood another recogniser, which was refused, forever. A lit
+  // microphone that cannot hear is worse than no microphone, because the
+  // person keeps talking to it.
+  //
+  // The sibling screen already carries this fix and the comment explaining
+  // it. This room never got it.
+  const [earFault, setEarFault] = useState<string | null>(null);
   // What is being heard, before it is sent. It rides in the draft box on
   // purpose: a person talking to a room needs to see that they are being
   // heard, and a microphone with no visible output is one people repeat
@@ -883,14 +910,38 @@ export function Inside({ onPlans, start = "", onLeave }: {
     // The browser ends recognition on its own — a quiet stretch, a
     // backgrounded tab. A standing ear restarts, because the person's
     // decision has not changed; only the platform's patience has.
+    // The three a person can act on, each named, and the fourth that names
+    // itself as a dead end. `no-speech` and `aborted` are the ordinary end of
+    // a quiet stretch and the restart below is the right answer to them.
+    let fatal = false;
+    rec.onerror = (e: { error?: string }) => {
+      const code = e.error || "";
+      if (code === "not-allowed") {
+        fatal = true; setEarFault(tr("ins.ear.blocked", lang));
+      } else if (code === "service-not-allowed") {
+        // The platform refusing, rather than the person. No setting on the
+        // phone changes it and no number of presses will either, so the
+        // sentence says that instead of sending somebody to a switch.
+        fatal = true; setEarFault(tr("ins.ear.platform", lang));
+      } else if (code === "audio-capture") {
+        fatal = true; setEarFault(tr("ins.ear.nomic", lang));
+      } else if (code === "network") {
+        fatal = true; setEarFault(tr("ins.ear.unreachable", lang));
+      }
+    };
     rec.onend = () => {
       talkRec.current = null;
       if (dozing.current) return;
+      // A fault relighting cannot fix ends the ear rather than feeding the
+      // loop. `wantTalking` goes with it: leaving the decision standing
+      // would have the next press restart straight back into the refusal.
+      if (fatal) { wantTalking.current = false; setTalking(false); return; }
       if (wantTalking.current) { startTalking(); return; }
       setTalking(false);
     };
     rec.start();
     talkRec.current = { stop: () => rec.stop() };
+    setEarFault(null);
     setTalking(true);
   }
 
@@ -1182,7 +1233,13 @@ export function Inside({ onPlans, start = "", onLeave }: {
   const voiceBar = (
     <div className="rs-voicebar">
       <div className="rs-voicenow">
-        {voicing
+        {/* A fault outranks everything else this line can say. An ear that
+            reports "hearing you" over a microphone the platform refused is
+            the line lying in the one direction that costs somebody their
+            words — they keep talking. */}
+        {earFault
+          ? earFault
+          : voicing
           ? fill(tr("ins.voice.speaking", lang),
                  { who: seats.find((s) => isTalking(s))?.display
                         || tr("ins.voice.someone", lang) })

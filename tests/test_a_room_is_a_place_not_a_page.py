@@ -438,8 +438,24 @@ def test_the_older_lines_go_above_the_fold_not_out_of_the_room():
     block = CSS[CSS.index(".rs-chatlog {"):]
     block = block[:block.index(".rs-chatline {")]
     assert "overflow-y: auto" in block, "the transcript box does not scroll"
-    assert "max-height" in block, (
+    # A FIXED height, not a maximum. This guard asked for `max-height` and
+    # got what it asked for, and the strip below the box still travelled
+    # 135px down the page between the first turn and the fifth — measured
+    # in a browser, not argued about — which on a phone put it under the
+    # bottom edge. Field report: "as the conversation starts to pile up
+    # five rows it pushes down the buttons."
+    #
+    #     asked     does the log stop growing
+    #     mattered  does the strip stop moving
+    #
+    # A maximum stops the first and not the second. The property was never
+    # the spelling of the property; it is that the box is one size from an
+    # empty room onwards.
+    assert re.search(r"(?<!max-)height:\s*\d", block), (
         "the transcript box has no height, so it cannot have a fold")
+    assert "max-height" not in block, (
+        "the box is capped rather than fixed, so it still grows from empty "
+        "to full — and everything under it moves down by that much")
 
 
 def test_a_long_line_wraps_instead_of_being_clipped():
@@ -613,3 +629,47 @@ def test_a_lent_microphone_is_visible_across_the_room():
     block = CSS[CSS.index(".rs-round.lend.live"):]
     block = block[:block.index("}")]
     assert "box-shadow" in block or "border-color" in block
+
+
+def test_the_oldest_line_fades_rather_than_being_cut_square() -> None:
+    """"Fade away the top line, but you should be able to scroll back if
+    you need to reread it."
+
+    Both halves matter and they pull against each other: a fade drawn by
+    painting a solid bar over the top edge would hide the line AND block
+    the scroll to it. A mask fades the pixels and leaves the box scrolling
+    underneath, so the oldest line is dimmed at the fold and whole again
+    once you drag it down.
+    """
+    block = CSS[CSS.index(".rs-chatlog {"):]
+    block = block[:block.index(".rs-chatline {")]
+    assert "mask-image" in block, (
+        "the oldest line is cut off square at the top of the box")
+    assert "-webkit-mask-image" in block, (
+        "Safari — which is every iPhone — draws no fade at all without the "
+        "prefixed property, and iPhone is where this was reported")
+    assert "transparent 0" in block, (
+        "the mask does not start transparent, so nothing fades")
+
+
+def test_a_short_conversation_sits_next_to_the_pill() -> None:
+    """A fixed box and one message would leave the line stranded at the top
+    with dead air between it and where you type.
+
+    `margin-top: auto` on the first line rather than `justify-content:
+    flex-end` on the box: the second makes overflowing content unreachable
+    at the top in some browsers, and scrolling back to it is the other half
+    of what was asked for.
+    """
+    assert re.search(r"\.rs-chatlog\s*>\s*:first-child\s*\{[^}]*margin-top:\s*auto",
+                     CSS), (
+        "a lone message floats at the top of an empty box")
+    # Comments stripped first. The rule above explains *why* it is not
+    # `justify-content: flex-end`, so a guard reading raw text finds the
+    # phrase in the note written to prevent it — which is the second time
+    # this file has caught itself reading its own documentation as code.
+    block = RULES[RULES.index(".rs-chatlog {"):]
+    block = block[:block.index(".rs-chatline {")]
+    assert "justify-content: flex-end" not in block, (
+        "flex-end on a scrolling column can strand the oldest lines out of "
+        "reach above the top — which is exactly what must stay reachable")

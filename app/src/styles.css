@@ -1196,8 +1196,36 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   /* Five rows, then the sixth pushes the first out of sight — not out of
      the room. "Max lines of five before the text starts vanishing, always
      pinning to the bottom." 5 x 1.35 line-height x 12px, plus each row's
-     padding and the gaps between them. */
-  max-height: 135px; overflow-y: auto; overscroll-behavior: contain;
+     padding and the gaps between them.
+
+     A FIXED height, not a maximum, and that is the whole of this fix.
+     Field report, with the strip circled in one photo and absent in the
+     next: "the buttons at the bottom I have circled disappear mid
+     conversation" — then, self-diagnosed: "as the conversation starts to
+     pile up five rows it pushes down the buttons."
+
+         asked     does the log stop growing
+         mattered  does the strip stop moving
+
+     A maximum stops the growing and not the moving. Measured in a browser
+     rather than argued about: an empty log is 0px and a full one is 135px,
+     so the strip below it travelled 135px down the page between the first
+     turn and the fifth — off the bottom of a phone. Fixed, the strip sits
+     in the same place from the empty room onwards, and the conversation
+     scrolls behind it. */
+  flex: 0 0 135px; height: 135px;
+  overflow-y: auto; overscroll-behavior: contain;
+  /* Few lines sit at the bottom, next to the pill, so a new turn appears
+     just above where you type. `margin-top: auto` on the first child
+     rather than `justify-content: flex-end`, which makes overflowing
+     content unreachable at the top in some browsers — and being able to
+     scroll back is half of what was asked for. */
+  /* The oldest line fades out at the top edge instead of being cut off
+     square. It is still there: the box scrolls, and the fade moves with
+     it. "Fade away the top line, but you should be able to scroll back if
+     you need to reread it." */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 22px);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 22px);
   scrollbar-width: thin;
   /* The box itself stays transparent to the finger — it spans the whole
      width, and a rectangle of dead air over the seat tiles would eat the
@@ -1205,6 +1233,7 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
      starting on one scrolls this box, because that is the scrolling
      ancestor of whatever the finger landed on. */
   pointer-events: none; }
+.rs-chatlog > :first-child { margin-top: auto; }
 .rs-chatline { margin: 0; max-width: 78%; padding: 3px 10px;
   border-radius: 12px; font-size: 12px; line-height: 1.35; color: #fff;
   background: rgba(10, 12, 32, 0.55); backdrop-filter: blur(6px);
