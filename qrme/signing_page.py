@@ -30,6 +30,7 @@ Three things make this work rather than merely compile:
 from __future__ import annotations
 
 import html
+import json
 
 _CSS = """
 *{box-sizing:border-box;margin:0;padding:0}
@@ -112,10 +113,38 @@ document.getElementById('go').addEventListener('click', run);
 """
 
 
+# The characters that can end a `<script>` element early, or end a JavaScript
+# string literal, written as the \uXXXX escapes JavaScript reads back as the
+# original character. An HTML parser cannot mistake any of them for markup.
+# U+2028 and U+2029 are JavaScript line terminators and break a string literal
+# where JSON leaves them raw.
+_JS_STRING_HAZARDS = {
+    "<": "\\u003c", ">": "\\u003e", "&": "\\u0026",
+    "\u2028": "\\u2028", "\u2029": "\\u2029",
+}
+
+
 def _q(value: str) -> str:
-    """A JS string literal, safe to drop into the script."""
-    return html.escape(
-        __import__("json").dumps(value), quote=False).replace("</", "<\\/")
+    """One JS string literal, safe to drop inside a `<script>` element.
+
+    Deliberately **not** `html.escape`. A browser does not decode HTML
+    entities inside a script element, so escaping there protects nothing and
+    corrupts the value: `Marks & Spencer` reached the reader as
+    `Marks &amp; Spencer`, on the one page whose whole job is showing
+    somebody what they are about to sign.
+
+        asked     is the value escaped
+        mattered  is it escaped for the place it lands
+
+    The page was safe by accident rather than by the mechanism written for
+    it. `html.escape` turned `<` into `&lt;` before the `.replace("</", ...)`
+    below it ever ran, so the guard against a literal `</script` — the actual
+    hazard inside a script element — never matched anything and never could.
+    """
+    literal = json.dumps(value)
+    for char, escape in _JS_STRING_HAZARDS.items():
+        literal = literal.replace(char, escape)
+    return literal
 
 
 def ceremony_page(mode: str, challenge: str, rp_id: str,

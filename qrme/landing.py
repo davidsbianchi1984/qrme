@@ -207,7 +207,7 @@ def desk_page(card: dict, label: str | None = None) -> str:
     if presence == "away":
         said = "Away from the desk — ring the bell and they will see it"
 
-    waiting = card["bell"]["waiting"]
+    waiting = int(card["bell"]["waiting"] or 0)
     queued = (f" · {waiting} waiting" if waiting else "")
 
     if card["bell"]["available"]:
@@ -245,7 +245,7 @@ def desk_page(card: dict, label: str | None = None) -> str:
       <p class="sub">{trade}</p>
       {where}
       {blurb}
-      <p class="status"><span class="dot {dot}"></span>{html.escape(said)}{queued}</p>
+      <p class="status"><span class="dot {html.escape(dot)}"></span>{html.escape(said)}{queued}</p>
       {bell}
       <div class="vouch"><b>Who says they are real:</b>
         {html.escape(att["attestor"])} — {html.escape(att["basis"])}
@@ -257,7 +257,18 @@ def desk_page(card: dict, label: str | None = None) -> str:
 
 def desks_anon_cooldown() -> int:
     from . import desks
-    return desks.ANON_COOLDOWN_SECONDS
+    return int(desks.ANON_COOLDOWN_SECONDS)
+
+
+# The same table `signing_page` keeps, for the same reason: these end a
+# `<script>` element or a JavaScript string literal, and written as \uXXXX
+# JavaScript reads them back as the original character. In JSON they appear
+# only inside string values, so rewriting the serialised text is safe for any
+# shape.
+_JS_HAZARDS = {
+    "<": "\\u003c", ">": "\\u003e", "&": "\\u0026",
+    "\u2028": "\\u2028", "\u2029": "\\u2029",
+}
 
 
 def _js_literal(obj) -> str:
@@ -269,9 +280,25 @@ def _js_literal(obj) -> str:
     ends the *element* whatever the JavaScript quoting says, closing the
     page's own nonced script and leaving everything after it to be parsed as
     markup.
+
+    Deliberately **not** `html.escape`. A browser does not decode HTML
+    entities inside a script element, so escaping there protects nothing and
+    corrupts the value: `Terms & Conditions` reached the reader as
+    `Terms &amp; Conditions`, and this is what the string table is built on.
+
+        asked     is the value escaped
+        mattered  is it escaped for the place it lands
+
+    The page was safe by accident rather than by the mechanism written for
+    it. The `.replace("</", "<\\/")` — the guard against a literal
+    `</script` ending the element, which is the hazard named above — sat
+    *after* an `html.escape` that had already turned `<` into `&lt;`. It
+    never matched anything and never could.
     """
-    return html.escape(json.dumps(obj, ensure_ascii=False),
-                       quote=False).replace("</", "<\\/")
+    text = json.dumps(obj, ensure_ascii=False)
+    for char, escape in _JS_HAZARDS.items():
+        text = text.replace(char, escape)
+    return text
 
 
 def _js(value: str) -> str:
