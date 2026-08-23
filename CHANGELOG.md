@@ -6,6 +6,29 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The mailbox reaches the container.** Two IONOS mailboxes were bought for
+  this stack, and the ten variables that carry them were about to go into
+  `.env` — where compose would have ignored every one of them. A service sees
+  only what its own `environment:` block names.
+
+      asked     is the variable in .env
+      mattered  does a container ever see it
+
+  `test_every_documented_variable_reaches_its_container.py` exists because
+  this happened twice before, to `PDI_RESIDENT_PULSE` and `PDI_OLLAMA_URL` —
+  *a documented dial that reaches no container is a lie with good
+  documentation*. It could not catch this one, because the variables were in
+  neither half yet; a guard comparing two lists is quiet while both are empty.
+  Both halves land together here, so it holds them from now on.
+
+  The five `JIM_SMTP_*` and five `QRME_SMTP_*` are forwarded by the `jim` and
+  `qrme` blocks and templated on the deploy page, with the note that setting
+  `HOST` sets all five — the code reads the environment as a block the moment
+  the host is present and stops consulting stored settings, so a half-filled
+  block sends with a blank username rather than falling back.
+
 ## [1.6.0] - 2026-08-23
 
 ### Fixed

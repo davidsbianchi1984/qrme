@@ -168,6 +168,15 @@ services:
       # The stack's eyes, for the briefcase's read-once links — named in
       # this service's own block because compose forwards only what a
       # block names.
+      # The mailbox this product sends verification and reset mail from.
+      # Named here for the same forwards-only-what-a-block-names reason:
+      # a value in .env that no block names reaches no container, and the
+      # operator would have a mailbox that never sends.
+      QRME_SMTP_HOST: ${QRME_SMTP_HOST:-}
+      QRME_SMTP_PORT: ${QRME_SMTP_PORT:-}
+      QRME_SMTP_USER: ${QRME_SMTP_USER:-}
+      QRME_SMTP_FROM: ${QRME_SMTP_FROM:-}
+      QRME_SMTP_PASSWORD: ${QRME_SMTP_PASSWORD:-}
       QRME_RENDERER_URL: http://renderer:8400
       # The stack's ears, for the briefcase's read-once links that are
       # recordings — same forwards-only-what-a-block-names reason.
@@ -210,6 +219,15 @@ services:
       JIM_PUBLIC_URL: ${JIM_PUBLIC_URL:?set JIM_PUBLIC_URL in .env}
       # Empty means open signup, same as QRME's key above.
       JIM_SIGNUP_KEY: ${JIM_SIGNUP_KEY:-}
+      # The mailbox the far end is written from. Unset, farend.notify
+      # prints the letter on the server and reports delivered: false --
+      # honest, and still nobody told. The ladder ends at a person only
+      # when these are set.
+      JIM_SMTP_HOST: ${JIM_SMTP_HOST:-}
+      JIM_SMTP_PORT: ${JIM_SMTP_PORT:-}
+      JIM_SMTP_USER: ${JIM_SMTP_USER:-}
+      JIM_SMTP_FROM: ${JIM_SMTP_FROM:-}
+      JIM_SMTP_PASSWORD: ${JIM_SMTP_PASSWORD:-}
       JIM_DB: /data/jim.db
       JIM_QRME_URL: http://qrme:8000
       JIM_PDI_URL: http://pdi:8100

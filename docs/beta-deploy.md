@@ -102,6 +102,28 @@ PDI_OLLAMA_URL=
 PDI_RESIDENT_MODEL=
 QRME_OLLAMA_URL=
 QRME_OLLAMA_MODEL=
+
+# --- optional: the mailbox both products write from ----------------------
+# Empty means the console transport: a letter is printed on the server and
+# reaches nobody. Both products say so rather than reporting it delivered
+# (jim/farend.py), but a printed letter is still a letter nobody got, so
+# an emergency contact and a verification link both need these set.
+#
+# Set HOST and you have set all five: the code reads the environment as a
+# block the moment HOST is present, and stops consulting stored settings.
+# The password is typed on this box, never pasted into a document.
+#
+# IONOS: smtp.ionos.com, port 587, STARTTLS. USER is the whole address.
+JIM_SMTP_HOST=
+JIM_SMTP_PORT=
+JIM_SMTP_USER=
+JIM_SMTP_FROM=
+JIM_SMTP_PASSWORD=
+QRME_SMTP_HOST=
+QRME_SMTP_PORT=
+QRME_SMTP_USER=
+QRME_SMTP_FROM=
+QRME_SMTP_PASSWORD=
 EOF
 
 nano .env      # paste the key on the last line
