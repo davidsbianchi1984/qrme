@@ -8,6 +8,32 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **A document that was cut says so.** Last round's work got a patent
+  application to read. This round found that reading it was not the same as
+  having it: `_clean` tidied and cut on the same line, so a 70,000-character
+  filing became 20,000 characters, the item said **read**, and the count
+  shown beside it was the KEPT length rather than the document's. Nothing
+  anywhere said that two thirds had gone.
+
+      asked     did the document read
+      mattered  how much of it did
+
+  That is the *held, not read* problem wearing better clothes. The profile is
+  not refusing — it is answering about claim 14, confidently, from material it
+  never saw, because nothing told it the document stopped. And a person
+  reading "read once — 20,000 characters" has no way to know their filing was
+  three times that.
+
+  The cap stays: a briefcase is not an archive, and the whole economy of the
+  module rests on a long document being paid for once and carried as a digest
+  after. What changed is that the cut now happens where its cost can be
+  written down beside it, so both the prompt and the screen can say *only the
+  first 20,000 characters of a 70,000-character document were kept — you have
+  not seen the rest, and must not answer as though you had*. Nothing is said
+  about a document that fits, since a truncation notice on a whole document is
+  a notice about nothing. Both doors again — the pair's briefcase and a room
+  share are the same reader and were the same silence.
+
 - **A guard that nothing a profile does on its own can reach money.** This
   round went looking for somewhere to put an ask-first confirmation in front
   of a profile spending, and found nothing to put one in front of. Every path

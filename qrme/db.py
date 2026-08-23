@@ -136,6 +136,11 @@ CREATE TABLE IF NOT EXISTS room_messages (
     -- code cannot follow, and a profile told only that cannot suggest which
     -- of the three the person should do something about. NULL when it read.
     media_why   TEXT,
+    -- The shared document's OWN length, when the cap kept less. Same fact and
+    -- same reason as briefcase_items.full_chars: a profile holding the first
+    -- third of a filing and believing it holds the filing answers about the
+    -- rest from material it never saw. NULL when nothing was cut.
+    media_full  INTEGER,
     -- How much of this turn was actually heard, when somebody cut it off
     -- mid-sentence. NULL is the ordinary case: it played out, or nobody was
     -- listening to it aloud at all.
@@ -650,6 +655,11 @@ CREATE TABLE IF NOT EXISTS briefcase_items (
     -- is a gap in this code, a locked file needs its password. NULL for
     -- anything that read, and for kinds that never claimed to.
     unread_why    TEXT,
+    -- The document's OWN length, when the cap kept less than all of it. The
+    -- cap is wanted — a briefcase is not an archive — but it was silent, and
+    -- the count shown beside an item was the kept length rather than the
+    -- document's. NULL when nothing was cut, which is most items.
+    full_chars    INTEGER,
     bytes         INTEGER,
     created_at    TEXT NOT NULL
 );
@@ -2675,6 +2685,7 @@ def db_path() -> str:
 #: every connection.
 _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     ("briefcase_items", "unread_why", "TEXT"),
+    ("briefcase_items", "full_chars", "INTEGER"),
     # What a memory landed under, and — when the arrangement is platform
     # custody — the words themselves.
     #
@@ -2738,6 +2749,7 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     ("room_messages", "media_text", "TEXT"),
     ("room_messages", "media_digest", "TEXT"),
     ("room_messages", "media_why", "TEXT"),
+    ("room_messages", "media_full", "INTEGER"),
     # What a person actually heard of a turn they interrupted. A profile
     # answering next has to know WHICH part reached them: continuing from a
     # point they never got to, or repeating what they cut off precisely

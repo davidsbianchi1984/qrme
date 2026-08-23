@@ -178,7 +178,7 @@ def _media_brief(media_id: str | None, read: bool = False,
 
 
 def _read_share(data: bytes, name: str | None,
-                on_behalf_of: str | None) -> tuple[str, str]:
+                on_behalf_of: str | None) -> tuple[str, str, str, int]:
     """The words in a shared file, and the reading carried thereafter.
 
         asked     can a profile read what somebody hands the room
@@ -207,22 +207,28 @@ def _read_share(data: bytes, name: str | None,
     try:
         kind, text, read = briefcase.read_file(data, name, on_behalf_of)
     except Exception:                                   # pragma: no cover
-        return "", "", ""
+        return "", "", "", 0
     if not read or not text.strip():
         # Not read, and WHICH kind of not read. The pair's briefcase gained
         # this first and the room is the other half of the same door — a fix
         # that reaches one of two paths looks exactly like a fix.
-        return "", "", briefcase.why_unread(data, kind, read) or ""
+        return "", "", briefcase.why_unread(data, kind, read) or "", 0
+    # The cap, applied where its cost can be recorded — `_clean` tidies and no
+    # longer cuts, so a room share that stored the reader's output raw would
+    # keep a whole filing in a transcript row.
+    whole = len(text)
+    text = briefcase.capped(text)
     try:
         digest = briefcase.distill(text, name or "a shared file")
     except Exception:                                   # pragma: no cover
         digest = text[:600]
-    return text, digest, ""
+    return text, digest, "", (whole if whole > len(text) else 0)
 
 
 def _store_room_message(room_id, sender_kind, sender_id, content,
                         approved, reason, media_id=None,
-                        media_text="", media_digest="", media_why="") -> dict:
+                        media_text="", media_digest="", media_why="",
+                        media_full=0) -> dict:
     conn = db.connect()
     message_id = db.new_id("rmg")
     # A profile's room turn is an AI render facing the whole room: stamped.
@@ -231,13 +237,13 @@ def _store_room_message(room_id, sender_kind, sender_id, content,
     conn.execute(
         "INSERT INTO room_messages (id, room_id, sender_kind, sender_id,"
         " content, status, flag_reason, watermark_id, media_id, media_text,"
-        " media_digest, media_why, created_at)"
-        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        " media_digest, media_why, media_full, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (message_id, room_id, sender_kind, sender_id, content,
          "approved" if approved else "blocked", reason,
          credential["watermark_id"] if credential else None,
          media_id, media_text or None, media_digest or None,
-         media_why or None, db.utcnow()),
+         media_why or None, media_full or None, db.utcnow()),
     )
     conn.commit()
     return {"id": message_id, "sender_kind": sender_kind,
@@ -263,7 +269,7 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
             continue
         history = conn.execute(
             "SELECT sender_kind, sender_id, content, media_id, media_digest,"
-            "       media_why, heard"
+            "       media_why, media_full, heard"
             " FROM room_messages"
             " WHERE room_id=? AND status='approved'"
             " ORDER BY created_at DESC, rowid DESC LIMIT 12",
@@ -299,6 +305,14 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
                     f": {brief['name']}" if brief["name"] else "")
                 if digest:
                     label += f" — it reads: {digest}]"
+                    whole = (r["media_full"]
+                             if "media_full" in keys else None)
+                    if whole:
+                        label = label[:-1] + (
+                            f" — and only the first "
+                            f"{briefcase.MAX_TEXT:,} "
+                            f"characters of a {whole:,}-character document "
+                            "were kept, so you have not seen the rest]")
                 else:
                     why = briefcase._PDF_WHY.get(
                         (r["media_why"] or "") if "media_why" in keys else "")
@@ -892,7 +906,8 @@ async def share_in_room(room_id: str, request: Request,
     # Read before storing, so the very first profile turn after the share
     # already has the document. Reading after would leave a one-turn hole
     # in which the profile says it cannot see the thing it can see.
-    words, digest, why = _read_share(data, filename or None, interactor_id)
+    words, digest, why, whole = _read_share(data, filename or None,
+                                            interactor_id)
 
     said = (caption or "").strip()[:500]
     approved, reason = True, None
@@ -907,7 +922,7 @@ async def share_in_room(room_id: str, request: Request,
     return {"shared": _store_room_message(
         room_id, "user", interactor_id, said, approved, reason,
         media_id=saved["id"], media_text=words, media_digest=digest,
-        media_why=why)}
+        media_why=why, media_full=whole)}
 
 
 @router.post("/rooms/{room_id}/heard")

@@ -131,7 +131,35 @@ _CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
 
 def _clean(text: str) -> str:
-    return _WS.sub(" ", _CONTROL.sub(" ", text)).strip()[:MAX_TEXT]
+    """Tidy and CAP — two different things happening on one line.
+
+    The cap is real and wanted: a briefcase is not an archive. What it was
+    not was visible. A 70,000-character filing became 20,000 characters, the
+    item said `read`, and the count shown beside it was the KEPT length
+    rather than the document's — so nothing anywhere said that two thirds of
+    it had gone. Asked about claim 14, a profile holding the first third
+    answers from material it never saw.
+
+        asked     did the document read
+        mattered  how much of it did
+
+    `full_length` is what a caller uses to say so, kept separate rather than
+    returned alongside because `_clean` has nine callers and only the
+    document ones have anywhere to put the number.
+    """
+    return _WS.sub(" ", _CONTROL.sub(" ", text)).strip()
+
+
+def capped(text: str) -> str:
+    """The tidied text, cut to what a briefcase keeps.
+
+    The cap lives HERE and not inside `_clean` because the two callers that
+    store a document are the only ones that can record what the cut cost.
+    Capping inside the cleaner meant every reader had already thrown the
+    number away before anybody could ask for it — which is why the loss was
+    silent for as long as it was.
+    """
+    return text[:MAX_TEXT]
 
 
 #: Stream filters this reader knows how to undo. Anything outside this set —
@@ -1040,7 +1068,8 @@ def _count(profile_id: str, interactor_id: str) -> int:
 def add(profile_id: str, interactor_id: str, *, kind: str, title: str,
         text: str, read: bool, note: str | None = None,
         source: str | None = None, size: int | None = None,
-        provider=None, unread_why: str | None = None) -> dict:
+        provider=None, unread_why: str | None = None,
+        full_chars: int | None = None) -> dict:
     if kind not in KINDS:
         raise BriefcaseError(422, f"kind is one of {', '.join(KINDS)}")
     if _count(profile_id, interactor_id) >= MAX_ITEMS:
@@ -1049,16 +1078,31 @@ def add(profile_id: str, interactor_id: str, *, kind: str, title: str,
                  "items — remove one before adding another")
     title = (title or "").strip()[:160] or "Untitled"
     note = (note or "").strip()[:400] or None
+    # The cut happens here, where its cost can be written down beside it.
+    # Tidied first so the two numbers are comparable: `read_file` hands over
+    # tidied text already and this is a no-op for it, but a direct caller
+    # passing raw text would otherwise be told "20,000 of 70,000" where the
+    # 70,000 counts whitespace the kept 20,000 no longer has.
+    text = _clean(text or "")
+    whole = len(text)
+    text = capped(text)
+    if full_chars is None:
+        full_chars = whole
     digest = distill(text, title, provider) if read else ""
     item_id = db.new_id("brf")
     conn = db.connect()
     conn.execute(
         "INSERT INTO briefcase_items (id, profile_id, interactor_id, kind,"
-        " title, note, source, text, digest, was_read, unread_why, bytes,"
-        " created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        " title, note, source, text, digest, was_read, unread_why,"
+        " full_chars, bytes, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (item_id, profile_id, interactor_id, kind, title, note, source,
          text or None, digest or None, 1 if read else 0,
-         None if read else (unread_why or None), size, db.utcnow()))
+         None if read else (unread_why or None),
+         # NULL unless something was actually cut. A number equal to the kept
+         # length would be a truncation notice on every whole document.
+         full_chars if (full_chars or 0) > len(text or "") else None,
+         size, db.utcnow()))
     conn.commit()
     return facade(conn.execute("SELECT * FROM briefcase_items WHERE id=?",
                                (item_id,)).fetchone())
@@ -1078,6 +1122,11 @@ def facade(row) -> dict:
             # whether to try a different export or stop trying.
             "unread_why": (row["unread_why"]
                            if "unread_why" in row.keys() else None),
+            # And how much of it is actually here. `chars` is the kept
+            # length; this is the document's, when the two differ. Absent
+            # when nothing was cut, which is most items.
+            "full_chars": (row["full_chars"]
+                           if "full_chars" in row.keys() else None),
             "chars": len(text), "digest_chars": len(digest),
             "bytes": row["bytes"], "created_at": row["created_at"]}
 
@@ -1158,6 +1207,19 @@ def block(profile_id: str, interactor_id: str) -> str | None:
             body = row["digest"]
             if row["note"]:
                 body = f"They said: {row['note']}. {body}"
+            # How much of it is here. A profile holding the first third of a
+            # filing and believing it holds the filing answers about claim 14
+            # from material it never saw — confidently, because nothing told
+            # it otherwise. Said as a fact about the item, so it can offer
+            # the part it has rather than invent the part it does not.
+            whole = (row["full_chars"]
+                     if "full_chars" in row.keys() else None)
+            kept = len(row["text"] or "")
+            if whole and kept and whole > kept:
+                body += (f" [only the first {kept:,} characters of a "
+                         f"{whole:,}-character document were kept — you have "
+                         "not seen the rest, and must not answer as though "
+                         "you had]")
             lines.append(f"{head}\n  {body}")
         else:
             said = f" They said it is: {row['note']}." if row["note"] else ""
