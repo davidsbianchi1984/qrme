@@ -25,11 +25,14 @@ unknown-address and wrong-password answers are indistinguishable.
 from __future__ import annotations
 
 import hashlib
+import logging
 import re
 import secrets
 from datetime import datetime, timedelta, timezone
 
 from . import db, mailer
+
+logger = logging.getLogger(__name__)
 
 CODE_TTL_MINUTES = 15
 _PBKDF2_ITERATIONS = 600_000
@@ -64,6 +67,23 @@ def _public_url() -> str:
     return mailer.public_url()
 
 
+def _try_send(to: str, subject: str, body: str) -> str:
+    """`mailer.deliver`, with the refusal named instead of raised.
+
+    The account row is written and committed before the code is sent. An
+    unhandled refusal costs more than the letter: the caller gets a 500, the
+    pending account survives, and the next attempt from the same address is
+    turned away as already pending — naming a code nobody ever received. A
+    transient mail outage locked an address out of signup. The code is
+    stored either way, so `resend` remains the way back.
+    """
+    try:
+        return mailer.deliver(to, subject, body)
+    except Exception:  # noqa: BLE001 — smtplib raises many kinds
+        logger.warning("verification mail to %s was refused", to)
+        return "failed"
+
+
 def _send_code(email: str, purpose: str = "verify") -> str:
     """Issue a fresh code for ``email`` (retiring any previous ones for the
     same purpose), deliver it, and return the transport name — never the
@@ -93,7 +113,7 @@ def _send_code(email: str, purpose: str = "verify") -> str:
         )
     conn.commit()
     if purpose == "reset":
-        return mailer.deliver(
+        return _try_send(
             email,
             "Your QRME password reset code",
             f"Your password reset code is: {code}\n\n"
@@ -101,7 +121,7 @@ def _send_code(email: str, purpose: str = "verify") -> str:
             "reset your password, ignore this message — your password is "
             "unchanged without it.",
         )
-    return mailer.deliver(
+    return _try_send(
         email,
         "Verify your QRME account",
         f"Click to verify your account:\n\n"

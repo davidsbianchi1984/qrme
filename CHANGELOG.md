@@ -8,6 +8,24 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **A transient mail outage could lock an address out of signup.** The account
+  row is written and committed before the verification code is sent, and that
+  send was never wrapped — until a mail server existed `mailer.deliver` could
+  not fail. An unhandled refusal gave the caller a 500 while the pending
+  account survived, so the next attempt from that address was turned away as
+  already pending, naming a code nobody ever received.
+
+      asked     did the code go
+      mattered  can this person ever sign up
+
+  One bad minute at the mail host, and that address could not create an
+  account. Signup and `resend` both answer now with `code_delivery: "failed"`,
+  and the password reset with them — a reset that 500s tells somebody already
+  locked out of an account nothing at all.
+
+  JIM-mini carries the identical shape and the identical fix. Buying the two
+  IONOS mailboxes is what made it reachable in both.
+
 - **The mailbox reaches the container.** Two IONOS mailboxes were bought for
   this stack, and the ten variables that carry them were about to go into
   `.env` — where compose would have ignored every one of them. A service sees
