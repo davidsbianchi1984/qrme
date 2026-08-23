@@ -80,7 +80,7 @@ test_the_keys_the_android_client_reads.py:360: sum((len(k) for _, k in reads)) >
 test_the_keys_the_android_client_reads.py:383: len(driven) >= 80
 test_the_keys_the_till_and_the_lifeline.py:140: client.post('/auth/oauth/nobody/start', json={}).status_code >= 400
 test_the_keys_the_till_and_the_lifeline.py:284: len(keys) >= 40
-test_the_last_doors.py:247: len(keys) >= 42
+test_the_last_doors.py:301: len(keys) >= 42
 test_the_member_that_isnt_there.py:329: len(_declared(lang, REPO / decl)) >= 5
 test_the_member_that_isnt_there.py:338: len(keys) >= 12
 test_the_member_that_isnt_there.py:339: len(used) >= 10

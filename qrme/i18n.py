@@ -5034,6 +5034,13 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     # is what the switch decides rather than a name for the field — "on" alone
     # would be a refusal about the API's word for a thing nobody typed.
     'on': {'en': 'Allowed or not', 'es': 'Permitido o no', 'fr': 'Autorisé ou non', 'de': 'Erlaubt oder nicht', 'pt': 'Permitido ou não', 'it': 'Consentito o no', 'ja': '許可するかどうか', 'zh': '是否允许', 'hi': 'अनुमति है या नहीं', 'ar': 'مسموح أم لا'},
+    # The two the console sends when somebody speaks over a profile
+    # mid-answer. Nobody types either of them, which is exactly why they need
+    # wording: a refusal that names `cut_off_heard` is an error about this
+    # API's own vocabulary, shown to a person who was only having a
+    # conversation.
+    'cut_off_id': {'en': 'The reply you interrupted', 'es': 'La respuesta que interrumpiste', 'fr': "La réponse que vous avez interrompue", 'de': 'Die Antwort, die du unterbrochen hast', 'pt': 'A resposta que interrompeu', 'it': 'La risposta che hai interrotto', 'ja': '割り込んだ相手の返答', 'zh': '你打断的那句回答', 'hi': 'जिस उत्तर को आपने बीच में रोका', 'ar': 'الردّ الذي قاطعته'},
+    'cut_off_heard': {'en': 'How much of it you heard', 'es': 'Cuánto alcanzaste a oír', 'fr': "Ce que vous en avez entendu", 'de': 'Wie viel davon du gehört hast', 'pt': 'Quanto chegou a ouvir', 'it': 'Quanto ne hai sentito', 'ja': 'どこまで聞こえていたか', 'zh': '你听到了多少', 'hi': 'आपने उसमें से कितना सुना', 'ar': 'ما سمعته منه'},
     'preferred': {'en': 'Asked first', 'es': 'Se le pregunta primero', 'fr': 'Sollicité en premier', 'de': 'Zuerst gefragt', 'pt': 'Perguntado primeiro', 'it': 'Interpellato per primo', 'ja': '最初に頼む相手', 'zh': '优先联系', 'hi': 'पहले पूछा जाएगा', 'ar': 'يُسأل أولًا'},
     # The open board's answer form. Somebody with no account is typing here,
     # so a refusal naming the API's word for the field would be a refusal
