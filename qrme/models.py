@@ -353,6 +353,19 @@ class RoomCreate(BaseModel):
 class RoomMessage(BaseModel):
     sender_id: str                     # must be a user participant
     message: str
+    #: The turn this one interrupted, and how much of it reached the room.
+    #:
+    #: A person who cuts a profile off mid-paragraph has heard a PREFIX of
+    #: what it said. The profile answering next needs to know which prefix:
+    #: carrying on from a point they never reached, or repeating the part
+    #: they cut off precisely because they had heard enough of it, are both
+    #: the model talking past the person rather than to them.
+    #:
+    #: Optional and ignorable. A client that does not send it — the three
+    #: native shells, anything older — is describing a room where nothing
+    #: was interrupted, which is the ordinary case.
+    cut_off_id: str | None = None
+    cut_off_heard: str | None = None
 
 
 class ListingCreate(BaseModel):

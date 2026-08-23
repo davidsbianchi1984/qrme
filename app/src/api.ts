@@ -4043,10 +4043,23 @@ export const api = {
   // to read everything said in it.
   roomMessages: (roomId: string, token: string) =>
     req<RoomMsg[]>(`/rooms/${roomId}/messages`, { token }),
+  /** Say something in a room.
+   *
+   *  `cutOff` rides along when this turn interrupted a profile mid-answer:
+   *  which turn it was, and how much of it actually reached the room. A
+   *  profile answering next needs the second half — continuing from a point
+   *  the person never reached, or repeating the part they cut off precisely
+   *  because they had heard enough of it, are both the model talking past
+   *  them rather than to them. */
   sayInRoom: (roomId: string, interactorId: string, message: string,
-              token: string) =>
+              token: string,
+              cutOff?: { id: string; heard: string }) =>
     req<{ message: RoomMsg; replies: RoomMsg[] }>(`/rooms/${roomId}/messages`,
-      { method: "POST", body: { sender_id: interactorId, message }, token }),
+      { method: "POST",
+        body: { sender_id: interactorId, message,
+                ...(cutOff ? { cut_off_id: cutOff.id,
+                               cut_off_heard: cutOff.heard } : {}) },
+        token }),
   advanceRoom: (roomId: string, token: string) =>
     req<{ replies: RoomMsg[] }>(`/rooms/${roomId}/advance`,
       { method: "POST", token }),

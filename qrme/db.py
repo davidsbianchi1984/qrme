@@ -131,6 +131,10 @@ CREATE TABLE IF NOT EXISTS room_messages (
     media_id    TEXT REFERENCES media(id),  -- a shared picture, video or file
     media_text  TEXT,            -- the words in it, for a person to read back
     media_digest TEXT,           -- the reading every later turn carries
+    -- How much of this turn was actually heard, when somebody cut it off
+    -- mid-sentence. NULL is the ordinary case: it played out, or nobody was
+    -- listening to it aloud at all.
+    heard       TEXT,
     created_at  TEXT NOT NULL
 );
 
@@ -2721,6 +2725,12 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # profile is told the file is unreadable rather than handed a guess.
     ("room_messages", "media_text", "TEXT"),
     ("room_messages", "media_digest", "TEXT"),
+    # What a person actually heard of a turn they interrupted. A profile
+    # answering next has to know WHICH part reached them: continuing from a
+    # point they never got to, or repeating what they cut off precisely
+    # because they had heard enough of it, are both the model talking past
+    # the person rather than to them.
+    ("room_messages", "heard", "TEXT"),
     # What is behind you in a room, as distinct from what stands in for you.
     # NULL on every row that predates backgrounds — no background is a
     # background of nothing, not an empty picture.

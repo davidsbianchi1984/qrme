@@ -10,6 +10,27 @@ An iPhone gets a voice in a room.
 
 ### Added
 
+- **A profile answering an interruption knows where it was cut off.** Cutting
+  one off mid-paragraph leaves you holding a PREFIX of what it said, and the
+  reply you got next was built from a transcript that showed the whole turn as
+  though you had sat through it. So the profile carried on from a point you
+  never reached, or answered as if its unheard sentences had landed.
+
+      asked     did the person interrupt
+      mattered  how much had they heard when they did
+
+  The voice is played sentence by sentence, so an interruption lands on a
+  known boundary and the client can report exactly what reached the room. It
+  rides on the interrupted turn itself rather than beside it — it is a fact
+  about that turn, every profile in the room reads the same transcript, and it
+  survives a reload. The model reads it as a stated fact in the same shape an
+  attachment is, naming the part that was heard so it can pick up from there
+  rather than from the end nobody reached. A turn heard all the way to its
+  last sentence is reported as finished rather than as a loss; apologising for
+  a gap that is not there is its own failure. Optional on the wire and
+  ignorable: a client that never sends it is describing a room where nothing
+  was interrupted, which is the ordinary case.
+
 - **A second ear this console owns.** The room has listened through the
   browser's own recogniser and nothing else. On iOS that constructor exists
   and the service always refuses, so the phone this product is mostly used on

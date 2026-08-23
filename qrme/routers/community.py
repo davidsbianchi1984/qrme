@@ -249,7 +249,8 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
         if profile["status"] == "departed":
             continue
         history = conn.execute(
-            "SELECT sender_kind, sender_id, content, media_id, media_digest"
+            "SELECT sender_kind, sender_id, content, media_id, media_digest,"
+            "       heard"
             " FROM room_messages"
             " WHERE room_id=? AND status='approved'"
             " ORDER BY created_at DESC, rowid DESC LIMIT 12",
@@ -289,6 +290,17 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
                     label += " — this deployment could not turn it into "\
                              "words, so you have not read it]"
                 text = f"{text} {label}".strip() if text else label
+            # Interrupted, and by how much. Said as a fact about the turn,
+            # in the same shape an attachment is: the model reads what
+            # happened rather than being told what to do about it, and the
+            # sentence names the part that reached the room so it can pick
+            # up from there instead of from the end nobody heard.
+            heard = (r["heard"] or "") if "heard" in keys else ""
+            if heard and heard.strip() != text.strip():
+                text += (" [they interrupted before you finished — all they"
+                         f" heard was: {heard.strip()}]")
+            elif heard:
+                text += " [they interrupted you just as you finished]"
             return text
 
         turns = [
@@ -1110,6 +1122,16 @@ def room_message(room_id: str, body: RoomMessage, request: Request) -> dict:
     maturity = _room_maturity(participants)
     verdict = moderation.review(body.message, None, {"birthdate": None},
                                 maturity=maturity)
+    # Recorded before the profiles take their turn, so the history they read
+    # already carries it. Written onto the interrupted turn rather than kept
+    # beside it: it is a fact about that turn, and every profile in the room
+    # reads the same transcript.
+    if body.cut_off_id and body.cut_off_heard is not None:
+        db.connect().execute(
+            "UPDATE room_messages SET heard=? WHERE id=? AND room_id=?"
+            "  AND sender_kind='profile'",
+            (body.cut_off_heard[:4000], body.cut_off_id, room_id))
+        db.connect().commit()
     sent = _store_room_message(room_id, "user", speaker, body.message,
                                verdict.approved, verdict.reason)
     replies = []

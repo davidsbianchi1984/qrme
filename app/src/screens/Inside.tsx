@@ -4,7 +4,7 @@ import { api, getBase, type Avatar, type MicsHere, type RoomFaces,
          type RoomMsg } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
-import { speakInPieces } from "../spoken";
+import { speakInPieces, type Speaking } from "../spoken";
 import { useSession } from "../store";
 import { putAway, whenPutAway } from "../away";
 import { canRecord, meterWhileSpeaking, recordTurn, type Recording }
@@ -266,7 +266,11 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // the screen bumps the run and stops the playing turn — without this,
   // the queue kept reading the OLD room's turns under the new one (or
   // under no screen at all), because the loop's handle was a local.
-  const nowSaying = useRef<{ stop: () => void } | null>(null);
+  const nowSaying = useRef<Speaking | null>(null);
+  /** Which TURN is in the air — the message id, not the speaker's. An
+   *  interruption is about the sentence being said, and a profile can say
+   *  several in a row. */
+  const sayingMsg = useRef<string | null>(null);
   const earRun = useRef(0);
   // Dictation: speech types into the box and sends nothing — the send
   // stays a decision. Only offered where the browser ships a recogniser
@@ -434,6 +438,11 @@ export function Inside({ onPlans, start = "", onLeave }: {
    *  screen to be read, scrolled back to and answered. Cutting a voice off
    *  is not deleting what it said.
    */
+  /** What the last interruption cut off: which turn, and how much of it
+   *  reached the room. Spent on the next thing said, because it describes
+   *  that one turn and not the conversation. */
+  const cutOff = useRef<{ id: string; heard: string } | null>(null);
+
   function personTakesTheTurn() {
     // The QUEUE first, not just the sentence.
     //
@@ -450,6 +459,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
     // somebody left the room. A person interrupting is the same fact:
     // whatever was queued is not what they want to hear now.
     earRun.current++;
+    // Read before the stop: `heard()` reports the pieces that actually
+    // played, and stopping is what makes that number final.
+    const said = nowSaying.current?.heard() || "";
+    const was = sayingMsg.current;
+    if (was && said) cutOff.current = { id: was, heard: said };
+    sayingMsg.current = null;
     nowSaying.current?.stop();
     nowSaying.current = null;
     setVoicing(null);
@@ -836,6 +851,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
             m.sender_id as string, m.content || "", token);
           roomSpeaks(m.content || "");
           nowSaying.current = s;
+          sayingMsg.current = m.id;
           if (run !== earRun.current) { s.stop(); break; }
           // The light follows the voice: while a backlog is being read,
           // the transcript's last line is not who is speaking.
@@ -1055,7 +1071,10 @@ export function Inside({ onPlans, start = "", onLeave }: {
     personTakesTheTurn();
     // `act` is deliberately not used: it flips `busy`, which would grey
     // out the room under somebody mid-conversation.
-    api.sayInRoom(open, me, said, token).then(load).catch(setError);
+    const cut = cutOff.current;
+    cutOff.current = null;
+    api.sayInRoom(open, me, said, token, cut || undefined)
+      .then(load).catch(setError);
   }
 
   /** The recorded ear, standing.
@@ -1311,7 +1330,11 @@ export function Inside({ onPlans, start = "", onLeave }: {
     const text = draft;
     setDraft("");
     personTakesTheTurn();
-    await act(async () => { await api.sayInRoom(open, me, text, token); })();
+    const cut = cutOff.current;
+    cutOff.current = null;
+    await act(async () => {
+      await api.sayInRoom(open, me, text, token, cut || undefined);
+    })();
   }
 
   async function shareFile(file: File) {
@@ -2425,6 +2448,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
                             speakInPieces(id, m.content || "", token)
                               .then((s) => {
                                 nowSaying.current = s;
+                                sayingMsg.current = m.id;
                                 setVoicing({ kind: "profile", id });
                                 return s.done;
                               })
