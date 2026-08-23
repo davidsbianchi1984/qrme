@@ -204,3 +204,34 @@ def test_the_meter_goes_down_when_you_leave() -> None:
     teardown = teardown[:teardown.index("}, [open])")]
     assert "closeMeter" in teardown, (
         "leaving the room leaves the barge-in meter holding the microphone")
+
+
+def test_the_meter_never_opens_a_microphone_nobody_asked_for() -> None:
+    """The question the first version of this meter did not ask.
+
+        asked     can we tell an interruption from an echo
+        mattered  whose microphone are we opening to find out
+
+    It opened a stream whenever the room spoke — so somebody reading a room
+    with the voices on, who had never pressed the microphone, got a
+    recording light they never asked for. That is worse than the problem it
+    solves, and no amount of "it records nothing" makes an unasked-for
+    microphone acceptable.
+
+    `wantTalking` is the person having already said yes to this room
+    hearing them. Under that decision the meter adds nothing new; without
+    it, it is the product taking a liberty. Somebody listening in silence
+    loses nothing — they were not talking, so there is no interruption to
+    recognise.
+    """
+    code = _stripped()
+    speaks = re.search(r"function roomSpeaks\([^)]*\)\s*\{(.*?)\n  \}",
+                       code, re.S)
+    assert speaks, "roomSpeaks moved — this guard reads it by name"
+    gate = re.search(r"if \(([^)]*)\)\s*\{[^}]*meterWhileSpeaking",
+                     speaks.group(1), re.S)
+    assert gate, "the meter is opened without any condition in front of it"
+    assert "wantTalking" in gate.group(1), (
+        "the meter opens a microphone for somebody who never pressed one — "
+        "a recording light nobody asked for, to solve a problem they do not "
+        "have")

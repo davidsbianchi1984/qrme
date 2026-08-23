@@ -376,11 +376,24 @@ export function Inside({ onPlans, start = "", onLeave }: {
 
   function roomSpeaks(said: string) {
     speaking.current = true;
-    // The meter runs only while the voice is in the air. On a browser with
-    // a recogniser this is the ONLY thing that can tell an interruption
-    // from an echo — the recogniser has no analyser, which is why the echo
-    // fix had to drop everything and took barge-in with it.
-    if (!closeMeter.current) {
+    // The meter runs only while the voice is in the air, and ONLY for
+    // somebody whose own microphone is already standing.
+    //
+    //     asked     can we tell an interruption from an echo
+    //     mattered  whose microphone are we opening to find out
+    //
+    // The first version asked the first question and not the second: it
+    // opened a stream whenever the room spoke, so a person who had never
+    // pressed the microphone — reading a room with the voices on — got a
+    // recording light they did not ask for. That is worse than the problem
+    // it solves. `wantTalking` is the person having already said yes to
+    // this room hearing them; metering under that decision adds nothing
+    // they have not already allowed, and metering without it is the
+    // product taking a liberty.
+    //
+    // Nobody listening in silence loses anything: they were not talking, so
+    // there is no interruption to recognise.
+    if (wantTalking.current && !closeMeter.current) {
       barged.current = false;
       void meterWhileSpeaking(() => {
         barged.current = true;
