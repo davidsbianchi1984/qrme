@@ -278,3 +278,20 @@ def test_the_typed_send_interrupts_too() -> None:
     assert "personTakesTheTurn()" in send.group(1), (
         "sending typed text leaves the profile talking over the reply it is "
         "about to get")
+
+
+def test_speaking_over_the_profile_is_submitting_text() -> None:
+    """Typing while a profile talks has always worked. Saying the same
+    words did not — the ear dropped them before they could become a turn,
+    so a person interrupting by voice got nothing twice: the reply carried
+    on, and their sentence never existed.
+
+        asked     is the room speaking
+        mattered  is somebody speaking to it anyway
+    """
+    code = _stripped()
+    ear = code[code.index("const heard = parts.join"):]
+    ear = ear[:ear.index("pending.current =")]
+    assert "barged.current" in ear, (
+        "words spoken over a profile are discarded at the ear, so no "
+        "interruption by voice can ever reach the room")
