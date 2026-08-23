@@ -64,6 +64,22 @@ An iPhone gets a voice in a room.
 
 ### Fixed
 
+- **Whatever you put up in a room, you can take back down again.** The chip
+  labelled "Just my name" was taken out on request earlier in this round — it
+  was a display toggle on a strip that was cropping, and the way back to a
+  name in a box is still the camera control. But it was also the only caller
+  of the one route that takes an uploaded picture or background back OFF the
+  server: changing what is shown leaves the file exactly where it is.
+
+      asked     is the picture on screen
+      mattered  can the person who put it there get it off the server
+
+  Nothing looked broken, because the behaviour anybody would have gone
+  looking for survived elsewhere. What left with it was the way down from a
+  background you regret. The taking-down half is back, narrowed: offered only
+  when there is something up to take down, which the display toggle never
+  checked.
+
 - **Barge-in comes back.** 1.4.1 traded it away to stop the room prompting
   itself, and said so at the time. The trade was forced: a recogniser has no
   analyser, so there was no way to tell a person leaning into the microphone

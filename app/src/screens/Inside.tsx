@@ -2238,9 +2238,26 @@ export function Inside({ onPlans, start = "", onLeave }: {
                              }
                            }} />
                     {/* "Just my name" used to sit here — taken out on
-                        request. The way back to a name in a box is the
-                        camera control, which sets `showing` to voice and
-                        lands in the same place. */}
+                        request, and it took something with it that the
+                        request did not ask for. That chip only changed
+                        what was DISPLAYED, and the way back to a name in
+                        a box is still the camera control. But it was also
+                        the only caller of the one route that takes an
+                        uploaded picture or background back OFF the server,
+                        so removing it left somebody who put up a
+                        background they regret with no way down.
+                        This is the taking-down half, kept and narrowed:
+                        offered only when there is something up to take
+                        down, which the display toggle never checked. */}
+                    {(face?.media_url || face?.background_url) && (
+                      <button className="chip" disabled={busy}
+                              onClick={act(async () => {
+                                await api.clearRoomFace(open, me, token);
+                                load();
+                              })}>
+                        {tr("ins.face.hereoff", lang)}
+                      </button>
+                    )}
                     {/* The masks. Two records, not one: taking a mask off and
                         turning a camera off are different actions, so this
                         sits beside the three above rather than among them. */}

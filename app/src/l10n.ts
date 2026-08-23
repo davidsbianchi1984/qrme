@@ -8410,6 +8410,9 @@ const CHROME: Table = {
   "ins.face.mineoff": {
     en: "Take my picture down", es: "Quitar mi foto", fr: "Retirer ma photo", de: "Mein Bild entfernen", pt: "Remover a minha foto", it: "Togli la mia foto", ja: "自分の写真を外す", zh: "撤下我的照片", hi: "मेरी तस्वीर हटाएँ", ar: "إزالة صورتي",
   },
+  "ins.face.hereoff": {
+    en: "Take down what I put up here", es: "Quitar lo que puse aquí", fr: "Retirer ce que j'ai mis ici", de: "Entfernen, was ich hier gezeigt habe", pt: "Remover o que coloquei aqui", it: "Togli ciò che ho messo qui", ja: "ここに出したものを外す", zh: "撤下我在这里放的内容", hi: "मैंने यहाँ जो लगाया है उसे हटाएँ", ar: "إزالة ما وضعته هنا",
+  },
   "chat.doc": {
     en: "Document", es: "Documento", fr: "Document", de: "Dokument", pt: "Documento", it: "Documento", ja: "ドキュメント", zh: "文档", hi: "दस्तावेज़", ar: "مستند",
   },
