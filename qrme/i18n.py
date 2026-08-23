@@ -5040,7 +5040,7 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     # API's own vocabulary, shown to a person who was only having a
     # conversation.
     'cut_off_id': {'en': 'The reply you interrupted', 'es': 'La respuesta que interrumpiste', 'fr': "La réponse que vous avez interrompue", 'de': 'Die Antwort, die du unterbrochen hast', 'pt': 'A resposta que interrompeu', 'it': 'La risposta che hai interrotto', 'ja': '割り込んだ相手の返答', 'zh': '你打断的那句回答', 'hi': 'जिस उत्तर को आपने बीच में रोका', 'ar': 'الردّ الذي قاطعته'},
-    'cut_off_heard': {'en': 'How much of it you heard', 'es': 'Cuánto alcanzaste a oír', 'fr': "Ce que vous en avez entendu", 'de': 'Wie viel davon du gehört hast', 'pt': 'Quanto chegou a ouvir', 'it': 'Quanto ne hai sentito', 'ja': 'どこまで聞こえていたか', 'zh': '你听到了多少', 'hi': 'आपने उसमें से कितना सुना', 'ar': 'ما سمعته منه'},
+    'cut_off_heard': {'en': 'How much of the answer you heard', 'es': 'Cuánto alcanzaste a oír de la respuesta', 'fr': "Ce que vous avez entendu de la réponse", 'de': 'Wie viel der Antwort du gehört hast', 'pt': 'Quanto ouviu da resposta', 'it': "Quanto hai sentito della risposta", 'ja': '答えをどこまで聞いたか', 'zh': '这句回答你听到了多少', 'hi': 'उत्तर आपने कितना सुना', 'ar': 'ما سمعته من الإجابة'},
     'preferred': {'en': 'Asked first', 'es': 'Se le pregunta primero', 'fr': 'Sollicité en premier', 'de': 'Zuerst gefragt', 'pt': 'Perguntado primeiro', 'it': 'Interpellato per primo', 'ja': '最初に頼む相手', 'zh': '优先联系', 'hi': 'पहले पूछा जाएगा', 'ar': 'يُسأل أولًا'},
     # The open board's answer form. Somebody with no account is typing here,
     # so a refusal naming the API's word for the field would be a refusal
