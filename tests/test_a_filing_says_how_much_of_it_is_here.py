@@ -35,9 +35,12 @@ from qrme.briefcase import MAX_TEXT, add, block, capped
 from tests.test_capabilities import (as_interactor, make_interactor,  # noqa: F401
                                      make_profile, pdi_pair)
 
-#: Long enough that the cap bites hard — a real application runs to this and
-#: further. Written as a claim so a digest of it reads like a document.
-FILING = "Claim 1. A method of regulating thermal transfer. " * 1400
+#: Long enough that the cap bites, DERIVED from the cap rather than written
+#: as a number: a constant that has to be edited every time the ceiling moves
+#: is a test that silently stops exercising the thing it is named for. This
+#: one is always half again longer than whatever the cap is.
+_SENTENCE = "Claim 1. A method of regulating thermal transfer. "
+FILING = _SENTENCE * (int(MAX_TEXT * 1.5 // len(_SENTENCE)) + 1)
 SHORT = "A one-page note about the sealed enclosure and its two conduits."
 
 

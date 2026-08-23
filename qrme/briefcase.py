@@ -87,9 +87,25 @@ from . import db, llm, media, offline, scrape
 #: the person says about them; the rest carry text this deployment can read.
 KINDS = ("link", "photo", "video", "document", "recording")
 
-#: How much extracted text is kept per item. Generous for a filing, small
-#: enough that a briefcase is not an archive.
-MAX_TEXT = 20_000
+#: How much extracted text is kept per item.
+#:
+#: This said *generous for a filing*, and it was not. A US patent application
+#: runs to forty thousand characters and often past a hundred thousand; at
+#: 20,000 the product read the first third of the documents it was mostly
+#: being handed, and the round that made the truncation visible is what made
+#: that legible rather than arguable — "the first 20,000 of 70,000" is a
+#: sentence about a number that was chosen when nobody had measured one.
+#:
+#: 120,000 holds a long filing whole. What it costs is stated rather than
+#: hidden: `distill` sends the stored text to the model once per import, so
+#: a document six times longer is six times the reading — ONCE, and never
+#: again, because the digest is what every later turn carries and that is
+#: still capped at `MAX_DIGEST`. That is the module's whole economy working
+#: as described rather than an exception to it.
+#:
+#: Still a cap, and the notice still fires past it: a briefcase is not an
+#: archive, and something longer than this exists.
+MAX_TEXT = 120_000
 
 #: How much of the digest is carried into the prompt on every turn. This is
 #: the number the credit argument rests on: the digest is what recurs.

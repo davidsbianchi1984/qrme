@@ -8,6 +8,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The cap holds a filing now.** `MAX_TEXT` said *generous for a filing* and
+  was not. A US patent application runs to forty thousand characters and often
+  past a hundred thousand, so at 20,000 this read the first third of exactly
+  the documents it is mostly handed. Making the cut visible in the same round
+  is what turned that from arguable into legible: *the first 20,000 of 70,000*
+  is a sentence about a number chosen before anybody had measured one.
+
+  120,000 holds a long application whole — a 99,000-character filing now
+  arrives uncut. The cost is stated rather than hidden: `distill` sends the
+  stored text to the model once per import, so a document six times longer is
+  six times the reading — **once**, and never again, because the digest every
+  later turn carries is still capped at 700 characters. That is the module's
+  stated economy working rather than an exception to it.
+
+  Still a cap, and the notice still fires past it. Something longer than this
+  exists, and a briefcase is not an archive.
+
 - **A document that was cut says so.** Last round's work got a patent
   application to read. This round found that reading it was not the same as
   having it: `_clean` tidied and cut on the same line, so a 70,000-character
