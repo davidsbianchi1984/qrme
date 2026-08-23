@@ -34,6 +34,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   a notice about nothing. Both doors again — the pair's briefcase and a room
   share are the same reader and were the same silence.
 
+  **And on both screens.** The profile being told is half of it: a person
+  reading "read once — 20,000 characters" beside a filing three times that
+  length has been handed the kept length wearing the document's name, with
+  nothing on screen distinguishing the two. The briefcase panel and the
+  room's attachment line both say *the first 20,000 of 70,000 characters*
+  now, and the briefcase adds what to do about it — ask about the part that
+  matters, and paste it if it is further in — because a number alone tells
+  somebody their filing was cut and leaves them standing there. Both figures
+  ride the wire rather than being derived: the cap is a server constant, and
+  a console that hard-coded it would print a stale number the day it moves.
+
 - **A guard that nothing a profile does on its own can reach money.** This
   round went looking for somewhere to put an ask-first confirmation in front
   of a profile spending, and found nothing to put one in front of. Every path
