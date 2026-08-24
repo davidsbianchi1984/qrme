@@ -6,6 +6,36 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The chat ear still closed a fifth of a second after it opened.** 1.7.0 set
+  `continuous = true` and gave `onend` a reopen, and the defect survived both.
+  Two reasons, and neither was in the browser:
+
+      asked     does the ear reopen after a silence
+      mattered  does anything else close it on the way
+
+  `aborted` was treated as fatal. It is what the engine reports when a session
+  is superseded or stopped on purpose — the ordinary end of a session — and on
+  it the listener cleared the very flag `onend` reads to decide whether to
+  reopen. And every recogniser's handlers wrote to that one shared flag, so a
+  late event from a superseded session turned off the ear that had just
+  replaced it. Pressing the button while it was already listening produced
+  exactly that, because nothing stopped a second session from starting.
+
+  Each opening now carries a turn number and its handlers act only while they
+  are still the live one; `aborted` joins `no-speech` as an ordinary end; a
+  second session cannot start over a live one; and every stop retires its own
+  turn so the abort it provokes cannot reach the next ear.
+
+- **The talk screen could not say why it stopped.** A refused microphone, an
+  unreachable speech service and a defect all read as "tap to talk". That is
+  why the first repair shipped on an assumption: nothing on the surface could
+  contradict it, for the person using it or for anybody reading the report
+  afterwards. The overlay now names the reason — permission, no device,
+  service unreachable, or a general close — hand-translated into all ten
+  languages.
+
 ## [1.7.0] - 2026-08-24
 
 ### Fixed

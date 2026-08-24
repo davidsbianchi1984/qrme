@@ -21,6 +21,22 @@ interface Msg { who: "you" | "assistant"; text: string; note?: string;
                  *  the local fallback wrote this instead. */
                 degradedFrom?: string | null }
 
+/** What the engine's error codes mean to somebody looking at the screen.
+ *
+ * Deliberately a small map rather than the raw code: `not-allowed` is not a
+ * sentence, and a person who has just been refused a microphone is not the
+ * person to hand a spec term to. Anything unmapped falls through to the
+ * general line, which still says the ear closed rather than pretending it
+ * drifted shut.
+ */
+const EAR_TROUBLE: Record<string, string> = {
+  "not-allowed": "chat.talk.trouble.blocked",
+  "service-not-allowed": "chat.talk.trouble.blocked",
+  "audio-capture": "chat.talk.trouble.nomic",
+  "network": "chat.talk.trouble.network",
+  "start-refused": "chat.talk.trouble.nomic",
+};
+
 export function Chat({ onPlans }: {
   /** Where a plan refusal sends somebody. Threaded in from the shell
    *  rather than looked up here, so the tab id stays in one place. */
@@ -73,6 +89,7 @@ export function Chat({ onPlans }: {
     // voice and left the ear open — put-away had its own handler and unmount
     // did not, so navigating away kept a browser tab's recording indicator
     // lit on a screen that was no longer there.
+    earTurn.current += 1;
     wantsEar.current = false;
     talkRec.current?.stop();
     talkRec.current = null;
@@ -100,6 +117,22 @@ export function Chat({ onPlans }: {
   // fires from the engine outside React's render, and reading `listening`
   // there would read the value from the render that installed the handler.
   const wantsEar = useRef(false);
+  // Which opening of the ear is the live one. Every recognizer closes over
+  // its own turn number and does nothing unless it is still that turn.
+  //
+  //     asked     did this session end
+  //     mattered  is this session still the one on screen
+  //
+  // `wantsEar` is one ref and every recognizer's handlers write to it, so a
+  // late event from a superseded session was turning off the ear that had
+  // just replaced it — a race that reads exactly like the engine refusing.
+  const earTurn = useRef(0);
+  // Why the ear closed, when it closed for a reason rather than a silence.
+  // A caption that only ever falls back to "tap to talk" cannot tell a
+  // refused microphone from a bug, and the person watching it has no way to
+  // find out — which is how the first repair of this screen shipped on an
+  // assumption with nothing able to contradict it.
+  const [earTrouble, setEarTrouble] = useState<string | null>(null);
   // The talk surface: a full listening overlay in the sibling product's
   // shape — except this product's speaker has a face. The profile's avatar
   // is what you look at while it listens and answers; the abstract orb only
@@ -216,6 +249,14 @@ export function Chat({ onPlans }: {
   // swallows words silently.
   function talkListen() {
     if (!Recognition || putAway()) return;
+    // An ear that is already open must not be opened again. Chrome allows
+    // one recognition at a time, and starting a second aborts the first —
+    // whose `aborted` then arrived and closed the one that had just opened.
+    // Pressing the button while it was listening did exactly this.
+    if (talkRec.current) return;
+    const mine = ++earTurn.current;
+    const live = () => mine === earTurn.current;
+    setEarTrouble(null);
     const rec = new Recognition();
     rec.lang = lang;
     // `continuous` defaults to **false**, and that was the whole defect: the
@@ -250,6 +291,7 @@ export function Chat({ onPlans }: {
       setInput(text);
     };
     rec.onend = () => {
+      if (!live()) return;
       talkRec.current = null;
       // Chrome ends the session on its own silence timeout even when
       // continuous, so an ear meant to stay open has to be reopened. Only
@@ -260,25 +302,48 @@ export function Chat({ onPlans }: {
       setListening(false);
     };
     rec.onerror = (e: any) => {
-      // A refused permission or a lost device is not a silence timeout, and
-      // reopening on one would spin.
-      if (e?.error === "no-speech" && wantsEar.current && !putAway()) return;
+      if (!live()) return;
+      const why = String(e?.error || "");
+      // Neither of these is a fault. `no-speech` is a quiet room, and
+      // `aborted` is what the engine reports when a session is superseded
+      // or stopped on purpose — treating it as fatal is what made the ear
+      // close a fifth of a second after it opened.
+      if ((why === "no-speech" || why === "aborted")
+          && wantsEar.current && !putAway()) return;
+      // Anything else closes the ear, and says so. Falling silently back to
+      // "tap to talk" left the person and the next person to read this
+      // screen with the same nothing to go on.
       wantsEar.current = false;
       talkRec.current = null;
       setListening(false);
+      if (why && why !== "aborted") setEarTrouble(why);
     };
     talkRec.current = { stop: () => rec.stop() };
     wantsEar.current = true;
     setListening(true);
-    rec.start();
+    // `start()` throws where the engine refuses outright — no microphone
+    // bound, or a session the browser will not grant. Unhandled, the ear
+    // was left reading as open over a recognizer that never began.
+    try {
+      rec.start();
+    } catch {
+      wantsEar.current = false;
+      talkRec.current = null;
+      setListening(false);
+      setEarTrouble("start-refused");
+    }
   }
 
   /** Close the ear because the person asked, not because it timed out. */
   function talkStop() {
+    // Retire the turn first: the `aborted` this stop provokes then belongs
+    // to a session nobody is listening to, and cannot reopen or report.
+    earTurn.current += 1;
     wantsEar.current = false;
     const rec = talkRec.current;
     talkRec.current = null;
     setListening(false);
+    setEarTrouble(null);
     rec?.stop();
   }
 
@@ -287,6 +352,7 @@ export function Chat({ onPlans }: {
   // started by a press, and a press is not a thing to replay on somebody's
   // behalf when they come back.
   useEffect(() => whenPutAway(() => {
+    earTurn.current += 1;
     wantsEar.current = false;
     talkRec.current?.stop();
     talkRec.current = null;
@@ -658,6 +724,15 @@ export function Chat({ onPlans }: {
           </div>
           <Waveform presence={presence} lang={lang} />
           {heard && <div className="talk-heard">{heard}</div>}
+          {/* Why the ear closed, when it closed for a reason. Without this
+              the surface had one way of failing and no way of saying which
+              failure it was — a refused microphone, a speech service it
+              could not reach and a defect all read as "tap to talk". */}
+          {earTrouble && (
+            <div className="talk-trouble muted small">
+              {tr(EAR_TROUBLE[earTrouble] || "chat.talk.trouble", lang)}
+            </div>
+          )}
           {talkAvatar && (!talkAvatar.asset || talkAvatar.placeholder) && (
             <div className="muted small">{tr("chat.talk.noface", lang)}</div>
           )}
