@@ -255,7 +255,56 @@ def _client_bindings() -> int:
     return len(_bindings())
 
 
+# -- the readers that stand between a guard and nothing ---------------------
+#
+# The README pair is the shared-literal case measured for the third time: a
+# floor of 40 against 258 history rows here, 256 in JIM-mini and 254 in the
+# vault. One number, three products, never revisited in any of them.
+
+
+def _form_asked_for() -> int:
+    from .test_a_form_that_asks_for_it_has_a_label_for_it import _asked_for
+    return len(_asked_for())
+
+
+def _wire_declared() -> int:
+    from .test_one_name_one_type_on_the_wire import _declared
+    return len(_declared())
+
+
+def _face_kinds() -> int:
+    from qrme import overlays
+    return len(overlays.FACE_KINDS)
+
+
+def _readme_rows() -> int:
+    from .test_the_readme_says_what_shipped import _rows
+    return len(_rows())
+
+
+def _readme_released() -> int:
+    from .test_the_readme_says_what_shipped import _released
+    return len(_released())
+
+
+def _validation_messages() -> int:
+    from qrme import i18n
+    return len(i18n._VALIDATION)
+
+
 RATCHETS: tuple[Ratchet, ...] = (
+    Ratchet("form.asked_for", 44, _form_asked_for,
+            "the request fields the form check knows a control for"),
+    Ratchet("wire.declared", 524, _wire_declared,
+            "every name declared on the wire, across all four clients"),
+    Ratchet("overlays.face_kinds", 13, _face_kinds,
+            "the face kinds an overlay can be drawn for"),
+    Ratchet("readme.history_rows", 206, _readme_rows,
+            "the release history rows the README table carries"),
+    Ratchet("readme.released", 208, _readme_released,
+            "the releases the CHANGELOG declares"),
+    Ratchet("i18n.validation_messages", 8, _validation_messages,
+            "the validation sentences with a row in every language"),
     Ratchet("shells.swift_files", 39, _shell_files("SWIFT"),
             "the Swift sources the shell parser reads"),
     Ratchet("shells.kotlin_files", 9, _shell_files("KOTLIN"),

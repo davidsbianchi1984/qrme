@@ -20,6 +20,7 @@ import pytest
 
 from qrme import db, overlays
 from tests.test_capabilities import auth_header, make_profile
+from . import ratchets
 
 
 def _interactor(client, name="Sam"):
@@ -158,7 +159,7 @@ def test_the_whole_facial_catalogue_is_available(client):
     sam = _interactor(client)
     rid = _room(client, p, sam)
 
-    assert len(overlays.FACE_KINDS) >= 15
+    assert len(overlays.FACE_KINDS) >= ratchets.floor("overlays.face_kinds")
     for kind in ("obscured", "silhouette", "avatar_2d", "avatar_3d",
                  "stylised", "prosthetic", "half_mask"):
         assert kind in overlays.FACE_KINDS
