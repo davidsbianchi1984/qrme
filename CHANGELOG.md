@@ -147,6 +147,35 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   (the delegation policy still decides), and a mechanic who can point at the
   Permissions tab is still a mechanic.
 
+- **On the phone the conversation leaves the application entirely.** The
+  console's walk-along strip stops when the browser puts the page away, and no
+  web page can do better. An installed app can, and the Android shell now
+  does: the conversation with a synthetic profile runs in a foreground service
+  while somebody is on another site, in their camera roll, anywhere.
+
+      asked     can the conversation survive a screen change
+      mattered  can it survive leaving the application
+
+  The notification is not a platform tax to be minimised — it is the whole
+  difference between *the conversation you took with you* and *an app
+  recording you after you left it*. It cannot be swiped away, its first action
+  ends the conversation, and it carries the profile's **AI designation**,
+  because a notification glanced at from inside another app is the moment
+  somebody has the least context and the last place to leave *is this a
+  person* to a guess.
+
+  The service is declared as a microphone service and not exported; quiet
+  reopens the ear while a refused microphone stops and says which failure it
+  was; a held or refused turn is not spoken as though it were a quiet moment;
+  and nothing restarts the service by itself.
+
+  **This has not been run.** There is no Android toolchain in the environment
+  it was written in. The guard beside it reads the declarations, which are the
+  parts whose absence is a microphone with no indicator; the loop has been
+  reasoned about and not executed. iOS and Windows do not have it — the iOS
+  shell has no project file to declare a background audio mode in, and the
+  Windows shell has no voice loop to keep running.
+
 ### Changed
 
 - **The share menu opens before the talk control** rather than after the send

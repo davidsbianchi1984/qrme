@@ -61,6 +61,7 @@ import app.qrme.studio.ShopOrder
 import app.qrme.studio.Solitude
 import app.qrme.studio.SolitudeReferral
 import app.qrme.studio.SuggestedRow
+import app.qrme.studio.Walking
 import app.qrme.studio.WallPost
 import app.qrme.studio.AppConn
 import app.qrme.studio.L10n
@@ -1823,6 +1824,52 @@ fun ChatScreen(vm: StudioViewModel) {
                 labeledField("", draft, L10n.t("nc.say.ph", vm.language)) { draft = it }
             }
             BrandButtonSmall(if (busy) "…" else L10n.t("nc.send", vm.language), enabled = draft.isNotBlank() && !busy) { send() }
+            // Take the conversation with you — out of this app entirely,
+            // which is the half the console cannot have. A web page put away
+            // has its recogniser ended by the browser and says so; a phone
+            // can keep the conversation running while somebody is looking
+            // something up somewhere else.
+            //
+            //     asked     can the conversation survive a screen change
+            //     mattered  can it survive leaving the application
+            //
+            // A press starts it, a notification says the microphone is open
+            // for as long as it is with End as its first control, and the
+            // same button ends it — a control that only starts something
+            // sends a person hunting through a notification shade.
+            val here = androidx.compose.ui.platform.LocalContext.current
+            BrandButtonSmall(
+                if (Walking.underway) L10n.t("nc.end", vm.language)
+                else L10n.t("walk.take", vm.language),
+                enabled = true,
+            ) {
+                if (Walking.underway) {
+                    Walking.stop(here)
+                } else {
+                    val pid = vm.pid
+                    val tok = vm.token
+                    val who = vm.interactorId
+                    if (pid != null && tok != null && who != null) {
+                        // The name carries its designation. A person glancing
+                        // at a notification from inside another app has the
+                        // least context they will ever have, and that is not
+                        // the place to leave "is this a person" to a guess.
+                        Walking.start(here, pid, tok, who,
+                            vm.displayName, vm.language)
+                    }
+                }
+            }
+        }
+        // What it last heard and last said, so somebody coming back can see
+        // where the conversation got to; and why it stopped, when it stopped
+        // for a reason. Blank when somebody pressed End: they know.
+        if (Walking.underway && Walking.said.isNotEmpty()) {
+            Text(Walking.said, color = Qrme.T2, fontSize = 11.sp,
+                modifier = Modifier.padding(horizontal = 20.dp))
+        }
+        if (Walking.trouble.isNotEmpty()) {
+            Text(Walking.trouble, color = Qrme.Amber, fontSize = 11.sp,
+                modifier = Modifier.padding(horizontal = 20.dp))
         }
     }
 }

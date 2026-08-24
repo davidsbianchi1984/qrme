@@ -1,0 +1,308 @@
+package app.qrme.studio
+
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
+import android.content.Context
+import android.content.Intent
+import android.content.pm.ServiceInfo
+import android.os.Build
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
+import android.speech.RecognitionListener
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import android.speech.tts.TextToSpeech
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.Locale
+
+/**
+ * The conversation that keeps going when this app is not on screen.
+ *
+ * The console's walk-along strip carries a conversation across a tab change
+ * and stops dead when the browser puts the page away. That is not a
+ * shortcoming of the strip — a backgrounded web page has its recogniser
+ * ended by the browser — and the strip says so rather than pretending.
+ *
+ *     asked     can the conversation survive a screen change
+ *     mattered  can it survive leaving the application
+ *
+ * On a phone the answer can be yes, and the price is a foreground service
+ * holding a microphone while the person is in another app entirely. The
+ * notification it must show is not a platform tax to be minimised: it is the
+ * whole difference between *the conversation you took with you* and *an app
+ * recording you after you left it*, and the two are the same code with
+ * different honesty.
+ *
+ * ## The designation travels
+ *
+ * Whoever is being talked to here is a synthetic profile, and a person must
+ * know that at all times — including in a notification glanced at from
+ * another app, which is the moment they have the least context. So the title
+ * carries the profile's watermark line, the same designation the chat bubble
+ * wears, rather than the bare display name.
+ *
+ * ## Written without a compiler
+ *
+ * There is no Android toolchain in the environment this was written in, so
+ * the guard beside it reads the declarations rather than the behaviour: the
+ * permissions and service type, the foreground start, the notification and
+ * its stop. Those are the parts whose absence is a microphone with no
+ * indicator. The loop itself has been reasoned about and not run.
+ */
+object Walking {
+
+    var underway by mutableStateOf(false)
+        internal set
+    var heard by mutableStateOf("")
+        internal set
+    var said by mutableStateOf("")
+        internal set
+    /** Why it stopped, when it stopped for a reason. Empty when somebody
+     *  pressed End — they know. */
+    var trouble by mutableStateOf("")
+        internal set
+
+    fun start(context: Context, profileId: String, token: String,
+              interactorId: String, shownName: String, lang: String) {
+        val intent = Intent(context, WalkService::class.java)
+            .putExtra(WalkService.EXTRA_PROFILE, profileId)
+            .putExtra(WalkService.EXTRA_TOKEN, token)
+            .putExtra(WalkService.EXTRA_INTERACTOR, interactorId)
+            .putExtra(WalkService.EXTRA_NAME, shownName)
+            .putExtra(WalkService.EXTRA_LANG, lang)
+        // `startForegroundService`: the service has one window to call
+        // `startForeground` and the system kills it if it does not, which is
+        // the platform enforcing the same rule this file is about.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent)
+        } else {
+            context.startService(intent)
+        }
+    }
+
+    fun stop(context: Context) {
+        context.startService(
+            Intent(context, WalkService::class.java)
+                .setAction(WalkService.ACTION_STOP))
+    }
+}
+
+class WalkService : Service() {
+
+    companion object {
+        const val EXTRA_PROFILE = "profile"
+        const val EXTRA_TOKEN = "token"
+        const val EXTRA_INTERACTOR = "interactor"
+        const val EXTRA_NAME = "name"
+        const val EXTRA_LANG = "lang"
+        const val ACTION_STOP = "app.qrme.studio.WALK_STOP"
+        private const val CHANNEL = "walk"
+        private const val NOTE_ID = 4201
+    }
+
+    private val main = Handler(Looper.getMainLooper())
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private var recogniser: SpeechRecognizer? = null
+    private var speaker: TextToSpeech? = null
+    private var profileId: String = ""
+    private var token: String = ""
+    private var interactorId: String = ""
+    private var shownName: String = ""
+    private var lang: String = "en"
+    /** Every opening of the ear carries a number, and a late callback from a
+     *  superseded one is ignored. The console learned this the hard way: one
+     *  shared flag meant a stale error closed the ear that had replaced it,
+     *  and the microphone died a fifth of a second after it opened. */
+    private var turn = 0
+    private var wants = false
+
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_STOP) {
+            close(reason = "")
+            return START_NOT_STICKY
+        }
+        profileId = intent?.getStringExtra(EXTRA_PROFILE).orEmpty()
+        token = intent?.getStringExtra(EXTRA_TOKEN).orEmpty()
+        interactorId = intent?.getStringExtra(EXTRA_INTERACTOR).orEmpty()
+        shownName = intent?.getStringExtra(EXTRA_NAME).orEmpty()
+        lang = intent?.getStringExtra(EXTRA_LANG) ?: "en"
+        if (profileId.isEmpty() || token.isEmpty() || interactorId.isEmpty()) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
+        goForeground()
+        Walking.underway = true
+        Walking.trouble = ""
+        speaker = TextToSpeech(this) { }.also {
+            it.language = Locale.forLanguageTag(lang)
+        }
+        wants = true
+        main.post { hear() }
+        // NOT sticky. A service the system restarts after killing it is a
+        // microphone that reopens without anybody pressing anything, which
+        // is the one thing this must never be.
+        return START_NOT_STICKY
+    }
+
+    override fun onDestroy() {
+        close(reason = "")
+        scope.cancel()
+        super.onDestroy()
+    }
+
+    // -- the notification ----------------------------------------------------
+
+    private fun goForeground() {
+        val manager = getSystemService(NotificationManager::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            manager.createNotificationChannel(
+                NotificationChannel(CHANNEL,
+                    L10n.t("walk.note.channel", lang),
+                    // Low, not minimum: visible in the shade for as long as
+                    // the microphone is open, and silent between turns.
+                    NotificationManager.IMPORTANCE_LOW))
+        }
+        val stop = PendingIntent.getService(
+            this, 0,
+            Intent(this, WalkService::class.java).setAction(ACTION_STOP),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        // The designation, in the one place a person has the least context.
+        // `shownName` is handed in already carrying the profile's watermark
+        // line; this is the belt to that braces, so a name that arrived bare
+        // still says what it is.
+        val who = if (shownName.lowercase().contains("ai")) shownName
+                  else L10n.t("walk.note.ai", lang) + " " + shownName
+        val note: Notification = Notification.Builder(this, CHANNEL)
+            .setContentTitle(L10n.fill("walk.note.title", lang,
+                                       mapOf("who" to who)))
+            .setContentText(L10n.t("walk.note.body", lang))
+            .setSmallIcon(android.R.drawable.ic_btn_speak_now)
+            .setOngoing(true)
+            .addAction(Notification.Action.Builder(
+                null, L10n.t("nc.end", lang), stop).build())
+            .build()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(NOTE_ID, note,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
+        } else {
+            startForeground(NOTE_ID, note)
+        }
+    }
+
+    // -- one turn ------------------------------------------------------------
+
+    private fun hear() {
+        if (!wants) return
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+            close(reason = L10n.t("walk.trouble.norecogniser", lang))
+            return
+        }
+        val mine = ++turn
+        fun live() = mine == turn && wants
+        val rec = SpeechRecognizer.createSpeechRecognizer(this)
+        recogniser = rec
+        rec.setRecognitionListener(object : RecognitionListener {
+            override fun onResults(results: android.os.Bundle?) {
+                if (!live()) return
+                val text = results
+                    ?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                    ?.firstOrNull()
+                    .orEmpty()
+                    .trim()
+                if (text.isEmpty()) { main.post { hear() }; return }
+                Walking.heard = text
+                take(mine, text)
+            }
+
+            override fun onError(code: Int) {
+                if (!live()) return
+                // Quiet is not a failure in a standing conversation — the
+                // microphone simply opens again. Everything else stops and
+                // says which failure it was, because a refused microphone
+                // reported as quiet is a loop that reopens forever with
+                // nothing to hear and nothing to say about it.
+                when (code) {
+                    SpeechRecognizer.ERROR_NO_MATCH,
+                    SpeechRecognizer.ERROR_SPEECH_TIMEOUT ->
+                        main.post { hear() }
+                    SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS ->
+                        close(reason = L10n.t("walk.trouble.permission", lang))
+                    SpeechRecognizer.ERROR_NETWORK,
+                    SpeechRecognizer.ERROR_NETWORK_TIMEOUT ->
+                        close(reason = L10n.t("walk.trouble.network", lang))
+                    else ->
+                        close(reason = L10n.t("walk.trouble.stopped", lang))
+                }
+            }
+
+            override fun onReadyForSpeech(params: android.os.Bundle?) {}
+            override fun onBeginningOfSpeech() {}
+            override fun onRmsChanged(rms: Float) {}
+            override fun onBufferReceived(buffer: ByteArray?) {}
+            override fun onEndOfSpeech() {}
+            override fun onPartialResults(partial: android.os.Bundle?) {}
+            override fun onEvent(type: Int, params: android.os.Bundle?) {}
+        })
+        rec.startListening(
+            Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+                .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                          RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                .putExtra(RecognizerIntent.EXTRA_LANGUAGE, lang))
+    }
+
+    private fun take(mine: Int, message: String) {
+        scope.launch {
+            val reply = runCatching {
+                ApiClient.chat(profileId, token, interactorId, message)
+            }.getOrNull()
+            if (mine != turn || !wants) return@launch
+            // A held or refused turn has no content, and the moderation
+            // status is the reason. Speaking nothing and carrying on would
+            // make a refusal indistinguishable from a quiet moment.
+            val text = if (reply?.status == "approved") reply.content.orEmpty()
+                       else ""
+            withContext(Dispatchers.Main) {
+                if (mine != turn || !wants) return@withContext
+                if (text.isEmpty()) {
+                    Walking.said = L10n.t("walk.lost", lang)
+                } else {
+                    Walking.said = text
+                    speaker?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "walk")
+                }
+                // The next turn opens after the answer is handed to the
+                // speaker rather than after it finishes: a person may
+                // interrupt, and a conversation where interrupting is
+                // impossible is a broadcast.
+                hear()
+            }
+        }
+    }
+
+    private fun close(reason: String) {
+        wants = false
+        turn += 1
+        recogniser?.destroy()
+        recogniser = null
+        speaker?.stop()
+        speaker?.shutdown()
+        speaker = null
+        Walking.underway = false
+        Walking.trouble = reason
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
+    }
+}
