@@ -451,14 +451,49 @@ def test_the_phones_own_voice_is_the_fallback_and_not_the_first_choice():
 
 
 def _without_comments(src: str) -> str:
-    """Source with `//`, `/** */` and `/* */` comments removed.
+    """Source with comments removed, and string literals left alone.
 
     A guard about what the code reaches must not be decided by prose that
-    names the same symbols while explaining the rule.
+    names the same symbols while explaining the rule. That is why this
+    exists. Why it is *this* long is a second lesson, learned the same hour.
+
+    The first version scanned for `//` and `/*` and nothing else. A Kotlin
+    screen in this estate has the two characters `/*` inside a **string
+    literal**, and that fake comment-open swallowed 54,296 characters —
+    including the very call the guard was hunting for. It reported a served
+    voice as absent from a file that calls it correctly.
+
+        asked     is this `/*` a comment
+        mattered  is it code at all, or is it inside a string
+
+    So the scanner tracks strings: double quotes with backslash escapes, and
+    the triple-quoted raw strings Kotlin and Swift use, which honour no
+    escapes at all. Characters inside a string are copied through untouched —
+    a comment marker in there is text, and text is not a comment.
+
+    Deliberately not a parser. It does not know char literals, interpolation,
+    or C#'s `@"..."`; it knows the one construct that actually bit, and the
+    cost of being wrong is now a visible miss rather than a silent 54,000
+    character hole.
     """
     out, i, n = [], 0, len(src)
     while i < n:
-        if src.startswith("/*", i):
+        # Raw strings first: they swallow quotes, so testing the single-quote
+        # case ahead of this would end one at the second `"` of its own
+        # opening delimiter.
+        if src.startswith('"""', i):
+            j = src.find('"""', i + 3)
+            end = n if j < 0 else j + 3
+            out.append(src[i:end])
+            i = end
+        elif src[i] == '"':
+            j = i + 1
+            while j < n and src[j] != '"':
+                j += 2 if src[j] == "\\" else 1
+            end = min(j + 1, n)
+            out.append(src[i:end])
+            i = end
+        elif src.startswith("/*", i):
             j = src.find("*/", i + 2)
             i = n if j < 0 else j + 2
         elif src.startswith("//", i):
@@ -468,3 +503,5 @@ def _without_comments(src: str) -> str:
             out.append(src[i])
             i += 1
     return "".join(out)
+
+
