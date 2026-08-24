@@ -1,5 +1,5 @@
-# status: backlog — 85 rows
-# ceiling: 85
+# status: backlog — 84 rows
+# ceiling: 84
 #
 # Every numeric floor in this suite still carrying its own literal: an
 # `assert <something> > <int>` with the number written into the assertion.
@@ -88,7 +88,6 @@ test_the_nav_is_translated_and_nothing_behind_it_is.py:227: len(nav) >= 40
 test_the_nav_is_translated_and_nothing_behind_it_is.py:253: len(nav_ids) >= 40
 test_the_objector_cannot_read_their_own_case.py:151: len(handlers) >= 8
 test_the_place_the_camera_the_org_and_the_tour.py:134: len(keys) >= 44
-test_the_platform_refuses_in_one_language.py:649: len(i18n._REFUSALS) >= 9
 test_the_readme_says_what_shipped.py:127: len(_rows()) >= 40
 test_the_readme_says_what_shipped.py:130: len(_released()) >= 40
 test_the_record_the_veil_and_the_exit.py:266: len(keys) >= 40

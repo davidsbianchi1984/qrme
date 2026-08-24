@@ -55,6 +55,8 @@ import pytest
 
 from qrme import i18n
 
+from . import ratchets
+
 
 def _repo_root() -> Path:
     for d in Path(__file__).resolve().parents:
@@ -792,7 +794,9 @@ def test_every_translated_refusal_has_every_language():
         "these refusals are missing languages:\n    "
         + "\n    ".join(f"{k[:60]}: {', '.join(v)}"
                         for k, v in sorted(gaps.items())))
-    assert len(i18n._REFUSALS) >= 9, (
+    # Was a literal 9 against a table of 335 — a floor far below
+    # what it measures. Registered, so the comparison is made, not assumed.
+    assert len(i18n._REFUSALS) >= ratchets.floor("refusals.translated"), (
         f"only {len(i18n._REFUSALS)} refusals in the table — this check would "
         "be passing on almost nothing")
 
