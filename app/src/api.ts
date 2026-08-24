@@ -5198,8 +5198,13 @@ export const api = {
         headers: { authorization: `Bearer ${token}` } });
     const body = await res.json().catch(() => ({}));
     if (!res.ok) {
-      throw new RequestError(res.status,
-        (body as { detail?: string }).detail || "that could not be heard");
+      // Three arguments, not two. The third is the sentence a person reads,
+      // and a throw that omits it renders a 422's row list through
+      // `JSON.stringify` — which is exactly what somebody read before the
+      // refusal round fixed it everywhere else.
+      const detail = (body as { detail?: string }).detail;
+      throw new RequestError(res.status, detail,
+        detail || "that could not be heard");
     }
     return (body as { text?: string }).text || "";
   },

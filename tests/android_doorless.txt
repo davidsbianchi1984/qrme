@@ -12,3 +12,18 @@
 # unused_native_bindings.txt was written to catch. The web console has the
 # door; these three do not, and this row says so until they do.
 POST /rooms/{room_id}/heard
+
+# POST /interactors/{interactor_id}/heard — the same door without a room, and
+# this shell should never want it. It exists because the *browser's* own
+# recogniser is ended when a page is put away, so the web console records and
+# posts the bytes instead. This shell has no such problem: it holds a native
+# recogniser that keeps working with the app off screen, does it on the
+# device, and spends none of the deployment's transcription doing it.
+#
+#     asked     can this client reach the route
+#     mattered  does this client have a better answer than the route
+#
+# Recorded rather than built, because building it would be giving a phone a
+# slower, costlier ear than the one it already has — a door that exists to
+# empty a backlog is worse than an honest row.
+POST /interactors/{interactor_id}/heard
