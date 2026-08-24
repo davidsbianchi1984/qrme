@@ -1,4 +1,5 @@
-# status: backlog — 82 rows
+# status: retired — 0 rows
+# ceiling: 0
 #
 # English refusals — the sentences this product says when it says no.
 # Checked by test_the_platform_refuses_in_one_language.py, both directions,
@@ -12,32 +13,30 @@
 #     asked     did the caller state a language
 #     mattered  did the profile
 #
-# One handler now translates every refusal into the reader's own language, and
-# the eleven sentences any route can raise — the shared owner and interactor
-# checks, the credential checks — are translated. These 142 are not, and pass
-# through as English, which is a visible gap rather than a confident error.
+# One handler translates every refusal into the reader's own language, and as
+# of this release every constant sentence any route can raise is translated
+# into all nine. The count this file carried went 165 → 142 → 82 → 0 across
+# four rounds; what is left below the line is the part that is not a count.
 #
 # ## What this file does not cover
 #
-# **31 f-string refusals**, down from 49. Sentences built with interpolation
-# cannot be keyed on their English source, because at the moment they are
-# raised there is no English source — only a result.
+# **31 f-string refusals.** Sentences built with interpolation cannot be keyed
+# on their English source, because at the moment they are raised there is no
+# English source — only a result.
 #
 #     asked     is the refusal a constant we can translate
 #     mattered  is every part of it something we can translate
 #
-# `i18n.Templated` now carries the template and its slots alongside the
-# finished English sentence, and eighteen sites were converted. What decides
-# whether a site can be is the *slot*, not the frame:
+# `i18n.Templated` carries the template and its slots alongside the finished
+# English sentence, and eighteen sites were converted. What decides whether a
+# site can be is the *slot*, not the frame:
 #
 #   - a slot holding a token — `en, es, pt`, `openai`, `prf_9f2` — is safe to
 #     drop into a translated frame, because it is the same string in every
 #     language;
 #   - a slot holding prose is not, and a translated frame around an English
 #     slot is worse than an English sentence: it reads as a bug, in front of
-#     somebody who is already being told no. That is the reason this file
-#     refuses to ship a translated plan gate, below, and the reason for the
-#     rest of these.
+#     somebody who is already being told no.
 #
 # Seven of the thirty-one carry prose this product does not author — a mail
 # server's exception, a moderation verdict, a hardware availability string.
@@ -75,36 +74,28 @@
 # real request because every unit test of it passed while the handler's dict
 # branch was dropping the template on the floor.
 #
-# ## The rule for what is not translated on purpose
+# ## The exemption that did not survive being reread
 #
-# One sentence here stays English by decision, not by backlog:
+# One sentence stayed English by decision for four releases — the 503 from
+# `auth.require_reviewer` when a deployment is reachable beyond localhost with
+# no `QRME_ADMIN_TOKEN` set. The argument written here was that the person who
+# can act on it is the operator reading a log, the fix is the name of an
+# environment variable, and no reader of a translated version could do
+# anything a reader of this one could not.
 #
-#     this deployment is reachable beyond localhost but has no
-#     QRME_ADMIN_TOKEN configured — objection review and succession stay
-#     closed until it is
+#     asked     who can act on this sentence
+#     mattered  who receives it
 #
-# The person who can act on it is the operator reading a log, the fix is the
-# name of an environment variable, and no reader of a translated version could
-# do anything a reader of this one could not.
+# The operator is who can act. The receiver is whoever made the request, and
+# the branch that raises it is reached precisely when the caller is *not*
+# local — an anonymous remote caller who tried objection review or succession
+# and is owed a reason in their own language. The variable name is a token: it
+# survives every translation verbatim, so an operator reading a translated
+# copy still has the fix in front of them. The exemption cost a reader their
+# language and bought the operator nothing.
 #
-# ceiling: 82
-# ## 0.80.0: the sentences behind `str(exc)`
-#
-# This file said "floor — 1 row" while the guard that filled it walked
-# `HTTPException` call sites and stopped there. A hundred and five of those
-# sites forward a domain exception — `except DisplayError as exc: raise
-# HTTPException(409, str(exc))` — and the sentence a person reads is at the
-# `raise DisplayError("…")` in a module the guard never opened.
-#
-#     asked     what does this route pass to HTTPException
-#     mattered  where does the sentence it passes come from
-#
-# 165 rows below are what following those forwards found. They are not new
-# English; they are English this file has been unable to see for as long as
-# it has existed, and the honest thing is the number rather than the floor it
-# was resting on. `tr_refusal` treats them identically to a directly-raised
-# literal: it looks the sentence up, misses, and serves English.
-#
+# It is translated now, and this section stands in place of the count so the
+# reversal is on the record rather than silently absent.
 #
 # ## Not refusals: sentences raised while the app is wired
 #
@@ -130,85 +121,3 @@
 # directions — forward, that each really is raised inside a constructor;
 # backward, that none is *also* raised where a request can reach it. An
 # exemption nothing verifies is a place to hide sentences that are owed.
-a beacon needs a label so its owner can tell their codes apart once several are printed and stuck to different doors
-a beacon needs the whole surface — a QR on a strip is too small for a phone to read, and an unscannable code looks broken rather than missing
-a delegation policy needs at least one phase
-a desk claims a real person staffs it, so it cannot be opened without recording who attests that and on what basis
-a device name is at most 60 characters
-a device needs a name you will recognise
-a free follow has nothing to renew
-a link label is at most 60 characters
-a link needs a label and a url
-a live view of somebody's body goes to a person, not to a synthetic profile. A profile watching a body in real time would be making judgements about it with no examination, no accountability and nobody to answer for being wrong — and unlike a still, there is no moment somebody chose to send. Invite a real person to this session, or use a still and send it to a clinician.
-a mail server host is required
-a paid subscription has to credit someone: no beneficiary means the money would accrue to nobody
-a paid subscription needs a price above zero — a free one is the 'follow' tier
-a pane with no faces is the helper button on its own — set the state to 'handle' instead
-a place needs a locality — 'somewhere' is what leaving it unset already means
-a position cannot be negative
-a post can only promote its own profile's listing
-a rated listing cannot carry a location: where a performer physically is has nothing to do with browsing them, and a place filter is a way of asking
-a rated profile can never be blended into a hybrid
-a rated profile cannot staff a department
-a review comes from somebody who actually talked to this profile — there is no interaction on record for you
-a room lends through its own routes — POST /rooms/{id}/mic. Two storage paths for one surface is how a live microphone ends up undisclosed
-a sample needs a positive duration
-a screen showing nothing is a screen turned off
-a session belongs to a place — name it
-a video link must be http or https
-a video needs a link
-a workflow needs at least one phase
-accent must be a #rrggbb colour
-an 18+ stream can only be opened by the person on it: the attestor must be the owner, attesting for themselves
-an empty image is not a picture
-an experience entry needs a title
-an imported image needs the rights to use it. Bring one you hold, generate one, or use your own room
-an invented person cannot hold the badge — there is nobody to verify
-an organization needs a name
-choose one — a preset emblem or your own image, not both
-coordination takes at least two departments — add another before asking them to coordinate
-delegating `research` requires a grant: without one the phase reads every source item on the profile
-give it a name — it is what the other people are shown
-hand over a card: `card` as JSON, or `content` as a base64 PNG with one embedded
-name what is being connected — a machine, a program, a screen
-no campaigns on a rated profile — tips to a performer go through the age-gated gift, never an open donation page
-no character card is embedded in this image — the PNG has no chara/ccv3 text chunk
-no department has an agent able to contribute — every one of them has departed, been terminated, or is under objection
-no such caller — sessions are with a real interactor, not a free-typed name
-no such department in this organization
-no such device
-no such screen
-no such subscription
-no voice consent on record for this profile
-no voice consent on record for this profile — grant it first (PUT /profiles/{id}/voiceprint/consent)
-no voiceprint for this profile — build one first
-not a PNG — a card image starts with the PNG signature
-remote control needs a written scope: what on the machine may be touched, in words the caller will be shown
-say where the money goes first — designate loved ones or organizations (PUT /profiles/{id}/proceeds) before asking anyone for it
-scope 'locality' needs a locality
-scope 'locality' needs a locality to be near
-scope 'region' needs a region
-shown_name needs the profile id to build an anonymous name — pass profile_id when the row does not carry one
-that is somebody else's likeness. An anonymous profile wearing another person's face is impersonation with a layer of deniability on top
-that post is not visible, so it cannot be watched together
-that signature authorises something else — a referral is released only by the signature raised for it
-the card carries no identity — description, personality and scenario are all empty
-the card names nobody — `data.name` is empty
-the department's agent must be a profile this organization's owner holds
-the founder is a fixed friend on every profile and cannot be removed
-the image carries a card chunk that does not decode as one
-the image could not be read — it is not base64
-there is nothing to refer yet — this releases your sessions with the specialist, and there are none
-this campaign has reached today's donation count — the tokenless door is rate-limited so it can never become a ledger-spam hose; give again tomorrow
-this deployment is reachable beyond localhost but has no QRME_ADMIN_TOKEN configured — objection review and succession stay closed until it is
-this profile depicts a real person, so an experience entry is a claim about them — record the rights basis that covers the persona before adding one
-this profile does not accept delegated workflows
-this profile is already the organization's own — staff it as a department; a lease is for somebody else's specialist
-this profile is not offered for license — a lease is licensed use, and there are no terms to lease under
-this subscription is cancelled — resubscribe instead of renewing it
-unknown avatar source — GET /avatars/market lists the import sources this deployment recognises
-unrecognized card: expected spec chara_card_v2 or chara_card_v3
-upload a picture first — 'photo' is a box with a picture in it, and there is none on this room yet
-voiceprint enrollment requires attesting the voice is your own — QRME will not clone a voice on somebody else's behalf
-workflow is not awaiting input
-you already have a hand up on this stream — one at a time, so a host reading the queue sees people rather than repeats
