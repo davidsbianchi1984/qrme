@@ -63,6 +63,7 @@ import { Access } from "./screens/Access";
 import { Matters } from "./screens/Matters";
 import { Help } from "./Help";
 import { ProblemNotice } from "./ProblemNotice";
+import { WalkAlong } from "./WalkAlong";
 import { Footsteps } from "./Footsteps";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
@@ -327,6 +328,9 @@ export function App() {
         </button>
       </aside>
 
+      {/* Above the tab switch on purpose: a conversation somebody
+          asked to carry has to outlive the screen it started on. */}
+      <WalkAlong />
       <main className="content" ref={contentRef}>
         <ProblemNotice />
         {tab === "home" && <Home go={setTab} onVisit={visitProfile}

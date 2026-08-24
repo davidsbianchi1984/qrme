@@ -78,6 +78,31 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   implied, because three fixed surfaces under a passing test would stop the
   next person looking.
 
+### Added
+
+- **A conversation you can take with you.** The chat screen unmounts on every
+  tab change and the voice went with it. That is right for navigating away and
+  wrong for walking away on purpose — the same event to React, opposite events
+  to the person: one means they left the conversation, the other means they
+  took it.
+
+      asked     did the screen unmount
+      mattered  did the person mean to end the conversation
+
+  A walking figure beside the composer hands the conversation to a strip
+  mounted above the tab switch, and it keeps listening and answering while you
+  move about the app. It is the only ear in this console that outlives its
+  screen, and it earns that on four terms the guard holds it to: nothing
+  starts it but a press, the strip says on screen that it is listening, ending
+  it is the first control there, and when the browser puts the page away and
+  ends the recogniser the strip says *that* rather than going on claiming to
+  hear. The last term is the one `away.ts` was written about — silence and
+  deafness look identical on screen and are opposite facts.
+
+  It does not survive the page being put away, and no web page can: a
+  backgrounded tab has its recogniser ended by the browser. Walking is inside
+  this application.
+
 ### Changed
 
 - **The share menu opens before the talk control** rather than after the send

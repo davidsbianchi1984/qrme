@@ -8012,6 +8012,24 @@ const CHROME: Table = {
   "chat.talk.again": {
     en: "Speak again", es: "Habla de nuevo", fr: "Parler encore", de: "Noch einmal sprechen", pt: "Falar novamente", it: "Parla di nuovo", ja: "もう一度話す", zh: "再说一次", hi: "फिर से बोलें", ar: "تحدث مرة أخرى",
   },
+  "chat.walk": {
+    en: "Take it with you", es: "Llévatelo contigo", fr: "Emmène-le avec toi", de: "Nimm es mit", pt: "Leva-o contigo", it: "Portalo con te", ja: "連れて行く", zh: "带着一起走", hi: "इसे साथ ले जाओ", ar: "خُذه معك",
+  },
+  "walk.end": {
+    en: "End", es: "Terminar", fr: "Terminer", de: "Beenden", pt: "Terminar", it: "Termina", ja: "終了", zh: "结束", hi: "समाप्त", ar: "إنهاء",
+  },
+  "walk.listening": {
+    en: "listening", es: "escuchando", fr: "à l'écoute", de: "hört zu", pt: "a ouvir", it: "in ascolto", ja: "聞いています", zh: "正在聆听", hi: "सुन रहा है", ar: "يستمع",
+  },
+  "walk.quiet": {
+    en: "not listening", es: "sin escuchar", fr: "n'écoute pas", de: "hört nicht zu", pt: "sem ouvir", it: "non in ascolto", ja: "聞いていません", zh: "未在聆听", hi: "नहीं सुन रहा", ar: "لا يستمع",
+  },
+  "walk.asleep": {
+    en: "stopped — this tab was put away", es: "detenido: esta pestaña quedó en segundo plano", fr: "arrêté — cet onglet est passé en arrière-plan", de: "gestoppt — dieser Tab wurde weggelegt", pt: "parado — este separador ficou em segundo plano", it: "fermo — questa scheda è passata in secondo piano", ja: "停止しました — このタブが背面に回りました", zh: "已停止 — 此标签页被切到后台", hi: "रुक गया — यह टैब पीछे चला गया", ar: "توقّف — أُبعدت هذه اللسان",
+  },
+  "walk.lost": {
+    en: "that did not reach it", es: "eso no llegó", fr: "cela n'est pas arrivé", de: "das kam nicht an", pt: "isso não chegou", it: "non è arrivato", ja: "届きませんでした", zh: "没有送达", hi: "वह नहीं पहुँचा", ar: "لم يصل ذلك",
+  },
   "chat.audio": {
     en: "Talk out loud", es: "Hablar en voz alta", fr: "Parler à voix haute", de: "Laut sprechen", pt: "Falar em voz alta", it: "Parlare ad alta voce", ja: "声で話す", zh: "开口说话", hi: "बोलकर बात करो", ar: "تحدّث بصوتك",
   },

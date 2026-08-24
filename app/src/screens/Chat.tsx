@@ -10,6 +10,7 @@ import { Waveform } from "../Waveform";
 import { presenceOf, presenceKey, animatedIn } from "../presence";
 import { useSession } from "../store";
 import { putAway, whenPutAway } from "../away";
+import { startWalking } from "../walk";
 
 interface Doc { id: string; name: string | null; url: string;
                 ai_marked: boolean }
@@ -1082,6 +1083,25 @@ export function Chat({ onPlans }: {
                   aria-label={tr("chat.audio", lang)}
                   className="chat-wave"
                   onClick={openTalk}>〰</button>
+        )}
+        {/* Take it with you. The only control in this console that hands an
+            ear to something outliving the screen — so it is a press, it is
+            labelled, and the strip it hands to says it is listening. */}
+        {Recognition && session.profileId && session.interactorId && (
+          <button title={tr("chat.walk", lang)}
+                  aria-label={tr("chat.walk", lang)}
+                  className="chat-walkbtn"
+                  onClick={() => {
+                    setTalking(false);
+                    window.speechSynthesis?.cancel();
+                    startWalking({
+                      profileId: session.profileId || "",
+                      shownName: shownName || "",
+                      interactorId: session.interactorId || "",
+                      interactorToken: session.interactorToken || "",
+                      lang,
+                    });
+                  }}>🚶</button>
         )}
       </div>
     </div>
