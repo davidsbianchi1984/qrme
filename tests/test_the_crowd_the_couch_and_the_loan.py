@@ -24,6 +24,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 import clientpaths  # noqa: E402
+from . import ratchets, shelltables
 
 REPO = Path(__file__).resolve().parent.parent
 
@@ -193,25 +194,13 @@ def test_the_crowd_speaks_ten_languages_on_every_shell(client):
     lost a language and the test stayed green. So the key list is read
     off the iOS table and required, complete, on all three shells — which
     also catches a key present on one shell and absent on another."""
-    shells = {
-        "ios": REPO / "native/ios/Sources/L10n.swift",
-        "android": (REPO / "native/android/app/src/main/java/app/qrme/"
-                           "studio/L10n.kt"),
-        "windows": REPO / "native/windows/L10n.cs",
-    }
-    langs = ("es", "fr", "de", "pt", "it", "ja", "zh", "hi", "ar")
-    ios_src = shells["ios"].read_text(encoding="utf-8")
-    keys = sorted(set(re.findall(
-        r'"((?:crowd|party|lend)\.[a-z.]+)":', ios_src)))
-    assert len(keys) >= 45, f"the iOS table lost rows: {len(keys)}"
-    for shell, path in shells.items():
-        src = path.read_text(encoding="utf-8")
-        for key in keys:
-            row = re.search(rf'"{re.escape(key)}"[^\n]*', src)
-            assert row, f"{shell}: missing {key}"
-            for lang in langs:
-                assert f'"{lang}"' in row.group(0), \
-                    f"{shell}: {key} missing {lang}"
+    keys = shelltables.ios_keys("crowd")
+    assert len(keys) >= ratchets.floor("l10n.block.crowd"), \
+        f"the iOS table lost rows: {len(keys)}"
+    problems = shelltables.missing_rows(keys)
+    assert not problems, (
+        f"{len(problems)} gap(s) in the shell tables:\n    "
+        + "\n    ".join(problems[:12]))
 
 
 def test_the_seek_field_earned_its_label(client):

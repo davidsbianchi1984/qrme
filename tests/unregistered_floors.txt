@@ -1,5 +1,5 @@
-# status: backlog — 61 rows
-# ceiling: 61
+# status: backlog — 50 rows
+# ceiling: 50
 #
 # Every numeric floor in this suite still carrying its own literal: an
 # `assert <something> > <int>` with the number written into the assertion.
@@ -101,36 +101,27 @@ test_starter_profiles.py:15: len(industries) >= 30
 test_termination_revokes_more_than_the_owners_token.py:154: len(found) >= 7
 test_the_body_market.py:65: len(c['robots']) >= 30
 test_the_body_market.py:67: len(c['by_maker']) >= 15
-test_the_body_the_case_and_the_lobby.py:183: len(keys) >= 45
 test_the_body_the_native_clients_send.py:358: matched >= 155
 test_the_body_the_route_requires.py:246: len(writes) >= 185
 test_the_body_the_route_requires.py:247: len(readable) >= 155
 test_the_body_the_route_requires.py:254: len(models) >= 160
 test_the_body_the_route_requires.py:264: matched >= 150
-test_the_crowd_the_couch_and_the_loan.py:206: len(keys) >= 45
 test_the_desktop_and_the_phone_say_different_things.py:302: len(shared) > 120
-test_the_face_it_shows_the_world.py:251: len(keys) >= 43
 test_the_files_the_release_never_touched.py:272: len(sorted(REPO.glob('native/ios/Sources/**/*.swift'))) >= 40
 test_the_files_the_release_never_touched.py:273: len(sorted(REPO.glob('native/android/**/*.kt'))) >= 10
 test_the_key_the_server_never_sends.py:221: len(vocabulary) >= 500
 test_the_keys_the_android_client_reads.py:359: len(reads) >= 165
 test_the_keys_the_android_client_reads.py:360: sum((len(k) for _, k in reads)) >= 370
 test_the_keys_the_android_client_reads.py:383: len(driven) >= 80
-test_the_keys_the_till_and_the_lifeline.py:284: len(keys) >= 40
-test_the_last_doors.py:301: len(keys) >= 42
-test_the_member_that_isnt_there.py:329: len(_declared(lang, REPO / decl)) >= 5
-test_the_member_that_isnt_there.py:338: len(keys) >= 12
-test_the_member_that_isnt_there.py:339: len(used) >= 10
+test_the_member_that_isnt_there.py:343: len(keys) >= 12
+test_the_member_that_isnt_there.py:344: len(used) >= 10
 test_the_nav_is_translated_and_nothing_behind_it_is.py:227: len(nav) >= 40
 test_the_nav_is_translated_and_nothing_behind_it_is.py:253: len(nav_ids) >= 40
 test_the_objector_cannot_read_their_own_case.py:151: len(handlers) >= 8
-test_the_place_the_camera_the_org_and_the_tour.py:134: len(keys) >= 44
-test_the_record_the_veil_and_the_exit.py:266: len(keys) >= 40
 test_the_refusal_has_somewhere_to_send_you.py:187: app.count('onPlans={toPlans}') >= 20
 test_the_refusal_names_the_field_on_the_form.py:104: len(found) >= 200
 test_the_refusal_that_handed_the_body_back.py:157: len(found) > 150
 test_the_refusal_that_handed_the_body_back.py:161: reached > 100
-test_the_seal_the_mail_and_the_screen.py:282: len(keys) >= 46
 test_the_shape_the_client_expects.py:309: len(driven) >= 30
 test_the_shape_the_client_expects.py:322: len(names) >= 490
 test_the_shape_the_console_expects.py:457: len(driven) >= 60
@@ -139,10 +130,8 @@ test_the_shells_table_answers_every_reader.py:107: len(_rows(shell)) >= 200
 test_the_starters_know_their_trade.py:140: len(tags) >= 8
 test_the_starters_know_their_trade.py:69: len(d['expertise']) >= 350
 test_the_starters_know_their_trade.py:72: len(d['services']) >= 250
-test_the_sticker_the_queue_and_the_stamp.py:283: len(keys) >= 34
 test_the_stranger_has_a_language_too.py:118: len(keys) > 15
 test_the_strangers_language_on_a_phone.py:427: len(text) > 800
 test_the_tabs_are_translated_and_the_screens_are_not.py:554: english + calls >= 50
 test_the_tabs_are_translated_and_the_screens_are_not.py:775: len(rows) >= 10
-test_the_workshop_in_the_pocket.py:274: len(keys) >= 49
 test_two_questions_a_mark_answers.py:196: len(why) > 40

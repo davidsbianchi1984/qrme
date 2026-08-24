@@ -26,6 +26,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 import clientpaths  # noqa: E402
+from . import ratchets, shelltables
 
 REPO = Path(__file__).resolve().parent.parent
 
@@ -121,22 +122,10 @@ def test_every_shell_has_doors_on_all_four_blocks(client):
 def test_the_place_speaks_ten_languages_on_every_shell(client):
     """Every place/cam/org/tut key the iOS table carries, complete on all
     three shells — the full-list rule the 0.43.2 injection taught."""
-    shells = {
-        "ios": REPO / "native/ios/Sources/L10n.swift",
-        "android": (REPO / "native/android/app/src/main/java/app/qrme/"
-                           "studio/L10n.kt"),
-        "windows": REPO / "native/windows/L10n.cs",
-    }
-    langs = ("es", "fr", "de", "pt", "it", "ja", "zh", "hi", "ar")
-    ios_src = shells["ios"].read_text(encoding="utf-8")
-    keys = sorted(set(re.findall(
-        r'"((?:place|cam|org|tut)\.[a-z.]+)":', ios_src)))
-    assert len(keys) >= 44, f"the iOS table lost rows: {len(keys)}"
-    for shell, path in shells.items():
-        src = path.read_text(encoding="utf-8")
-        for key in keys:
-            row = re.search(rf'"{re.escape(key)}"[^\n]*', src)
-            assert row, f"{shell}: missing {key}"
-            for lang in langs:
-                assert f'"{lang}"' in row.group(0), \
-                    f"{shell}: {key} missing {lang}"
+    keys = shelltables.ios_keys("place")
+    assert len(keys) >= ratchets.floor("l10n.block.place"), \
+        f"the iOS table lost rows: {len(keys)}"
+    problems = shelltables.missing_rows(keys)
+    assert not problems, (
+        f"{len(problems)} gap(s) in the shell tables:\n    "
+        + "\n    ".join(problems[:12]))

@@ -292,7 +292,97 @@ def _validation_messages() -> int:
     return len(i18n._VALIDATION)
 
 
+# -- the shell translation blocks -------------------------------------------
+#
+# Ten tests each owned a prefix group and a hand-set floor on it, in ten
+# copies of the same twenty lines. `shelltables.py` holds the reader now and
+# these hold the numbers.
+#
+# Worth recording what measuring them found, because it is not what the rest
+# of this paydown found: every one was already in band, ratios 0.71 to 1.00,
+# three of them exactly at their own count. They keep those floors rather than
+# being recomputed to four-fifths — lowering a guard that holds tight to
+# satisfy a convention about where floors usually sit would be following the
+# rule off a cliff.
+#
+#     asked     is this floor unregistered
+#     mattered  is this floor wrong
+#
+# The backlog counts the first. It has never counted the second, and the two
+# sets overlap less than the shrinking of one suggests about the other.
+
+
+def _l10n_block(group: str):
+    def go() -> int:
+        from . import shelltables
+        return len(shelltables.ios_keys(group))
+    return go
+
+
+# -- what each receiver declares --------------------------------------------
+#
+# `RECEIVERS` already carries a floor per receiver, and
+# `test_the_scan_reads_every_receiver` uses it — for the *reached* count. The
+# line above it floored the *declared* count at a blanket 5, for receivers
+# holding between eight and one thousand two hundred and fifty-two members.
+#
+#     asked     did the scan read this receiver
+#     mattered  did it read enough of it to be reading it at all
+#
+# The number was in the data the whole time; the tuple's own floor sits one
+# line below, doing this job for the other half of the check. Two quantities,
+# one of them measured per receiver and one of them guessed at once for all of
+# them — which is the same defect as a value handed to a function that never
+# reads it, and this estate has now found that shape four times in a day.
+
+
+def _receiver_declared(label: str):
+    def go() -> int:
+        from . import test_the_member_that_isnt_there as m
+        for row in m.RECEIVERS:
+            if row[0] == label:
+                return len(m._declared(row[1], m.REPO / row[2]))
+        raise KeyError(f"no receiver labelled {label!r}")
+    return go
+
+
 RATCHETS: tuple[Ratchet, ...] = (
+    Ratchet("receiver.declared.ios.state", 16, _receiver_declared("ios/state"),
+            "the members ios/state declares"),
+    Ratchet("receiver.declared.ios.api", 1026, _receiver_declared("ios/api"),
+            "the members ios/api declares"),
+    Ratchet("receiver.declared.ios.theme", 12, _receiver_declared("ios/theme"),
+            "the members ios/theme declares"),
+    Ratchet("receiver.declared.android.state", 17, _receiver_declared("android/state"),
+            "the members android/state declares"),
+    Ratchet("receiver.declared.android.api", 958, _receiver_declared("android/api"),
+            "the members android/api declares"),
+    Ratchet("receiver.declared.android.theme", 14, _receiver_declared("android/theme"),
+            "the members android/theme declares"),
+    Ratchet("receiver.declared.windows.state", 15, _receiver_declared("windows/state"),
+            "the members windows/state declares"),
+    Ratchet("receiver.declared.windows.api", 768, _receiver_declared("windows/api"),
+            "the members windows/api declares"),
+    Ratchet("l10n.block.lobby", 45, _l10n_block("lobby"),
+            "the bot/refer/object/lobby/dock keys the iOS table carries"),
+    Ratchet("l10n.block.crowd", 45, _l10n_block("crowd"),
+            "the crowd/party/lend keys the iOS table carries"),
+    Ratchet("l10n.block.face", 43, _l10n_block("face"),
+            "the avatar, emblem and steering keys the iOS table carries"),
+    Ratchet("l10n.block.till", 40, _l10n_block("till"),
+            "the acct/till/life keys the iOS table carries"),
+    Ratchet("l10n.block.lastdoors", 42, _l10n_block("lastdoors"),
+            "the born/mind/reach/lic/sens keys the iOS table carries"),
+    Ratchet("l10n.block.place", 44, _l10n_block("place"),
+            "the place/cam/org/tut keys the iOS table carries"),
+    Ratchet("l10n.block.record", 40, _l10n_block("record"),
+            "the memory, source and exit keys the iOS table carries"),
+    Ratchet("l10n.block.seal", 46, _l10n_block("seal"),
+            "the signature, mail and room keys the iOS table carries"),
+    Ratchet("l10n.block.sticker", 34, _l10n_block("sticker"),
+            "the beacon, queue and stamp keys the iOS table carries"),
+    Ratchet("l10n.block.workshop", 49, _l10n_block("workshop"),
+            "the workflow, delegation and task keys the iOS table carries"),
     Ratchet("form.asked_for", 44, _form_asked_for,
             "the request fields the form check knows a control for"),
     Ratchet("wire.declared", 524, _wire_declared,
