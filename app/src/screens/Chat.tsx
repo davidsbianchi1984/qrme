@@ -667,7 +667,7 @@ export function Chat({ onPlans }: {
                 no way to tell from the button that it was open. */}
             <button className={listening ? "" : "primary"}
                     onClick={listening ? talkStop : talkListen}>
-              {tr(listening ? "chat.talk.stop" : "chat.talk.again", lang)}
+              {listening ? tr("chat.talk.stop", lang) : tr("chat.talk.again", lang)}
             </button>
             <button className="primary" disabled={busy || !input.trim()}
                     onClick={() => { setHeard(""); send(); }}>

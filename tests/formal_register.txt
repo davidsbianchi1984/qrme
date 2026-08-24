@@ -1,12 +1,43 @@
-# status: ratchet — formal rows still to convert
+# status: at the floor — every row left is a false positive
 #
 # The register is informal: du / tú. Each row is a table and how many of its
 # strings still address the reader formally. The number never goes up.
 #
-# Spanish is finished (23 rows, not the 327 a `su`/`sus` count reported —
-# see the guard's docstring). What remains is German.
+# Spanish is finished (23 rows, not the 327 a `su`/`sus` count reported).
+# German is finished too. What is counted here is third-person `Sie`/`Ihr`
+# and one informal plural, not formal address — telling those apart takes
+# parsing German, and a detector that guessed would be worse than one that
+# counts. So they are counted, and named here instead.
 #
-app/src/l10n.ts 298
-native/android/app/src/main/java/app/qrme/studio/L10n.kt 36
-native/ios/Sources/L10n.swift 36
-native/windows/L10n.cs 41
+# The console's eighteen:
+#   ref.notes.pitch     "Ihre Worte, ihnen zugeschrieben" — *their* words
+#   rem.ask.out         "Sie hängt am Brett" — *it*, the question
+#   rbt.steer.pitch     "Sie berührt nie Identität" — *it*, the steering
+#   vis.here            "Sie sind da" — *they* are here
+#   vis.away            "Sie sind gerade weg" — *they* are away
+#   pas.token.once      "Ihr Besitzer-Token" — *their* owner token
+#   lby.to              "Ihr Link" — *their* link
+#   str.followit        "Ihr folgen" — follow *it*, the question
+#   nmd.mostpublic      "Sie trägt, an wen das Geld geht" — *it*, the read
+#   gde.written         "Sie funktionieren" — *they*, the written answers
+#   sol.declined        "Sie wird nicht erneut angeboten" — *it*, the door
+#   idn.mymem.lead      "Sie liegen auf deiner Seite" — *they*, the words
+#   ins.lendmic         "Ihnen mein Mikrofon leihen" — lend *them*
+#   ins.mark.camera     "Ihre Kamera ist an" — *their* camera
+#   prf.bc.why.locked   "Sie ist passwortgeschützt" — *it*, the briefcase
+#   prf.topfriends      "Ihre Top {n}" — *their* top n
+#   dsc.already         "Sie standen bereits" — *they* were already
+#   wave.out            "Ihre Stimme, ausgehend" — *their* voice
+#
+# The native tables' four: prf.topfriends and sol.declined (as ns.side.declined)
+# from the list above, plus
+#   org.dept.role       "Ihre Rolle" — *its* role, the department's
+#   tut.outline         "Ihren Umriss sehen" — see *its* shape
+# and, on Windows only, two more:
+#   nsig.ceremony.win   "Sie verlangt" — *it*, the ceremony
+#   prf.visit           "Ihre Seite öffnen" — open *their* page
+#
+app/src/l10n.ts 18
+native/android/app/src/main/java/app/qrme/studio/L10n.kt 4
+native/ios/Sources/L10n.swift 4
+native/windows/L10n.cs 6
