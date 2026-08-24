@@ -21,14 +21,6 @@ interface Msg { who: "you" | "assistant"; text: string; note?: string;
                  *  the local fallback wrote this instead. */
                 degradedFrom?: string | null }
 
-/** What the engine's error codes mean to somebody looking at the screen.
- *
- * Deliberately a small map rather than the raw code: `not-allowed` is not a
- * sentence, and a person who has just been refused a microphone is not the
- * person to hand a spec term to. Anything unmapped falls through to the
- * general line, which still says the ear closed rather than pretending it
- * drifted shut.
- */
 /** The designation, over the face it is the designation of.
  *
  * `Avatar.watermark` carries `line` and the type calls it "always displayed,
@@ -49,13 +41,34 @@ function TalkMark({ avatar }: { avatar: Avatar }) {
   return <span className="talk-wm">{line}</span>;
 }
 
-const EAR_TROUBLE: Record<string, string> = {
-  "not-allowed": "chat.talk.trouble.blocked",
-  "service-not-allowed": "chat.talk.trouble.blocked",
-  "audio-capture": "chat.talk.trouble.nomic",
-  "network": "chat.talk.trouble.network",
-  "start-refused": "chat.talk.trouble.nomic",
-};
+/** What the engine's error codes mean to somebody looking at the screen.
+ *
+ * `not-allowed` is not a sentence, and a person who has just been refused a
+ * microphone is not the person to hand a spec term to. Anything unrecognised
+ * falls through to the general line, which still says the ear closed rather
+ * than pretending it drifted shut.
+ *
+ * Written as a branch per key rather than a lookup table, and that is not
+ * style. A table holds its keys as data, so `tr(TABLE[x])` never shows the
+ * scanner a literal — the guard that finds strings translated into ten
+ * languages and read by nobody reported all four of these, correctly. It was
+ * the second time in one round: `chat.talk.stop` and `chat.talk.again` had
+ * just been fixed for being assembled the same way, and the repair for them
+ * reintroduced it one shape along.
+ *
+ *     asked     is the key used
+ *     mattered  can anything tell that it is used
+ */
+function earTroubleLine(why: string, lang: ReturnType<typeof visitorLang>): string {
+  if (why === "not-allowed" || why === "service-not-allowed") {
+    return tr("chat.talk.trouble.blocked", lang);
+  }
+  if (why === "audio-capture" || why === "start-refused") {
+    return tr("chat.talk.trouble.nomic", lang);
+  }
+  if (why === "network") return tr("chat.talk.trouble.network", lang);
+  return tr("chat.talk.trouble", lang);
+}
 
 export function Chat({ onPlans }: {
   /** Where a plan refusal sends somebody. Threaded in from the shell
@@ -864,7 +877,7 @@ export function Chat({ onPlans }: {
               could not reach and a defect all read as "tap to talk". */}
           {earTrouble && (
             <div className="talk-trouble muted small">
-              {tr(EAR_TROUBLE[earTrouble] || "chat.talk.trouble", lang)}
+              {earTroubleLine(earTrouble, lang)}
             </div>
           )}
           {talkAvatar && (!talkAvatar.asset || talkAvatar.placeholder) && (
