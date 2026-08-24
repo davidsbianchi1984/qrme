@@ -158,10 +158,19 @@ def test_a_superseded_session_cannot_close_the_one_that_replaced_it():
 def test_a_stop_retires_the_turn_it_stopped():
     """Otherwise the `aborted` a stop provokes arrives against the next ear."""
     src = (APP / "screens/Chat.tsx").read_text(encoding="utf-8")
-    stops = src.count("talkRec.current?.stop()") + src.count("rec?.stop()")
-    retires = src.count("earTurn.current += 1")
+    # Only the *talk* ear's stops. The composer's dictation is a second
+    # recogniser with its own handle and no turn of its own, so counting its
+    # `rec?.stop()` here reported a defect that was not one the moment
+    # dictation existed — and a guard that cries wolf is a guard somebody
+    # loosens in a hurry instead of correcting.
+    blocks = [b for b in re.split(r"\n  (?=function |useEffect\()", src)
+              if "talkRec" in b]
+    stops = sum(b.count("talkRec.current?.stop()") + b.count("rec?.stop()")
+                for b in blocks)
+    retires = sum(b.count("earTurn.current += 1") for b in blocks)
+    assert stops, "nothing stops the talk ear — has the handle been renamed?"
     assert retires >= stops, (
-        f"{stops} place(s) stop the recogniser but only {retires} retire the "
+        f"{stops} place(s) stop the talk ear but only {retires} retire the "
         "turn; a stop that does not retire its turn lets the abort it causes "
         "close the ear opened after it")
 
@@ -189,7 +198,7 @@ def test_the_ear_says_why_it_closed():
     assumed what was wrong."""
     src = (APP / "screens/Chat.tsx").read_text(encoding="utf-8")
     assert "setEarTrouble" in src, "the chat screen records no reason"
-    assert "EAR_TROUBLE" in src and "earTrouble &&" in src, (
+    assert "earTroubleLine(" in src and "earTrouble &&" in src, (
         "the reason is recorded but never rendered — which is the same as "
         "not having it")
     table = (APP / "l10n.ts").read_text(encoding="utf-8")
