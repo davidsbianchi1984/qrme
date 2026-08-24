@@ -484,7 +484,12 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         # Who is on the other side, so a profile meeting its own maker is
         # not told to treat them as a stranger. Knowledge, never authority —
         # `_OWNER_NOTE` says so in the prompt itself.
-        viewer_id=body.interactor_id)
+        viewer_id=body.interactor_id,
+        # And what they just said, which is what selects the doors of this
+        # application the prompt carries. Without it the profile still gets
+        # the consent doors and the index of names; with it, the screen they
+        # are actually asking about arrives described.
+        said=body.message)
     provider = llm.provider_for_profile(profile_id, cloud=cloud)
     # The remembrance: turns older than the window, folded down and carried,
     # so a friendship does not reset at message thirty-one. Distilled by the

@@ -151,6 +151,7 @@ def build_system_prompt(
     clinical_notes: list[dict] | None = None,
     viewer_id: str | None = None,
     among: list[dict] | None = None,
+    said: str | None = None,
 ) -> str:
     parts: list[str] = []
 
@@ -350,5 +351,22 @@ def build_system_prompt(
     # above says who this is, and this says what it can do with its hands.
     from . import composing
     parts.append(composing.GUIDANCE)
+
+    # Where it lives. Every block above says who this profile is; this one
+    # says what building it is standing in, because a profile knew
+    # everything about the person it represents and nothing about the
+    # application around it — asked where to change what it is allowed to
+    # do, a mechanic answered like a mechanic who had never seen the app.
+    #
+    #     asked     can this profile do it
+    #     mattered  can the console, and where is it
+    #
+    # Here rather than in the routes, so a profile created tomorrow has it
+    # without anybody remembering to add it — and selected against what was
+    # said rather than sent whole, because everything above this line is
+    # already competing for the model's attention with the person in front
+    # of it.
+    from . import productmap
+    parts.append(productmap.block(said or ""))
 
     return "\n\n".join(parts)

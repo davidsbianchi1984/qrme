@@ -117,6 +117,36 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   lets it be one component rather than one per surface, and it is why the
   agent's button cost a callback instead of a branch.
 
+- **Every profile knows the application it lives in.** A synthetic profile
+  knew everything about the person it represents and nothing about the place
+  it stands in. Asked *where do I change what you're allowed to do*, a
+  mechanic answered like a mechanic who had never seen the app — right for the
+  character and wrong for the moment. The agent had the same gap in a
+  different shape: told its eleven tools and nothing else, it shrugged at a
+  question about a screen sitting in the navigation bar.
+
+      asked     can this profile do it
+      mattered  can the console, and where is it
+
+  `qrme/productmap.py` is this console door by door — all sixty-eight — joined
+  to `ui_screens.txt`, the census that already answers whether a surface has a
+  drawing, so the two cannot drift and a screen added without a row fails the
+  suite in the round that adds it.
+
+  It is built into `persona.build_system_prompt` rather than into the routes,
+  so a profile created a second from now stands in the same building without
+  anybody remembering to add it. A turn carries the consent doors always —
+  what the agent may do, what has been delegated, who is allowed to know, how
+  to contest a profile that depicts you, and the way to reach a person — plus
+  the doors the message is about, plus the *names* of everything else. That
+  last part is what makes "I don't know how to do that" wrong when the screen
+  is in the navigation bar.
+
+  Two things it is explicitly not, said in the prompt itself because that is
+  the only place the model reads: naming a door is not permission to open one
+  (the delegation policy still decides), and a mechanic who can point at the
+  Permissions tab is still a mechanic.
+
 ### Changed
 
 - **The share menu opens before the talk control** rather than after the send

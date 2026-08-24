@@ -645,7 +645,7 @@ def roster() -> str:
     return "\n".join(lines)
 
 
-def system_prompt() -> str:
+def system_prompt(said: str = "") -> str:
     """What is actually sent. `SYSTEM` is the frame; this fills in the roster
     and the page vocabulary, and is what every guard about the prompt reads.
 
@@ -653,12 +653,29 @@ def system_prompt() -> str:
     are a fixed list this product publishes and not a record belonging to
     anybody — see the note in `TOOLS`. Read from `pages` rather than copied,
     so a theme added there is offered here without anybody remembering to.
+
+    `said` selects the map of the console appended below the roster. The two
+    lists answer different questions and must not be confused: the roster is
+    what this agent may *do*, and the map is what the application *has*. An
+    agent that could only speak about its eleven tools sent somebody looking
+    for the Permissions tab away empty-handed while the tab sat in the
+    navigation bar — so the map is explicitly marked as places to point at
+    rather than doors to walk through.
+
+        asked     can the agent do it
+        mattered  can the console, and where is it
     """
-    from . import pages
-    return (SYSTEM
-            .replace("{tools}", roster())
-            .replace("{themes}", ", ".join(pages.THEMES))
-            .replace("{layouts}", ", ".join(pages.LAYOUTS)))
+    from . import pages, productmap
+    prompt = (SYSTEM
+              .replace("{tools}", roster())
+              .replace("{themes}", ", ".join(pages.THEMES))
+              .replace("{layouts}", ", ".join(pages.LAYOUTS)))
+    return prompt + (
+        "\n\nSeparately from your tools — which are the only things you may "
+        "act through — here is the application this person is in, so that a "
+        "question about a screen gets the screen's name rather than a "
+        "shrug. You cannot open these; you can say where they are.\n\n"
+        + productmap.block(said))
 
 
 def tool_names() -> tuple[str, ...]:
@@ -888,7 +905,7 @@ def converse(said: str, history: list[dict], *, app, profile_id: str,
 
     steps: list[dict] = []
     for _ in range(STEPS):
-        reply = provider.generate(system_prompt(), turns)
+        reply = provider.generate(system_prompt(said), turns)
         wanted = wants_a_tool(reply)
         if wanted is None:
             return {"reply": reply.strip(), "acted": steps,
