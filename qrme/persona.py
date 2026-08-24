@@ -271,7 +271,13 @@ def build_system_prompt(
     # on every one of them — including, until `among` existed, the profile's
     # own maker.
     if among is not None:
-        said = []
+        # `seats`, not `said`. This was `said` until the walking conversation
+        # gave this function a `said` parameter, and a local list quietly
+        # shadowed it — every room turn then handed a list of seat
+        # descriptions to a selector expecting a sentence. The suite caught
+        # it; nothing about the code reads wrong at either end on its own,
+        # which is what a shadowed name does.
+        seats = []
         for who in among:
             line = who["display"]
             marks = []
@@ -284,10 +290,10 @@ def build_system_prompt(
             elif not marks:
                 marks.append("a person you do not know")
             line += " (" + ", ".join(marks) + ")"
-            said.append(line)
-        if said:
+            seats.append(line)
+        if seats:
             parts.append(
-                "In the room with you: " + "; ".join(said) + ". Lines in the "
+                "In the room with you: " + "; ".join(seats) + ". Lines in the "
                 "conversation are labelled with their speaker's name; your own "
                 "earlier turns are unlabelled. Follow who said what, answer the "
                 "person or profile you mean — by name when it helps — and never "

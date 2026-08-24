@@ -1096,9 +1096,19 @@ export function Chat({ onPlans }: {
                     window.speechSynthesis?.cancel();
                     const pid = session.profileId || "";
                     const iid = session.interactorId || "";
+                    const itok = session.interactorToken || "";
                     startWalking({
                       shownName: shownName || "",
                       lang,
+                      // How it hears out there. The browser's recogniser
+                      // is ended when the page is put away; a recording is
+                      // not, so the strip records and posts the bytes. Only
+                      // when this person holds their own token — an ear is
+                      // spent on the deployment's transcription, and a
+                      // stranger's id is not a way to spend it.
+                      ...(iid && itok ? {
+                        hears: (audio: Blob) => api.heard(iid, audio, itok),
+                      } : {}),
                       take: async (message) => {
                         const r = await api.chat(pid, {
                           interactor_id: iid, message });

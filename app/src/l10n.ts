@@ -8024,6 +8024,14 @@ const CHROME: Table = {
   "walk.quiet": {
     en: "not listening", es: "sin escuchar", fr: "n'écoute pas", de: "hört nicht zu", pt: "sem ouvir", it: "non in ascolto", ja: "聞いていません", zh: "未在聆听", hi: "नहीं सुन रहा", ar: "لا يستمع",
   },
+  // The strip's own two, for the recording path. The recogniser's failures
+  // are the browser's to name; these are the ones this path can hit.
+  "walk.nomic": {
+    en: "no microphone the browser can reach — check the device, then take the conversation again", es: "ningún micrófono al alcance del navegador: revisa el dispositivo y vuelve a llevarte la conversación", fr: "aucun micro accessible au navigateur — vérifie l'appareil, puis emmène à nouveau la conversation", de: "kein Mikrofon, das der Browser erreicht — prüf das Gerät und nimm das Gespräch dann wieder mit", pt: "nenhum microfone ao alcance do navegador — verifica o dispositivo e leva a conversa outra vez", it: "nessun microfono raggiungibile dal browser — controlla il dispositivo, poi porta di nuovo con te la conversazione", ja: "ブラウザーが使えるマイクがありません — デバイスを確認して、もう一度会話を連れて行ってください", zh: "浏览器找不到可用的麦克风 — 请检查设备，然后再次带着这段对话一起走", hi: "ब्राउज़र को कोई माइक नहीं मिला — डिवाइस देखो, फिर बातचीत को दोबारा साथ ले जाओ", ar: "لا يوجد ميكروفون في متناول المتصفّح — تحقّق من الجهاز ثم خُذ المحادثة معك مرّة أخرى",
+  },
+  "walk.aloft": {
+    en: "still listening while you're away — the browser shows it is recording", es: "sigue escuchando mientras no estás — el navegador indica que está grabando", fr: "écoute toujours pendant ton absence — le navigateur indique qu'il enregistre", de: "hört weiter zu, während du weg bist — der Browser zeigt an, dass er aufnimmt", pt: "continua a ouvir enquanto estás fora — o navegador mostra que está a gravar", it: "continua ad ascoltare mentre non ci sei — il browser segnala che sta registrando", ja: "離れている間も聞いています — ブラウザーが録音中と表示しています", zh: "你离开时仍在聆听 — 浏览器会显示正在录音", hi: "तुम्हारे दूर रहते हुए भी सुन रहा है — ब्राउज़र दिखा रहा है कि रिकॉर्ड हो रहा है", ar: "ما زال يستمع أثناء غيابك — يُظهر المتصفّح أنه يسجّل",
+  },
   "walk.asleep": {
     en: "stopped — this tab was put away", es: "detenido: esta pestaña quedó en segundo plano", fr: "arrêté — cet onglet est passé en arrière-plan", de: "gestoppt — dieser Tab wurde weggelegt", pt: "parado — este separador ficou em segundo plano", it: "fermo — questa scheda è passata in secondo piano", ja: "停止しました — このタブが背面に回りました", zh: "已停止 — 此标签页被切到后台", hi: "रुक गया — यह टैब पीछे चला गया", ar: "توقّف — أُبعدت هذه اللسان",
   },

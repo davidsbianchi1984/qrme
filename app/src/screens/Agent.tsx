@@ -846,10 +846,19 @@ export function Agent({ onPlans, go }: {
                       if (voiceMode) stopVoice();
                       const pid = session.profileId || "";
                       const tok = session.ownerToken || "";
+                      const iid = session.interactorId || "";
+                      const itok = session.interactorToken || "";
                       let thread = talk;
                       startWalking({
                         shownName: tr("agent.title", lang),
                         lang,
+                        // See Chat.tsx: the recording ear, which is the
+                        // one that survives a minimised window. The owner
+                        // token opens the authoring turn; hearing is spent
+                        // against this person's own interactor identity.
+                        ...(iid && itok ? {
+                          hears: (audio: Blob) => api.heard(iid, audio, itok),
+                        } : {}),
                         take: async (message) => {
                           const turn = await api.authoringTurn(
                             pid, message, thread, tok);

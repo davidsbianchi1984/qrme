@@ -46,6 +46,27 @@ export type Walking = {
    * lets it be one component instead of four.
    */
   take: (message: string) => Promise<Said>;
+  /** How this conversation hears, when it can hear in a way that survives
+   *  the window being minimised.
+   *
+   * The browser's own recogniser is ended when a page is put away — that is
+   * documented behaviour and `away.ts` was written about it. `getUserMedia`
+   * is not: an open capture keeps recording while the window is minimised,
+   * and the browser shows its own recording indicator throughout. So a strip
+   * that wants to survive being minimised records and posts the bytes to be
+   * turned into words, rather than listening.
+   *
+   *     asked     does a hidden page stop hearing
+   *     mattered  which of the two ways of hearing was it using
+   *
+   * A callback for the same reason `take` is one: the ear needs the
+   * person's own credential, and the screen is the only thing that has it.
+   * Optional, because a surface with nobody signed in has no credential to
+   * spend on transcription — and when it is missing the strip falls back to
+   * the recogniser and says plainly that this one stops when the window
+   * does, rather than quietly hearing nothing.
+   */
+  hears?: (audio: Blob) => Promise<string>;
 };
 
 /** What a turn came back as, and who answered it.

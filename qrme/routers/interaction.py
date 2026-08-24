@@ -1572,3 +1572,51 @@ def revoke_voiceprint(profile_id: str, request: Request) -> dict:
     profile_or_404(profile_id)
     require_owner(profile_id, request)
     return voiceprint.revoke(profile_id)
+
+
+@router.post("/interactors/{interactor_id}/heard")
+async def heard(interactor_id: str, request: Request) -> dict:
+    """Recorded speech in, words out. The audio is not stored.
+
+    The room has had this door since 1.4.2, scoped to a room, because an
+    iPhone's own recogniser exists and always refuses. This is the same door
+    without the room, and it exists for a different failure: a conversation
+    somebody took with them.
+
+        asked     can this browser hear you
+        mattered  can it still hear you once the window is minimised
+
+    The browser's recogniser is ended when a page is put away — that is the
+    documented behaviour and `away.ts` was written about it. `getUserMedia`
+    is not: an open capture keeps recording while the window is minimised,
+    and the browser shows its own recording indicator throughout. So a page
+    that wants to carry a conversation out of itself records and posts the
+    bytes here rather than listening, and this is where they land.
+
+    Deliberately **only** the hearing, exactly as the room's door is. What
+    comes back is said through whichever conversation the caller is in —
+    a profile's chat, the agent's turn — so moderation, the watermark and
+    the speaking rules stay in the one place that owns them. A route that
+    heard and answered in one breath would be a second door into every
+    conversation with its own copy of those rules to drift out of step.
+
+    Gated on the interactor's own token, like the room's. Somebody else's
+    id is not a way to spend this deployment's transcription.
+
+    A deployment with no ears answers 503 with the reason rather than an
+    empty string. Silence would read as *it didn't hear me* to somebody who
+    has just spoken into their phone, and the true answer — that this
+    deployment has nowhere to send audio — is one an owner can act on and a
+    guest cannot guess.
+    """
+    require_interactor(interactor_id, request)
+    data = await request.body()
+    if not data:
+        raise HTTPException(422, "no audio")
+    words = scrape.transcribe_bytes(data, interactor_id)
+    if words is None:
+        raise HTTPException(
+            503, "this deployment has no transcription service, so recorded "
+                 "speech cannot be turned into words — set QRME_EARS_URL, or "
+                 "type instead")
+    return {"text": words["text"]}

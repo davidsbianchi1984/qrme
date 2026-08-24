@@ -47,11 +47,34 @@ targets:
           sent.
         # Required before AVAudioRecorder may run, for the same reason: iOS
         # kills the app if the mic opens without it. Voice enrollment records
-        # to this app's container and sends only the measurements.
+        # to this app's container and sends only the measurements — and a
+        # conversation taken along keeps the microphone open while the person
+        # is in other apps, which this string has to say too. It is what
+        # somebody reads in Settings months later, and describing only the
+        # gentler half would be true of one feature and false of the product.
         NSMicrophoneUsageDescription: >-
           QRME records a sample of your own voice so your profile can speak in
-          it, with your permission. The recording stays on this device; only
-          how long it ran and how many turns it held are sent.
+          it, with your permission — and, if you choose to take a conversation
+          with you, listens while you are in other apps. iOS shows an orange
+          dot in the status bar for as long as it is listening, and the
+          conversation ends the moment you end it.
+        # Speech recognition is its own permission, and its own refusal.
+        NSSpeechRecognitionUsageDescription: >-
+          QRME turns what you say into words so a profile can answer. On
+          phones that support it this happens on the device, and the audio
+          does not leave your phone.
+        # The conversation you took with you, out of the app entirely.
+        #
+        #     asked     can the conversation survive a screen change
+        #     mattered  can it survive leaving the application
+        #
+        # `audio` is what lets an active AVAudioSession keep running once
+        # this app is no longer on screen. The orange indicator the system
+        # then draws is the point rather than a side effect: it is the
+        # difference between a conversation somebody is carrying and an app
+        # recording them after they left it.
+        UIBackgroundModes:
+          - audio
         # Allow http://127.0.0.1:8000 in the Simulator (local dev backend).
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true

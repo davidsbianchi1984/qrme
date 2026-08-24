@@ -75,6 +75,16 @@ class MainActivity : ComponentActivity() {
 @androidx.compose.runtime.Composable
 private fun HomeShell(vm: StudioViewModel) {
     var tab by remember { mutableIntStateOf(0) }
+    // Pressing walk lands on the front page. Here rather than in the screen
+    // that offers the button: the shell owns navigation, and a screen that
+    // set the tab itself would be a second definition of where the front
+    // door is.
+    //
+    //     asked     did the conversation survive
+    //     mattered  can they now go anywhere
+    androidx.compose.runtime.LaunchedEffect(Walking.landings) {
+        if (Walking.landings > 0) tab = 0
+    }
     val tabs = listOf(
         Triple(L10n.t("tab.overview", vm.language), Icons.Filled.GridView, 0),
         Triple(L10n.t("tab.chat", vm.language), Icons.Filled.Chat, 1),

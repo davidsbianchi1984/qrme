@@ -259,3 +259,92 @@ def test_the_profile_walk_reads_its_own_wire():
     assert "r.provenance" in call, (
         "the walk reads provenance off the message rather than off the "
         "reply, where the record of who wrote it lives")
+
+
+# ---------------------------------------------------------------------------
+# The ear that survives a minimised window, and the correction behind it.
+#
+# This file first held that the strip could not survive being put away, and
+# that a minimised browser was a native shell's problem. That was half right
+# and the wrong half was load-bearing.
+#
+# `away.ts` is correct that a backgrounded page has its *recogniser* ended by
+# the browser. It is not correct about `getUserMedia`: an open capture keeps
+# the tab alive, keeps recording while the window is minimised, and makes the
+# browser show its own recording indicator throughout — the same bargain iOS
+# makes with its orange dot.
+#
+#     asked     does a hidden page stop hearing
+#     mattered  which of the two ways of hearing was it using
+#
+# So the strip records where it can, and the recogniser is the fallback that
+# says what it costs rather than the default that does not.
+
+
+def test_the_strip_records_where_it_can():
+    assert "MediaRecorder" in STRIP and "getUserMedia" in STRIP, (
+        "the strip has only the recogniser, which is ended by the browser "
+        "the moment the window is minimised")
+    assert "w.hears" in STRIP or "who.hears" in STRIP, (
+        "nothing uses the way of hearing the screen handed over")
+    # The choice is made, not hoped for.
+    assert "if (who.hears) void record(who); else listen(who);" in STRIP, (
+        "the strip does not prefer the surviving path when it has one")
+
+
+def test_being_put_away_closes_only_the_path_the_browser_closes():
+    """The correction, held in place. Closing the recorder here would be the
+    component inventing a failure the browser did not have; leaving the
+    recogniser open would be claiming to hear when it cannot."""
+    i = STRIP.index("whenPutAway(")
+    depth, j = 0, i
+    while j < len(STRIP):
+        if STRIP[j] == "(":
+            depth += 1
+        elif STRIP[j] == ")":
+            depth -= 1
+            if depth == 0:
+                break
+        j += 1
+    call = STRIP[i:j + 1]
+    assert "!walking()?.hears" in call, (
+        "being put away closes the ear whatever kind it is — one of the two "
+        "survives, and closing it is inventing a failure the browser did "
+        "not have")
+    assert 'tr("walk.aloft"' in STRIP, (
+        "the strip cannot say it is still listening while the window is "
+        "minimised, which leaves the person with no idea the microphone is "
+        "open")
+    assert 'tr("walk.asleep"' in STRIP, (
+        "the strip cannot say it stopped, which is still the truth for the "
+        "recogniser path")
+
+
+def test_the_ear_is_spent_against_the_persons_own_identity():
+    """Transcription costs the deployment something, and a route that took
+    any id would be a way for a stranger to spend it."""
+    for name, src in _surfaces().items():
+        call = _braced(src, src.index("startWalking({") + len("startWalking("))
+        assert "api.heard(iid, audio, itok)" in call, (
+            f"{name} hands over an ear that does not carry this person's "
+            "own token")
+        assert "iid && itok" in call, (
+            f"{name} hands over an ear even with no identity to spend it "
+            "against, so the walk starts and the first thing said is refused")
+
+
+def test_the_route_is_gated_on_that_identity():
+    router = (_repo() / "qrme" / "routers" / "interaction.py").read_text(
+        encoding="utf-8")
+    i = router.index('@router.post("/interactors/{interactor_id}/heard")')
+    body = router[i:i + 2600]
+    assert "require_interactor(interactor_id, request)" in body, (
+        "the general ear is not gated on the interactor's own token, so any "
+        "id is a way to spend this deployment's transcription")
+    # The raise, not the number. The docstring above the route explains the
+    # 503, so asserting the digits passed with the route returning an empty
+    # string and the prose still describing a refusal it no longer makes.
+    assert "raise HTTPException(\n            503," in body, (
+        "a deployment with no ears does not refuse — silence reads as *it "
+        "didn't hear me* to somebody who has just spoken into their phone, "
+        "and the true answer is one an owner can act on")

@@ -64,6 +64,7 @@ import { Matters } from "./screens/Matters";
 import { Help } from "./Help";
 import { ProblemNotice } from "./ProblemNotice";
 import { WalkAlong } from "./WalkAlong";
+import { onWalk } from "./walk";
 import { Footsteps } from "./Footsteps";
 import { VersionGuard } from "./VersionGuard";
 import { WatchLights } from "./WatchLights";
@@ -145,6 +146,23 @@ const NAV_GROUPS = ["community", "profile", "create", "business",
 export function App() {
   const { session, signOut } = useSession();
   const [tab, setTab] = useState<Tab>("home");
+
+  // Pressing walk lands on the front page.
+  //
+  // The point of taking a conversation with you is going somewhere, and the
+  // screen you were on is the one place you have finished with. Leaving
+  // somebody on the chat screen with the strip lit means the first thing
+  // they do is find their way out of it; the overview is where the whole
+  // console is reachable from, and from there the app itself is one swipe
+  // from being left behind.
+  //
+  //     asked     did the conversation survive
+  //     mattered  can they now go anywhere
+  //
+  // Here rather than in the four screens that offer the button: the shell
+  // owns navigation, and a screen that set the tab itself would be a second
+  // definition of where the front door is.
+  useEffect(() => onWalk((w) => { if (w) setTab("home"); }), []);
   // The scroll container. Every tab change lands at the top of the new
   // screen — a field report opened menus "pinned in the middle somewhere",
   // because the pane kept the previous screen's scroll position.

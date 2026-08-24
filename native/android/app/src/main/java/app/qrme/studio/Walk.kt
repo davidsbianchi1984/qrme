@@ -87,6 +87,17 @@ object Walking {
     var trouble by mutableStateOf("")
         internal set
 
+    /** Bumped every time a walk begins, so the shell can land the person on
+     *  the front page. The point of taking a conversation with you is going
+     *  somewhere, and the screen you were on is the one place you have
+     *  finished with.
+     *
+     *  A counter rather than a flag: a second walk started from the front
+     *  page must still land there, and a boolean already true would say
+     *  nothing happened. */
+    var landings by mutableStateOf(0)
+        internal set
+
     /** True when the last turn was answered by the local fallback rather
      *  than by the model this profile is set to. Not a failure — a
      *  deployment with no key still answers — but not the voice somebody
@@ -200,6 +211,7 @@ class WalkService : Service() {
         goForeground()
         Walking.underway = true
         Walking.trouble = ""
+        Walking.landings += 1
         speaker = TextToSpeech(this) { }.also {
             it.language = Locale.forLanguageTag(lang)
         }

@@ -354,3 +354,38 @@ def test_the_agent_branch_makes_no_claim_about_who_answered():
     assert "fromStore" not in agent, (
         "the agent's branch decides who answered, and its wire does not "
         "report that")
+
+
+# ---------------------------------------------------------------------------
+# iOS: the other bargain.
+#
+# Android suspends an app when it leaves the screen and charges a foreground
+# service with a notification that cannot be dismissed. iOS charges the
+# `audio` background mode and draws the indicator itself — better, because a
+# person learns one orange dot for every app rather than one notification per
+# app.
+#
+#     asked     can the conversation survive a screen change
+#     mattered  what does this platform charge for it
+
+IOS_SPEC = REPO / "native/ios/project.yml"
+
+
+def test_ios_declares_the_background_mode_and_both_permissions():
+    spec = IOS_SPEC.read_text(encoding="utf-8")
+    assert "UIBackgroundModes" in spec and "- audio" in spec, (
+        "iOS is not declared as a background audio app, so the session is "
+        "torn down the moment the app leaves the screen and the walk ends "
+        "without saying why")
+    assert "NSSpeechRecognitionUsageDescription" in spec, (
+        "speech recognition is its own permission on iOS, and an app that "
+        "asks for it without a string is killed on the spot")
+    # The microphone string has to describe the walking case too. It is what
+    # somebody reads in Settings months later, and describing only voice
+    # enrollment would be true of one feature and false of the product.
+    i = spec.index("NSMicrophoneUsageDescription:")
+    said = spec[i:spec.index("NSSpeechRecognitionUsageDescription:", i)]
+    assert "other apps" in said, (
+        "the microphone permission string describes only voice enrollment; "
+        "the app also listens while the person is elsewhere, and this string "
+        "is where they find that out")

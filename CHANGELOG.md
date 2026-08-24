@@ -162,6 +162,39 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   (the delegation policy still decides), and a mechanic who can point at the
   Permissions tab is still a mechanic.
 
+- **The web version survives a minimised window too.** This entry used to say
+  it could not, and that a minimised browser was a native shell's problem.
+  That was half right and the wrong half was load-bearing.
+
+  `away.ts` is correct that a backgrounded page has its *recogniser* ended by
+  the browser. It is not correct about `getUserMedia`: an open capture keeps
+  the tab alive, keeps recording while the window is minimised, and makes the
+  browser show its own recording indicator throughout — the same bargain iOS
+  makes with its orange dot.
+
+      asked     does a hidden page stop hearing
+      mattered  which of the two ways of hearing was it using
+
+  So the strip records where it can and posts the bytes to a new general ear,
+  `POST /interactors/{id}/heard` — the room's door of the same name without a
+  room around it, gated on the person's own token, because transcription costs
+  the deployment something and a stranger's id is not a way to spend it. Being
+  put away now closes the recogniser and not the recorder, because the browser
+  closes one and not the other, and the strip says *still listening while
+  you're away* rather than stopping.
+
+  A deployment with no ears refuses in its own sentence. Silence would read as
+  *it didn't hear me* to somebody who has just spoken into their phone.
+
+- **Pressing walk lands on the front page**, so the app is navigable from
+  there and one swipe from being left behind. In the shell rather than the
+  screens with the button, because the shell owns navigation.
+
+- **iOS carries it out of the app**, with `UIBackgroundModes: audio`, both
+  usage strings, and the microphone one rewritten to describe the walking case
+  rather than only voice enrollment — it is what somebody reads in Settings
+  months later. **Not compiled**: there is no Swift toolchain here.
+
 - **On the phone the conversation leaves the application entirely.** The
   console's walk-along strip stops when the browser puts the page away, and no
   web page can do better. An installed app can, and the Android shell now

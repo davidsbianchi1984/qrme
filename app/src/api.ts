@@ -5178,6 +5178,31 @@ export const api = {
    *  of bytes, and base64 through JSON would cost a third more of somebody's
    *  data for nothing. 503 is a real answer here (no ears configured) and
    *  reaches the caller as a `RequestError` with the sentence to show. */
+  /** Recorded speech in, words out, with no room around it.
+   *
+   *  `heardInRoom` below is the same door scoped to a room. This one exists
+   *  for a conversation somebody took with them: the browser's own
+   *  recogniser is ended when a page is put away, and `getUserMedia` is not
+   *  — an open capture keeps recording while the window is minimised. So a
+   *  strip that wants to survive being minimised records and posts the bytes
+   *  rather than listening.
+   *
+   *  Raw body, like the room's: the audio is a file of bytes, and base64
+   *  through JSON would cost a third more of somebody's data for nothing.
+   *  503 is a real answer (no ears configured) and reaches the caller as a
+   *  `RequestError` carrying the sentence to show. */
+  heard: async (interactorId: string, audio: Blob, token: string) => {
+    const res = await fetch(getBase() +
+      `/interactors/${encodeURIComponent(interactorId)}/heard`,
+      { method: "POST", body: audio,
+        headers: { authorization: `Bearer ${token}` } });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new RequestError(res.status,
+        (body as { detail?: string }).detail || "that could not be heard");
+    }
+    return (body as { text?: string }).text || "";
+  },
   heardInRoom: async (roomId: string, interactorId: string, audio: Blob,
                       token: string) => {
     const res = await fetch(getBase() +
