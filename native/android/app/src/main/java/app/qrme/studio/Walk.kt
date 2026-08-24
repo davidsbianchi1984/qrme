@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.media.MediaPlayer
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
@@ -19,6 +20,7 @@ import android.speech.tts.TextToSpeech
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -170,6 +172,10 @@ class WalkService : Service() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var recogniser: SpeechRecognizer? = null
     private var speaker: TextToSpeech? = null
+    /** The profile's own voice. Held, so leaving ends it with everything
+     *  else — a bound voice talking on under a stopped walk is the same
+     *  defect as an indicator that outlives the microphone. */
+    private var player: MediaPlayer? = null
     private var kind: String = KIND_PROFILE
     /** The agent's thread. It keeps no memory of its own — which is the
      *  cheaper design and the one where *forget this* is something a person
@@ -392,7 +398,7 @@ class WalkService : Service() {
                     Walking.said = L10n.t("walk.lost", lang)
                 } else {
                     Walking.said = text
-                    speaker?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "walk")
+                    sayAloud(text)
                 }
                 // The notification is the only surface a person walking
                 // about has. Rewritten under the same id rather than posted
@@ -410,6 +416,75 @@ class WalkService : Service() {
         }
     }
 
+    /**
+     * Say it in the profile's own voice, and fall back to the phone's only
+     * when there is no such voice to be had.
+     *
+     * This is the point of the product, and the walk was missing it. The
+     * first draft called [TextToSpeech] and stopped there — the generic
+     * Android voice, for a profile whose whole identity includes how it
+     * sounds, while `ApiClient.saySpoken` sat in the same package returning
+     * watermarked audio in the bound voice and nothing called it. A field
+     * report on the web strip put it plainly: *the voice is robotic again,
+     * it should be my voice when I'm talking to my AI*. That was the strip;
+     * this is the same thing out here, and JIM-mini's three shells had it as
+     * well.
+     *
+     *     asked     did the reply get spoken
+     *     mattered  in whose voice
+     *
+     * Both kinds go through it. An agent carries a profile id too, and a
+     * deployment that bound a voice to that profile meant it to be used.
+     *
+     * The direction of the fallback is load-bearing: a bound voice that
+     * fails must not leave silence, because the words are already on the
+     * notification. The phone's own voice used *first* would be a different
+     * thing — it never fails, so the bound voice would never be reached and
+     * nobody would find out it was configured.
+     *
+     * The turn number rides along because this is a network call now. Audio
+     * that arrives after the person has moved on must not talk over the turn
+     * that replaced it — the rule the ear in this file already knows.
+     */
+    private fun sayAloud(text: String) {
+        val mine = turn
+        scope.launch {
+            val audio = try {
+                if (profileId.isEmpty() || token.isEmpty()) null
+                else ApiClient.saySpoken(profileId, token, text)
+                    .takeIf { it.isNotEmpty() }
+            } catch (_: Exception) {
+                null
+            }
+            withContext(Dispatchers.Main) {
+                if (mine != turn || !wants) return@withContext
+                if (audio == null) {
+                    speaker?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "walk")
+                    return@withContext
+                }
+                try {
+                    val file = File.createTempFile("walk", ".mp3", cacheDir)
+                    file.writeBytes(audio)
+                    player?.release()
+                    player = MediaPlayer().apply {
+                        setDataSource(file.absolutePath)
+                        // Deleted when it finishes rather than kept. A
+                        // watermarked utterance in somebody's enrolled voice
+                        // is not a thing to leave lying in a cache.
+                        setOnCompletionListener {
+                            release(); file.delete()
+                            if (player === this) player = null
+                        }
+                        prepare()
+                        start()
+                    }
+                } catch (_: Exception) {
+                    speaker?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "walk")
+                }
+            }
+        }
+    }
+
     private fun close(reason: String) {
         wants = false
         turn += 1
@@ -418,6 +493,8 @@ class WalkService : Service() {
         speaker?.stop()
         speaker?.shutdown()
         speaker = null
+        try { player?.release() } catch (_: Exception) { }
+        player = null
         thread.clear()
         Walking.underway = false
         Walking.offline = false

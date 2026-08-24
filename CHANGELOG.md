@@ -63,6 +63,29 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   registered in `shared_guards.txt`, so the next round cannot fix one and
   forget the other two.
 
+- **The voice the profile was given.** Reported against the web strip from a
+  Windows machine — *the voice is robotic again, it should be my voice when
+  I'm talking to my AI*. The strip was fixed and the Android shell was never
+  asked the same question. It had it: `TextToSpeech`, the generic phone voice,
+  for a profile whose whole identity includes how it sounds, while
+  `ApiClient.saySpoken` sat in the same package returning watermarked audio in
+  the bound voice and nothing called it.
+
+      asked     did the reply get spoken
+      mattered  in whose voice
+
+  Both kinds go through the bound voice now — an agent carries a profile id
+  too, and a deployment that bound a voice to that profile meant it to be
+  used. The phone's own voice is the fallback and never the first choice: it
+  cannot fail, so putting it first makes the bound voice unreachable. The
+  audio is deleted when the utterance finishes rather than cached, because a
+  watermarked recording in somebody's enrolled voice is not a thing to leave
+  lying on a disk.
+
+  JIM-mini's three shells had the identical gap and were fixed the same round.
+  Four surfaces, one defect, found once by somebody using it and carried
+  nowhere until now.
+
 - **A guard on the claim about the platform.** The sentence above — an open
   capture keeps recording while the window is minimised — was written as a
   universal in every console that hears, and one docstring offered iOS as the

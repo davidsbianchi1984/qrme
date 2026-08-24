@@ -389,3 +389,82 @@ def test_ios_declares_the_background_mode_and_both_permissions():
         "the microphone permission string describes only voice enrollment; "
         "the app also listens while the person is elsewhere, and this string "
         "is where they find that out")
+
+
+# ---------------------------------------------------------------------------
+# The voice.
+#
+# Reported from a Windows machine against the web strip, in these words: *the
+# voice is robotic again, it should be my voice when I'm talking to my AI*.
+# The strip was fixed and nobody asked the shell the same question. It had it
+# — `TextToSpeech`, the generic Android voice, for a profile whose whole
+# identity includes how it sounds — while `ApiClient.saySpoken` sat in the
+# same package returning watermarked audio in the bound voice, uncalled.
+#
+#     asked     did the reply get spoken
+#     mattered  in whose voice
+#
+# JIM-mini's three shells had the identical gap and were fixed in the same
+# round. Four surfaces, one defect, found once and carried nowhere until
+# somebody using it said so.
+
+
+def test_the_walk_asks_for_the_voice_the_profile_was_given():
+    """The bound voice is reachable, and the phone's own is still there."""
+    src = SERVICE.read_text(encoding="utf-8")
+    assert "ApiClient.saySpoken" in src, (
+        "the walk never asks for the profile's bound voice — it speaks every "
+        "profile in the same generic Android voice, which is the product's "
+        "own point missed out here")
+    assert "speaker?.speak(" in src and "TextToSpeech" in src, (
+        "the walk has no fallback voice; a deployment with no speaking "
+        "service would go silent, and silence is the wrong failure when the "
+        "words are already on the notification")
+
+
+def test_the_phones_own_voice_is_the_fallback_and_not_the_first_choice():
+    """The direction, not merely the presence, of the fallback.
+
+    Both calls being in the file proves nothing on its own: a walk that says
+    it with the phone's voice *first* has both, never fails, never reaches
+    the bound one, and nobody ever finds out it was configured.
+
+        asked     can this shell reach the bound voice
+        mattered  does it, before the one that cannot fail
+
+    Compared as *calls* rather than as names. The first draft of the sibling
+    guard in JIM-mini compared against the type `TextToSpeech`, whose first
+    appearance in a Kotlin file is the import line near the top — so every
+    shell read as fallback-first and the ordering check measured nothing but
+    where imports live. A name where a use was meant, in the guard written
+    against exactly that.
+    """
+    code = _without_comments(SERVICE.read_text(encoding="utf-8"))
+    served, spoken = "ApiClient.saySpoken", "speaker?.speak("
+    assert served in code and spoken in code, (
+        "one of the two voices is named only in a comment — a call that "
+        "exists in prose is not a call")
+    assert code.index(served) < code.index(spoken), (
+        "the walk reaches the phone's own voice before the bound one. The "
+        "built-in never fails, so the bound voice is unreachable and a "
+        "profile's configured voice would never be heard.")
+
+
+def _without_comments(src: str) -> str:
+    """Source with `//`, `/** */` and `/* */` comments removed.
+
+    A guard about what the code reaches must not be decided by prose that
+    names the same symbols while explaining the rule.
+    """
+    out, i, n = [], 0, len(src)
+    while i < n:
+        if src.startswith("/*", i):
+            j = src.find("*/", i + 2)
+            i = n if j < 0 else j + 2
+        elif src.startswith("//", i):
+            j = src.find("\n", i)
+            i = n if j < 0 else j
+        else:
+            out.append(src[i])
+            i += 1
+    return "".join(out)
