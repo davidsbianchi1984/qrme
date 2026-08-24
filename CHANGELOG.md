@@ -103,6 +103,20 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   backgrounded tab has its recogniser ended by the browser. Walking is inside
   this application.
 
+- **The console's agent can be taken along too.** It answers through the
+  authoring turn rather than a profile's chat, so the strip that was written
+  around one wire could not carry it without learning a second — and a third
+  and a fourth behind that, since JIM's two conversations answer through their
+  own coach.
+
+      asked     can the strip carry this conversation
+      mattered  does the strip have to know what kind it is
+
+  The screen now hands over *how to take a turn* instead of the ids to take it
+  with, and the strip stays ignorant of every wire in the estate. That is what
+  lets it be one component rather than one per surface, and it is why the
+  agent's button cost a callback instead of a branch.
+
 ### Changed
 
 - **The share menu opens before the talk control** rather than after the send

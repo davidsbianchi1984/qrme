@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { api } from "./api";
 import { putAway, whenPutAway } from "./away";
 import { t as tr } from "./l10n";
 import { onWalk, stopWalking, walking, type Walking } from "./walk";
@@ -53,7 +52,7 @@ export function WalkAlong() {
     listen(who);
     return close;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [who?.profileId]);
+  }, [who?.shownName]);
 
   function close() {
     turn.current += 1;
@@ -117,10 +116,7 @@ export function WalkAlong() {
 
   async function turnTaken(w: Walking, message: string) {
     try {
-      const reply = await api.chat(w.profileId, {
-        interactor_id: w.interactorId, message,
-      });
-      const text = reply.profile_message?.content || "";
+      const text = await w.take(message);
       setSaid(text);
       setHeard("");
       if (text && "speechSynthesis" in window) {

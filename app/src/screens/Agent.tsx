@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api, type AgentTurn, type WebSearchAnswer,
          uploadMedia } from "../api";
+import { startWalking } from "../walk";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { speakInPieces, type Speaking } from "../spoken";
@@ -834,6 +835,32 @@ export function Agent({ onPlans, go }: {
                   onClick={send}>
             {asking ? tr("studio.ask.working", lang) : tr("studio.ask.go", lang)}
           </button>
+          {/* Take the agent with you. Its turn is the authoring turn, which
+              the strip never has to know: the screen hands over how to take
+              one and stays the only thing that understands its own wire. */}
+          {session.profileId && session.ownerToken && (
+            <button className="chat-walkbtn"
+                    title={tr("chat.walk", lang)}
+                    aria-label={tr("chat.walk", lang)}
+                    onClick={() => {
+                      if (voiceMode) stopVoice();
+                      const pid = session.profileId || "";
+                      const tok = session.ownerToken || "";
+                      let thread = talk;
+                      startWalking({
+                        shownName: tr("agent.title", lang),
+                        lang,
+                        take: async (message) => {
+                          const turn = await api.authoringTurn(
+                            pid, message, thread, tok);
+                          thread = [...thread,
+                                    { role: "user", content: message },
+                                    { role: "assistant", content: turn.reply }];
+                          return turn.reply;
+                        },
+                      });
+                    }}>🚶</button>
+          )}
         </div>
       </div>
     </div>

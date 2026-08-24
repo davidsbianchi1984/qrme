@@ -109,3 +109,77 @@ def test_coming_back_does_not_reopen_it_by_itself():
     assert "listen(" not in call, (
         "the put-away handling restarts the ear itself — a microphone that "
         "reopens because a tab regained focus is one nobody pressed for")
+
+
+# ---------------------------------------------------------------------------
+# The second surface, and what it cost the first one.
+#
+# The strip was written for one caller and held that caller's wire: a profile
+# id and an interactor id, which it posted to `/profiles/{id}/chat` itself.
+# Then the console's agent asked for the same button and answered through a
+# different endpoint entirely, and the strip had no way to carry it without
+# learning a second wire — and a third and a fourth behind that, since JIM's
+# two surfaces answer through their own coach.
+#
+#     asked     can the strip carry this conversation
+#     mattered  does the strip have to know what kind it is
+#
+# So the screen hands over how to take a turn and the strip stays ignorant.
+# These hold that: the strip must not learn a wire back, and a surface that
+# offers the button must bring its own.
+
+
+def _surfaces() -> dict[str, str]:
+    """The console's conversations that can be carried."""
+    return {name: (APP / f"screens/{name}").read_text(encoding="utf-8")
+            for name in ("Chat.tsx", "Agent.tsx")}
+
+
+def test_the_strip_does_not_know_what_kind_of_conversation_it_carries():
+    """The moment it does, a fifth surface is a fifth branch inside it."""
+    for wire in ("profileId", "interactorId", "interactorToken"):
+        assert wire not in STORE, (
+            f"the walking store carries `{wire}` — that is one surface's "
+            "wire, and holding it here is what made a second surface need a "
+            "second branch")
+    assert "from \"./api\"" not in STRIP, (
+        "the strip imports the console's api; it is meant to take turns "
+        "through the callback the screen handed it, not to know an endpoint")
+    assert "w.take(" in STRIP, "the strip never uses the turn it was handed"
+
+
+def test_every_surface_that_offers_the_walk_hands_over_its_own_turn():
+    """A caller that starts a walk without a `take` hands the strip a
+    conversation it cannot continue — and the strip finds out at the first
+    thing the person says, which is the worst moment to find out."""
+    for name, src in _surfaces().items():
+        for m in re.finditer(r"startWalking\(\{", src):
+            i = m.end() - 1
+            depth, j = 0, i
+            while j < len(src):
+                if src[j] == "{":
+                    depth += 1
+                elif src[j] == "}":
+                    depth -= 1
+                    if depth == 0:
+                        break
+                j += 1
+            call = src[i:j + 1]
+            assert "take:" in call, (
+                f"{name} starts a walk without handing over how to take a "
+                "turn")
+            assert "shownName:" in call, (
+                f"{name} starts a walk without saying who the person is "
+                "walking with")
+
+
+def test_both_of_the_consoles_conversations_offer_it():
+    """The agent is not the synthetic profile — different wire, same person
+    wanting to leave the screen without leaving the conversation."""
+    for name, src in _surfaces().items():
+        assert "startWalking({" in src, (
+            f"{name} is a conversation this console can hold and offers no "
+            "way to take it along")
+        assert 'tr("chat.walk"' in src, (
+            f"{name}'s walk control is unlabelled or labelled in one "
+            "language")

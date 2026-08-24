@@ -24,15 +24,28 @@
 // can be honest about it.
 
 export type Walking = {
-  /** The profile being talked to, and what it is called with its
-   *  designation in front — the strip names it the way every other surface
-   *  has to. */
-  profileId: string;
+  /** What it is called, with its designation in front where it has one —
+   *  the strip names it the way every other surface has to. */
   shownName: string;
-  interactorId: string;
-  interactorToken: string;
   /** The voice the reply is read in, so walking sounds like the screen. */
   lang: string;
+  /** How this conversation takes a turn.
+   *
+   * A callback rather than an id, because the four surfaces that can be
+   * carried do not share a wire: a synthetic profile answers through
+   * `POST /profiles/{id}/chat`, QRME's agent through the authoring turn,
+   * and JIM's two through its own coach. Holding the ids here would have
+   * meant the strip knowing all four, and a fifth surface meaning a fifth
+   * branch inside it.
+   *
+   *     asked     can the strip carry this conversation
+   *     mattered  does the strip have to know what kind it is
+   *
+   * The screen that started the walk already knows how to take its own
+   * turn. It hands that over and the strip stays ignorant, which is what
+   * lets it be one component instead of four.
+   */
+  take: (message: string) => Promise<string>;
 };
 
 let current: Walking | null = null;

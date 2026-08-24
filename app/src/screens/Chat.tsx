@@ -1094,12 +1094,16 @@ export function Chat({ onPlans }: {
                   onClick={() => {
                     setTalking(false);
                     window.speechSynthesis?.cancel();
+                    const pid = session.profileId || "";
+                    const iid = session.interactorId || "";
                     startWalking({
-                      profileId: session.profileId || "",
                       shownName: shownName || "",
-                      interactorId: session.interactorId || "",
-                      interactorToken: session.interactorToken || "",
                       lang,
+                      take: async (message) => {
+                        const r = await api.chat(pid, {
+                          interactor_id: iid, message });
+                        return r.profile_message?.content || "";
+                      },
                     });
                   }}>🚶</button>
         )}
