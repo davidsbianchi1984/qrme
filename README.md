@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v1.7.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v1.8.0** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -180,6 +180,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **1.8.0** | **Every profile knows the application it lives in** — a synthetic profile knew everything about the person it represents and nothing about the place it stands in, and the agent was told its eleven tools and nothing else. All sixty-eight screens are now in the prompt builder, so a profile created a second from now stands in the same building; naming a door is not permission to open one, and the delegation policy still decides. Also: **a conversation you can take with you** on both surfaces, surviving a minimised browser window and leaving the application entirely on Android and iOS — the notification carrying the profile's AI designation, because a notification glanced at from another app is where somebody has the least context; and the walk says when the local fallback answered rather than the model the profile is set to |
 | **1.7.0** | **The chat ear closed after one sentence** — `SpeechRecognition.continuous` defaults to false, so the engine stopped itself the moment it decided one utterance had ended and nothing reopened it; the ear now runs continuous, accumulates finalised phrases and reopens itself while the listener is still wanted, and the talk overlay can share what the composer can. Also: 380 rows of German are informal now, the refusal backlog was counting two constructor preconditions nobody can read, its ratchet had 82 rows of slack, and `len(_REFUSALS) >= 9` was a floor against a table of 335 |
 | **1.6.2** | **Discover showed 3 profiles on a deployment holding 38** — the screen read the opt-in marketplace listing rather than the pool, so a beta cohort could not find each other and no privacy setting was involved; Discover reads `/people/browse` now, where listing is the default and the owner's private switch is the door out, with marketplace tags and blurbs merged over it. Also: a script was being escaped like a page — `_js_literal` html-escaped values bound for a `<script>` element, corrupting every ampersand while the guard written against `</script` never matched |
 | **1.6.1** | **A transient mail outage could lock an address out of signup** — the account row commits before the verification code is sent, and that send was never wrapped, so a refusal 500'd while the pending account survived; the next attempt from that address was then turned away as already pending, naming a code nobody ever received. Signup, resend and password reset all answer now instead of raising |
