@@ -6,6 +6,81 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.8.1] - 2026-08-24
+
+### Changed
+
+- **Every refusal this platform can raise reaches the reader in their own
+  language.** The last 82 English sentences in `_REFUSALS` are translated into
+  all nine, and that backlog is closed: 165 → 142 → 82 → 0 across four rounds.
+
+      asked     did the caller state a language
+      mattered  did the sentence we told them no in
+
+  What was left was the whole middle of the product — consent and likeness,
+  the card and image import family, the short validation sentences a form
+  raises on every wrong keystroke, and the organization rules: departments,
+  leases, delegated workflows, the objection and succession gates. An owner on
+  a Portuguese account met the model in Portuguese, the sidebar in Portuguese,
+  and then a 409 in English at the one moment they were being refused. Tokens
+  inside a sentence stay verbatim in every language, because they are the same
+  string everywhere and are the part the reader acts on: `data.name`,
+  `chara_card_v2`, `#rrggbb`, `POST /rooms/{id}/mic`, `profile_id`.
+
+- **An exemption that did not survive being reread.** One sentence stayed
+  English by decision for four releases — the 503 from `require_reviewer` when
+  a deployment is reachable beyond localhost with no admin token set. The
+  recorded argument was that the person who can act on it is the operator
+  reading a log.
+
+      asked     who can act on this sentence
+      mattered  who receives it
+
+  The operator is who can act. The receiver is whoever made the request, and
+  that branch is reached precisely when the caller is *not* local — an
+  anonymous remote caller who tried objection review or succession and is owed
+  a reason in their own language. The variable name is a token and survives
+  translation verbatim, so an operator reading a translated copy still has the
+  fix in front of them. The exemption cost a reader their language and bought
+  the operator nothing.
+
+### Added
+
+- **A guard that reads the translations, not just the count of missing ones.**
+  `refusals_untranslated.txt` counts sentences with no translation and only
+  shrinks. Nothing in three suites had ever read the ones that do exist, so
+  the backlog could reach zero with a Chinese row written in Cyrillic in it.
+
+      asked     is every refusal translated
+      mattered  is each translation in the language it is filed under
+
+  Two got through that way and were caught by eye rather than by anything:
+  `как` inside a Chinese string, `각` inside a Japanese one — single
+  characters in otherwise correct sentences, both of which would have
+  rendered, neither of which would have failed a test. It is deliberately
+  narrow: it cannot tell a good translation from a poor one, only that this is
+  not that language at all. Byte-identical in all three products and
+  registered in `shared_guards.txt`, so the next round cannot fix one and
+  forget the other two.
+
+- **A guard on the claim about the platform.** The sentence above — an open
+  capture keeps recording while the window is minimised — was written as a
+  universal in every console that hears, and one docstring offered iOS as the
+  example proving it.
+
+      asked     was the claim tested
+      mattered  was it tested on the platform it was made about
+
+  It was not. iOS Safari suspends the whole page, capture included; the orange
+  dot belongs to a native application. `test_a_claim_about_a_platform.py`
+  reads every TypeScript source in the console and requires any file making
+  the claim to name where it does not hold, and bans the backwards sentence
+  outright. It is in all three products including the one with no microphone,
+  because the claim spread by being copied between consoles — the day a
+  capture arrives in the third, the sentence that comes with it meets a guard
+  already waiting. The alternative was a row in `guard_divergences.txt`, whose
+  own rule is that a new divergence is a fix that did not travel.
+
 ## [1.8.0] - 2026-08-24
 
 ### Fixed
@@ -176,6 +251,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
       asked     does a hidden page stop hearing
       mattered  which of the two ways of hearing was it using
+
+  **Corrected in 1.8.1:** the paragraph above holds on a desktop and on
+  Android and not on the platform it cites. The orange dot is what a native
+  iOS application earns; iOS Safari suspends the whole page, capture included.
+  Naming the exception as the proof is why this sentence was copied into three
+  consoles. See that release's entry.
 
   So the strip records where it can and posts the bytes to a new general ear,
   `POST /interactors/{id}/heard` — the room's door of the same name without a
@@ -15224,7 +15305,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.1...HEAD
+[1.8.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.0...app-v1.8.1
 [1.8.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.7.0...app-v1.8.0
 [1.7.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.6.2...app-v1.7.0
 [1.6.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.6.1...app-v1.6.2

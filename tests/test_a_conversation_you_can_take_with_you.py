@@ -410,20 +410,6 @@ def test_the_way_back_is_offered_and_not_only_announced():
         "the resume control is not tied to the failure it recovers from")
 
 
-def test_the_claim_about_surviving_names_its_exception():
-    """The docstring said an open capture keeps recording while the window is
-    minimised, full stop. It does not, on the one platform the reporter was
-    holding. A comment that overstates what was tested is how the next person
-    stops testing it."""
-    store = (APP / "walk.ts").read_text(encoding="utf-8")
-    assert "iOS Safari" in store, (
-        "`walk.ts` still claims the capture survives being put away without "
-        "naming the platform where it does not")
-    for wrong in ("keeps recording while the window is minimised,\n",):
-        assert wrong not in store, (
-            "the unqualified claim is still there")
-
-
 # ---------------------------------------------------------------------------
 # Two field reports from a Windows machine, one root cause.
 #
