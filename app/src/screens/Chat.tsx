@@ -5,7 +5,6 @@ import { api, getBase, type Avatar, type Briefing, type DialerPosture,
 import { Briefcase } from "../Briefcase";
 import { Refusal } from "../Refusal";
 import { speakInPieces } from "../spoken";
-import { SkinPicker } from "../SkinPicker";
 import { TalkRail } from "../TalkRail";
 import { Waveform } from "../Waveform";
 import { presenceOf, presenceKey, animatedIn } from "../presence";
@@ -70,6 +69,13 @@ export function Chat({ onPlans }: {
     saying.current?.stop();
     saying.current = null;
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    // Leaving the screen closes the microphone too. This teardown stopped the
+    // voice and left the ear open — put-away had its own handler and unmount
+    // did not, so navigating away kept a browser tab's recording indicator
+    // lit on a screen that was no longer there.
+    wantsEar.current = false;
+    talkRec.current?.stop();
+    talkRec.current = null;
   }, []);
   // Voice: replies read aloud by the device's own engine, and a microphone
   // that fills the composer. Both feature-detected — the mic button simply
@@ -90,6 +96,10 @@ export function Chat({ onPlans }: {
   // so the caption said the profile was listening to a microphone the
   // browser had already stopped.
   const talkRec = useRef<{ stop: () => void } | null>(null);
+  // Whether the person still wants the ear open. A ref, not state: `onend`
+  // fires from the engine outside React's render, and reading `listening`
+  // there would read the value from the render that installed the handler.
+  const wantsEar = useRef(false);
   // The talk surface: a full listening overlay in the sibling product's
   // shape — except this product's speaker has a face. The profile's avatar
   // is what you look at while it listens and answers; the abstract orb only
@@ -106,12 +116,19 @@ export function Chat({ onPlans }: {
   // the text box paid for it — the field report could not even see it. The
   // mic, the box and Send stay; everything else folds here.
   const [plusOpen, setPlusOpen] = useState(false);
-  const [skinOpen, setSkinOpen] = useState(false);
+  const [talkPlus, setTalkPlus] = useState(false);
   // The camera. A photograph goes into the briefcase rather than into a
   // route of its own — the briefcase is already the place material handed to
   // a profile lives, already says plainly that this deployment cannot see a
   // picture, and already scopes what you hand over to the two of you.
   const camRef = useRef<HTMLInputElement | null>(null);
+  // The camera carries `capture`, which is what makes a phone open the lens.
+  // These three deliberately do not: a picture already taken, a video, and
+  // anything else are chosen from the device. All four land in the same
+  // place — `shoot` imports whatever it is given.
+  const libRef = useRef<HTMLInputElement | null>(null);
+  const vidRef = useRef<HTMLInputElement | null>(null);
+  const docRef = useRef<HTMLInputElement | null>(null);
   const [shooting, setShooting] = useState(false);
   const shoot = (file: File) => {
     if (!session.profileId || !session.interactorId) return;
@@ -201,17 +218,68 @@ export function Chat({ onPlans }: {
     if (!Recognition || putAway()) return;
     const rec = new Recognition();
     rec.lang = lang;
+    // `continuous` defaults to **false**, and that was the whole defect: the
+    // engine is specified to stop after the first utterance, so the ear shut
+    // itself about a second in and the caption fell back to "tap to talk"
+    // while somebody was still speaking. The room's dictation has set it
+    // since it was written; this screen was a worse copy of a listener that
+    // already worked here.
+    rec.continuous = true;
+    // Words appear as they are said rather than only when a phrase settles,
+    // so the surface never looks deaf while it is hearing.
+    rec.interimResults = true;
+    let settled = "";
+    let seen = 0;
     rec.onresult = (e: any) => {
-      const text = e.results[0][0].transcript;
+      // A continuous session hands back a growing list. Reading
+      // `results[0][0]` took the first phrase and only ever the first, so a
+      // second sentence replaced nothing and was lost.
+      let live = "";
+      for (let i = seen; i < e.results.length; i++) {
+        const r = e.results[i];
+        if (r.isFinal) {
+          const said = String(r[0].transcript).trim();
+          if (said) settled += (settled ? " " : "") + said;
+          seen = i + 1;
+        } else {
+          live += r[0].transcript;
+        }
+      }
+      const text = (settled + (live ? " " + live : "")).trim();
       setHeard(text);
       setInput(text);
     };
-    const done = () => { talkRec.current = null; setListening(false); };
-    rec.onend = done;
-    rec.onerror = done;
+    rec.onend = () => {
+      talkRec.current = null;
+      // Chrome ends the session on its own silence timeout even when
+      // continuous, so an ear meant to stay open has to be reopened. Only
+      // while the person still wants it and the screen has not been put
+      // away — a press is not a thing to replay on somebody's behalf.
+      if (wantsEar.current && !putAway()) { talkListen(); return; }
+      wantsEar.current = false;
+      setListening(false);
+    };
+    rec.onerror = (e: any) => {
+      // A refused permission or a lost device is not a silence timeout, and
+      // reopening on one would spin.
+      if (e?.error === "no-speech" && wantsEar.current && !putAway()) return;
+      wantsEar.current = false;
+      talkRec.current = null;
+      setListening(false);
+    };
     talkRec.current = { stop: () => rec.stop() };
+    wantsEar.current = true;
     setListening(true);
     rec.start();
+  }
+
+  /** Close the ear because the person asked, not because it timed out. */
+  function talkStop() {
+    wantsEar.current = false;
+    const rec = talkRec.current;
+    talkRec.current = null;
+    setListening(false);
+    rec?.stop();
   }
 
   // Put away mid-listen: the microphone goes down and the caption with it.
@@ -219,6 +287,7 @@ export function Chat({ onPlans }: {
   // started by a press, and a press is not a thing to replay on somebody's
   // behalf when they come back.
   useEffect(() => whenPutAway(() => {
+    wantsEar.current = false;
     talkRec.current?.stop();
     talkRec.current = null;
     setListening(false);
@@ -593,30 +662,46 @@ export function Chat({ onPlans }: {
             <div className="muted small">{tr("chat.talk.noface", lang)}</div>
           )}
           <div className="row" style={{ justifyContent: "center" }}>
-            {!listening && (
-              <button className="primary" onClick={talkListen}>
-                {tr("chat.talk.again", lang)}
-              </button>
-            )}
+            {/* One control, both directions. While it was only "Speak
+                again" there was no way to close an ear that had opened, and
+                no way to tell from the button that it was open. */}
+            <button className={listening ? "" : "primary"}
+                    onClick={listening ? talkStop : talkListen}>
+              {tr(listening ? "chat.talk.stop" : "chat.talk.again", lang)}
+            </button>
             <button className="primary" disabled={busy || !input.trim()}
                     onClick={() => { setHeard(""); send(); }}>
               {tr("chat.send", lang)}
             </button>
-            {/* Changing the face here rather than on a settings screen: this
-                is the one surface where you are actually looking at it. */}
-            {session.profileId && session.ownerToken && (
-              <button className={skinOpen ? "primary" : ""}
-                      onClick={() => setSkinOpen((o) => !o)}>
-                {tr("idn.deck.market", lang)}
-              </button>
-            )}
+            {/* Sharing from the face, not only from the composer below it.
+                This is the screen somebody is actually on while talking, and
+                it was the one surface with no way to hand anything over. */}
+            <button className="agent-plusbtn" aria-label={tr("agent.plus", lang)}
+                    aria-expanded={talkPlus}
+                    onClick={() => setTalkPlus((o) => !o)}>+</button>
           </div>
-          {skinOpen && session.profileId && session.ownerToken && (
-            <div className="card talk-skin">
-              <SkinPicker profileId={session.profileId}
-                          token={session.ownerToken}
-                          onError={setError}
-                          onChanged={setTalkAvatar} />
+          {talkPlus && (
+            <div className="agent-plus talk-plus" role="menu">
+              <button role="menuitem"
+                      disabled={!session.profileId || !session.interactorId}
+                      onClick={() => { setTalkPlus(false); libRef.current?.click(); }}>
+                🖼️ {tr("chat.share.photo", lang)}
+              </button>
+              <button role="menuitem"
+                      disabled={!session.profileId || !session.interactorId}
+                      onClick={() => { setTalkPlus(false); vidRef.current?.click(); }}>
+                🎬 {tr("chat.share.video", lang)}
+              </button>
+              <button role="menuitem"
+                      disabled={!session.profileId || !session.interactorId}
+                      onClick={() => { setTalkPlus(false); camRef.current?.click(); }}>
+                📷 {tr("chat.camera", lang)}
+              </button>
+              <button role="menuitem"
+                      disabled={!session.profileId || !session.interactorId}
+                      onClick={() => { setTalkPlus(false); docRef.current?.click(); }}>
+                📄 {tr("chat.share.file", lang)}
+              </button>
             </div>
           )}
           {/* Who they are, what they hold about you, what you are to each
@@ -720,6 +805,27 @@ export function Chat({ onPlans }: {
             shipping that never took a photograph. On a desktop browser the
             attribute is ignored and the file chooser opens, which is the
             honest fallback rather than a control that does nothing. */}
+        <input ref={libRef} type="file" accept="image/*"
+               style={{ display: "none" }}
+               onChange={(e) => {
+                 const f = e.target.files?.[0];
+                 e.target.value = "";
+                 if (f) shoot(f);
+               }} />
+        <input ref={vidRef} type="file" accept="video/*"
+               style={{ display: "none" }}
+               onChange={(e) => {
+                 const f = e.target.files?.[0];
+                 e.target.value = "";
+                 if (f) shoot(f);
+               }} />
+        <input ref={docRef} type="file"
+               style={{ display: "none" }}
+               onChange={(e) => {
+                 const f = e.target.files?.[0];
+                 e.target.value = "";
+                 if (f) shoot(f);
+               }} />
         <input ref={camRef} type="file" accept="image/*" capture="environment"
                style={{ display: "none" }}
                onChange={(e) => {
