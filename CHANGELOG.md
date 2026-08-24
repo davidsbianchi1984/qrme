@@ -117,6 +117,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   lets it be one component rather than one per surface, and it is why the
   agent's button cost a callback instead of a branch.
 
+- **The walk says who answered it.** `generated_by` is who *actually* wrote a
+  turn rather than who a profile is set to, and the field exists because an
+  owner whose own key had expired read stub-written text labelled with the
+  model they had chosen. The console shows an amber banner for that. Out on
+  the walking strip there is no banner, and on the phone there is no screen at
+  all.
+
+      asked     did the turn come back
+      mattered  who wrote it
+
+  A turn now carries whether the local fallback answered it, the strip says
+  *answered from what's stored here*, and the Android notification says it too.
+  The agent's walk says nothing, deliberately: the authoring turn reports no
+  provenance, and claiming a model answered would be a claim nothing checked.
+
 - **Every profile knows the application it lives in.** A synthetic profile
   knew everything about the person it represents and nothing about the place
   it stands in. Asked *where do I change what you're allowed to do*, a

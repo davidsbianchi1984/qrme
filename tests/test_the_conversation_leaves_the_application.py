@@ -185,10 +185,16 @@ def test_the_designation_rides_the_notification():
     src = SERVICE.read_text(encoding="utf-8")
     assert 'L10n.t("walk.note.ai"' in src, (
         "the notification never says the profile is an AI")
-    assert re.search(r'if \(shownName\.lowercase\(\)\.contains\("ai"\)\)', src), (
+    # The whole `val who =` expression, so the check survives the condition
+    # growing a second clause (the agent) without the assertion loosening
+    # into "the words appear somewhere in the file".
+    block = src.split("val who =")[1].split("\n        val note")[0]
+    assert 'shownName.lowercase().contains("ai")' in block, (
         "the designation is prepended unconditionally, so a name that "
-        "already carries one reads as `AI · AI · Dana` — or, worse, the "
-        "check was dropped and a bare name goes out undesignated")
+        "already carries one reads as `AI · AI · Dana`")
+    assert "else" in block and 'L10n.t("walk.note.ai"' in block, (
+        "nothing prepends the designation to a name that lacks one, so a "
+        "bare display name goes out undesignated")
     m = re.search(r"setContentTitle\((.{0,160}?)\)\n", src, re.S)
     assert m and "who" in m.group(1), (
         "the notification title does not carry the designated name")
@@ -209,3 +215,142 @@ def test_the_screen_says_why_it_stopped():
         r"Text\(Walking\.trouble", ui), (
         "the screen never shows why the conversation stopped, so a refused "
         "microphone and a person pressing End look the same afterwards")
+
+
+# ---------------------------------------------------------------------------
+# Two conversations, one service.
+#
+# A synthetic profile answers through `POST /profiles/{id}/chat`; the console's
+# agent answers through the authoring turn and keeps no memory of its own. The
+# console met the same fork and answered it by handing the strip a callback —
+# the screen knows its own wire, the strip stays ignorant. A Service cannot be
+# handed a lambda across a start intent, so this one is told which kind it is
+# carrying instead.
+#
+#     asked     can the service carry this conversation
+#     mattered  how many wires does it have to know
+#
+# The agent's half brings a question the profile's half does not have: a row
+# that cannot be taken back is answered by a press on a screen, and out here
+# there is no screen.
+
+
+def test_the_service_knows_which_conversation_it_is_carrying():
+    src = SERVICE.read_text(encoding="utf-8")
+    assert "KIND_PROFILE" in src and "KIND_AGENT" in src, (
+        "the service carries only one kind of conversation; the console has "
+        "two, and the agent is not the synthetic profile")
+    assert "ApiClient.authoringTurn(" in src, (
+        "nothing in the service takes an authoring turn, so the agent "
+        "cannot be carried at all")
+    assert "ApiClient.chat(" in src, "the profile's own wire is gone"
+
+
+def test_the_agent_needs_no_interactor_and_the_profile_does():
+    """The authoring turn is the owner's own door, reached with the owner's
+    own token. Demanding an interactor for it would refuse every agent walk;
+    not demanding one for a profile would start a chat with nobody."""
+    src = SERVICE.read_text(encoding="utf-8")
+    m = re.search(r"if \(profileId\.isEmpty\(\)(.{0,200}?)\{", src, re.S)
+    assert m, "the service does not check what it was handed"
+    assert "kind == KIND_PROFILE && interactorId.isEmpty()" in m.group(1), (
+        "the interactor check does not distinguish the two kinds")
+
+
+def test_the_agents_thread_is_carried_and_then_let_go():
+    """The agent keeps no memory of its own — the cheaper design, and the one
+    where *forget this* is something a person can actually do. Out here the
+    transcript is the service's, and it must not outlive the walk."""
+    src = SERVICE.read_text(encoding="utf-8")
+    assert "thread.toList()" in src, (
+        "the authoring turn is sent with no history, so the agent forgets "
+        "between one sentence and the next")
+    assert re.search(r"thread\.add\(\"user\"", src) and \
+        re.search(r"thread\.add\(\"assistant\"", src), (
+            "nothing accumulates the thread")
+    assert "thread.clear()" in src, (
+        "the transcript outlives the walk — a conversation somebody ended "
+        "is still in memory afterwards")
+
+
+def test_a_row_that_needs_a_press_is_said_and_not_done():
+    """`asks` comes back instead of an act for the rows that cannot be taken
+    back. A yes spoken into a phone in somebody's pocket is not the press
+    that row is asking for."""
+    src = SERVICE.read_text(encoding="utf-8")
+    assert "turnTaken?.asks != null" in src, (
+        "the walk does not check whether the turn came back as a proposal, "
+        "so a confirming row's own sentence is never said and the person "
+        "hears silence where a question was")
+    assert 'L10n.fill("walk.agent.asks"' in src, (
+        "the proposal is not put into words")
+    # And it must not act on it out here. The one door that turns a proposal
+    # into an act is `authoringAct`, and it has no business in a service with
+    # no screen to press.
+    assert "authoringAct" not in src, (
+        "the service can complete a confirming row without a press — the "
+        "press is the whole of the difference between *may this person do "
+        "this* and *did this person mean this*")
+
+
+def test_the_designation_is_for_the_profile_not_the_agent():
+    """A synthetic profile stands in for a person and must say it is an AI.
+    The agent is the console's own tool, named as itself — a designation
+    prepended to it is noise, and noise is how a designation stops being read
+    where it matters."""
+    src = SERVICE.read_text(encoding="utf-8")
+    assert "kind == KIND_AGENT" in src.split("val who =")[1][:200], (
+        "the agent is given a synthetic profile's AI designation, or the "
+        "profile is not given one — the two are not the same thing")
+
+
+def test_the_agent_screen_offers_it_too():
+    ui = (REPO / "native/android/app/src/main/java/app/qrme/studio/ui/"
+          "Screens.kt").read_text(encoding="utf-8")
+    assert "Walking.startAgent(" in ui, (
+        "the agent screen offers no way to take the conversation out of the "
+        "app, though the shell has had the authoring turn all along")
+
+
+# ---------------------------------------------------------------------------
+# Who answered, out where there is no screen.
+#
+# A deployment with no model key still answers — the offline stack does, from
+# stored knowledge — and that has been true for releases. On the phone the
+# person is in another application entirely, so the notification is the only
+# surface they have and the only place this can be said.
+#
+#     asked     did the turn come back
+#     mattered  who wrote it
+
+
+def test_the_service_reads_who_answered():
+    src = SERVICE.read_text(encoding="utf-8")
+    assert "generatedBy" in src, (
+        "the service never reads who wrote the turn, so a fallback answer "
+        "is spoken as though the chosen model wrote it")
+    assert 'generatedBy == "stub"' in src
+
+
+def test_the_notification_says_it_and_stops_saying_it():
+    src = SERVICE.read_text(encoding="utf-8")
+    assert 'L10n.t("walk.offline"' in src, (
+        "the notification never says the answer came from stored knowledge")
+    # One notification, not one per turn: rewritten under the same id, and
+    # only when the answer actually changed hands.
+    assert "if (fromStore != Walking.offline)" in src, (
+        "the notification is rebuilt on every turn rather than when the "
+        "answerer changes, which is a notification that flickers all day")
+    assert "Walking.offline = false" in src, (
+        "the flag outlives the walk, so the next one starts by claiming a "
+        "fallback answered a turn that has not happened yet")
+
+
+def test_the_agent_branch_makes_no_claim_about_who_answered():
+    """The authoring turn reports no provenance. A `false` there would be a
+    claim nothing checked."""
+    src = SERVICE.read_text(encoding="utf-8")
+    agent = src.split("if (kind == KIND_AGENT) {")[1].split("} else {")[0]
+    assert "fromStore" not in agent, (
+        "the agent's branch decides who answered, and its wire does not "
+        "report that")

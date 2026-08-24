@@ -45,6 +45,19 @@ import java.util.Locale
  * recording you after you left it*, and the two are the same code with
  * different honesty.
  *
+ * ## Two conversations, one service
+ *
+ * A synthetic profile answers through `POST /profiles/{id}/chat`; the agent
+ * answers through the authoring turn and keeps no memory of its own, so the
+ * thread has to be carried here. The console met the same fork and answered
+ * it by handing the strip a callback — the screen knows its own wire and the
+ * strip stays ignorant. A Service cannot be handed a lambda across a
+ * `startForegroundService`, so this one is told *which kind* instead, in one
+ * extra, and the fork is two branches in `take` rather than two services.
+ *
+ *     asked     can the service carry this conversation
+ *     mattered  how many wires does it have to know
+ *
  * ## The designation travels
  *
  * Whoever is being talked to here is a synthetic profile, and a person must
@@ -74,9 +87,34 @@ object Walking {
     var trouble by mutableStateOf("")
         internal set
 
+    /** True when the last turn was answered by the local fallback rather
+     *  than by the model this profile is set to. Not a failure — a
+     *  deployment with no key still answers — but not the voice somebody
+     *  chose either, and out here there is no amber banner to notice it on. */
+    var offline by mutableStateOf(false)
+        internal set
+
+    /** Carry a conversation with a synthetic profile. */
     fun start(context: Context, profileId: String, token: String,
               interactorId: String, shownName: String, lang: String) {
+        begin(context, WalkService.KIND_PROFILE, profileId, token,
+              interactorId, shownName, lang)
+    }
+
+    /** Carry the console's agent. No interactor — the authoring turn is the
+     *  owner's own door — and the thread lives in the service, because the
+     *  agent keeps no memory of its own. */
+    fun startAgent(context: Context, profileId: String, token: String,
+                   shownName: String, lang: String) {
+        begin(context, WalkService.KIND_AGENT, profileId, token, "",
+              shownName, lang)
+    }
+
+    private fun begin(context: Context, kind: String, profileId: String,
+                      token: String, interactorId: String, shownName: String,
+                      lang: String) {
         val intent = Intent(context, WalkService::class.java)
+            .putExtra(WalkService.EXTRA_KIND, kind)
             .putExtra(WalkService.EXTRA_PROFILE, profileId)
             .putExtra(WalkService.EXTRA_TOKEN, token)
             .putExtra(WalkService.EXTRA_INTERACTOR, interactorId)
@@ -102,6 +140,11 @@ object Walking {
 class WalkService : Service() {
 
     companion object {
+        const val EXTRA_KIND = "kind"
+        /** A synthetic profile, answering through its own chat door. */
+        const val KIND_PROFILE = "profile"
+        /** The console's agent, answering through the authoring turn. */
+        const val KIND_AGENT = "agent"
         const val EXTRA_PROFILE = "profile"
         const val EXTRA_TOKEN = "token"
         const val EXTRA_INTERACTOR = "interactor"
@@ -116,6 +159,12 @@ class WalkService : Service() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var recogniser: SpeechRecognizer? = null
     private var speaker: TextToSpeech? = null
+    private var kind: String = KIND_PROFILE
+    /** The agent's thread. It keeps no memory of its own — which is the
+     *  cheaper design and the one where *forget this* is something a person
+     *  can actually do — so whoever is talking to it holds the transcript.
+     *  Out here that is this service, and it goes when the service does. */
+    private val thread = mutableListOf<Pair<String, String>>()
     private var profileId: String = ""
     private var token: String = ""
     private var interactorId: String = ""
@@ -135,12 +184,16 @@ class WalkService : Service() {
             close(reason = "")
             return START_NOT_STICKY
         }
+        kind = intent?.getStringExtra(EXTRA_KIND) ?: KIND_PROFILE
         profileId = intent?.getStringExtra(EXTRA_PROFILE).orEmpty()
         token = intent?.getStringExtra(EXTRA_TOKEN).orEmpty()
         interactorId = intent?.getStringExtra(EXTRA_INTERACTOR).orEmpty()
         shownName = intent?.getStringExtra(EXTRA_NAME).orEmpty()
         lang = intent?.getStringExtra(EXTRA_LANG) ?: "en"
-        if (profileId.isEmpty() || token.isEmpty() || interactorId.isEmpty()) {
+        // The agent needs no interactor: the authoring turn is the owner's
+        // own door, reached with the owner's own token.
+        if (profileId.isEmpty() || token.isEmpty()
+            || (kind == KIND_PROFILE && interactorId.isEmpty())) {
             stopSelf()
             return START_NOT_STICKY
         }
@@ -184,12 +237,21 @@ class WalkService : Service() {
         // `shownName` is handed in already carrying the profile's watermark
         // line; this is the belt to that braces, so a name that arrived bare
         // still says what it is.
-        val who = if (shownName.lowercase().contains("ai")) shownName
+        // A synthetic profile stands in for a person and must say it is an
+        // AI. The agent is the console's own tool and is named as itself —
+        // prepending a designation to it would be noise, and noise is how a
+        // designation stops being read where it matters.
+        val who = if (kind == KIND_AGENT
+                      || shownName.lowercase().contains("ai")) shownName
                   else L10n.t("walk.note.ai", lang) + " " + shownName
         val note: Notification = Notification.Builder(this, CHANNEL)
             .setContentTitle(L10n.fill("walk.note.title", lang,
                                        mapOf("who" to who)))
-            .setContentText(L10n.t("walk.note.body", lang))
+            .setContentText(
+                if (Walking.offline)
+                    L10n.t("walk.note.body", lang) + " "
+                        + L10n.t("walk.offline", lang)
+                else L10n.t("walk.note.body", lang))
             .setSmallIcon(android.R.drawable.ic_btn_speak_now)
             .setOngoing(true)
             .addAction(Notification.Action.Builder(
@@ -266,15 +328,52 @@ class WalkService : Service() {
 
     private fun take(mine: Int, message: String) {
         scope.launch {
-            val reply = runCatching {
-                ApiClient.chat(profileId, token, interactorId, message)
-            }.getOrNull()
-            if (mine != turn || !wants) return@launch
-            // A held or refused turn has no content, and the moderation
-            // status is the reason. Speaking nothing and carrying on would
-            // make a refusal indistinguishable from a quiet moment.
-            val text = if (reply?.status == "approved") reply.content.orEmpty()
-                       else ""
+            // Set by the profile branch below. The authoring turn reports no
+            // provenance, so the agent's branch leaves this alone rather than
+            // claiming a model answered — a false `false` is still a claim.
+            var fromStore = false
+            val text = if (kind == KIND_AGENT) {
+                val turnTaken = runCatching {
+                    ApiClient.authoringTurn(profileId, message,
+                                            thread.toList(), token)
+                }.getOrNull()
+                if (mine != turn || !wants) return@launch
+                // A row that cannot be taken back comes back as a proposal
+                // rather than an act, and answering it needs a press on a
+                // screen. Out here there is no screen, so the walk says what
+                // it would do and leaves it — a yes spoken into a phone in
+                // somebody's pocket is not the press that row is asking for.
+                //
+                //     asked     may this person do this
+                //     mattered  did this person mean this
+                if (turnTaken?.asks != null) {
+                    val says = turnTaken.asks.says
+                    thread.add("user" to message)
+                    thread.add("assistant" to says)
+                    L10n.fill("walk.agent.asks", lang, mapOf("what" to says))
+                } else {
+                    val reply = turnTaken?.reply.orEmpty()
+                    if (reply.isNotEmpty()) {
+                        thread.add("user" to message)
+                        thread.add("assistant" to reply)
+                    }
+                    reply
+                }
+            } else {
+                val reply = runCatching {
+                    ApiClient.chat(profileId, token, interactorId, message)
+                }.getOrNull()
+                if (mine != turn || !wants) return@launch
+                // A held or refused turn has no content, and the moderation
+                // status is the reason. Speaking nothing and carrying on
+                // would make a refusal indistinguishable from a quiet
+                // moment.
+                // Who actually wrote it, not who the profile is set to. An
+                // owner whose key expired used to read stub-written text
+                // under the name of the model they picked.
+                fromStore = reply?.provenance?.generatedBy == "stub"
+                if (reply?.status == "approved") reply.content.orEmpty() else ""
+            }
             withContext(Dispatchers.Main) {
                 if (mine != turn || !wants) return@withContext
                 if (text.isEmpty()) {
@@ -282,6 +381,13 @@ class WalkService : Service() {
                 } else {
                     Walking.said = text
                     speaker?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "walk")
+                }
+                // The notification is the only surface a person walking
+                // about has. Rewritten under the same id rather than posted
+                // fresh, so one notification stays one notification.
+                if (fromStore != Walking.offline) {
+                    Walking.offline = fromStore
+                    goForeground()
                 }
                 // The next turn opens after the answer is handed to the
                 // speaker rather than after it finishes: a person may
@@ -300,7 +406,9 @@ class WalkService : Service() {
         speaker?.stop()
         speaker?.shutdown()
         speaker = null
+        thread.clear()
         Walking.underway = false
+        Walking.offline = false
         Walking.trouble = reason
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()

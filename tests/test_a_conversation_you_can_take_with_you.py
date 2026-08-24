@@ -129,6 +129,24 @@ def test_coming_back_does_not_reopen_it_by_itself():
 # offers the button must bring its own.
 
 
+def _braced(src: str, at: int) -> str:
+    """The whole `{...}` starting at `at`, brace-matched.
+
+    A regex stopping at the first `}` reads a nested object as the end of the
+    call, which in these files is most of them.
+    """
+    depth, j = 0, at
+    while j < len(src):
+        if src[j] == "{":
+            depth += 1
+        elif src[j] == "}":
+            depth -= 1
+            if depth == 0:
+                return src[at:j + 1]
+        j += 1
+    raise AssertionError("unbalanced braces from the call site")
+
+
 def _surfaces() -> dict[str, str]:
     """The console's conversations that can be carried."""
     return {name: (APP / f"screens/{name}").read_text(encoding="utf-8")
@@ -183,3 +201,61 @@ def test_both_of_the_consoles_conversations_offer_it():
         assert 'tr("chat.walk"' in src, (
             f"{name}'s walk control is unlabelled or labelled in one "
             "language")
+
+
+# ---------------------------------------------------------------------------
+# Who answered, when the deployment has no model.
+#
+# `generated_by` is who *actually* wrote a turn rather than who the profile is
+# set to, and the field exists because an owner whose own key had expired read
+# stub-written text labelled with the model they had chosen. The console shows
+# an amber banner for that. Out on the walking strip there is no banner and no
+# screen — the person is somewhere else entirely.
+#
+#     asked     did the turn come back
+#     mattered  who wrote it
+
+
+def test_the_turn_carries_who_answered_it():
+    assert "export type Said" in STORE, (
+        "a turn is still a bare string, so nothing can say who wrote it")
+    assert "offline?: boolean" in STORE
+
+
+def test_the_strip_says_when_the_fallback_answered():
+    assert 'tr("walk.offline"' in STRIP, (
+        "the strip never says an answer came from the local fallback, so it "
+        "reads as the model the profile is set to")
+    assert re.search(r"setOffline\(Boolean\(\s*answer\.offline\s*\)\)", STRIP), (
+        "the strip sets the flag from something other than what the screen "
+        "handed it — a component that decided this itself would be guessing "
+        "about somebody else's endpoint")
+
+
+def test_the_agent_does_not_claim_a_model_answered():
+    """The authoring turn reports no provenance. Saying `offline: false`
+    there would be a claim nothing checked, which is the failure this whole
+    file keeps finding."""
+    src = _surfaces()["Agent.tsx"]
+    call = _braced(src, src.index("startWalking({") + len("startWalking("))
+    # The property, not the word: the comment there explains why the
+    # property is absent, and a check that banned the word would fail on
+    # its own explanation.
+    assert "offline:" not in call, (
+        "the agent's walk asserts who answered, and its wire does not "
+        "report that")
+
+
+def test_the_profile_walk_reads_its_own_wire():
+    src = _surfaces()["Chat.tsx"]
+    call = _braced(src, src.index("startWalking({") + len("startWalking("))
+    # The access, not the name. The comment above the expression mentions
+    # `degraded_from` too, so asserting the bare word would pass with the
+    # field dropped from the expression and the comment left explaining a
+    # read that no longer happens.
+    assert "prov?.degraded_from" in call, (
+        "the profile's walk does not read the field that exists precisely "
+        "for a key that went dead mid-conversation")
+    assert "r.provenance" in call, (
+        "the walk reads provenance off the message rather than off the "
+        "reply, where the record of who wrote it lives")

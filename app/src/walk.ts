@@ -45,7 +45,30 @@ export type Walking = {
    * turn. It hands that over and the strip stays ignorant, which is what
    * lets it be one component instead of four.
    */
-  take: (message: string) => Promise<string>;
+  take: (message: string) => Promise<Said>;
+};
+
+/** What a turn came back as, and who answered it.
+ *
+ * A turn used to be a string, which was enough until somebody asked what
+ * happens when the deployment has no model. The answer is that it already
+ * works — the offline stack answers from stored knowledge — and the person
+ * was never told, so text written by a fallback read exactly like text
+ * written by the model they chose.
+ *
+ *     asked     did the turn come back
+ *     mattered  who wrote it
+ *
+ * `offline` is set by the screen that knows its own wire, from what that
+ * wire reports. The strip only renders it: a component that inferred who
+ * answered would be guessing about somebody else's endpoint.
+ */
+export type Said = {
+  text: string;
+  /** True when the answer came from what is stored here rather than from a
+   *  model. Never a failure — an answer is an answer — but never silent
+   *  either. */
+  offline?: boolean;
 };
 
 let current: Walking | null = null;

@@ -856,7 +856,13 @@ export function Agent({ onPlans, go }: {
                           thread = [...thread,
                                     { role: "user", content: message },
                                     { role: "assistant", content: turn.reply }];
-                          return turn.reply;
+                          // No `offline` here, and deliberately not a
+                          // guess: the authoring turn reports no
+                          // provenance, so this screen does not know who
+                          // answered. Saying `false` would be a claim, and
+                          // the strip renders nothing rather than a claim
+                          // nothing checked.
+                          return { text: turn.reply };
                         },
                       });
                     }}>🚶</button>

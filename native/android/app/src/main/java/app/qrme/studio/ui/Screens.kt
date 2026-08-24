@@ -8533,6 +8533,36 @@ fun WidgetsScreen(state: AppState) {
                 asking = false
             }
         }
+        // Take the agent with you, out of this app entirely. Its wire is the
+        // authoring turn rather than a profile's chat, and the service is
+        // told which kind it is carrying rather than being handed a callback
+        // — a Service cannot be passed a lambda across a start intent, so
+        // the fork is one extra and two branches instead of two services.
+        //
+        // The thread goes with it and comes back to nothing: the agent keeps
+        // no memory of its own, which is the design where *forget this* is
+        // something a person can actually do.
+        run {
+            val here = androidx.compose.ui.platform.LocalContext.current
+            Text(
+                if (Walking.underway) L10n.t("nc.end", lang)
+                else L10n.t("walk.take", lang),
+                color = Qrme.BrandA, fontSize = 12.sp,
+                modifier = Modifier.clickable {
+                    if (Walking.underway) {
+                        Walking.stop(here)
+                    } else {
+                        val id = pid; val bearer = token
+                        if (id != null && bearer != null) {
+                            Walking.startAgent(here, id, bearer,
+                                L10n.t("wdg.ask.title", lang), lang)
+                        }
+                    }
+                })
+            if (Walking.trouble.isNotEmpty()) {
+                Text(Walking.trouble, color = Qrme.Amber, fontSize = 11.sp)
+            }
+        }
         if (talk.isNotEmpty()) {
             Text(L10n.t("wdg.ask.forget", lang), color = Qrme.T2, fontSize = 12.sp,
                 modifier = Modifier.clickable {

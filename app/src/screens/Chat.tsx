@@ -1102,7 +1102,18 @@ export function Chat({ onPlans }: {
                       take: async (message) => {
                         const r = await api.chat(pid, {
                           interactor_id: iid, message });
-                        return r.profile_message?.content || "";
+                        // `degraded_from` is the honest half: a profile
+                        // whose key expired reads as the model it was set
+                        // to unless something says otherwise, and out on
+                        // the strip there is no banner to notice.
+                        // On the reply, not on the message: the record of
+                        // who wrote it belongs to the turn.
+                        const prov = r.provenance;
+                        return {
+                          text: r.profile_message?.content || "",
+                          offline: Boolean(prov?.degraded_from)
+                                   || prov?.generated_by === "stub",
+                        };
                       },
                     });
                   }}>🚶</button>

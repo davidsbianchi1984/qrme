@@ -31,6 +31,10 @@ export function WalkAlong() {
   const [who, setWho] = useState<Walking | null>(walking());
   const [heard, setHeard] = useState("");
   const [said, setSaid] = useState("");
+  // Who answered the last turn. Not an error state — an answer
+  // from what is stored here is an answer — but a person hearing
+  // it should know it was not the model they picked.
+  const [offline, setOffline] = useState(false);
   const [listening, setListening] = useState(false);
   const [asleep, setAsleep] = useState(putAway());
   const rec = useRef<{ stop: () => void } | null>(null);
@@ -116,8 +120,10 @@ export function WalkAlong() {
 
   async function turnTaken(w: Walking, message: string) {
     try {
-      const text = await w.take(message);
+      const answer = await w.take(message);
+      const text = answer.text;
       setSaid(text);
+      setOffline(Boolean(answer.offline));
       setHeard("");
       if (text && "speechSynthesis" in window) {
         const u = new SpeechSynthesisUtterance(text);
@@ -141,6 +147,13 @@ export function WalkAlong() {
                 : listening ? tr("walk.listening", who.lang as never)
                             : tr("walk.quiet", who.lang as never)}
       </span>
+      {/* Who answered, when it was not the model. It qualifies the words,
+          so it sits with them rather than with the ear's own state. */}
+      {offline && (
+        <span className="muted small walk-offline">
+          {tr("walk.offline", who.lang as never)}
+        </span>
+      )}
       {(heard || said) && (
         <span className="walk-words">{heard || said}</span>
       )}

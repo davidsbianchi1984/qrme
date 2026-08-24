@@ -1804,3 +1804,8 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   white-space: nowrap; opacity: 0.85; }
 .walk-end { flex: 0 0 auto; }
 .chat-walkbtn { font-size: 17px; line-height: 1; padding: 0 12px; }
+
+/* Who answered, when it was not the model. Dim rather than alarming: an
+   answer from stored knowledge is an answer, and styling it as a warning
+   would teach people to distrust a working deployment. */
+.walk-offline { white-space: nowrap; opacity: 0.75; font-style: italic; }
