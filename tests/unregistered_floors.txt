@@ -1,5 +1,5 @@
-# status: backlog — 70 rows
-# ceiling: 70
+# status: backlog — 67 rows
+# ceiling: 67
 #
 # Every numeric floor in this suite still carrying its own literal: an
 # `assert <something> > <int>` with the number written into the assertion.
@@ -42,6 +42,49 @@
 # The ceiling does not move up. A new bare floor is a new number nothing will
 # ever audit.
 #
+#
+# ## Not floors: a value that is not a size
+#
+# The sweep matches the *shape* `assert <something> >= <int>`. Some of what it
+# caught is not a floor on anything that can grow — it is a value read out of
+# a response or a fixture, compared against a number that means something else
+# entirely.
+#
+#     asked     is this an `assert x >= <int>`
+#     mattered  is the int a floor on something that can grow
+#
+# `status_code >= 400` is the clearest. 400 is not a size, there is no
+# four-fifths of it to raise toward, and the comment beside it says what it is
+# actually asking: an unconfigured door "refuses rather than pretending".
+#
+# `effective_age >= 41` is not even a minimum. The line above it fixes
+# `base_age == 41` and aging on, so this asserts the effective age has moved
+# *at or above* the base — a direction, written as a comparison.
+# `remembered_turns >= 12` is about one simulation's basis, seeded by the test
+# that reads it, and there is no estate-wide quantity for it to be four-fifths
+# of.
+#
+# Each is exempted by `file.py: expr` rather than by line, because a line
+# number is a fact about today's file — registering floors in this estate has
+# already shifted unrelated rows by a line each, and an exemption keyed on a
+# line would have silently started covering whatever slid into the slot.
+#
+#   test_steering_hub.py: hub['age']['effective_age'] >= 41
+#   test_the_keys_the_till_and_the_lifeline.py: client.post('/auth/oauth/nobody/start', json={}).status_code >= 400
+#   test_spec_mined.py: conditioned['basis']['remembered_turns'] >= 12
+#
+# One candidate was deliberately *not* exempted. `test_seed_backfill.py`'s
+# `out['repaired'] >= 34` counts profiles a repair pass fixed, and that
+# number tracks the seed catalogue, which grows. It reads like the others and
+# is not one of them, which is the reason this list is prose a person edits
+# rather than a rule a sweep applies.
+#
+# `test_every_exempted_comparison_is_still_there` checks each is really
+# written somewhere, and `test_a_count_can_never_be_exempted` checks the
+# direction that matters: a comparison against `len(...)` or `sum(...)` is a
+# count of a swept surface, is always a floor, and may not be excused here
+# however convincing the prose above it. An exemption nothing verifies is a
+# place to hide the numbers this file is meant to find.
 test_a_binding_is_not_a_door.py:134: len(found) > 20
 test_a_form_that_asks_for_it_has_a_label_for_it.py:128: controls > 10000
 test_a_form_that_asks_for_it_has_a_label_for_it.py:131: len(_asked_for()) >= 20
@@ -57,9 +100,7 @@ test_nothing_leaves_the_host.py:161: len(sites) >= 5
 test_one_name_one_type_on_the_wire.py:134: len(_declared()) >= 400
 test_overlays.py:161: len(overlays.FACE_KINDS) >= 15
 test_seed_backfill.py:86: out['repaired'] >= 34
-test_spec_mined.py:147: conditioned['basis']['remembered_turns'] >= 12
 test_starter_profiles.py:15: len(industries) >= 30
-test_steering_hub.py:51: hub['age']['effective_age'] >= 41
 test_termination_revokes_more_than_the_owners_token.py:154: len(found) >= 7
 test_the_body_market.py:65: len(c['robots']) >= 30
 test_the_body_market.py:67: len(c['by_maker']) >= 15
@@ -78,7 +119,6 @@ test_the_key_the_server_never_sends.py:221: len(vocabulary) >= 500
 test_the_keys_the_android_client_reads.py:359: len(reads) >= 165
 test_the_keys_the_android_client_reads.py:360: sum((len(k) for _, k in reads)) >= 370
 test_the_keys_the_android_client_reads.py:383: len(driven) >= 80
-test_the_keys_the_till_and_the_lifeline.py:140: client.post('/auth/oauth/nobody/start', json={}).status_code >= 400
 test_the_keys_the_till_and_the_lifeline.py:284: len(keys) >= 40
 test_the_last_doors.py:301: len(keys) >= 42
 test_the_member_that_isnt_there.py:329: len(_declared(lang, REPO / decl)) >= 5
