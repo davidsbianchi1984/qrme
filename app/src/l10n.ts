@@ -9203,6 +9203,12 @@ const CHROME: Table = {
   "dsc.badge.real": {
     en: "✓ real photo", es: "✓ foto real", fr: "✓ vraie photo", de: "✓ echtes Foto", pt: "✓ foto real", it: "✓ foto vera", ja: "✓ 実写", zh: "✓ 真人照片", hi: "✓ असली तस्वीर", ar: "✓ صورة حقيقية",
   },
+  "dsc.headcount": {
+    en: "{n} here", es: "{n} aquí", fr: "{n} ici", de: "{n} hier", pt: "{n} aqui", it: "{n} qui", ja: "{n}人います", zh: "共 {n} 位", hi: "{n} यहाँ", ar: "{n} هنا",
+  },
+  "dsc.badge.verified": {
+    en: "✓ verified", es: "✓ verificado", fr: "✓ vérifié", de: "✓ verifiziert", pt: "✓ verificado", it: "✓ verificato", ja: "✓ 認証済み", zh: "✓ 已验证", hi: "✓ सत्यापित", ar: "✓ مُوثَّق",
+  },
   "dsc.addfriend": {
     en: "Add friend", es: "Añadir amistad", fr: "Ajouter en ami", de: "Als Freund:in hinzufügen", pt: "Adicionar amigo", it: "Aggiungi agli amici", ja: "友だちに追加", zh: "加为好友", hi: "मित्र बनाएँ", ar: "أضِف صديقًا",
   },

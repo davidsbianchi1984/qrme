@@ -27,8 +27,17 @@ def test_a_name_finds_its_profile(client):
     found = client.get("/people?q=marisol").json()["found"]
     assert [p["profile_id"] for p in found] == [pid]
     row = found[0]
+    # `avatar_kind` is in this set deliberately, and it is the only key here
+    # that was ever added after the guard was written. It is not new exposure:
+    # it is derived from `avatar`, which the row already hands out, and a
+    # caller can read `/photos/...` against `/portraits/...` for themselves.
+    # What it buys is that no *surface* has to — the AI badge is mandatory,
+    # and a rule re-derived per client is a rule that drifts.
+    #
+    #     asked     did the row grow a key
+    #     mattered  did the row grow a fact
     assert set(row) == {"profile_id", "display_name", "handle", "avatar",
-                        "kind", "verification"}, (
+                        "avatar_kind", "kind", "verification"}, (
         "the row grew keys beyond what the profile already shows the public")
 
 

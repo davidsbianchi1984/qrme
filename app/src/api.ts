@@ -3722,6 +3722,10 @@ export const api = {
   browsePeople: () =>
     req<{ profiles: { profile_id: string; display_name: string;
                       handle: string | null; avatar: string | null;
+                      // "ai" | "real_photo" | null, decided server side by
+                      // `avatars.kind_of` — the badge is not optional, so
+                      // no client re-derives it from the asset path.
+                      avatar_kind: string | null;
                       kind: string;
                       verification: Record<string, unknown> }[];
           head_count: number; kind_counts: Record<string, number> }>(

@@ -1,6 +1,6 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v1.6.1** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v1.6.2** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -180,6 +180,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **1.6.2** | **Discover showed 3 profiles on a deployment holding 38** — the screen read the opt-in marketplace listing rather than the pool, so a beta cohort could not find each other and no privacy setting was involved; Discover reads `/people/browse` now, where listing is the default and the owner's private switch is the door out, with marketplace tags and blurbs merged over it. Also: a script was being escaped like a page — `_js_literal` html-escaped values bound for a `<script>` element, corrupting every ampersand while the guard written against `</script` never matched |
 | **1.6.1** | **A transient mail outage could lock an address out of signup** — the account row commits before the verification code is sent, and that send was never wrapped, so a refusal 500'd while the pending account survived; the next attempt from that address was then turned away as already pending, naming a code nobody ever received. Signup, resend and password reset all answer now instead of raising |
 | **1.6.0** | **A visitor is refused in their own language** — the twenty-five refusals a visitor actually hits (a room that closed, a party whose host left, a comment, a friend request) leave the English-only ledger, 109 rows down to 84; and nothing assembled into a prompt is cut inside a word any more — a person's own note and caption, a clinician's letter, and a filing whose cap was three times too small to hold one |
 | **1.5.0** | **An iPhone gets a voice in a room** — the room listened through the browser's own recogniser and nothing else, and on iOS that constructor exists while the service always refuses, so the phone this product is mostly used on had a microphone button and no way to speak; `POST /rooms/{id}/heard` takes recorded audio and answers with words, gated like sharing a file and storing nothing, with the say door still owning moderation and the echo rules. Recording also brings the browser's own echo cancellation — the one defence that works on sound rather than on words or on clocks — and an analyser, which gives back the barge-in 1.4.1 had to trade away |

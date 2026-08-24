@@ -133,6 +133,23 @@ def photo_path(handle: str) -> str | None:
             if (photos_dir() / f"{handle}.webp").is_file() else None)
 
 
+def kind_of(asset: str | None) -> str | None:
+    """Which kind of face this is: ``"real_photo"``, ``"ai"``, or None.
+
+    A face on a discovery card must say which kind of face it is, and the AI
+    badge is not optional — so the decision belongs in one place rather than
+    at each surface that draws a card. The marketplace made this call inline
+    and the browse pool made it nowhere, which is how one surface could badge
+    a generated portrait and another show the same face bare.
+
+        asked     is there a picture
+        mattered  does the card say what kind of picture it is
+    """
+    if not asset:
+        return None
+    return "real_photo" if asset.startswith(PHOTO_ROUTE) else "ai"
+
+
 def shown(asset: str | None) -> str:
     """The picture a *row* shows — the asset, or the empty frame.
 

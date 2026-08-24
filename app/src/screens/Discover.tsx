@@ -4,10 +4,26 @@ import { t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
-// For You + the marketplace + the starter collection, one discovery surface.
-// Everything here was already in the backend; the console just never showed
-// the doors. The starter collection installs on demand (idempotent server
-// side), and every card is a real profile you can befriend.
+// Everyone on this deployment, in one place.
+//
+// This screen used to render `GET /marketplace` alone — the opt-IN listing a
+// profile enters only when somebody explicitly lists it. So a beta cohort of
+// 38 profiles showed 3 cards, and no privacy setting was involved: the other
+// 35 had simply never been listed into a table this screen should not have
+// been reading.
+//
+//     asked     is this profile listed
+//     mattered  does this profile exist here
+//
+// `GET /people/browse` is the pool, and it already carries the rule the
+// product means: every active, non-anonymous profile, with the owner's
+// private switch (`profiles.unlisted`, default 0) as the door out. Friends
+// has read it all along. Discover reads it now too, and the marketplace
+// supplies tags and blurbs for the profiles that have them — a listing makes
+// a card richer, it no longer decides whether the card exists.
+//
+// The Marketplace screen keeps reading the marketplace. Opt-in is right for a
+// storefront; it was only ever wrong here.
 export function Discover({ onPlans, onVisit }: {
   /** Where a plan refusal sends somebody. Threaded in from the shell
    *  rather than looked up here, so the tab id stays in one place. */
@@ -18,14 +34,46 @@ export function Discover({ onPlans, onVisit }: {
 }) {
   const { session } = useSession();
   const lang = visitorLang();
-  const [cards, setCards] = useState<Awaited<ReturnType<typeof api.marketplace>>>([]);
+  type Card = Awaited<ReturnType<typeof api.marketplace>>[number] & {
+    verified?: boolean;
+  };
+  const [cards, setCards] = useState<Card[]>([]);
+  const [headCount, setHeadCount] = useState<number | null>(null);
   const [tag, setTag] = useState("");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [error, setError] = useState<unknown>(null);
 
   function load(t?: string) {
-    api.marketplace(t || undefined).then(setCards).catch((e) => setError(e));
+    // Two calls, deliberately. The pool answers *who is here*; the listing
+    // answers *what they say about themselves*. Asking only the second is
+    // the defect this screen shipped with.
+    Promise.all([api.browsePeople(), api.marketplace(t || undefined)])
+      .then(([pool, listings]) => {
+        const extra = new Map(listings.map((l) => [l.profile_id, l]));
+        const merged: Card[] = pool.profiles.map((p) => {
+          const l = extra.get(p.profile_id);
+          return {
+            profile_id: p.profile_id,
+            display_name: p.display_name,
+            purpose: l?.purpose ?? null,
+            tags: l?.tags ?? [],
+            blurb: l?.blurb ?? null,
+            avatar: p.avatar,
+            // Server-decided on both sides, so a face is badged the same
+            // whichever pool the card came from.
+            avatar_kind: l?.avatar_kind ?? p.avatar_kind,
+            verified: Boolean(
+              (p.verification as { verified?: boolean } | null)?.verified),
+          } as Card;
+        });
+        // A tag filter is a marketplace question — only listed profiles carry
+        // tags — so filtering narrows to the listings that match rather than
+        // silently emptying the pool.
+        setCards(t ? merged.filter((c) => c.tags.length > 0) : merged);
+        setHeadCount(pool.head_count);
+      })
+      .catch((e) => setError(e));
   }
   useEffect(() => load(), []);
 
@@ -63,6 +111,15 @@ export function Discover({ onPlans, onVisit }: {
       <header className="screen-head">
         <h2>{tr("dsc.title", lang)}</h2>
         <span className="muted small">{tr("dsc.pitch", lang)}</span>
+        {/* The honest population, from the pool's own count rather than the
+            length of this page. A screen showing three cards out of
+            thirty-eight looked like a quiet deployment; it was a screen
+            reading the wrong table, and a head count says which. */}
+        {headCount !== null && (
+          <span className="muted small">
+            {tr("dsc.headcount", lang).replace("{n}", String(headCount))}
+          </span>
+        )}
       </header>
 
       {cards.length === 0 && (
@@ -115,6 +172,11 @@ export function Discover({ onPlans, onVisit }: {
             )}
             {c.avatar_kind === "real_photo" && (
               <span className="dc-badge real">{tr("dsc.badge.real", lang)}</span>
+            )}
+            {c.verified && (
+              <span className="dc-badge verified">
+                {tr("dsc.badge.verified", lang)}
+              </span>
             )}
             <b>{c.display_name}</b>
             </button>

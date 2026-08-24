@@ -831,11 +831,7 @@ def browse_marketplace(tag: str | None = None) -> list[dict]:
         # hidden face can leak onto the marketplace through this field.
         av = avatar_mod.render(row["profile_id"])
         asset = av.get("asset")
-        avatar_kind = None
-        if asset:
-            avatar_kind = ("real_photo"
-                           if asset.startswith(avatar_mod.PHOTO_ROUTE)
-                           else "ai")
+        avatar_kind = avatar_mod.kind_of(asset)
         cards.append({
             "profile_id": row["profile_id"],
             "display_name": (identity.anonymous_name(row["profile_id"])

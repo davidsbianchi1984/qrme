@@ -552,6 +552,10 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   margin-bottom: 6px; white-space: nowrap; }
 .dc-badge.ai { background: rgba(123,92,255,0.9); color: #fff; }
 .dc-badge.real { background: rgba(67,224,138,0.9); color: #06281a; }
+/* A verified identity, distinct from a real photograph: one says the
+   face is authentic, the other says the person is who they say. A
+   card can carry both. */
+.dc-badge.verified { background: rgba(255,204,102,0.95); color: #2b1d00; }
 
 /* ---- Inside a room: the scene -------------------------------------------
    Everyone in their own square, and the square of whoever spoke last wears

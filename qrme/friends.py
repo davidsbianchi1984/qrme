@@ -350,6 +350,10 @@ def _public_rows(rows) -> list[dict]:
         "display_name": r["display_name"],
         "handle": r["handle"],
         "avatar": avatars.shown(r["avatar"]),
+        # Which kind of face, by the same rule the marketplace card uses.
+        # Without it a pool row could only be drawn bare, so any surface
+        # built on this pool would show a generated portrait with no badge.
+        "avatar_kind": avatars.kind_of(r["avatar"]),
         "kind": r["kind"],
         "verification": badges.get(r["id"], {}),
     } for r in rows]

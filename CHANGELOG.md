@@ -6,7 +6,57 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.6.2] - 2026-08-24
+
 ### Fixed
+
+- **A Microsoft dependency pin read as one of this release's own version
+  fields.** The guard that keeps the release checklist honest scans the native
+  build files for lines carrying the version being cut. At 1.6.2 it reported
+  `<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.240923002" />`
+  — because `1.6.2` is a *substring* of `1.6.240923002`.
+
+      asked     does this line carry the release version
+      mattered  is it ours, or somebody else's that starts the same way
+
+  Acting on it would have been the worst available fix: adding that pin to
+  `release_fields.txt` makes the next bump rewrite Microsoft's version. The
+  exemption for a third party's number now covers MSBuild's
+  `<PackageReference>` as well as Gradle's `group:artifact:version`, which it
+  already did — Gradle's collided on an exact match once before, when
+  `androidx.credentials` sat at 1.3.0 on the day 1.3.0 was cut. This one
+  collided on a prefix, which is the same trap one character further along.
+
+- **Discover showed 3 profiles on a deployment holding 38.** The screen
+  rendered `GET /marketplace` — the opt-**in** listing a profile enters only
+  when somebody explicitly lists it. Nobody's privacy setting was involved:
+  the other 35 had simply never been listed into a table this screen should
+  not have been reading.
+
+      asked     is this profile listed
+      mattered  does this profile exist here
+
+  `GET /people/browse` is the pool, and it already carried the rule the
+  product means — every active, non-anonymous profile, with the owner's
+  private switch (`profiles.unlisted`, default `0`) as the door out. Its
+  docstring has said so all along: *listing is the default and privacy is the
+  door out*. **Friends read that pool; Discover did not**, and nothing checked
+  that two surfaces onto the same deployment agreed about who was on it. A
+  beta cohort could not find each other.
+
+  Discover reads the pool now and merges the marketplace over it, so a listing
+  makes a card richer rather than deciding whether the card exists. The
+  Marketplace screen still reads the marketplace — opt-in is right for a
+  storefront; it was only ever wrong here.
+
+  Three things came with it. The pool's rows carry `avatar_kind`, because the
+  AI badge is not optional and a card built from a pool row could not draw one
+  — and the rule now lives once, in `avatars.kind_of`, rather than inline in
+  the marketplace route and nowhere else. A verified profile shows a badge, so
+  the verified people in a cohort are visible as such. And the screen prints
+  the pool's own head count: three cards out of thirty-eight looked like a
+  quiet deployment rather than a screen reading the wrong table, and a number
+  says which.
 
 - **A script was being escaped like a page.** `_js_literal` builds the JSON and
   JavaScript literals this product's landing page drops inside a `<script>`
@@ -14840,7 +14890,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.6.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.6.2...HEAD
+[1.6.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.6.1...app-v1.6.2
 [1.6.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.6.0...app-v1.6.1
 [1.6.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.5.0...app-v1.6.0
 [1.5.0]: https://github.com/davidsbianchi1984/qrme/commit/3e8ed32
