@@ -8,6 +8,41 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **The refusal backlog counted sentences nobody can read.** The guard that
+  finds untranslated refusals derives the exception classes to follow from the
+  handlers that stringify them, which correctly picks up `ValueError` — plenty
+  of real refusals are raised as one. It then swept *every* raise of that class
+  in the package, constructors included.
+
+      asked     is this sentence raised through a class a route stringifies
+      mattered  can a person reach the place it is raised
+
+  So `QRMEClient needs base_url or an injected client` sat in a backlog that
+  describes itself as sentences a person reads in a language they did not
+  choose. It fires in an `__init__`, from environment variables, while the app
+  is being wired: there is no object yet, no request to answer and no reader —
+  if it ever fired the process would not start. Those rows left the backlog
+  without being translated, because they were never in it by right.
+
+  The exemption is checked rather than trusted, in three directions. Forward,
+  that each exempted sentence really is raised inside a constructor. Backward,
+  that none is *also* raised where a request can reach it — a sentence with two
+  raise sites is owed a translation for the reachable one. And the exempted set
+  must match the sentences the ledger names, exactly, so a new exemption takes
+  an edit to the record where somebody reads it, rather than appearing by
+  writing code.
+
+  The first cut of the rule took every `__init__` raise in the package and
+  exempted two sentences the collector had never picked up at all — an
+  exemption wider than the thing it exempts from. The naming check is what
+  reported it.
+
+- **The refusal ratchet had eighty-two rows of slack.** Its ceiling read
+  164 against 82 recorded rows — the number it started at, never brought
+  down as rows were struck. A ratchet with that much room is a ratchet that
+  would have let the whole backlog be written again without a word. Tightened
+  to the rows actually there.
+
 - **An ear that opens closed again after one sentence.** Opening the chat's talk
   overlay and pressing *speak* listened for about a second and dropped straight
   back to *tap to talk*. `SpeechRecognition.continuous` defaults to **false** —
