@@ -147,6 +147,11 @@ export function Chat({ onPlans }: {
   // late event from a superseded session was turning off the ear that had
   // just replaced it — a race that reads exactly like the engine refusing.
   const earTurn = useRef(0);
+  /** The composer's dictation, held apart from the overlay's ear: they are
+   *  two microphones with two destinations and must not share a handle. */
+  const dictRec = useRef<{ stop: () => void } | null>(null);
+  const [dictating, setDictating] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   // Why the ear closed, when it closed for a reason rather than a silence.
   // A caption that only ever falls back to "tap to talk" cannot tell a
   // refused microphone from a bug, and the person watching it has no way to
@@ -159,6 +164,25 @@ export function Chat({ onPlans }: {
   // appears when the profile has no portrait yet.
   const [talking, setTalking] = useState(false);
   const [talkAvatar, setTalkAvatar] = useState<Avatar | null>(null);
+  /** The name as the product requires it to be shown.
+   *
+   * `watermark.design()` on the server builds `AI · {name}` and forces the
+   * designation in front even of a label an owner customised — "the AI
+   * designation is invariant". The console was rendering `display_name`
+   * straight, which walks around that rule entirely: the header of a
+   * conversation with a synthetic profile read "Chat with David Bianchi"
+   * and said nothing about what it was.
+   *
+   *     asked     does the profile carry a designation
+   *     mattered  does the screen naming it use one
+   *
+   * Falls back to the bare name only where no watermark has loaded yet, so
+   * a slow request shows a name rather than an empty header — and never the
+   * reverse, which would be the designation arriving after somebody had
+   * already read the name without it.
+   */
+  const shownName = talkAvatar?.watermark?.label
+    || session.profile?.display_name;
   const [heard, setHeard] = useState("");
   // Handing your own profile something to read, and changing the face it
   // wears. Both shipped with a door on somebody *else's* homepage and none
@@ -254,13 +278,19 @@ export function Chat({ onPlans }: {
     window.speechSynthesis.speak(u);
   }
 
+  // The watermark is needed by the header, not only by the talk overlay, so
+  // it is fetched when the conversation opens. A designation that arrives
+  // only once somebody presses the microphone is a designation most readers
+  // never see.
+  useEffect(() => {
+    if (!session.profileId) return;
+    api.avatar(session.profileId, session.ownerToken || "")
+      .then(setTalkAvatar).catch(() => setTalkAvatar(null));
+  }, [session.profileId]);
+
   function openTalk() {
     setTalking(true);
     setHeard("");
-    if (session.profileId) {
-      api.avatar(session.profileId, session.ownerToken || "")
-        .then(setTalkAvatar).catch(() => setTalkAvatar(null));
-    }
     talkListen();
   }
 
@@ -352,6 +382,73 @@ export function Chat({ onPlans }: {
       setListening(false);
       setEarTrouble("start-refused");
     }
+  }
+
+  /** The microphone beside the composer: speech into the text bar, and
+   *  nothing else.
+   *
+   * It used to open the talk overlay, which meant the two voice controls on
+   * this screen did the same thing and neither did dictation — there was no
+   * way to speak a message and then edit it before sending. They are
+   * different jobs: this one fills a field somebody is looking at, the wave
+   * beside Send hands the whole conversation over to voice.
+   *
+   *     asked     does the microphone open
+   *     mattered  where do the words it hears go
+   */
+  function dictate() {
+    if (!Recognition) return;
+    if (dictRec.current) { dictStop(); return; }
+    // The caret goes into the bar first, so the words land somewhere the
+    // person is already looking and can correct.
+    inputRef.current?.focus();
+    const rec = new Recognition();
+    rec.lang = lang;
+    rec.continuous = true;
+    rec.interimResults = true;
+    const before = input;
+    let settled = "";
+    let seen = 0;
+    rec.onresult = (e: any) => {
+      let live = "";
+      for (let i = seen; i < e.results.length; i++) {
+        const r = e.results[i];
+        if (r.isFinal) {
+          const said = String(r[0].transcript).trim();
+          if (said) settled += (settled ? " " : "") + said;
+          seen = i + 1;
+        } else {
+          live += r[0].transcript;
+        }
+      }
+      const heardNow = (settled + (live ? " " + live : "")).trim();
+      setInput((before ? before + " " : "") + heardNow);
+    };
+    rec.onend = () => { dictRec.current = null; setDictating(false); };
+    rec.onerror = (e: any) => {
+      const why = String(e?.error || "");
+      if (why === "no-speech" || why === "aborted") return;
+      dictRec.current = null;
+      setDictating(false);
+      setEarTrouble(why || "start-refused");
+    };
+    dictRec.current = { stop: () => rec.stop() };
+    setDictating(true);
+    try {
+      rec.start();
+    } catch {
+      dictRec.current = null;
+      setDictating(false);
+      setEarTrouble("start-refused");
+    }
+  }
+
+  function dictStop() {
+    const rec = dictRec.current;
+    dictRec.current = null;
+    setDictating(false);
+    rec?.stop();
+    inputRef.current?.focus();
   }
 
   /** Close the ear because the person asked, not because it timed out. */
@@ -461,8 +558,7 @@ export function Chat({ onPlans }: {
     <div className="screen chat">
       <header className="screen-head">
         <h2>
-          {fill(tr("chat.with", lang),
-                { name: session.profile?.display_name })}
+          {fill(tr("chat.with", lang), { name: shownName })}
         </h2>
         <span className="muted small">{tr("chat.pitch", lang)}</span>
       </header>
@@ -479,8 +575,7 @@ export function Chat({ onPlans }: {
            ref={listRef}>
         {msgs.length === 0 && (
           <div className="muted center">
-            {fill(tr("chat.sayhello", lang),
-                  { name: session.profile?.display_name })}
+            {fill(tr("chat.sayhello", lang), { name: shownName })}
           </div>
         )}
         {msgs.map((m, i) => (
@@ -530,6 +625,17 @@ export function Chat({ onPlans }: {
         </select>
       </label>
 
+      {/* Both doors still exist and neither is on the screen by default.
+          They are the escalation to emergency services and the handoff to a
+          real person: safety paths, and safety paths are not a thing to
+          delete for room. Folded into one line instead, closed until asked
+          for — which is what "make them smaller or put them somewhere else"
+          leaves standing.
+
+              asked     is the chat screen clear
+              mattered  are the doors still there */}
+      <details className="chat-doors">
+        <summary className="muted small">{tr("chat.doors", lang)}</summary>
       {/* --- what this profile can do, before anything goes wrong ------- */}
       <div className="card">
         <h3>{tr("esc.hdr", lang)}</h3>
@@ -690,6 +796,8 @@ export function Chat({ onPlans }: {
               )}
             </>)}
       </div>
+      </details>
+
 
       {whereOpen && (
         <div className="row" style={{ padding: "4px 0" }}>
@@ -741,7 +849,7 @@ export function Chat({ onPlans }: {
               <TalkMark avatar={talkAvatar} />
             </div>
           ) : null}
-          <div className="talk-name">{session.profile?.display_name}</div>
+          <div className="talk-name">{shownName}</div>
           {/* Seven states rather than two, and the strip below reads from the
               same decision — so the caption and the bars cannot disagree
               about what is happening. */}
@@ -934,13 +1042,16 @@ export function Chat({ onPlans }: {
                  e.target.value = "";
                  if (f) shoot(f);
                }} />
+        {/* Two microphones, two destinations. This one fills the bar. */}
         {Recognition && (
           <button title={tr("chat.mic", lang)}
                   aria-label={tr("chat.mic", lang)}
-                  className={listening ? "primary" : ""}
-                  onClick={openTalk}>🎤</button>
+                  className={dictating ? "primary" : ""}
+                  onClick={dictating ? dictStop : dictate}>🎤</button>
         )}
         <input
+          ref={inputRef}
+          autoFocus
           value={input}
           placeholder={tr("chat.type.ph", lang)}
           onChange={(e) => setInput(e.target.value)}
@@ -949,6 +1060,16 @@ export function Chat({ onPlans }: {
         <button className="primary" onClick={send} disabled={busy}>
           {tr("chat.send", lang)}
         </button>
+        {/* And this one hands the whole conversation over to voice. It sits
+            after Send because it leaves the text surface rather than
+            contributing to it — the microphone belongs to the bar, the wave
+            belongs to the conversation. */}
+        {Recognition && (
+          <button title={tr("chat.audio", lang)}
+                  aria-label={tr("chat.audio", lang)}
+                  className="chat-wave"
+                  onClick={openTalk}>〰</button>
+        )}
       </div>
     </div>
   );

@@ -8012,6 +8012,12 @@ const CHROME: Table = {
   "chat.talk.again": {
     en: "Speak again", es: "Habla de nuevo", fr: "Parler encore", de: "Noch einmal sprechen", pt: "Falar novamente", it: "Parla di nuovo", ja: "もう一度話す", zh: "再说一次", hi: "फिर से बोलें", ar: "تحدث مرة أخرى",
   },
+  "chat.audio": {
+    en: "Talk out loud", es: "Hablar en voz alta", fr: "Parler à voix haute", de: "Laut sprechen", pt: "Falar em voz alta", it: "Parlare ad alta voce", ja: "声で話す", zh: "开口说话", hi: "बोलकर बात करो", ar: "تحدّث بصوتك",
+  },
+  "chat.doors": {
+    en: "If this needs a person, or an emergency", es: "Si esto necesita una persona, o una emergencia", fr: "S'il faut une personne, ou en cas d'urgence", de: "Wenn das einen Menschen braucht, oder im Notfall", pt: "Se isto precisa de uma pessoa, ou de uma emergência", it: "Se serve una persona, o in caso di emergenza", ja: "人が必要なとき、または緊急のとき", zh: "如果这需要真人，或遇到紧急情况", hi: "अगर इसके लिए कोई इंसान चाहिए, या आपात स्थिति हो", ar: "إذا كان هذا يحتاج إنسانًا، أو في حالة طارئة",
+  },
   "chat.talk.trouble": {
     en: "The microphone stopped. Tap to talk to try again.", es: "El micrófono se detuvo. Toca para hablar e inténtalo otra vez.", fr: "Le micro s'est arrêté. Touche pour parler et réessayer.", de: "Das Mikrofon hat gestoppt. Zum Sprechen tippen und es erneut versuchen.", pt: "O microfone parou. Toca para falar e tenta de novo.", it: "Il microfono si è fermato. Tocca per parlare e riprova.", ja: "マイクが止まりました。タップして話すともう一度試せます。", zh: "麦克风停止了。点按说话可再试一次。", hi: "माइक रुक गया। बोलने के लिए टैप करो और फिर कोशिश करो।", ar: "توقّف الميكروفون. اضغط للتحدّث وحاول مرّة أخرى.",
   },

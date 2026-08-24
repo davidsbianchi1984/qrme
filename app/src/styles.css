@@ -1778,3 +1778,14 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
 .bubble-doc-ai { flex: none; font-size: 10px; padding: 2px 6px;
   border-radius: 999px; background: rgba(123, 92, 255, 0.28); }
+
+/* The two safety doors, folded. Present on every conversation, open only
+   when asked for — a chat screen is not the place to keep an emergency
+   form permanently unfolded, and deleting one to clear the room would be
+   removing a door rather than tidying it. */
+.chat-doors { margin: 6px 0; }
+.chat-doors > summary { cursor: pointer; padding: 6px 2px; }
+.chat-doors[open] > summary { margin-bottom: 6px; }
+/* The wave: hands the conversation to voice, and reads as a different kind
+   of control from the microphone that only fills the bar. */
+.chat-wave { font-size: 18px; line-height: 1; padding: 0 12px; }

@@ -57,6 +57,27 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   the mark nowhere on it. It is drawn from the server's own line, so a
   customised designation reads the same here as everywhere else.
 
+- **A conversation with a synthetic profile did not say it was one.**
+  `watermark.design()` builds the label as `AI · {name}` and forces the
+  designation in front even of a label an owner customised — the module's own
+  words are that the designation is invariant. The console walked around the
+  rule by never asking for it: every conversation surface rendered
+  `display_name` straight, so the header read "Chat with David Bianchi" and
+  said nothing about what it was, on the product whose whole subject is that
+  distinction.
+
+      asked     does the profile carry a designation
+      mattered  does the screen naming it use one
+
+  The header, the empty-state greeting and the talk overlay's caption all take
+  the server's own label now, and the watermark is fetched when the
+  conversation opens rather than when the microphone is pressed — a
+  designation that arrives only for people who press a button is one most
+  readers never see. `display_name` is still rendered bare in 89 other places
+  across the console; that count is written into the guard rather than left
+  implied, because three fixed surfaces under a passing test would stop the
+  next person looking.
+
 ### Changed
 
 - **The share menu opens before the talk control** rather than after the send
