@@ -846,13 +846,38 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .talk-overlay { position: fixed; inset: 0; z-index: 60;
   background: rgba(7,10,20,0.96); backdrop-filter: blur(10px);
   display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 14px; padding: 24px; text-align: center; }
+  justify-content: center; gap: 14px; padding: 24px; text-align: center;
+  /* Content taller than the screen scrolls. Without this the column had
+     nowhere to put a panel somebody opened, so it took the room out of the
+     one child willing to give it: the face. `safe` keeps the top reachable
+     while scrolling — plain `center` can push it out of reach. */
+  overflow-y: auto;
+  justify-content: safe center; }
 .talk-close { position: absolute; top: calc(14px + env(safe-area-inset-top));
   right: 18px; background: transparent; border: 0; color: var(--t2);
   font-size: 30px; line-height: 1; }
+/* The face keeps its size. In a column flex container `flex-shrink` works
+   on the *height*, and the default is 1 — so every panel that opened below
+   squeezed the circle into a flatter and flatter ellipse, a little more each
+   time, and nothing said it had. A fixed width and height are not a size
+   unless the box is also told not to give them up.
+
+       asked     is the face given a size
+       mattered  can anything take it back */
 .talk-face { width: min(58vw, 260px); height: min(58vw, 260px);
+  flex: 0 0 auto;
+  position: relative;
   border-radius: 50%; overflow: hidden; border: 3px solid var(--line);
   box-shadow: 0 0 40px rgba(64,224,255,0.25); }
+/* The designation, over the face it belongs to. `Avatar.watermark` is
+   documented as "always displayed, by the product's own rule" and this
+   surface — the one where the face is largest and talking — was the one
+   showing it without. */
+.talk-wm { position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 6px 8px 8px; font-size: 12px; line-height: 1.2;
+  letter-spacing: 0.02em; color: #eaf6ff;
+  background: linear-gradient(to top, rgba(3,6,14,0.86), rgba(3,6,14,0));
+  text-shadow: 0 1px 2px rgba(0,0,0,0.9); pointer-events: none; }
 .talk-face img { width: 100%; height: 100%; object-fit: cover; }
 .talk-face.listening { animation: talk-pulse 1.6s ease-in-out infinite;
   border-color: var(--brand, #40e0ff); }
@@ -865,12 +890,19 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 /* The upper-torso form, standing on the talk surface at full figure. */
 .talk-torso {
   width: min(46vw, 220px); height: min(62vw, 300px);
+  flex: 0 0 auto;
   object-fit: cover; object-position: top;
   border-radius: 26px 26px 14px 14px;
   border: 2px solid rgba(159,216,232,0.55);
   box-shadow: 0 0 34px rgba(123,92,255,0.6);
 }
 .talk-torso.listening { animation: talk-pulse 1.6s ease-in-out infinite; }
+/* The torso is an image, so the mark needs a box to sit on. Same rule as the
+   circle: it keeps its size and does not lend height to a panel below it. */
+.talk-torso-wrap { position: relative; flex: 0 0 auto; display: inline-flex;
+  border-radius: 26px 26px 14px 14px; overflow: hidden; }
+.talk-torso-wrap .talk-torso { border-radius: 0; }
+.talk-torso-wrap .talk-wm { border-radius: 0; }
 @keyframes talk-pulse {
   0%, 100% { transform: scale(1); box-shadow: 0 0 34px rgba(64,224,255,0.35); }
   50% { transform: scale(1.05); box-shadow: 0 0 64px rgba(64,224,255,0.6); }

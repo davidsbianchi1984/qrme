@@ -29,6 +29,26 @@ interface Msg { who: "you" | "assistant"; text: string; note?: string;
  * general line, which still says the ear closed rather than pretending it
  * drifted shut.
  */
+/** The designation, over the face it is the designation of.
+ *
+ * `Avatar.watermark` carries `line` and the type calls it "always displayed,
+ * by the product's own rule". This surface showed the face at its largest,
+ * talking, and displayed it nowhere — the one screen where a synthetic
+ * person is most convincing was the one not saying so.
+ *
+ *     asked     does the avatar carry a watermark
+ *     mattered  does the screen showing the avatar display it
+ *
+ * Rendered from the server's own line rather than a literal here, so a
+ * designation an owner customised reads the same on this screen as on every
+ * other, and a deployment that changes the mark changes it once.
+ */
+function TalkMark({ avatar }: { avatar: Avatar }) {
+  const line = avatar.watermark?.line;
+  if (!line) return null;
+  return <span className="talk-wm">{line}</span>;
+}
+
 const EAR_TROUBLE: Record<string, string> = {
   "not-allowed": "chat.talk.trouble.blocked",
   "service-not-allowed": "chat.talk.trouble.blocked",
@@ -695,11 +715,16 @@ export function Chat({ onPlans }: {
               circular face is next; the orb is only for a profile with no
               portrait at all. */}
           {talkAvatar?.torso ? (
-            <img className={"talk-torso" + (animatedIn(presence) ? " listening" : "")}
-                 src={talkAvatar.torso.startsWith("http")
-                        ? talkAvatar.torso
-                        : getBase() + talkAvatar.torso}
-                 alt={session.profile?.display_name || ""} />
+            <div className={"talk-torso-wrap"
+                            + (animatedIn(presence) ? " listening" : "")}>
+              <img className={"talk-torso"
+                              + (animatedIn(presence) ? " listening" : "")}
+                   src={talkAvatar.torso.startsWith("http")
+                          ? talkAvatar.torso
+                          : getBase() + talkAvatar.torso}
+                   alt={session.profile?.display_name || ""} />
+              <TalkMark avatar={talkAvatar} />
+            </div>
           ) : talkAvatar?.asset ? (
             /* The face, or the empty frame — `render()` decides which, and
                `placeholder` only says how to caption it. This branch used to
@@ -713,6 +738,7 @@ export function Chat({ onPlans }: {
                           ? talkAvatar.asset
                           : getBase() + talkAvatar.asset}
                    alt={session.profile?.display_name || ""} />
+              <TalkMark avatar={talkAvatar} />
             </div>
           ) : null}
           <div className="talk-name">{session.profile?.display_name}</div>
@@ -740,6 +766,12 @@ export function Chat({ onPlans }: {
             {/* One control, both directions. While it was only "Speak
                 again" there was no way to close an ear that had opened, and
                 no way to tell from the button that it was open. */}
+            {/* The share menu opens leftward of the talk control rather than
+                past the send button, which is where the row ran out of room
+                on a phone. */}
+            <button className="agent-plusbtn" aria-label={tr("agent.plus", lang)}
+                    aria-expanded={talkPlus}
+                    onClick={() => setTalkPlus((o) => !o)}>+</button>
             <button className={listening ? "" : "primary"}
                     onClick={listening ? talkStop : talkListen}>
               {listening ? tr("chat.talk.stop", lang) : tr("chat.talk.again", lang)}
@@ -748,12 +780,6 @@ export function Chat({ onPlans }: {
                     onClick={() => { setHeard(""); send(); }}>
               {tr("chat.send", lang)}
             </button>
-            {/* Sharing from the face, not only from the composer below it.
-                This is the screen somebody is actually on while talking, and
-                it was the one surface with no way to hand anything over. */}
-            <button className="agent-plusbtn" aria-label={tr("agent.plus", lang)}
-                    aria-expanded={talkPlus}
-                    onClick={() => setTalkPlus((o) => !o)}>+</button>
           </div>
           {talkPlus && (
             <div className="agent-plus talk-plus" role="menu">

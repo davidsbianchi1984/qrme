@@ -36,6 +36,32 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   service unreachable, or a general close — hand-translated into all ten
   languages.
 
+- **The talking face got smaller every time a panel opened.** The talk overlay
+  is a column flex container, and `.talk-face` was given a width and a height
+  and nothing else. In a column the main axis is the *vertical* one, so
+  `flex-shrink` defaults to 1 and applies to exactly the dimension meant to be
+  fixed: every panel opened beside the conversation took its room out of the
+  one child willing to give it, and four of them left a slit.
+
+      asked     is the face given a size
+      mattered  can anything take it back
+
+  A fixed width and height are not a size unless the box is also told not to
+  lend them out. The face and the standing torso keep theirs now, and the
+  overlay scrolls where the content no longer fits — which is where the extra
+  height was always supposed to go.
+
+- **The talking face carried no designation.** `Avatar.watermark` is
+  documented as "always displayed, by the product's own rule", and this was
+  the screen showing a synthetic face at its largest, mid-conversation, with
+  the mark nowhere on it. It is drawn from the server's own line, so a
+  customised designation reads the same here as everywhere else.
+
+### Changed
+
+- **The share menu opens before the talk control** rather than after the send
+  button, where the row ran out of room on a phone.
+
 ## [1.7.0] - 2026-08-24
 
 ### Fixed
