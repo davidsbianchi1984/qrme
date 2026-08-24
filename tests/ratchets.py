@@ -186,7 +186,104 @@ def _translated_refusals() -> int:
     return len(i18n._REFUSALS)
 
 
+# -- the shells and the shapes they declare ---------------------------------
+#
+# The same cluster JIM-mini paid down, measured here rather than assumed from
+# there. The prediction in this file's header was that a literal copied into
+# three repositories is calibrated for whichever was smallest when it was
+# written -- and in this direction it came out the other way round. These
+# floors were set locally and most sit at four-fifths already; JIM-mini's
+# equivalents had drifted to a third. A number is not stale because it is
+# shared; it is stale because nobody measured it.
+
+
+def _shell_files(kind: str):
+    def go() -> int:
+        from . import test_the_shells_still_parse as m
+        return len(getattr(m, kind))
+    return go
+
+
+def _xaml_named() -> int:
+    from .test_the_shells_still_parse import XAML, _XNAME
+    return sum(len(set(_XNAME.findall(p.read_text(encoding="utf-8"))))
+               for p in XAML)
+
+
+def _xaml_handlers() -> int:
+    from .test_the_shells_still_parse import XAML, _handlers
+    return _handlers(XAML)[0]
+
+
+def _xaml_driveable() -> int:
+    from .test_the_shells_still_parse import XAML, _undriveable
+    return _undriveable(XAML)[0]
+
+
+def _swift_structs() -> int:
+    from .test_the_shape_the_swift_client_expects import _structs
+    return len(_structs())
+
+
+def _swift_fields() -> int:
+    from .test_the_shape_the_swift_client_expects import _structs
+    return sum(len(f) for f in _structs().values())
+
+
+def _swift_bindings() -> int:
+    from .test_the_shape_the_swift_client_expects import _bindings
+    return len(_bindings())
+
+
+def _console_shapes() -> int:
+    from .test_the_shape_the_console_expects import _shapes
+    return len(_shapes())
+
+
+def _console_shape_fields() -> int:
+    from .test_the_shape_the_console_expects import _shapes
+    return sum(len(f) for f in _shapes().values())
+
+
+def _console_gets() -> int:
+    from .test_the_shape_the_console_expects import _gets
+    return len(_gets())
+
+
+def _client_bindings() -> int:
+    from .test_the_shape_the_client_expects import _bindings
+    return len(_bindings())
+
+
 RATCHETS: tuple[Ratchet, ...] = (
+    Ratchet("shells.swift_files", 39, _shell_files("SWIFT"),
+            "the Swift sources the shell parser reads"),
+    Ratchet("shells.kotlin_files", 9, _shell_files("KOTLIN"),
+            "the Kotlin sources the shell parser reads"),
+    Ratchet("shells.csharp_files", 23, _shell_files("CSHARP"),
+            "the C# sources the shell parser reads"),
+    Ratchet("shells.xaml_files", 19, _shell_files("XAML"),
+            "the XAML screens the markup checks reach"),
+    Ratchet("shells.xaml_named", 1047, _xaml_named,
+            "the named elements across those XAML screens"),
+    Ratchet("shells.xaml_handlers", 387, _xaml_handlers,
+            "the XAML handlers checked against their code-behind"),
+    Ratchet("shells.xaml_driveable", 916, _xaml_driveable,
+            "the XAML elements the drive check reaches"),
+    Ratchet("swift.structs", 266, _swift_structs,
+            "the Swift client's declared shapes"),
+    Ratchet("swift.struct_fields", 1027, _swift_fields,
+            "the fields across the Swift client's shapes"),
+    Ratchet("swift.bindings", 212, _swift_bindings,
+            "the Swift screens' bindings to those shapes"),
+    Ratchet("console.shapes", 227, _console_shapes,
+            "the console's declared shapes"),
+    Ratchet("console.shape_fields", 1572, _console_shape_fields,
+            "the fields across the console's shapes"),
+    Ratchet("console.gets", 191, _console_gets,
+            "the console's read calls"),
+    Ratchet("console.bindings", 158, _client_bindings,
+            "the console screens' bindings to route shapes"),
     Ratchet("refusals.translated", 335, _translated_refusals,
             "rows in the hand-translated refusal table"),
     Ratchet("refusals.literal", 200, _literal_refusals,

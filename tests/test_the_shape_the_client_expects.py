@@ -58,6 +58,7 @@ import pathlib
 import re
 
 import pytest
+from . import ratchets
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
 WINDOWS_CLIENT = REPO / "native/windows/ApiClient.cs"
@@ -317,7 +318,7 @@ def test_the_extractor_reads_the_bindings_and_the_records():
     flat one is dropping fields — this caught exactly that, a closing paren
     eaten by the block regex, before it could report a clean client."""
     names = {wire for fields in _records().values() for wire, _ in fields}
-    assert len(_bindings()) >= 150, len(_bindings())
+    assert len(_bindings()) >= ratchets.floor("console.bindings"), len(_bindings())
     assert len(names) >= 490, len(names)
 
 def test_no_extracted_record_swallowed_the_next_one():

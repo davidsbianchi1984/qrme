@@ -1,5 +1,5 @@
-# status: backlog — 84 rows
-# ceiling: 84
+# status: backlog — 70 rows
+# ceiling: 70
 #
 # Every numeric floor in this suite still carrying its own literal: an
 # `assert <something> > <int>` with the number written into the assertion.
@@ -97,24 +97,10 @@ test_the_refusal_that_handed_the_body_back.py:156: len(found) > 150
 test_the_refusal_that_handed_the_body_back.py:160: reached > 100
 test_the_refusal_that_handed_the_body_back.py:275: len(i18n._VALIDATION) >= 10
 test_the_seal_the_mail_and_the_screen.py:282: len(keys) >= 46
-test_the_shape_the_client_expects.py:308: len(driven) >= 30
-test_the_shape_the_client_expects.py:320: len(_bindings()) >= 150
-test_the_shape_the_client_expects.py:321: len(names) >= 490
-test_the_shape_the_console_expects.py:404: len(shapes) >= 240
-test_the_shape_the_console_expects.py:405: sum((len(f) for f in shapes.values())) >= 1700
-test_the_shape_the_console_expects.py:406: len(_gets()) >= 190
-test_the_shape_the_console_expects.py:456: len(driven) >= 60
-test_the_shape_the_swift_client_expects.py:218: len(_structs()) >= 200
-test_the_shape_the_swift_client_expects.py:219: fields >= 900
-test_the_shape_the_swift_client_expects.py:220: len(_bindings()) >= 150
-test_the_shape_the_swift_client_expects.py:227: len(driven) >= 25
-test_the_shells_still_parse.py:394: len(SWIFT) >= 40
-test_the_shells_still_parse.py:395: len(KOTLIN) >= 10
-test_the_shells_still_parse.py:396: len(CSHARP) >= 25
-test_the_shells_still_parse.py:406: len(XAML) >= 20
-test_the_shells_still_parse.py:409: named >= 900
-test_the_shells_still_parse.py:411: checked >= 340
-test_the_shells_still_parse.py:413: driven >= 780
+test_the_shape_the_client_expects.py:309: len(driven) >= 30
+test_the_shape_the_client_expects.py:322: len(names) >= 490
+test_the_shape_the_console_expects.py:457: len(driven) >= 60
+test_the_shape_the_swift_client_expects.py:228: len(driven) >= 25
 test_the_shells_table_answers_every_reader.py:107: len(_rows(shell)) >= 200
 test_the_starters_know_their_trade.py:140: len(tags) >= 8
 test_the_starters_know_their_trade.py:69: len(d['expertise']) >= 350
