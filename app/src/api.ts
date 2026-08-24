@@ -5183,7 +5183,9 @@ export const api = {
    *  `heardInRoom` below is the same door scoped to a room. This one exists
    *  for a conversation somebody took with them: the browser's own
    *  recogniser is ended when a page is put away, and `getUserMedia` is not
-   *  — an open capture keeps recording while the window is minimised. So a
+   *  — an open capture keeps recording while the window is minimised on
+   *  a desktop browser and on Android, though not in iOS Safari, which
+   *  suspends the page outright. So a
    *  strip that wants to survive being minimised records and posts the bytes
    *  rather than listening.
    *

@@ -8041,6 +8041,18 @@ const CHROME: Table = {
   "walk.offline": {
     en: "answered from what's stored here", es: "respondido con lo que hay guardado aquí", fr: "répondu à partir de ce qui est stocké ici", de: "beantwortet aus dem, was hier gespeichert ist", pt: "respondido a partir do que está guardado aqui", it: "risposto con ciò che è conservato qui", ja: "ここに保存されている知識から回答", zh: "由本机存有的知识作答", hi: "यहाँ संग्रहीत जानकारी से उत्तर", ar: "أُجيب من المحفوظ هنا",
   },
+  // The iPhone's answer, said out loud. iOS Safari suspends the whole page
+  // when you leave it — capture and all — so the survival the strip promises
+  // elsewhere is simply not available there. A field report found this by
+  // swiping up to the home screen and coming back to a conversation that had
+  // stopped without a word, which is the failure this whole strip is written
+  // against; a platform stopping it is no excuse for the silence.
+  "walk.again": {
+    en: "Carry on", es: "Continuar", fr: "Continuer", de: "Weitermachen", pt: "Continuar", it: "Continua", ja: "続ける", zh: "继续", hi: "जारी रखो", ar: "تابِع",
+  },
+  "walk.away.stopped": {
+    en: "This browser stopped listening while you were away.", es: "Este navegador dejó de escuchar mientras no estabas.", fr: "Ce navigateur a cessé d'écouter pendant ton absence.", de: "Dieser Browser hat aufgehört zuzuhören, während du weg warst.", pt: "Este navegador deixou de ouvir enquanto estavas fora.", it: "Questo browser ha smesso di ascoltare mentre non c'eri.", ja: "離れている間にこのブラウザーが聞くのをやめました。", zh: "你离开时，这个浏览器停止了聆听。", hi: "तुम्हारे दूर रहते हुए इस ब्राउज़र ने सुनना बंद कर दिया।", ar: "توقّف هذا المتصفّح عن الاستماع أثناء غيابك.",
+  },
   "walk.lost": {
     en: "that did not reach it", es: "eso no llegó", fr: "cela n'est pas arrivé", de: "das kam nicht an", pt: "isso não chegou", it: "non è arrivato", ja: "届きませんでした", zh: "没有送达", hi: "वह नहीं पहुँचा", ar: "لم يصل ذلك",
   },

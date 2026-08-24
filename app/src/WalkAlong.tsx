@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { putAway, whenPutAway } from "./away";
+import { isEcho } from "./echo";
+import { plainVoice } from "./spoken";
 import { t as tr } from "./l10n";
 import { onWalk, stopWalking, walking, type Walking } from "./walk";
 
@@ -50,6 +52,19 @@ export function WalkAlong() {
   const rec = useRef<{ stop: () => void } | null>(null);
   const wants = useRef(false);
   const turn = useRef(0);
+  // The reply is playing. The ear must not open while it does — a field
+  // report on Windows watched the strip transcribe its own answer and send
+  // it back as the next thing the person said, because the recorder sliced
+  // every few seconds whether or not anything was speaking.
+  //
+  //     asked     is the microphone open
+  //     mattered  is anything else in the room already talking
+  const saying = useRef(false);
+  // And what was last said, so a slice that catches the tail of it can be
+  // recognised for what it is rather than answered. Belt to the braces
+  // above: echo cancellation and a closed ear both leak a little, and the
+  // console has had `isEcho` for exactly this since the rooms grew ears.
+  const lastSaid = useRef("");
 
   useEffect(() => onWalk(setWho), []);
 
@@ -64,9 +79,38 @@ export function WalkAlong() {
   //
   //     asked     does a hidden page stop hearing
   //     mattered  which of the two ways of hearing was it using
+  //
+  // ## And what a phone did to that
+  //
+  // A field report, from an iPhone: walk, swipe up to the home screen, come
+  // back to Safari, and the conversation had stopped without a word. iOS
+  // Safari suspends the whole page the moment you leave it, capture and
+  // all — the survival above is a desktop fact and an Android fact, and on
+  // iOS it is simply false. The strip could not have known that in advance
+  // and does not try to; what it must do is notice on the way back.
+  //
+  //     asked     did the capture survive being put away
+  //     mattered  does the strip find out when it did not
+  //
+  // So returning checks whether the ear is really still open, and says so
+  // when it is not. Stopping without a word is the failure this whole
+  // component is written against, and a platform stopping it is no excuse
+  // for the silence.
   useEffect(() => whenPutAway(
     () => { setAsleep(true); if (!walking()?.hears) close(); },
-    () => setAsleep(false)), []);
+    () => {
+      setAsleep(false);
+      // A tick, because the recorder's own `onstop` may still be queued
+      // behind the page waking up — reading `wants` in the same beat would
+      // catch a teardown that has not finished announcing itself.
+      window.setTimeout(() => {
+        if (!walking()) return;
+        if (!wants.current) {
+          setListening(false);
+          setTrouble(tr("walk.away.stopped", walking()!.lang as never));
+        }
+      }, 0);
+    }), []);
 
   useEffect(() => {
     if (!who) { close(); return; }
@@ -102,6 +146,10 @@ export function WalkAlong() {
    */
   async function record(w: Walking) {
     if (!w.hears || rec.current) return;
+    // Never under the reply. `turnTaken` calls this again once the speaking
+    // has finished; opening here would put the microphone back into the
+    // room the answer is still playing into.
+    if (saying.current) return;
     const mine = ++turn.current;
     const live = () => mine === turn.current;
     let stream: MediaStream;
@@ -146,7 +194,19 @@ export function WalkAlong() {
       return;
     }
     if (mine !== turn.current) return;
-    if (words) { setHeard(words); await turnTaken(w, words); }
+    // The reply, coming back. Echo cancellation thins what the speakers put
+    // into the microphone and does not remove it, and a slice that caught
+    // the tail of an answer transcribes as somebody saying that answer.
+    // Answering it starts a conversation the profile is having with itself,
+    // which is what a field report on Windows watched happen.
+    if (words && isEcho(words, lastSaid.current)) {
+      if (wants.current) void record(w);
+      return;
+    }
+    if (words) { setHeard(words); await turnTaken(w, words); return; }
+    // Nothing said, and nothing to answer: open the ear again. When there
+    // *was* something, `turnTaken` reopens it after the reply has finished
+    // rather than under it.
     if (wants.current) void record(w);
   }
 
@@ -202,21 +262,40 @@ export function WalkAlong() {
   }
 
   async function turnTaken(w: Walking, message: string) {
+    const mine = turn.current;
     try {
       const answer = await w.take(message);
+      if (mine !== turn.current) return;
       const text = answer.text;
       setSaid(text);
       setOffline(Boolean(answer.offline));
       setHeard("");
-      if (text && "speechSynthesis" in window) {
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = w.lang;
-        window.speechSynthesis.speak(u);
+      if (text) {
+        lastSaid.current = text;
+        saying.current = true;
+        try {
+          // The screen's own voice when it handed one over — the profile's
+          // bound voice, the one somebody chose and is paying for. The
+          // browser's built-in speech is the fallback and sounds like one.
+          if (w.say) await w.say(text);
+          else await plainVoice(text, w.lang);
+        } finally {
+          saying.current = false;
+        }
       }
     } catch {
-      setSaid(tr("walk.lost", w.lang as never));
+      if (mine === turn.current) setSaid(tr("walk.lost", w.lang as never));
+    } finally {
+      // The ear opens again after the answer has finished, not during it.
+      // Interrupting is a real thing to want and this is not the shape that
+      // gives it: the recorder posts fixed slices rather than listening
+      // continuously, so an ear open under the reply hears the reply.
+      if (mine === turn.current && wants.current) {
+        if (w.hears) void record(w); else listen(w);
+      }
     }
   }
+
 
   if (!who) return null;
   return (
@@ -239,6 +318,19 @@ export function WalkAlong() {
         </span>
       )}
       {trouble && <span className="walk-trouble">{trouble}</span>}
+      {/* The way back. A strip that says it stopped and offers nothing is
+          a dead end somebody has to leave the app to escape — and on the
+          platform this exists for, they have just come back into it. */}
+      {trouble && (
+        <button className="walk-again"
+                onClick={() => {
+                  setTrouble("");
+                  const w = walking();
+                  if (w) { if (w.hears) void record(w); else listen(w); }
+                }}>
+          {tr("walk.again", who.lang as never)}
+        </button>
+      )}
       {(heard || said) && !trouble && (
         <span className="walk-words">{heard || said}</span>
       )}

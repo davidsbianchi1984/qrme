@@ -263,3 +263,24 @@ function started(el: HTMLAudioElement): Promise<void> {
     el.addEventListener("playing", () => go(), { once: true });
   });
 }
+
+/** The device's own voice, awaited.
+ *
+ * What stands in when `speakInPieces` rejects — no binding, no engine, or a
+ * platform that refused to play. It is a worse voice and it is not silence,
+ * which is the whole of the argument for it.
+ *
+ * Awaited on purpose. A caller that reopens a microphone when speaking
+ * *starts* rather than when it ends records its own reply, which is what a
+ * field report on Windows watched the walking strip do.
+ */
+export function plainVoice(text: string, lang: string): Promise<void> {
+  if (!("speechSynthesis" in window)) return Promise.resolve();
+  return new Promise((done) => {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang;
+    u.onend = () => done();
+    u.onerror = () => done();
+    window.speechSynthesis.speak(u);
+  });
+}

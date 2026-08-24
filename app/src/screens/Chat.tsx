@@ -4,7 +4,7 @@ import { api, getBase, type Avatar, type Briefing, type DialerPosture,
          type Escalated, type MyPerson } from "../api";
 import { Briefcase } from "../Briefcase";
 import { Refusal } from "../Refusal";
-import { speakInPieces } from "../spoken";
+import { plainVoice, speakInPieces } from "../spoken";
 import { TalkRail } from "../TalkRail";
 import { Waveform } from "../Waveform";
 import { presenceOf, presenceKey, animatedIn } from "../presence";
@@ -1097,6 +1097,12 @@ export function Chat({ onPlans }: {
                     const pid = session.profileId || "";
                     const iid = session.interactorId || "";
                     const itok = session.interactorToken || "";
+                    // The same token the screen's own voice uses: the
+                    // owner's when this is their profile, the interactor's
+                    // otherwise. Captured here rather than read inside the
+                    // callback, so the walk keeps the identity it started
+                    // with even if the session moves on.
+                    const vtok = session.ownerToken || itok;
                     startWalking({
                       shownName: shownName || "",
                       lang,
@@ -1109,6 +1115,27 @@ export function Chat({ onPlans }: {
                       ...(iid && itok ? {
                         hears: (audio: Blob) => api.heard(iid, audio, itok),
                       } : {}),
+                      // The voice somebody chose, not the browser's own.
+                      // The strip shipped with `SpeechSynthesisUtterance`
+                      // while this screen had `speakInPieces` two hundred
+                      // lines up — a field report heard the robot and
+                      // reasonably blamed the voice key, when nothing was
+                      // broken except that the strip never asked.
+                      //
+                      //     asked     did the reply get spoken
+                      //     mattered  in whose voice
+                      say: async (text: string) => {
+                        try {
+                          const s = await speakInPieces(pid, text, vtok);
+                          await s.done;
+                        } catch {
+                          // The device's own voice stands in. A rejection
+                          // here is no binding, no engine, or a platform
+                          // that refused to play — and to a listener all
+                          // three are the same event: nothing was said.
+                          await plainVoice(text, lang);
+                        }
+                      },
                       take: async (message) => {
                         const r = await api.chat(pid, {
                           interactor_id: iid, message });

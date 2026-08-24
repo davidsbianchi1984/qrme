@@ -348,3 +348,176 @@ def test_the_route_is_gated_on_that_identity():
         "a deployment with no ears does not refuse — silence reads as *it "
         "didn't hear me* to somebody who has just spoken into their phone, "
         "and the true answer is one an owner can act on")
+
+
+# ---------------------------------------------------------------------------
+# The platform that does not survive, found on a phone.
+#
+# A field report, from an iPhone: walk, swipe up to the home screen, come back
+# to Safari, and the conversation had stopped without a word. iOS Safari
+# suspends the whole page the moment you leave it — capture included — so the
+# survival this strip relies on elsewhere is a desktop fact and an Android
+# fact, and there it is simply false. It had been written down as though it
+# were true everywhere, which is the kind of claim that reads as tested.
+#
+#     asked     did the capture survive being put away
+#     mattered  does the strip find out when it did not
+#
+# The strip cannot know which platform it is on in advance and must not guess.
+# What it owes is to check on the way back — because stopping without a word
+# is the failure this whole component is written against, and a platform doing
+# the stopping is no excuse for the silence.
+
+
+def test_coming_back_notices_an_ear_that_did_not_survive():
+    i = STRIP.index("whenPutAway(")
+    depth, j = 0, i
+    while j < len(STRIP):
+        if STRIP[j] == "(":
+            depth += 1
+        elif STRIP[j] == ")":
+            depth -= 1
+            if depth == 0:
+                break
+        j += 1
+    call = STRIP[i:j + 1]
+    # The return handler is the second argument, and it must do more than
+    # clear a flag: on a platform that suspended the page, clearing the flag
+    # leaves the strip drawn exactly as it was over an ear that is gone.
+    assert "wants.current" in call, (
+        "coming back does not check whether the ear actually survived, so a "
+        "browser that stopped listening while away leaves the strip saying "
+        "nothing happened")
+    assert 'tr("walk.away.stopped"' in call, (
+        "the strip has no way to say the browser stopped listening while the "
+        "person was away — which is the silence the field report found")
+    # And it must not restart by itself. A microphone that reopens because a
+    # tab regained focus is one nobody pressed for.
+    assert "record(" not in call and "listen(" not in call, (
+        "coming back reopens the microphone itself rather than offering it")
+
+
+def test_the_way_back_is_offered_and_not_only_announced():
+    """A strip that says it stopped and offers nothing is a dead end — and
+    on the platform this exists for, the person has just come back into the
+    app to find it."""
+    assert 'tr("walk.again"' in STRIP, (
+        "nothing offers the conversation back after the browser stopped it")
+    # The control is gated on the trouble, so it appears when there is
+    # something to recover from rather than sitting there always.
+    i = STRIP.index('tr("walk.again"')
+    assert "trouble &&" in STRIP[:i], (
+        "the resume control is not tied to the failure it recovers from")
+
+
+def test_the_claim_about_surviving_names_its_exception():
+    """The docstring said an open capture keeps recording while the window is
+    minimised, full stop. It does not, on the one platform the reporter was
+    holding. A comment that overstates what was tested is how the next person
+    stops testing it."""
+    store = (APP / "walk.ts").read_text(encoding="utf-8")
+    assert "iOS Safari" in store, (
+        "`walk.ts` still claims the capture survives being put away without "
+        "naming the platform where it does not")
+    for wrong in ("keeps recording while the window is minimised,\n",):
+        assert wrong not in store, (
+            "the unqualified claim is still there")
+
+
+# ---------------------------------------------------------------------------
+# Two field reports from a Windows machine, one root cause.
+#
+# The strip transcribed its own answer and sent it back as the next thing the
+# person said; and it spoke in the browser's built-in robot rather than the
+# voice somebody chose and is paying for. Both were this component doing its
+# own thing while the console next door already had the machinery — the exact
+# drift this file's own docstring warns about, committed anyway.
+#
+#     asked     did the reply get spoken and the next turn heard
+#     mattered  in whose voice, and into whose silence
+
+
+def test_the_ear_does_not_open_under_the_reply():
+    """The recorder posts fixed slices rather than listening continuously,
+    so an ear open while the answer plays records the answer. Echo
+    cancellation thins what the speakers put back into the microphone; it
+    does not remove it."""
+    assert "saying" in STRIP, (
+        "nothing tracks whether the reply is playing, so the recorder opens "
+        "under it")
+    # The guard is at the top of `record`, before anything opens. `.{0,400}`
+    # with a `\n` terminator matched only the signature line — a lazy
+    # quantifier stops at the first newline it can, which is the one right
+    # after the brace. Take a fixed slice of the body instead.
+    i = STRIP.index("async function record(w: Walking) {")
+    head = STRIP[i:i + 700]
+    assert "if (saying.current) return;" in head, (
+        "`record` opens the microphone without asking whether the answer is "
+        "still playing into the room")
+    # And the reopen happens after the speaking, in `turnTaken`'s `finally`,
+    # rather than beside it.
+    j = STRIP.index("async function turnTaken(")
+    body = STRIP[j:]
+    tail = body[body.index("} finally {"):body.index("\n  }", body.index("} finally {"))]
+    assert "record(w)" in tail or "listen(w)" in tail, (
+        "the ear is not reopened after the answer finishes, so either it "
+        "never reopens or it reopens beside the voice")
+
+
+def test_what_comes_back_as_the_reply_is_not_answered():
+    """Belt to the braces. A slice that caught the tail of an answer
+    transcribes as somebody saying that answer, and answering it starts a
+    conversation the profile is having with itself."""
+    assert "isEcho(" in STRIP, (
+        "the strip does not check whether what it heard is its own reply "
+        "coming back — the console has had `isEcho` since the rooms grew ears")
+    assert 'from "./echo"' in STRIP, "isEcho is not the console's own"
+    assert "lastSaid" in STRIP, (
+        "nothing remembers what was said, so there is nothing to compare a "
+        "suspicious transcript against")
+
+
+def test_the_walk_speaks_in_the_voice_somebody_chose():
+    """`SpeechSynthesisUtterance` is the browser's robot. The profile's own
+    bound voice is two hundred lines up in the screen that started the walk,
+    and the strip shipped never asking for it."""
+    store = (APP / "walk.ts").read_text(encoding="utf-8")
+    assert "say?:" in store, (
+        "the walk carries no way to speak in the screen's own voice")
+    # And the strip reaches for it first. A sabotage that deleted the
+    # `w.say` branch — leaving the type, leaving both screens handing a
+    # voice over, and quietly using the browser's robot for all of it —
+    # passed every other assertion here. Handed over and never used is the
+    # same silence as never handed over.
+    assert "if (w.say) await w.say(text);" in STRIP, (
+        "the strip does not use the voice the screen handed it, so every "
+        "reply comes out in the browser's built-in one anyway")
+    for name, src in _surfaces().items():
+        call = _braced(src, src.index("startWalking({") + len("startWalking("))
+        assert "say:" in call, (
+            f"{name} hands over no voice, so the strip falls back to the "
+            "browser's built-in one and a person reasonably concludes the "
+            "voice key is broken")
+        assert "speakInPieces(" in call, (
+            f"{name}'s walk speaks by some other means than the piece-by-"
+            "piece bound voice the screen itself uses")
+
+
+def test_the_browser_voice_is_the_fallback_and_is_awaited():
+    """It stays, for a screen that handed none over. What it must not do is
+    return before the speaking ends — that is what let the ear open under
+    the reply in the first place."""
+    # It lives in `spoken.ts` beside the real voice it stands in for, and
+    # is shared with the two screens rather than being the strip's private
+    # copy — the guard next door wants every `speakInPieces` call site to
+    # have somewhere to fall back to, and three copies of one fallback is
+    # how two of them drift.
+    spoken = (APP / "spoken.ts").read_text(encoding="utf-8")
+    assert "export function plainVoice" in spoken, (
+        "the fallback voice is gone; a screen that hands over no voice, or "
+        "whose voice was refused, now says nothing at all")
+    m = re.search(r"export function plainVoice\(.*?\n\}", spoken, re.S)
+    assert m and "u.onend" in m.group(0), (
+        "the fallback voice is not awaited, so the ear reopens the moment "
+        "speaking starts rather than when it ends")
+    assert "plainVoice(" in STRIP, "the strip never reaches its fallback"

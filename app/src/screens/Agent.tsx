@@ -4,7 +4,7 @@ import { api, type AgentTurn, type WebSearchAnswer,
 import { startWalking } from "../walk";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
-import { speakInPieces, type Speaking } from "../spoken";
+import { plainVoice, speakInPieces, type Speaking } from "../spoken";
 import { useSession } from "../store";
 import { putAway, whenPutAway } from "../away";
 
@@ -859,6 +859,27 @@ export function Agent({ onPlans, go }: {
                         ...(iid && itok ? {
                           hears: (audio: Blob) => api.heard(iid, audio, itok),
                         } : {}),
+                        // The voice somebody chose, not the browser's own.
+                        // The strip shipped with `SpeechSynthesisUtterance`
+                        // while this screen had `speakInPieces` two hundred
+                        // lines up — a field report heard the robot and
+                        // reasonably blamed the voice key, when nothing was
+                        // broken except that the strip never asked.
+                        //
+                        //     asked     did the reply get spoken
+                        //     mattered  in whose voice
+                        say: async (text: string) => {
+                          try {
+                            const s = await speakInPieces(pid, text, tok);
+                            await s.done;
+                          } catch {
+                            // The device's own voice stands in. A rejection
+                            // here is no binding, no engine, or a platform
+                            // that refused to play — and to a listener all
+                            // three are the same event: nothing was said.
+                            await plainVoice(text, lang);
+                          }
+                        },
                         take: async (message) => {
                           const turn = await api.authoringTurn(
                             pid, message, thread, tok);
