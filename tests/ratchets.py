@@ -435,7 +435,92 @@ def _key_vocabulary() -> int:
     return len(_vocabulary())
 
 
+# -- the floors the sweep was too coarse to see -----------------------------
+#
+# `SMALLEST_FLOOR` is five, so `assert n >= 2` never entered the backlog. The
+# cutoff is right about most of what it hides: a two or a three is usually a
+# shape check on a response body, not a floor on a scanned surface. It is
+# wrong about these.
+#
+#     asked     is this floor big enough to be worth auditing
+#     mattered  is this floor smaller than what it stands over
+#
+# It filters on the number's size as a stand-in for the number's kind, and
+# the stand-in fails in both directions — it would drag in fifty-two runtime
+# assertions if it were lowered, and it hides a two standing over a hundred
+# and twenty-seven.
+
+def _requests_built(shell: str):
+    def go() -> int:
+        import re
+        from . import test_the_language_nobody_was_sending as m
+        for name, _, _, _, client, _ in m.SHELLS:
+            if name == shell:
+                return len(re.findall(m.BUILT[name], m._code(m.REPO / client)))
+        raise KeyError(f"no shell named {shell!r}")
+    return go
+
+
+def _ratchet_files() -> int:
+    from .test_a_record_that_outlived_the_code import _ratchets
+    return len(_ratchets())
+
+
+def _readme_files() -> int:
+    from .test_readme_scripture import _readmes
+    return len(_readmes())
+
+
+def _verbs_min() -> int:
+    """The fewest distinct verbs any one surface reports.
+
+    A minimum rather than a total, because the assertion runs per surface: a
+    floor on the sum would be satisfied by one surface reading well while
+    another had gone silent.
+    """
+    from .test_native_routes_exist import NATIVE, calls
+    return min(len({method for method, _ in calls(lang)})
+               for lang in NATIVE)
+
+
+def _thinnest_closure() -> int:
+    from .test_a_profile_has_no_hands_on_the_money import AUTONOMOUS, _closure
+    return min(len(_closure(root)) for root in AUTONOMOUS)
+
+
+def _gallery_tables() -> int:
+    from .test_the_gallery_is_a_grid import _galleries
+    return len(list(_galleries()))
+
+
+def _workflow_files() -> int:
+    from .test_a_check_that_cannot_fail_before_the_merge import _files
+    return len(_files())
+
+
 RATCHETS: tuple[Ratchet, ...] = (
+    # Per shell, and the reason is in the numbers: this one literal stood
+    # over 10, 8 and 123 requests built. It was honest about the
+    # iPhone and decoration on the desktop, which is what a single floor
+    # under a loop over three surfaces always ends up being.
+    Ratchet("language.requests_built.ios", 8, _requests_built("ios"),
+            "the requests the iPhone client builds"),
+    Ratchet("language.requests_built.android", 6, _requests_built("android"),
+            "the requests the Android client builds"),
+    Ratchet("language.requests_built.windows", 98, _requests_built("windows"),
+            "the requests the desktop client builds"),
+    Ratchet("autonomy.thinnest_closure", 11, _thinnest_closure,
+            "the siblings the thinnest autonomous root imports"),
+    Ratchet("ratchet.files", 20, _ratchet_files,
+            "the ratchet records this suite keeps"),
+    Ratchet("gallery.tables", 9, _gallery_tables,
+            "the gallery tables the README carries"),
+    Ratchet("route.verbs_min", 4, _verbs_min,
+            "the distinct verbs the thinnest-reading shell reports"),
+    Ratchet("readme.files", 7, _readme_files,
+            "the READMEs the passage check reads"),
+    Ratchet("workflow.files", 5, _workflow_files,
+            "the workflow files the gating sweep reads"),
     Ratchet("console.bindings_scanned", 424, _console_bindings,
             "the bindings the console scan parses out of api.ts"),
     Ratchet("native.api_functions.ios", 438, _api_functions("ios"),

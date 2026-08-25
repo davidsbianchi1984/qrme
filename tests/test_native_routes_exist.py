@@ -19,6 +19,8 @@ from qrme.api import app
 from . import clientpaths
 from .clientpaths import NATIVE, VERBS, calls, paths
 
+from . import ratchets
+
 # The clients keep their paths in one file per platform, but the scan covers
 # every source under `native/` so an inline call in a view is caught too.
 _MIN_PATHS = 40
@@ -79,7 +81,7 @@ def test_each_shell_reports_more_than_one_verb():
         assert made, f"{lang.name}: no calls extracted at all"
         verbs = {method for method, _ in made}
         assert verbs <= set(VERBS), f"{lang.name}: unexpected verbs {verbs}"
-        assert len(verbs) > 1, (
+        assert len(verbs) >= ratchets.floor("route.verbs_min"), (
             f"{lang.name} reports only {verbs} across {len(made)} calls — its "
             "verb reader has probably stopped matching, which would turn every "
             "call into an unchecked GET"

@@ -46,6 +46,8 @@ from pathlib import Path
 
 import pytest
 
+from . import ratchets
+
 PKG = Path(__file__).resolve().parents[1] / "qrme"
 MODULES = {p.stem: p for p in PKG.glob("*.py")}
 
@@ -115,7 +117,8 @@ def test_the_roots_are_real_and_still_do_something():
     quietly, which is worse than not having it."""
     for root in AUTONOMOUS:
         assert root in MODULES, root
-        assert len(_closure(root)) > 1, (
+        assert len(_closure(root)) >= ratchets.floor(
+                "autonomy.thinnest_closure"), (
             f"{root} imports no siblings at all — either it was gutted or "
             "this file is reading the wrong package"
         )
