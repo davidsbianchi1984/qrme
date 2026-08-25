@@ -899,6 +899,8 @@
                 <StackPanel Spacing="8">
                     <TextBlock x:Name="AsstTitle" FontSize="15" FontWeight="Bold"
                                Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="AsstWorksTitle" FontSize="12" Visibility="Collapsed"
+                               Foreground="{StaticResource QrmeT2Brush}" />
                     <ItemsControl x:Name="AsstWorksList" />
                     <TextBox x:Name="AsstMomentBox" />
                     <Button x:Name="AsstComposeButton" Click="OnAsstCompose" />

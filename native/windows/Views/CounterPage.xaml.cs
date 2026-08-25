@@ -105,6 +105,9 @@ public sealed partial class CounterPage : Page
         ItemIdBox.Header = L10n.T("deals.manifest");
         TakeItemButton.Content = L10n.T("deals.take");
         DropItemButton.Content = L10n.T("deals.drop");
+        // The note the phones show above this button: what signing pins,
+        // before somebody pins it.
+        SignNoteText.Text = L10n.T("deals.sign.note");
         SignButton.Content = L10n.T("deals.sign.go");
         ReopenButton.Content = L10n.T("deals.reopen");
         WithdrawButton.Content = L10n.T("deals.withdraw");

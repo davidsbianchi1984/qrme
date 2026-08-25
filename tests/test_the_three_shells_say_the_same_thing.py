@@ -87,7 +87,7 @@ LANGS = ["en", "es", "fr", "de", "pt", "it", "ja", "zh", "hi", "ar"]
 
 #: Floors under the parse, a row all three hold, and a floor under the overlap.
 #: Per repo; nothing else in this file is.
-FLOOR, PROBE, OVERLAP = 900, "action.send", 800
+FLOOR, PROBE, OVERLAP = 900, "acct.email", 800
 
 _STR = r'"((?:[^"\\]|\\.)*)"'
 _HEAD = {

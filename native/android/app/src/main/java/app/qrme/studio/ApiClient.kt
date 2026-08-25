@@ -4092,11 +4092,15 @@ object ApiClient {
     }
 
     suspend fun mintTaskGrant(id: String,
-                              token: String): Pair<String, String> {
+                              token: String): Triple<String, String, String> {
         val o = JSONObject(request("/profiles/$id/grants", "POST",
             JSONObject().put("scope", org.json.JSONArray(listOf("*"))),
             token))
-        return o.optString("id") to o.optString("token")
+        // The scope comes back from the door rather than being echoed from
+        // the request: what the grant reaches is the server's to say.
+        val scope = o.optJSONArray("scope")?.let { a ->
+            (0 until a.length()).joinToString(",") { a.optString(it) } } ?: ""
+        return Triple(o.optString("id"), o.optString("token"), scope)
     }
 
     suspend fun revokeTaskGrant(grantId: String, token: String) {

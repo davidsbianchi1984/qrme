@@ -73,7 +73,17 @@ class StudioViewModel(app: Application) : AndroidViewModel(app) {
                     prefs.edit().putString("pid", r.id).putString("token", r.ownerToken)
                         .putString("name", r.displayName).apply()
                 }
-                .onFailure { onError(it.message ?: "Couldn't reach QRME — is the backend running?") }
+                .onFailure { e ->
+                    // A refusal keeps the server's own sentence — already in
+                    // the reader's language. Only a failure to REACH the
+                    // server gets this shell's wording, and that wording
+                    // comes from the table like the iPhone's, not from a
+                    // hardcoded English string only one reader could use.
+                    onError(if (e is java.io.IOException)
+                        L10n.fill("nw.unreachable", L10n.deviceLanguage(),
+                            mapOf("detail" to (e.message ?: "")))
+                    else (e.message ?: ""))
+                }
             onBusy(false)
         }
     }

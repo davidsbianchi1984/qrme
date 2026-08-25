@@ -975,7 +975,10 @@ RATCHETS: tuple[Ratchet, ...] = (
             "the crowd/party/lend keys the iOS table carries"),
     Ratchet("l10n.block.face", 43, _l10n_block("face"),
             "the avatar, emblem and steering keys the iOS table carries"),
-    Ratchet("l10n.block.till", 40, _l10n_block("till"),
+    # 40 -> 38 in the dead-keys close: acct.reset.code and life.legend were
+    # held by all three shells and asked for by none — see
+    # native_dead_keys.txt, 1.8.5.
+    Ratchet("l10n.block.till", 38, _l10n_block("till"),
             "the acct/till/life keys the iOS table carries"),
     Ratchet("l10n.block.lastdoors", 42, _l10n_block("lastdoors"),
             "the born/mind/reach/lic/sens keys the iOS table carries"),
@@ -987,7 +990,10 @@ RATCHETS: tuple[Ratchet, ...] = (
             "the signature, mail and room keys the iOS table carries"),
     Ratchet("l10n.block.sticker", 34, _l10n_block("sticker"),
             "the beacon, queue and stamp keys the iOS table carries"),
-    Ratchet("l10n.block.workshop", 49, _l10n_block("workshop"),
+    # 49 -> 47: work.phase, task.gid and task.list left in the same close.
+    # Three rows out against a floor that moved by two — the measured count
+    # had sat one above the floor since the block was ratcheted.
+    Ratchet("l10n.block.workshop", 47, _l10n_block("workshop"),
             "the workflow, delegation and task keys the iOS table carries"),
     Ratchet("form.asked_for", 44, _form_asked_for,
             "the request fields the form check knows a control for"),
