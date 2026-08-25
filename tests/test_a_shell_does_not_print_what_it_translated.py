@@ -87,6 +87,8 @@ says so.
 import pathlib
 import re
 
+from . import ratchets
+
 REPO = pathlib.Path(__file__).resolve().parent.parent
 
 #: Per shell: its table, the screens it draws, and how a row looks in it.
@@ -344,11 +346,12 @@ def test_the_scan_can_still_see_a_screen():
     what a rewrite of one of these regexes would produce.
     """
     for shell, spec in SHELLS.items():
-        assert len(_shown(spec)) > 100, (
+        assert len(_shown(spec)) >= ratchets.floor(f"shell.shown.{shell}"), (
             f"{shell}: the scan found only {len(_shown(spec))} literal(s) on "
             f"any screen — the extractor has stopped matching")
         assert _rows(spec), f"{shell}: no rows parsed out of its table"
-        assert len(_fragments(spec)) >= 45, (
+        assert len(_fragments(spec)) >= ratchets.floor(
+                f"shell.fragments.{shell}"), (
             f"{shell}: only {len(_fragments(spec))} fragment(s) out of its "
             f"slotted rows — the split has stopped finding slots, and the "
             f"check above would pass on nothing")

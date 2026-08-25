@@ -40,6 +40,8 @@ import re
 import subprocess
 from pathlib import Path
 
+from . import ratchets
+
 
 def _repo_root() -> Path:
     for d in Path(__file__).resolve().parents:
@@ -111,11 +113,16 @@ def test_the_public_keys_are_translated_everywhere():
           "who is reading.")
 
 
+def _public_keys() -> list[str]:
+    """The keys the console's table declares for somebody with no account."""
+    return re.findall(r'"((?:pub|onb)\.[\w.]+)":',
+                      (SRC / "l10n.ts").read_text(encoding="utf-8"))
+
+
 def test_there_are_public_keys_at_all():
     """A guard on the guard: an empty prefix search reports a perfect zero."""
-    keys = re.findall(r'"((?:pub|onb)\.[\w.]+)":',
-                      (SRC / "l10n.ts").read_text(encoding="utf-8"))
-    assert len(keys) > 15, (
+    keys = _public_keys()
+    assert len(keys) >= ratchets.floor("console.public_keys"), (
         f"only {len(keys)} public keys found — the pattern has stopped "
         "matching, so the check above would pass on nothing")
 

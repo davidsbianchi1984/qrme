@@ -150,7 +150,6 @@ def _files_swept() -> int:
     return parsed_files()
 
 
-
 def _nav_tabs() -> int:
     from .test_nav_labels_are_localised import _nav_ids
     return len(_nav_ids())
@@ -346,7 +345,133 @@ def _receiver_declared(label: str):
     return go
 
 
+# -- the guards on the guards -----------------------------------------------
+#
+# Every floor below stands under a docstring that says, in its own file's
+# words, that a reader which stopped reading would report a clean result. Five
+# of them carried the same literal in all three products, and three carried
+# some version of the same sentence:
+#
+#     Thresholds are kept low enough to hold in all three repositories, which
+#     have consoles of very different sizes.
+#
+# This file's header diagnosed that sentence once already — a true sentence
+# about why the number is small and a false one about what it holds. It was
+# fixed in one file and never carried anywhere else. Twenty against this
+# console's 530 bindings is under four per cent.
+#
+#     asked     does one number hold in all three products
+#     mattered  does it hold anything in any of them
+#
+# Four more sat inside a loop, where one literal has to be four-fifths of
+# three surfaces at once and settles for being four-fifths of none. Those are
+# registered per surface: this product's Windows shell puts 4,587 literals on
+# screens and its iPhone 1,950, under a shared floor of 100.
+
+
+def _console_bindings() -> int:
+    from .test_a_binding_is_not_a_door import _bindings
+    return len(_bindings())
+
+
+def _api_functions(shell: str):
+    def go() -> int:
+        from .test_a_native_binding_is_not_a_door_either import _api_functions
+        return len(_api_functions(shell))
+    return go
+
+
+def _path_segments() -> int:
+    from .test_error_report_carries_nothing_private import _segments
+    return len(_segments())
+
+
+def _scanned_controls() -> int:
+    from .test_a_form_that_asks_for_it_has_a_label_for_it import (
+        _scanned_controls as go)
+    return go()
+
+
+def _egress_sites() -> int:
+    from .test_nothing_leaves_the_host import _egress_sites
+    return len(_egress_sites())
+
+
+def _shell_shown(shell: str):
+    def go() -> int:
+        from .test_a_shell_does_not_print_what_it_translated import (
+            SHELLS, _shown)
+        return len(_shown(SHELLS[shell]))
+    return go
+
+
+def _shell_fragments(shell: str):
+    def go() -> int:
+        from .test_a_shell_does_not_print_what_it_translated import (
+            SHELLS, _fragments)
+        return len(_fragments(SHELLS[shell]))
+    return go
+
+
+def _public_keys() -> int:
+    from .test_the_stranger_has_a_language_too import _public_keys
+    return len(_public_keys())
+
+
+def _accountless_chars(shell: str):
+    def go() -> int:
+        from .test_the_strangers_language_on_a_phone import _accountless_text
+        return len(_accountless_text(shell))
+    return go
+
+
+def _plans_threaded() -> int:
+    from .test_the_refusal_has_somewhere_to_send_you import _plans_threaded
+    return _plans_threaded()
+
+
+def _key_vocabulary() -> int:
+    from .test_the_key_the_server_never_sends import _vocabulary
+    return len(_vocabulary())
+
+
 RATCHETS: tuple[Ratchet, ...] = (
+    Ratchet("console.bindings_scanned", 424, _console_bindings,
+            "the bindings the console scan parses out of api.ts"),
+    Ratchet("native.api_functions.ios", 438, _api_functions("ios"),
+            "the calls the iPhone's ApiClient declares"),
+    Ratchet("route.path_segments", 284, _path_segments,
+            "the literal path segments this product's routes contribute"),
+    Ratchet("form.controls_scanned", 21466, _scanned_controls,
+            "the characters of form control the screen scan matches"),
+    Ratchet("host.egress_sites", 12, _egress_sites,
+            "the calls in this package that can put bytes on a wire"),
+    Ratchet("shell.shown.ios", 1560, _shell_shown("ios"),
+            "the literals the iOS scan finds on any screen"),
+    Ratchet("shell.shown.android", 1133, _shell_shown("android"),
+            "the literals the Android scan finds on any screen"),
+    Ratchet("shell.shown.windows", 3669, _shell_shown("windows"),
+            "the literals the Windows scan finds on any screen"),
+    Ratchet("shell.fragments.ios", 56, _shell_fragments("ios"),
+            "the fragments split out of the iOS table's slotted rows"),
+    Ratchet("shell.fragments.android", 57, _shell_fragments("android"),
+            "the fragments split out of the Android table's slotted rows"),
+    Ratchet("shell.fragments.windows", 58, _shell_fragments("windows"),
+            "the fragments split out of the Windows table's slotted rows"),
+    Ratchet("console.public_keys", 101, _public_keys,
+            "the console's translations for somebody with no account"),
+    Ratchet("accountless.screen_chars.ios", 9771, _accountless_chars("ios"),
+            "the characters the iPhone's accountless screen reads as"),
+    Ratchet("accountless.screen_chars.android", 8708,
+            _accountless_chars("android"),
+            "the characters Android's accountless screen reads as"),
+    Ratchet("accountless.screen_chars.windows", 13636,
+            _accountless_chars("windows"),
+            "the characters the desktop's accountless screen reads as"),
+    Ratchet("console.plans_threaded", 35, _plans_threaded,
+            "the screens the shell hands a way out of a plan gate"),
+    Ratchet("key.vocabulary", 2229, _key_vocabulary,
+            "the field names the leak check knows to look for"),
     Ratchet("receiver.declared.ios.state", 16, _receiver_declared("ios/state"),
             "the members ios/state declares"),
     Ratchet("receiver.declared.ios.api", 1026, _receiver_declared("ios/api"),

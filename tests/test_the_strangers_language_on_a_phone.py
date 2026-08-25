@@ -352,6 +352,8 @@ def test_the_screens_the_backlog_names_are_still_there():
 from tests.test_the_tabs_are_translated_and_the_screens_are_not import (  # noqa: E402
     SHELLS as _COUNTED, _HAS_LETTER, _HOLE, _code as _screen_code)
 
+from . import ratchets
+
 CONSOLE_TABLE = REPO / "app" / "src" / "l10n.ts"
 
 #: Keys the shells carry that the console has no row for, each with the reason.
@@ -424,7 +426,8 @@ def test_the_screen_scan_is_reading_the_screens():
     English and pass the check above on an empty string."""
     for name, _, _, _ in SHELLS:
         text = _accountless_text(name)
-        assert len(text) > 800, (
+        assert len(text) >= ratchets.floor(
+                f"accountless.screen_chars.{name}"), (
             f"{name}'s accountless screen read as {len(text)} characters — the "
             "check above is passing on nothing")
 

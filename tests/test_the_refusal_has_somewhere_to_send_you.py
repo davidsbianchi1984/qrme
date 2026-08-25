@@ -31,6 +31,8 @@ from pathlib import Path
 
 import pytest
 
+from . import ratchets
+
 
 def _repo_root() -> Path:
     for d in Path(__file__).resolve().parents:
@@ -175,6 +177,11 @@ def test_the_plans_screen_calls_all_four_routes():
         assert binding in src, f"{binding}) is bound and never called"
 
 
+def _plans_threaded() -> int:
+    """Screens the shell hands the way out of a plan gate."""
+    return _src("app/src/App.tsx").count("onPlans={toPlans}")
+
+
 def test_the_shell_actually_gives_the_refusal_somewhere_to_go():
     """The defect this whole round is about, in its newest possible form.
 
@@ -184,7 +191,7 @@ def test_the_shell_actually_gives_the_refusal_somewhere_to_go():
     """
     app = _src("app/src/App.tsx")
     assert 'setTab("plans")' in app, "no way to reach the plans screen"
-    assert app.count("onPlans={toPlans}") >= 20, (
+    assert _plans_threaded() >= ratchets.floor("console.plans_threaded"), (
         "the shell stopped threading onPlans into the screens; a plan gate "
         "there would render an offer with no button")
 

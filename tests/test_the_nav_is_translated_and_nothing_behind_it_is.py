@@ -184,13 +184,15 @@ def test_the_two_records_partition_the_console():
     `public_untranslated.txt` measured one screen out of forty-eight for three
     releases and reported the pre-session surface clean.
     """
-    import importlib.util
+    # Imported as the sibling it is, not loaded off its path. A module built
+    # from a file location has no package, so every relative import inside it
+    # raises — which made this line a silent rule that the other file may not
+    # import anything from its own package, enforced from a file that never
+    # says so. The day that file needed `from . import ratchets`, this was
+    # the only thing in three suites that broke.
+    from . import test_the_stranger_has_a_language_too as stranger
 
-    sibling = Path(__file__).resolve().parent / "test_the_stranger_has_a_language_too.py"
-    spec = importlib.util.spec_from_file_location("_stranger_language", sibling)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    public_set = module.PRE_SESSION
+    public_set = stranger.PRE_SESSION
 
     on_disk = {p.name for p in SCREENS.glob("*.tsx")}
     public = {s.split("/")[-1] for s in public_set}
