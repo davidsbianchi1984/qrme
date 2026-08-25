@@ -20,6 +20,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from . import ratchets
+
 REPO = Path(__file__).resolve().parents[1]
 INSIDE = (REPO / "app/src/screens/Inside.tsx").read_text(encoding="utf-8")
 
@@ -201,7 +203,8 @@ def test_the_light_follows_the_voice():
         INSIDE), (
         "the ear's queue no longer marks whose turn it is reading before "
         "it plays")
-    assert INSIDE.count("setVoicing(null)") >= 3, (
+    assert INSIDE.count("setVoicing(null)") >= ratchets.floor(
+            "room.voicing_cleared"), (
         "every way a voice ends — queue drained, press played out, press "
         "failed — must put the light back on the transcript's answer")
 
@@ -255,7 +258,8 @@ def test_the_light_follows_the_speaker_not_the_name():
     assert "talking === s.display" not in INSIDE, (
         "a seat is lit by display-name match again — two participants "
         "can share a name, and one of them is a person")
-    assert INSIDE.count("isTalking(s)") >= 3
+    assert INSIDE.count("isTalking(s)") >= ratchets.floor(
+        "room.talking_checks")
     assert "lastSaid.sender_id === s.id" in INSIDE
 
 

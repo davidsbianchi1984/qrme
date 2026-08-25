@@ -45,6 +45,8 @@ from pathlib import Path
 
 import pytest
 
+from . import ratchets
+
 REPO = Path(__file__).resolve().parent.parent
 PAGE = REPO / "docs" / "beta-deploy.md"
 
@@ -200,7 +202,7 @@ def test_the_two_shells_are_a_choice_and_not_a_sequence():
     than on the shape.
     """
     blocks = _checks()
-    assert len(blocks) > 1, (
+    assert len(blocks) >= ratchets.floor("deploy.check_blocks"), (
         "one check block, so there is no choice to mark — if the Windows "
         "form has gone, `test_the_windows_lines_are_lines_a_windows_reader_"
         "can_paste` is the guard that says why it has to come back")

@@ -58,6 +58,8 @@ import re
 import subprocess
 from pathlib import Path
 
+from . import ratchets
+
 
 def _repo_root() -> Path:
     for d in Path(__file__).resolve().parents:
@@ -81,6 +83,18 @@ SNAPSHOT = Path(__file__).resolve().parent / "console_untranslated.txt"
 #: screen added to this console must default to *being counted*; the only way
 #: out of the count is to be one of these two, by name.
 PRE_SESSION = ("Public.tsx", "Onboarding.tsx")
+
+
+def _nav_keys() -> dict[str, str]:
+    """The `nav.*` rows the console table declares, with their bodies."""
+    text = (SRC / "l10n.ts").read_text(encoding="utf-8")
+    return dict(re.findall(r'"nav\.([\w.]+)":\s*\{(.*?)\n  \},', text, re.S))
+
+
+def _nav_ids() -> set[str]:
+    """The tab ids `App.tsx` declares."""
+    app = (SRC / "App.tsx").read_text(encoding="utf-8")
+    return set(re.findall(r'\{\s*id:\s*"([\w]+)"', app))
 
 
 def _gated() -> list[str]:
@@ -225,8 +239,8 @@ def test_the_nav_really_is_translated():
     langs = re.findall(r'"(\w+)"', union)
     assert len(langs) == 10, f"{len(langs)} languages, not ten: {langs}"
 
-    nav = dict(re.findall(r'"nav\.([\w.]+)":\s*\{(.*?)\n  \},', text, re.S))
-    assert len(nav) >= 40, (
+    nav = _nav_keys()
+    assert len(nav) >= ratchets.floor("console.nav_keys"), (
         f"only {len(nav)} nav keys found — the pattern has stopped matching, "
         "so this check would pass on almost nothing")
     gaps = {k: [c for c in langs if c not in set(re.findall(r"(\w+):", v))]
@@ -251,8 +265,8 @@ def test_every_translated_label_opens_a_measured_screen():
     forty-six of each that happened not to be the same forty-six.
     """
     app = (SRC / "App.tsx").read_text(encoding="utf-8")
-    nav_ids = set(re.findall(r'\{\s*id:\s*"([\w]+)"', app))
-    assert len(nav_ids) >= 40, (
+    nav_ids = _nav_ids()
+    assert len(nav_ids) >= ratchets.floor("console.nav_entries"), (
         f"only {len(nav_ids)} nav entries parsed out of App.tsx — the pattern "
         "has stopped matching")
     rendered = dict(re.findall(r'tab === "(\w+)" && <(\w+)', app))

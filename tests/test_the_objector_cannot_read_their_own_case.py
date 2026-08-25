@@ -74,6 +74,8 @@ import pytest
 
 from tests.test_capabilities import ADULT  # noqa: F401 — shared fixture module
 
+from . import ratchets
+
 
 def _repo_root() -> Path:
     for d in Path(__file__).resolve().parents:
@@ -148,7 +150,7 @@ def test_the_route_scan_is_finding_routes():
     """A guard on the guard. A decorator walk that stopped matching would
     report a router with no ungated routes and pass on nothing."""
     handlers = _route_handlers()
-    assert len(handlers) >= 8, (
+    assert len(handlers) >= ratchets.floor("governance.route_handlers"), (
         f"only {len(handlers)} route handler(s) parsed from governance.py — "
         "the decorator walk has stopped matching")
     assert any(_is_gated(fn) for fn in handlers), (

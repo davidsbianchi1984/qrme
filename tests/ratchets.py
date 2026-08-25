@@ -500,7 +500,277 @@ def _workflow_files() -> int:
     return len(_files())
 
 
+# -- the floors that were already holding ----------------------------------
+#
+# The other half of what widening the sweep turned up, and the half that is
+# easy to leave alone: measured, in band, several at exactly the number they
+# stand over. Nothing here is being corrected.
+#
+#     asked     is this floor wrong
+#     mattered  is anything comparing it to what it measures
+#
+# A floor at 1.00 today is a floor at 0.30 in a year, and the run it starts
+# being wrong on is a run nobody watches. What registering buys one that
+# holds is not a different number — it is the measurement attached, and the
+# audit every run. Each keeps the number it had unless four-fifths of what it
+# measures is higher, because lowering a guard that currently holds tight, to
+# satisfy a convention about where floors usually sit, is following the rule
+# off a cliff.
+
+
+def _template_calls() -> int:
+    from .test_a_refusal_whose_english_is_not_a_constant import _template_calls
+    return len(_template_calls())
+
+
+def _deploy_check_blocks() -> int:
+    from .test_the_deploy_page_is_paste_ready import _checks
+    return len(_checks())
+
+
+def _generating_routes() -> int:
+    from .test_a_memorial_does_not_keep_posting import _generating_routes
+    return len(_generating_routes())
+
+
+def _form_declared_fields() -> int:
+    from .test_the_refusal_names_the_field_on_the_form import _declared
+    return len(_declared())
+
+
+def _android_reads() -> int:
+    from .test_the_keys_the_android_client_reads import _reads
+    return len(_reads())
+
+
+def _android_read_keychars() -> int:
+    from .test_the_keys_the_android_client_reads import _reads
+    return sum(len(k) for _, k in _reads())
+
+
+def _nav_keys() -> int:
+    from .test_the_nav_is_translated_and_nothing_behind_it_is import _nav_keys
+    return len(_nav_keys())
+
+
+def _nav_entries() -> int:
+    from .test_the_nav_is_translated_and_nothing_behind_it_is import _nav_ids
+    return len(_nav_ids())
+
+
+def _record_wire_names() -> int:
+    from .test_the_shape_the_client_expects import _records
+    return len({wire for fields in _records().values() for wire, _ in fields})
+
+
+def _route_writes() -> int:
+    from .test_the_body_the_route_requires import WRITES, _sent
+    return len([w for w in _sent() if w[0] in WRITES])
+
+
+def _route_writes_readable() -> int:
+    from .test_the_body_the_route_requires import WRITES, _sent
+    return len([w for w in _sent() if w[0] in WRITES
+                and w[2] in ("literal", "parameter") and w[3] is not None])
+
+
+def _route_models() -> int:
+    from .test_the_body_the_route_requires import _models
+    return len(_models())
+
+
+def _route_writes_meeting_a_model() -> int:
+    from .test_the_body_the_route_requires import _writes_meeting_a_model
+    return _writes_meeting_a_model()
+
+
+def _body_matched(slug: str):
+    def go() -> int:
+        from . import test_the_body_the_native_clients_send as m
+        for client, short in m.SLUG.items():
+            if short == slug:
+                return m._writes_meeting_a_model(client)
+        raise KeyError(f"no native client slugged {slug!r}")
+    return go
+
+
+def _shell_sources(shell: str):
+    def go() -> int:
+        from .test_the_files_the_release_never_touched import _shell_sources
+        return len(_shell_sources(shell))
+    return go
+
+
+def _capability_used(shell: str):
+    def go() -> int:
+        from . import test_the_files_the_release_never_touched as m
+        needs = m.IOS_NEEDS if shell == "ios" else m.ANDROID_NEEDS
+        return len(m._used(m._shell_sources(shell), needs))
+    return go
+
+
+def _inside_count(needle: str):
+    def go() -> int:
+        from .test_the_room_speaks_for_itself import INSIDE
+        return INSIDE.count(needle)
+    return go
+
+
+def _l10n_sentences(needle: str):
+    def go() -> int:
+        from .test_a_code_on_a_wall import _markup
+        return _markup("app/src/l10n.ts").count(needle)
+    return go
+
+
+def _close_reasons() -> int:
+    from . import test_the_conversation_leaves_the_application as m
+    import re
+    found = re.search(
+        r"override fun onError\(code: Int\)\s*\{(.*?)\n            \}",
+        m.SERVICE.read_text(encoding="utf-8"), re.S)
+    return found.group(1).count("close(reason =") if found else 0
+
+
+def _build_steps() -> int:
+    from .test_the_installer_can_actually_report import _build_steps
+    return len(_build_steps())
+
+
+def _exception_handlers() -> int:
+    from .test_the_platform_refuses_in_one_language import _handlers
+    return len(_handlers())
+
+
+def _brushes(half: int):
+    def go() -> int:
+        from .test_the_member_that_isnt_there import _brushes
+        return len(_brushes()[half])
+    return go
+
+
+def _console_request_headers() -> int:
+    from .test_the_language_nobody_was_sending import _console_headers
+    return len(_console_headers())
+
+
+def _governance_handlers() -> int:
+    from .test_the_objector_cannot_read_their_own_case import _route_handlers
+    return len(_route_handlers())
+
+
+def _starter_industries() -> int:
+    from .test_starter_profiles import STARTERS
+    return len({industry for _h, industry, *_ in STARTERS})
+
+
+def _thinnest_pack() -> int:
+    from .test_knowledge_packs import STARTER_PACKS
+    return min(len(items) for _title, items in STARTER_PACKS.values())
+
+
+def _degrading_wrappers() -> int:
+    from .test_the_provenance_names_who_answered import _degrading_wrappers
+    return len(_degrading_wrappers())
+
+
+def _wheel_declared() -> int:
+    from .test_the_image_holds_what_the_wheel_declares import _declared
+    return len(_declared())
+
+
+def _console_players() -> int:
+    from .test_a_player_handed_no_origin_will_not_play import _players
+    return len(_players())
+
+
+def _answer_pieces() -> int:
+    from .test_the_answer_begins_before_it_ends import LONG_ANSWER, _pieces
+    return len(_pieces(LONG_ANSWER)[0])
+
+
+def _thinnest_pin() -> int:
+    from .test_the_shape_inside_the_shape import contract, _pin_rows
+    return min(len(contract(*row)) for row in _pin_rows())
+
+
 RATCHETS: tuple[Ratchet, ...] = (
+    Ratchet("refusals.template_calls", 24, _template_calls,
+            "the `i18n.fill` call sites the conversion left behind"),
+    Ratchet("deploy.check_blocks", 2, _deploy_check_blocks,
+            "the check blocks the deploy page offers a choice between"),
+    Ratchet("route.generating", 10, _generating_routes,
+            "the routes that generate, as the walk finds them"),
+    Ratchet("form.declared_fields", 256, _form_declared_fields,
+            "the request-model fields the refusal check maps to a control"),
+    Ratchet("android.reads", 175, _android_reads,
+            "the key reads the Android extractor finds"),
+    Ratchet("android.read_keychars", 417, _android_read_keychars,
+            "the characters across those keys, as a shape check on them"),
+    Ratchet("console.nav_keys", 44, _nav_keys,
+            "the `nav.*` rows the console's table declares"),
+    Ratchet("console.nav_entries", 44, _nav_entries,
+            "the tab ids `App.tsx` declares"),
+    Ratchet("console.record_wire_names", 518, _record_wire_names,
+            "the wire names the record-aware client extractor reads"),
+    Ratchet("route.writes", 195, _route_writes,
+            "the write calls the extractor reads off the clients"),
+    Ratchet("route.writes_readable", 158, _route_writes_readable,
+            "the write calls whose body it can actually read"),
+    Ratchet("route.models", 162, _route_models,
+            "the request models FastAPI publishes in the schema"),
+    Ratchet("route.writes_meeting_a_model", 156, _route_writes_meeting_a_model,
+            "the clients' writes whose verb and shape meet a model"),
+    Ratchet("native.body_matched.windows", 160, _body_matched("windows"),
+            "the desktop client's writes that meet a declared model"),
+    Ratchet("native.body_matched.ios", 158, _body_matched("ios"),
+            "the iPhone client's writes that meet a declared model"),
+    Ratchet("native.body_matched.android", 158, _body_matched("android"),
+            "the Android client's writes that meet a declared model"),
+    Ratchet("shell.sources.ios", 40, _shell_sources("ios"),
+            "the Swift sources the release check walks"),
+    Ratchet("shell.sources.android", 10, _shell_sources("android"),
+            "the Kotlin sources the release check walks"),
+    Ratchet("capability.used.ios", 3, _capability_used("ios"),
+            "the gated iPhone capabilities the shell actually calls"),
+    Ratchet("capability.used.android", 2, _capability_used("android"),
+            "the gated Android capabilities the shell actually calls"),
+    Ratchet("room.voicing_cleared", 3, _inside_count("setVoicing(null)"),
+            "the places the room stops showing a voice as speaking"),
+    Ratchet("room.talking_checks", 3, _inside_count("isTalking(s)"),
+            "the places the room asks whether a speaker is talking"),
+    Ratchet("l10n.scan_sentences", 2, _l10n_sentences("counts as a scan"),
+            "the translated sentences saying what counts as a scan"),
+    Ratchet("l10n.press_sentences", 2, _l10n_sentences("pressed a button"),
+            "the translated sentences saying a button was pressed"),
+    Ratchet("service.close_reasons", 3, _close_reasons,
+            "the ways the listening service says why it stopped"),
+    Ratchet("installer.build_steps", 3, _build_steps,
+            "the steps that run the packaging command"),
+    Ratchet("api.exception_handlers", 2, _exception_handlers,
+            "the exception handlers `api.py` declares"),
+    Ratchet("brush.keys", 16, _brushes(0),
+            "the brush keys App.xaml declares"),
+    Ratchet("brush.used", 10, _brushes(1),
+            "the brush keys the screens actually paint with"),
+    Ratchet("console.request_headers", 3, _console_request_headers,
+            "the headers the console attaches to every request"),
+    Ratchet("governance.route_handlers", 8, _governance_handlers,
+            "the route handlers the governance walk parses"),
+    Ratchet("starters.industries", 30, _starter_industries,
+            "the industries the starter profiles cover"),
+    Ratchet("packs.thinnest", 3, _thinnest_pack,
+            "the items in the thinnest starter pack"),
+    Ratchet("degrading.wrappers", 2, _degrading_wrappers,
+            "the wrappers that degrade quietly, as the walk finds them"),
+    Ratchet("wheel.declared", 2, _wheel_declared,
+            "the variables the deploy wheel declares"),
+    Ratchet("console.players", 2, _console_players,
+            "the players the console mounts"),
+    Ratchet("speech.pieces_from_a_long_answer", 2, _answer_pieces,
+            "the pieces a long answer splits into before it is spoken"),
+    Ratchet("pin.thinnest", 2, _thinnest_pin,
+            "the keys on the thinnest pinned contract"),
     # Per shell, and the reason is in the numbers: this one literal stood
     # over 10, 8 and 123 requests built. It was honest about the
     # iPhone and decoration on the desktop, which is what a single floor

@@ -59,6 +59,8 @@ import pytest
 
 from qrme import cloud, common, llm
 
+from . import ratchets
+
 
 def _repo_root() -> Path:
     for d in Path(__file__).resolve().parents:
@@ -260,7 +262,7 @@ def test_the_wrapper_scan_is_finding_wrappers():
     """A guard on the guard. A structural walk that stopped matching would
     report no silent wrappers and pass on nothing at all."""
     found = _degrading_wrappers()
-    assert len(found) >= 2, (
+    assert len(found) >= ratchets.floor("degrading.wrappers"), (
         f"only {len(found)} degrading wrapper(s) parsed — this codebase has "
         "two, in llm.FallbackProvider and cloud.CloudProvider, and the check "
         "above is passing on an empty set")

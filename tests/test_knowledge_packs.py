@@ -4,6 +4,8 @@ grounds the persona's knowledge base and shows up in provenance."""
 
 from qrme.packs import STARTER_PACKS
 
+from . import ratchets
+
 TRIO = {"mental_health", "psychiatry", "counseling"}
 
 
@@ -15,7 +17,7 @@ def test_starter_packs_cover_every_industry():
     industries = {industry for _, industry, *_ in STARTERS + RATED}
     assert set(STARTER_PACKS) == industries       # one pack per industry
     for title, items in STARTER_PACKS.values():
-        assert len(items) >= 3
+        assert len(items) >= ratchets.floor("packs.thinnest")
         assert all(content for _, content in items)
 
 

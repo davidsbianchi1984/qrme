@@ -58,6 +58,7 @@ import pathlib
 import re
 
 import pytest
+
 from . import ratchets
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
@@ -319,7 +320,8 @@ def test_the_extractor_reads_the_bindings_and_the_records():
     eaten by the block regex, before it could report a clean client."""
     names = {wire for fields in _records().values() for wire, _ in fields}
     assert len(_bindings()) >= ratchets.floor("console.bindings"), len(_bindings())
-    assert len(names) >= 490, len(names)
+    assert len(names) >= ratchets.floor("console.record_wire_names"), (
+        len(names))
 
 def test_no_extracted_record_swallowed_the_next_one():
     """The block regex is non-greedy, so an unbalanced paren anywhere would let

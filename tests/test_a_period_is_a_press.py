@@ -35,6 +35,8 @@ from pathlib import Path
 
 import pytest
 
+from . import ratchets
+
 
 def _repo_root() -> Path:
     for d in Path(__file__).resolve().parents:
@@ -301,5 +303,6 @@ def test_the_screen_says_a_period_is_a_press():
     # one somebody reads on a second press, and it is the press that this
     # sentence exists to name.
     l10n = _markup("app/src/l10n.ts")
-    assert l10n.count("pressed a button") >= 2, (
+    assert l10n.count("pressed a button") >= ratchets.floor(
+            "l10n.press_sentences"), (
         "one of the two period rows has stopped saying what they count")

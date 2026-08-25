@@ -62,6 +62,8 @@ import json
 import re
 from pathlib import Path
 
+from . import ratchets
+
 
 def _repo_root() -> Path:
     for d in Path(__file__).resolve().parents:
@@ -264,13 +266,26 @@ def test_every_android_capability_used_is_declared():
 
 # --- the checks have to be able to see, and to fail --------------------------
 
+#: Where each shell's sources live, as the globs the checks above walk.
+SHELL_SOURCES = {
+    "ios": "native/ios/Sources/**/*.swift",
+    "android": "native/android/**/*.kt",
+}
+
+
+def _shell_sources(shell: str) -> list:
+    """This shell's sources, so the floor under the read counts what it reads."""
+    return sorted(REPO.glob(SHELL_SOURCES[shell]))
+
+
 def test_there_are_build_files_to_read():
     """Three globs and three files. A path that stopped resolving would report
     a clean shell by finding nothing to check, which is the failure this whole
     arc keeps producing."""
     assert IOS_SPEC.exists() and GRADLE.exists() and CSPROJ
-    assert len(sorted(REPO.glob("native/ios/Sources/**/*.swift"))) >= 40
-    assert len(sorted(REPO.glob("native/android/**/*.kt"))) >= 10
+    assert len(_shell_sources("ios")) >= ratchets.floor("shell.sources.ios")
+    assert len(_shell_sources("android")) >= ratchets.floor(
+        "shell.sources.android")
 
 
 def test_the_capability_check_reaches_the_calls_this_shell_makes():
@@ -279,8 +294,8 @@ def test_the_capability_check_reaches_the_calls_this_shell_makes():
     would mean nothing."""
     ios = _used(sorted(REPO.glob("native/ios/Sources/**/*.swift")), IOS_NEEDS)
     android = _used(sorted(REPO.glob("native/android/**/*.kt")), ANDROID_NEEDS)
-    assert len(ios) >= 3, ios
-    assert len(android) >= 2, android
+    assert len(ios) >= ratchets.floor("capability.used.ios"), ios
+    assert len(android) >= ratchets.floor("capability.used.android"), android
 
 
 def test_a_platform_api_named_in_a_comment_is_not_a_use(tmp_path):

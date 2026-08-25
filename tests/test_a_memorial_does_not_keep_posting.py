@@ -51,6 +51,8 @@ import pytest
 
 from qrme import common
 
+from . import ratchets
+
 
 def _repo_root() -> Path:
     for d in Path(__file__).resolve().parents:
@@ -157,7 +159,7 @@ def test_the_route_scan_is_finding_routes():
     """A guard on the guard: a walk that stopped matching would report nothing
     ungated and pass on an empty set."""
     found = _generating_routes()
-    assert len(found) >= 8, (
+    assert len(found) >= ratchets.floor("route.generating"), (
         f"only {len(found)} generating route(s) parsed — this codebase has "
         "nine, and the check above is passing on almost nothing")
 

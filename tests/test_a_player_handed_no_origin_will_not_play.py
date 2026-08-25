@@ -42,6 +42,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from . import ratchets
+
 SRC = Path(__file__).resolve().parent.parent / "app" / "src"
 
 #: The attributes that mark an iframe as somebody else's player rather than
@@ -96,7 +98,7 @@ def test_the_origin_is_all_a_player_is_given():
 def test_the_reader_can_still_find_a_player():
     """A guard on the guard. If the pattern stopped matching, both checks
     above would pass on a console with every embed broken."""
-    assert len(_players()) >= 2, (
+    assert len(_players()) >= ratchets.floor("console.players"), (
         f"found {len(_players())} embedded players, which cannot be right — "
         "the Feed and the Wall each carry one, so the reader has drifted "
         "off the markup and these checks are vacuous")

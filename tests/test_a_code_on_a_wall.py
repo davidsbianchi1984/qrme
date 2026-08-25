@@ -35,6 +35,8 @@ from pathlib import Path
 
 import pytest
 
+from . import ratchets
+
 
 def _repo_root() -> Path:
     for d in Path(__file__).resolve().parents:
@@ -114,7 +116,8 @@ def test_the_console_says_a_scan_link_costs_one():
         "app/src/screens/Placements.tsx")
     assert 'tr("desk.beacons.open"' in _markup("app/src/screens/Desk.tsx")
     l10n = _markup("app/src/l10n.ts")
-    assert l10n.count("counts as a scan") >= 2, (
+    assert l10n.count("counts as a scan") >= ratchets.floor(
+            "l10n.scan_sentences"), (
         "one of the two screens has stopped warning that following the "
         "link inflates the number somebody is checking")
 

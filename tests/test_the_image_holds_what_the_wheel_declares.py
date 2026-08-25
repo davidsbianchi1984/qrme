@@ -33,6 +33,8 @@ import re
 import tomllib
 from pathlib import Path
 
+from . import ratchets
+
 REPO = Path(__file__).resolve().parent.parent
 
 
@@ -94,7 +96,7 @@ def test_the_guard_can_still_see_both_halves():
     `copied` would fail so loudly nobody could miss it, which is the
     harmless direction. This pins the silent one.
     """
-    assert len(_declared()) >= 2, (
+    assert len(_declared()) >= ratchets.floor("wheel.declared"), (
         "fewer than two packages found for the wheel — the reader has "
         "drifted off pyproject's shape and this file is checking nothing")
     assert "qrme" in _runtime_copies(), (

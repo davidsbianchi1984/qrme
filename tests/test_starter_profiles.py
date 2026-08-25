@@ -5,6 +5,8 @@ end-to-end through summoning and chat like any user profile."""
 
 from qrme.seed import RATED, STARTERS
 
+from . import ratchets
+
 # The seeded collection is the industry starters plus the rated tier.
 COLLECTION = STARTERS + RATED
 
@@ -12,7 +14,7 @@ COLLECTION = STARTERS + RATED
 def test_starters_cover_every_industry_exactly_once():
     industries = [industry for _, industry, *_ in STARTERS]
     assert len(industries) == len(set(industries))    # one per industry
-    assert len(industries) >= 30
+    assert len(industries) >= ratchets.floor("starters.industries")
     handles = [handle for handle, *_ in STARTERS]
     assert len(handles) == len(set(handles))
 

@@ -71,6 +71,8 @@ import re
 
 from .test_the_shape_the_client_expects import _returned_keys, _shape_of
 
+from . import ratchets
+
 REPO = pathlib.Path(__file__).resolve().parents[1]
 ANDROID_CLIENT = (
     REPO / "native/android/app/src/main/java/app/qrme/studio/ApiClient.kt")
@@ -356,8 +358,9 @@ def test_the_extractor_reads_this_clients_calls():
     """Neither the C# nor the Swift pattern finds anything in a file that
     declares no shapes, and nothing found reads as nothing wrong."""
     reads = _reads()
-    assert len(reads) >= 165, len(reads)
-    assert sum(len(k) for _, k in reads) >= 370, sum(len(k) for _, k in reads)
+    assert len(reads) >= ratchets.floor("android.reads"), len(reads)
+    assert sum(len(k) for _, k in reads) >= ratchets.floor(
+        "android.read_keychars"), sum(len(k) for _, k in reads)
 
 
 def test_no_function_body_swallowed_the_next_one():

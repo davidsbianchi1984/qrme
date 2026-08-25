@@ -451,7 +451,6 @@ def test_every_refusal_is_translated_or_written_down():
     assert not problems, "\n\n".join(problems)
 
 
-
 def test_a_wiring_precondition_is_not_a_refusal():
     """The exemption, checked in both directions.
 
@@ -631,21 +630,11 @@ def test_the_backlog_only_shrinks():
         "guard started at")
 
 
-def test_every_handler_returns_through_the_one_place():
-    """The structural half, ported from the siblings.
+def _handlers() -> list[tuple[str, bool]]:
+    """Every `@app.exception_handler` in `api.py`, and whether it returns
+    through the one place.
 
-    PDI and JIM-mini have asked this since the round that gave them one
-    `i18n.refuse`; this product answers its refusals a shape of its own —
-    `refusal_language`, then `localize_detail` and `sentence_of` — and so the
-    question never crossed. It stood on `guard_divergences.txt` as a name
-    this suite lacked, which is the same thing as nobody asking here whether
-    a new exception handler would answer in English.
-
-        asked     is this refusal translated where it is raised
-        mattered  does every handler that answers one consult the reader
-
-    Checked structurally rather than by driving each handler: a driven check
-    would cover the ones that exist today and say nothing about the next.
+    Lifted out of the guard so the floor under it walks the same tree.
     """
     tree = ast.parse((REPO / "qrme" / "api.py").read_text(encoding="utf-8"))
     handlers: list[tuple[str, bool]] = []
@@ -663,7 +652,27 @@ def test_every_handler_returns_through_the_one_place():
             for n in ast.walk(node))
         handlers.append((node.name, routed))
 
-    assert len(handlers) >= 2, (
+    return handlers
+
+
+def test_every_handler_returns_through_the_one_place():
+    """The structural half, ported from the siblings.
+
+    PDI and JIM-mini have asked this since the round that gave them one
+    `i18n.refuse`; this product answers its refusals a shape of its own —
+    `refusal_language`, then `localize_detail` and `sentence_of` — and so the
+    question never crossed. It stood on `guard_divergences.txt` as a name
+    this suite lacked, which is the same thing as nobody asking here whether
+    a new exception handler would answer in English.
+
+        asked     is this refusal translated where it is raised
+        mattered  does every handler that answers one consult the reader
+
+    Checked structurally rather than by driving each handler: a driven check
+    would cover the ones that exist today and say nothing about the next.
+    """
+    handlers = _handlers()
+    assert len(handlers) >= ratchets.floor("api.exception_handlers"), (
         f"only {len(handlers)} exception handlers found in api.py — the "
         "pattern has stopped matching, so this check would pass on nothing")
     astray = sorted(name for name, routed in handlers if not routed)

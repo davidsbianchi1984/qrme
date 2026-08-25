@@ -37,6 +37,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from . import ratchets
+
 
 def _repo() -> Path:
     for d in Path(__file__).resolve().parents:
@@ -160,7 +162,8 @@ def test_quiet_reopens_and_a_refusal_does_not():
     assert "ERROR_INSUFFICIENT_PERMISSIONS" in body, (
         "a refused microphone is not distinguished, so it reads as quiet "
         "and the loop reopens into nothing")
-    assert body.count("close(reason =") >= 3, (
+    assert body.count("close(reason =") >= ratchets.floor(
+            "service.close_reasons"), (
         "the service has one way of failing; the console has already been "
         "caught by exactly that, where a refusal, an unreachable service "
         "and a defect all read the same")
