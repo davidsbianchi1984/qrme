@@ -1638,15 +1638,18 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
  * be vague about.
  */
 .rs-round.mic.live {
-  border-color: rgba(255, 184, 77, 0.95);
-  background: rgba(255, 184, 77, 0.26);
-  color: #ffe4b3;
-  box-shadow: 0 0 0 3px rgba(255, 184, 77, 0.22);
+  border-color: rgba(224, 85, 85, 0.95);
+  background: rgba(224, 85, 85, 0.28);
+  color: #ffc9c9;
+  box-shadow: 0 0 0 3px rgba(224, 85, 85, 0.22);
 }
-/* And muted is the other half of the same sentence. */
+/* And muted is the other half of the same sentence. Red means the mic is
+   hot — the recording-light convention, by the owner's own call — and
+   green means it is safe to sneeze. The first cut had these reversed and
+   the owner read the room wrong twice before saying so. */
 .rs-round.mic:not(.live) {
-  border-color: rgba(224, 104, 122, 0.85);
-  background: rgba(224, 104, 122, 0.16);
+  border-color: rgba(123, 196, 127, 0.85);
+  background: rgba(123, 196, 127, 0.16);
 }
 
 /* The invite lives further down the page; pressing the strip's button

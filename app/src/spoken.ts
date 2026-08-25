@@ -110,15 +110,21 @@ armTheEar();
  *  Safe to call on every press: opening an already-open ear is a no-op,
  *  and a platform that refuses even this leaves `ear` standing so that
  *  `speakInPieces` still reports honestly rather than pretending. */
+let earOpen = false;
+
 export function openTheEar(): void {
-  if (ear) return;
-  const el = new Audio(SILENCE);
+  if (earOpen) return;
+  const el = ear ?? new Audio(SILENCE);
   // Muted so the silence cannot even theoretically be heard, and inline
-  // so iOS does not hand playback to its own full-screen player.
+  // so iOS does not hand playback to its own full-screen player. A refused
+  // attempt no longer leaves a dead element standing — the sibling product
+  // found that `if (ear) return` made the first refusal the last try, and
+  // on an iPhone the first try being refused is the ordinary case.
   el.muted = true;
   el.setAttribute("playsinline", "");
+  if (!el.src) el.src = SILENCE;
   ear = el;
-  el.play().then(() => { el.pause(); el.muted = false; },
+  el.play().then(() => { el.pause(); el.muted = false; earOpen = true; },
                 () => { el.muted = false; });
 }
 
