@@ -33,6 +33,7 @@ from ..models import (
     ProviderCreate, ReferralPrepare, ReferralRelease, ReferralReply,
     RoomCreate, RoomFace, RoomInvite, RoomMessage, RoomMicLend, RoomRename,
 )
+from .. import i18n
 
 router = APIRouter()
 
@@ -424,7 +425,7 @@ def create_room(body: RoomCreate) -> dict:
         if participant.kind == "profile":
             profile = profile_or_404(participant.id)
             if profile["status"] == "departed":
-                raise HTTPException(410, f"profile {participant.id} has departed")
+                raise HTTPException(410, i18n.fill(i18n.PROFILE_DEPARTED, profile=participant.id))
         else:
             interactor_or_404(participant.id)
     room_id = db.new_id("room")
@@ -505,7 +506,7 @@ def open_standing_room(key: str, request: Request,
                  "and a profile in it — pick a profile first")
     profile = profile_or_404(profile_id)
     if profile["status"] == "departed":
-        raise HTTPException(410, f"profile {profile_id} has departed")
+        raise HTTPException(410, i18n.fill(i18n.PROFILE_DEPARTED, profile=profile_id))
     room_id = db.new_id("room")
     conn.execute(
         "INSERT INTO rooms (id, topic, channel, status, created_at)"
@@ -609,7 +610,7 @@ def invite_to_room(room_id: str, body: RoomInvite, request: Request) -> dict:
     guest = profile_or_404(body.profile_id)
     if guest["status"] == "departed":
         raise HTTPException(
-            410, f"profile {body.profile_id} has departed")
+            410, i18n.fill(i18n.PROFILE_DEPARTED, profile=body.profile_id))
 
     present = _participants(room_id)
     if any(p["kind"] == "profile" and p["ref_id"] == body.profile_id
@@ -737,7 +738,7 @@ def set_room_face(room_id: str, body: RoomFace, request: Request) -> dict:
                                     media_id=body.media_id,
                                     media_url=body.media_url)
     except roomface.RoomFaceError as exc:
-        raise HTTPException(422, str(exc)) from exc
+        raise HTTPException(422, i18n.raised(exc)) from exc
 
 
 @router.patch("/rooms/{room_id}")
@@ -1097,7 +1098,7 @@ def lend_room_mic(room_id: str, body: RoomMicLend, request: Request) -> dict:
         return roommic.lend(room_id, body.interactor_id, body.device,
                             body.mic_type, body.gain)
     except roommic.RoomMicError as exc:
-        raise HTTPException(403, str(exc))
+        raise HTTPException(403, i18n.raised(exc))
 
 
 @router.delete("/rooms/{room_id}/mic/{interactor_id}")
@@ -1429,7 +1430,7 @@ def search_listings(request: Request, q: str | None = None,
             locality=locality, region=region, include_remote=include_remote,
             adult_viewer=rated.viewer_is_adult(request), limit=limit)
     except marketplace.MarketError as exc:
-        raise HTTPException(422, str(exc))
+        raise HTTPException(422, i18n.raised(exc))
 
 
 @router.get("/marketplace/localities")
@@ -1455,7 +1456,7 @@ def set_listing_place(listing_id: str, body: ListingPlace,
                                      body.remote)
     except marketplace.MarketError as exc:
         raise HTTPException(
-            404 if str(exc).startswith("no such") else 422, str(exc))
+            404 if i18n.raised(exc).startswith("no such") else 422, i18n.raised(exc))
 
 
 @router.delete("/marketplace/listings/{listing_id}/place")
@@ -1484,7 +1485,7 @@ def put_market_settings(interactor_id: str, body: MarketPrefs,
             scope=body.scope, include_remote=body.include_remote,
             kinds=body.kinds, tags=body.tags)
     except marketplace.MarketError as exc:
-        raise HTTPException(422, str(exc))
+        raise HTTPException(422, i18n.raised(exc))
 
 
 @router.post("/marketplace/assist")
@@ -1503,7 +1504,7 @@ def assist_search(body: MarketAssist, request: Request) -> dict:
             body.need, interactor_id=interactor_id,
             provider=llm.get_provider(cloud=request.app.state.cloud))
     except marketplace.MarketError as exc:
-        raise HTTPException(422, str(exc))
+        raise HTTPException(422, i18n.raised(exc))
 
 
 @router.delete("/marketplace/listings/{listing_id}", status_code=204)
@@ -1689,13 +1690,13 @@ def prepare_referral(body: ReferralPrepare, request: Request) -> dict:
     try:
         storage.require(tiers.plan_of_profile(profile["id"]), "clinical_note")
     except storage.StorageError as exc:
-        raise HTTPException(402, str(exc)) from None
+        raise HTTPException(402, i18n.raised(exc)) from None
     try:
         return referral.prepare(
             interactor, profile, body.provider_id,
             account_id=f"interactor:{body.interactor_id}", rp_id=_rp_id())
     except referral.ReferralError as exc:
-        raise HTTPException(422, str(exc))
+        raise HTTPException(422, i18n.raised(exc))
 
 
 @router.post("/referrals/{referral_id}/release")
@@ -1714,7 +1715,7 @@ def release_referral(referral_id: str, body: ReferralRelease,
     try:
         return referral.release(referral_id, body.signature_id)
     except referral.ReferralError as exc:
-        raise HTTPException(403, str(exc))
+        raise HTTPException(403, i18n.raised(exc))
 
 
 @router.get("/referrals/{referral_id}")
@@ -1725,8 +1726,8 @@ def open_referral(referral_id: str, token: str) -> dict:
     try:
         return referral.redeem(referral_id, token)
     except referral.ReferralError as exc:
-        raise HTTPException(410 if "already opened" in str(exc) else 403,
-                            str(exc))
+        raise HTTPException(410 if "already opened" in i18n.raised(exc) else 403,
+                            i18n.raised(exc))
 
 
 @router.post("/referrals/{referral_id}/reply", status_code=201)
@@ -1744,7 +1745,7 @@ def reply_to_referral(referral_id: str, token: str, body: ReferralReply,
         return referral.reply(referral_id, token, body.content,
                               pdi=request.app.state.pdi)
     except referral.ReferralError as exc:
-        raise HTTPException(403, str(exc))
+        raise HTTPException(403, i18n.raised(exc))
 
 
 @router.get("/profiles/{profile_id}/clinical-notes/{interactor_id}")

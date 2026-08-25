@@ -52,7 +52,7 @@ from __future__ import annotations
 
 import json
 
-from . import db, wearables
+from . import db, i18n, wearables
 
 # Where the pane may sit. Both at the bottom, for the reason in the module
 # note: the top-left carries the name of whoever's surface this is, and the
@@ -235,7 +235,7 @@ def route(face: str) -> dict:
     if face in REFUSED:
         raise DockError(REFUSED[face])
     if face not in ROUTES:
-        raise DockError(f"no such face {face!r}; one of {', '.join(FACES)}")
+        raise DockError(i18n.fill(i18n.NO_SUCH_FACE, got=repr(face), choices=', '.join(FACES)))
     return {"face": face, **ROUTES[face], "opens_dock_face": face}
 
 
@@ -243,7 +243,7 @@ def _check_face(face: str) -> None:
     if face in REFUSED:
         raise DockError(REFUSED[face])
     if face not in FACES:
-        raise DockError(f"no such face {face!r}; one of {', '.join(FACES)}")
+        raise DockError(i18n.fill(i18n.NO_SUCH_FACE, got=repr(face), choices=', '.join(FACES)))
 
 
 def settings(profile_id: str, platform: str = DEFAULT_PLATFORM) -> dict:
@@ -259,8 +259,7 @@ def settings(profile_id: str, platform: str = DEFAULT_PLATFORM) -> dict:
     """
     if platform not in DEFAULT_STATE_ON:
         raise DockError(
-            f"unknown platform {platform!r}; one of "
-            f"{', '.join(DEFAULT_STATE_ON)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE, field="platform", got=repr(platform), choices=', '.join(DEFAULT_STATE_ON)))
     row = db.connect().execute(
         "SELECT * FROM dock_prefs WHERE profile_id=?", (profile_id,)).fetchone()
     if row is None:
@@ -287,11 +286,9 @@ def configure(profile_id: str, corner: str | None = None,
 
     if corner not in CORNERS:
         raise DockError(
-            f"the pane sits in a bottom corner — {', '.join(CORNERS)}. A top "
-            "corner would cover the name of whoever's surface this is, or the "
-            "recording light.")
+            i18n.fill(i18n.PANE_BOTTOM_CORNER_LIGHT, choices=', '.join(CORNERS)))
     if state not in STATES:
-        raise DockError(f"unknown state {state!r}; one of {', '.join(STATES)}")
+        raise DockError(i18n.fill(i18n.UNKNOWN_CHOICE, field="state", got=repr(state), choices=', '.join(STATES)))
     for f in chosen:
         _check_face(f)
     if not chosen:
@@ -299,7 +296,7 @@ def configure(profile_id: str, corner: str | None = None,
                         "— set the state to 'handle' instead")
     _check_face(face)
     if face not in chosen:
-        raise DockError(f"{face!r} is not one of the faces this dock carries")
+        raise DockError(i18n.fill(i18n.FACE_NOT_CARRIED, got=repr(face)))
 
     conn = db.connect()
     conn.execute(
@@ -349,8 +346,7 @@ def face(profile_id: str, name: str, surface: str | None = None,
     _check_face(name)
     if name in PER_SURFACE and not surface_id:
         raise DockError(
-            f"the {name} face is about a place — tell it which surface it is "
-            "floating over")
+            i18n.fill(i18n.FACE_ABOUT_A_PLACE, face=name))
     return {
         "face": name,
         "shows": FACES[name],

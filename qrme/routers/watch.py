@@ -24,6 +24,7 @@ from .. import db, robotics, steering, wearables, workflows
 from ..common import profile_or_404, require_owner
 from .interaction import approve_message, reject_message
 from .robots import RobotCommand, command_robot
+from .. import i18n
 
 router = APIRouter()
 
@@ -66,7 +67,7 @@ def pair_wearable(profile_id: str, body: WearablePair,
     try:
         return wearables.pair(profile_id, body.name, body.kind, body.faces)
     except wearables.WearableError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.delete("/profiles/{profile_id}/wearables/{name}")
@@ -79,7 +80,7 @@ def unpair_wearable(profile_id: str, name: str, request: Request) -> dict:
     try:
         return wearables.unpair(profile_id, name)
     except wearables.WearableError as exc:
-        raise HTTPException(404, str(exc)) from None
+        raise HTTPException(404, i18n.raised(exc)) from None
 
 
 # agent status -> watch light

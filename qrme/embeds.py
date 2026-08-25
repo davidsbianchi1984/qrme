@@ -41,6 +41,7 @@ import re
 from urllib.parse import parse_qs, urlparse
 
 from . import db
+from . import i18n
 
 
 class EmbedError(ValueError):
@@ -176,8 +177,7 @@ def parse(url: str) -> dict:
             vid = _video_id(key, url)
             if not vid or not spec["id"].match(vid):
                 raise EmbedError(
-                    f"that looks like a {spec['name']} link but there is no "
-                    f"video in it")
+                    i18n.fill(i18n.EMBED_NO_VIDEO, kind=spec['name']))
             return {"platform": key, "platform_name": spec["name"],
                     "video_id": vid,
                     "url": spec["watch"].format(id=vid),
@@ -199,7 +199,7 @@ def attach(post_id: str, url: str, title: str = "") -> dict:
     video = parse(url)
     title = (title or "").strip()
     if len(title) > MAX_TITLE:
-        raise EmbedError(f"a video title is at most {MAX_TITLE} characters")
+        raise EmbedError(i18n.fill(i18n.VIDEO_TITLE_CEILING, max=MAX_TITLE))
 
     conn = db.connect()
     if conn.execute("SELECT 1 FROM post_videos WHERE post_id=?",

@@ -22,6 +22,7 @@ from pydantic import BaseModel, Field
 
 from .. import auth, db, gamelobby
 from ..common import require_owner, require_self
+from .. import i18n
 
 router = APIRouter()
 
@@ -154,7 +155,7 @@ def seat(session_id: str, body: SeatIn, request: Request) -> dict:
         return gamelobby.seat(session_id, body.member_kind, body.member_id,
                               body.role, body.callsign)
     except gamelobby.LobbyError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.get("/gaming/sessions/{session_id}/lobby")
@@ -196,4 +197,4 @@ def context(session_id: str, request: Request) -> dict:
     try:
         return gamelobby.prompt_context(session_id)
     except gamelobby.LobbyError as exc:
-        raise HTTPException(404, str(exc)) from None
+        raise HTTPException(404, i18n.raised(exc)) from None

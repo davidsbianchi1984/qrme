@@ -162,7 +162,7 @@ def claim(profile_id: str, body: VerifyIn, request: Request) -> dict:
                                method=body.method, ref=body.ref)
     except identity.IdentityError as exc:
         # The one-badge rule refusing: your other profile already holds it.
-        raise HTTPException(409, str(exc)) from None
+        raise HTTPException(409, i18n.raised(exc)) from None
     except verification.VerificationError as exc:
         # The claim itself is malformed — an unknown level, or a level above
         # `self_asserted` with nobody named as having checked.
@@ -174,7 +174,7 @@ def claim(profile_id: str, body: VerifyIn, request: Request) -> dict:
         # ("expected one of self_asserted, federated, document, in_person").
         # A good message thrown away by the wrong handler is worse than no
         # message: the work of explaining was done and then discarded.
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.post("/profiles/{profile_id}/verification/move")
@@ -191,7 +191,7 @@ def move(profile_id: str, request: Request) -> dict:
     try:
         return identity.move(profile["owner_id"], profile_id)
     except identity.IdentityError as exc:
-        raise HTTPException(409, str(exc)) from None
+        raise HTTPException(409, i18n.raised(exc)) from None
 
 
 @router.get("/profiles/{profile_id}/siblings")
@@ -275,4 +275,4 @@ def set_emblem(profile_id: str, body: EmblemIn, request: Request) -> dict:
         return identity.set_picture(profile_id, body.emblem, body.asset,
                                     body.depicts_someone_else)
     except identity.IdentityError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None

@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import json
 
-from . import agentlight, db, llm, moderation, persona
+from . import agentlight, db, i18n, llm, moderation, persona
 
 # The phases a plan may use. `confirm` is the one pausing phase: it waits for
 # external input and resumes later.
@@ -38,7 +38,7 @@ def create(profile_id: str, goal: str, plan: list[str] | None,
     plan = plan or DEFAULT_PLAN
     unknown = [p for p in plan if p not in PHASES]
     if unknown:
-        raise ValueError(f"unknown phase(s): {', '.join(unknown)}")
+        raise ValueError(i18n.fill(i18n.UNKNOWN_PHASES, got=', '.join(unknown)))
     if not plan:
         raise ValueError("a workflow needs at least one phase")
     conn = db.connect()
@@ -199,7 +199,7 @@ def advance(profile: dict, wf: dict, pdi=None, cloud=None) -> dict:
             "polished deliverable exactly as it should go out.", provider)
 
     else:                                   # pragma: no cover - guarded at create
-        raise ValueError(f"unknown phase {phase}")
+        raise ValueError(i18n.fill(i18n.UNKNOWN_VALUE, field="phase", got=phase))
 
     memory[phase] = output
     cursor = wf["cursor"] + 1

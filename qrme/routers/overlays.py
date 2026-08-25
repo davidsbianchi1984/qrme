@@ -141,7 +141,7 @@ def wear(surface: str, surface_id: str, body: WearIn,
                              body.depicts_real_person, body.source,
                              body.holds_rights)
     except overlays.OverlayError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.delete("/places/{surface}/{surface_id}/overlay")

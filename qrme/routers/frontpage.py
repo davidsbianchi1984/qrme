@@ -10,6 +10,7 @@ from fastapi import APIRouter, HTTPException, Request
 from .. import auth, frontpage, help as help_mod
 from ..models import ExperienceSet, HelpAsk, ReviewIn
 from .profiles import profile_or_404, require_owner
+from .. import i18n
 
 router = APIRouter(tags=["front page"])
 
@@ -43,7 +44,7 @@ def set_experience(profile_id: str, body: ExperienceSet,
         entries = frontpage.set_experience(
             profile_id, [e.model_dump() for e in body.entries])
     except frontpage.FrontPageError as exc:
-        raise HTTPException(422, str(exc))
+        raise HTTPException(422, i18n.raised(exc))
     return {"profile_id": profile_id, "experience": entries}
 
 
@@ -66,7 +67,7 @@ def leave_review(profile_id: str, body: ReviewIn, request: Request) -> dict:
         return frontpage.review(profile_id, body.interactor_id, body.rating,
                                 body.body)
     except frontpage.FrontPageError as exc:
-        raise HTTPException(422, str(exc))
+        raise HTTPException(422, i18n.raised(exc))
 
 
 @router.get("/help/topics")

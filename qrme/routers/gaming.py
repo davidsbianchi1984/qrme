@@ -47,7 +47,7 @@ def _platform_or_422(platform: str) -> dict:
     entry = catalog.BY_KEY.get(("gaming", platform))
     if entry is None:
         raise HTTPException(
-            422, f"unknown gaming platform '{platform}'; see /connectors/catalog")
+            422, i18n.fill(i18n.UNKNOWN_GAMING_PLATFORM, got=platform))
     return entry
 
 

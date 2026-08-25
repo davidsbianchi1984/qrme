@@ -95,7 +95,7 @@ def translate_text(profile_id: str, body: TranslateRequest,
         return i18n.translate(profile_id, body.text, body.to,
                               cloud=request.app.state.cloud)
     except ValueError as exc:
-        raise HTTPException(422, str(exc))
+        raise HTTPException(422, i18n.raised(exc))
 
 
 @router.get("/models")
@@ -130,7 +130,7 @@ def set_profile_model(profile_id: str, body: ModelChoice, request: Request) -> d
     try:
         llm.set_choice(profile_id, body.provider)
     except ValueError as exc:  # defensive: CHOICES already validated above
-        raise HTTPException(422, str(exc)) from exc
+        raise HTTPException(422, i18n.raised(exc)) from exc
     effective = llm.resolve_choice(body.provider)
     logger.info("owner set profile %s model provider=%s (effective=%s)",
                 profile_id, body.provider, effective)

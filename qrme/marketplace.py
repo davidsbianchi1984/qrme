@@ -41,7 +41,7 @@ from __future__ import annotations
 import json
 import re
 
-from . import db
+from . import db, i18n
 
 SCOPES = ("locality", "region", "anywhere")
 KINDS = ("profile", "content", "expertise", "service")
@@ -172,10 +172,10 @@ def set_prefs(interactor_id: str, *, locality=None, region=None, scope=None,
     cur = prefs(interactor_id)
     scope = scope or cur["scope"]
     if scope not in SCOPES:
-        raise MarketError(f"scope must be one of {', '.join(SCOPES)}")
+        raise MarketError(i18n.fill(i18n.MUST_BE_ONE_OF, field="scope", choices=', '.join(SCOPES)))
     bad = [k for k in (kinds or []) if k not in KINDS]
     if bad:
-        raise MarketError(f"unknown listing kind(s): {bad}")
+        raise MarketError(i18n.fill(i18n.UNKNOWN_LISTING_KINDS, got=bad))
     # Narrowing to a place you have not named would return nothing and look
     # like an empty marketplace, so say what is actually wrong.
     place = locality if locality is not None else cur["locality"]
@@ -240,7 +240,7 @@ def search(q: str | None = None, *, kind: str | None = None,
     response carries the terms that matched and the fields they hit.
     """
     if scope not in SCOPES:
-        raise MarketError(f"scope must be one of {', '.join(SCOPES)}")
+        raise MarketError(i18n.fill(i18n.MUST_BE_ONE_OF, field="scope", choices=', '.join(SCOPES)))
     if scope == "locality" and not locality:
         raise MarketError("scope 'locality' needs a locality")
     if scope == "region" and not (region or locality):

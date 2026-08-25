@@ -34,7 +34,7 @@ from __future__ import annotations
 
 import json
 
-from . import db
+from . import db, i18n
 
 # What may be paired. Personal devices, worn by the person pairing them.
 #
@@ -150,12 +150,12 @@ def pair(profile_id: str, name: str, kind: str,
         raise WearableError(REFUSAL.format(kind=kind, what=REFUSED[kind]))
     if kind not in KINDS:
         raise WearableError(
-            f"unknown wearable {kind!r}; expected one of {', '.join(KINDS)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_EXPECTED, field="wearable", got=repr(kind), choices=', '.join(KINDS)))
     chosen = list(faces) if faces is not None else list(DEFAULT_FACES)
     for face in chosen:
         if face not in FACES:
             raise WearableError(
-                f"unknown face {face!r}; expected one of {', '.join(FACES)}")
+                i18n.fill(i18n.UNKNOWN_CHOICE_EXPECTED, field="face", got=repr(face), choices=', '.join(FACES)))
 
     conn = db.connect()
     existing = conn.execute(
@@ -167,7 +167,7 @@ def pair(profile_id: str, name: str, kind: str,
             " revoked_at IS NULL", (profile_id,)).fetchone()["n"]
         if live >= MAX_WEARABLES:
             raise WearableError(
-                f"{MAX_WEARABLES} paired devices is the limit — unpair one")
+                i18n.fill(i18n.PAIRED_DEVICES_LIMIT, max=MAX_WEARABLES))
         conn.execute(
             "INSERT INTO wearables (id, profile_id, name, kind, transport,"
             " faces, paired_at) VALUES (?,?,?,?,'bluetooth',?,?)",

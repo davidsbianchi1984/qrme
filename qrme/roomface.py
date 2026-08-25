@@ -48,6 +48,7 @@ while the code checked nothing, and a room id travels on printed stickers.
 from __future__ import annotations
 
 from . import db
+from . import i18n
 
 # What a box can be. The values are the client's rendering instruction and the
 # person's own words for it, kept together so a client cannot invent a fourth.
@@ -96,7 +97,7 @@ def set_showing(room_id: str, interactor_id: str, showing: str,
     """
     if showing not in SHOWING:
         raise RoomFaceError(
-            f"unknown {showing!r} — one of {', '.join(SHOWING)}")
+            i18n.fill(i18n.UNKNOWN_ONE_OF, got=repr(showing), choices=', '.join(SHOWING)))
 
     conn = db.connect()
     row = conn.execute(

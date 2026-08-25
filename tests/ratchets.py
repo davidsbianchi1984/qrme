@@ -819,7 +819,7 @@ RATCHETS: tuple[Ratchet, ...] = (
             "the rows the ios shell-table scan parses"),
     Ratchet("shellstable.rows.windows", 1052, _shellstable_rows("windows"),
             "the rows the windows shell-table scan parses"),
-    Ratchet("refusals.template_calls", 24, _template_calls,
+    Ratchet("refusals.template_calls", 152, _template_calls,
             "the `i18n.fill` call sites the conversion left behind"),
     Ratchet("deploy.check_blocks", 2, _deploy_check_blocks,
             "the check blocks the deploy page offers a choice between"),

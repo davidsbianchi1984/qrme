@@ -12,6 +12,7 @@ from fastapi import APIRouter, HTTPException, Request
 from .. import campaigns, ledger
 from ..common import interactor_or_404, profile_or_404, require_owner
 from ..models import CampaignCreate, DonationCreate, ProceedsSet
+from .. import i18n
 
 router = APIRouter()
 
@@ -51,8 +52,7 @@ def request_payout(profile_id: str, request: Request,
             if t["accrued"] > 0]
     if currency and held:
         raise HTTPException(
-            409, f"nothing accrued in {currency} — this account holds a "
-                 f"balance in {', '.join(sorted(held))}")
+            409, i18n.fill(i18n.NOTHING_ACCRUED, currency=currency, held=', '.join(sorted(held))))
     raise HTTPException(409, "nothing accrued — the balance is zero")
 
 
@@ -70,7 +70,7 @@ def set_proceeds(profile_id: str, body: ProceedsSet, request: Request) -> dict:
         return {"profile_id": profile_id,
                 "proceeds_to": campaigns.designate(profile_id, body.designees)}
     except campaigns.CampaignError as e:
-        raise HTTPException(422, str(e))
+        raise HTTPException(422, i18n.raised(e))
 
 
 @router.get("/profiles/{profile_id}/proceeds")
@@ -90,7 +90,7 @@ def create_campaign(profile_id: str, body: CampaignCreate,
     try:
         return campaigns.create(profile, body.title, body.goal, body.cause)
     except campaigns.CampaignError as e:
-        raise HTTPException(422, str(e))
+        raise HTTPException(422, i18n.raised(e))
 
 
 @router.get("/profiles/{profile_id}/campaigns")
@@ -119,8 +119,8 @@ def donate(campaign_id: str, body: DonationCreate) -> dict:
                                 note=body.note,
                                 on_behalf_of=body.on_behalf_of)
     except campaigns.CampaignError as e:
-        code = 404 if "no such" in str(e) else 422
-        raise HTTPException(code, str(e))
+        code = 404 if "no such" in i18n.raised(e) else 422
+        raise HTTPException(code, i18n.raised(e))
 
 
 @router.post("/campaigns/{campaign_id}/close")
@@ -132,4 +132,4 @@ def close_campaign(campaign_id: str, request: Request) -> dict:
     try:
         return campaigns.close(campaign_id)
     except campaigns.CampaignError as e:
-        raise HTTPException(409, str(e))
+        raise HTTPException(409, i18n.raised(e))

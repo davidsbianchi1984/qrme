@@ -121,7 +121,7 @@ def add_friend(profile_id: str, body: FriendAdd, request: Request) -> dict:
     try:
         return friends.befriend(profile_id, body.friend_id)
     except friends.FriendError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.delete("/profiles/{profile_id}/friends/{friend_id}")

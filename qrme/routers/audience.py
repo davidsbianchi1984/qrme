@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import audience, auth, db, rated
+from .. import i18n
 
 router = APIRouter()
 
@@ -36,8 +37,7 @@ def _kind(path_kind: str) -> str:
     kind = _KIND_BY_PATH.get(path_kind)
     if kind is None:
         raise HTTPException(
-            404, f"nothing at /{path_kind} to react to; expected one of "
-                 f"{', '.join(sorted(_KIND_BY_PATH))}")
+            404, i18n.fill(i18n.NOTHING_TO_REACT, path=path_kind, choices=', '.join(sorted(_KIND_BY_PATH))))
     return kind
 
 
@@ -64,9 +64,9 @@ def _fail(exc: audience.AudienceError):
     # "no such profile" is a missing resource, not a malformed request — 404
     # keeps it consistent with every other resource lookup in the API. A 422
     # here would read as "your body was wrong" when the body was fine.
-    if str(exc).startswith("no such "):
-        return HTTPException(404, str(exc))
-    return HTTPException(422, str(exc))
+    if i18n.raised(exc).startswith("no such "):
+        return HTTPException(404, i18n.raised(exc))
+    return HTTPException(422, i18n.raised(exc))
 
 
 def _gate(kind: str, target_id: str, request: Request) -> None:
@@ -152,10 +152,10 @@ def delete_comment(comment_id: str, request: Request) -> dict:
     try:
         return audience.delete_comment(comment_id, _actor(request))
     except audience.AudienceError as exc:
-        if str(exc) == "no such comment":
-            raise HTTPException(404, str(exc)) from exc
-        if str(exc) == "not your comment":
-            raise HTTPException(403, str(exc)) from exc
+        if i18n.raised(exc) == "no such comment":
+            raise HTTPException(404, i18n.raised(exc)) from exc
+        if i18n.raised(exc) == "not your comment":
+            raise HTTPException(403, i18n.raised(exc)) from exc
         raise _fail(exc) from exc
 
 
@@ -203,8 +203,8 @@ def unsubscribe(kind: str, subject_id: str, request: Request) -> dict:
     try:
         return audience.cancel(kind, subject_id, _actor(request))
     except audience.AudienceError as exc:
-        if str(exc) == "not subscribed":
-            raise HTTPException(404, str(exc)) from exc
+        if i18n.raised(exc) == "not subscribed":
+            raise HTTPException(404, i18n.raised(exc)) from exc
         raise _fail(exc) from exc
 
 
@@ -222,8 +222,8 @@ def renew(sub_id: str, body: SubscribeIn, request: Request) -> dict:
     try:
         return audience.renew(sub_id, body.beneficiary)
     except audience.AudienceError as exc:
-        if str(exc) == "no such subscription":
-            raise HTTPException(404, str(exc)) from exc
+        if i18n.raised(exc) == "no such subscription":
+            raise HTTPException(404, i18n.raised(exc)) from exc
         raise _fail(exc) from exc
 
 
@@ -268,6 +268,6 @@ def audience_counts(kind: str, target_id: str, request: Request) -> dict:
     except audience.AudienceError as exc:
         raise _fail(exc) from exc
     if not audience.target_exists(kind, target_id):
-        raise HTTPException(404, f"no such {kind}")
+        raise HTTPException(404, i18n.fill(i18n.NO_SUCH_THING, thing=kind))
     return audience.counts(kind, target_id,
                            who["subject_id"] if who else None)

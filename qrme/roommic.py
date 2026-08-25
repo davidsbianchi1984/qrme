@@ -52,7 +52,7 @@ Permission and state only — capture is on the device, like everywhere else.
 
 from __future__ import annotations
 
-from . import db
+from . import db, i18n
 
 
 # What may be lent, and what may not. Kept in step with `jim/mic.py`'s
@@ -161,8 +161,7 @@ def lend(room_id: str, interactor_id: str, device: str,
         raise RoomMicError("that room has closed")
     if room["channel"] not in ("voice", "video", "ar", "vr"):
         raise RoomMicError(
-            f"this is a {room['channel']} room — nobody's microphone is busy, "
-            "so the profiles can already read everything you send")
+            i18n.fill(i18n.OPEN_ROOM_MIC, kind=room['channel']))
     if not _is_participant(room_id, interactor_id):
         raise RoomMicError("only a participant can lend a microphone")
     # A device may arrive under the name it was paired with. See FROM_WEARABLE:
@@ -178,23 +177,15 @@ def lend(room_id: str, interactor_id: str, device: str,
         from . import wearables
         if mic_type in wearables.REFUSED:
             raise RoomMicError(
-                f"a {mic_type.replace('_', ' ')} is "
-                f"{wearables.REFUSED[mic_type]}: it would pick up the people "
-                "around you, and their voices are not yours to lend. A worn "
-                "or clipped-on one can: "
-                f"{', '.join(t.replace('_', ' ') for t in PERSONAL_TYPES)}")
+                i18n.fill(i18n.ROOM_MIC_LONG, kind=mic_type.replace('_', ' '), why=wearables.REFUSED[mic_type], choices=', '.join(t.replace('_', ' ') for t in PERSONAL_TYPES)))
         raise RoomMicError(
-            f"unknown microphone type {mic_type!r} — one of "
-            f"{', '.join(sorted(MIC_TYPES))}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_DASH, field="microphone type", got=repr(mic_type), choices=', '.join(sorted(MIC_TYPES))))
     if not MIC_TYPES[mic_type]:
         raise RoomMicError(
-            f"a {mic_type.replace('_', ' ')} microphone is pointed at the "
-            "room, not at you. It would pick up the people around you, and "
-            "their voices are not yours to lend. A worn or clipped-on one "
-            f"can: {', '.join(t.replace('_', ' ') for t in PERSONAL_TYPES)}")
+            i18n.fill(i18n.POINTED_MIC_LONG, kind=mic_type.replace('_', ' '), choices=', '.join(t.replace('_', ' ') for t in PERSONAL_TYPES)))
     if gain not in GAIN_LEVELS:
         raise RoomMicError(
-            f"unknown gain {gain!r} — one of {', '.join(GAIN_LEVELS)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_DASH, field="gain", got=repr(gain), choices=', '.join(GAIN_LEVELS)))
 
     conn = db.connect()
     existing = conn.execute(
@@ -328,7 +319,7 @@ def _place(surface: str) -> None:
             "undisclosed")
     if surface not in PLACES:
         raise RoomMicError(
-            f"unknown surface {surface!r} — one of {', '.join(PLACES)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_DASH, field="surface", got=repr(surface), choices=', '.join(PLACES)))
 
 
 def lend_on(surface: str, surface_id: str, interactor_id: str, device: str,
@@ -348,17 +339,13 @@ def lend_on(surface: str, surface_id: str, interactor_id: str, device: str,
         from . import wearables
         if mic_type in wearables.REFUSED:
             raise RoomMicError(
-                f"a {mic_type.replace('_', ' ')} is "
-                f"{wearables.REFUSED[mic_type]}: it would pick up the people "
-                "around you, and their voices are not yours to lend")
-        raise RoomMicError(f"unknown microphone type {mic_type!r}")
+                i18n.fill(i18n.ROOM_MIC_SHORT, kind=mic_type.replace('_', ' '), why=wearables.REFUSED[mic_type]))
+        raise RoomMicError(i18n.fill(i18n.UNKNOWN_VALUE, field="microphone type", got=repr(mic_type)))
     if not MIC_TYPES[mic_type]:
         raise RoomMicError(
-            f"a {mic_type.replace('_', ' ')} microphone is pointed at the "
-            "room, not at you. It would pick up the people around you, and "
-            "their voices are not yours to lend")
+            i18n.fill(i18n.POINTED_MIC_SHORT, kind=mic_type.replace('_', ' ')))
     if gain not in GAIN_LEVELS:
-        raise RoomMicError(f"unknown gain {gain!r}")
+        raise RoomMicError(i18n.fill(i18n.UNKNOWN_VALUE, field="gain", got=repr(gain)))
 
     conn = db.connect()
     existing = conn.execute(

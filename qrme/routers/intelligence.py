@@ -144,7 +144,7 @@ def create_workflow(profile_id: str, body: WorkflowCreate,
     try:
         return workflows.create(profile_id, body.goal, body.plan, grant_id)
     except ValueError as e:
-        raise HTTPException(422, str(e))
+        raise HTTPException(422, i18n.raised(e))
 
 
 @router.get("/profiles/{profile_id}/workflows")
@@ -180,7 +180,7 @@ def resume_workflow(profile_id: str, workflow_id: str, body: WorkflowResume,
     try:
         return workflows.resume(profile_id, wf, body.input)
     except ValueError as e:
-        raise HTTPException(409, str(e))
+        raise HTTPException(409, i18n.raised(e))
 
 
 @router.post("/profiles/{profile_id}/workflows/{workflow_id}/cancel")
@@ -236,7 +236,7 @@ def set_delegation(profile_id: str, body: DelegationSet,
         return delegation.set_policy(profile_id, body.phases, grant_id,
                                      body.enabled)
     except ValueError as e:
-        raise HTTPException(422, str(e))
+        raise HTTPException(422, i18n.raised(e))
 
 
 @router.get("/profiles/{profile_id}/delegation")
@@ -268,9 +268,9 @@ def start_delegated_workflow(profile_id: str, body: DelegatedWorkflowCreate,
         return delegation.start(profile_id, body.interactor_id, body.goal,
                                 body.plan)
     except delegation.DelegationError as e:
-        raise HTTPException(403, str(e))
+        raise HTTPException(403, i18n.raised(e))
     except ValueError as e:
-        raise HTTPException(422, str(e))
+        raise HTTPException(422, i18n.raised(e))
 
 
 @router.get("/profiles/{profile_id}/delegated-workflows/{workflow_id}")
@@ -302,7 +302,7 @@ def resume_delegated_workflow(profile_id: str, workflow_id: str,
         return {**workflows.resume(profile_id, wf, body.input),
                 "delegated_to": who}
     except ValueError as e:
-        raise HTTPException(409, str(e))
+        raise HTTPException(409, i18n.raised(e))
 
 
 # -- Real-time simulation / predictive modeling (spec clauses 1 & 5) ---------

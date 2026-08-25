@@ -16,6 +16,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse, Response
 
 from .. import db, auth, desks, landing, rated
+from .. import i18n
 
 router = APIRouter()
 
@@ -55,7 +56,7 @@ def _require_desk(desk_id: str, request: Request) -> None:
 
 
 def _fail(exc: desks.DeskError):
-    return HTTPException(422, str(exc))
+    return HTTPException(422, i18n.raised(exc))
 
 
 def _adult(request: Request) -> bool:
@@ -189,7 +190,7 @@ def ring_bell(desk_id: str, body: RingIn, request: Request) -> dict:
     try:
         return desks.ring(desk_id, caller_id=body.caller_id, note=body.note)
     except desks.DeskError as exc:
-        if str(exc) == "no such desk":
+        if i18n.raised(exc) == "no such desk":
             raise HTTPException(404, "no such desk") from exc
         raise _fail(exc) from exc
 
@@ -258,7 +259,7 @@ def join_stream(desk_id: str, request: Request,
     try:
         joined = desks.join(desk_id, mode=mode)
     except desks.DeskError as exc:
-        if str(exc) == "no such desk":
+        if i18n.raised(exc) == "no such desk":
             raise HTTPException(404, "no such desk") from exc
         raise _fail(exc) from exc
     if who is not None:
@@ -287,7 +288,7 @@ def ask_to_come_up(desk_id: str, body: GuestIn, request: Request) -> dict:
         return desks.request_guest(desk_id, who["subject_id"],
                                    body.display_name, body.note)
     except desks.DeskError as exc:
-        if str(exc) == "no such desk":
+        if i18n.raised(exc) == "no such desk":
             raise HTTPException(404, "no such desk") from exc
         raise _fail(exc) from exc
 
@@ -308,8 +309,8 @@ def accept_guest(desk_id: str, req_id: str, request: Request) -> dict:
     try:
         return desks.decide_guest(desk_id, req_id, True)
     except desks.DeskError as exc:
-        if str(exc) == "no such request":
-            raise HTTPException(404, str(exc)) from exc
+        if i18n.raised(exc) == "no such request":
+            raise HTTPException(404, i18n.raised(exc)) from exc
         raise _fail(exc) from exc
 
 
@@ -320,8 +321,8 @@ def decline_guest(desk_id: str, req_id: str, request: Request) -> dict:
     try:
         return desks.decide_guest(desk_id, req_id, False)
     except desks.DeskError as exc:
-        if str(exc) == "no such request":
-            raise HTTPException(404, str(exc)) from exc
+        if i18n.raised(exc) == "no such request":
+            raise HTTPException(404, i18n.raised(exc)) from exc
         raise _fail(exc) from exc
 
 
@@ -370,7 +371,7 @@ def place_desk_beacon(desk_id: str, body: DeskBeaconCreate,
     try:
         return desks.place_beacon(desk_id, body.label, body.location)
     except desks.DeskError as exc:
-        if str(exc) == "no such desk":
+        if i18n.raised(exc) == "no such desk":
             raise HTTPException(404, "no such desk") from exc
         raise _fail(exc) from exc
 

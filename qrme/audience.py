@@ -40,7 +40,7 @@ so rather than implying a payment processor that does not exist.
 
 from __future__ import annotations
 
-from . import db, inbox, ledger, moderation
+from . import db, i18n, inbox, ledger, moderation
 
 # What can be liked, commented on or shared. Kept as a closed set so a typo
 # in a path parameter cannot silently create a fifth kind of thing that no
@@ -66,16 +66,13 @@ class AudienceError(ValueError):
 def _check_target(kind: str) -> None:
     if kind not in TARGETS:
         raise AudienceError(
-            f"unknown target kind {kind!r}; expected one of "
-            f"{', '.join(TARGETS)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_EXPECTED, field="target kind", got=repr(kind), choices=', '.join(TARGETS)))
 
 
 def _check_subject(kind: str) -> None:
     if kind not in SUBJECTS:
         raise AudienceError(
-            f"cannot subscribe to {kind!r} — subscribing means 'tell me when "
-            f"there is more from them', so it applies to "
-            f"{' and '.join(SUBJECTS)}")
+            i18n.fill(i18n.CANNOT_SUBSCRIBE_TO, got=repr(kind), choices=' and '.join(SUBJECTS)))
 
 
 def _owner_of(kind: str, target_id: str) -> str | None:
@@ -142,7 +139,7 @@ def like(kind: str, target_id: str, actor_id: str) -> dict:
     """Like something. Idempotent: liking twice is still one like."""
     _check_target(kind)
     if not target_exists(kind, target_id):
-        raise AudienceError(f"no such {kind}")
+        raise AudienceError(i18n.fill(i18n.NO_SUCH_THING, thing=kind))
     conn = db.connect()
     existing = conn.execute(
         "SELECT id FROM reactions WHERE target_kind=? AND target_id=? AND"
@@ -212,7 +209,7 @@ def comment(kind: str, target_id: str, author_id: str, body: str,
     if not body.strip():
         raise AudienceError("a comment needs something in it")
     if not target_exists(kind, target_id):
-        raise AudienceError(f"no such {kind}")
+        raise AudienceError(i18n.fill(i18n.NO_SUCH_THING, thing=kind))
 
     verdict = moderation.review(
         body, None, author or {"birthdate": None},
@@ -298,7 +295,7 @@ def share(kind: str, target_id: str, actor_id: str | None = None,
     """
     _check_target(kind)
     if not target_exists(kind, target_id):
-        raise AudienceError(f"no such {kind}")
+        raise AudienceError(i18n.fill(i18n.NO_SUCH_THING, thing=kind))
     conn = db.connect()
     conn.execute(
         "INSERT INTO shares (id, target_kind, target_id, actor_id, channel,"
@@ -352,9 +349,9 @@ def subscribe(kind: str, subject_id: str, subscriber: str,
     _check_subject(kind)
     if tier not in TIERS:
         raise AudienceError(
-            f"unknown tier {tier!r}; expected one of {', '.join(TIERS)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_EXPECTED, field="tier", got=repr(tier), choices=', '.join(TIERS)))
     if not target_exists(kind, subject_id):
-        raise AudienceError(f"no such {kind}")
+        raise AudienceError(i18n.fill(i18n.NO_SUCH_THING, thing=kind))
 
     if tier == "paid":
         if price <= 0:
@@ -363,8 +360,7 @@ def subscribe(kind: str, subject_id: str, subscriber: str,
                 "the 'follow' tier")
         if accept_price is None or round(accept_price, 2) != round(price, 2):
             raise AudienceError(
-                f"this subscription costs {price:.2f} per period and renews "
-                f"until cancelled; send accept_price={price:.2f} to confirm")
+                i18n.fill(i18n.SUBSCRIPTION_CONFIRM, price=format(price, ".2f"), accept=format(price, ".2f")))
         if not beneficiary:
             raise AudienceError(
                 "a paid subscription has to credit someone: no beneficiary "

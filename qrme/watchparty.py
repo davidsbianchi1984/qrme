@@ -42,7 +42,7 @@ runs strict, the same rule rooms already use.
 
 from __future__ import annotations
 
-from . import avatars, db, embeds, moderation, sharing
+from . import avatars, db, embeds, i18n, moderation, sharing
 
 MAX_PARTY = 50
 MAX_LINE = 600
@@ -127,7 +127,7 @@ def start_from_url(url: str, host_id: str, title: str = "") -> dict:
     try:
         embeds.parse(url)
     except embeds.EmbedError as exc:
-        raise PartyError(str(exc)) from None
+        raise PartyError(i18n.raised(exc)) from None
     pid = db.new_id("wpt")
     db.connect().execute(
         "INSERT INTO watch_parties (id, post_id, host_id, title, position_s,"
@@ -148,9 +148,9 @@ def join(party_id: str, who_id: str, kind: str = "person",
     if row is None:
         raise PartyError("no such watch party")
     if kind not in KINDS:
-        raise PartyError(f"kind is one of {', '.join(KINDS)}")
+        raise PartyError(i18n.fill(i18n.FIELD_IS_ONE_OF, field="kind", choices=', '.join(KINDS)))
     if role not in ROLES:
-        raise PartyError(f"role is one of {', '.join(ROLES)}")
+        raise PartyError(i18n.fill(i18n.FIELD_IS_ONE_OF, field="role", choices=', '.join(ROLES)))
     conn = db.connect()
     if kind == "profile":
         if conn.execute("SELECT 1 FROM profiles WHERE id=?",
@@ -160,7 +160,7 @@ def join(party_id: str, who_id: str, kind: str = "person",
         "SELECT COUNT(*) AS n FROM watch_party_members WHERE party_id=? AND"
         " left_at IS NULL", (party_id,)).fetchone()["n"]
     if n >= MAX_PARTY:
-        raise PartyError(f"{MAX_PARTY} is the limit for one party")
+        raise PartyError(i18n.fill(i18n.PARTY_LIMIT, max=MAX_PARTY))
     conn.execute(
         "INSERT INTO watch_party_members (id, party_id, member_id, kind, role,"
         " joined_at) VALUES (?,?,?,?,?,?)"
@@ -339,7 +339,7 @@ def say(party_id: str, who_id: str, body: str, author: dict | None = None,
     if not body:
         raise PartyError("say something")
     if len(body) > MAX_LINE:
-        raise PartyError(f"a line is at most {MAX_LINE} characters")
+        raise PartyError(i18n.fill(i18n.LINE_CEILING, max=MAX_LINE))
     member = db.connect().execute(
         "SELECT * FROM watch_party_members WHERE party_id=? AND member_id=?"
         " AND left_at IS NULL", (party_id, who_id)).fetchone()

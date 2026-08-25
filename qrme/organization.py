@@ -28,6 +28,7 @@ from __future__ import annotations
 import json
 
 from . import db, llm, persona, tasks, watermark
+from . import i18n
 
 
 class OrganizationError(ValueError):
@@ -105,9 +106,7 @@ def add_department(org: dict, name: str, role: str, profile: dict,
         (org["id"],)).fetchone()[0]
     if staffed >= MAX_DEPARTMENTS:
         raise OrganizationError(
-            f"an organization holds at most {MAX_DEPARTMENTS} departments — "
-            "a coordination is one model call per desk, and the cap is what "
-            "keeps one press from becoming a bill")
+            i18n.fill(i18n.ORG_DEPARTMENTS_MAX, max=MAX_DEPARTMENTS))
     dept_id = db.new_id("dep")
     try:
         conn.execute(
@@ -117,7 +116,7 @@ def add_department(org: dict, name: str, role: str, profile: dict,
              db.utcnow()))
     except Exception:
         raise OrganizationError(
-            f"the organization already has a department named {name!r}")
+            i18n.fill(i18n.DEPARTMENT_EXISTS, name=repr(name)))
     conn.commit()
     return view(org["id"])
 
@@ -138,7 +137,7 @@ def lease_department(org: dict, source: dict, name: str, role: str) -> dict:
             "department; a lease is for somebody else's specialist")
     if source["status"] != "active":
         raise OrganizationError(
-            f"this specialist is {source['status']} and not for lease")
+            i18n.fill(i18n.SPECIALIST_NOT_FOR_LEASE, status=i18n.Term(source['status'])))
     if source["adult_mode"]:
         raise OrganizationError("a rated profile cannot staff a department")
     offer = conn.execute("SELECT * FROM license_offers WHERE profile_id=?",
@@ -151,9 +150,7 @@ def lease_department(org: dict, source: dict, name: str, role: str) -> dict:
                            (org["id"],)).fetchone()[0]
     if staffed >= MAX_DEPARTMENTS:
         raise OrganizationError(
-            f"an organization holds at most {MAX_DEPARTMENTS} departments — "
-            "a coordination is one model call per desk, and the cap is what "
-            "keeps one press from becoming a bill")
+            i18n.fill(i18n.ORG_DEPARTMENTS_MAX, max=MAX_DEPARTMENTS))
     dept_id = db.new_id("dep")
     try:
         conn.execute(
@@ -162,7 +159,7 @@ def lease_department(org: dict, source: dict, name: str, role: str) -> dict:
             (dept_id, org["id"], name, role, source["id"], db.utcnow()))
     except Exception:
         raise OrganizationError(
-            f"the organization already has a department named {name!r}")
+            i18n.fill(i18n.DEPARTMENT_EXISTS, name=repr(name)))
     lease_id = db.new_id("lse")
     conn.execute(
         "INSERT INTO license_leases (id, profile_id, org_id, department_id,"
@@ -279,8 +276,7 @@ def coordinate(org: dict, goal: str, from_department_id: str,
                                      (initiator["profile_id"],)).fetchone())
     if lead_profile["status"] != "active":
         raise OrganizationError(
-            "the initiating department's agent is "
-            f"{lead_profile['status']} and cannot compose a joint plan")
+            i18n.fill(i18n.AGENT_CANNOT_COMPOSE, status=i18n.Term(lead_profile['status'])))
     if not contributions:
         raise OrganizationError(
             "no department has an agent able to contribute — every one of "

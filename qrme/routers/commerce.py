@@ -22,6 +22,7 @@ from pydantic import BaseModel, Field
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import audience, auth, commerce, db, rated
+from .. import i18n
 
 router = APIRouter()
 
@@ -200,8 +201,7 @@ def gift(kind: str, subject_id: str, body: GiftIn, request: Request) -> dict:
     resolved = {"profiles": "profile", "desks": "desk"}.get(kind)
     if resolved is None:
         raise HTTPException(
-            404, f"nothing at /{kind} to gift; a gift goes to a person, so it "
-                 f"applies to profiles and desks")
+            404, i18n.fill(i18n.NOTHING_TO_GIFT_PERSON, path=kind))
     giver = _verified_adult_or_403(request)
     # A rated desk keeps its own gate on top of the giver being an adult:
     # the two answer different questions and neither substitutes.
@@ -223,7 +223,7 @@ def list_gifts(kind: str, subject_id: str, request: Request) -> dict:
     desk's is behind the same gate as everything else about it."""
     resolved = {"profiles": "profile", "desks": "desk"}.get(kind)
     if resolved is None:
-        raise HTTPException(404, f"nothing at /{kind} to gift")
+        raise HTTPException(404, i18n.fill(i18n.NOTHING_TO_GIFT, path=kind))
     if audience.is_rated(resolved, subject_id) \
             and not rated.viewer_is_adult(request):
         raise HTTPException(

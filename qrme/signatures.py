@@ -35,7 +35,7 @@ import json
 import secrets
 from datetime import datetime, timedelta, timezone
 
-from . import db, webauthn
+from . import db, i18n, webauthn
 
 # --- policy ---------------------------------------------------------------
 
@@ -91,14 +91,13 @@ def _level_rank(level: str) -> int:
         return PROOFING_LEVELS.index(level)
     except ValueError as exc:
         raise SignatureError(
-            f"unknown proofing level {level!r}; expected one of "
-            f"{', '.join(PROOFING_LEVELS)}") from exc
+            i18n.fill(i18n.UNKNOWN_CHOICE_EXPECTED, field="proofing level", got=repr(level), choices=', '.join(PROOFING_LEVELS))) from exc
 
 
 def tier_or_error(tier: str) -> dict:
     if tier not in TIERS:
         raise SignatureError(
-            f"unknown tier {tier!r}; expected one of {', '.join(TIERS)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_EXPECTED, field="tier", got=repr(tier), choices=', '.join(TIERS)))
     return TIERS[tier]
 
 
@@ -170,8 +169,7 @@ def enroll(account_id: str, credential_id: str, attestation_object: str,
     rank = _level_rank(proofing_level)
     if rank > 0 and not proofing_attestor:
         raise SignatureError(
-            f"proofing level {proofing_level!r} requires an attestor — who "
-            "checked the identity is part of the record, not a footnote")
+            i18n.fill(i18n.PROOFING_NEEDS_ATTESTOR, level=repr(proofing_level)))
 
     raw_client = webauthn.b64url_decode(client_data_json)
     webauthn.parse_client_data(raw_client, "webauthn.create",
@@ -271,8 +269,7 @@ def reproof(row_id: str, level: str, attestor: str,
     rank = _level_rank(level)
     if rank > 0 and not attestor:
         raise SignatureError(
-            f"proofing level {level!r} requires an attestor — who checked the "
-            "identity is part of the record, not a footnote")
+            i18n.fill(i18n.PROOFING_NEEDS_ATTESTOR, level=repr(level)))
     conn = db.connect()
     if conn.execute("SELECT 1 FROM signing_credentials WHERE id=?",
                     (row_id,)).fetchone() is None:

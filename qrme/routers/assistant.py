@@ -25,6 +25,7 @@ from ..common import profile_or_404, require_owner, source_items
 from ..models import (
     ComposeCreative, PerceiveRequest, ProofreadRequest, TriageRequest,
 )
+from .. import i18n
 
 router = APIRouter()
 
@@ -182,7 +183,7 @@ def compose_creative(profile_id: str, body: ComposeCreative,
     verdict = moderation.review(content, None, {"birthdate": None},
                                 maturity=profile["maturity"])
     if not verdict.approved:
-        raise HTTPException(422, f"creative work blocked: {verdict.reason}")
+        raise HTTPException(422, i18n.fill(i18n.CREATIVE_BLOCKED, detail=verdict.reason))
 
     # A creative work is composed by AI to be kept and shared: stamped, and
     # every render of it carries the profile's mark.

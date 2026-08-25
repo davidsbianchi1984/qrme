@@ -18,6 +18,7 @@ from pydantic import BaseModel, Field
 
 from .. import displays
 from ..common import profile_or_404, require_owner
+from .. import i18n
 
 router = APIRouter()
 
@@ -56,7 +57,7 @@ def place(profile_id: str, body: PlaceIn, request: Request) -> dict:
         return displays.place(profile_id, body.kind, body.label, body.size,
                               body.finish, body.faces, body.location)
     except displays.DisplayError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.get("/profiles/{profile_id}/displays")
@@ -84,7 +85,7 @@ def read(display_id: str) -> dict:
     try:
         return displays.read(display_id)
     except displays.DisplayError as exc:
-        raise HTTPException(404, str(exc)) from None
+        raise HTTPException(404, i18n.raised(exc)) from None
 
 
 @router.put("/displays/{display_id}/faces")
@@ -93,12 +94,12 @@ def set_faces(display_id: str, body: FacesIn, request: Request) -> dict:
     try:
         current = displays.read(display_id)
     except displays.DisplayError as exc:
-        raise HTTPException(404, str(exc)) from None
+        raise HTTPException(404, i18n.raised(exc)) from None
     require_owner(current["profile_id"], request)
     try:
         return displays.set_faces(display_id, body.faces)
     except displays.DisplayError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.delete("/displays/{display_id}")
@@ -108,6 +109,6 @@ def take_down(display_id: str, request: Request) -> dict:
     try:
         current = displays.read(display_id)
     except displays.DisplayError as exc:
-        raise HTTPException(404, str(exc)) from None
+        raise HTTPException(404, i18n.raised(exc)) from None
     require_owner(current["profile_id"], request)
     return displays.take_down(display_id)

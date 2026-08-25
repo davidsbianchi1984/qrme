@@ -15,6 +15,7 @@ from .. import auth, db, organization
 from ..common import profile_or_404
 from ..models import (CoordinateRequest, DepartmentAdd, LeaseRequest,
                       OrganizationCreate)
+from .. import i18n
 
 router = APIRouter()
 
@@ -48,7 +49,7 @@ def create_organization(body: OrganizationCreate, request: Request) -> dict:
     try:
         return organization.create(owner_id, body.name)
     except organization.OrganizationError as e:
-        raise HTTPException(422, str(e))
+        raise HTTPException(422, i18n.raised(e))
 
 
 @router.get("/organizations")
@@ -79,7 +80,7 @@ def add_department(org_id: str, body: DepartmentAdd,
         return organization.add_department(org, body.name, body.role,
                                            profile, body.grant_token)
     except organization.OrganizationError as e:
-        raise HTTPException(422, str(e))
+        raise HTTPException(422, i18n.raised(e))
 
 
 @router.post("/organizations/{org_id}/lease", status_code=201)
@@ -94,7 +95,7 @@ def lease_specialist(org_id: str, body: LeaseRequest,
         return organization.lease_department(org, source, body.name,
                                              body.role)
     except organization.OrganizationError as e:
-        raise HTTPException(422, str(e))
+        raise HTTPException(422, i18n.raised(e))
 
 
 @router.post("/organizations/{org_id}/coordinate", status_code=201)
@@ -106,7 +107,7 @@ def coordinate(org_id: str, body: CoordinateRequest,
                                        pdi=request.app.state.pdi,
                                        cloud=request.app.state.cloud)
     except organization.OrganizationError as e:
-        raise HTTPException(422, str(e))
+        raise HTTPException(422, i18n.raised(e))
 
 
 @router.get("/organizations/{org_id}/coordinations")

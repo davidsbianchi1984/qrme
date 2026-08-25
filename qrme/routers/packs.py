@@ -16,6 +16,7 @@ from fastapi import APIRouter, HTTPException, Request
 from .. import auth, db, ledger, robotics
 from ..common import profile_or_404, require_owner
 from ..models import PackInstall, PackPublish
+from .. import i18n
 
 router = APIRouter()
 
@@ -175,8 +176,7 @@ def seed_packs() -> dict:
 def _price_gate(pack: dict, body: PackInstall) -> None:
     if pack["price"] > 0 and not body.accept_price:
         raise HTTPException(
-            402, f"this pack costs {pack['price']:.2f} {pack['currency']} — "
-                 "set accept_price to buy it")
+            402, i18n.fill(i18n.PACK_COSTS, price=format(pack['price'], ".2f"), currency=pack['currency']))
 
 
 @router.post("/packs/{pack_id}/install", status_code=201)
@@ -221,18 +221,15 @@ def install_pack(pack_id: str, body: PackInstall, request: Request) -> dict:
                        if c not in caps]
             if missing:
                 raise HTTPException(
-                    422, f"this {spec['kind']} lacks "
-                         f"{', '.join(missing)} — '{item['title']}' cannot "
-                         "run on it")
+                    422, i18n.fill(i18n.PACK_LACKS, model=spec['kind'], capability=', '.join(missing), task=item['title']))
             if item["task"] in builtins:
                 raise HTTPException(
-                    409, f"task '{item['task']}' shadows a built-in command")
+                    409, i18n.fill(i18n.TASK_SHADOWS, task=item['task']))
             if conn.execute("SELECT 1 FROM robot_skills WHERE robot_id=? AND"
                             " task=?", (body.robot_id,
                                         item["task"])).fetchone():
                 raise HTTPException(
-                    409, f"task '{item['task']}' is already installed from "
-                         "another pack")
+                    409, i18n.fill(i18n.TASK_FROM_OTHER_PACK, task=item['task']))
         for item in items:
             conn.execute(
                 "INSERT INTO robot_skills (robot_id, pack_id, task, title,"

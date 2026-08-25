@@ -51,7 +51,7 @@ from __future__ import annotations
 import hashlib
 import json
 
-from . import db, inbox, sharing
+from . import db, i18n, inbox, sharing
 
 MAX_ITEMS = 40
 MAX_TEXT = 400
@@ -142,11 +142,10 @@ def propose(host_id: str, guest_id: str, work: str, industry: str,
     if not work:
         raise ExchangeError("say what the work is, in one sentence")
     if len(work) > MAX_TEXT:
-        raise ExchangeError(f"the work description is at most {MAX_TEXT} characters")
+        raise ExchangeError(i18n.fill(i18n.WORK_DESCRIPTION_CEILING, max=MAX_TEXT))
     if industry not in INDUSTRIES:
         raise ExchangeError(
-            f"unknown industry {industry!r}; expected one of "
-            f"{', '.join(INDUSTRIES)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_EXPECTED, field="industry", got=repr(industry), choices=', '.join(INDUSTRIES)))
     if host_id == guest_id:
         raise ExchangeError("an exchange needs two parties")
     if fee < 0:
@@ -184,12 +183,12 @@ def add_item(exchange_id: str, direction: str, name: str, kind: str,
         raise ExchangeError("direction is host_to_guest or guest_to_host")
     if kind not in KINDS:
         raise ExchangeError(
-            f"unknown kind {kind!r}; expected one of {', '.join(KINDS)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_EXPECTED, field="kind", got=repr(kind), choices=', '.join(KINDS)))
     name = (name or "").strip()
     if not name:
         raise ExchangeError("every item needs a name the other side will read")
     if len(name) > MAX_NAME:
-        raise ExchangeError(f"an item name is at most {MAX_NAME} characters")
+        raise ExchangeError(i18n.fill(i18n.ITEM_NAME_CEILING, max=MAX_NAME))
     if size_bytes < 0:
         raise ExchangeError("a size cannot be negative")
     n = db.connect().execute(
@@ -197,8 +196,7 @@ def add_item(exchange_id: str, direction: str, name: str, kind: str,
         (exchange_id,)).fetchone()["n"]
     if n >= MAX_ITEMS:
         raise ExchangeError(
-            f"{MAX_ITEMS} items is the limit — a manifest nobody reads is not "
-            f"consent")
+            i18n.fill(i18n.MANIFEST_ITEMS_LIMIT, max=MAX_ITEMS))
 
     db.connect().execute(
         "INSERT INTO exchange_items (id, exchange_id, direction, name, kind,"

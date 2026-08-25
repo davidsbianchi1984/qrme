@@ -54,6 +54,7 @@ nothing about the backups, logs and copies that already exist, and
 """
 
 from __future__ import annotations
+from . import i18n
 
 POSTURES: dict[str, dict] = {
     "open_cloud": {
@@ -312,12 +313,7 @@ def require(plan: str, kind: str) -> None:
     if may_store(plan, kind):
         return
     raise StorageError(
-        f"{SENSITIVE[kind]}. The free plan stores everything in the clear, "
-        "and this is not ours to expose on somebody else's behalf — the "
-        "person in the frame is often not the person who chose the plan. "
-        "Basic seals it in the vault — free during the beta, $20 a month "
-        "after — and the vault itself is free to host."
-    )
+        i18n.fill(i18n.STORAGE_SEALED_PLAN, lead=SENSITIVE[kind])   )
 
 
 def upgrade_effect(from_plan: str, to_plan: str) -> dict:

@@ -15,7 +15,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from .. import embeds, media as media_mod, wall
+from .. import embeds, i18n, media as media_mod, wall
 from ..common import profile_or_404, require_owner
 
 router = APIRouter()
@@ -44,7 +44,7 @@ def create_post(profile_id: str, body: PostCreate, request: Request) -> dict:
                             video_title=body.video_title,
                             media_ids=body.media_ids)
     except (wall.WallError, embeds.EmbedError) as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
     except media_mod.MediaError as exc:
         raise HTTPException(exc.status, exc.message) from None
 

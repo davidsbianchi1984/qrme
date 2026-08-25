@@ -40,6 +40,7 @@ import json
 import re
 
 from . import db, friends, markup, moderation
+from . import i18n
 
 # The presets, named for what they feel like rather than what they contain.
 # A closed set, because "pick a theme" is a decision a person can make in two
@@ -96,7 +97,7 @@ def _check_links(links: list[dict]) -> list[dict]:
     scheme is not a harmless one.
     """
     if len(links) > MAX_LINKS:
-        raise PageError(f"a page carries at most {MAX_LINKS} links")
+        raise PageError(i18n.fill(i18n.PAGE_LINKS_MAX, max=MAX_LINKS))
     out = []
     for link in links:
         label = (link.get("label") or "").strip()
@@ -107,8 +108,7 @@ def _check_links(links: list[dict]) -> list[dict]:
             raise PageError("a link label is at most 60 characters")
         if not markup._safe_url(url):
             raise PageError(
-                f"{url!r} is not a link a page may carry — http, https and "
-                f"mailto only")
+                i18n.fill(i18n.LINK_NOT_ALLOWED, got=repr(url)))
         out.append({"label": label, "url": url})
     return out
 
@@ -128,16 +128,16 @@ def set_page(profile_id: str, *, theme: str | None = None,
     """
     if theme is not None and theme not in THEMES:
         raise PageError(
-            f"unknown theme {theme!r}; pick one of {', '.join(THEMES)}")
+            i18n.fill(i18n.UNKNOWN_THEME_PICK, got=repr(theme), choices=', '.join(THEMES)))
     if layout is not None and layout not in LAYOUTS:
         raise PageError(
-            f"unknown layout {layout!r}; pick one of {', '.join(LAYOUTS)}")
+            i18n.fill(i18n.UNKNOWN_LAYOUT_PICK, got=repr(layout), choices=', '.join(LAYOUTS)))
     if accent is not None and not _HEX.match(accent):
         raise PageError("accent must be a #rrggbb colour")
     if tagline is not None and len(tagline) > MAX_TAGLINE:
-        raise PageError(f"a tagline is at most {MAX_TAGLINE} characters")
+        raise PageError(i18n.fill(i18n.TAGLINE_CEILING, max=MAX_TAGLINE))
     if about is not None and len(about) > MAX_ABOUT:
-        raise PageError(f"about is at most {MAX_ABOUT} characters")
+        raise PageError(i18n.fill(i18n.ABOUT_CEILING, max=MAX_ABOUT))
 
     status, flag = "approved", None
     if about and about.strip():
@@ -152,7 +152,7 @@ def set_page(profile_id: str, *, theme: str | None = None,
     html_removed = None
     if html is not None:
         if len(html) > MAX_HTML:
-            raise PageError(f"page markup is at most {MAX_HTML} characters")
+            raise PageError(i18n.fill(i18n.MARKUP_CEILING, max=MAX_HTML))
         # Stored already-safe. Sanitising on the way in rather than on the way
         # out means there is exactly one moment where unsafe markup could
         # exist, and it is before anything is written — rather than one per
@@ -209,15 +209,14 @@ def _check_top(profile_id: str, ids: list[str]) -> list[str]:
     the graph does not.
     """
     if len(ids) > TOP_FRIENDS:
-        raise PageError(f"a Top {TOP_FRIENDS} holds at most {TOP_FRIENDS}")
+        raise PageError(i18n.fill(i18n.TOP_HOLDS_AT_MOST, n=TOP_FRIENDS, max=TOP_FRIENDS))
     if len(set(ids)) != len(ids):
         raise PageError("the same friend twice is still one friend")
     allowed = {f["profile_id"] for f in friends.friends_of(profile_id)}
     for fid in ids:
         if fid not in allowed:
             raise PageError(
-                f"{fid} is not on this profile's friends list — a Top "
-                f"{TOP_FRIENDS} features friends, it does not create them")
+                i18n.fill(i18n.TOP_FEATURES_FRIENDS, profile=fid, n=TOP_FRIENDS))
     return list(ids)
 
 

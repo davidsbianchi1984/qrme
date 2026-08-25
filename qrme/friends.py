@@ -36,6 +36,7 @@ Three decisions worth keeping in view:
 from __future__ import annotations
 
 from . import avatars, db, inbox, verification
+from . import i18n
 
 # The founder's two profiles, in the order they stand. One constant, because
 # "who is pinned" is a product decision and should be greppable rather than
@@ -142,7 +143,7 @@ def befriend(profile_id: str, friend_id: str) -> dict:
         raise FriendError("a profile cannot be its own friend")
     for pid in (profile_id, friend_id):
         if not _profile_exists(pid):
-            raise FriendError(f"no such profile: {pid}")
+            raise FriendError(i18n.fill(i18n.NO_SUCH_PROFILE_COLON, got=pid))
 
     conn = db.connect()
     row = conn.execute(

@@ -58,7 +58,7 @@ the rest of this codebase argues against.
 
 from __future__ import annotations
 
-from . import db
+from . import db, i18n
 from .signatures import _level_rank
 
 
@@ -681,7 +681,7 @@ def set_picture(profile_id: str, emblem: str | None = None,
             "choose one — a preset emblem or your own image, not both")
     if emblem is not None and emblem not in EMBLEM_FIELDS:
         raise IdentityError(
-            f"unknown emblem {emblem!r} — one of {', '.join(EMBLEM_FIELDS)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_DASH, field="emblem", got=repr(emblem), choices=', '.join(EMBLEM_FIELDS)))
     if asset is not None:
         if depicts_someone_else:
             raise IdentityError(

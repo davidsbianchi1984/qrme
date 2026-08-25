@@ -38,6 +38,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from . import audience, avatars, db, embeds, moderation
+from . import i18n
 
 #: How long one post may be.
 #:
@@ -186,7 +187,7 @@ def publish(profile_id: str, body: str, author: dict | None = None,
     if not body:
         raise WallError("a post needs something in it")
     if len(body) > MAX_BODY:
-        raise WallError(f"a post is at most {MAX_BODY} characters")
+        raise WallError(i18n.fill(i18n.POST_CEILING, max=MAX_BODY))
     row = db.connect().execute("SELECT adult_mode FROM profiles WHERE id=?",
                                (profile_id,)).fetchone()
     if row is None:

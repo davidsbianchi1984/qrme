@@ -43,7 +43,7 @@ rule reaching the surface it matters most on.
 
 from __future__ import annotations
 
-from . import db
+from . import db, i18n
 
 # What can hold a seat.
 #
@@ -163,9 +163,9 @@ def seat(session_id: str, member_kind: str, member_id: str,
         raise LobbyError("that session has ended")
     if member_kind not in KINDS:
         raise LobbyError(
-            f"unknown member kind {member_kind!r} — one of {', '.join(KINDS)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_DASH, field="member kind", got=repr(member_kind), choices=', '.join(KINDS)))
     if role not in SEATS:
-        raise LobbyError(f"unknown seat {role!r} — one of {', '.join(SEATS)}")
+        raise LobbyError(i18n.fill(i18n.UNKNOWN_CHOICE_DASH, field="seat", got=repr(role), choices=', '.join(SEATS)))
 
     # A `teammate` seat is a player's seat: it is the one that means *in the
     # match, on the roster, taking a slot*. Nothing synthetic may hold one, and
@@ -173,9 +173,7 @@ def seat(session_id: str, member_kind: str, member_id: str,
     # point of the rule is that it survives a model deciding otherwise.
     if member_kind in SYNTHETIC_KINDS and role not in SYNTHETIC_SEATS:
         raise LobbyError(
-            f"a {KINDS[member_kind].split(' —')[0]} cannot take the {role!r} "
-            f"seat — that is a player's slot. It can sit beside the players "
-            f"as {', '.join(SYNTHETIC_SEATS)}, never among them")
+            i18n.fill(i18n.GAME_SEAT, kind=KINDS[member_kind].split(' —')[0], seat=repr(role), role=', '.join(SYNTHETIC_SEATS)))
 
     conn = db.connect()
     if member_kind == "profile":
@@ -206,9 +204,7 @@ def seat(session_id: str, member_kind: str, member_id: str,
             (session_id,)).fetchone()["n"]
         if live >= MAX_SYNTHETIC:
             raise LobbyError(
-                f"{MAX_SYNTHETIC} synthetic members is the limit. Past that a "
-                "lobby has stopped being people playing with help and become "
-                "an operation being run, whatever any single line says")
+                i18n.fill(i18n.SYNTH_MEMBERS_LIMIT, max=MAX_SYNTHETIC))
 
     seat_id = db.new_id("gsl")
     conn.execute(

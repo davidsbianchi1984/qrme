@@ -28,6 +28,7 @@ from fastapi import APIRouter, HTTPException, Request, Response
 from .. import catalog, db, moderation, offline, scrape, watermark
 from ..common import profile_or_404, require_owner, source_items
 from ..models import SocialCollect, SocialConnect, SocialPublish
+from .. import i18n
 
 router = APIRouter()
 
@@ -269,7 +270,7 @@ def scrape_page(cid: str, request: Request) -> dict:
                  "again")
     except Exception as e:                                     # noqa: BLE001
         raise HTTPException(
-            502, f"could not fetch {url} — {e.__class__.__name__}: {e}")
+            502, i18n.fill(i18n.COULD_NOT_FETCH_URL, url=url, kind=e.__class__.__name__, detail=e))
     # A wall's words are the platform's, not the person's. Before this
     # check, a Facebook import "succeeded" by storing the login page as
     # source material — which the persona then quoted back in chat as
@@ -283,8 +284,7 @@ def scrape_page(cid: str, request: Request) -> dict:
     parts = [p for p in (page["description"], page["text"]) if p]
     if not (page["title"] or parts):
         raise HTTPException(
-            502, f"{url} answered with nothing readable — no title, no "
-                 "description, no text")
+            502, i18n.fill(i18n.ANSWERED_NOTHING_READABLE, url=url))
     body_text = "\n\n".join(parts) + f"\n\nFetched from {url} at {db.utcnow()}"
     pdi = request.app.state.pdi
     conn = db.connect()

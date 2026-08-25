@@ -46,6 +46,7 @@ from fastapi import APIRouter, HTTPException, Request
 from .. import catalog, db, storage, tiers
 from ..common import profile_or_404, require_owner
 from ..models import AppAuthorize, AppCollect, AppConnect, AppInvoke
+from .. import i18n
 
 router = APIRouter()
 
@@ -53,7 +54,7 @@ router = APIRouter()
 def _entry(provider: str, app: str) -> dict:
     entry = catalog.BY_KEY.get((provider, app))
     if entry is None:
-        raise HTTPException(404, f"unknown connector: {provider}/{app}")
+        raise HTTPException(404, i18n.fill(i18n.UNKNOWN_CONNECTOR, provider=provider, app=app))
     return entry
 
 
@@ -86,11 +87,8 @@ def _out(row: dict) -> dict:
 #: so the three of them can be read side by side — a person meeting one of
 #: these is being told what to go and do, not that something went wrong.
 _MISSING = {
-    "sign-in": "{label} is installed and has not been signed in to yet, so it "
-               "cannot reach your account there. Sign in to it from this "
-               "connector and try again.",
-    "key": "{label} needs a key this deployment has not been given, so it "
-           "cannot reach the service. Whoever runs this deployment adds it.",
+    "sign-in": i18n.APP_NOT_SIGNED_IN,
+    "key": i18n.APP_NEEDS_KEY,
 }
 
 
@@ -102,7 +100,7 @@ def connect_app(profile_id: str, body: AppConnect, request: Request) -> dict:
     caps = body.capabilities or list(entry["capabilities"])
     unknown = set(caps) - set(entry["capabilities"])
     if unknown:
-        raise HTTPException(422, f"{body.app} does not offer: {sorted(unknown)}")
+        raise HTTPException(422, i18n.fill(i18n.APP_DOES_NOT_OFFER, app=body.app, capabilities=sorted(unknown)))
     conn = db.connect()
     cid = db.new_id("app")
     now = db.utcnow()
@@ -157,8 +155,7 @@ def authorize_app(cid: str, body: AppAuthorize, request: Request) -> dict:
         raise HTTPException(409, "connector has been revoked")
     if catalog.needs(row["provider"], row["app"]) == "nothing":
         raise HTTPException(
-            409, f"{row['label']} reads what anybody can read — it has no "
-                 f"account to sign in to and nothing to keep for it")
+            409, i18n.fill(i18n.APP_READS_PUBLIC, app=row['label']))
     # The vault question asks the *plan*, not the deployment — `storage`
     # explains why at length, and this is a write, so the plan gate applies.
     # A free profile is platform custody over plain HTTPS by design, which is
@@ -186,7 +183,7 @@ def collect_app(cid: str, body: AppCollect, request: Request) -> dict:
     row = _conn_or_404(cid)
     require_owner(row["profile_id"], request)
     if "collect" not in json.loads(row["directions"]):
-        raise HTTPException(409, f"{row['app']} does not support collecting context")
+        raise HTTPException(409, i18n.fill(i18n.NO_COLLECT_SUPPORT, app=row['app']))
     if row["status"] != "active":
         raise HTTPException(409, "connector has been revoked")
     pdi = request.app.state.pdi
@@ -222,12 +219,11 @@ def invoke_app(cid: str, body: AppInvoke, request: Request) -> dict:
         raise HTTPException(409, "connector has been revoked")
     if body.capability not in json.loads(row["capabilities"]):
         raise HTTPException(422,
-                            f"this {row['app']} connector was not granted "
-                            f"'{body.capability}'")
+                            i18n.fill(i18n.CONNECTOR_NOT_GRANTED_Q, app=row['app'], capability=body.capability))
     if not row["authorized_at"]:
-        raise HTTPException(409, _MISSING[
-            catalog.needs(row["provider"], row["app"])].format(
-                label=row["label"]))
+        raise HTTPException(409, i18n.fill(
+            _MISSING[catalog.needs(row["provider"], row["app"])],
+            label=row["label"]))
     conn = db.connect()
     conn.execute("UPDATE app_connectors SET actions = actions + 1 WHERE id=?", (cid,))
     conn.commit()

@@ -52,7 +52,7 @@ the room.
 
 from __future__ import annotations
 
-from . import db
+from . import db, i18n
 
 # What the camera is pointed at. Declared by the person holding it, because
 # they are the only party who knows — and everything else reads from this.
@@ -148,10 +148,10 @@ class ViewfinderError(ValueError):
 def may_watch(subject: str, viewer: str) -> bool:
     if subject not in SUBJECTS:
         raise ViewfinderError(
-            f"unknown subject {subject!r}; one of {', '.join(SUBJECTS)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE, field="subject", got=repr(subject), choices=', '.join(SUBJECTS)))
     if viewer not in VIEWERS:
         raise ViewfinderError(
-            f"unknown viewer kind {viewer!r}; one of {', '.join(VIEWERS)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE, field="viewer kind", got=repr(viewer), choices=', '.join(VIEWERS)))
     return MAY_WATCH[subject][viewer]
 
 
@@ -186,7 +186,7 @@ def bystander_guidance(subject: str) -> dict:
     room.
     """
     if subject not in SUBJECTS:
-        raise ViewfinderError(f"unknown subject {subject!r}")
+        raise ViewfinderError(i18n.fill(i18n.UNKNOWN_VALUE, field="subject", got=repr(subject)))
     return {
         "subject": subject,
         "risk": SUBJECTS[subject]["bystander_risk"],
@@ -208,20 +208,20 @@ def open_session(holder_id: str, surface: str, surface_id: str,
     """Start a live view. Ephemeral, capped, and the holder's to end."""
     if surface not in SURFACES:
         raise ViewfinderError(
-            f"unknown surface {surface!r}; one of {', '.join(SURFACES)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE, field="surface", got=repr(surface), choices=', '.join(SURFACES)))
     if not surface_id:
         raise ViewfinderError("a session belongs to a place — name it")
     if subject not in SUBJECTS:
         raise ViewfinderError(
-            f"unknown subject {subject!r}; one of {', '.join(SUBJECTS)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE, field="subject", got=repr(subject), choices=', '.join(SUBJECTS)))
     if viewer_kind not in VIEWERS:
         raise ViewfinderError(
-            f"unknown viewer kind {viewer_kind!r}; one of {', '.join(VIEWERS)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE, field="viewer kind", got=repr(viewer_kind), choices=', '.join(VIEWERS)))
     if not may_watch(subject, viewer_kind):
         raise ViewfinderError(REFUSAL_PROFILE_ON_PERSON)
     if not 1 <= minutes <= MAX_MINUTES:
         raise ViewfinderError(
-            f"a session runs between 1 and {MAX_MINUTES} minutes")
+            i18n.fill(i18n.SESSION_MINUTES, max=MAX_MINUTES))
     if record and subject == "person" and viewer_kind == "profile":
         # Unreachable while `may_watch` refuses the pair, and kept anyway: a
         # second guard costs nothing and the day somebody widens the table is

@@ -69,16 +69,14 @@ def bind_robot(profile_id: str, body: RobotBind, request: Request) -> dict:
     require_owner(profile_id, request)
     spec = robotics.get(body.model)
     if spec is None:
-        raise HTTPException(404, f"unknown robot model '{body.model}'")
+        raise HTTPException(404, i18n.fill(i18n.UNKNOWN_ROBOT_MODEL_QUOTED, got=body.model))
     if not spec["bindable"]:
         # Named rather than 404'd. The catalogue lists announced platforms on
         # purpose — an owner shopping for a body should see what is coming —
         # and "unknown model" would be a lie about a machine its maker has
         # publicly shown. Every command to a body nobody has would go nowhere.
         raise HTTPException(
-            409, f"{spec['label']} is {spec['availability']}, not shipping — "
-                 "it is in the catalogue so you can see it coming, and there "
-                 "is no body to bind a profile to yet")
+            409, i18n.fill(i18n.ROBOT_NOT_SHIPPING, model=spec['label'], status=i18n.Term(spec['availability'])))
 
     # Which LLM rides along: an explicit choice, else the profile's own
     # preference. Only validated (and stored) for llm-capable platforms.
@@ -91,7 +89,7 @@ def bind_robot(profile_id: str, body: RobotBind, request: Request) -> dict:
                                  choices=", ".join(llm.CHOICES)))
     elif body.llm_provider:
         raise HTTPException(
-            422, f"{spec['label']} cannot run an onboard LLM")
+            422, i18n.fill(i18n.CANNOT_RUN_ONBOARD_LLM, label=spec['label']))
 
     name = body.name or spec["label"]
     conn = db.connect()
@@ -162,10 +160,7 @@ def command_robot(robot_id: str, body: RobotCommand, request: Request) -> dict:
         (robot_id, body.command)).fetchone()
     if body.command not in allowed and skill is None:
         raise HTTPException(
-            422, f"'{body.command}' is not permitted for a "
-                 f"{robotics.get(robot['model'])['kind']}; "
-                 f"allowed: {', '.join(allowed)} — plus any installed "
-                 "task-pack modules")
+            422, i18n.fill(i18n.ROBOT_COMMAND_NOT_PERMITTED, command=body.command, model=robotics.get(robot['model'])['kind'], choices=', '.join(allowed)))
 
     result: dict
     if body.command == "say":

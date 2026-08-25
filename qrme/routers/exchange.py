@@ -18,6 +18,7 @@ from pydantic import BaseModel, Field
 
 from .. import exchange
 from ..common import require_one_of, require_self
+from .. import i18n
 
 router = APIRouter()
 
@@ -33,7 +34,7 @@ def _parties(exchange_id: str) -> list[str]:
     try:
         row = exchange.get(exchange_id)
     except exchange.ExchangeError as exc:
-        raise HTTPException(404, str(exc)) from None
+        raise HTTPException(404, i18n.raised(exc)) from None
     return [row["host_id"], row["guest_id"]]
 
 

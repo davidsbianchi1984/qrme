@@ -27,7 +27,7 @@ surfaces render both. What it must never do is show the word on its own.
 
 from __future__ import annotations
 
-from . import db
+from . import db, i18n
 from .signatures import PROOFING_LEVELS, _level_rank
 
 # What each rung actually means, in the words a person reading a profile needs
@@ -54,12 +54,10 @@ def verify(profile_id: str, level: str, attestor: str | None = None,
     """
     if level not in PROOFING_LEVELS:
         raise VerificationError(
-            f"unknown proofing level {level!r}; expected one of "
-            f"{', '.join(PROOFING_LEVELS)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_EXPECTED, field="proofing level", got=repr(level), choices=', '.join(PROOFING_LEVELS)))
     if _level_rank(level) > 0 and not attestor:
         raise VerificationError(
-            f"proofing level {level!r} requires an attestor — who checked the "
-            "identity is part of the record, not a footnote")
+            i18n.fill(i18n.PROOFING_NEEDS_ATTESTOR, level=repr(level)))
 
     conn = db.connect()
     conn.execute(

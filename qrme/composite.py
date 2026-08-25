@@ -25,6 +25,7 @@ from __future__ import annotations
 import json
 
 from . import db
+from . import i18n
 
 
 class CompositeError(Exception):
@@ -36,23 +37,21 @@ def _source_or_refuse(source, owner_id: str) -> dict:
     row = conn.execute("SELECT * FROM profiles WHERE id=?",
                        (source.profile_id,)).fetchone()
     if row is None:
-        raise CompositeError(f"source profile {source.profile_id} not found")
+        raise CompositeError(i18n.fill(i18n.SOURCE_NOT_FOUND, profile=source.profile_id))
     profile = dict(row)
     if profile["adult_mode"]:
         raise CompositeError(
             "a rated profile can never be blended into a hybrid")
     if profile["status"] in ("terminated", "restricted"):
         raise CompositeError(
-            f"source profile {profile['display_name']} is "
-            f"{profile['status']} and cannot be blended")
+            i18n.fill(i18n.SOURCE_STATUS, profile=profile['display_name'], status=i18n.Term(profile['status'])))
     if profile["owner_id"] != owner_id:
         listed = conn.execute(
             "SELECT 1 FROM marketplace WHERE profile_id=?",
             (source.profile_id,)).fetchone()
         if listed is None:
             raise CompositeError(
-                "sources must be your own profiles or listed on the "
-                f"marketplace; {profile['display_name']} is neither")
+                i18n.fill(i18n.SOURCE_NEITHER, profile=profile['display_name']))
     return profile
 
 
@@ -63,7 +62,7 @@ def resolve_sources(body) -> list[tuple[dict, float, str | None]]:
     for source in body.sources:
         if source.profile_id in seen:
             raise CompositeError(
-                f"source profile {source.profile_id} appears twice")
+                i18n.fill(i18n.SOURCE_TWICE, profile=source.profile_id))
         seen.add(source.profile_id)
         resolved.append((_source_or_refuse(source, body.owner_id),
                          source.weight, source.aspect))

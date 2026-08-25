@@ -40,6 +40,7 @@ before you changed it", not a silent rewrite of history.
 from __future__ import annotations
 
 from . import db, moderation
+from . import i18n
 
 MAX_EDITS = 20          # per message; a hundred revisions is a different problem
 
@@ -84,7 +85,7 @@ def edit(message_id: str, new_content: str, actor_id: str,
     if msg["status"] == "retracted":
         raise RevisionError("that message was retracted")
     if _count(message_id) >= MAX_EDITS:
-        raise RevisionError(f"a message can be edited {MAX_EDITS} times")
+        raise RevisionError(i18n.fill(i18n.EDIT_TIMES_MAX, max=MAX_EDITS))
     if new_content == msg["content"]:
         return thread_entry(message_id)
 

@@ -47,6 +47,7 @@ import json
 import secrets
 
 from . import db, signatures
+from . import i18n
 
 # Releasing a health conversation is not a "basic" act. `high` additionally
 # demands document proofing and a device-bound credential — the platform
@@ -180,7 +181,7 @@ def prepare(interactor: dict, profile: dict, provider_id: str,
         # Surfaced rather than swallowed: "you have no credential at this
         # tier" is something the user can act on, and silently dropping to a
         # weaker tier would be the checkbox again wearing a signature's name.
-        raise ReferralError(str(exc)) from exc
+        raise ReferralError(i18n.raised(exc)) from exc
 
     conn = db.connect()
     conn.execute(
@@ -264,8 +265,7 @@ def redeem(referral_id: str, token: str, pdi=None) -> dict:
         raise ReferralError("that link is not valid")
     if row["redeemed_at"]:
         raise ReferralError(
-            f"this referral was already opened at {row['redeemed_at']} and "
-            "a referral link works once")
+            i18n.fill(i18n.REFERRAL_WORKS_ONCE, when=row['redeemed_at']))
 
     # A reply token is minted *here*, at the single opening, so the clinician
     # can write back without the summary link staying reusable. Open once,

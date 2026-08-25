@@ -25,6 +25,7 @@ from fastapi.responses import HTMLResponse
 from .. import avatars, db, identity, landing, rated
 from ..common import profile_or_404, require_owner
 from ..models import BeaconCreate, HandleSet, RatedPlacementCreate
+from .. import i18n
 
 router = APIRouter()
 
@@ -100,7 +101,7 @@ def claim_handle(profile_id: str, body: HandleSet) -> dict:
     taken = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
                          (handle,)).fetchone()
     if taken and taken["profile_id"] != profile_id:
-        raise HTTPException(409, f"@{handle} is already claimed")
+        raise HTTPException(409, i18n.fill(i18n.HANDLE_CLAIMED, handle=handle))
     conn.execute("DELETE FROM handles WHERE profile_id=?", (profile_id,))
     conn.execute(
         "INSERT INTO handles (handle, profile_id, created_at) VALUES (?,?,?)",
@@ -368,7 +369,7 @@ def summon(ref: str, request: Request) -> dict:
         row = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
                            (ref[1:].lower(),)).fetchone()
         if row is None:
-            raise HTTPException(404, f"no profile answers to {ref}")
+            raise HTTPException(404, i18n.fill(i18n.NO_PROFILE_ANSWERS, handle=ref))
         profile = profile_or_404(row["profile_id"])
         if profile["adult_mode"]:
             rated.record_event(profile["id"], None,

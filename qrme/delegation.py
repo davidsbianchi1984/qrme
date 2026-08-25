@@ -54,6 +54,7 @@ from __future__ import annotations
 import json
 
 from . import db, workflows
+from . import i18n
 
 # Phases an owner may put in a delegation policy. Identical to
 # ``workflows.PHASES`` today; named separately so narrowing what is delegable
@@ -79,7 +80,7 @@ def set_policy(profile_id: str, phases: list[str], grant_id: str | None,
     """
     unknown = [p for p in phases if p not in DELEGABLE]
     if unknown:
-        raise ValueError(f"not delegable: {', '.join(unknown)}")
+        raise ValueError(i18n.fill(i18n.NOT_DELEGABLE, what=', '.join(unknown)))
     if not phases:
         raise ValueError("a delegation policy needs at least one phase")
     if "research" in phases and grant_id is None:
@@ -151,8 +152,7 @@ def start(profile_id: str, interactor_id: str, goal: str,
     outside = [p for p in plan if p not in policy["phases"]]
     if outside:
         raise DelegationError(
-            f"policy does not permit: {', '.join(outside)}; "
-            f"permitted: {', '.join(policy['phases'])}")
+            i18n.fill(i18n.POLICY_NOT_PERMIT, got=', '.join(outside), choices=', '.join(policy['phases'])))
 
     wf = workflows.create(profile_id, goal, plan, policy["grant_id"])
     conn = db.connect()

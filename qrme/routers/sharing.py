@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 from .. import sharing
 from ..auth import principal
 from ..common import require_one_of, require_self
+from .. import i18n
 
 router = APIRouter()
 
@@ -27,7 +28,7 @@ def _parties(grant_id: str) -> list[str]:
     try:
         row = sharing.get(grant_id)
     except sharing.SharingError as exc:
-        raise HTTPException(404, str(exc)) from None
+        raise HTTPException(404, i18n.raised(exc)) from None
     return [row["lender_id"], row["borrower_id"]]
 
 
@@ -178,7 +179,7 @@ def in_surface(surface: str, surface_id: str, request: Request) -> dict:
     membership is something this can actually ask about.
     """
     if surface not in sharing.SURFACES:
-        raise HTTPException(404, f"no surface {surface!r}")
+        raise HTTPException(404, i18n.fill(i18n.NO_SURFACE_PLAIN, got=repr(surface)))
     who = principal(request)
     if who is None:
         raise HTTPException(401, "authentication required")

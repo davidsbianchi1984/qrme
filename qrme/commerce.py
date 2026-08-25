@@ -44,6 +44,7 @@ looks whole is worse than an absent one.
 from __future__ import annotations
 
 from . import db, ledger
+from . import i18n
 
 # The most one gift can be. A cap does not make gifting safe; it removes the
 # single worst outcome — one tap that empties an account — while the rest of
@@ -271,7 +272,7 @@ def gift(kind: str, subject_id: str, giver_id: str, amount: float,
 
     beneficiary = beneficiary_of(kind, subject_id)
     if beneficiary is None:
-        raise CommerceError(f"no such {kind}")
+        raise CommerceError(i18n.fill(i18n.NO_SUCH_THING, thing=kind))
     if beneficiary == giver_id:
         raise CommerceError(
             "this is yours — gifting it would move money from you to you and "

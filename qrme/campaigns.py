@@ -29,6 +29,7 @@ surface must never become a second, unwalled door to the same money.
 from __future__ import annotations
 
 from . import db, ledger
+from . import i18n
 
 DONATION_MAX = 500.0     # same stance as commerce.GIFT_MAX: one tap, capped
 
@@ -52,7 +53,7 @@ def designate(profile_id: str, designees: list) -> list[dict]:
     total = sum(d.share for d in designees)
     if total != 100:
         raise CampaignError(
-            f"shares must sum to exactly 100, got {total}")
+            i18n.fill(i18n.SHARES_SUM, got=total))
     if any(d.share <= 0 for d in designees):
         raise CampaignError("every share must be above zero")
     conn = db.connect()
@@ -153,9 +154,7 @@ def donate(campaign_id: str, giver_id: str | None, amount: float,
         raise CampaignError("a donation needs an amount above zero")
     if amount > DONATION_MAX:
         raise CampaignError(
-            f"a single donation is capped at {DONATION_MAX:.2f} — give "
-            "less, or give more than once, so one tap cannot empty an "
-            "account")
+            i18n.fill(i18n.DONATION_CAP, max=format(DONATION_MAX, ".2f")))
 
     conn = db.connect()
     today = db.utcnow()[:10]

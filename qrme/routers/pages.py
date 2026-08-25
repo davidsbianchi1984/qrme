@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 from .. import pages
 from ..common import profile_or_404, require_owner
+from .. import i18n
 
 router = APIRouter()
 
@@ -69,4 +70,4 @@ def edit_page(profile_id: str, body: PageEdit, request: Request) -> dict:
             top_friends=body.top_friends, html=body.html, links=body.links,
             show_offers=body.show_offers)
     except pages.PageError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None

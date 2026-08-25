@@ -46,7 +46,7 @@ the statement and no funds move.
 
 from __future__ import annotations
 
-from . import db
+from . import db, i18n
 
 # Where a grant can live. Each is a place two people are already sharing —
 # there is deliberately no "everywhere" and no "my account", because a grant
@@ -102,12 +102,10 @@ def offer(lender_id: str, borrower_id: str, surface: str, surface_id: str,
     """
     if surface not in SURFACES:
         raise SharingError(
-            f"unknown surface {surface!r}; expected one of "
-            f"{', '.join(SURFACES)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_EXPECTED, field="surface", got=repr(surface), choices=', '.join(SURFACES)))
     if skill_kind not in SKILL_KINDS:
         raise SharingError(
-            f"unknown skill kind {skill_kind!r}; expected one of "
-            f"{', '.join(SKILL_KINDS)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_EXPECTED, field="skill kind", got=repr(skill_kind), choices=', '.join(SKILL_KINDS)))
     if lender_id == borrower_id:
         raise SharingError("a grant needs two people")
     title = (title or "").strip()
@@ -122,7 +120,7 @@ def offer(lender_id: str, borrower_id: str, surface: str, surface_id: str,
         (surface, surface_id)).fetchone()["n"]
     if live >= MAX_PER_SURFACE:
         raise SharingError(
-            f"{MAX_PER_SURFACE} open grants is the limit in one place")
+            i18n.fill(i18n.OPEN_GRANTS_LIMIT, max=MAX_PER_SURFACE))
 
     gid = db.new_id("skg")
     db.connect().execute(

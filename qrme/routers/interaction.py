@@ -347,7 +347,7 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         registered += embodiment_names
         if registered and body.surface not in registered:
             raise HTTPException(
-                422, f"profile is not live on surface '{body.surface}'")
+                422, i18n.fill(i18n.NOT_LIVE_ON_SURFACE, surface=body.surface))
         if body.surface in embodiment_names:
             embodiment_name = body.surface
 
@@ -1448,7 +1448,7 @@ def grant_voice_consent(profile_id: str, body: VoiceConsent,
         return voiceprint.consent(profile_id, own_voice=body.own_voice,
                                   sources=body.sources, note=body.note)
     except voiceprint.VoiceError as exc:
-        raise HTTPException(422, str(exc))
+        raise HTTPException(422, i18n.raised(exc))
 
 
 @router.get("/profiles/{profile_id}/voiceprint")
@@ -1472,7 +1472,7 @@ def collect_voice_sample(profile_id: str, body: VoiceSample,
             turns=body.turns, transcript_chars=body.transcript_chars,
             reference=body.reference)
     except voiceprint.VoiceError as exc:
-        raise HTTPException(403 if "consent" in str(exc) else 422, str(exc))
+        raise HTTPException(403 if "consent" in i18n.raised(exc) else 422, i18n.raised(exc))
 
 
 @router.post("/profiles/{profile_id}/voiceprint", status_code=201)
@@ -1483,7 +1483,7 @@ def build_voiceprint(profile_id: str, request: Request) -> dict:
     try:
         return voiceprint.build(profile_id)
     except voiceprint.VoiceError as exc:
-        raise HTTPException(422, str(exc))
+        raise HTTPException(422, i18n.raised(exc))
 
 
 @router.post("/profiles/{profile_id}/voiceprint/speak")
@@ -1495,7 +1495,7 @@ def speak_in_voice(profile_id: str, body: VoiceSay, request: Request) -> dict:
     try:
         return voiceprint.speak(profile_id, body.text)
     except voiceprint.VoiceError as exc:
-        raise HTTPException(422, str(exc))
+        raise HTTPException(422, i18n.raised(exc))
 
 
 # -- The spoken voice: a bound engine reference (qrme/spoken.py) -------------

@@ -400,7 +400,7 @@ def revoke_authorization(objection_id: str, request: Request,
     basis = profile["consent_basis"]
     if basis not in _REVOCABLE:
         raise HTTPException(
-            409, f"basis '{basis}' cannot be revoked; use the review path")
+            409, i18n.fill(i18n.BASIS_NOT_REVOCABLE, basis=basis))
     actor = "subject" if basis == "subject_consent" else "estate"
     return _force_terminate(objection_id, request, basis=basis,
                             status="revoked", actor=actor, event="revoked",
@@ -422,8 +422,7 @@ def _force_terminate(objection_id: str, request: Request, *, basis: str,
     profile = profile_or_404(obj["profile_id"])
     if profile["consent_basis"] != basis:
         raise HTTPException(
-            409, f"this action applies only to {basis} profiles; this "
-                 f"profile's basis is '{profile['consent_basis']}'")
+            409, i18n.fill(i18n.ACTION_APPLIES_ONLY, kind=basis, basis=profile['consent_basis']))
     _terminate(obj["profile_id"], request)
     auth.revoke_subject(obj["profile_id"])
     conn = db.connect()

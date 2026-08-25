@@ -38,7 +38,7 @@ it.
 
 from __future__ import annotations
 
-from . import db
+from . import db, i18n
 
 # What kind of fixed screen this is. Grouped by who is standing in front of it,
 # because that is what decides what may be on it — not the hardware.
@@ -157,18 +157,18 @@ def vocabulary() -> dict:
 def _check(kind: str, size: str, finish: str, faces: list[str]) -> None:
     if kind not in KINDS:
         raise DisplayError(
-            f"unknown screen {kind!r} — one of {', '.join(KINDS)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_DASH, field="screen", got=repr(kind), choices=', '.join(KINDS)))
     if size not in SIZES:
-        raise DisplayError(f"unknown size {size!r} — one of {', '.join(SIZES)}")
+        raise DisplayError(i18n.fill(i18n.UNKNOWN_CHOICE_DASH, field="size", got=repr(size), choices=', '.join(SIZES)))
     if finish not in FINISHES:
         raise DisplayError(
-            f"unknown finish {finish!r} — one of {', '.join(FINISHES)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_DASH, field="finish", got=repr(finish), choices=', '.join(FINISHES)))
     for face in faces:
         if face in NEVER:
             raise DisplayError(NEVER[face])
         if face not in FACES:
             raise DisplayError(
-                f"unknown face {face!r} — one of {', '.join(FACES)}")
+                i18n.fill(i18n.UNKNOWN_CHOICE_DASH, field="face", got=repr(face), choices=', '.join(FACES)))
     if "beacon" in faces and size == "badge":
         # Not a rule about neatness. A QR at strip height is a QR nobody's
         # camera resolves, and a code that cannot be scanned is a code that
@@ -202,8 +202,7 @@ def place(profile_id: str, kind: str, label: str, size: str = "full",
         "SELECT COUNT(*) AS n FROM displays WHERE profile_id=?"
         " AND removed_at IS NULL", (profile_id,)).fetchone()["n"]
     if live >= MAX_PER_OWNER:
-        raise DisplayError(f"{MAX_PER_OWNER} screens is the limit — take one "
-                           "down first")
+        raise DisplayError(i18n.fill(i18n.SCREENS_LIMIT, max=MAX_PER_OWNER))
 
     import json
     display_id = db.new_id("dsp")

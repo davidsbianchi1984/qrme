@@ -35,6 +35,7 @@ all. A profile with glowing reviews is a well-liked synthetic profile.
 from __future__ import annotations
 
 from . import avatars, db, identity, moderation, verification
+from . import i18n
 
 MIN_RATING, MAX_RATING = 1, 5
 
@@ -77,7 +78,7 @@ def set_experience(profile_id: str, entries: list[dict]) -> list[dict]:
         raise FrontPageError("no such profile")
     if len(entries) > MAX_EXPERIENCE:
         raise FrontPageError(
-            f"a front page carries at most {MAX_EXPERIENCE} experience entries")
+            i18n.fill(i18n.FRONTPAGE_EXPERIENCE_MAX, max=MAX_EXPERIENCE))
 
     # The rule that makes this different from a generic CV field. A fictional
     # profile's history is invented and openly so; a real person's is a claim
@@ -136,7 +137,7 @@ def review(profile_id: str, interactor_id: str, rating: int,
     if profile is None:
         raise FrontPageError("no such profile")
     if not isinstance(rating, int) or not MIN_RATING <= rating <= MAX_RATING:
-        raise FrontPageError(f"rating is {MIN_RATING}–{MAX_RATING}")
+        raise FrontPageError(i18n.fill(i18n.RATING_RANGE, lo=MIN_RATING, hi=MAX_RATING))
     if not _has_interacted(profile_id, interactor_id):
         raise FrontPageError(NOT_THERE)
 

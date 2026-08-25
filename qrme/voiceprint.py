@@ -40,6 +40,7 @@ from __future__ import annotations
 import json
 
 from . import db, watermark
+from . import i18n
 
 # How much of somebody's voice it takes before a clone is worth calling one.
 # Not a model constraint — a floor so a thin enrollment cannot quietly
@@ -79,7 +80,7 @@ def consent(profile_id: str, *, own_voice: bool, sources: list[str] | None,
     picked = sorted(set(sources or ["voice_note"]))
     unknown = [s for s in picked if s not in SOURCES]
     if unknown:
-        raise VoiceError(f"unknown voice source(s): {', '.join(unknown)}")
+        raise VoiceError(i18n.fill(i18n.UNKNOWN_VOICE_SOURCES, got=', '.join(unknown)))
 
     conn = db.connect()
     now = db.utcnow()
@@ -110,8 +111,7 @@ def require_consent(profile_id: str, source: str):
     allowed = json.loads(row["sources"])
     if source not in allowed:
         raise VoiceError(
-            f"consent covers {', '.join(allowed)} — not {source}. Widen the "
-            "consent if that is what you meant")
+            i18n.fill(i18n.CONSENT_COVERS, covered=', '.join(allowed), asked=source))
     return row
 
 

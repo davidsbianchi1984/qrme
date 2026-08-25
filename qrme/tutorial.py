@@ -36,7 +36,7 @@ tour of a moving product stays true.
 
 from __future__ import annotations
 
-from . import db
+from . import db, i18n
 
 # The disclosure the walkthrough carries, matching `help.DISCLOSURE` in spirit:
 # this is the product talking about itself, not a character.
@@ -1310,7 +1310,7 @@ def _index(key: str) -> int:
     for i, lesson in enumerate(LESSONS):
         if lesson["key"] == key:
             return i
-    raise TutorialError(f"no such step {key!r}")
+    raise TutorialError(i18n.fill(i18n.NO_SUCH_VALUE, field="step", got=repr(key)))
 
 
 def say(lesson: dict, mode: str = "text") -> dict:
@@ -1322,7 +1322,7 @@ def say(lesson: dict, mode: str = "text") -> dict:
     spoken one would be the one nobody re-read.
     """
     if mode not in MODES:
-        raise TutorialError(f"unknown mode {mode!r} — one of {', '.join(MODES)}")
+        raise TutorialError(i18n.fill(i18n.UNKNOWN_CHOICE_DASH, field="mode", got=repr(mode), choices=', '.join(MODES)))
     out = {
         "key": lesson["key"],
         "chapter": lesson["chapter"],

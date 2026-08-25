@@ -58,7 +58,7 @@ be told about it.
 
 from __future__ import annotations
 
-from . import db
+from . import db, i18n
 
 # What a person may put over their own face, and what each actually is.
 #
@@ -224,12 +224,12 @@ def _check(surface: str, kind: str) -> None:
         raise OverlayError(FORBIDDEN_SURFACES[surface])
     if surface not in SURFACES:
         raise OverlayError(
-            f"unknown surface {surface!r} — one of {', '.join(SURFACES)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_DASH, field="surface", got=repr(surface), choices=', '.join(SURFACES)))
     if kind in REFUSED:
         raise OverlayError(REFUSED[kind])
     if kind not in KINDS:
         raise OverlayError(
-            f"unknown overlay {kind!r} — one of {', '.join(KINDS)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_DASH, field="overlay", got=repr(kind), choices=', '.join(KINDS)))
 
 
 def wear(interactor_id: str, surface: str, surface_id: str, kind: str,
@@ -256,13 +256,10 @@ def wear(interactor_id: str, surface: str, surface_id: str, kind: str,
     if kind == "backdrop":
         if source is None:
             raise OverlayError(
-                "say where the background came from — one of "
-                f"{', '.join(BACKDROP_SOURCES)}. A generated scene and a photo "
-                "of your own kitchen are different claims")
+                i18n.fill(i18n.BACKGROUND_SOURCE, choices=', '.join(BACKDROP_SOURCES)))
         if source not in BACKDROP_SOURCES:
             raise OverlayError(
-                f"unknown background source {source!r} — one of "
-                f"{', '.join(BACKDROP_SOURCES)}")
+                i18n.fill(i18n.UNKNOWN_CHOICE_DASH, field="background source", got=repr(source), choices=', '.join(BACKDROP_SOURCES)))
         if source == "imported" and not holds_rights:
             # Asked, not guessed: nothing here can look at an image and know
             # who owns it. Declaring you do not is the one answer that has an
@@ -272,8 +269,7 @@ def wear(interactor_id: str, surface: str, surface_id: str, kind: str,
                 "hold, generate one, or use your own room")
     elif source is not None:
         raise OverlayError(
-            f"{kind!r} does not have a background — `source` describes the "
-            "picture behind you, and this one is on your face")
+            i18n.fill(i18n.NO_BACKGROUND, overlay=repr(kind)))
     title = (title or "").strip()
     if not title:
         raise OverlayError(

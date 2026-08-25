@@ -32,7 +32,7 @@ from __future__ import annotations
 import os
 from datetime import datetime, timedelta, timezone
 
-from . import auth, db, inbox
+from . import auth, db, i18n, inbox
 
 
 def _public_base() -> str:
@@ -99,8 +99,7 @@ def create(owner_id: str, display_name: str, trade: str,
         raise DeskError("a desk needs a name a visitor can read")
     if view_style not in VIEW_STYLES:
         raise DeskError(
-            f"unknown view style {view_style!r}; expected one of "
-            f"{', '.join(VIEW_STYLES)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_EXPECTED, field="view style", got=repr(view_style), choices=', '.join(VIEW_STYLES)))
     # The repo's existing hard line is that adult mode is never available for
     # a profile of *another* real person. A rated stream is a real person by
     # definition, so the same line lands here as: only they can put themselves
@@ -134,8 +133,7 @@ def _row(desk_id: str):
 def set_presence(desk_id: str, presence: str) -> dict:
     if presence not in PRESENCE:
         raise DeskError(
-            f"unknown presence {presence!r}; expected one of "
-            f"{', '.join(PRESENCE)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_EXPECTED, field="presence", got=repr(presence), choices=', '.join(PRESENCE)))
     conn = db.connect()
     conn.execute("UPDATE desks SET presence=?, last_seen=? WHERE id=?",
                  (presence, db.utcnow(), desk_id))
@@ -557,7 +555,7 @@ def decide_guest(desk_id: str, req_id: str, accept: bool) -> dict:
     if row is None:
         raise DeskError("no such request")
     if row["status"] != "requested":
-        raise DeskError(f"this request was already {row['status']}")
+        raise DeskError(i18n.fill(i18n.REQUEST_ALREADY, status=i18n.Term(row['status'])))
     conn.execute("UPDATE desk_guests SET status=?, decided_at=? WHERE id=?",
                  ("accepted" if accept else "declined", db.utcnow(), req_id))
     conn.commit()
@@ -605,8 +603,7 @@ def join(desk_id: str, mode: str = "audience") -> dict:
     """
     if mode not in JOIN_MODES:
         raise DeskError(
-            f"unknown join mode {mode!r}; expected one of "
-            f"{', '.join(JOIN_MODES)}")
+            i18n.fill(i18n.UNKNOWN_CHOICE_EXPECTED, field="join mode", got=repr(mode), choices=', '.join(JOIN_MODES)))
     row = _row(desk_id)
     if row is None:
         raise DeskError("no such desk")
@@ -813,8 +810,7 @@ def offer_connection(session_id: str, kind: str, target: str,
     if s["status"] != "open":
         raise DeskError("this session is closed")
     if kind not in CONNECTION_KINDS:
-        raise DeskError(f"unknown connection kind {kind!r}; expected one of "
-                        f"{', '.join(CONNECTION_KINDS)}")
+        raise DeskError(i18n.fill(i18n.UNKNOWN_CHOICE_EXPECTED, field="connection kind", got=repr(kind), choices=', '.join(CONNECTION_KINDS)))
     if not (target or "").strip():
         raise DeskError("name what is being connected — a machine, a "
                         "program, a screen")
@@ -844,8 +840,7 @@ def answer_connection(session_id: str, connection_id: str,
     if s["status"] != "open":
         raise DeskError("this session is closed")
     if c["status"] != "offered":
-        raise DeskError(f"this connection is {c['status']}, not awaiting "
-                        "an answer")
+        raise DeskError(i18n.fill(i18n.CONNECTION_NOT_AWAITING, status=i18n.Term(c['status'])))
     conn = db.connect()
     if not accept:
         conn.execute(
@@ -868,7 +863,7 @@ def end_connection(session_id: str, connection_id: str, by: str) -> dict:
     if c is None or c["session_id"] != session_id:
         raise DeskError("no such connection in this session")
     if c["status"] != "active":
-        raise DeskError(f"this connection is {c['status']}, not active")
+        raise DeskError(i18n.fill(i18n.CONNECTION_NOT_ACTIVE, status=i18n.Term(c['status'])))
     conn = db.connect()
     conn.execute(
         "UPDATE desk_connections SET status='ended', token=NULL, ended_at=?,"

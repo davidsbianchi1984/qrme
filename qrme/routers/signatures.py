@@ -24,6 +24,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse
 
 from .. import auth, signatures, signing_page
+from .. import i18n
 
 router = APIRouter()
 
@@ -210,7 +211,7 @@ def enroll(body: EnrollIn, request: Request) -> dict:
     except signatures.SignatureError as exc:
         raise _fail(exc) from exc
     except ValueError as exc:
-        raise HTTPException(422, f"registration could not be read: {exc}") \
+        raise HTTPException(422, i18n.fill(i18n.REGISTRATION_UNREADABLE, detail=exc)) \
             from exc
 
 
@@ -289,7 +290,7 @@ def sign(body: SignIn, request: Request) -> dict:
     except signatures.SignatureError as exc:
         raise _fail(exc) from exc
     except ValueError as exc:
-        raise HTTPException(422, f"assertion could not be read: {exc}") from exc
+        raise HTTPException(422, i18n.fill(i18n.ASSERTION_UNREADABLE, detail=exc)) from exc
     if result["signer"]["account_id"] != account:
         raise HTTPException(403, "not your envelope")
     return result
@@ -326,5 +327,5 @@ def verify(body: VerifyIn) -> dict:
         return signatures.verify_package(body.package)
     except Exception as exc:
         raise HTTPException(
-            422, f"this does not look like an evidence package: {exc}") \
+            422, i18n.fill(i18n.NOT_EVIDENCE_PACKAGE, detail=exc)) \
             from exc

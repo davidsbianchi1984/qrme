@@ -14,6 +14,7 @@ from fastapi import APIRouter, HTTPException, Request
 
 from .. import avatars, presentation, skins
 from ..common import profile_or_404, require_owner
+from .. import i18n
 
 router = APIRouter()
 
@@ -51,7 +52,7 @@ def set_avatar(profile_id: str, body: AvatarSet, request: Request) -> dict:
         try:
             avatars.set_motion(profile_id, body.motion_style)
         except ValueError as exc:
-            raise HTTPException(422, str(exc)) from None
+            raise HTTPException(422, i18n.raised(exc)) from None
     # An empty string clears the override and hands the question back to the
     # address, which is what an owner who mis-declared once needs.
     if body.presentation_kind is not None:
@@ -59,7 +60,7 @@ def set_avatar(profile_id: str, body: AvatarSet, request: Request) -> dict:
             presentation.set_kind(profile_id,
                                   body.presentation_kind.strip() or None)
         except ValueError as exc:
-            raise HTTPException(422, str(exc)) from None
+            raise HTTPException(422, i18n.raised(exc)) from None
     return avatars.set_avatar(profile_id, body.asset)
 
 
@@ -107,7 +108,7 @@ def import_avatar(profile_id: str, body: AvatarImport,
             extra=body.extra, torso=body.torso,
             pdi=request.app.state.pdi)
     except ValueError as e:
-        raise HTTPException(422, str(e))
+        raise HTTPException(422, i18n.raised(e))
 
 
 @router.get("/avatars/briefs")
@@ -137,5 +138,5 @@ def list_briefs() -> dict:
 def get_brief(handle: str) -> dict:
     brief = avatars.brief(handle)
     if brief is None:
-        raise HTTPException(404, f"no portrait brief for @{handle}")
+        raise HTTPException(404, i18n.fill(i18n.NO_PORTRAIT_BRIEF, handle=handle))
     return brief

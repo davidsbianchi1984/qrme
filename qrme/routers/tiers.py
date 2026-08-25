@@ -12,6 +12,7 @@ from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from .. import auth, tiers
+from .. import i18n
 
 router = APIRouter()
 
@@ -69,7 +70,7 @@ def subscribe(account_id: str, body: Subscribe, request: Request) -> dict:
     try:
         return tiers.subscribe(account_id, body.plan)
     except tiers.TierError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.delete("/memberships/{account_id}")

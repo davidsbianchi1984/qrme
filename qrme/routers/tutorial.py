@@ -20,6 +20,7 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
 from .. import tutorial
+from .. import i18n
 
 router = APIRouter()
 
@@ -41,7 +42,7 @@ def outline(mode: str = Query("text")) -> dict:
     try:
         return tutorial.outline(mode)
     except tutorial.TutorialError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.get("/tutorial/steps/{key}")
@@ -50,7 +51,7 @@ def step(key: str, mode: str = Query("text")) -> dict:
     try:
         return tutorial.step(key, mode)
     except tutorial.TutorialError as exc:
-        raise HTTPException(404, str(exc)) from None
+        raise HTTPException(404, i18n.raised(exc)) from None
 
 
 @router.get("/tutorial/for-screen/{number}")
@@ -72,7 +73,7 @@ def start(body: MarkIn) -> dict:
     try:
         return tutorial.start(body.learner_id, body.mode)
     except tutorial.TutorialError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.get("/tutorial/progress/{learner_id}")
@@ -81,7 +82,7 @@ def progress(learner_id: str, mode: str = Query("text")) -> dict:
     try:
         return tutorial.where(learner_id, mode)
     except tutorial.TutorialError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.post("/tutorial/done")
@@ -90,4 +91,4 @@ def mark(body: MarkIn) -> dict:
     try:
         return tutorial.mark(body.learner_id, body.lesson, body.mode)
     except tutorial.TutorialError as exc:
-        raise HTTPException(404, str(exc)) from None
+        raise HTTPException(404, i18n.raised(exc)) from None

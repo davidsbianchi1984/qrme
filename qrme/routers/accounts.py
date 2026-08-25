@@ -228,7 +228,7 @@ def put_mail_settings(body: MailSettings) -> dict:
             password=body.password or "", sender=body.sender or "",
             public_url=body.public_url or "")
     except ValueError as exc:
-        raise HTTPException(422, str(exc))
+        raise HTTPException(422, i18n.raised(exc))
 
 
 @router.delete("/settings/mail",
@@ -252,7 +252,7 @@ def test_mail_settings(body: MailTest) -> dict:
             "This is a test from QRME.\n\nIf you are reading it in your "
             "inbox, verification emails will reach your users too.")
     except Exception as exc:  # noqa: BLE001 — smtplib raises many kinds
-        raise HTTPException(502, f"the mail server refused it: {exc}")
+        raise HTTPException(502, i18n.fill(i18n.MAIL_SERVER_REFUSED, detail=exc))
     return {"sent": True, "to": body.to}
 
 
@@ -263,6 +263,7 @@ def test_mail_settings(body: MailTest) -> dict:
 from fastapi import Request as _Request
 
 from .. import oauth as oauth_mod
+from .. import i18n
 
 
 class OAuthStart(BaseModel):

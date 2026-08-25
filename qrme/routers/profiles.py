@@ -87,7 +87,7 @@ def create_profile(body: ProfileCreate) -> dict:
         try:
             storage.require(landing, "rated_content")
         except storage.StorageError as exc:
-            raise HTTPException(402, str(exc)) from None
+            raise HTTPException(402, i18n.raised(exc)) from None
     if body.kind == "other_person" and body.consent is None:
         raise HTTPException(
             422, "profiles of another real person require a consent/rights record")
@@ -118,7 +118,6 @@ def create_profile(body: ProfileCreate) -> dict:
     # Language chosen at the setup gateway: the profile speaks it from its
     # very first reply.
     if body.language:
-        from .. import i18n
         if body.language not in i18n.SUPPORTED:
             raise HTTPException(
                 422, i18n.fill(i18n.MUST_BE_ONE_OF, field="language",
@@ -165,7 +164,7 @@ def create_composite(body: CompositeCreate) -> dict:
     try:
         resolved = composite.resolve_sources(body)
     except composite.CompositeError as e:
-        raise HTTPException(403, str(e))
+        raise HTTPException(403, i18n.raised(e))
     persona_text, demographics = composite.blend_persona(resolved)
 
     profile_id = db.new_id("prf")
@@ -184,7 +183,6 @@ def create_composite(body: CompositeCreate) -> dict:
     conn.commit()
     composite.record(profile_id, resolved)
     if body.language:
-        from .. import i18n
         if body.language not in i18n.SUPPORTED:
             raise HTTPException(
                 422, i18n.fill(i18n.MUST_BE_ONE_OF, field="language",
@@ -729,7 +727,7 @@ def add_source(profile_id: str, body: SourceAdd, request: Request) -> dict:
             storage.require(tiers.plan_of(row["owner_id"]),
                             "third_party_source")
         except storage.StorageError as exc:
-            raise HTTPException(402, str(exc)) from None
+            raise HTTPException(402, i18n.raised(exc)) from None
     pdi = request.app.state.pdi
     conn = db.connect()
     item_id = db.new_id("src")

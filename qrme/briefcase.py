@@ -81,7 +81,7 @@ import zipfile
 import zlib
 from io import BytesIO
 
-from . import common, db, llm, media, offline, scrape
+from . import common, db, i18n, llm, media, offline, scrape
 
 #: Kinds a person can hand over. ``photo`` and ``video`` are stored for what
 #: the person says about them; the rest carry text this deployment can read.
@@ -1087,7 +1087,7 @@ def add(profile_id: str, interactor_id: str, *, kind: str, title: str,
         provider=None, unread_why: str | None = None,
         full_chars: int | None = None) -> dict:
     if kind not in KINDS:
-        raise BriefcaseError(422, f"kind is one of {', '.join(KINDS)}")
+        raise BriefcaseError(422, i18n.fill(i18n.FIELD_IS_ONE_OF, field="kind", choices=', '.join(KINDS)))
     if _count(profile_id, interactor_id) >= MAX_ITEMS:
         raise BriefcaseError(
             422, f"this conversation already carries {MAX_ITEMS} imported "

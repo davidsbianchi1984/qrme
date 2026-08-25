@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field
 
 from .. import dock
 from ..common import profile_or_404, require_owner
+from .. import i18n
 
 router = APIRouter()
 
@@ -52,7 +53,7 @@ def where(face: str) -> dict:
     try:
         return dock.route(face)
     except dock.DockError as exc:
-        raise HTTPException(404, str(exc)) from None
+        raise HTTPException(404, i18n.raised(exc)) from None
 
 
 @router.get("/dock/{profile_id}")
@@ -71,7 +72,7 @@ def settings(profile_id: str, request: Request,
     try:
         return dock.opens_as(profile_id, surface, platform)
     except dock.DockError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.put("/dock/{profile_id}")
@@ -83,7 +84,7 @@ def configure(profile_id: str, body: DockConfig, request: Request) -> dict:
         return dock.configure(profile_id, body.corner, body.state, body.face,
                               body.faces)
     except dock.DockError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.get("/dock/{profile_id}/face/{name}")
@@ -101,4 +102,4 @@ def face(profile_id: str, name: str, request: Request,
     try:
         return dock.face(profile_id, name, surface, surface_id)
     except dock.DockError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None

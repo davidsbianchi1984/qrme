@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 from .. import revisions
 from ..common import profile_or_404, require_owner_or_interactor
+from .. import i18n
 
 router = APIRouter()
 
@@ -31,7 +32,7 @@ def edit_message(profile_id: str, message_id: str, body: MessageEdit,
     try:
         return revisions.edit(message_id, body.content, body.interactor_id)
     except revisions.RevisionError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.delete("/profiles/{profile_id}/messages/{message_id}")
@@ -44,7 +45,7 @@ def retract_message(profile_id: str, message_id: str, body: MessageRetract,
     try:
         return revisions.retract(message_id, body.interactor_id)
     except revisions.RevisionError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.get("/profiles/{profile_id}/thread/{interactor_id}")

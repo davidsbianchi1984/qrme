@@ -20,6 +20,7 @@ from pydantic import BaseModel, Field
 
 from .. import viewfinder
 from ..common import require_one_of, require_self
+from .. import i18n
 
 router = APIRouter()
 
@@ -58,7 +59,7 @@ def bystanders(subject: str) -> dict:
     try:
         return viewfinder.bystander_guidance(subject)
     except viewfinder.ViewfinderError as exc:
-        raise HTTPException(404, str(exc)) from None
+        raise HTTPException(404, i18n.raised(exc)) from None
 
 
 @router.post("/camera/sessions", status_code=201)
@@ -76,7 +77,7 @@ def open_session(body: OpenSession, request: Request) -> dict:
             body.viewer_kind, body.viewer_id, body.minutes, body.record,
             body.bystanders_declared, body.note)
     except viewfinder.ViewfinderError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.get("/camera/sessions/{session_id}")
@@ -85,7 +86,7 @@ def read_session(session_id: str, request: Request) -> dict:
     try:
         found = viewfinder.session(session_id)
     except viewfinder.ViewfinderError as exc:
-        raise HTTPException(404, str(exc)) from None
+        raise HTTPException(404, i18n.raised(exc)) from None
     require_one_of([found["holder_id"], found["viewer_id"]], request)
     return found
 
@@ -97,12 +98,12 @@ def close_session(session_id: str, body: CloseSession,
     try:
         found = viewfinder.session(session_id)
     except viewfinder.ViewfinderError as exc:
-        raise HTTPException(404, str(exc)) from None
+        raise HTTPException(404, i18n.raised(exc)) from None
     require_self(body.actor_id, request)
     try:
         return viewfinder.close(session_id, body.actor_id)
     except viewfinder.ViewfinderError as exc:
-        raise HTTPException(403, str(exc)) from None
+        raise HTTPException(403, i18n.raised(exc)) from None
     finally:
         del found
 

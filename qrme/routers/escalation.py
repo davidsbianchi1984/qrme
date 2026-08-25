@@ -61,7 +61,7 @@ def cannot_resolve(profile_id: str, body: Unresolved,
         return escalation.unresolved(profile_id, body.interactor_id,
                                      body.matter)
     except ValueError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.get("/interactors/{interactor_id}/unresolved")
@@ -99,7 +99,7 @@ def dial(escalation_id: str, request: Request,
     except escalation.NotArmed as exc:
         raise HTTPException(403, str(exc)) from None
     except ValueError as exc:
-        raise HTTPException(404, str(exc)) from None
+        raise HTTPException(404, i18n.raised(exc)) from None
     # Unreachable while any deployment is sealed, and left here rather than
     # removed: the day a carrier is configured, this is the only place that
     # may say a call was placed.

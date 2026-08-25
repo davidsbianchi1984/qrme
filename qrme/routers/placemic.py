@@ -22,6 +22,8 @@ from .. import db, roommic
 from ..auth import principal
 from ..common import require_self
 
+from .. import i18n
+
 router = APIRouter()
 
 
@@ -70,8 +72,7 @@ def _members(surface: str, surface_id: str) -> list[str]:
 def _present(surface: str, surface_id: str, request: Request) -> str:
     if surface not in roommic.PLACES:
         raise HTTPException(
-            422, f"unknown surface {surface!r} — one of "
-                 f"{', '.join(roommic.PLACES)}"
+            422, i18n.fill(i18n.UNKNOWN_CHOICE_DASH, field="surface", got=repr(surface), choices=', '.join(roommic.PLACES))
             + (". A room lends through POST /rooms/{id}/mic"
                if surface == "room" else ""))
     here = _members(surface, surface_id)
@@ -124,7 +125,7 @@ def lend(surface: str, surface_id: str, body: LendIn,
         return roommic.lend_on(surface, surface_id, body.interactor_id,
                                body.device, body.mic_type, body.gain)
     except roommic.RoomMicError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.delete("/places/{surface}/{surface_id}/microphone")
@@ -136,7 +137,7 @@ def take_back(surface: str, surface_id: str, body: TakeBackIn,
     try:
         return roommic.take_back_on(surface, surface_id, body.interactor_id)
     except roommic.RoomMicError as exc:
-        raise HTTPException(422, str(exc)) from None
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.get("/places/{surface}/{surface_id}/microphone")

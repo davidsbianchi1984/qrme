@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 from .. import db, watchparty
 from ..auth import principal
 from ..common import require_self
+from .. import i18n
 
 router = APIRouter()
 
@@ -27,7 +28,7 @@ def _party_or_404(party_id: str) -> dict:
     try:
         return watchparty.get(party_id)
     except watchparty.PartyError as exc:
-        raise HTTPException(404, str(exc)) from None
+        raise HTTPException(404, i18n.raised(exc)) from None
 
 
 def _require_member(party_id: str, request: Request) -> str:
