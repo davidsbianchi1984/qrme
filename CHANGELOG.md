@@ -6,6 +6,50 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.8.2] - 2026-08-25
+
+### Fixed
+
+- **The last answer does not depend on anything that can fail.** Found by
+  a full suite run, once, order-dependently: the catch-all middleware —
+  the one that turns a crashed route into an answer the console can read —
+  builds its 500 in the reader's language, and the translation is itself a
+  call that can fail. When it did, the exception left the handler,
+  Starlette's outermost layer answered instead, and the 500 went back
+  without the CORS header, so the browser dropped the whole response and
+  the console read a crash as an unreachable backend.
+
+      asked     does the last answer say it in the reader's language
+      mattered  does the last answer leave at all
+
+  The handler is the one place with nobody behind it to try again, so the
+  translation is guarded and the fallback is English and constant. A
+  sentence in the wrong language beats no sentence. The middleware was
+  byte-identical in all three products, so the defect was too, and so is
+  the fix — with a guard each that poisons the translator and checks the
+  product's own answer still leaves.
+
+- **The widget the suite could not lose.** Five tests guard the always-on
+  watch lights, and every one reads the component's own source — so all
+  five keep passing on a component nothing renders. Unmounting
+  `<WatchLights />` from the shell would orphan the file and the suite
+  would call the orphan healthy. The sibling's mounted-in-the-shell guard
+  rides beside them now, and the open posture route checks its own fields:
+  `/offline/status` had grown `data_locality` and `provider` with nothing
+  asking whether a stranger should see them.
+
+### Changed
+
+- **The suite audits its own floors by kind, not by size.** The floor
+  registry grew from 62 ratchets to 174, each measured against what it
+  stands over every run. The sharpest fossil: a docstring reading "the
+  Windows shell makes exactly two localizer calls — the nav loop and one
+  button". It makes 1,278, and the floor of 2 under it held two tenths of
+  one per cent of the surface it claimed. The unregistered backlog holds
+  9 rows, every one needing a live client; the 120 unlabelled fields are
+  verified decisions with a guard; the divergence record reaches zero
+  unread rows.
+
 ## [1.8.1] - 2026-08-24
 
 ### Changed
@@ -15328,7 +15372,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.2...HEAD
+[1.8.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.1...app-v1.8.2
 [1.8.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.0...app-v1.8.1
 [1.8.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.7.0...app-v1.8.0
 [1.7.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.6.2...app-v1.7.0
