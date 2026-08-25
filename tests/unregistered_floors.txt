@@ -1,5 +1,5 @@
-# status: backlog — 39 rows
-# ceiling: 39
+# status: backlog — 54 rows
+# ceiling: 54
 #
 # Every numeric floor in this suite still carrying its own literal: an
 # `assert <something> > <int>` with the number written into the assertion.
@@ -39,8 +39,24 @@
 # requires knowing what each one measures, which is the work of registering
 # it, which is why they are counted rather than guessed at.
 #
-# The ceiling does not move up. A new bare floor is a new number nothing will
-# ever audit.
+# The ceiling does not move up because a floor was written. It moved up once,
+# here, because the sweep was widened — and the distinction is the whole
+# reason a number like this is worth keeping.
+#
+#     asked     did the backlog grow
+#     mattered  did the suite get worse, or did the instrument get better
+#
+# The sweep used to take any comparison against an integer of five or more.
+# Five stood in for "is this a floor at all", badly: it hid an `assert n >= 2`
+# over a shell building a hundred and twenty-seven requests, and lowering it
+# would have swept in fifty-two assertions about single response bodies that
+# no ratchet could ever measure. It now asks what the left side of the
+# comparison is — a count of something the suite went and found, or a value
+# pulled out of what something returned.
+#
+# Rows that appeared the day that changed were always there. A backlog that
+# only ever falls, when the thing generating it can be narrowed, is a number
+# about the sweep rather than about the suite.
 #
 #
 # ## Not floors: a value that is not a size
@@ -85,42 +101,57 @@
 # count of a swept surface, is always a floor, and may not be excused here
 # however convincing the prose above it. An exemption nothing verifies is a
 # place to hide the numbers this file is meant to find.
+test_a_code_on_a_wall.py:117: l10n.count('counts as a scan') >= 2
 test_a_memorial_does_not_keep_posting.py:160: len(found) >= 8
+test_a_period_is_a_press.py:304: l10n.count('pressed a button') >= 2
+test_a_player_handed_no_origin_will_not_play.py:99: len(_players()) >= 2
 test_a_refusal_whose_english_is_not_a_constant.py:248: len(calls) >= 15
 test_a_screen_nothing_opens.py:170: len(found) >= 5
-test_it_observes_and_talks.py:93: len(never[thing]) > 60
-test_seed_backfill.py:86: out['repaired'] >= 34
+test_a_screen_nothing_opens.py:287: len(sites) >= 2
+test_knowledge_packs.py:18: len(items) >= 3
+test_native_shells_record_nothing_private.py:138: len(calls) >= 2
 test_starter_profiles.py:15: len(industries) >= 30
 test_termination_revokes_more_than_the_owners_token.py:154: len(found) >= 7
-test_the_body_market.py:65: len(c['robots']) >= 30
-test_the_body_market.py:67: len(c['by_maker']) >= 15
+test_the_answer_begins_before_it_ends.py:65: len(pieces) >= 2
 test_the_body_the_native_clients_send.py:358: matched >= 155
 test_the_body_the_route_requires.py:246: len(writes) >= 185
 test_the_body_the_route_requires.py:247: len(readable) >= 155
 test_the_body_the_route_requires.py:254: len(models) >= 160
 test_the_body_the_route_requires.py:264: matched >= 150
+test_the_conversation_leaves_the_application.py:163: body.count('close(reason =') >= 3
+test_the_deploy_page_is_paste_ready.py:203: len(blocks) > 1
 test_the_desktop_and_the_phone_say_different_things.py:302: len(shared) > 120
 test_the_files_the_release_never_touched.py:272: len(sorted(REPO.glob('native/ios/Sources/**/*.swift'))) >= 40
 test_the_files_the_release_never_touched.py:273: len(sorted(REPO.glob('native/android/**/*.kt'))) >= 10
+test_the_files_the_release_never_touched.py:282: len(ios) >= 3
+test_the_files_the_release_never_touched.py:283: len(android) >= 2
+test_the_image_holds_what_the_wheel_declares.py:97: len(_declared()) >= 2
+test_the_installer_can_actually_report.py:115: len(steps) >= 3
 test_the_keys_the_android_client_reads.py:359: len(reads) >= 165
 test_the_keys_the_android_client_reads.py:360: sum((len(k) for _, k in reads)) >= 370
 test_the_keys_the_android_client_reads.py:383: len(driven) >= 80
+test_the_language_nobody_was_sending.py:308: len(found) >= 2
 test_the_member_that_isnt_there.py:343: len(keys) >= 12
 test_the_member_that_isnt_there.py:344: len(used) >= 10
 test_the_nav_is_translated_and_nothing_behind_it_is.py:229: len(nav) >= 40
 test_the_nav_is_translated_and_nothing_behind_it_is.py:255: len(nav_ids) >= 40
 test_the_objector_cannot_read_their_own_case.py:151: len(handlers) >= 8
+test_the_platform_refuses_in_one_language.py:666: len(handlers) >= 2
+test_the_provenance_names_who_answered.py:263: len(found) >= 2
 test_the_refusal_names_the_field_on_the_form.py:104: len(found) >= 200
 test_the_refusal_that_handed_the_body_back.py:157: len(found) > 150
 test_the_refusal_that_handed_the_body_back.py:161: reached > 100
+test_the_room_reads_what_you_hand_it.py:166: fn.count('except Exception') >= 2
+test_the_room_speaks_for_itself.py:204: INSIDE.count('setVoicing(null)') >= 3
+test_the_room_speaks_for_itself.py:258: INSIDE.count('isTalking(s)') >= 3
+test_the_shape_inside_the_shape.py:613: len(sent) >= 2
 test_the_shape_the_client_expects.py:309: len(driven) >= 30
 test_the_shape_the_client_expects.py:322: len(names) >= 490
 test_the_shape_the_console_expects.py:457: len(driven) >= 60
 test_the_shape_the_swift_client_expects.py:228: len(driven) >= 25
 test_the_shells_table_answers_every_reader.py:107: len(_rows(shell)) >= 200
-test_the_starters_know_their_trade.py:69: len(d['expertise']) >= 350
-test_the_starters_know_their_trade.py:72: len(d['services']) >= 250
-test_the_starters_know_their_trade.py:140: len(tags) >= 8
+test_the_strangers_language_on_a_phone.py:273: n >= 2
 test_the_tabs_are_translated_and_the_screens_are_not.py:554: english + calls >= 50
+test_the_tabs_are_translated_and_the_screens_are_not.py:558: calls >= 1
 test_the_tabs_are_translated_and_the_screens_are_not.py:775: len(rows) >= 10
 test_two_questions_a_mark_answers.py:196: len(why) > 40
