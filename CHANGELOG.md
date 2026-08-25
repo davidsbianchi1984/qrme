@@ -6,6 +6,47 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.8.4] - 2026-08-25
+
+### Changed
+
+- **A field afternoon on three devices, fixed the same afternoon.** The
+  owner tested the beta on a Windows handheld, an iPhone and a desktop and
+  sent photographs; each one became a repair.
+
+      asked     does the console make a sound where a person actually is
+      mattered  a voice product that is silent on phones is a text product
+
+  - **Audio is on by default.** Spoken replies in chat, hearing in rooms,
+    and the agent's typed answers all speak unless this browser chose mute
+    — the first field report on the chat screen was one word: silence.
+  - **The ear that opens stays open.** The playback unlock arms on the
+    gestures WebKit actually counts (click, touchend, keydown), retries
+    until granted, and every surface plays through the one granted
+    element. This is what made the iPhone speak.
+  - **When the browser's recogniser has no service, the deployment's ears
+    listen.** The handheld's recogniser answered `network` on every start;
+    the talk overlay, the chat recording bar, the studio orb and its
+    dictation now record the turn and `/interactors/{id}/heard`
+    transcribes it. Silence ends a turn, exactly like the room's ear.
+  - **The robot voice says why it is standing in.** A refused bound voice
+    used to fall back in silence in chat — and in rooms it killed the
+    whole hear queue. The room now stands in with the device's voice per
+    turn, and both surfaces show the server's own refusal sentence beside
+    the conversation.
+  - **Dictation without a keyboard.** The composer's microphone draws a
+    voice-memo bar — discard, live meter off a real analyser, stop —
+    instead of summoning the on-screen keyboard; Send is a round arrow.
+  - **The room's microphone tells the truth at a glance.** Live is red,
+    the recording-light convention by the owner's own call, and muted is
+    green; the split-wording ledger closed alongside so every translation
+    of every control names its object.
+  - **The conversation wears its face.** The profile's portrait sits
+    beside the chat title, the talk overlay's face is small on every
+    screen so the four rail panels get the room a panel needs, and the
+    voice door is the studio microphone on both products — the telephone
+    read as a call.
+
 ## [1.8.3] - 2026-08-25
 
 ### Changed
@@ -15398,7 +15439,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.3...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.4...HEAD
+[1.8.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.3...app-v1.8.4
 [1.8.3]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.2...app-v1.8.3
 [1.8.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.1...app-v1.8.2
 [1.8.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.0...app-v1.8.1
