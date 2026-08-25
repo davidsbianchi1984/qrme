@@ -74,29 +74,6 @@ const SILENCE =
 /** The one element every piece plays through, once a press has opened it. */
 let ear: HTMLAudioElement | null = null;
 
-/** Open the ear on the first press anywhere on the page.
- *
- *  Armed once, at import, rather than wired into each screen's press
- *  handlers. Three screens speak and each has several ways in — the room's
- *  Go in, its send, its microphone; the chat's send; the agent's orb — and
- *  a list of gesture sites that must all remember to call something is a
- *  list with one missing entry, which here means one screen that is silent
- *  on a phone and nowhere else. Any press will do, so this takes any press.
- *
- *  Capture phase, and never cancelled: it only reads that a press happened.
- *  It removes itself once the ear is open, so the cost is one listener for
- *  the first press of a session. */
-function armTheEar(): void {
-  if (typeof document === "undefined") return;
-  const open = () => {
-    openTheEar();
-    document.removeEventListener("pointerdown", open, true);
-    document.removeEventListener("keydown", open, true);
-  };
-  document.addEventListener("pointerdown", open, true);
-  document.addEventListener("keydown", open, true);
-}
-armTheEar();
 
 /** Open the ear, from inside a user gesture.
  *
@@ -127,6 +104,34 @@ export function openTheEar(): void {
   el.play().then(() => { el.pause(); el.muted = false; earOpen = true; },
                 () => { el.muted = false; });
 }
+
+/** Open the ear on presses anywhere on the page.
+ *
+ *  Armed once, at import, rather than wired into each screen's press
+ *  handlers — a list of gesture sites that must all remember to call
+ *  something is a list with one missing entry, which here means one
+ *  screen silent on a phone and nowhere else. The first cut listened on
+ *  pointerdown and removed itself after the first press whether or not
+ *  the platform granted anything; WebKit counts the tail of the gesture
+ *  (click, touchend), so on an iPhone the one press this ever took was
+ *  one the platform refused. These listeners stay attached until an
+ *  attempt actually succeeds, and the explicit calls at Send and the
+ *  microphones stay — they are the presses a reply rides on. */
+function armTheEar(): void {
+  if (typeof document === "undefined") return;
+  const open = () => {
+    openTheEar();
+    if (earOpen) {
+      document.removeEventListener("click", open, true);
+      document.removeEventListener("touchend", open, true);
+      document.removeEventListener("keydown", open, true);
+    }
+  };
+  document.addEventListener("click", open, true);
+  document.addEventListener("touchend", open, true);
+  document.addEventListener("keydown", open, true);
+}
+armTheEar();
 
 /** Play one piece through the opened ear, resolving when it is over.
  *
