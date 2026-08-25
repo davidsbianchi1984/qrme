@@ -1084,6 +1084,13 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
                    text-overflow: ellipsis; white-space: nowrap; }
 .talk-panel { max-height: 60vh; overflow-y: auto; width: min(96vw, 720px);
               text-align: left; }
+/* The portrait beside the chat title — the same face the talk overlay
+   shows, at header scale. */
+.chat-head { display: flex; align-items: center; gap: 12px; }
+.chat-head-face { width: 52px; height: 52px; border-radius: 50%;
+                  object-fit: cover; border: 2px solid var(--line);
+                  flex: none; }
+.chat-head-words { display: flex; flex-direction: column; min-width: 0; }
 /* The action row under the face: small presses, close together, so the
    panels beneath them get the room. */
 .talk-actions button { padding: 6px 14px; font-size: 14px; }

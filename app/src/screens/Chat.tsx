@@ -576,11 +576,23 @@ export function Chat({ onPlans }: {
 
   return (
     <div className="screen chat">
-      <header className="screen-head">
-        <h2>
-          {fill(tr("chat.with", lang), { name: shownName })}
-        </h2>
-        <span className="muted small">{tr("chat.pitch", lang)}</span>
+      <header className="screen-head chat-head">
+        {/* The face belongs beside the name — the same portrait the talk
+            overlay stands at full height, at header scale. Decorative here:
+            the h2 already says who this is, so a reader hears it once. */}
+        {talkAvatar?.asset && !talkAvatar.placeholder && (
+          <img className="chat-head-face"
+               src={talkAvatar.asset.startsWith("http")
+                      ? talkAvatar.asset
+                      : getBase() + talkAvatar.asset}
+               alt="" aria-hidden="true" />
+        )}
+        <div className="chat-head-words">
+          <h2>
+            {fill(tr("chat.with", lang), { name: shownName })}
+          </h2>
+          <span className="muted small">{tr("chat.pitch", lang)}</span>
+        </div>
       </header>
 
       {/* role=log + aria-live: a screen reader is told when the reply
