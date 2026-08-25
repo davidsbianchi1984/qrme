@@ -176,7 +176,10 @@ def test_the_room_remembers_what_it_said_before_it_says_it():
     assert announce, "roomSpeaks is gone — nothing records what the room said"
     assert "roomSaid.current = [" in announce.group(1), (
         "the room's own words never enter the echo window")
-    play = INSIDE[INSIDE.index("const s = await speakInPieces"):]
+    # `s = await speakInPieces` rather than `const s = ...`: the assignment
+    # moved inside a try when the bound-voice refusal grew a device-voice
+    # fallback, and the claim here is about ordering, not declaration form.
+    play = INSIDE[INSIDE.index("s = await speakInPieces"):]
     play = play[:play.index("await s.done")]
     assert "roomSpeaks(" in play, (
         "the backlog plays a turn without recording that the room said it")

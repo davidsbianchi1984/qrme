@@ -326,12 +326,21 @@ def test_the_paperclip_takes_photos_video_and_files():
         assert kind in picker, f"the attach picker refuses {kind}"
 
 
-def test_muted_is_the_loud_state():
-    """Whether your own microphone is off is the thing worth seeing from
-    across a room."""
+def test_live_is_the_loud_state():
+    """The recording-light convention, by the owner's own call — asked as a
+    question and answered once: red means the microphone is hot, green means
+    it is safe to sneeze. The first cut had these reversed and the owner
+    read the room wrong twice before saying so.
+
+        asked     which state is the alarming one
+        mattered  an open microphone is not a thing to be vague about
+    """
+    live = CSS[CSS.index(".rs-round.mic.live"):]
+    live = live[:live.index("}")]
+    assert "224, 85, 85" in live, "a live microphone does not read as hot"
     block = CSS[CSS.index(".rs-round.mic:not(.live)"):]
     block = block[:block.index("}")]
-    assert "224, 104, 122" in block, "muted does not read as muted"
+    assert "123, 196, 127" in block, "muted does not read as safe"
 
 
 def test_the_seat_marks_are_only_drawn_where_the_fact_exists():

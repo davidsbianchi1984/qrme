@@ -4,7 +4,7 @@ import { api, getBase, type Avatar, type MicsHere, type RoomFaces,
          type RoomMsg } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
-import { speakInPieces, type Speaking } from "../spoken";
+import { plainVoice, speakInPieces, type Speaking } from "../spoken";
 import { useSession } from "../store";
 import { putAway, whenPutAway } from "../away";
 import { canRecord, meterWhileSpeaking, recordTurn, type Recording }
@@ -270,6 +270,11 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // that ARRIVES speaks in its bound voice. Turns already on screen stay
   // silent (switching this on is not a request to re-hear the backlog),
   // one turn plays at a time, and the choice is this browser's to keep.
+  // Why the device's voice is standing in for a profile's, when it is —
+  // the server's own refusal sentence, shown beside the transcript. The
+  // room used to fall back (or worse, fall silent) with no reason on
+  // screen anywhere.
+  const [earNote, setEarNote] = useState<string | null>(null);
   const [hearAll, setHearAll] = useState(
     () => localStorage.getItem("qrme.room.hear") !== "0");
   const heardUpTo = useRef<string | null>(null);
@@ -863,11 +868,27 @@ export function Inside({ onPlans, start = "", onLeave }: {
           if (run !== earRun.current) break;
           // Piece by piece: a long turn starts being heard at its first
           // sentence. A first piece the platform refuses now REJECTS
-          // rather than resolving as a reply that was heard, so the catch
-          // below leaves the text standing instead of the room going
-          // silently deaf — the per-turn 🔊 is still on every line.
-          const s = await speakInPieces(
-            m.sender_id as string, m.content || "", token);
+          // rather than resolving as a reply that was heard.
+          let s: Speaking;
+          try {
+            s = await speakInPieces(
+              m.sender_id as string, m.content || "", token);
+          } catch (e) {
+            // No binding, no engine key, or the platform refused. The
+            // room used to go silently deaf on exactly this — the whole
+            // backlog abandoned on the first profile without a voice, and
+            // "no audio in the rooms" reported three times with nothing
+            // on screen to say why. The device's voice stands in per
+            // turn, and the reason is a line beside the transcript.
+            const why = (e as { message?: string })?.message;
+            if (why) setEarNote(why);
+            roomSpeaks(m.content || "");
+            setVoicing({ kind: "profile", id: m.sender_id as string });
+            await plainVoice(m.content || "", lang);
+            setVoicing(null);
+            roomFellQuiet();
+            continue;
+          }
           roomSpeaks(m.content || "");
           nowSaying.current = s;
           sayingMsg.current = m.id;
@@ -2471,6 +2492,13 @@ export function Inside({ onPlans, start = "", onLeave }: {
                             : tr("ins.hear.on", lang)}
               </button>
             </h3>
+            {earNote && (
+              <div className="voice-note" role="status">
+                <span>🔇 {earNote}</span>
+                <button type="button" aria-label="×"
+                        onClick={() => setEarNote(null)}>×</button>
+              </div>
+            )}
             {transcript.length === 0 && (
               <p className="muted small">{tr("ins.nothingyet", lang)}</p>
             )}
