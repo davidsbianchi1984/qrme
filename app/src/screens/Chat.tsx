@@ -1212,7 +1212,7 @@ export function Chat({ onPlans }: {
           <button title={tr("chat.audio", lang)}
                   aria-label={tr("chat.audio", lang)}
                   className="chat-wave"
-                  onClick={openTalk}>📞</button>
+                  onClick={openTalk}>🎙️</button>
         )}
         {/* Take it with you. The only control in this console that hands an
             ear to something outliving the screen — so it is a press, it is
