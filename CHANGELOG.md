@@ -6,6 +6,32 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.8.3] - 2026-08-25
+
+### Changed
+
+- **The platform refuses in the reader's language, all the way down.** The
+  143 interpolated refusals `refusal_templates.txt` was holding open — and
+  the 28 more the widened sweep surfaced — become registered templates: six
+  generic families carry fifty sites with the field name slotted, ~94
+  bespoke sentences keep their exact English behind their own frames, and
+  the seven sentences JIM already says ride in with JIM's frames, so the
+  tandem refuses in one voice. The spoken-voice claim joins `_REFUSALS` as
+  a translated constant, and the apps router's posture table holds
+  templates now instead of raw strings.
+
+      asked     every sentence the platform says when it says no
+      mattered  the reader who picked a language and was answered in English
+
+  `_stringified_errors` learns what JIM's twin already knew: `i18n.raised`
+  counts as stringifying, because obeying the launder guard must not make a
+  module's refusals invisible to the recorder. That widening is what
+  surfaced the 28 — plus seven status slots now wrapped in `i18n.Term`, so
+  a state word travels through the vocabulary instead of sitting English
+  inside a translated sentence, ninety-one handlers handing the sentence on
+  through `i18n.raised`, and the `refusals.template_calls` floor rising
+  24 → 152.
+
 ## [1.8.2] - 2026-08-25
 
 ### Fixed
@@ -15372,7 +15398,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.2...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.3...HEAD
+[1.8.3]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.2...app-v1.8.3
 [1.8.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.1...app-v1.8.2
 [1.8.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.0...app-v1.8.1
 [1.8.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.7.0...app-v1.8.0
