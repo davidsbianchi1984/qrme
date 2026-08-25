@@ -142,7 +142,7 @@ LANGS = ["en", "es", "fr", "de", "pt", "it", "ja", "zh", "hi", "ar"]
 #: A floor under the parse, and a row every shell in this repo holds. The two
 #: together are what stops a pattern that has stopped matching from reporting a
 #: table in perfect agreement. Both change per repo; nothing else here does.
-FLOOR, PROBE = 900, "action.send"
+FLOOR, PROBE = 900, "acct.email"
 
 #: A double-quoted literal with escapes left intact — `\\"` must not end it.
 _STR = r'"((?:[^"\\]|\\.)*)"'

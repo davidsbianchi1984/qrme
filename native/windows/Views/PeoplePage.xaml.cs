@@ -305,6 +305,7 @@ public sealed partial class PeoplePage : Page
         DeleInputBox.Header = L10n.T("work.input");
         DeleResumeButton.Content = L10n.T("dele.resume");
         AsstTitle.Text = L10n.T("asst.title");
+        AsstWorksTitle.Text = L10n.T("asst.works");
         AsstMomentBox.Header = L10n.T("asst.moment");
         AsstComposeButton.Content = L10n.T("asst.compose");
         AsstTextBox.Header = L10n.T("asst.text");
@@ -438,6 +439,10 @@ public sealed partial class PeoplePage : Page
         WristActButton.Content = L10n.T("wrist.act");
         AcctTitle.Text = L10n.T("acct.title");
         AcctEmailBox.Header = L10n.T("acct.email");
+        // Two PasswordBoxes were live and unlabeled — the rows sat in the
+        // table while the boxes showed nothing. Same headers the phones use.
+        AcctPasswordBox.Header = L10n.T("acct.password");
+        AcctNewPasswordBox.Header = L10n.T("acct.reset.new");
         AcctNameBox.Header = L10n.T("acct.name");
         AcctSignupButton.Content = L10n.T("acct.signup");
         AcctSigninButton.Content = L10n.T("acct.signin");
@@ -601,11 +606,12 @@ public sealed partial class PeoplePage : Page
         try
         {
             var offer = await ApiClient.Shared.DelegationOfferOf(s.Pid);
-            DeleOfferText.Text = offer.Delegation == true
-                ? string.Join(", ", offer.Phases ?? []) : "—";
+            DeleOfferText.Text = L10n.T("dele.offer") + ": "
+                + (offer.Delegation == true
+                    ? string.Join(", ", offer.Phases ?? []) : "—");
             var venues = await ApiClient.Shared.RatedVenues();
-            PlcVenuesText.Text = string.Join(", ",
-                venues.Select(v => v.Key));
+            PlcVenuesText.Text = L10n.T("plc.venues") + ": "
+                + string.Join(", ", venues.Select(v => v.Key));
             var memories = await ApiClient.Shared.Memories(
                 s.Pid, s.Token!);
             MemList.ItemsSource = memories.Select(m => new Row(
@@ -2291,7 +2297,8 @@ public sealed partial class PeoplePage : Page
                 .Select(x => x.Trim()).Where(x => x.Length > 0).ToArray();
             var offer = await ApiClient.Shared.SetDelegation(
                 AppState.Current.Pid!, phases, AppState.Current.Token!);
-            DeleOfferText.Text = string.Join(", ", offer.Phases ?? []);
+            DeleOfferText.Text = L10n.T("dele.offer") + ": "
+                + string.Join(", ", offer.Phases ?? []);
         });
 
     private async void OnDeleStart(object sender, RoutedEventArgs e) =>
@@ -2349,6 +2356,10 @@ public sealed partial class PeoplePage : Page
             AppState.Current.Pid!, AppState.Current.Token!);
         AsstWorksList.ItemsSource = rows.Select(w => new Row(
             $"{w.Kind} \u00b7 {w.Moment}")).ToList();
+        // The siblings title this list when it has rows; untitled rows of
+        // "kind · moment" read as debris.
+        AsstWorksTitle.Visibility = rows.Count > 0
+            ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private async void OnAsstProof(object sender, RoutedEventArgs e) =>
@@ -2382,7 +2393,10 @@ public sealed partial class PeoplePage : Page
                 AppState.Current.Pid!, AppState.Current.Token!);
             _grantId = g.Id ?? "";
             _grantToken = g.Token ?? "";
-            StatusText.Text = string.Join(",", g.Scope ?? []);
+            // Labeled, as the phones label it — a bare "*" in the status
+            // line answered a question nobody could know was being asked.
+            StatusText.Text = L10n.T("task.scope") + ": "
+                + string.Join(",", g.Scope ?? []);
         });
 
     private async void OnTaskRevoke(object sender, RoutedEventArgs e) =>

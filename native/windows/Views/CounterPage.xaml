@@ -197,6 +197,8 @@
                     <TextBox x:Name="ItemIdBox" />
                     <Button x:Name="TakeItemButton" Click="OnTakeItem" />
                     <Button x:Name="DropItemButton" Click="OnDropItem" />
+                    <TextBlock x:Name="SignNoteText" FontSize="11" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
                     <Button x:Name="SignButton" Click="OnSign" />
                     <Button x:Name="ReopenButton" Click="OnReopen" />
                     <Button x:Name="WithdrawButton" Click="OnWithdraw" />

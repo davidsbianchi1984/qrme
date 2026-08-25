@@ -5909,6 +5909,11 @@ private fun AsstBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(L10n.t("asst.title", lang), color = Qrme.Txt, fontSize = 16.sp,
             fontWeight = FontWeight.Bold)
+        // The siblings title this list; an untitled run of "kind · moment"
+        // rows reads as debris. Same row, same condition as the iPhone's.
+        if (works.isNotEmpty()) {
+            Text(L10n.t("asst.works", lang), color = Qrme.T2, fontSize = 12.sp)
+        }
         works.forEach { Text(it, color = Qrme.T2, fontSize = 12.sp) }
         labeledField(L10n.t("asst.moment", lang), moment, "") { moment = it }
         BrandButton(L10n.t("asst.compose", lang), enabled = moment.isNotBlank()) {
@@ -5938,6 +5943,7 @@ private fun TaskBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
     var rows by remember { mutableStateOf(listOf<String>()) }
     var grantId by remember { mutableStateOf("") }
     var grantToken by remember { mutableStateOf("") }
+    var grantScope by remember { mutableStateOf("") }
     var topic by remember { mutableStateOf("") }
     LaunchedEffect(vm.pid) {
         vm.call({ ApiClient.tasksRun(vm.pid!!, vm.token!!) }) { r ->
@@ -5951,15 +5957,22 @@ private fun TaskBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
             BrandButton(L10n.t("task.grant", lang)) {
                 vm.call({ ApiClient.mintTaskGrant(vm.pid!!, vm.token!!) }) { r ->
                     r.getOrNull()?.let { grantId = it.first
-                        grantToken = it.second }
+                        grantToken = it.second
+                        grantScope = it.third }
                     onNote(r.exceptionOrNull()?.message) }
             }
             BrandButton(L10n.t("task.revoke", lang),
                 enabled = grantId.isNotBlank()) {
                 vm.call({ ApiClient.revokeTaskGrant(grantId, vm.token!!) }) { r ->
-                    grantId = ""; grantToken = ""
+                    grantId = ""; grantToken = ""; grantScope = ""
                     onNote(r.exceptionOrNull()?.message) }
             }
+        }
+        // What the grant reaches, said next to the buttons that minted it —
+        // the iPhone has shown this line since the grant flow was written.
+        if (grantScope.isNotBlank()) {
+            Text(L10n.t("task.scope", lang) + ": " + grantScope,
+                color = Qrme.T2, fontSize = 12.sp)
         }
         labeledField(L10n.t("task.topic", lang), topic, "") { topic = it }
         BrandButton(L10n.t("task.run", lang),

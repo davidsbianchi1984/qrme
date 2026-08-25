@@ -1,4 +1,4 @@
-# status: backlog — 28 rows
+# status: backlog — 0 rows
 #
 # ...but see below: only 72 of them are deletion work. The other 263 are a
 # to-do list about screens, and calling the whole number a backlog is the
@@ -160,7 +160,24 @@
 # phones never did. The row was translated ten ways and asked for by nobody
 # because no shell had a form to save.
 #
-# ceiling: 103
+# ## 1.8.5 — the file closes
+#
+# The last 28 rows, resolved by their own doctrine: rows a sibling asked
+# for became screens, rows nobody asked for became deletions.
+#
+#   * **Ten parity wirings.** Android gained the works-list title, the
+#     grant's scope line, and the unreachable-server sentence from the
+#     table (its hardcoded English fallback died with it). Windows gained
+#     the works-list title, the labeled scope line, the signing note, the
+#     delegation-offer and venues labels — and headers on two
+#     PasswordBoxes that had been live and unlabeled since the account
+#     card was built.
+#   * **Eighteen deletions.** acct.reset.code, life.legend, task.gid,
+#     task.list, work.phase and action.send were held by all three shells
+#     and asked for by none — translations somebody paid attention to
+#     that no reader could ever reach.
+#
+# ceiling: 0
 # total: 273
 
 # ios: 67 of 82 are asked for by another shell
@@ -181,35 +198,7 @@
 # it is the parse-probe two table-reading guards are pinned to
 # (test_the_same_sentence_translated_twice, test_the_three_shells_say
 # _the_same_thing), so the rows stay and are recorded here instead.
-android: acct.reset.code
-android: life.legend
-android: task.gid
-android: task.list
-android: work.phase
-android: action.send
-ios: acct.reset.code
-ios: life.legend
-ios: task.gid
-ios: task.list
-ios: work.phase
-ios: action.send
 
 # android: 83 of 110 are asked for by another shell
-android: asst.works
-android: nw.unreachable
-android: task.scope
 
 # windows: 113 of 143 are asked for by another shell
-windows: deals.sign.note
-windows: acct.password
-windows: acct.reset.new
-windows: asst.works
-windows: dele.offer
-windows: plc.venues
-windows: task.scope
-windows: acct.reset.code
-windows: life.legend
-windows: task.gid
-windows: task.list
-windows: work.phase
-windows: action.send
