@@ -1092,8 +1092,12 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
                   flex: none; }
 .chat-head-words { display: flex; flex-direction: column; min-width: 0; }
 /* The action row under the face: small presses, close together, so the
-   panels beneath them get the room. */
-.talk-actions button { padding: 6px 14px; font-size: 14px; }
+   panels beneath them get the room. `.row` is a two-column grid, which
+   stacked the third button onto its own line on a phone — this row is
+   three presses side by side, always. */
+.talk-actions { display: flex; flex-wrap: nowrap; align-items: center;
+                gap: 10px; }
+.talk-actions button { padding: 6px 14px; font-size: 14px; flex: none; }
 .talk-tap, .talk-state { cursor: pointer; }
 /* The bar while it is an ear, drawn the way a voice memo draws itself:
    discard, the levels actually read, keep. The bars are data — scaled per
