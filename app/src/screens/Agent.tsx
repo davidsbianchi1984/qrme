@@ -7,6 +7,7 @@ import { Refusal } from "../Refusal";
 import { openTheEar, plainVoice, speakInPieces, type Speaking } from "../spoken";
 import { useSession } from "../store";
 import { putAway, whenPutAway } from "../away";
+import { canRecord, recordAsked, type Recording } from "../roomear";
 
 /**
  * The Agent — the collaborator, with its own front door.
@@ -194,6 +195,10 @@ export function Agent({ onPlans, go }: {
   const imgPicker = useRef<HTMLInputElement>(null);
   const mediaPicker = useRef<HTMLInputElement>(null);
   const dictation = useRef<{ stop: () => void } | null>(null);
+  // Which dictation is the live one. The recorded fallback's words arrive
+  // only after the recording stops, and only the turn they belong to may
+  // put them in the box.
+  const dictTurn = useRef(0);
   const askBox = useRef<HTMLInputElement>(null);
   // The browser's own recogniser, where there is one. Held in a ref — it is
   // a live handle like the room camera's MediaStream, not a value to render
@@ -381,7 +386,16 @@ export function Agent({ onPlans, go }: {
         setEarFault(tr("agent.ear.nomic", lang));
       } else if (code === "network") {
         fatal = true;
-        setEarFault(tr("agent.ear.unreachable", lang));
+        // The recogniser exists but its speech service is unreachable —
+        // the handheld's report. The microphone itself is fine, so the
+        // turn moves to the recorded ear rather than reporting a dead end;
+        // the relight after each spoken reply tries the recogniser first
+        // and lands back in the recorded loop while the service stays out.
+        if (canRecord() && session.interactorId) {
+          void voiceRecord();
+        } else {
+          setEarFault(tr("agent.ear.unreachable", lang));
+        }
       }
     };
     r.onend = () => {
@@ -408,6 +422,65 @@ export function Agent({ onPlans, go }: {
     r.start();
   }
 
+  /** One recorded turn of the voice conversation, for a browser whose
+   *  recogniser cannot reach its speech service. The deployment's ears
+   *  transcribe (`/interactors/{id}/heard`), the words feed the same turn
+   *  the recogniser would have fed, and the recording sits behind the
+   *  `recogniser` handle so every existing stop — the orb closing, the
+   *  doze — still puts the microphone down. Silence ends a turn the way
+   *  the room's ear decided it should.
+   *
+   *      asked     can this browser reach a transcriber
+   *      mattered  does the orb still hear when it cannot */
+  async function voiceRecord() {
+    if (!voiceOn.current || turning.current || dozing.current || putAway()) {
+      return;
+    }
+    if (!session.interactorId) return;
+    let recording: Recording;
+    try {
+      recording = await recordAsked(
+        session.interactorId, session.interactorToken || "");
+    } catch {
+      setEarFault(tr("agent.ear.nomic", lang));
+      return;
+    }
+    if (!voiceOn.current || dozing.current) { recording.stop(); return; }
+    recogniser.current = { stop: () => recording.stop() };
+    setEarFault(null);
+    try {
+      const words = await recording.done;
+      if (!voiceOn.current || dozing.current) return;
+      recogniser.current = null;
+      setAsk(words);
+      if (words.trim()) {
+        lastHeard.current = Date.now();
+        turning.current = true;
+        void sendSaid(words);
+        return;
+      }
+      if (Date.now() - lastHeard.current >= CONVERSATION_IDLE_MS) {
+        stopVoice();
+        return;
+      }
+      void voiceRecord();
+    } catch (e) {
+      if (!voiceOn.current || dozing.current) return;
+      recogniser.current = null;
+      // A quiet stretch — the recogniser's `no-speech`. Listen again,
+      // unless the conversation has been idle long enough to bow out.
+      if (String((e as Error)?.message || "").startsWith("nothing")) {
+        if (Date.now() - lastHeard.current >= CONVERSATION_IDLE_MS) {
+          stopVoice();
+          return;
+        }
+        void voiceRecord();
+        return;
+      }
+      setEarFault(tr("agent.ear.unreachable", lang));
+    }
+  }
+
   function stopDictation() {
     dictation.current?.stop();
     dictation.current = null;
@@ -429,6 +502,9 @@ export function Agent({ onPlans, go }: {
     r.continuous = true;
     r.interimResults = true;
     r.lang = lang;
+    // A fresh press is a fresh turn: words from any earlier recording
+    // still resolving belong to it, not to this one.
+    dictTurn.current += 1;
     const base = ask.trim() ? ask.trim() + " " : "";
     r.onresult = (e) => {
       let finals = "", interim = "";
@@ -439,6 +515,7 @@ export function Agent({ onPlans, go }: {
       }
       setAsk(base + finals + interim);
     };
+    let routed = false;
     r.onerror = (e: { error?: string }) => {
       const code = e.error || "";
       if (code === "not-allowed" || code === "service-not-allowed") {
@@ -446,14 +523,65 @@ export function Agent({ onPlans, go }: {
       } else if (code === "audio-capture") {
         setEarFault(tr("agent.ear.nomic", lang));
       } else if (code === "network") {
-        setEarFault(tr("agent.ear.unreachable", lang));
+        // Same route-around as the orb's: the service is unreachable, the
+        // microphone is not. `routed` keeps this recogniser's own end from
+        // tearing down the recording that replaces it.
+        if (canRecord() && session.interactorId) {
+          routed = true;
+          void dictRecord();
+        } else {
+          setEarFault(tr("agent.ear.unreachable", lang));
+        }
       }
     };
-    r.onend = () => { dictation.current = null; setDictating(false); };
+    r.onend = () => {
+      if (routed) return;
+      dictation.current = null; setDictating(false);
+    };
     dictation.current = r;
     setEarFault(null);
     setDictating(true);
     r.start();
+  }
+
+  /** Dictation over the deployment's ears — the box-filling twin of the
+   *  orb's recorded turn, for the same unreachable speech service. The
+   *  stop button still stops it (the recording sits behind the same
+   *  `dictation` handle), and the words land in the box when the
+   *  transcriber answers. */
+  async function dictRecord() {
+    if (!session.interactorId) return;
+    const mine = ++dictTurn.current;
+    const base = ask.trim() ? ask.trim() + " " : "";
+    let recording: Recording;
+    try {
+      recording = await recordAsked(
+        session.interactorId, session.interactorToken || "");
+    } catch {
+      dictation.current = null;
+      setDictating(false);
+      setEarFault(tr("agent.ear.nomic", lang));
+      return;
+    }
+    if (mine !== dictTurn.current) { recording.stop(); return; }
+    dictation.current = { stop: () => recording.stop() };
+    setDictating(true);
+    try {
+      const words = await recording.done;
+      if (mine !== dictTurn.current) return;
+      dictation.current = null;
+      setDictating(false);
+      setAsk(base + words);
+    } catch (e) {
+      if (mine !== dictTurn.current) return;
+      dictation.current = null;
+      setDictating(false);
+      // A recording nobody spoke into leaves the box alone, quietly —
+      // the recogniser's own posture for `no-speech`.
+      if (!String((e as Error)?.message || "").startsWith("nothing")) {
+        setEarFault(tr("agent.ear.unreachable", lang));
+      }
+    }
   }
 
   async function doSearch(qWhat: string) {

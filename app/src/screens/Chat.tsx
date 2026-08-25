@@ -10,6 +10,7 @@ import { Waveform } from "../Waveform";
 import { presenceOf, presenceKey, animatedIn } from "../presence";
 import { useSession } from "../store";
 import { putAway, whenPutAway } from "../away";
+import { canRecord, recordAsked, type Recording } from "../roomear";
 import { startWalking } from "../walk";
 
 interface Doc { id: string; name: string | null; url: string;
@@ -176,6 +177,10 @@ export function Chat({ onPlans }: {
   const [dictLevels, setDictLevels] = useState<number[]>([]);
   const dictMeter = useRef<{ stop: () => void } | null>(null);
   const dictBefore = useRef("");
+  // Which dictation is the live one — the overlay's `earTurn`, for the bar.
+  // The recorded fallback's words arrive only after the recording stops, so
+  // ⏹ must let them land while ✕ must not; a retired turn is how ✕ says so.
+  const dictTurn = useRef(0);
   const inputRef = useRef<HTMLInputElement | null>(null);
   // Why the ear closed, when it closed for a reason rather than a silence.
   // A caption that only ever falls back to "tap to talk" cannot tell a
@@ -183,6 +188,12 @@ export function Chat({ onPlans }: {
   // find out — which is how the first repair of this screen shipped on an
   // assumption with nothing able to contradict it.
   const [earTrouble, setEarTrouble] = useState<string | null>(null);
+  // Why the robot voice is standing in, when it is. The fallback used to be
+  // silent about its reason — a field report heard "a female robot voice"
+  // and could only guess at keys and bindings. The server's refusal names
+  // it (no voice bound, no engine key, ceiling), already in the reader's
+  // language; showing that sentence turns the guess into a fact.
+  const [voiceNote, setVoiceNote] = useState<string | null>(null);
   // The talk surface: a full listening overlay in the sibling product's
   // shape — except this product's speaker has a face. The profile's avatar
   // is what you look at while it listens and answers; the abstract orb only
@@ -295,7 +306,16 @@ export function Chat({ onPlans }: {
           setVoicing(false);
         });
         return;
-      } catch { setVoicing(false); /* the device's voice stands in */ }
+      } catch (e) {
+        // The device's voice stands in — and says why, on screen. A
+        // rejection carries the server's own sentence when the door
+        // refused (no binding, no engine key), and the platform's when
+        // playback was refused; either way the person hearing the robot
+        // now reads the reason instead of guessing at keys.
+        setVoicing(false);
+        const why = (e as { message?: string })?.message;
+        if (why) setVoiceNote(why);
+      }
     }
     if (!("speechSynthesis" in window)) return;
     const u = new SpeechSynthesisUtterance(text);
@@ -388,6 +408,15 @@ export function Chat({ onPlans }: {
       // close a fifth of a second after it opened.
       if ((why === "no-speech" || why === "aborted")
           && wantsEar.current && !putAway()) return;
+      // The one fault this console can route around: the recogniser exists
+      // but its speech service is unreachable — the handheld's report,
+      // `network` on every start. The conversation moves to the recorded
+      // ear and the deployment's own transcriber does the hearing.
+      if (why === "network" && canRecord() && session.interactorId) {
+        talkRec.current = null;
+        void talkRecord(settled);
+        return;
+      }
       // Anything else closes the ear, and says so. Falling silently back to
       // "tap to talk" left the person and the next person to read this
       // screen with the same nothing to go on.
@@ -409,6 +438,61 @@ export function Chat({ onPlans }: {
       talkRec.current = null;
       setListening(false);
       setEarTrouble("start-refused");
+    }
+  }
+
+  /** The overlay's recorded ear: the browser's recogniser exists but cannot
+   *  reach its speech service, so this console records the turn itself and
+   *  the deployment's ears transcribe it (`/interactors/{id}/heard`).
+   *  Silence ends a turn exactly as the room's ear decided it should, the
+   *  transcript grows across turns the way the recogniser's did, and every
+   *  existing stop — ✕, put-away, unmount — still works, because the
+   *  recording sits behind the same `talkRec` handle.
+   *
+   *      asked     can this browser reach a transcriber
+   *      mattered  does the conversation still happen when it cannot */
+  async function talkRecord(prior: string) {
+    if (putAway() || !session.interactorId) return;
+    const mine = ++earTurn.current;
+    const live = () => mine === earTurn.current;
+    setEarTrouble(null);
+    wantsEar.current = true;
+    setListening(true);
+    let recording: Recording;
+    try {
+      recording = await recordAsked(
+        session.interactorId, session.interactorToken || "");
+    } catch {
+      if (!live()) return;
+      wantsEar.current = false;
+      setListening(false);
+      setEarTrouble("start-refused");
+      return;
+    }
+    if (!live()) { recording.stop(); return; }
+    talkRec.current = { stop: () => recording.stop() };
+    try {
+      const said = await recording.done;
+      if (!live()) return;
+      talkRec.current = null;
+      const text = (prior ? prior + " " : "") + said;
+      setHeard(text);
+      setInput(text);
+      if (wantsEar.current && !putAway()) { void talkRecord(text); return; }
+      setListening(false);
+    } catch (e) {
+      if (!live()) return;
+      talkRec.current = null;
+      // "nothing was heard in that" is a quiet stretch, not a fault —
+      // listen again, the recogniser's own posture for `no-speech`.
+      if (wantsEar.current && !putAway()
+          && String((e as Error)?.message || "").startsWith("nothing")) {
+        void talkRecord(prior);
+        return;
+      }
+      wantsEar.current = false;
+      setListening(false);
+      setEarTrouble(String((e as Error)?.message || "trouble"));
     }
   }
 
@@ -469,6 +553,10 @@ export function Chat({ onPlans }: {
   /** The ✕ on the recording bar: close the ear and put the field back the
    *  way it was — a cancelled recording leaves no words behind. */
   function dictCancel() {
+    // Retire the turn before the stop: a recorded fallback's words arrive
+    // only after the recording ends, and a cancelled bar must not have
+    // them land in the field it just restored.
+    dictTurn.current += 1;
     const rec = dictRec.current;
     dictRec.current = null;
     setDictating(false);
@@ -481,6 +569,9 @@ export function Chat({ onPlans }: {
     if (!Recognition) return;
     openTheEar();
     if (dictRec.current) { dictStop(); return; }
+    // A fresh press is a fresh turn: words from any earlier recording that
+    // is still resolving belong to it, not to this one.
+    dictTurn.current += 1;
     // Deliberately no focus() here: on a touch device focusing the input
     // summons the on-screen keyboard, and the person asked to speak, not to
     // type. The bar shows the recording; the keyboard comes only from a
@@ -518,6 +609,14 @@ export function Chat({ onPlans }: {
     rec.onerror = (e: any) => {
       const why = String(e?.error || "");
       if (why === "no-speech" || why === "aborted") return;
+      // Same route-around as the overlay's: an unreachable speech service
+      // hands the bar to the recorded ear. The meter restarts inside it,
+      // fed by the recording's own analyser.
+      if (why === "network" && canRecord() && session.interactorId) {
+        stopDictMeter();
+        void dictRecord();
+        return;
+      }
       dictRec.current = null;
       setDictating(false);
       setEarTrouble(why || "start-refused");
@@ -539,6 +638,49 @@ export function Chat({ onPlans }: {
     setDictating(false);
     stopDictMeter();
     rec?.stop();
+  }
+
+  /** The recording bar over the deployment's ears — dictation's version of
+   *  the overlay's fallback. The bar looks and works exactly as it did:
+   *  the meter draws from the recording's own analyser, ⏹ (or 2.5s of
+   *  silence) ends the recording and the words land in the field, and ✕
+   *  cancels clean. The words arrive only after the recording stops, which
+   *  is why ⏹ leaves the turn standing and ✕ retires it. */
+  async function dictRecord() {
+    if (!session.interactorId) return;
+    const mine = ++dictTurn.current;
+    const before = dictBefore.current;
+    setDictLevels([]);
+    let recording: Recording;
+    try {
+      recording = await recordAsked(
+        session.interactorId, session.interactorToken || "",
+        (level) => setDictLevels((l) => [...l.slice(-46), level]));
+    } catch {
+      dictRec.current = null;
+      setDictating(false);
+      setEarTrouble("start-refused");
+      return;
+    }
+    if (mine !== dictTurn.current) { recording.stop(); return; }
+    dictRec.current = { stop: () => recording.stop() };
+    setDictating(true);
+    try {
+      const said = await recording.done;
+      if (mine !== dictTurn.current) return;
+      dictRec.current = null;
+      setDictating(false);
+      setInput((before ? before + " " : "") + said);
+    } catch (e) {
+      if (mine !== dictTurn.current) return;
+      dictRec.current = null;
+      setDictating(false);
+      // A recording nobody spoke into leaves the field alone, quietly —
+      // the recogniser's own posture for `no-speech`.
+      if (!String((e as Error)?.message || "").startsWith("nothing")) {
+        setEarTrouble(String((e as Error)?.message || "trouble"));
+      }
+    }
   }
 
   /** The caption says "tap to talk", so the face and the caption are the
@@ -1084,6 +1226,13 @@ export function Chat({ onPlans }: {
         </div>
       )}
 
+      {voiceNote && (
+        <div className="voice-note" role="status">
+          <span>🔇 {voiceNote}</span>
+          <button type="button" aria-label="×"
+                  onClick={() => setVoiceNote(null)}>×</button>
+        </div>
+      )}
       <div className="composer">
         {plusOpen && (
           <div className="agent-plus composer-plus" role="menu">
@@ -1258,11 +1407,15 @@ export function Chat({ onPlans }: {
                         try {
                           const s = await speakInPieces(pid, text, vtok);
                           await s.done;
-                        } catch {
+                        } catch (e) {
                           // The device's own voice stands in. A rejection
                           // here is no binding, no engine, or a platform
                           // that refused to play — and to a listener all
                           // three are the same event: nothing was said.
+                          // The reason lands on the screen's note, so the
+                          // robot never stands in unexplained.
+                          const why = (e as { message?: string })?.message;
+                          if (why) setVoiceNote(why);
                           await plainVoice(text, lang);
                         }
                       },

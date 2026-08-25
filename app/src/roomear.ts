@@ -67,6 +67,33 @@ export async function recordTurn(
   speakingNow: () => boolean,
   onLevel?: (level: number) => void,
 ): Promise<Recording> {
+  return open(async (blob) => {
+    const heard = await api.heardInRoom(roomId, interactorId, blob, token);
+    return (heard.text || "").trim();
+  }, speakingNow, onLevel);
+}
+
+/** The same ear pointed at a conversation instead of a room: one recorded
+ *  turn, transcribed through `/interactors/{id}/heard`. The chat overlay,
+ *  its dictation bar and the studio orb fall back to this when the
+ *  browser's recogniser exists but cannot reach its speech service — the
+ *  handheld's report: `network` on every start, a microphone with no
+ *  transcriber behind it. */
+export async function recordAsked(
+  interactorId: string, token: string,
+  onLevel?: (level: number) => void,
+): Promise<Recording> {
+  return open(
+    async (blob) => (await api.heard(interactorId, blob, token)).trim(),
+    () => false, onLevel);
+}
+
+/** The recording itself, held apart from the door the words go through. */
+async function open(
+  transcribe: (blob: Blob) => Promise<string>,
+  speakingNow: () => boolean,
+  onLevel?: (level: number) => void,
+): Promise<Recording> {
   const stream = await navigator.mediaDevices.getUserMedia({
     // Asked for by name rather than hoped for. This is the one echo
     // defence that works on sound instead of on words or on clocks.
@@ -142,8 +169,7 @@ export async function recordTurn(
         return;
       }
       try {
-        const heard = await api.heardInRoom(roomId, interactorId, blob, token);
-        said((heard.text || "").trim());
+        said(await transcribe(blob));
       } catch (e) { refused(e as Error); }
     };
   });
