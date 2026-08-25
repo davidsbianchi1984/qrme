@@ -99,7 +99,7 @@ export function TalkRail({
 }
 
 const GLYPH: Record<RailPanel, string> = {
-  profile: "☰", memory: "◔", relationship: "⇄", controls: "⚙",
+  profile: "☰", memory: "◔", relationship: "⇄", controls: "🎛️",
 };
 
 // -- who they are ----------------------------------------------------------

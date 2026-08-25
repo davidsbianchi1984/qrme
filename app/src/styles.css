@@ -1082,8 +1082,27 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .talk-rail-label { font-size: 10px; font-weight: 600; max-width: 60px;
                    text-align: center; overflow: hidden;
                    text-overflow: ellipsis; white-space: nowrap; }
-.talk-panel { max-height: 46vh; overflow-y: auto; width: min(92vw, 560px);
+.talk-panel { max-height: 60vh; overflow-y: auto; width: min(96vw, 720px);
               text-align: left; }
+/* The action row under the face: small presses, close together, so the
+   panels beneath them get the room. */
+.talk-actions button { padding: 6px 14px; font-size: 14px; }
+.talk-tap, .talk-state { cursor: pointer; }
+/* The bar while it is an ear. A press anywhere on it closes the ear. */
+.chat-recording { flex: 1; display: flex; align-items: center; gap: 8px;
+                  min-width: 0; padding: 8px 12px; border-radius: 10px;
+                  background: rgba(13,10,32,0.62);
+                  border: 1px solid var(--accent); color: inherit;
+                  cursor: pointer; text-align: left; }
+.chat-rec-dot { width: 10px; height: 10px; border-radius: 50%;
+                background: #e05555; flex: none;
+                animation: rec-pulse 1.2s ease-in-out infinite; }
+.chat-rec-live { flex: 1; min-width: 0; overflow: hidden;
+                 text-overflow: ellipsis; white-space: nowrap; }
+@keyframes rec-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@media (prefers-reduced-motion: reduce) {
+  .chat-rec-dot { animation: none; }
+}
 /* The reading under the figure. Height and gap only — the bars are scaled
    by the component, because a CSS keyframe cannot be told what is happening
    and would animate on a dead microphone. */

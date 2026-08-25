@@ -413,9 +413,10 @@ export function Chat({ onPlans }: {
   function dictate() {
     if (!Recognition) return;
     if (dictRec.current) { dictStop(); return; }
-    // The caret goes into the bar first, so the words land somewhere the
-    // person is already looking and can correct.
-    inputRef.current?.focus();
+    // Deliberately no focus() here: on a touch device focusing the input
+    // summons the on-screen keyboard, and the person asked to speak, not to
+    // type. The bar shows the recording; the keyboard comes only from a
+    // tap into the field itself.
     const rec = new Recognition();
     rec.lang = lang;
     rec.continuous = true;
@@ -462,7 +463,12 @@ export function Chat({ onPlans }: {
     dictRec.current = null;
     setDictating(false);
     rec?.stop();
-    inputRef.current?.focus();
+  }
+
+  /** The caption says "tap to talk", so the face and the caption are the
+   * tap targets — not only the buttons under them. */
+  function tapTalk() {
+    if (!listening && !busy) talkListen();
   }
 
   /** Close the ear because the person asked, not because it timed out. */
@@ -837,8 +843,9 @@ export function Chat({ onPlans }: {
               circular face is next; the orb is only for a profile with no
               portrait at all. */}
           {talkAvatar?.torso ? (
-            <div className={"talk-torso-wrap"
-                            + (animatedIn(presence) ? " listening" : "")}>
+            <div className={"talk-torso-wrap talk-tap"
+                            + (animatedIn(presence) ? " listening" : "")}
+                 onClick={tapTalk}>
               <img className={"talk-torso"
                               + (animatedIn(presence) ? " listening" : "")}
                    src={talkAvatar.torso.startsWith("http")
@@ -854,8 +861,10 @@ export function Chat({ onPlans }: {
                placeholder, which made every portrait-less profile look
                identical to every other and looked like a thing rather than
                like something to fill. */
-            <div className={"talk-face" + (animatedIn(presence) ? " listening" : "")
-                            + (talkAvatar.placeholder ? " empty" : "")}>
+            <div className={"talk-face talk-tap"
+                            + (animatedIn(presence) ? " listening" : "")
+                            + (talkAvatar.placeholder ? " empty" : "")}
+                 onClick={tapTalk}>
               <img src={talkAvatar.asset.startsWith("http")
                           ? talkAvatar.asset
                           : getBase() + talkAvatar.asset}
@@ -867,24 +876,16 @@ export function Chat({ onPlans }: {
           {/* Seven states rather than two, and the strip below reads from the
               same decision — so the caption and the bars cannot disagree
               about what is happening. */}
-          <div className="talk-state muted small">
-            {tr(presenceKey(presence), lang)}
+          <div className="talk-state muted small" onClick={tapTalk}>
+            {(earTrouble && earTroubleLine(earTrouble, lang))
+              || tr(presenceKey(presence), lang)}
           </div>
           <Waveform presence={presence} lang={lang} />
           {heard && <div className="talk-heard">{heard}</div>}
-          {/* Why the ear closed, when it closed for a reason. Without this
-              the surface had one way of failing and no way of saying which
-              failure it was — a refused microphone, a speech service it
-              could not reach and a defect all read as "tap to talk". */}
-          {earTrouble && (
-            <div className="talk-trouble muted small">
-              {earTroubleLine(earTrouble, lang)}
-            </div>
-          )}
           {talkAvatar && (!talkAvatar.asset || talkAvatar.placeholder) && (
             <div className="muted small">{tr("chat.talk.noface", lang)}</div>
           )}
-          <div className="row" style={{ justifyContent: "center" }}>
+          <div className="row talk-actions" style={{ justifyContent: "center" }}>
             {/* One control, both directions. While it was only "Speak
                 again" there was no way to close an ear that had opened, and
                 no way to tell from the button that it was open. */}
@@ -1063,14 +1064,28 @@ export function Chat({ onPlans }: {
                   className={dictating ? "primary" : ""}
                   onClick={dictating ? dictStop : dictate}>🎤</button>
         )}
-        <input
-          ref={inputRef}
-          autoFocus
-          value={input}
-          placeholder={tr("chat.type.ph", lang)}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && send()}
-        />
+        {dictating ? (
+          /* The bar itself says it is recording. A button rather than a
+             live input, so the on-screen keyboard stays down: the words
+             arrive when the ear closes, and the field is there to edit
+             them only if the person then taps into it. */
+          <button type="button" className="chat-recording" aria-live="polite"
+                  onClick={dictStop}>
+            <span className="chat-rec-dot" aria-hidden="true" />
+            <span className="chat-rec-live">
+              {input || tr("chat.rec.live", lang)}
+            </span>
+            <span className="muted small">{tr("chat.rec.stop", lang)}</span>
+          </button>
+        ) : (
+          <input
+            ref={inputRef}
+            value={input}
+            placeholder={tr("chat.type.ph", lang)}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && send()}
+          />
+        )}
         <button className="primary" onClick={send} disabled={busy}>
           {tr("chat.send", lang)}
         </button>
@@ -1082,7 +1097,7 @@ export function Chat({ onPlans }: {
           <button title={tr("chat.audio", lang)}
                   aria-label={tr("chat.audio", lang)}
                   className="chat-wave"
-                  onClick={openTalk}>〰</button>
+                  onClick={openTalk}>📞</button>
         )}
         {/* Take it with you. The only control in this console that hands an
             ear to something outliving the screen — so it is a press, it is
