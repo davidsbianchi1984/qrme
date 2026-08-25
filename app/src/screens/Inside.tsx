@@ -271,7 +271,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // silent (switching this on is not a request to re-hear the backlog),
   // one turn plays at a time, and the choice is this browser's to keep.
   const [hearAll, setHearAll] = useState(
-    () => localStorage.getItem("qrme.room.hear") === "1");
+    () => localStorage.getItem("qrme.room.hear") !== "0");
   const heardUpTo = useRef<string | null>(null);
   const speaking = useRef(false);
   // Whose turn is being read aloud RIGHT NOW — an identity (kind + id),
@@ -832,13 +832,16 @@ export function Inside({ onPlans, start = "", onLeave }: {
     const v = !hearAll;
     setHearAll(v);
     if (v) {
-      localStorage.setItem("qrme.room.hear", "1");
+      localStorage.removeItem("qrme.room.hear");
       // Everything already said stays said: the toggle speaks what comes
       // next, not the scrollback.
       heardUpTo.current = transcript.length > 0
         ? transcript[transcript.length - 1].id : null;
     } else {
-      localStorage.removeItem("qrme.room.hear");
+      // "0" is the remembered mute; hearing is the default a fresh
+      // browser arrives with, after the field report that said, in one
+      // word, what a silent room reads as: broken.
+      localStorage.setItem("qrme.room.hear", "0");
     }
   }
 

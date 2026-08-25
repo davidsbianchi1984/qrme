@@ -4,7 +4,7 @@ import { api, getBase, type Avatar, type Briefing, type DialerPosture,
          type Escalated, type MyPerson } from "../api";
 import { Briefcase } from "../Briefcase";
 import { Refusal } from "../Refusal";
-import { plainVoice, speakInPieces } from "../spoken";
+import { openTheEar, plainVoice, speakInPieces } from "../spoken";
 import { TalkRail } from "../TalkRail";
 import { Waveform } from "../Waveform";
 import { presenceOf, presenceKey, animatedIn } from "../presence";
@@ -132,7 +132,11 @@ export function Chat({ onPlans }: {
   // that fills the composer. Both feature-detected — the mic button simply
   // does not render on a browser without SpeechRecognition, because a
   // control that cannot work is worse than no control.
-  const [speakOn, setSpeakOn] = useState(false);
+  // On by default — a profile with a voice is expected to be heard, and
+  // the first field report on this screen was one word: silence. The mute
+  // is this browser's to keep.
+  const [speakOn, setSpeakOn] = useState(
+    () => localStorage.getItem("qrme.chat.speak") !== "0");
   // The bound voice mid-utterance — `speechSynthesis.speaking` cannot see
   // an <audio> element, so the face needs its own word for it.
   const [voicing, setVoicing] = useState(false);
@@ -313,6 +317,9 @@ export function Chat({ onPlans }: {
   // swallows words silently.
   function talkListen() {
     if (!Recognition || putAway()) return;
+    // The playback grant is taken here, inside the press, so the reply's
+    // bound voice can play on platforms that gate audio behind a gesture.
+    openTheEar();
     // An ear that is already open must not be opened again. Chrome allows
     // one recognition at a time, and starting a second aborts the first —
     // whose `aborted` then arrived and closed the one that had just opened.
@@ -412,6 +419,7 @@ export function Chat({ onPlans }: {
    */
   function dictate() {
     if (!Recognition) return;
+    openTheEar();
     if (dictRec.current) { dictStop(); return; }
     // Deliberately no focus() here: on a touch device focusing the input
     // summons the on-screen keyboard, and the person asked to speak, not to
@@ -499,6 +507,8 @@ export function Chat({ onPlans }: {
   async function send() {
     const message = input.trim();
     if (!message || !session.profileId || !session.interactorId) return;
+    // Send is the press the spoken reply will ride on.
+    if (speakOn || talking) openTheEar();
     setInput("");
     setError(null);
     setMsgs((m) => [...m, { who: "you", text: message }]);
@@ -1027,7 +1037,14 @@ export function Chat({ onPlans }: {
               📍 {tr("chat.wheretitle", lang)}{whereOpen ? " ✓" : ""}
             </button>
             <button role="menuitem" aria-pressed={speakOn}
-                    onClick={() => { setPlusOpen(false); setSpeakOn((v) => !v); }}>
+                    onClick={() => {
+                      setPlusOpen(false);
+                      setSpeakOn((v) => {
+                        if (v) localStorage.setItem("qrme.chat.speak", "0");
+                        else localStorage.removeItem("qrme.chat.speak");
+                        return !v;
+                      });
+                    }}>
               {speakOn ? "🔊" : "🔇"} {tr("chat.speak", lang)}{speakOn ? " ✓" : ""}
             </button>
           </div>
