@@ -63,11 +63,24 @@ def test_the_two_ears_do_not_share_a_handle():
 
 
 def test_the_bar_is_ready_for_the_words():
-    """Asked for: the caret in the bar, so dictated words land where the
-    person is already looking."""
-    assert "autoFocus" in CHAT, "the composer does not take the caret"
-    assert "inputRef.current?.focus()" in CHAT, (
-        "dictation does not put the caret in the bar it writes into")
+    """Asked for, then asked again the other way. The first field call put
+    the caret in the bar so dictated words landed where the person was
+    looking — and the second watched the on-screen keyboard ride that caret
+    up over the conversation: "when you press the audio button ... I want
+    the recording feature, but no keyboard popping up."
+
+        asked     where do the dictated words land
+        mattered  does asking to speak summon a keyboard
+
+    So the bar draws the recording (the voice-memo strip), the words land
+    in the field when it stops, and only a tap into the field itself takes
+    the caret."""
+    assert "chat-recbar" in CHAT, "the recording bar is gone"
+    body = re.search(r"function dictate\(\) \{(.*?)\n  \}", CHAT, re.S)
+    assert body, "no dictate() to read"
+    assert ".focus()" not in body.group(1), (
+        "dictation focuses the field — on a touch device that summons the "
+        "keyboard the owner asked to keep down")
 
 
 def test_the_safety_doors_are_folded_and_not_deleted():

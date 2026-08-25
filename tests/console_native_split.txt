@@ -1,4 +1,4 @@
-# status: backlog — 24 rows
+# status: backlog — 9 rows
 #
 # English strings held by both the desktop console's table and a shell's, on
 # which no console row and no native row share a wording. Checked by
@@ -81,28 +81,22 @@
 #     `test_the_three_shells_say_the_same_thing.py`, zero rows in all three
 #     products.
 #
-# ceiling: 24
+#   * **The pronoun family closed in 1.8.4.** The split-wordings round gave
+#     the shells English that names its object — *Show the avatar*, *Take
+#     the microphone back*, *Withdraw from the deal* — so the console's
+#     *Show it* no longer shares an English string with them at all, and
+#     eighteen rows left this file by the gap ceasing to exist. *Trade*
+#     narrowed the same way: `counter.trade` became *Craft* (the trade a
+#     person practises, named as such), leaving only the tab label sharing
+#     the word with the console's placeholder.
+#
+# ceiling: 9
 ios: vce.sayit :: nvoi.say  ("Say something in it")
-ios: rch.show :: ava.show,cam.show,lend.show,org.show,work.show  ("Show it")
-ios: lby.takeback,liv.takeback :: modq.retract,place.mic.back,room.mic.back  ("Take it back")
-ios: sell.listing.down :: counter.sticker.drop,disp.down  ("Take it down")
-ios: liv.takeoff :: deals.drop,place.mask.off,veil.off  ("Take it off")
-ios: desk.open.trade.ph :: counter.trade,nmg.t.trade  ("Trade")
+ios: desk.open.trade.ph :: nmg.t.trade  ("Trade")
 ios: liv.wearit :: embl.set  ("Wear it")
-ios: exc.withdraw :: deals.withdraw,people.withdraw  ("Withdraw")
 android: vce.sayit :: nvoi.say  ("Say something in it")
-android: rch.show :: ava.show,cam.show,lend.show,org.show,work.show  ("Show it")
-android: lby.takeback,liv.takeback :: modq.retract,place.mic.back,room.mic.back  ("Take it back")
-android: sell.listing.down :: counter.sticker.drop,disp.down  ("Take it down")
-android: liv.takeoff :: deals.drop,place.mask.off,veil.off  ("Take it off")
-android: desk.open.trade.ph :: counter.trade,nmg.t.trade  ("Trade")
+android: desk.open.trade.ph :: nmg.t.trade  ("Trade")
 android: liv.wearit :: embl.set  ("Wear it")
-android: exc.withdraw :: deals.withdraw,people.withdraw  ("Withdraw")
 windows: vce.sayit :: nvoi.say  ("Say something in it")
-windows: rch.show :: ava.show,cam.show,lend.show,org.show,work.show  ("Show it")
-windows: lby.takeback,liv.takeback :: modq.retract,place.mic.back,room.mic.back  ("Take it back")
-windows: sell.listing.down :: counter.sticker.drop,disp.down  ("Take it down")
-windows: liv.takeoff :: deals.drop,place.mask.off,veil.off  ("Take it off")
-windows: desk.open.trade.ph :: counter.trade,tab.trade  ("Trade")
+windows: desk.open.trade.ph :: tab.trade  ("Trade")
 windows: liv.wearit :: embl.set  ("Wear it")
-windows: exc.withdraw :: deals.withdraw,people.withdraw  ("Withdraw")
