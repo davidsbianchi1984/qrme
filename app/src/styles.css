@@ -862,13 +862,18 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    time, and nothing said it had. A fixed width and height are not a size
    unless the box is also told not to give them up.
 
+   And the size it keeps is small, on every screen. The face was the biggest
+   thing on the surface, and each of the four rail buttons opens a panel that
+   needs the room more — the owner's call: a panel showing one or two lines
+   is not a panel. The face identifies; the panels are what somebody opened.
+
        asked     is the face given a size
        mattered  can anything take it back */
-.talk-face { width: min(58vw, 260px); height: min(58vw, 260px);
+.talk-face { width: min(30vw, 120px); height: min(30vw, 120px);
   flex: 0 0 auto;
   position: relative;
-  border-radius: 50%; overflow: hidden; border: 3px solid var(--line);
-  box-shadow: 0 0 40px rgba(64,224,255,0.25); }
+  border-radius: 50%; overflow: hidden; border: 2px solid var(--line);
+  box-shadow: 0 0 28px rgba(64,224,255,0.25); }
 /* The designation, over the face it belongs to. `Avatar.watermark` is
    documented as "always displayed, by the product's own rule" and this
    surface — the one where the face is largest and talking — was the one
@@ -889,7 +894,7 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .talk-face.empty img { object-fit: contain; padding: 18%; }
 /* The upper-torso form, standing on the talk surface at full figure. */
 .talk-torso {
-  width: min(46vw, 220px); height: min(62vw, 300px);
+  width: min(24vw, 110px); height: min(32vw, 150px);
   flex: 0 0 auto;
   object-fit: cover; object-position: top;
   border-radius: 26px 26px 14px 14px;
@@ -907,7 +912,7 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   0%, 100% { transform: scale(1); box-shadow: 0 0 34px rgba(64,224,255,0.35); }
   50% { transform: scale(1.05); box-shadow: 0 0 64px rgba(64,224,255,0.6); }
 }
-.talk-name { font-size: 20px; font-weight: 800; }
+.talk-name { font-size: 17px; font-weight: 800; }
 .talk-heard { max-width: 480px; font-size: 15px; color: var(--txt);
   background: rgba(255,255,255,0.05); border: 1px solid var(--line);
   border-radius: 14px; padding: 10px 14px; }
@@ -1082,8 +1087,21 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .talk-rail-label { font-size: 10px; font-weight: 600; max-width: 60px;
                    text-align: center; overflow: hidden;
                    text-overflow: ellipsis; white-space: nowrap; }
-.talk-panel { max-height: 60vh; overflow-y: auto; width: min(96vw, 720px);
+.talk-panel { max-height: 60vh; min-height: 180px; flex: none;
+              overflow-y: auto; width: min(96vw, 720px);
               text-align: left; }
+/* A short landscape screen — the handheld — gets the panel by taking the
+   room from the face, which the owner offered by name: "you can make the
+   photo a lot smaller if you need room". One line of dials is not a
+   panel. */
+@media (max-height: 600px) {
+  .talk-overlay { gap: 8px; padding: 12px 24px; }
+  .talk-face { width: min(20vh, 100px); height: min(20vh, 100px); }
+  .talk-torso { max-height: 22vh; }
+  .talk-name { font-size: 15px; }
+  .waveform { height: 22px; margin: 0; }
+  .talk-panel { max-height: none; flex: 1 1 auto; min-height: 140px; }
+}
 /* The portrait beside the chat title — the same face the talk overlay
    shows, at header scale. */
 .chat-head { display: flex; align-items: center; gap: 12px; }
