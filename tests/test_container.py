@@ -56,6 +56,15 @@ def test_database_lives_on_a_mounted_volume():
     assert 'VOLUME ["/data"]' in DOCKERFILE
 
 
+def test_healthcheck_matches_the_port_the_suite_harness_expects():
+    """Ported from the sibling. The Dockerfile health-checks on a port; a
+    default that disagreed with the one the beta compose file publishes would
+    leave the service permanently unhealthy there, restarting forever while
+    answering fine on the port nobody probed."""
+    assert "EXPOSE 8000" in DOCKERFILE
+    assert "http://127.0.0.1:8000/health" in DOCKERFILE
+
+
 def test_service_does_not_run_as_root():
     assert re.search(r"^USER qrme", DOCKERFILE, re.MULTILINE)
     assert DOCKERFILE.index("USER qrme") < DOCKERFILE.index("CMD ")

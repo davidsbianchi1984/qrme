@@ -63,6 +63,7 @@ import pytest
 from qrme import offline
 
 from . import ratchets
+import re
 
 
 def _repo_root() -> Path:
@@ -154,6 +155,36 @@ def _egress_sites() -> list[tuple[str, int, str, bool]]:
                                   holder is not None and _gate_calls(holder)))
                     break
     return found
+
+
+def test_the_console_reads_it_rather_than_only_binding_it():
+    """A binding is not a door — the estate's own lesson, ported the night
+    the classifier noticed this product had the code and not the guard. The
+    console binds `offlineStatus` and Settings renders it; nothing held
+    either half, so a refactor could drop the screen's read and the posture
+    would go back to being a route nobody meets.
+
+        asked     does a screen mention the binding
+        mattered  does a screen call it
+
+    Comments stripped first, for the sibling's recorded reason: the injection
+    that proved it necessary replaced the call with
+    `null /* api.offlineStatus() */`, and a substring search called that a
+    door.
+    """
+    console = REPO / "app" / "src"
+    binding = (console / "api.ts").read_text(encoding="utf-8")
+    assert "offlineStatus" in binding, "the console cannot ask for the posture"
+    used = []
+    for screen in (console / "screens").glob("*.tsx"):
+        text = re.sub(r"/\*.*?\*/", "", screen.read_text(encoding="utf-8"),
+                      flags=re.S)
+        text = re.sub(r"//[^\n]*", "", text)
+        if re.search(r"\bapi\s*\.\s*offlineStatus\s*\(", text):
+            used.append(screen)
+    assert used, (
+        "`api.offlineStatus` is bound and no screen calls it, so the posture "
+        "is a route nobody meets")
 
 
 def test_the_extraction_finds_the_paths_out():
