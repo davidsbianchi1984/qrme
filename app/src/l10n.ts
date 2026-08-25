@@ -8062,6 +8062,9 @@ const CHROME: Table = {
   "chat.doors": {
     en: "If this needs a person, or an emergency", es: "Si esto necesita una persona, o una emergencia", fr: "S'il faut une personne, ou en cas d'urgence", de: "Wenn das einen Menschen braucht, oder im Notfall", pt: "Se isto precisa de uma pessoa, ou de uma emergência", it: "Se serve una persona, o in caso di emergenza", ja: "人が必要なとき、または緊急のとき", zh: "如果这需要真人，或遇到紧急情况", hi: "अगर इसके लिए कोई इंसान चाहिए, या आपात स्थिति हो", ar: "إذا كان هذا يحتاج إنسانًا، أو في حالة طارئة",
   },
+  "chat.rec.cancel": {
+    en: "Discard the recording", es: "Descartar la grabación", fr: "Abandonner l'enregistrement", de: "Aufnahme verwerfen", pt: "Descartar a gravação", it: "Scartare la registrazione", ja: "録音を破棄", zh: "丢弃录音", hi: "रिकॉर्डिंग हटाएँ", ar: "تجاهل التسجيل",
+  },
   "chat.rec.live": {
     en: "Recording…", es: "Grabando…", fr: "Enregistrement…", de: "Aufnahme läuft…", pt: "A gravar…", it: "Registrazione…", ja: "録音中…", zh: "录音中…", hi: "रिकॉर्ड हो रहा है…", ar: "يسجّل…",
   },

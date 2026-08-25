@@ -1095,21 +1095,25 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    panels beneath them get the room. */
 .talk-actions button { padding: 6px 14px; font-size: 14px; }
 .talk-tap, .talk-state { cursor: pointer; }
-/* The bar while it is an ear. A press anywhere on it closes the ear. */
-.chat-recording { flex: 1; display: flex; align-items: center; gap: 8px;
-                  min-width: 0; padding: 8px 12px; border-radius: 10px;
-                  background: rgba(13,10,32,0.62);
-                  border: 1px solid var(--accent); color: inherit;
-                  cursor: pointer; text-align: left; }
-.chat-rec-dot { width: 10px; height: 10px; border-radius: 50%;
-                background: #e05555; flex: none;
-                animation: rec-pulse 1.2s ease-in-out infinite; }
-.chat-rec-live { flex: 1; min-width: 0; overflow: hidden;
-                 text-overflow: ellipsis; white-space: nowrap; }
-@keyframes rec-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-@media (prefers-reduced-motion: reduce) {
-  .chat-rec-dot { animation: none; }
-}
+/* The bar while it is an ear, drawn the way a voice memo draws itself:
+   discard, the levels actually read, keep. The bars are data — scaled per
+   reading by the component — because a keyframe cannot be told whether
+   the microphone is alive, and would wave over a dead one. */
+.chat-recbar { flex: 1; display: flex; align-items: center; gap: 8px;
+               min-width: 0; padding: 6px 8px; border-radius: 999px;
+               background: rgba(13,10,32,0.62);
+               border: 1px solid var(--line); }
+.rec-strip { flex: 1; min-width: 0; display: flex; align-items: center;
+             justify-content: flex-end; gap: 3px; height: 24px;
+             overflow: hidden; }
+.rec-bar { width: 3px; min-height: 4px; border-radius: 2px; flex: none;
+           background: #cfd2e8; }
+.rec-x, .rec-ok { width: 30px; height: 30px; border-radius: 50%; flex: none;
+                  display: inline-flex; align-items: center;
+                  justify-content: center; font-size: 15px; cursor: pointer; }
+.rec-x { background: rgba(255,255,255,0.10); border: 0; color: inherit; }
+.rec-ok { background: var(--accent); border: 0; color: #0d0a20;
+          font-weight: 700; }
 /* The reading under the figure. Height and gap only — the bars are scaled
    by the component, because a CSS keyframe cannot be told what is happening
    and would animate on a dead microphone. */

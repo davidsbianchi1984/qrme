@@ -169,6 +169,13 @@ export function Chat({ onPlans }: {
    *  two microphones with two destinations and must not share a handle. */
   const dictRec = useRef<{ stop: () => void } | null>(null);
   const [dictating, setDictating] = useState(false);
+  // The recording bar's level history — real readings off a real analyser,
+  // newest at the right, the way a voice memo draws itself. An empty array
+  // when no analyser could open; the bar then shows its resting dots and
+  // the recording still works.
+  const [dictLevels, setDictLevels] = useState<number[]>([]);
+  const dictMeter = useRef<{ stop: () => void } | null>(null);
+  const dictBefore = useRef("");
   const inputRef = useRef<HTMLInputElement | null>(null);
   // Why the ear closed, when it closed for a reason rather than a silence.
   // A caption that only ever falls back to "tap to talk" cannot tell a
@@ -417,6 +424,59 @@ export function Chat({ onPlans }: {
    *     asked     does the microphone open
    *     mattered  where do the words it hears go
    */
+  /** A real meter behind the recording bar. Its own stream beside the
+   *  recogniser's — refusal is harmless: the bars rest and the words
+   *  still arrive, the same posture the room's ear takes. */
+  async function startDictMeter() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const w = window as unknown as {
+        AudioContext?: typeof AudioContext;
+        webkitAudioContext?: typeof AudioContext;
+      };
+      const Ctx = w.AudioContext ?? w.webkitAudioContext;
+      if (!Ctx) { stream.getTracks().forEach((t) => t.stop()); return; }
+      const ctx = new Ctx();
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 1024;
+      ctx.createMediaStreamSource(stream).connect(analyser);
+      const wave = new Uint8Array(analyser.fftSize);
+      const tick = window.setInterval(() => {
+        analyser.getByteTimeDomainData(wave);
+        let peak = 0;
+        for (let i = 0; i < wave.length; i++) {
+          const dev = Math.abs(wave[i] - 128);
+          if (dev > peak) peak = dev;
+        }
+        const level = Math.min(1, peak / 40);
+        setDictLevels((l) => [...l.slice(-46), level]);
+      }, 90);
+      dictMeter.current = {
+        stop: () => {
+          window.clearInterval(tick);
+          stream.getTracks().forEach((t) => t.stop());
+          void ctx.close().catch(() => {});
+        },
+      };
+    } catch { /* no meter is not no recording */ }
+  }
+
+  function stopDictMeter() {
+    dictMeter.current?.stop();
+    dictMeter.current = null;
+  }
+
+  /** The ✕ on the recording bar: close the ear and put the field back the
+   *  way it was — a cancelled recording leaves no words behind. */
+  function dictCancel() {
+    const rec = dictRec.current;
+    dictRec.current = null;
+    setDictating(false);
+    stopDictMeter();
+    rec?.stop();
+    setInput(dictBefore.current);
+  }
+
   function dictate() {
     if (!Recognition) return;
     openTheEar();
@@ -430,9 +490,14 @@ export function Chat({ onPlans }: {
     rec.continuous = true;
     rec.interimResults = true;
     const before = input;
+    dictBefore.current = input;
+    setDictLevels([]);
+    void startDictMeter();
     let settled = "";
     let seen = 0;
+    const handle = { stop: () => rec.stop() };
     rec.onresult = (e: any) => {
+      if (dictRec.current !== handle) return;
       let live = "";
       for (let i = seen; i < e.results.length; i++) {
         const r = e.results[i];
@@ -447,7 +512,9 @@ export function Chat({ onPlans }: {
       const heardNow = (settled + (live ? " " + live : "")).trim();
       setInput((before ? before + " " : "") + heardNow);
     };
-    rec.onend = () => { dictRec.current = null; setDictating(false); };
+    rec.onend = () => {
+      dictRec.current = null; setDictating(false); stopDictMeter();
+    };
     rec.onerror = (e: any) => {
       const why = String(e?.error || "");
       if (why === "no-speech" || why === "aborted") return;
@@ -455,7 +522,7 @@ export function Chat({ onPlans }: {
       setDictating(false);
       setEarTrouble(why || "start-refused");
     };
-    dictRec.current = { stop: () => rec.stop() };
+    dictRec.current = handle;
     setDictating(true);
     try {
       rec.start();
@@ -470,6 +537,7 @@ export function Chat({ onPlans }: {
     const rec = dictRec.current;
     dictRec.current = null;
     setDictating(false);
+    stopDictMeter();
     rec?.stop();
   }
 
@@ -1094,18 +1162,30 @@ export function Chat({ onPlans }: {
                   onClick={dictating ? dictStop : dictate}>🎤</button>
         )}
         {dictating ? (
-          /* The bar itself says it is recording. A button rather than a
-             live input, so the on-screen keyboard stays down: the words
-             arrive when the ear closes, and the field is there to edit
-             them only if the person then taps into it. */
-          <button type="button" className="chat-recording" aria-live="polite"
-                  onClick={dictStop}>
-            <span className="chat-rec-dot" aria-hidden="true" />
-            <span className="chat-rec-live">
-              {input || tr("chat.rec.live", lang)}
-            </span>
-            <span className="muted small">{tr("chat.rec.stop", lang)}</span>
-          </button>
+          /* The bar is the recording, drawn like a voice memo draws
+             itself: discard on the left, the levels the analyser actually
+             read in the middle, keep on the right. No live input, so the
+             on-screen keyboard stays down; the words land in the field
+             when the ✓ closes the ear, and only a tap into the field
+             summons a keyboard. */
+          <div className="chat-recbar" role="group"
+               aria-label={tr("chat.rec.live", lang)}>
+            <button type="button" className="rec-x"
+                    aria-label={tr("chat.rec.cancel", lang)}
+                    onClick={dictCancel}>×</button>
+            <div className="rec-strip" aria-hidden="true">
+              {dictLevels.length === 0 && (
+                <span className="rec-bar" style={{ height: "4px" }} />
+              )}
+              {dictLevels.map((v, i) => (
+                <span key={i} className="rec-bar"
+                      style={{ height: `${4 + Math.round(v * 18)}px` }} />
+              ))}
+            </div>
+            <button type="button" className="rec-ok"
+                    aria-label={tr("chat.rec.stop", lang)}
+                    onClick={dictStop}>✓</button>
+          </div>
         ) : (
           <input
             ref={inputRef}
