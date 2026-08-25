@@ -45,6 +45,16 @@ L10N = (REPO / "app/src/l10n.ts").read_text(encoding="utf-8")
 LANGS = ("en", "es", "fr", "de", "pt", "it", "ja", "zh", "hi", "ar")
 
 
+def test_the_widget_is_mounted_in_the_shell():
+    """Ported from the sibling. Every check in this file reads the component's
+    own source, so all of them keep passing on a component nothing renders —
+    unmounting `<WatchLights />` from the shell would orphan the file and the
+    suite would call the orphan healthy."""
+    app = (REPO / "app/src/App.tsx").read_text(encoding="utf-8")
+    assert "<WatchLights />" in app, (
+        "the watch lights are no longer part of the shell")
+
+
 def test_a_failed_first_fetch_leaves_a_dot_not_a_blank():
     """The structural claim: in the no-face branch the *only* bare exit is
     the guarded one, so the unlit dot is reachable — a branch that merely
