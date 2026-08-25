@@ -35,6 +35,35 @@ def test_offline_status_reports_no_external_transmission(offline_client):
     assert "no cloud gateway calls" in s["guarantees"]
 
 
+def test_the_route_is_open_because_the_posture_precedes_the_account(client):
+    """Ported from the sibling, and it had grown two fields in the meantime.
+
+    An operator standing up an on-prem deployment confirms the posture before
+    there is anything to sign in with, so this route answers a bare GET with
+    no credential — the sibling reasoned it open, like `/health`, on the
+    grounds that the answer names no person, no record and no credential.
+
+    That reasoning is a claim about the *fields*, and nothing here was
+    checking them. This product's posture has since grown `data_locality` and
+    `provider`, neither of which the sibling has. Both name a deployment
+    rather than a person, so both are listed — but they were added with no
+    guard asking the question, and the next field will not be.
+
+        asked     is the posture readable without an account
+        mattered  is everything on it safe to hand a stranger
+    """
+    answered = client.get("/offline/status", headers={"authorization": ""})
+    assert answered.status_code == 200, answered.text
+    body = answered.json()
+    assert "offline" in body and "external_transmission_possible" in body
+    for key in body:
+        assert key in ("offline", "cloud_attached",
+                       "external_transmission_possible", "guarantees",
+                       "data_locality", "provider"), (
+            f"the posture grew a {key!r} field — check it names no person, no "
+            "record and no credential before leaving this route open")
+
+
 def test_offline_refuses_the_injected_cloud(offline_client):
     # Even though a cloud client was injected, offline drops it.
     assert offline_client.get("/cloud/status").json()["cloud"] is False
