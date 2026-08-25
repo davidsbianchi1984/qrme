@@ -1,4 +1,4 @@
-# status: backlog — 40 rows
+# status: backlog — 0 rows
 #
 # One English string carried by two or more keys whose ten translations do not
 # agree. Checked by test_the_same_sentence_translated_twice.py, matched exactly
@@ -78,47 +78,6 @@
 # in the console are not compared by anything. That is the next bite, and it is
 # larger than this one.
 #
-# ceiling: 42
-
+# ceiling: 0
 # Ten of these are one English pronoun standing for a different object each time.
-ios: org.name place.mask.name  ("A name for it" — a mask's name and an organization's)
-ios: ava.set spec.set  ("Attach it" — an avatar and a specialist)
-ios: cam.close camp.close lend.close  ("Close it" — a camera, a campaign, a loan)
-ios: counter.open.go pub.object.open  ("Open it" — a desk and a contested object)
-ios: hand.revoke task.revoke  ("Revoke it" — a handoff and a task grant)
-ios: ava.show cam.show lend.show org.show work.show  ("Show it")
-ios: bot.dials.set steer.set  ("Steer it" — a robot and a persona)
-ios: modq.retract place.mic.back room.mic.back  ("Take it back" — a lent mic, a queued post)
-ios: counter.sticker.drop disp.down  ("Take it down" — a sticker and a display)
-ios: deals.drop place.mask.off veil.off  ("Take it off" — a mask, a veil, a deal)
 # One English word doing two jobs.
-ios: till.camp.goal work.goal  ("Goal" — a fundraising target and an objective)
-ios: ndsk.signed nsig.signed  ("Signed" — signed in at a desk, and a signed document)
-ios: counter.trade nmg.t.trade  ("Trade" — a craft, and commerce)
-ios: deals.withdraw people.withdraw  ("Withdraw" — withdraw yourself, and withdraw a request)
-android: org.name place.mask.name  ("A name for it")
-android: ava.set spec.set  ("Attach it")
-android: cam.close camp.close lend.close  ("Close it")
-android: counter.open.go pub.object.open  ("Open it")
-android: hand.revoke task.revoke  ("Revoke it")
-android: ava.show cam.show lend.show org.show work.show  ("Show it")
-android: bot.dials.set steer.set  ("Steer it")
-android: modq.retract place.mic.back room.mic.back  ("Take it back")
-android: counter.sticker.drop disp.down  ("Take it down")
-android: deals.drop place.mask.off veil.off  ("Take it off")
-android: till.camp.goal work.goal  ("Goal")
-android: counter.trade nmg.t.trade  ("Trade")
-android: deals.withdraw people.withdraw  ("Withdraw")
-windows: org.name place.mask.name  ("A name for it")
-windows: ava.set spec.set  ("Attach it")
-windows: cam.close camp.close lend.close  ("Close it")
-windows: counter.open.go pub.object.open  ("Open it")
-windows: hand.revoke task.revoke  ("Revoke it")
-windows: ava.show cam.show lend.show org.show work.show  ("Show it")
-windows: bot.dials.set steer.set  ("Steer it")
-windows: modq.retract place.mic.back room.mic.back  ("Take it back")
-windows: counter.sticker.drop disp.down  ("Take it down")
-windows: deals.drop place.mask.off veil.off  ("Take it off")
-windows: till.camp.goal work.goal  ("Goal")
-windows: counter.trade tab.trade  ("Trade")
-windows: deals.withdraw people.withdraw  ("Withdraw")
