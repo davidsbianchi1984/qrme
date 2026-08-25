@@ -4,7 +4,7 @@ import { api, type AgentTurn, type WebSearchAnswer,
 import { startWalking } from "../walk";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
-import { plainVoice, speakInPieces, type Speaking } from "../spoken";
+import { openTheEar, plainVoice, speakInPieces, type Speaking } from "../spoken";
 import { useSession } from "../store";
 import { putAway, whenPutAway } from "../away";
 
@@ -482,6 +482,7 @@ export function Agent({ onPlans, go }: {
   }
 
   async function send() {
+    openTheEar();
     if (searchMode) return doSearch(ask);
     if (pending) return postIt();
     return sendSaid(ask);
@@ -507,6 +508,12 @@ export function Agent({ onPlans, go }: {
       // idle clock restarts, so a long answer never eats into the
       // person's two minutes.
       if (voiceMode) {
+        setSaying(true);
+        void speakReply(turn.reply);
+      } else if (localStorage.getItem("qrme.chat.speak") !== "0") {
+        // A typed turn is still a conversation with a profile that has a
+        // voice, so the reply speaks — under the same remembered mute the
+        // chat thread keeps, one choice for every typed surface.
         setSaying(true);
         void speakReply(turn.reply);
       } else {
