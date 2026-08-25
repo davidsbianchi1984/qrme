@@ -1114,6 +1114,13 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .rec-x { background: rgba(255,255,255,0.10); border: 0; color: inherit; }
 .rec-ok { background: var(--accent); border: 0; color: #0d0a20;
           font-weight: 700; }
+.rec-stopsq { width: 11px; height: 11px; border-radius: 2px;
+              background: #0d0a20; display: block; }
+/* The arrow send: round, compact, the input gets the width back. */
+.chat-send { width: 36px; height: 36px; min-width: 36px; padding: 0;
+             border-radius: 50%; font-size: 17px; line-height: 1;
+             display: inline-flex; align-items: center;
+             justify-content: center; flex: none; }
 /* The reading under the figure. Height and gap only — the bars are scaled
    by the component, because a CSS keyframe cannot be told what is happening
    and would animate on a dead microphone. */

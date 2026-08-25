@@ -1184,7 +1184,10 @@ export function Chat({ onPlans }: {
             </div>
             <button type="button" className="rec-ok"
                     aria-label={tr("chat.rec.stop", lang)}
-                    onClick={dictStop}>✓</button>
+                    title={tr("chat.rec.stop", lang)}
+                    onClick={dictStop}>
+              <span className="rec-stopsq" aria-hidden="true" />
+            </button>
           </div>
         ) : (
           <input
@@ -1195,9 +1198,12 @@ export function Chat({ onPlans }: {
             onKeyDown={(e) => e.key === "Enter" && send()}
           />
         )}
-        <button className="primary" onClick={send} disabled={busy}>
-          {tr("chat.send", lang)}
-        </button>
+        {/* An arrow, not the word: on a phone the spelt-out Send was
+            width the input needed more. The name stays for the screen
+            reader and the tooltip. */}
+        <button className="primary chat-send" onClick={send} disabled={busy}
+                aria-label={tr("chat.send", lang)}
+                title={tr("chat.send", lang)}>↑</button>
         {/* And this one hands the whole conversation over to voice. It sits
             after Send because it leaves the text surface rather than
             contributing to it — the microphone belongs to the bar, the wave
