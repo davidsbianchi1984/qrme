@@ -43,6 +43,7 @@ import re
 from pathlib import Path
 
 import pytest
+from . import ratchets
 
 
 def _repo_root() -> Path:
@@ -104,7 +105,8 @@ def test_the_row_scan_is_finding_rows(shell):
     """A guard on the guard. A pattern that stopped matching would report
     every row complete by finding none — which is how this whole audit's
     false passes have looked every time."""
-    assert len(_rows(shell)) >= 200, (
+    assert len(_rows(shell)) >= ratchets.floor(
+            f"shellstable.rows.{shell}"), (
         f"only {len(_rows(shell))} row(s) parsed out of {TABLES[shell]}")
 
 

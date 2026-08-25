@@ -1,5 +1,5 @@
-# status: backlog — 17 rows
-# ceiling: 17
+# status: backlog — 9 rows
+# ceiling: 9
 #
 # Every numeric floor in this suite still carrying its own literal: an
 # `assert <something> > <int>` with the number written into the assertion.
@@ -102,11 +102,7 @@
 # count of a swept surface, is always a floor, and may not be excused here
 # however convincing the prose above it. An exemption nothing verifies is a
 # place to hide the numbers this file is meant to find.
-test_a_screen_nothing_opens.py:170: len(found) >= 5
-test_a_screen_nothing_opens.py:287: len(sites) >= 2
-test_native_shells_record_nothing_private.py:138: len(calls) >= 2
 test_termination_revokes_more_than_the_owners_token.py:154: len(found) >= 7
-test_the_desktop_and_the_phone_say_different_things.py:302: len(shared) > 120
 test_the_keys_the_android_client_reads.py:386: len(driven) >= 80
 test_the_refusal_that_handed_the_body_back.py:157: len(found) > 150
 test_the_refusal_that_handed_the_body_back.py:161: reached > 100
@@ -114,8 +110,4 @@ test_the_room_reads_what_you_hand_it.py:166: fn.count('except Exception') >= 2
 test_the_shape_the_client_expects.py:310: len(driven) >= 30
 test_the_shape_the_console_expects.py:457: len(driven) >= 60
 test_the_shape_the_swift_client_expects.py:228: len(driven) >= 25
-test_the_shells_table_answers_every_reader.py:107: len(_rows(shell)) >= 200
-test_the_tabs_are_translated_and_the_screens_are_not.py:554: english + calls >= 50
-test_the_tabs_are_translated_and_the_screens_are_not.py:558: calls >= 1
-test_the_tabs_are_translated_and_the_screens_are_not.py:775: len(rows) >= 10
 test_two_questions_a_mark_answers.py:196: len(why) > 40
