@@ -152,6 +152,7 @@ def build_system_prompt(
     viewer_id: str | None = None,
     among: list[dict] | None = None,
     said: str | None = None,
+    standing: str | None = None,
 ) -> str:
     parts: list[str] = []
 
@@ -373,6 +374,10 @@ def build_system_prompt(
     # already competing for the model's attention with the person in front
     # of it.
     from . import productmap
-    parts.append(productmap.block(said or ""))
+    # A turn spoken among seats IS a room turn — the caller does not have
+    # to say so, because `among` already did.
+    parts.append(productmap.block(
+        said or "",
+        standing=standing or ("room" if among is not None else None)))
 
     return "\n\n".join(parts)

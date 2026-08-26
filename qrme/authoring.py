@@ -675,7 +675,7 @@ def system_prompt(said: str = "") -> str:
         "act through — here is the application this person is in, so that a "
         "question about a screen gets the screen's name rather than a "
         "shrug. You cannot open these; you can say where they are.\n\n"
-        + productmap.block(said))
+        + productmap.block(said, standing="agent"))
 
 
 def tool_names() -> tuple[str, ...]:

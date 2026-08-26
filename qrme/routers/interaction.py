@@ -546,7 +546,10 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         # application the prompt carries. Without it the profile still gets
         # the consent doors and the index of names; with it, the screen they
         # are actually asking about arrives described.
-        said=body.message)
+        said=body.message,
+        # And where they are standing as they say it, so a door is given
+        # from the screen they are actually on.
+        standing=body.standing)
     provider = llm.provider_for_profile(profile_id, cloud=cloud)
     # The remembrance: turns older than the window, folded down and carried,
     # so a friendship does not reset at message thirty-one. Distilled by the

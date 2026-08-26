@@ -439,10 +439,41 @@ def index(exclude: set[str] | None = None) -> str:
     return _INDEX + "; ".join(names)
 
 
-def lines(message: str = "", limit: int = LIMIT) -> list[str]:
-    """The whole block for one turn: core, then relevant, then the index."""
+#: The screens a client can say a person is standing on, by key. A closed
+#: vocabulary rather than free text: the client names a screen it knows it
+#: is, and an unknown key says nothing rather than guessing. Grown beside
+#: DOORS, so the sentence uses the same names the doors do.
+STANDING: dict[str, str] = {
+    "chat": "the Chat screen",
+    "talk": "the Chat screen's talk face — the full-screen voice view",
+    "room": "a room (the Inside screen)",
+    "agent": "the Agent screen",
+}
+
+
+def lines(message: str = "", limit: int = LIMIT,
+          standing: str | None = None) -> list[str]:
+    """The whole block for one turn: core, then relevant, then the index.
+
+    `standing` is which screen the person is looking at while they ask,
+    when the client said. The field report that earned it: asked where to
+    attach a file, a profile described the Chat composer's briefcase — to
+    somebody standing in a room, whose file door is the paperclip by the
+    Type box. Every door it named existed; none of them were where the
+    person was. Directions start from where somebody stands or they are
+    trivia.
+    """
     picked = selected(message, limit)
     out = [core()]
+    place = STANDING.get(standing or "")
+    if place:
+        out.insert(0, (
+            f"They are standing on {place} RIGHT NOW. Give directions from "
+            "where they stand: a control on that screen is pointed to as it "
+            "appears there, and a control on any other screen is said to be "
+            "on that other screen, by name — directions for a screen they "
+            "are not on send somebody hunting for a briefcase that is not "
+            "there."))
     if picked:
         out.append("also relevant to what they just said:\n"
                    + "\n".join(_row(d) for d in picked))
@@ -450,6 +481,6 @@ def lines(message: str = "", limit: int = LIMIT) -> list[str]:
     return out
 
 
-def block(message: str = "") -> str:
+def block(message: str = "", standing: str | None = None) -> str:
     """One string, for a prompt that is assembled by joining parts."""
-    return "\n".join(lines(message))
+    return "\n".join(lines(message, standing=standing))

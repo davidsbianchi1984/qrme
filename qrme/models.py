@@ -221,6 +221,11 @@ class ChatRequest(BaseModel):
     message: str
     modality: Modality = "text"        # requested output modality
     surface: str | None = None         # which registered surface this is from
+    # Which console screen the person is looking at as they ask —
+    # productmap.STANDING's vocabulary ("chat", "talk", ...). Distinct from
+    # `surface`, which names a registered display. Directions start from
+    # where somebody stands or they are trivia.
+    standing: str | None = None
     # Real-time biometric monitoring context (claim 23): e.g. stress_level
     # (0..1), heart_rate, condition — typically supplied by JIM-mini.
     biometrics: dict | None = None

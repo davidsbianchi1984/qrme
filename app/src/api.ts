@@ -3659,6 +3659,10 @@ export const api = {
 
   chat: (profileId: string, body: {
     interactor_id: string; message: string;
+    // Which console screen the person is looking at as they ask — the
+    // server's productmap.STANDING vocabulary. Directions start from
+    // where somebody stands or they are trivia.
+    standing?: string;
     // Environmental context (spec clause 1): the reply adapts to where the
     // person actually is. Optional; echoed back on the response.
     environment?: { location?: string; conditions?: string;

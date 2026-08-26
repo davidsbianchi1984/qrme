@@ -6,6 +6,28 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The guide knows where you're standing.** Asked where to attach a
+  file, a profile described the Chat composer's briefcase to somebody
+  standing in a room — every door it named existed, none were where the
+  person was. The client now says which screen the person is looking at
+  (the typed chat, the talk face, a room, the agent), and directions
+  start from there: a control on that screen is pointed to as it
+  appears, a control elsewhere is named as being on its own screen.
+
+- **The room's mic-lend toggle says its state in words** — "Lend them
+  my microphone" / "Take my microphone back" — after its glyph read as
+  "a person in a doorway" on a Windows handheld and the press looked
+  dead.
+
+- **The invite panel opens on the desktop room too.** Both room overlays
+  — the invite scrim and the press-and-hold options — sat at a layer
+  beneath the full-bleed stage the desktop room paints, so on a computer
+  the 👤+ press opened the panel underneath the room and read as a dead
+  button. The phone's flowed layout has no stage, which is how the
+  defect hid there.
+
 ## [1.8.6] - 2026-08-27
 
 ### Added

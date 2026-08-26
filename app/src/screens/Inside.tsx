@@ -1654,7 +1654,13 @@ export function Inside({ onPlans, start = "", onLeave }: {
          * Two states, not one, because lending and taking back are
          * different acts and a toggle that says "microphone" for both
          * tells you nothing about which way it is pointing. */}
-        <button className={"rs-round lend" + (lentByMe ? " live" : "")}
+        {/* In words now, like "Let it talk first" and for the same
+            report — the glyph read as "a person in a doorway" on a
+            Windows handheld and the press looked dead because the only
+            feedback was a note below the fold. The label IS the state:
+            it says which way the toggle is pointing before the press
+            and after it. */}
+        <button className={"rs-round rs-worded lend" + (lentByMe ? " live" : "")}
                 disabled={busy || !token || !me || !open}
                 aria-pressed={lentByMe}
                 aria-label={lentByMe ? tr("ins.takeback", lang)
@@ -1668,7 +1674,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
                   }
                 }, lentByMe ? tr("ins.takenback", lang)
                             : tr("ins.lent", lang))}>
-          {lentByMe ? "🎧" : "🎚"}
+          {lentByMe ? tr("ins.takeback", lang) : tr("ins.lendmic", lang)}
         </button>
         {/* Letting the profiles talk without you saying anything. The one
          * control on the card below that was NOT a duplicate, so it moved

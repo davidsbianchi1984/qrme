@@ -890,6 +890,9 @@ export function Chat({ onPlans }: {
       const reply = await api.chat(session.profileId, {
         interactor_id: session.interactorId,
         message,
+        // Where they are standing as they ask — the talk face and the
+        // typed screen are different rooms to give directions in.
+        standing: talking ? "talk" : "chat",
         environment,
         // Spec clauses 2/12: ask the profile to work as an advisor,
         // collaborator or operator. Left on "read the prompt" the profile
