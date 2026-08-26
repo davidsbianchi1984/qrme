@@ -379,8 +379,17 @@ export function Agent({ onPlans, go }: {
       // and the relight in onend is the right answer.
       const code = e.error || "";
       if (code === "not-allowed" || code === "service-not-allowed") {
+        // On iPhones these arrive with the microphone permission reading
+        // Allow — the platform refusing its own recogniser, not the person
+        // refusing the page. The recorded ear answers where it can, and
+        // the blocked sentence is kept for the case where nothing can
+        // record, which is what blocked actually looks like.
         fatal = true;
-        setEarFault(tr("agent.ear.blocked", lang));
+        if (canRecord() && session.interactorId) {
+          void voiceRecord();
+        } else {
+          setEarFault(tr("agent.ear.blocked", lang));
+        }
       } else if (code === "audio-capture") {
         fatal = true;
         setEarFault(tr("agent.ear.nomic", lang));
@@ -519,7 +528,15 @@ export function Agent({ onPlans, go }: {
     r.onerror = (e: { error?: string }) => {
       const code = e.error || "";
       if (code === "not-allowed" || code === "service-not-allowed") {
-        setEarFault(tr("agent.ear.blocked", lang));
+        // The same iPhone fork as the orb's: Allow on the page, refusal
+        // from the platform's recogniser. Route to the recorded ear when
+        // one can run; say blocked only when it cannot.
+        if (canRecord() && session.interactorId) {
+          routed = true;
+          void dictRecord();
+        } else {
+          setEarFault(tr("agent.ear.blocked", lang));
+        }
       } else if (code === "audio-capture") {
         setEarFault(tr("agent.ear.nomic", lang));
       } else if (code === "network") {

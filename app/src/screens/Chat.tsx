@@ -408,11 +408,18 @@ export function Chat({ onPlans }: {
       // close a fifth of a second after it opened.
       if ((why === "no-speech" || why === "aborted")
           && wantsEar.current && !putAway()) return;
-      // The one fault this console can route around: the recogniser exists
-      // but its speech service is unreachable — the handheld's report,
-      // `network` on every start. The conversation moves to the recorded
-      // ear and the deployment's own transcriber does the hearing.
-      if (why === "network" && canRecord() && session.interactorId) {
+      // The faults this console can route around. `network` is the
+      // recogniser's speech service unreachable — the handheld's report.
+      // `service-not-allowed` and `not-allowed` are iPhones refusing
+      // Apple's own recogniser while the microphone permission reads
+      // Allow — the field report was a person staring at Safari's own
+      // settings saying Allow while this screen told them to go allow it.
+      // The recorded ear answers all three, and it is self-correcting: if
+      // the person truly blocked the microphone, the recording fails at
+      // getUserMedia and says so honestly.
+      if ((why === "network" || why === "service-not-allowed"
+           || why === "not-allowed")
+          && canRecord() && session.interactorId) {
         talkRec.current = null;
         void talkRecord(settled);
         return;
@@ -609,10 +616,15 @@ export function Chat({ onPlans }: {
     rec.onerror = (e: any) => {
       const why = String(e?.error || "");
       if (why === "no-speech" || why === "aborted") return;
-      // Same route-around as the overlay's: an unreachable speech service
-      // hands the bar to the recorded ear. The meter restarts inside it,
-      // fed by the recording's own analyser.
-      if (why === "network" && canRecord() && session.interactorId) {
+      // Same route-around as the overlay's, and for the same three codes:
+      // an unreachable speech service — or an iPhone refusing its own
+      // recogniser under `not-allowed`/`service-not-allowed` while the
+      // microphone permission reads Allow — hands the bar to the recorded
+      // ear. The meter restarts inside it, fed by the recording's own
+      // analyser.
+      if ((why === "network" || why === "service-not-allowed"
+           || why === "not-allowed")
+          && canRecord() && session.interactorId) {
         stopDictMeter();
         void dictRecord();
         return;
