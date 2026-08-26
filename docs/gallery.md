@@ -599,6 +599,7 @@ is exactly how the old card came to be showing yours in place of theirs.
     <td align="center" width="25%"><a href="screens/201-plug-ins.svg"><img src="screens/201-plug-ins.svg" width="210" alt="Plug-ins"></a><br><sub><b>201</b> · Plug-ins · what it can reach, and what it needs first</sub></td>
     <td align="center" width="25%"><a href="screens/202-what-it-may-do.svg"><img src="screens/202-what-it-may-do.svg" width="210" alt="What it may do"></a><br><sub><b>202</b> · What it may do · every power, and what each one keeps</sub></td>
     <td align="center" width="25%"><a href="screens/203-get-help.svg"><img src="screens/203-get-help.svg" width="210" alt="Get help"></a><br><sub><b>203</b> · Get help · your matter, and what happened to it</sub></td>
+    <td align="center" width="25%"><a href="screens/204-your-circle.svg"><img src="screens/204-your-circle.svg" width="210" alt="Your circle"></a><br><sub><b>204</b> · Your circle · everyone you added, and what they do</sub></td>
   </tr>
 </table>
 

@@ -103,6 +103,11 @@ DOORS: tuple[Door, ...] = (
     Door("Friends", "Friends tab",
          "friends, and the inbox",
          ("friend", "inbox", "message someone", "contacts")),
+    Door("Circle", "Your circle, from See all on the homepage",
+         "everyone you have added, with what each of them does — friends "
+         "only, nothing offered",
+         ("my circle", "see all my friends", "all my friends",
+          "who have i added")),
     Door("Audience", "Audience tab",
          "who follows a profile, and what they pay",
          ("follow", "audience", "subscriber", "who follows")),

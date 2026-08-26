@@ -717,6 +717,17 @@ LESSONS: tuple[dict, ...] = (
          screens=(71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 82, 83, 84, 85, 86,
                   87, 88, 89),
          try_it="Open your page and change the theme."),
+    dict(key="circle", chapter="People", title="Your circle",
+         what="See all, across from Top friends on the homepage, opens the "
+              "friends screen that is only friends: everyone you have added, "
+              "with what each of them does — the face, the blurb, the tags — "
+              "and no add button anywhere, because everybody here already "
+              "said yes. The Friends tab stays the workbench for changing "
+              "the list; this is the list itself. A face opens their page, "
+              "and an empty circle offers Discover, which is the one place "
+              "where offering is the point.",
+         screens=(204,),
+         try_it="Press See all, then press a face."),
     dict(key="mic", chapter="People", title="Lending a microphone",
          what="In a voice room your microphone is busy carrying your voice. "
               "This lends the profiles the one on your watch, so they hear you "
