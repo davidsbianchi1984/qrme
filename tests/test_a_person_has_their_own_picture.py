@@ -56,6 +56,7 @@ from tests.test_capabilities import (as_interactor, make_interactor,  # noqa: F4
 
 ROOT = Path(__file__).resolve().parents[1]
 INSIDE = (ROOT / "app/src/screens/Inside.tsx").read_text(encoding="utf-8")
+IDENTITY = (ROOT / "app/src/screens/Identity.tsx").read_text(encoding="utf-8")
 CSS = (ROOT / "app/src/styles.css").read_text(encoding="utf-8")
 
 PNG = (b"\x89PNG\r\n\x1a\n" + b"\x00\x00\x00\rIHDR"
@@ -228,14 +229,41 @@ def test_the_controls_are_your_own_seats_only():
         assert handler in INSIDE, f"{handler} is not anchored to your own seat"
 
 
-def test_all_three_pictures_have_their_own_button():
-    """The room's photo, the person's own picture, and the background —
-    three different destinations, so three buttons. One button that did
-    all three is how the background ended up replacing people."""
+def test_each_picture_has_its_own_control_where_it_belongs():
+    """Three destinations, three controls — and one of them moved house.
+
+    The first version of this guard held that all three buttons live in the
+    room's controls, and for two of them that is still right: what you show
+    in THIS room, and what stands behind you here, are the room's own
+    decisions. The person's own picture is not — it follows them into every
+    room — and in the room it sat beside "put a picture up" doing what
+    reads as the same thing. The owner asked for it gone by name: the seat
+    DEFAULTS to the person's picture, and the picture is set once, on the
+    Identity screen, where it always had a control of its own.
+
+        asked     does each destination have its own control
+        mattered  is each control where somebody would look for it
+
+    So the room holds two, the Identity screen holds the third, and the
+    concern the first version protected — one button quietly doing three
+    jobs, which is how the background ended up replacing people — is held
+    by the doors staying distinct, not by the buttons sharing a row. The
+    room block must NOT grow the own-picture button back: two buttons for
+    one visible outcome is a menu.
+    """
     block = INSIDE[INSIDE.index('<div className="rs-controls">'):]
     block = block[:block.index("</select>")]
-    for key in ("ins.face.photo", "ins.face.mine", "ins.face.background"):
-        assert key in block, f"{key} has no control"
-    for door in ("api.uploadRoomFace", "api.setOwnPicture",
-                 "api.uploadRoomBackground"):
+    for key in ("ins.face.photo", "ins.face.background"):
+        assert key in block, f"{key} has no control in the room"
+    for door in ("api.uploadRoomFace", "api.uploadRoomBackground"):
         assert door in block, f"{door} is not wired to anything"
+    # Quoted, because `ins.face.mine` is a substring of `ins.face.mineoff`
+    # — the take-it-down button, which stays. The third guard today whose
+    # first draft matched more than it meant.
+    assert 'tr("ins.face.mine"' not in block, (
+        "the own-picture button is back in the room, beside a button that "
+        "reads as the same thing — the seat defaults to the person's "
+        "picture, and its control lives on the Identity screen")
+    assert "idn.mypic" in IDENTITY and "api.setOwnPicture" in IDENTITY, (
+        "the person's own picture has no control anywhere: it left the "
+        "room and the Identity screen is not carrying it either")
