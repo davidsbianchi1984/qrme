@@ -1159,6 +1159,23 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 /* The portrait beside the chat title — the same face the talk overlay
    shows, at header scale. */
 .chat-head { display: flex; align-items: center; gap: 12px; }
+/* "This is way too large — make it smaller to match the scaling of the
+   photo." The banner outweighed the 52px face beside it; the words now
+   hold the face's scale instead of a page-title's. */
+.chat-head-words h2 { font-size: 17px; margin: 0; line-height: 1.25; }
+.chat-head-words .small { font-size: 11px; line-height: 1.35; }
+/* The four conversation panels, docked in the main chat where the owner
+   circled: the right edge, under the loudness rail. Fixed like the rail
+   so scroll does not carry them off. The dock's selectors outweigh the
+   phone media rule that lays the overlay's rail flat, so the column
+   holds at every width; the opened panel swings out to the left of the
+   column rather than into it. */
+.chat-rail-dock .talk-rail { position: fixed; right: 6px;
+                             top: calc(50% + 96px); transform: none;
+                             flex-direction: column; z-index: 84; }
+.chat-rail-dock .talk-panel { position: fixed; right: 76px; top: 50%;
+                              transform: translateY(-50%); z-index: 86;
+                              width: min(86vw, 560px); }
 .chat-head-face { width: 52px; height: 52px; border-radius: 50%;
                   object-fit: cover; border: 2px solid var(--line);
                   flex: none; }

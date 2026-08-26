@@ -10,6 +10,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The four panels meet you in the chat, at the size of the face.** Who
+  they are, what they hold, what you are to each other and how they
+  behave were reachable only inside the talk overlay — a voice feature
+  by accident of placement. They now dock in the main chat where the
+  owner circled: the right edge, under the loudness rail, with the
+  opened panel swinging out beside the column. And the chat banner
+  drops to the scale of the 52px face it sits beside.
+
 - **Your circle — the friends screen that is only friends.** "See all"
   now sits across from Top friends on the homepage and opens a new
   screen: everyone you have added, in the descriptive card style — the

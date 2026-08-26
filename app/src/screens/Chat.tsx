@@ -1362,6 +1362,21 @@ export function Chat({ onPlans }: {
         </div>
       )}
 
+      {/* The same four panels in the main chat — the owner circled the
+          spot: the right edge, docked under the loudness rail. They were
+          reachable only inside the talk overlay, which made them a voice
+          feature by accident of placement. */}
+      {!talking && session.profileId && (
+        <div className="chat-rail-dock">
+          <TalkRail profileId={session.profileId}
+                    interactorId={session.interactorId || null}
+                    lang={lang}
+                    ownerToken={session.ownerToken || null}
+                    interactorToken={session.interactorToken || null}
+                    onError={setError} />
+        </div>
+      )}
+
       {/* Rehearsal: practice the hard conversation — the transcript lives
           only in the room, and closing the room wipes it. While a room is
           open, turns go there instead of the remembered conversation. */}
