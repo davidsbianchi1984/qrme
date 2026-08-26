@@ -6,6 +6,80 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.8.5] - 2026-08-26
+
+### Added
+
+- **A voice its owner released is everybody's, on the record.** The first
+  cloned voice on this deployment was its owner's own, made to be handed
+  around — *anybody can use it, I am waiving my rights to it* — and the
+  claim, doing its job, refused every account but the one that brought it.
+  `spoken.release` is that yes: owner-only by construction, a row rather
+  than a flag (who let it go, when, and when it came back), and while it
+  stands the claim steps aside for that one voice. Reclaiming is personal
+  and takes every other account's binding with it. The watermark is
+  untouched, on every utterance, whoever binds it. Console controls sit on
+  the Spoken voice card; the shells' doors are recorded in their backlogs.
+
+- **The claim stops where nobody's throat begins.** The first live refusal
+  the claim ever produced was over **Daniel** — the premade British voice on
+  the deployment's own picker, fenced off to whichever account clicked
+  first. Premade library voices are unclaimable now; a voice the library
+  cannot vouch for stays claimed, because the cost of the two mistakes is
+  nothing alike.
+
+- **Full blast by default, and a slider that only dials down.** Spoken
+  audio plays at 1.0 — the loudest a page may play — and a fixed vertical
+  rail on the Voice screen's right edge attenuates, remembered per device,
+  applied to the sentence already in the ear. Off to the side on purpose:
+  a control that moves other controls to exist costs more than it gives.
+
+- **The talk face holds a conversation instead of taking dictation.** Four
+  and a half seconds of silence sends the turn — the Send button stays for
+  the person who wants it, but nobody has to find it mid-sentence. While
+  the profile speaks the caption says *speaking*: the ear stays open the
+  whole time so an interruption lands, but a face that says "Listening…"
+  through its own reply reads as a face that never answered. And the roll
+  of the back-and-forth sits on the surface — pinned to its newest line,
+  fading out about four lines up — so a missed sentence doesn't cost the
+  whole screen.
+
+### Fixed
+
+- **An iPhone refusing its own recogniser is not a person refusing the
+  page.** `not-allowed` and `service-not-allowed` arrive with the
+  microphone permission on Allow — the platform refusing Apple's own
+  speech service. Inside forked to the recorded ear ("iOS, every time");
+  Chat and Agent mapped both codes to the blocked sentence and sent
+  somebody to a switch that was already set. All four sites fork now, and
+  the blocked sentence is kept for the case where nothing can record.
+
+- **The first button on the Voice screen sent no credential.** Every
+  voiceprint route is an owner door, and every voiceprint binding in the
+  console sent no token at all — so "This is my own voice" answered
+  `authentication required` to its own owner, and the banner's sign-in
+  link bounced a signed-in person home. The token rides on all six now.
+
+- **A mic is not a muted speaker.** The room's talk toggle drew a slashed
+  speaker while idle — "sound is muted" on a button that means "press to
+  talk". One glyph, two states, lit and dim.
+
+- **The frame shows what its owner chose.** "My own picture" left the room
+  menu — the seat defaults to the person's picture, set once on the
+  Identity screen — a user with no photo is a silhouette rather than a
+  "Y", and the double-tap or long press clears the controls off the frame
+  in every state, not only over a live camera, both directions.
+
+### Changed
+
+- **The records caught up with the siblings.** Twenty guards now shared by
+  all three products joined `shared_guards.txt`; seventy-nine held by
+  exactly two joined `guard_divergences.txt` as `unclassified`, ceilings
+  raised deliberately. The per-shell backlogs took the release routes with
+  the reason. And the picture guard follows the button it guards — with
+  its own first draft caught matching `ins.face.mineoff` by substring, the
+  third guard in two days to read its own surroundings.
+
 ## [1.8.4] - 2026-08-25
 
 ### Changed
@@ -15439,7 +15513,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.4...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.5...HEAD
+[1.8.5]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.4...app-v1.8.5
 [1.8.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.3...app-v1.8.4
 [1.8.3]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.2...app-v1.8.3
 [1.8.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.1...app-v1.8.2
