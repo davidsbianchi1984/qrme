@@ -8,6 +8,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **A profile hands documents over in rooms too — and as PDFs when a PDF
+  was asked for.** The composing fence has been offered in every room
+  prompt since it shipped, but the room never made the split, so a
+  profile that took the offer had its whole document land raw in the
+  transcript, markers showing. The room now runs the chat door's whole
+  ceremony: the fence becomes a real file (AI-marked at the moment it is
+  made, reviewed with the words, stamped), the card rides the turn, and
+  the other profiles in the room read the handed document the way they
+  read a shared file. And the shape is now the person's to ask: a fence
+  title ending `.pdf` arrives as a real multi-page PDF from a built-in
+  writer — verified readable by the estate's own PDF reader — with an
+  honest fallback to Markdown for scripts beyond Latin-1, where a page
+  of substitution marks would be worse than the right words in the
+  wrong costume. `.txt` works the same way; Markdown stays the default.
+
 - **A link pasted into a room is read.** The pair conversation has read
   handed links since the briefcase round; the room never made the call,
   so a profile in a room met every URL as inert text — "fifth link, same

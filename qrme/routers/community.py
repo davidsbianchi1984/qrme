@@ -473,11 +473,48 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
                 "to have picked up background talk, treat it as noise rather "
                 "than as something said to you.")
         content = llm.get_provider(cloud=cloud).generate(system, turns)
-        verdict = moderation.review(content, None, {"birthdate": None},
-                                    maturity=maturity)
+        # A room turn may hand a document over as well as say something.
+        # The guidance has ridden every room prompt since the composing
+        # round — build_system_prompt appends it unconditionally — but the
+        # room never made the split, so a profile that took the offer had
+        # its whole fence land raw in the transcript: the document as a
+        # wall of chat, with the markers showing. Same ceremony as the
+        # chat door (qrme/routers/interaction.py): split before
+        # moderation, so the document is reviewed with the words rather
+        # than slipping past a check the words had to pass.
+        from .. import composing
+        content, composed = composing.split(content)
+        if composed and not content:
+            content = i18n.tr_public(
+                "Here it is.", i18n.effective_language(profile["id"]))
+        verdict = moderation.review(
+            content + (("\n\n" + composed["body"]) if composed else ""),
+            None, {"birthdate": None}, maturity=maturity)
+        document_id, doc_words, doc_digest = None, "", ""
+        if composed and verdict.approved:
+            from .. import media as media_mod
+            try:
+                data, doc_name = composing.render(composed)
+                saved = media_mod.save(profile["id"], data, name=doc_name,
+                                       ai_marked=True)
+                document_id = saved["id"]
+                watermark.stamp(profile["id"], "document", composed["body"])
+            except Exception:  # noqa: BLE001 — a turn that lands beats a
+                document_id = None        # turn refused for a full disk
+            if document_id:
+                # The other profiles in this room read the handed document
+                # the way they read a shared file — and here the body IS
+                # the words, so the reading costs no reader.
+                doc_words = briefcase.capped(composed["body"])
+                try:
+                    doc_digest = briefcase.distill(doc_words,
+                                                   composed["title"])
+                except Exception:               # pragma: no cover
+                    doc_digest = doc_words[:600]
         produced.append(_store_room_message(
             room["id"], "profile", profile["id"], content,
-            verdict.approved, verdict.reason))
+            verdict.approved, verdict.reason, media_id=document_id,
+            media_text=doc_words, media_digest=doc_digest))
     return produced
 
 

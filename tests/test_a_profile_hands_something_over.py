@@ -171,3 +171,121 @@ def test_the_turn_carries_the_card_and_not_the_body(client, profile_id,
     turn = out["profile_message"]
     assert body not in str(turn), "the whole document rode the turn"
     assert turn["document"]["url"]
+
+
+# -- the shape that was asked for --------------------------------------------
+#
+# "Let's let the synthetic profiles generate PDFs." The fence title is the
+# one channel the profile already has, so the shape rides there: a title
+# ending .pdf arrives as a real PDF from the built-in writer; .txt as plain
+# text; everything else stays Markdown, the shape every language fits.
+
+def test_a_pdf_when_a_pdf_was_asked_for():
+    data, name = composing.render(
+        {"title": "Audit plan.pdf", "body": "One page.\nTwo lines."})
+    assert name == "Audit plan.pdf"
+    assert data.startswith(b"%PDF-"), "the .pdf that arrived is not a PDF"
+
+
+def test_the_estate_can_read_its_own_hand():
+    """The writer proven by the reader that has parsed PDFs since 1.0.0 —
+    if briefcase cannot read the page we wrote, nobody's viewer is likely
+    to either."""
+    from qrme import briefcase
+
+    body = ("The plan\n\n" + "\n".join(
+        f"Step {i}: measure, publish, repeat." for i in range(1, 60)))
+    data, name = composing.render({"title": "Plan.pdf", "body": body})
+    kind, text, read = briefcase.read_file(data, name, None)
+    assert read, "our own reader could not read our own PDF"
+    assert "Step 1:" in text
+    assert "Step 59:" in text, "the second page was written and lost"
+
+
+def test_a_script_helvetica_cannot_carry_arrives_as_markdown():
+    """The honest limit, honestly taken: standard Type-1 Helvetica stops
+    at Latin-1, and a page of substitution marks is worse than the right
+    words in the wrong costume."""
+    data, name = composing.render(
+        {"title": "计划.pdf", "body": "三个产品一起前进。"})
+    assert name.endswith(".md"), "a PDF was promised for a script it cannot hold"
+    assert "三个产品" in data.decode("utf-8"), "the words did not survive"
+
+
+def test_plain_text_when_plain_text_was_asked_for():
+    data, name = composing.render({"title": "notes.TXT", "body": "plain"})
+    assert name == "notes.txt"
+    assert data == b"plain"
+
+
+def test_the_profile_is_told_about_the_shapes():
+    assert ".pdf" in composing.GUIDANCE, (
+        "a shape nobody is told about is a shape nobody asks for")
+
+
+# -- the same hand, in a room ------------------------------------------------
+#
+# The guidance has ridden every room prompt since the composing round —
+# build_system_prompt appends it unconditionally — but the room never made
+# the split. A profile that took the offer had its whole fence land raw in
+# the transcript: the document as a wall of chat, with the markers showing.
+
+from tests.test_capabilities import (as_interactor, make_interactor,  # noqa: E402,F401
+                                     make_profile)
+
+
+def _doc_room(client, monkeypatch, provider):
+    from qrme.routers import community
+    monkeypatch.setattr(community.llm, "get_provider",
+                        lambda *a, **k: provider)
+    user = make_interactor(client, "Theo", "1990-01-01")
+    made = make_profile(client)
+    room = client.post("/rooms", json={
+        "topic": "the audit", "channel": "chat",
+        "participants": [{"kind": "user", "id": user},
+                         {"kind": "profile", "id": made["id"]}]}).json()
+    return user, room
+
+
+def test_a_room_turn_hands_the_document_over(client, monkeypatch):
+    user, room = _doc_room(client, monkeypatch, Composing())
+    r = client.post(f"/rooms/{room['id']}/messages",
+                    headers=as_interactor(user),
+                    json={"message": "prepare me a summary",
+                          "sender_id": user})
+    assert r.status_code == 201, r.text
+    turn = r.json()["replies"][0]
+    assert "```" not in (turn["content"] or ""), (
+        "the fence landed raw in the room transcript")
+    assert turn["media"], "the profile composed and the room got no file"
+    assert turn["media"]["name"] == "Quarterly summary.md"
+    assert turn["media"]["read"] is True, (
+        "the other profiles in this room cannot read the handed document")
+
+
+def test_the_room_document_is_marked(client, monkeypatch):
+    user, room = _doc_room(client, monkeypatch, Composing())
+    client.post(f"/rooms/{room['id']}/messages", headers=as_interactor(user),
+                json={"message": "write it up", "sender_id": user})
+    row = db.connect().execute(
+        "SELECT media_id FROM room_messages WHERE room_id=?"
+        " AND sender_kind='profile' AND media_id IS NOT NULL",
+        (room["id"],)).fetchone()
+    assert row, "no document row landed"
+    marked = db.connect().execute(
+        "SELECT ai_marked FROM media WHERE id=?",
+        (row["media_id"],)).fetchone()
+    assert marked["ai_marked"] == 1, (
+        "a document a profile composed is synthetic media and must say so")
+
+
+def test_a_wordless_room_handover_still_gets_a_sentence(client, monkeypatch):
+    user, room = _doc_room(client, monkeypatch, Composing(said=""))
+    r = client.post(f"/rooms/{room['id']}/messages",
+                    headers=as_interactor(user),
+                    json={"message": "prepare me a summary",
+                          "sender_id": user})
+    turn = r.json()["replies"][0]
+    assert turn["content"], "the page was handed over without a word"
+    assert "```" not in turn["content"]
+    assert turn["media"]

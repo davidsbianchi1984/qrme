@@ -695,10 +695,9 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     if composed and status == "approved":
         from .. import media as media_mod
         try:
+            data, doc_name = composing.render(composed)
             saved = media_mod.save(
-                speaking_profile["id"],
-                composed["body"].encode("utf-8"),
-                name=composing.filename(composed["title"]),
+                speaking_profile["id"], data, name=doc_name,
                 ai_marked=True)
             document_id = saved["id"]
             watermark.stamp(speaking_profile["id"], "document",
