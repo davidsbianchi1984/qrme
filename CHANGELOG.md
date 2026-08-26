@@ -22,6 +22,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   honest fallback to Markdown for scripts beyond Latin-1, where a page
   of substitution marks would be worse than the right words in the
   wrong costume. `.txt` works the same way; Markdown stays the default.
+  A stuttered fence — a model that loses the thread mid-document and
+  starts the fence again, seen in a field transcript as three
+  overlapping drafts in one turn — now files the attempt that got
+  furthest and strips every retry from the bubble, instead of filing
+  the most truncated draft and leaving the rest raw.
 
 - **A link pasted into a room is read.** The pair conversation has read
   handed links since the briefcase round; the room never made the call,

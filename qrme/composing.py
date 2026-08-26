@@ -47,10 +47,13 @@ import re
 #: The fence. Deliberately not a bare ``` block: a profile writing about
 #: code, or quoting a file, produces those constantly and none of them are
 #: a document being handed over. The opening line names the document, which
-#: is also how it gets a filename somebody can find later.
-_FENCE = re.compile(
-    r"```document:[ \t]*(?P<title>[^\n]*)\n(?P<body>.*?)(?:\n```|\Z)",
-    re.S)
+#: is also how it gets a filename somebody can find later. Anchored to the
+#: start of a line: a profile *describing* the fence mid-sentence is talking
+#: about it, not using it.
+_OPEN = re.compile(r"^```document:[ \t]*(?P<title>[^\n]*)$", re.M)
+
+#: The line that closes a fence — nothing on it but the backticks.
+_CLOSE = re.compile(r"\n```[ \t]*(?:\n|$)")
 
 #: A composition longer than this is a file that wants to be a book. The cap
 #: is generous and exists so one runaway generation cannot fill a disk.
@@ -72,20 +75,42 @@ def split(reply: str) -> tuple[str, dict | None]:
     Leaving it would put the whole document in the chat bubble *and* in the
     file — which is the failure this exists to fix, with an attachment
     added to it.
+
+    A reply can carry the fence MORE THAN ONCE. Field transcript: a model
+    that lost the thread mid-document started the fence again, twice —
+    one turn, three overlapping drafts, each a longer prefix of the page
+    it was trying to write. Taking the first match filed the most
+    truncated attempt and left the retries raw in the bubble. So every
+    fence comes out of the spoken text, and the document is the longest
+    body — the attempt that got furthest is the draft the person was
+    meant to have.
     """
     if not reply:
         return reply, None
-    found = _FENCE.search(reply)
-    if not found:
+    opens = list(_OPEN.finditer(reply))
+    if not opens:
         return reply, None
-    body = found.group("body").strip()
-    if not body:
+    spoken_parts = [reply[:opens[0].start()]]
+    document = None
+    for i, found in enumerate(opens):
+        stop = opens[i + 1].start() if i + 1 < len(opens) else len(reply)
+        segment = reply[found.end():stop]
+        closed = _CLOSE.search(segment)
+        if closed:
+            body, tail = segment[:closed.start()], segment[closed.end():]
+        else:
+            # An unclosed fence runs to the next attempt or the end — a
+            # truncation, and everything in it is document, not speech.
+            body, tail = segment, ""
+        spoken_parts.append(tail)
+        body = body.strip()
         # A fence with nothing in it is a model stumble, not a document.
         # The fence still comes out — a person should never read one.
-        return (reply[:found.start()] + reply[found.end():]).strip(), None
-    title = (found.group("title") or "").strip()[:120] or FALLBACK_TITLE
-    spoken = (reply[:found.start()] + reply[found.end():]).strip()
-    return spoken, {"title": title, "body": body[:MAX_BODY]}
+        if body and (document is None or len(body) > len(document["body"])):
+            title = ((found.group("title") or "").strip()[:120]
+                     or FALLBACK_TITLE)
+            document = {"title": title, "body": body[:MAX_BODY]}
+    return "".join(spoken_parts).strip(), document
 
 
 #: An extension the profile put on the title itself — the one place it can

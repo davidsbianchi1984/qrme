@@ -289,3 +289,43 @@ def test_a_wordless_room_handover_still_gets_a_sentence(client, monkeypatch):
     assert turn["content"], "the page was handed over without a word"
     assert "```" not in turn["content"]
     assert turn["media"]
+
+
+# -- the stuttered fence -----------------------------------------------------
+#
+# Field transcript, from a room: the model lost the thread mid-document and
+# started the fence again, twice — one turn, three overlapping drafts, each
+# a longer prefix of the page it was trying to write. First-match filing
+# handed over the most truncated attempt and left the retries raw.
+
+def test_a_stuttered_fence_hands_over_the_furthest_attempt():
+    reply = ("Here's the page — hand it straight to them.\n\n"
+             "```document: Staleness Contract\n"
+             "# Contract\n\n## Part 1\nTimestamp at the source.\n"
+             "```document: Staleness Contract\n"
+             "# Contract\n\n## Part 1\nTimestamp at the source.\n"
+             "## Part 2\nDeclare a freshness window.\n"
+             "```document: Staleness Contract\n"
+             "# Contract\n\n## Part 1\nTimestamp at the source.\n"
+             "## Part 2\nDeclare a freshness window.\n"
+             "## Part 3\nSeparate the two silences.\n")
+    spoken, doc = composing.split(reply)
+    assert spoken == "Here's the page — hand it straight to them."
+    assert "```" not in spoken, "a retry landed raw in the bubble"
+    assert doc is not None
+    assert "Part 3" in doc["body"], (
+        "a shorter attempt was filed while the finished draft existed")
+
+
+def test_prose_after_a_closed_fence_survives():
+    spoken, doc = composing.split(
+        "Before.\n\n```document: Notes\nBody.\n```\nAfter.")
+    assert spoken == "Before.\n\nAfter."
+    assert doc == {"title": "Notes", "body": "Body."}
+
+
+def test_talking_about_the_fence_is_not_using_it():
+    """The opener is anchored to the start of a line — a profile telling
+    somebody how the fence works mid-sentence is describing it."""
+    reply = "You'd write ```document: Title on its own line to hand one over."
+    assert composing.split(reply) == (reply, None)
