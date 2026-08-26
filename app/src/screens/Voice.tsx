@@ -50,7 +50,7 @@ export function Voice({ onPlans }: {
 
   async function load() {
     if (!pid) return;
-    try { setState(await api.voiceprint(pid)); }
+    try { setState(await api.voiceprint(pid, session.ownerToken as string)); }
     catch (e) { setError(e); }
     api.profileVoice(pid).then(setBound).catch(() => setBound(null));
   }
@@ -88,7 +88,7 @@ export function Voice({ onPlans }: {
               <span className="muted small"> · {state?.consent.granted_at?.slice(0, 10)}</span>
             </p>
             <button className="warn" disabled={busy}
-                    onClick={() => run(() => api.revokeVoiceprint(pid!))}>
+                    onClick={() => run(() => api.revokeVoiceprint(pid!, session.ownerToken as string))}>
               {tr("vce.withdraw", lang)}
             </button>
           </>
@@ -101,7 +101,7 @@ export function Voice({ onPlans }: {
             <button className="primary" disabled={busy}
                     onClick={() => run(() => api.grantVoiceConsent(pid!, {
                       own_voice: true, sources: ["call", "voice_note", "direct"],
-                    }))}>
+                    }, session.ownerToken as string))}>
               {tr("vce.allow", lang)}
             </button>
           </>
@@ -125,7 +125,7 @@ export function Voice({ onPlans }: {
           </div>
           <button disabled={busy} onClick={() => run(() => api.addVoiceSample(pid!, {
             source, seconds, turns: Math.max(1, Math.round(seconds / 4)),
-          }))}>{tr("vce.addsample", lang)}</button>
+          }, session.ownerToken as string))}>{tr("vce.addsample", lang)}</button>
 
           {enrol && (
             <>
@@ -174,7 +174,7 @@ export function Voice({ onPlans }: {
                           onChange={(e) => setSay(e.target.value)} /></label>
               <button className="primary" disabled={busy || !say.trim()}
                       onClick={() => run(async () => {
-                        setSpoken(await api.speakInVoice(pid!, say));
+                        setSpoken(await api.speakInVoice(pid!, say, session.ownerToken as string));
                       })}>{tr("vce.speak", lang)}</button>
               {spoken && (
                 <div className="guidance">
@@ -190,7 +190,7 @@ export function Voice({ onPlans }: {
                   ? tr("vce.enough", lang) : tr("vce.addmore", lang)}
               </p>
               <button className="primary" disabled={busy || !enrol?.ready}
-                      onClick={() => run(() => api.buildVoiceprint(pid!))}>
+                      onClick={() => run(() => api.buildVoiceprint(pid!, session.ownerToken as string))}>
                 {tr("vce.build", lang)}
               </button>
               {print && !print.active && (

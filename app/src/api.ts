@@ -4234,21 +4234,26 @@ export const api = {
           memory_resealed: boolean }>(
       `/profiles/${profileId}/memory/${interactorId}/turns/${messageId}`,
       { method: "PUT", body: { content }, token }),
-  // The voiceprint, in FIG. 800's order (qrme/voiceprint.py).
-  voiceprint: (pid: string) =>
-    req<VoiceprintStatus>(`/profiles/${pid}/voiceprint`),
-  grantVoiceConsent: (pid: string, body: { own_voice: boolean; sources?: string[]; note?: string }) =>
-    req<VoiceprintStatus>(`/profiles/${pid}/voiceprint/consent`, { method: "PUT", body }),
-  addVoiceSample: (pid: string, body: { source: string; seconds: number; turns?: number }) =>
-    req<{ id: string } & VoiceEnrollment>(`/profiles/${pid}/voiceprint/samples`, { method: "POST", body }),
-  buildVoiceprint: (pid: string) =>
-    req<VoiceprintStatus>(`/profiles/${pid}/voiceprint`, { method: "POST", body: {} }),
-  speakInVoice: (pid: string, text: string) =>
+  // The voiceprint, in FIG. 800's order (qrme/voiceprint.py). Every one of
+  // these is an owner door on the backend, and every one of these sent no
+  // credential at all — so the first button on the Voice screen answered
+  // "authentication required" to its own owner, however signed-in, and the
+  // banner's sign-in link bounced a signed-in person straight back home.
+  // The token rides now, the way it does on every other owner binding here.
+  voiceprint: (pid: string, token: string) =>
+    req<VoiceprintStatus>(`/profiles/${pid}/voiceprint`, { token }),
+  grantVoiceConsent: (pid: string, body: { own_voice: boolean; sources?: string[]; note?: string }, token: string) =>
+    req<VoiceprintStatus>(`/profiles/${pid}/voiceprint/consent`, { method: "PUT", body, token }),
+  addVoiceSample: (pid: string, body: { source: string; seconds: number; turns?: number }, token: string) =>
+    req<{ id: string } & VoiceEnrollment>(`/profiles/${pid}/voiceprint/samples`, { method: "POST", body, token }),
+  buildVoiceprint: (pid: string, token: string) =>
+    req<VoiceprintStatus>(`/profiles/${pid}/voiceprint`, { method: "POST", body: {}, token }),
+  speakInVoice: (pid: string, text: string, token: string) =>
     req<{ basis: string; disclosure: string; watermark: { watermark_id: string } }>(
-      `/profiles/${pid}/voiceprint/speak`, { method: "POST", body: { text } }),
-  revokeVoiceprint: (pid: string) =>
+      `/profiles/${pid}/voiceprint/speak`, { method: "POST", body: { text }, token }),
+  revokeVoiceprint: (pid: string, token: string) =>
     req<{ revoked: boolean; samples_deleted: number }>(
-      `/profiles/${pid}/voiceprint`, { method: "DELETE" }),
+      `/profiles/${pid}/voiceprint`, { method: "DELETE", token }),
   // How many people this profile is talking to. Public on purpose: the count
   // is a fact about the profile, not a secret earned by intimacy, and making
   // somebody get close before they may learn it is what turns an ordinary
