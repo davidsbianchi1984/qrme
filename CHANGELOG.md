@@ -8,6 +8,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **Your own profiles seat on the press.** The invite panel sent your
+  own profile an invitation — into an inbox only that profile's owner
+  token can answer, which the console holds for one profile at a time —
+  so "no extra frame showed up." When the account pressing owns the
+  profile pressed, both consents are in the one press and the seat
+  appears at once, up to the room's eight. Anybody else's profile keeps
+  its owner's choice, exactly as before.
+
 - **Green is live, red is muted.** Rooms open listening now, and the
   owner met the red ring on arrival and read it as muted — so the pair
   swaps to the traffic-light reading: green while the ear is running

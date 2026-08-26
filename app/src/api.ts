@@ -4045,7 +4045,11 @@ export const api = {
   // for you would make "invite" a word for something else.
   inviteToRoom: (roomId: string, profileId: string, token: string) =>
     req<{ room_id: string; profile_id: string; invited: boolean;
-          asked_by: string; already_invited: boolean }>(
+          asked_by: string; already_invited: boolean;
+          // True when the press itself seated them — the caller's own
+          // profile, where the consent is complete. Anybody else's
+          // profile keeps its owner's choice: invited, not seated.
+          seated?: boolean }>(
       `/rooms/${roomId}/invite`,
       { method: "POST", body: { profile_id: profileId }, token }),
   acceptRoomInvite: (roomId: string, profileId: string, ownerToken: string) =>

@@ -1815,7 +1815,18 @@ export function Inside({ onPlans, start = "", onLeave }: {
     if (!guest || !token) return;
     setError(null); setNote(null); setBusy(true);
     try {
-      await api.inviteToRoom(open, guest, token);
+      const asked = await api.inviteToRoom(open, guest, token);
+      // The server seats the caller's OWN profile on the spot — the
+      // account is the identity that owns profiles, and this console
+      // only ever holds one profile's owner token at a time, so the
+      // owner-token dance below could never cover a stable ("I selected
+      // a profile to add them and no extra frame showed up").
+      if (asked.seated) {
+        setNote(tr("ins.ask.seated", lang));
+        setGuestId("");
+        load();
+        return;
+      }
       // The invite stands either way. The acceptance is the guest's own
       // owner token saying yes — held here exactly when the guest is this
       // person's profile. Anybody else's profile keeps its owner's choice:

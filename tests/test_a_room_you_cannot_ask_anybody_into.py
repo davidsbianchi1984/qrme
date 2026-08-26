@@ -240,3 +240,63 @@ def test_a_departed_profile_is_not_asked_anywhere(client):
     r = client.post(f"/rooms/{rid}/invite", headers=ada,
                     json={"profile_id": guest})
     assert r.status_code == 410, r.text
+
+
+# --- your own stable needs no invitation -------------------------------------
+#
+# The dance above is for somebody ELSE's profile, whose owner answers from
+# their own inbox. When the host's account owns the guest, both consents are
+# in the one press — and the dance was a person mailing themselves a question
+# nothing would answer. Field report, from the invite panel: "I selected a
+# profile to add them and no extra frame showed up." No seat, no error, an
+# invitation rotting in an inbox the presser cannot see; the console only
+# ever holds one profile's owner token at a time, so a client-side accept
+# could never cover a stable.
+
+
+def test_your_own_profile_is_seated_by_the_press(client):
+    from .conftest import enrol
+
+    uid, mine = _person(client, "David")
+    account = enrol(uid)
+    host, _own = _profile(client, account, "First")
+    rid = _room(client, uid, mine, host)
+    second, _tok = _profile(client, account, "Second")
+
+    r = client.post(f"/rooms/{rid}/invite", headers=mine,
+                    json={"profile_id": second})
+    assert r.status_code == 201, r.text
+    assert r.json()["seated"] is True
+    from qrme import db
+
+    seats = db.connect().execute(
+        "SELECT ref_id FROM room_participants WHERE room_id=? AND"
+        " kind='profile'", (rid,)).fetchall()
+    assert any(row["ref_id"] == second for row in seats), (
+        "the press said seated and the room does not hold the seat")
+
+
+def test_somebody_elses_profile_still_keeps_its_owners_choice(client):
+    """The seat-on-press is ownership, never hosting: a guest from another
+    account is invited exactly as before, and only their own owner token
+    takes it up."""
+    from .conftest import enrol
+
+    uid, mine = _person(client, "David")
+    enrol(uid)
+    host, _own = _profile(client, "acct_other_h", "Host")
+    rid = _room(client, uid, mine, host)
+    guest, _g = _profile(client, "acct_other_g", "Wren")
+
+    r = client.post(f"/rooms/{rid}/invite", headers=mine,
+                    json={"profile_id": guest})
+    assert r.status_code == 201, r.text
+    assert r.json()["seated"] is False
+    from qrme import db
+
+    seats = db.connect().execute(
+        "SELECT ref_id FROM room_participants WHERE room_id=? AND"
+        " kind='profile'", (rid,)).fetchall()
+    assert not any(row["ref_id"] == guest for row in seats), (
+        "a stranger's profile was seated from the host's own screen — "
+        "'invite' has become a word for something that is not one")

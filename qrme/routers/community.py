@@ -623,7 +623,44 @@ def invite_to_room(room_id: str, body: RoomInvite, request: Request) -> dict:
         raise HTTPException(
             409, "this room is full — eight seats, and every one taken")
 
+    # Your own profile needs no invitation — you are the yes it would
+    # ask for. `accept` guards seating with the GUEST's owner token
+    # because a host must not seat somebody ELSE's profile from their own
+    # screen; when the host's account owns the guest, both consents are
+    # in the one press, and the dance was a person mailing themselves a
+    # question nothing would answer. Field report, from the panel this
+    # route feeds: "I selected a profile to add them and no extra frame
+    # showed up" — no seat, no error, an invitation rotting in an inbox
+    # the presser cannot see. The account is the identity that owns
+    # profiles, so it is the comparison — the console only ever holds one
+    # profile's owner token at a time, which is why the client-side
+    # accept could not cover a stable.
     conn = db.connect()
+    who = auth.principal(request)
+    caller_account = None
+    if who is not None and who.get("role") == "interactor":
+        row = conn.execute(
+            "SELECT account_id FROM interactors WHERE id=?",
+            (who["subject_id"],)).fetchone()
+        caller_account = row["account_id"] if row else None
+    elif who is not None and who.get("role") == "owner":
+        row = conn.execute(
+            "SELECT owner_id FROM profiles WHERE id=?",
+            (who["subject_id"],)).fetchone()
+        caller_account = row["owner_id"] if row else None
+    if caller_account and guest["owner_id"] == caller_account:
+        conn.execute(
+            "INSERT OR IGNORE INTO room_participants (room_id, kind, ref_id)"
+            " VALUES (?,'profile',?)", (room_id, body.profile_id))
+        # A standing invitation is answered by the seat, not left behind.
+        conn.execute(
+            "DELETE FROM inbox_events WHERE profile_id=? AND"
+            " kind='room_invite' AND ref=?", (body.profile_id, room_id))
+        conn.commit()
+        return {"room_id": room_id, "profile_id": body.profile_id,
+                "invited": True, "asked_by": asker,
+                "already_invited": False, "seated": True}
+
     already = conn.execute(
         "SELECT 1 FROM inbox_events WHERE profile_id=? AND kind='room_invite'"
         " AND ref=?", (body.profile_id, room_id)).fetchone()
@@ -633,7 +670,10 @@ def invite_to_room(room_id: str, body: RoomInvite, request: Request) -> dict:
             "invited": True, "asked_by": asker,
             # Said plainly rather than implied by a 200: a repeated press is
             # a no-op and the caller should be able to tell.
-            "already_invited": already is not None}
+            "already_invited": already is not None,
+            # And whether the press itself seated them — true only for the
+            # caller's own profile, where the consent is complete.
+            "seated": False}
 
 
 @router.post("/rooms/{room_id}/invites/accept", status_code=201)
