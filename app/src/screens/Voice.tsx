@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type VoiceprintStatus , type ProfileVoice } from "../api";
 import { Refusal } from "../Refusal";
-import { playClip } from "../spoken";
+import { playClip, setSpokenLoudness, spokenLoudness } from "../spoken";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { useSession } from "../store";
 
@@ -28,6 +28,7 @@ export function Voice({ onPlans }: {
   const [source, setSource] = useState<"call" | "voice_note" | "direct">("voice_note");
   const [say, setSay] = useState("");
   const [spoken, setSpoken] = useState<{ basis: string; disclosure: string } | null>(null);
+  const [loud, setLoud] = useState(() => spokenLoudness());
 
   const [bound, setBound] = useState<ProfileVoice | null>(null);
   const [voiceId, setVoiceId] = useState("");
@@ -315,6 +316,29 @@ export function Voice({ onPlans }: {
                       })}>
                 {tr("voice.spoken.unbind", lang)}
               </button>
+              {/* Full blast is the default; the slider only dials DOWN.
+                  Vertical on purpose — it reads as a volume, and it sits
+                  beside the button that makes sound. It moves the piece
+                  already in your ear, not just the next one. The play-only
+                  paths hold no microphone, so a Bluetooth earbud stays in
+                  its loud music mode — see spoken.ts. */}
+              <label className="loudness" title={tr("voice.spoken.loud", lang)}
+                     style={{ display: "inline-flex", flexDirection: "column",
+                              alignItems: "center", gap: 4 }}>
+                <span className="muted small">
+                  {tr("voice.spoken.loud", lang)} {Math.round(loud * 100)}%
+                </span>
+                <input type="range" min={5} max={100} step={5}
+                       value={Math.round(loud * 100)}
+                       aria-label={tr("voice.spoken.loud", lang)}
+                       style={{ writingMode: "vertical-lr",
+                                direction: "rtl", height: 96, width: 24 }}
+                       onChange={(e) => {
+                         const v = Number(e.target.value) / 100;
+                         setLoud(v);
+                         setSpokenLoudness(v);
+                       }} />
+              </label>
               <button disabled={busy}
                       onClick={() => run(async () => {
                         const blob = await api.sayInProfileVoice(

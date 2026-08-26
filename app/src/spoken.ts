@@ -74,6 +74,50 @@ const SILENCE =
 /** The one element every piece plays through, once a press has opened it. */
 let ear: HTMLAudioElement | null = null;
 
+// ------------------------------------------------------------------------
+// Loudness: full blast by default, dialled DOWN by the person.
+//
+// Field report, from an earbud: the voice worked and was hard to hear. Two
+// decisions came out of it. The default is 1.0 — the loudest a page may
+// play — because a quiet default helps nobody and the device's own volume
+// rocker is the ceiling anyway. And the slider only attenuates: a boost
+// above 1.0 means clipping, which reads as a broken voice, not a loud one.
+//
+// The other half of that report is not a setting: a page holding a
+// Bluetooth earbud's MICROPHONE drops the earbud from its music mode into
+// phone-call mode — quiet and tinny at any volume. The play-only paths in
+// this module (`playClip`, `speakInPieces`, `plainVoice`) therefore open
+// no microphone, ever. The talk surfaces' barge-in meter is the one
+// deliberate exception, and it belongs to those surfaces, not to playback.
+// ------------------------------------------------------------------------
+
+const LOUDNESS_KEY = "qrme.loudness";
+
+function storedLoudness(): number {
+  try {
+    const v = parseFloat(localStorage.getItem(LOUDNESS_KEY) ?? "1");
+    return Number.isFinite(v) ? Math.min(1, Math.max(0.05, v)) : 1;
+  } catch {
+    return 1;
+  }
+}
+
+let loudness = storedLoudness();
+
+/** How loud the spoken voice plays, 0.05–1. 1 is the default and the max. */
+export function spokenLoudness(): number {
+  return loudness;
+}
+
+/** Set it, remember it on this device, and apply it to the element that is
+ *  already speaking — a slider that only affects the NEXT sentence reads
+ *  as broken while this one is in your ear. */
+export function setSpokenLoudness(v: number): void {
+  loudness = Math.min(1, Math.max(0.05, v));
+  try { localStorage.setItem(LOUDNESS_KEY, String(loudness)); } catch { /* per-device nicety */ }
+  if (ear) ear.volume = loudness;
+}
+
 
 /** Open the ear, from inside a user gesture.
  *
@@ -100,6 +144,7 @@ export function openTheEar(): void {
   el.muted = true;
   el.setAttribute("playsinline", "");
   if (!el.src) el.src = SILENCE;
+  el.volume = loudness;
   ear = el;
   el.play().then(() => { el.pause(); el.muted = false; earOpen = true; },
                 () => { el.muted = false; });
@@ -155,6 +200,7 @@ function playPiece(el: HTMLAudioElement, src: string): Promise<void> {
     el.addEventListener("ended", done);
     el.addEventListener("pause", done);
     el.addEventListener("error", done);
+    el.volume = loudness;
     el.src = src;
     el.play().catch((why) => { clear(); refused(why); });
   });
@@ -290,6 +336,7 @@ export function plainVoice(text: string, lang: string): Promise<void> {
   return new Promise((done) => {
     const u = new SpeechSynthesisUtterance(text);
     u.lang = lang;
+    u.volume = loudness;
     u.onend = () => done();
     u.onerror = () => done();
     window.speechSynthesis.speak(u);

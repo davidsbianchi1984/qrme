@@ -8625,6 +8625,9 @@ const CHROME: Table = {
   "voice.spoken.save": {
     en: "Bind it", es: "Vincularla", fr: "La lier", de: "Binden", pt: "Vincular", it: "Collegala", ja: "結び付ける", zh: "绑定", hi: "जोड़ें", ar: "اربطه",
   },
+  "voice.spoken.loud": {
+    en: "Loudness", es: "Volumen", fr: "Volume", de: "Lautstärke", pt: "Volume", it: "Volume", ja: "音量", zh: "音量", hi: "आवाज़ की तेज़ी", ar: "مستوى الصوت",
+  },
   "voice.spoken.released": {
     en: "everybody here may use it — your waiver is on record", es: "todos aquí pueden usarla: tu renuncia queda registrada", fr: "tout le monde ici peut l'utiliser — votre renonciation est enregistrée", de: "alle hier dürfen sie nutzen — dein Verzicht ist festgehalten", pt: "todos aqui podem usá-la — a sua renúncia fica registada", it: "tutti qui possono usarla — la tua rinuncia è registrata", ja: "ここにいる全員が使えます — あなたの権利放棄は記録されています", zh: "这里的所有人都可以使用它——你的弃权已被记录", hi: "यहाँ सब इसे इस्तेमाल कर सकते हैं — आपका अधिकार-त्याग दर्ज है", ar: "يمكن للجميع هنا استخدامه — تنازلك مسجّل",
   },
