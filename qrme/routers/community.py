@@ -233,6 +233,51 @@ def _read_share(data: bytes, name: str | None,
     return text, digest, "", (whole if whole > len(text) else 0)
 
 
+def _read_link(message: str, on_behalf_of: str | None) -> tuple[str, str, str]:
+    """The first link in a person's room message, read on the way in.
+
+    The pair conversation has read handed links since the briefcase round
+    (``interaction._handed_link_block``); the room never made the call, so
+    a link pasted into a room was inert text to every seat — "fifth link,
+    same wall", said a profile, honestly, about a wall this module was.
+
+        asked     can a profile in a room open the link I pasted
+        mattered  the same fetch the chat door uses was never called here
+
+    Read once at post time and kept on the row, the share door's own
+    economy: every profile's every later turn carries the reading without
+    a refetch. Returns ``(words, digest, why)`` — words and a digest when
+    the page was read, else a why key the prompt words honestly:
+    ``offline`` (this deployment does not fetch), ``unreachable`` (it
+    tried), ``empty`` (reached, but no words to take away — a page drawn
+    entirely by scripts reads like this). Never load-bearing: a link that
+    cannot be read still lands as the message it rode in on.
+    """
+    from .. import briefcase, offline, scrape
+    from .interaction import _URL_RE
+
+    m = _URL_RE.search(message or "")
+    if not m:
+        return "", "", ""
+    url = m.group(0)
+    if offline.enabled():
+        return "", "", "offline"
+    try:
+        page = scrape.extract(scrape.fetch(url, on_behalf_of))
+    except Exception:  # noqa: BLE001 — an unread page is a fact, not a fault
+        return "", "", "unreachable"
+    parts = [p for p in (page.get("title"), page.get("description"),
+                         page.get("text")) if p]
+    words = briefcase.capped("\n".join(parts))
+    if not words.strip():
+        return "", "", "empty"
+    try:
+        digest = briefcase.distill(words, page.get("title") or url)
+    except Exception:                                   # pragma: no cover
+        digest = words[:600]
+    return words, digest, ""
+
+
 def _store_room_message(room_id, sender_kind, sender_id, content,
                         approved, reason, media_id=None,
                         media_text="", media_digest="", media_why="",
@@ -333,6 +378,24 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
                               else " — this deployment could not turn it "
                                    "into words, so you have not read it]")
                 text = f"{text} {label}".strip() if text else label
+            elif digest:
+                # A handed link, read once on the way in (_read_link) —
+                # a reading with no attachment row under it. Same shape
+                # as a shared file's: the page enters the turn as a
+                # stated fact.
+                text += (" [they handed a link and the page was read — "
+                         f"it says: {digest}]")
+            elif "media_why" in keys and (r["media_why"] or ""):
+                # The honest half. The one outcome worse than the old
+                # wall is a profile summarising a page nobody fetched.
+                why = {"offline": "that was not visited — this deployment"
+                                  " is offline",
+                       "unreachable": "that could not be reached just now",
+                       "empty": "whose page had no words to take away",
+                       }.get(r["media_why"], "that was not read")
+                text += (f" [their message includes a link {why}, so you "
+                         "have not read it — if asked about it, say so; "
+                         "never guess at what it says]")
             # Interrupted, and by how much. Said as a fact about the turn,
             # in the same shape an attachment is: the model reads what
             # happened rather than being told what to do about it, and the
@@ -1222,8 +1285,16 @@ def room_message(room_id: str, body: RoomMessage, request: Request) -> dict:
             "  AND sender_kind='profile'",
             (body.cut_off_heard[:4000], body.cut_off_id, room_id))
         db.connect().commit()
+    # A link in the message is read before storing, the share door's own
+    # ordering: the very first profile turn already carries the page, with
+    # no one-turn hole in which a profile denies seeing what it can see.
+    lwords, ldigest, lwhy = ("", "", "")
+    if verdict.approved:
+        lwords, ldigest, lwhy = _read_link(body.message, speaker)
     sent = _store_room_message(room_id, "user", speaker, body.message,
-                               verdict.approved, verdict.reason)
+                               verdict.approved, verdict.reason,
+                               media_text=lwords, media_digest=ldigest,
+                               media_why=lwhy)
     replies = []
     if verdict.approved:
         replies = _profile_turns(room, participants,

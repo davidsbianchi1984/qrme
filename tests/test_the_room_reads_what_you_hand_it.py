@@ -194,3 +194,127 @@ def test_the_profile_is_actually_handed_the_words(client, monkeypatch):
     assert "response-1.txt" in handed
     assert "it reads:" in handed, (
         "the profile was told a file arrived and not what is in it")
+
+
+# ---------------------------------------------------------------------------
+# The handed link — the other thing a person hands a room.
+#
+# Field report, from a room, said by the profile itself: "Fifth link, same
+# wall — I can't open any of them from this seat." The pair conversation has
+# read handed links since the briefcase round; the room never made the call.
+# Same discipline as the file above: read once at post time, kept on the row,
+# said honestly when it could not be read.
+
+PAGE = ("<html><head><title>The QRME estate</title>"
+        '<meta name="description" content="Three products in lockstep.">'
+        "</head><body>The estate ships QRME, JIM-mini and PDI together, "
+        "and the beta is live.</body></html>")
+
+
+def test_a_link_handed_to_the_room_is_read(client, monkeypatch):
+    from qrme import scrape
+
+    monkeypatch.setattr(scrape, "fetch", lambda url, on_behalf_of=None: PAGE)
+    user, room = _room(client)
+    r = client.post(f"/rooms/{room['id']}/messages",
+                    headers=as_interactor(user),
+                    json={"message": "Have a look at https://example.com/qrme",
+                          "sender_id": user})
+    assert r.status_code == 201, r.text
+    from qrme import db
+
+    row = db.connect().execute(
+        "SELECT media_id, media_text, media_digest FROM room_messages"
+        " WHERE room_id=? AND sender_kind='user'", (room["id"],)).fetchone()
+    assert row["media_id"] is None, "a link is not an attachment"
+    assert row["media_digest"], "the page was read and no reading was kept"
+
+
+def test_the_link_reading_reaches_the_prompt(client, monkeypatch):
+    """The whole point — the reading in the turn the model actually gets."""
+    from qrme import scrape
+    from qrme.routers import community
+
+    monkeypatch.setattr(scrape, "fetch", lambda url, on_behalf_of=None: PAGE)
+    seen: list = []
+
+    class Provider:
+        def generate(self, system, turns):
+            seen.append(turns)
+            return "Read it."
+
+    monkeypatch.setattr(community.llm, "get_provider",
+                        lambda *a, **k: Provider())
+    user, room = _room(client)
+    client.post(f"/rooms/{room['id']}/messages", headers=as_interactor(user),
+                json={"message": "Thoughts on https://example.com/qrme ?",
+                      "sender_id": user})
+    assert seen, "no profile turn was taken"
+    handed = " ".join(t["content"] for t in seen[-1])
+    assert "the page was read — it says:" in handed, (
+        "the profile was handed a link and not the page")
+
+
+def test_an_unreached_link_is_said_to_be_unread(client, monkeypatch):
+    """The honest half, again. A fetch that fails must reach the prompt as
+    an absence, or the profile invents the page."""
+    from qrme import scrape
+    from qrme.routers import community
+
+    def refuse(url, on_behalf_of=None):
+        raise OSError("no route")
+
+    monkeypatch.setattr(scrape, "fetch", refuse)
+    seen: list = []
+
+    class Provider:
+        def generate(self, system, turns):
+            seen.append(turns)
+            return "I could not open it."
+
+    monkeypatch.setattr(community.llm, "get_provider",
+                        lambda *a, **k: Provider())
+    user, room = _room(client)
+    client.post(f"/rooms/{room['id']}/messages", headers=as_interactor(user),
+                json={"message": "See https://example.com/gone",
+                      "sender_id": user})
+    assert seen, "no profile turn was taken"
+    handed = " ".join(t["content"] for t in seen[-1])
+    assert "could not be reached" in handed
+    assert "never guess" in handed
+
+
+def test_an_offline_deployment_does_not_fetch(client, monkeypatch):
+    """The same switch every outbound path honours. A vault that promises
+    nothing leaves this machine cannot open a socket because somebody
+    pasted a URL into a room."""
+    from qrme import offline, scrape
+
+    def trip(url, on_behalf_of=None):
+        raise AssertionError("an offline deployment opened a socket")
+
+    monkeypatch.setattr(offline, "enabled", lambda: True)
+    monkeypatch.setattr(scrape, "fetch", trip)
+    user, room = _room(client)
+    r = client.post(f"/rooms/{room['id']}/messages",
+                    headers=as_interactor(user),
+                    json={"message": "See https://example.com/qrme",
+                          "sender_id": user})
+    assert r.status_code == 201, r.text
+    from qrme import db
+
+    row = db.connect().execute(
+        "SELECT media_why FROM room_messages WHERE room_id=?"
+        " AND sender_kind='user'", (room["id"],)).fetchone()
+    assert row["media_why"] == "offline"
+
+
+def test_reading_never_costs_the_message():
+    """The message is the deliverable; the reading is a bonus on top of
+    it — the same sentence _read_share earned, owed here too."""
+    fn = SRC[SRC.index("def _read_link"):]
+    fn = fn[:fn.index("\ndef ")]
+    assert "except Exception" in fn, (
+        "a failure to read would refuse a message that said something")
+    assert "offline.enabled()" in fn, (
+        "the room's link fetch does not honour the offline switch")

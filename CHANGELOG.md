@@ -6,6 +6,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **A link pasted into a room is read.** The pair conversation has read
+  handed links since the briefcase round; the room never made the call,
+  so a profile in a room met every URL as inert text — "fifth link, same
+  wall", as one put it, honestly. The first link in a person's room
+  message is now fetched once at post time through the same offline-gated
+  reader the chat door uses, and the page's reading is kept on the
+  message row — every profile's every turn carries it, the share door's
+  own economy. A page that could not be read enters the prompt as an
+  honest absence (offline, unreachable, or wordless), never as a guess.
+
 ### Fixed
 
 - **Sharing files says what it is doing, takes several at once, and
