@@ -356,8 +356,12 @@ def build_system_prompt(
     # A profile may hand something over rather than only say it. Last in
     # the prompt because it is a capability rather than a trait: everything
     # above says who this is, and this says what it can do with its hands.
-    from . import composing
+    from . import composing, selfsteer
     parts.append(composing.GUIDANCE)
+    # And the other thing it can do with its hands: turn its own dials,
+    # when asked — the moves ride the reply the way a document does, and
+    # both doors that generate turns take them out and apply them.
+    parts.append(selfsteer.guidance(bool(profile["adult_mode"])))
 
     # Where it lives. Every block above says who this profile is; this one
     # says what building it is standing in, because a profile knew

@@ -664,8 +664,12 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     # (qrme/composing.py). Split before moderation, deliberately: the
     # document is part of what was said, so it is reviewed with the words
     # rather than slipping past a check the words had to pass.
-    from .. import composing
+    from .. import composing, selfsteer
     reply, composed = composing.split(reply)
+    # The dial moves ride the same channel (qrme/selfsteer.py): markers
+    # out before anything else reads the text — a person never reads one,
+    # and the review reads the words the person will.
+    reply, dial_moves = selfsteer.split(reply)
     if composed and not reply:
         # A profile that fenced a document and said nothing outside it.
         # Handing somebody a page without a word is a stranger thing than
@@ -682,6 +686,18 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
         status, flag_reason = "pending", "owner approval required"
     else:
         status, flag_reason = "approved", None
+
+    # The profile turns its own dials — asked to, one step of 25, max or
+    # none, through the same set_dials the owner's sliders write. Only on
+    # an approved turn (a refused reply does not get to leave a change
+    # behind), and before the stamp, so a locked profile's honest
+    # sentence is part of what the credential covers.
+    if dial_moves and status == "approved":
+        if not selfsteer.apply(speaking_profile["id"], dial_moves,
+                               bool(speaking_profile["adult_mode"])):
+            reply += " " + i18n.tr_public(
+                selfsteer.LOCKED_SENTENCE,
+                i18n.effective_language(profile_id))
 
     # Every approved textual render is stamped — the reply leaves carrying
     # the producing profile's credential and always-displayed mark.

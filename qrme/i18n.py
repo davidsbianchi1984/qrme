@@ -239,6 +239,20 @@ _PUBLIC: dict[str, dict[str, str]] = {
         "pt": "Aqui está.", "it": "Eccolo.", "ja": "こちらです。",
         "zh": "给你。", "hi": "यह रहा।", "ar": "ها هو ذا.",
     },
+    # A profile asked to change how it comes across while its owner has
+    # the steering locked (qrme/selfsteer.py). Said, never silent: the
+    # person asked for a change and is owed the fact that nothing moved.
+    "My dials are locked, so nothing moved.": {
+        "es": "Mis diales están bloqueados, así que nada cambió.",
+        "fr": "Mes réglages sont verrouillés, rien n'a donc bougé.",
+        "de": "Meine Regler sind gesperrt, es hat sich nichts bewegt.",
+        "pt": "Os meus botões estão bloqueados, por isso nada mudou.",
+        "it": "Le mie manopole sono bloccate, quindi nulla è cambiato.",
+        "ja": "ダイヤルがロックされているので、何も変わりませんでした。",
+        "zh": "我的调节旋钮被锁定了，所以什么都没变。",
+        "hi": "मेरे डायल लॉक हैं, इसलिए कुछ नहीं बदला।",
+        "ar": "أقراصي مقفلة، لذا لم يتغيّر شيء.",
+    },
 
     "this is the record of your own case: what happened, who did it, and when. The reasons and other free text are not repeated here — you wrote yours, and nobody else's is yours to read": {
         'es': 'este es el registro de su propio caso: qué ocurrió, quién lo hizo y cuándo. Los motivos y demás texto libre no se repiten aquí: el suyo lo escribió usted, y el de los demás no le corresponde leerlo',

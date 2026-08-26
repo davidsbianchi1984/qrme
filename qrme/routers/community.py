@@ -515,14 +515,23 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
         # chat door (qrme/routers/interaction.py): split before
         # moderation, so the document is reviewed with the words rather
         # than slipping past a check the words had to pass.
-        from .. import composing
+        from .. import composing, selfsteer
         content, composed = composing.split(content)
+        # Dial moves ride the same channel in a room — anybody seated can
+        # ask, the owner's lock is the veto (qrme/selfsteer.py).
+        content, dial_moves = selfsteer.split(content)
         if composed and not content:
             content = i18n.tr_public(
                 "Here it is.", i18n.effective_language(profile["id"]))
         verdict = moderation.review(
             content + (("\n\n" + composed["body"]) if composed else ""),
             None, {"birthdate": None}, maturity=maturity)
+        if dial_moves and verdict.approved:
+            if not selfsteer.apply(profile["id"], dial_moves,
+                                   bool(profile["adult_mode"])):
+                content += " " + i18n.tr_public(
+                    selfsteer.LOCKED_SENTENCE,
+                    i18n.effective_language(profile["id"]))
         document_id, doc_words, doc_digest = None, "", ""
         if composed and verdict.approved:
             from .. import media as media_mod

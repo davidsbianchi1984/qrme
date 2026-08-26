@@ -10,6 +10,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The profile turns its own dials, when asked.** "Be more funny" is a
+  slider three screens away no more: asked to come across differently,
+  the profile moves the dial itself — a steady step of 25 up or down,
+  or max, or none, or `all` for every dial at once — through the same
+  `set_dials` the owner's sliders write, with the same clamps and the
+  same intimacy rule. The owner's steering lock is the veto its own
+  docstring promised: while it stands the change is refused, and the
+  profile says so instead of pretending. Works in chat, on the talk
+  face, and in rooms.
+
 - **The four panels meet you in the chat, at the size of the face.** Who
   they are, what they hold, what you are to each other and how they
   behave were reachable only inside the talk overlay — a voice feature
