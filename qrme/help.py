@@ -266,6 +266,8 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     "social": ("friends", "my page", "the feed", "the wall", "post something",
                "unfriend", "remove a friend", "delete my comment",
                "take back what i said"),
+    "circle": ("my circle", "see all my friends", "all my friends",
+               "everyone i added", "who are my friends"),
     "mic": ("lend my microphone", "microphone", "let it hear me", "channel 2",
             "mic"),
     "fullscreen": ("full screen", "fullscreen", "landscape", "sideways",
