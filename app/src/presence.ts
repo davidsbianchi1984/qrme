@@ -49,12 +49,17 @@ export interface ConversationSignals {
  *
  * Order is the priority order, and it is not arbitrary: a failure outranks
  * everything because a screen that shows `speaking` over a failed turn is
- * lying about the most important thing on it. Listening outranks speaking
- * because a person who has started talking has taken the floor. */
+ * lying about the most important thing on it. Speaking outranks listening
+ * because the ear now stays open through the profile's whole reply — that
+ * is what lets a person interrupt — so "listening" would be the caption for
+ * the entire turn and the person would never see that the profile is
+ * talking. The moment they do interrupt, playback stops, `speaking` drops,
+ * and the caption is "listening" again: the floor still changes hands, it
+ * just changes hands on the audio rather than on the flag. */
 export function presenceOf(s: ConversationSignals): Presence {
   if (s.failed) return "error";
-  if (s.listening) return "listening";
   if (s.speaking) return "speaking";
+  if (s.listening) return "listening";
   if (s.awaiting) return "thinking";
   if (s.working) return "processing";
   if (s.held) return "paused";

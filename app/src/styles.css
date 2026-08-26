@@ -916,6 +916,19 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .talk-heard { max-width: 480px; font-size: 15px; color: var(--txt);
   background: rgba(255,255,255,0.05); border: 1px solid var(--line);
   border-radius: 14px; padding: 10px 14px; }
+/* The roll of the conversation, on the talk surface. Bottom-anchored flex in
+   a box about four lines tall: the newest line is always in view without any
+   scroll bookkeeping, and the mask fades the older lines out at the top
+   instead of cutting them. Overflow is hidden, not scrolled — the roll is a
+   glance at what was just said, and the full record is the chat behind it. */
+.talk-roll { max-width: 480px; width: 100%; max-height: 6.2em;
+  flex: 0 0 auto; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  gap: 4px; font-size: 14px; line-height: 1.4; text-align: left;
+  -webkit-mask-image: linear-gradient(to top, #000 55%, transparent);
+  mask-image: linear-gradient(to top, #000 55%, transparent); }
+.talk-roll-line { color: var(--t2); }
+.talk-roll-line.mine { color: var(--txt); text-align: right; }
 
 /* The moving image: a breath the length of motion.tempo_ms — the duration
    arrives inline from the avatar response, so the dot beats at the

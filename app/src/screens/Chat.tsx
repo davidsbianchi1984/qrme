@@ -99,6 +99,17 @@ export function Chat({ onPlans }: {
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  // Mirrors for the talk loops, which live in closures older than the
+  // state they need: the loop that heard the words is not the render that
+  // holds them, and a send() captured three turns ago would send three
+  // turns ago's input. Assigned every render, read at fire time.
+  const heardText = useRef("");
+  const busyRef = useRef(false);
+  const sendRef = useRef<() => void>(() => {});
+  // When words last arrived from either ear, and which ear is live.
+  // "rec" is the platform recogniser, "tape" the recorded fallback.
+  const lastWords = useRef(0);
+  const earMode = useRef<"rec" | "tape" | null>(null);
   const [error, setError] = useState<unknown>(null);
   // Where you are (spec clause 1): optional context the reply adapts to.
   // Off until opened, empty until filled — nothing is inferred or collected.
@@ -333,6 +344,30 @@ export function Chat({ onPlans }: {
       .then(setTalkAvatar).catch(() => setTalkAvatar(null));
   }, [session.profileId]);
 
+  // The pause that sends, for the platform recogniser. Its continuous
+  // session never ends a turn on its own, so the words stood in the box
+  // until somebody pressed Send — on a talk surface whose whole design is
+  // listen, send, speak, listen again. Half a second of polling against a
+  // timestamp the ears stamp; 4.5s of quiet with words standing fires the
+  // same press the Send button does, then flushes the recogniser session
+  // so its settled text cannot resurrect what was already sent. The
+  // recorded ear sends through its own silent-turn fork instead — its
+  // turns already end on silence, and two senders would race.
+  useEffect(() => {
+    if (!talking) return;
+    const t = window.setInterval(() => {
+      if (earMode.current !== "rec" || !wantsEar.current) return;
+      if (busyRef.current || !heardText.current.trim()) return;
+      if (!lastWords.current
+          || Date.now() - lastWords.current < 4500) return;
+      lastWords.current = 0;
+      setHeard("");
+      sendRef.current();
+      talkRec.current?.stop();
+    }, 500);
+    return () => window.clearInterval(t);
+  }, [talking]);
+
   function openTalk() {
     setTalking(true);
     setHeard("");
@@ -356,6 +391,7 @@ export function Chat({ onPlans }: {
     const live = () => mine === earTurn.current;
     setEarTrouble(null);
     const rec = new Recognition();
+    earMode.current = "rec";
     rec.lang = lang;
     // `continuous` defaults to **false**, and that was the whole defect: the
     // engine is specified to stop after the first utterance, so the ear shut
@@ -387,6 +423,7 @@ export function Chat({ onPlans }: {
       const text = (settled + (live ? " " + live : "")).trim();
       setHeard(text);
       setInput(text);
+      if (text) lastWords.current = Date.now();
     };
     rec.onend = () => {
       if (!live()) return;
@@ -460,6 +497,7 @@ export function Chat({ onPlans }: {
    *      mattered  does the conversation still happen when it cannot */
   async function talkRecord(prior: string) {
     if (putAway() || !session.interactorId) return;
+    earMode.current = "tape";
     const mine = ++earTurn.current;
     const live = () => mine === earTurn.current;
     setEarTrouble(null);
@@ -485,6 +523,7 @@ export function Chat({ onPlans }: {
       const text = (prior ? prior + " " : "") + said;
       setHeard(text);
       setInput(text);
+      if (text.trim()) lastWords.current = Date.now();
       if (wantsEar.current && !putAway()) { void talkRecord(text); return; }
       setListening(false);
     } catch (e) {
@@ -494,6 +533,19 @@ export function Chat({ onPlans }: {
       // listen again, the recogniser's own posture for `no-speech`.
       if (wantsEar.current && !putAway()
           && String((e as Error)?.message || "").startsWith("nothing")) {
+        // A silent stretch with words already standing is not a turn to
+        // keep waiting on — it is the pause that sends. "I shouldn't have
+        // to press send; it should send automatically after a silence of
+        // like four seconds, five seconds." The recorded ear's turns end
+        // on their own silence, so one empty turn IS that pause; the loop
+        // restarts with nothing carried, because carrying `prior` across
+        // the send would resurrect words already on their way.
+        if (prior.trim() && !busyRef.current) {
+          setHeard("");
+          sendRef.current();
+          void talkRecord("");
+          return;
+        }
         void talkRecord(prior);
         return;
       }
@@ -726,6 +778,9 @@ export function Chat({ onPlans }: {
     setListening(false);
   }), []);
 
+  heardText.current = input;
+  busyRef.current = busy;
+
   async function send() {
     const message = input.trim();
     if (!message || !session.profileId || !session.interactorId) return;
@@ -805,6 +860,7 @@ export function Chat({ onPlans }: {
       setBusy(false);
     }
   }
+  sendRef.current = send;
 
   return (
     <div className="screen chat">
@@ -1126,6 +1182,23 @@ export function Chat({ onPlans }: {
           </div>
           <Waveform presence={presence} lang={lang} />
           {heard && <div className="talk-heard">{heard}</div>}
+          {/* The roll: the conversation so far, pinned to its newest line and
+              fading out a few lines up. The talk surface had no record at all
+              — a person who missed a sentence had to close the face and read
+              the chat behind it.
+
+                  asked     can I see the back-and-forth here
+                  mattered  newest at the bottom, gone by four lines up */}
+          {msgs.some((m) => m.text) && (
+            <div className="talk-roll" aria-live="polite">
+              {msgs.filter((m) => m.text).slice(-6).map((m, i) => (
+                <div key={i}
+                     className={"talk-roll-line" + (m.who === "you" ? " mine" : "")}>
+                  {m.text}
+                </div>
+              ))}
+            </div>
+          )}
           {talkAvatar && (!talkAvatar.asset || talkAvatar.placeholder) && (
             <div className="muted small">{tr("chat.talk.noface", lang)}</div>
           )}
