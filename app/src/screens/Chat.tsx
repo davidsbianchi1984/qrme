@@ -363,7 +363,7 @@ export function Chat({ onPlans }: {
       lastWords.current = 0;
       setHeard("");
       sendRef.current();
-      talkRec.current?.stop();
+      talkFlush();
     }, 500);
     return () => window.clearInterval(t);
   }, [talking]);
@@ -751,6 +751,17 @@ export function Chat({ onPlans }: {
    * tap targets — not only the buttons under them. */
   function tapTalk() {
     if (!listening && !busy) talkListen();
+  }
+
+  /** Flush the recogniser session after a silence-send — a restart, not a
+   *  close. Deliberately does NOT retire the turn: the `aborted` this stop
+   *  provokes is non-fatal in `onerror`, and `onend`, finding the turn
+   *  still live and the ear still wanted, stands a fresh session up with
+   *  an empty transcript — which is the point, because the old session's
+   *  settled text would otherwise resurrect words already sent. Retiring
+   *  the turn here is the one thing that would close the ear for good. */
+  function talkFlush() {
+    talkRec.current?.stop();
   }
 
   /** Close the ear because the person asked, not because it timed out. */

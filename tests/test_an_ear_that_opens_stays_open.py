@@ -165,6 +165,22 @@ def test_a_stop_retires_the_turn_it_stopped():
     # loosens in a hurry instead of correcting.
     blocks = [b for b in re.split(r"\n  (?=function |useEffect\()", src)
               if "talkRec" in b]
+    # One deliberate exception: `talkFlush`, the silence-send's restart.
+    # Its stop must NOT retire the turn — `onend` has to find the turn
+    # live and the ear wanted so a fresh session stands up with an empty
+    # transcript, which is what keeps settled text from resurrecting words
+    # already sent. Its `aborted` is non-fatal (the test two down holds
+    # that door), so the abort it provokes cannot close anything. The
+    # exemption is only safe while the flush stays that narrow: a stop and
+    # nothing else — no turn arithmetic, no flag writes it could get wrong.
+    flushes = [b for b in blocks if b.lstrip().startswith("function talkFlush")]
+    if flushes:
+        assert len(flushes) == 1, "two flushes is two senders racing"
+        flush = flushes[0]
+        assert "earTurn" not in flush and "wantsEar" not in flush, (
+            "talkFlush grew turn or flag writes; it is exempt from the "
+            "stop/retire count only while it is a bare restart")
+        blocks = [b for b in blocks if b is not flush]
     stops = sum(b.count("talkRec.current?.stop()") + b.count("rec?.stop()")
                 for b in blocks)
     retires = sum(b.count("earTurn.current += 1") for b in blocks)
