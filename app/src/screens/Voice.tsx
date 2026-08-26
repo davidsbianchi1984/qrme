@@ -316,29 +316,6 @@ export function Voice({ onPlans }: {
                       })}>
                 {tr("voice.spoken.unbind", lang)}
               </button>
-              {/* Full blast is the default; the slider only dials DOWN.
-                  Vertical on purpose — it reads as a volume, and it sits
-                  beside the button that makes sound. It moves the piece
-                  already in your ear, not just the next one. The play-only
-                  paths hold no microphone, so a Bluetooth earbud stays in
-                  its loud music mode — see spoken.ts. */}
-              <label className="loudness" title={tr("voice.spoken.loud", lang)}
-                     style={{ display: "inline-flex", flexDirection: "column",
-                              alignItems: "center", gap: 4 }}>
-                <span className="muted small">
-                  {tr("voice.spoken.loud", lang)} {Math.round(loud * 100)}%
-                </span>
-                <input type="range" min={5} max={100} step={5}
-                       value={Math.round(loud * 100)}
-                       aria-label={tr("voice.spoken.loud", lang)}
-                       style={{ writingMode: "vertical-lr",
-                                direction: "rtl", height: 96, width: 24 }}
-                       onChange={(e) => {
-                         const v = Number(e.target.value) / 100;
-                         setLoud(v);
-                         setSpokenLoudness(v);
-                       }} />
-              </label>
               <button disabled={busy}
                       onClick={() => run(async () => {
                         const blob = await api.sayInProfileVoice(
@@ -356,6 +333,35 @@ export function Voice({ onPlans }: {
             </>
           )}
         </div>
+      </div>
+      {/* Full blast is the default; the slider only dials DOWN, and it
+          lives OFF TO THE SIDE — position: fixed, so it reshapes nothing.
+          The card layout is the way its owner wants it, and a control
+          that moves other controls to exist is a control that costs more
+          than it gives. Vertically centred on the right edge, clear of
+          the help bubble in the corner. It moves the piece already in
+          your ear, not just the next one, and the play-only paths hold
+          no microphone, so a Bluetooth earbud stays in its loud music
+          mode — see spoken.ts. */}
+      <div className="loudness-rail" title={tr("voice.spoken.loud", lang)}
+           style={{ position: "fixed", right: 6, top: "50%",
+                    transform: "translateY(-50%)", zIndex: 40,
+                    display: "flex", flexDirection: "column",
+                    alignItems: "center", gap: 4, padding: "8px 2px",
+                    borderRadius: 12, background: "rgba(20,18,40,0.55)" }}>
+        <span className="muted small" aria-hidden="true">
+          {Math.round(loud * 100)}%
+        </span>
+        <input type="range" min={5} max={100} step={5}
+               value={Math.round(loud * 100)}
+               aria-label={tr("voice.spoken.loud", lang)}
+               style={{ writingMode: "vertical-lr", direction: "rtl",
+                        height: 110, width: 22 }}
+               onChange={(e) => {
+                 const v = Number(e.target.value) / 100;
+                 setLoud(v);
+                 setSpokenLoudness(v);
+               }} />
       </div>
     </div>
   );
