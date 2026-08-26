@@ -15,8 +15,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   behave were reachable only inside the talk overlay — a voice feature
   by accident of placement. They now dock in the main chat where the
   owner circled: the right edge, under the loudness rail, with the
-  opened panel swinging out beside the column. And the chat banner
+  opened panel swinging out beside the column — and in rooms too, with
+  seat chips saying whose panels are open and the owner's panels offered
+  only for the profile the session actually owns. And the chat banner
   drops to the scale of the 52px face it sits beside.
+
+- **The README shows the screens you'll meet.** Twenty-eight of them,
+  grouped by journey — getting in, talking, people, places, yours,
+  worth, trust — each with what it does in one line, drawn at phone
+  scale and serving web, computer and the installed app alike; the
+  complete 204-screen tour stays in docs/gallery.md.
 
 - **Your circle — the friends screen that is only friends.** "See all"
   now sits across from Top friends on the homepage and opens a new

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { isEcho, RECENT_TURNS } from "../echo";
+import { TalkRail } from "../TalkRail";
 import { accountApi, api, getBase, type Avatar, type MicsHere, type RoomFaces,
          type RoomMsg } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
@@ -193,6 +194,8 @@ export function Inside({ onPlans, start = "", onLeave }: {
   const [seats, setSeats] = useState<
     { kind: string; id: string; display: string }[]>([]);
   const [draft, setDraft] = useState("");
+  // Whose four panels the dock shows, in a room with several profiles.
+  const [railFor, setRailFor] = useState<string | null>(null);
   const [scene, setScene] = useState<RoomFaces | null>(null);
   // The room's own channel, read off the join answer. `chat`, `voice` and
   // `video` present flat; `ar` and `vr` are the two the homepage sells as
@@ -2782,6 +2785,40 @@ export function Inside({ onPlans, start = "", onLeave }: {
            * strip is where a person's hand already is. The doors both
            * cards opened are unchanged; only these copies of them are
            * gone. */}
+
+          {/* The four panels, docked under the loudness rail — "those
+              four extra boxes should be located in all the chats,
+              including rooms." With several profiles seated, the small
+              chips above the column say whose panels are open; the
+              owner's own panels appear only for the profile the session
+              actually owns, so no button here opens onto a refusal. */}
+          {seats.some((s) => s.kind === "profile") && (
+            <div className="chat-rail-dock">
+              {seats.filter((s) => s.kind === "profile").length > 1 && (
+                <div className="room-dock-picker" role="tablist">
+                  {seats.filter((s) => s.kind === "profile").map((p) => (
+                    <button key={p.id}
+                            className={railFor === p.id ? "on" : ""}
+                            role="tab" aria-selected={railFor === p.id}
+                            onClick={() => setRailFor(p.id)}>
+                      {p.display.split(/\s+/)[0]}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <TalkRail
+                profileId={railFor
+                  || seats.find((s) => s.kind === "profile")!.id}
+                interactorId={me || null}
+                lang={lang}
+                ownerToken={(railFor
+                  || seats.find((s) => s.kind === "profile")!.id)
+                    === session.profileId
+                  ? (session.ownerToken || null) : null}
+                interactorToken={token || null}
+                onError={setError} />
+            </div>
+          )}
         </>
       )}
     </div>

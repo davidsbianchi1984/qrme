@@ -43,3 +43,18 @@ def test_the_dock_is_a_fixed_column_under_the_rail():
 def test_the_chat_banner_holds_the_faces_scale():
     assert ".chat-head-words h2" in CSS, (
         "the banner is back at page-title size beside a 52px face")
+
+
+def test_the_rail_reaches_the_rooms_too():
+    """"Those four extra boxes should be located in all the chats,
+    including rooms." With several profiles seated, the chips above the
+    column say whose panels are open — and the owner's panels are offered
+    only for the profile the session actually owns, so no button opens
+    onto a refusal."""
+    inside = (SRC / "screens" / "Inside.tsx").read_text(encoding="utf-8")
+    assert "<TalkRail" in inside, "the rooms lost the four panels"
+    assert "room-dock-picker" in inside, (
+        "a room with two profiles has one unnamed rail — whose panels?")
+    assert '=== session.profileId' in inside, (
+        "the owner token is handed to profiles the session does not own — "
+        "two of the four buttons become refusals")
