@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type VoiceprintStatus , type ProfileVoice } from "../api";
 import { Refusal } from "../Refusal";
-import { playClip, setSpokenLoudness, spokenLoudness } from "../spoken";
+import { playClip } from "../spoken";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { useSession } from "../store";
 
@@ -28,7 +28,6 @@ export function Voice({ onPlans }: {
   const [source, setSource] = useState<"call" | "voice_note" | "direct">("voice_note");
   const [say, setSay] = useState("");
   const [spoken, setSpoken] = useState<{ basis: string; disclosure: string } | null>(null);
-  const [loud, setLoud] = useState(() => spokenLoudness());
 
   const [bound, setBound] = useState<ProfileVoice | null>(null);
   const [voiceId, setVoiceId] = useState("");
@@ -334,35 +333,9 @@ export function Voice({ onPlans }: {
           )}
         </div>
       </div>
-      {/* Full blast is the default; the slider only dials DOWN, and it
-          lives OFF TO THE SIDE — position: fixed, so it reshapes nothing.
-          The card layout is the way its owner wants it, and a control
-          that moves other controls to exist is a control that costs more
-          than it gives. Vertically centred on the right edge, clear of
-          the help bubble in the corner. It moves the piece already in
-          your ear, not just the next one, and the play-only paths hold
-          no microphone, so a Bluetooth earbud stays in its loud music
-          mode — see spoken.ts. */}
-      <div className="loudness-rail" title={tr("voice.spoken.loud", lang)}
-           style={{ position: "fixed", right: 6, top: "50%",
-                    transform: "translateY(-50%)", zIndex: 40,
-                    display: "flex", flexDirection: "column",
-                    alignItems: "center", gap: 4, padding: "8px 2px",
-                    borderRadius: 12, background: "rgba(20,18,40,0.55)" }}>
-        <span className="muted small" aria-hidden="true">
-          {Math.round(loud * 100)}%
-        </span>
-        <input type="range" min={5} max={100} step={5}
-               value={Math.round(loud * 100)}
-               aria-label={tr("voice.spoken.loud", lang)}
-               style={{ writingMode: "vertical-lr", direction: "rtl",
-                        height: 110, width: 22 }}
-               onChange={(e) => {
-                 const v = Number(e.target.value) / 100;
-                 setLoud(v);
-                 setSpokenLoudness(v);
-               }} />
-      </div>
+      {/* The loudness rail lived here first; it belongs to the shell now
+          (LoudnessRail.tsx) so the screens that actually play a voice —
+          the talk face, the agent, a room — have it too. */}
     </div>
   );
 }

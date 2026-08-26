@@ -62,6 +62,7 @@ import { Settings } from "./screens/Settings";
 import { Access } from "./screens/Access";
 import { Matters } from "./screens/Matters";
 import { Help } from "./Help";
+import { LoudnessRail } from "./LoudnessRail";
 import { ProblemNotice } from "./ProblemNotice";
 import { WalkAlong } from "./WalkAlong";
 import { onWalk } from "./walk";
@@ -427,6 +428,9 @@ export function App() {
       {/* Same reason: the agent task lights are on every screen, watch-sized,
           minimizable to a dot when they're in the way. */}
       <WatchLights />
+      {/* And the dial-down for spoken audio, above the surfaces the sound
+          actually comes out of — the talk face and the room stage. */}
+      <LoudnessRail />
     </div>
   );
 }

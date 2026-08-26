@@ -6,6 +6,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **The loudness rail is the shell's now.** It began on the Voice screen —
+  where a voice is configured — but the places a voice is *heard* are the
+  talk face, the agent and a room, and none of them could reach it: too
+  loud mid-conversation meant leaving the conversation to fix it. The
+  shell owns the rail the way it owns Help and the task lights, floated
+  above the talk overlay and the room stage, still full blast by default,
+  still attenuate-only, still remembered per device.
+
 ## [1.8.5] - 2026-08-26
 
 ### Added

@@ -72,6 +72,15 @@ NOT_A_SURFACE = {
     # stopped it is, ending it is its first control, and being put away
     # closes it and says so.
     "WalkAlong",
+    # The loudness rail: the dial-down for spoken audio, fixed to the right
+    # edge over every screen since it left the Voice card for the shell.
+    # Chrome by the same reasoning as the corner counter above — and unlike
+    # the walk-along strip it holds no microphone: it is play-only, and the
+    # only thing it changes is the volume of the piece already in the ear
+    # (spoken.ts is the one place that applies it). While it lived inside
+    # Voice.tsx it was covered by screen 147; moving files did not make it
+    # a destination.
+    "LoudnessRail",
 }
 
 
