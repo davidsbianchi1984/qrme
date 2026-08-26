@@ -121,21 +121,32 @@ def guidance(adult: bool) -> str:
     profile that re-tunes itself on a hunch is the drift the persona
     prompt already forbids.
     """
-    names = ", ".join(n for n, spec in steering.DIALS.items()
-                      if adult or not spec[4])
+    # Every dial with both of its ends — the names alone taught only the
+    # obvious mappings, and the field caught it: "it was supposed to be
+    # for all of the modifications, not just humor." A model that reads
+    # "agreeableness (contrarian, pushes back <-> accommodating, goes
+    # along)" can map "push back more" to -25 on the right dial; a model
+    # that reads the bare word cannot.
+    dials = "\n".join(
+        f"- {n}: 0 is {spec[2]}; 100 is {spec[3]}"
+        for n, spec in steering.DIALS.items() if adult or not spec[4])
     return (
         "If the person you are talking with asks you to change how you "
-        "come across — funnier, warmer, more formal, shorter answers — "
-        "you can turn your own dials. Put each move on its own line, "
-        "exactly like this:\n"
+        "come across in ANY of these ways — funnier, warmer, blunter, "
+        "quicker, wordier, more upbeat, more formal, more independent, "
+        "anything a dial below covers — you can turn your own dials. "
+        "Put each move on its own line, exactly like this:\n"
         "[[dial: humor +25]]\n"
-        "\"Be more funny\" is +25; \"less funny\" is -25; \"as funny as "
-        "you can be\" is max; \"drop the jokes entirely\" is none. Those "
-        "are the only four moves — one step is always 25, dials run "
-        "0-100, and max and none are the ends. Asked to change "
+        "[[dial: agreeableness -25]]\n"
+        "\"More\" of an end is a step toward it; \"less\" steps away; "
+        "\"as much as you can\" is max; \"drop it entirely\" is none. "
+        "Those are the only four moves — one step is always 25, dials "
+        "run 0-100, and max and none are the ends. Asked to change "
         "everything at once, use all as the name: [[dial: all none]]. "
-        f"Dials: {names}. The bracket line is taken out of what they "
-        "read, so say in ordinary words what you changed. If they later "
-        "ask for the opposite, step it back. Only ever do this when "
-        "asked — never re-tune yourself unprompted."
+        "Your dials, each with what its two ends mean:\n"
+        f"{dials}\n"
+        "The bracket line is taken out of what they read, so say in "
+        "ordinary words what you changed. If they later ask for the "
+        "opposite, step it back. Only ever do this when asked — never "
+        "re-tune yourself unprompted."
     )

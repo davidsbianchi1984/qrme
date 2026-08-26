@@ -125,3 +125,23 @@ def test_a_room_profile_turns_its_dials_too(client, monkeypatch):
     turn = r.json()["replies"][0]
     assert "[[" not in (turn["content"] or "")
     assert steering.get(prof["id"])["verbosity"] == 25
+
+
+def test_the_guidance_teaches_every_dial_by_its_ends(client, profile_id,
+                                                     interactor_id,
+                                                     monkeypatch):
+    """Field report, one deploy later: "it was supposed to be for all of
+    the modifications, not just humor." The names alone taught only the
+    obvious mappings — the prompt now carries each dial with both of its
+    ends, so "push back more" can find agreeableness and its direction."""
+    from qrme import llm
+    made = Turning()
+    monkeypatch.setattr(llm, "provider_for_profile", lambda *a, **k: made)
+    _chat(client, profile_id, interactor_id, "hello")
+    prompt = made.prompts[0]
+    for name, spec in steering.DIALS.items():
+        if spec[4]:
+            continue
+        assert f"- {name}: 0 is {spec[2]}; 100 is {spec[3]}" in prompt, (
+            f"the {name} dial is taught without its ends — a modification "
+            "the profile cannot map to a move")

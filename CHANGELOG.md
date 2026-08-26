@@ -6,6 +6,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The dial guidance teaches every modification, not just humor.** The
+  prompt listed bare dial names with one worked example, and the field
+  caught what that teaches: the obvious mappings only. Each dial now
+  rides the prompt with both of its ends spelled out, so "push back
+  more" can find agreeableness — and its direction.
+
 ## [1.8.7] - 2026-08-27
 
 ### Added
