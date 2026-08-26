@@ -530,35 +530,51 @@ def _parse_cmap(body: bytes) -> _Cmap | None:
             if char:
                 table[code] = char
     for block in _BFRANGE.findall(body):
-        for line in block.split(b"\n"):
-            arrays = re.findall(rb"\[(.*?)\]", line, re.S)
-            tokens = _HEXTOK.findall(re.sub(rb"\[.*?\]", b"", line, flags=re.S))
-            if len(tokens) < 2:
+        # In token order, not by line. CMaps are written by machines and
+        # machines disagree about lines: \r-only endings, several ranges to
+        # a line, a whole minified map on one. The first version split on
+        # \n and read one range per "line" — which on a one-line map meant
+        # the first range and none after it, an alphabet lost silently and
+        # reported as this reader's own "unmapped". The grammar itself is
+        # unambiguous without the lines: two hex tokens then a destination
+        # (a third hex token, or an array), repeated.
+        items: list[tuple[bytes, bytes]] = [
+            (b"arr", m.group(2)) if m.group(2) is not None
+            else (b"hex", m.group(1))
+            for m in re.finditer(rb"<([0-9A-Fa-f\s]*)>|\[(.*?)\]", block, re.S)
+        ]
+        i = 0
+        while i + 2 < len(items):
+            src_lo, src_hi, dest = items[i], items[i + 1], items[i + 2]
+            if src_lo[0] != b"hex" or src_hi[0] != b"hex":
+                i += 1
                 continue
             try:
-                lo = int(b"".join(tokens[0].split()), 16)
-                hi = int(b"".join(tokens[1].split()), 16)
+                lo = int(b"".join(src_lo[1].split()), 16)
+                hi = int(b"".join(src_hi[1].split()), 16)
             except ValueError:
+                i += 1
                 continue
             if not width:
-                width = max(1, len(b"".join(tokens[0].split())) // 2)
+                width = max(1, len(b"".join(src_lo[1].split())) // 2)
             if hi < lo or hi - lo > 65535:
+                i += 3
                 continue
-            if arrays:
-                for offset, token in enumerate(_HEXTOK.findall(arrays[0])):
+            if dest[0] == b"arr":
+                for offset, token in enumerate(_HEXTOK.findall(dest[1])):
                     char = _hex_chars(token)
                     if char:
                         table[lo + offset] = char
-            elif len(tokens) >= 3:
-                start = _hex_chars(tokens[2])
-                if not start:
-                    continue
-                base = ord(start[-1])
-                head = start[:-1]
-                for offset in range(hi - lo + 1):
-                    if base + offset > 0x10FFFF:
-                        break
-                    table[lo + offset] = head + chr(base + offset)
+            else:
+                start = _hex_chars(dest[1])
+                if start:
+                    base = ord(start[-1])
+                    head = start[:-1]
+                    for offset in range(hi - lo + 1):
+                        if base + offset > 0x10FFFF:
+                            break
+                        table[lo + offset] = head + chr(base + offset)
+            i += 3
     if not table:
         return None
     return _Cmap(width or 2, table)
@@ -821,6 +837,66 @@ def _pdf_text(data: bytes) -> str:
     return text if _reads_like_language(text) else ""
 
 
+#: How many pages the eyes look at. A cap because OCR is the expensive way
+#: to read and a scan can be four hundred pages; what a profile needs to
+#: DISCUSS a document lives overwhelmingly in its front matter, and the
+#: prompt block caps what it hands over anyway.
+_OCR_PAGES = 12
+
+
+def _ocr_text(data: bytes) -> str:
+    """The words drawn on a PDF's pages, read with actual eyes.
+
+    The route around both refusals the text reader gives honestly. A scan
+    has no text layer; a subset font without a followable map hides its
+    text behind glyph ids. In both files the words are nonetheless DRAWN
+    on the page, where an OCR pass reads them the way a person would —
+    the owner's two filings, refused as "scanned" and "unmapped" in the
+    same afternoon, are one problem from this side of the glass.
+
+    System tools, feature-detected: poppler's `pdftoppm` rasterises and
+    `tesseract` reads, both reached as subprocesses so this stays a
+    stack with no new Python dependencies — the same bargain the ears
+    struck. A deployment without them keeps today's honest refusal
+    (this function answering "" IS that refusal); the docker image
+    installs both, so the beta has eyes even where a dev checkout does
+    not.
+
+    Gated by the same language gate as everything upstream of it. OCR of
+    a blurry page is noise, and the gate is what keeps best-effort
+    honest: a failure must come back as a failure, never as a paragraph.
+    """
+    import shutil
+    import subprocess
+    import tempfile
+    from pathlib import Path
+
+    if not (shutil.which("pdftoppm") and shutil.which("tesseract")):
+        return ""
+    with tempfile.TemporaryDirectory(prefix="qrme-eyes-") as work:
+        held = Path(work) / "held.pdf"
+        held.write_bytes(data)
+        try:
+            subprocess.run(
+                ["pdftoppm", "-r", "200", "-gray", "-png",
+                 "-f", "1", "-l", str(_OCR_PAGES),
+                 str(held), str(Path(work) / "page")],
+                capture_output=True, timeout=120, check=True)
+        except Exception:
+            return ""            # not a PDF poppler can open; nothing read
+        seen: list[str] = []
+        for page in sorted(Path(work).glob("page*.png")):
+            try:
+                got = subprocess.run(
+                    ["tesseract", str(page), "stdout"],
+                    capture_output=True, timeout=60, check=True)
+            except Exception:
+                continue         # one bad page does not unread the rest
+            seen.append(got.stdout.decode("utf-8", "replace"))
+    text = _clean(" ".join(seen))
+    return text if _reads_like_language(text) else ""
+
+
 #: How much of an extraction has to look like writing before it counts as
 #: having been read. Deliberately generous: a filing is full of numbers,
 #: citations and reference signs, and this is a floor against byte soup, not a
@@ -964,6 +1040,14 @@ def read_file(data: bytes, name: str | None,
         # Empty is the honest answer for a scan, and now also for a PDF this
         # reader could open but not turn into words — see `_pdf_text`.
         text = _pdf_text(data)
+        if not text:
+            # The eyes. Both honest refusals — the scan with no text layer
+            # and the font whose map cannot be followed — leave the words
+            # drawn on the page, and drawn words can be read (_ocr_text).
+            # Tried only after the text reader comes back empty: where a
+            # text layer exists it is the exact text, and OCR is the
+            # approximate, expensive way to almost get it.
+            text = _ocr_text(data)
         return "document", text, bool(text)
     if data[:4] == b"PK\x03\x04":
         text = _zip_text(data, ext)

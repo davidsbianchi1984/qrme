@@ -304,6 +304,79 @@ def test_a_font_this_reader_cannot_follow_says_so():
     assert _why_unread(data) == "unmapped"
 
 
+def test_a_minified_map_is_the_whole_map():
+    """A CMap written on one line is the same map.
+
+    The first bfrange follower split the block on \\n and read one range
+    per "line" — which on a minified map, or one written with \\r-only
+    endings, meant the FIRST range and none after it: most of the alphabet
+    lost silently and reported as this reader's own "unmapped". The
+    grammar never needed the lines — two hex tokens then a destination,
+    repeated — so the follower walks tokens now and the layout of the
+    bytes stops mattering.
+    """
+    from qrme.briefcase import _parse_cmap
+
+    one_line = (b"begincodespacerange <0000> <FFFF> endcodespacerange "
+                b"beginbfrange <0003> <0005> <0041>"
+                b" <0006> <0007> [<0058> <0059>] endbfrange")
+    m = _parse_cmap(one_line)
+    assert m is not None
+    assert (m.table[3], m.table[4], m.table[5]) == ("A", "B", "C")
+    assert (m.table[6], m.table[7]) == ("X", "Y")
+    # The same map with carriage returns for line ends — a layout that
+    # really ships — reads identically.
+    cr = one_line.replace(b"> <", b">\r<")
+    m2 = _parse_cmap(cr)
+    assert m2 is not None and m2.table == m.table
+
+
+def test_the_eyes_read_what_the_text_reader_refused(monkeypatch):
+    """OCR is the route around BOTH honest refusals at once.
+
+    The owner shared two filings in one afternoon and the profile refused
+    both, correctly: one was pages-as-pictures ("scanned"), the other
+    wrote its text in fonts whose map could not be followed ("unmapped").
+    From the other side of the glass they are one problem — the words are
+    DRAWN on the page either way, and drawn words can be read. The eyes
+    run only after the text reader comes back empty, because a text layer
+    is the exact text and OCR is the approximate way to almost get it.
+    """
+    import qrme.briefcase as bc
+
+    monkeypatch.setattr(bc, "_ocr_text", lambda data: SENTENCE)
+    for data in (_scanned_pdf(),
+                 _identity_pdf().replace(b"/ToUnicode 6 0 R",
+                                         b"                ")):
+        kind, text, read = read_file(data, "filing.pdf")
+        assert read is True and text == SENTENCE
+        # Read is read: no diagnosis rides along with a document that
+        # arrived as words.
+        assert why_unread(data, kind, read) is None
+    # And a PDF whose text layer works never pays for the eyes.
+    monkeypatch.setattr(bc, "_ocr_text",
+                        lambda data: pytest.fail("OCR ran on readable text"))
+    _, text, read = read_file(_identity_pdf(), "filing.pdf")
+    assert read is True and SENTENCE.split()[0] in text
+
+
+def test_without_eyes_the_refusal_stands(monkeypatch):
+    """A deployment without the tools keeps today's honest answer.
+
+    `_ocr_text` feature-detects poppler and tesseract; both absent means
+    "" — which IS the refusal, in the same words as before, with the same
+    key for the console's ten languages. Nothing new to install for a dev
+    checkout, nothing invented for a box the image was not built on.
+    """
+    import shutil
+
+    monkeypatch.setattr(shutil, "which", lambda name: None)
+    data = _scanned_pdf()
+    kind, text, read = read_file(data, "filing.pdf")
+    assert read is False and text == ""
+    assert why_unread(data, kind, read) == "scanned"
+
+
 def test_only_a_document_gets_a_reason():
     """A photograph is not a failure of this reader — this deployment has
     ears and no eyes, which the prompt block says in its own words. Dressing

@@ -8,6 +8,20 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The deployment has eyes.** The owner shared two filings in one
+  afternoon and the profile refused both, correctly: one was
+  pages-as-pictures, the other wrote its text in fonts whose character
+  map could not be followed. From the other side of the glass they are
+  one problem — the words are *drawn* on the page either way — so when
+  the text reader comes back empty, an OCR pass (poppler + tesseract,
+  system tools, feature-detected, no new Python dependencies) reads the
+  first dozen pages the way a person would, gated by the same
+  is-this-language gate as everything else. A deployment without the
+  tools keeps today's honest refusal; the docker image installs them.
+  And the character-map follower itself got sharper: a CMap minified
+  onto one line, or written with carriage-return endings, now reads as
+  the whole map instead of its first range.
+
 - **The voice follows what is already connected.** "You shouldn't have to
   go to the settings menus to be using something that's already connected
   to your device." When the set of audio devices changes — an earbud

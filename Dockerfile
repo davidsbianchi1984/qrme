@@ -34,6 +34,15 @@ ENV PYTHONUNBUFFERED=1 \
     QRME_DB=/data/qrme.db \
     QRME_CONSOLE_DIR=/srv/app/dist
 
+# The eyes: `briefcase._ocr_text` reads scanned pages and unmappable fonts
+# by rasterising (poppler's pdftoppm) and reading (tesseract), both reached
+# as subprocesses — no new Python dependencies. Feature-detected in code,
+# so a checkout without them keeps the honest refusal; the image carries
+# them so the beta can actually read what it is handed.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends tesseract-ocr poppler-utils \
+ && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /srv
 COPY pyproject.toml README.md ./
 COPY qrme/ ./qrme/
