@@ -50,6 +50,33 @@ DIALS: dict[str, tuple[str, str, str, str, bool]] = {
               "serious and plain", "playful and witty", False),
     "assertiveness": ("behavior", "Assertiveness",
                       "gentle and deferential", "direct and assertive", False),
+    # The second behavior shelf — "add in any other ones you can come up
+    # with and create sliders for those." Style and manner only, like
+    # everything on this catalog: a dial never touches identity or
+    # boundaries, and each of these is a way of SAYING things, not a
+    # thing to say. Deliberately not in `temperament`, whose six rows are
+    # the field's own list, pinned verbatim by its guard.
+    "empathy": ("behavior", "Empathy",
+                "matter-of-fact about feelings", "tuned to feelings, names them",
+                False),
+    "encouragement": ("behavior", "Encouragement",
+                      "lets your work speak for itself",
+                      "cheering, celebrates the wins", False),
+    "patience": ("behavior", "Patience",
+                 "expects you to keep up", "unhurried, happy to re-explain",
+                 False),
+    "storytelling": ("behavior", "Storytelling",
+                     "sticks to the facts",
+                     "illustrates with stories and examples", False),
+    "technicality": ("behavior", "Technicality",
+                     "everyday words", "technical depth and precision", False),
+    "spontaneity": ("behavior", "Spontaneity",
+                    "consistent and predictable",
+                    "spontaneous, surprising turns", False),
+    "sarcasm": ("behavior", "Sarcasm",
+                "earnest, no irony", "dry, ironic wit", False),
+    "emoji": ("behavior", "Emoji",
+              "words only, never emoji", "expressive, emoji freely", False),
     # temperament — the disposition itself, the field's list verbatim:
     # mood, outlook, maturity, agreeableness, confidence, curiosity.
     "mood": ("temperament", "Mood",
@@ -71,6 +98,10 @@ DIALS: dict[str, tuple[str, str, str, str, bool]] = {
     "intimacy": ("intimacy", "Intimacy",
                  "reserved", "flirtatious & affectionate (within boundaries)",
                  True),
+    # Adult-only like intimacy, and clamped by the same rule in set_dials:
+    # it can never be raised on a non-rated persona.
+    "profanity": ("intimacy", "Profanity",
+                  "clean language always", "salty when it fits", True),
 }
 
 DEFAULT = 50
@@ -147,7 +178,11 @@ def set_dials(subject_id: str, values: dict, adult: bool) -> dict[str, int]:
             val = 0
         current[name] = val
     if not adult:
-        current["intimacy"] = 0
+        # Every adult-only dial, not a name: profanity joined intimacy and
+        # a list spelled here would drift from the catalog above.
+        for dial_name, dial_spec in DIALS.items():
+            if dial_spec[4]:
+                current[dial_name] = 0
     conn = db.connect()
     conn.execute(
         "INSERT INTO steering_settings (subject_id, dials, updated_at)"

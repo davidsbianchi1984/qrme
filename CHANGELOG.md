@@ -14,6 +14,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   rides the prompt with both of its ends spelled out, so "push back
   more" can find agreeableness — and its direction.
 
+### Added
+
+- **Nine new dials on the steering catalog.** Empathy, encouragement,
+  patience, storytelling, technicality, spontaneity, sarcasm and emoji
+  join the behavior shelf, and profanity joins intimacy on the adult
+  shelf — clamped by the same rule, never raisable on a non-rated
+  persona. Each is a slider in the Controls panel (the panel draws from
+  the catalog, so they simply appear) and each answers the profile's
+  own four moves — +25, -25, max, none — when the person asks.
+
 ## [1.8.7] - 2026-08-27
 
 ### Added

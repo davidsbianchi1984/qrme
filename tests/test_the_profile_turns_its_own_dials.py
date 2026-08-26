@@ -145,3 +145,29 @@ def test_the_guidance_teaches_every_dial_by_its_ends(client, profile_id,
         assert f"- {name}: 0 is {spec[2]}; 100 is {spec[3]}" in prompt, (
             f"the {name} dial is taught without its ends — a modification "
             "the profile cannot map to a move")
+
+
+def test_the_grown_catalog_answers_the_same_four_moves(client):
+    """"Add in any other ones you can come up with and create sliders for
+    those" — eight new behavior dials and one adult one, each reachable
+    by the same grammar and drawn by the same spec-driven sliders."""
+    grown = ("empathy", "encouragement", "patience", "storytelling",
+             "technicality", "spontaneity", "sarcasm", "emoji")
+    for name in grown:
+        assert name in steering.DIALS, f"the {name} dial fell off the catalog"
+        assert steering.DIALS[name][0] == "behavior", (
+            f"{name} strayed into a group whose membership is pinned")
+    profile = make_profile(client)
+    assert selfsteer.apply(profile["id"], {"empathy": "max",
+                                           "sarcasm": "+25"}, adult=False)
+    values = steering.get(profile["id"])
+    assert values["empathy"] == 100 and values["sarcasm"] == 75
+
+
+def test_profanity_is_18plus_only_like_intimacy(client):
+    profile = make_profile(client)
+    selfsteer.apply(profile["id"], {"profanity": "max"}, adult=False)
+    assert steering.get(profile["id"])["profanity"] == 0, (
+        "the conversational path raised an adult-only dial on a "
+        "non-rated persona")
+    assert steering.DIALS["profanity"][4] is True
