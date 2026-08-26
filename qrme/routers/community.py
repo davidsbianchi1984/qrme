@@ -472,6 +472,39 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
                 "would only know from someone else's voice, and if you seem "
                 "to have picked up background talk, treat it as noise rather "
                 "than as something said to you.")
+        # A friend you walk in with is not a stranger. The chat door has
+        # carried this pair's history on every turn since it existed — the
+        # briefcase (everything this person handed this profile) and the
+        # recalled moments (recollection.chat_block, vault-backed) — and
+        # the room door never made either call, so a person opening a room
+        # with their own profile was met as a stranger, their filings
+        # forgotten. Field report: "I had already given a bunch of files
+        # to the synthetic profile in a previous chat... it could not
+        # remember." The history is shared into the room behind the
+        # scenes, on the owner's word that this is what entering together
+        # means.
+        #
+        # Only when the room's one human IS the other half of the pair.
+        # recollection.py's own rule — what Alice told it must never
+        # surface in its reply to Bob — reaches its limit the moment Bob
+        # is in the room hearing the reply, so a room with a second human
+        # in it carries no pair memory at all: privacy over continuity,
+        # stated here so the next reader knows it is a line and not a gap.
+        humans = [p for p in participants if p["kind"] == "user"]
+        if len(humans) == 1:
+            from .. import recollection
+            person = humans[0]["ref_id"]
+            newest_said = next(
+                (r["content"] for r in history
+                 if r["sender_kind"] == "user" and r["content"]),
+                room["topic"])
+            recalled = recollection.chat_block(pdi, profile["id"], person,
+                                               newest_said)
+            if recalled:
+                system += "\n\n" + recalled
+            carried = briefcase.block(profile["id"], person)
+            if carried:
+                system += "\n\n" + carried
         content = llm.get_provider(cloud=cloud).generate(system, turns)
         # A room turn may hand a document over as well as say something.
         # The guidance has ridden every room prompt since the composing

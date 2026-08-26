@@ -8,6 +8,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **A friend you walk in with is not a stranger.** The same profile that
+  held your files and your history in chat met you as a stranger in a
+  room: the chat door carries the pair's briefcase and recalled moments
+  on every turn, and the room door never made either call. When the
+  room's one human is the other half of the pair, both now enter the
+  room behind the scenes — the profile remembers what you handed it and
+  what you told it, wherever you meet. The line is drawn where
+  recollection's own rule draws it: a second human in the room keeps all
+  pair memory out, because what Alice told a profile must not be read
+  out in front of Bob. Privacy over continuity, on the record. (No, PDI
+  does not need to be open in a tab — the vault is a service the server
+  talks to; browser tabs were never part of it.)
+
 - **A profile hands documents over in rooms too — and as PDFs when a PDF
   was asked for.** The composing fence has been offered in every room
   prompt since it shipped, but the room never made the split, so a
