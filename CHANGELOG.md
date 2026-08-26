@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.8.7] - 2026-08-27
+
 ### Added
 
 - **Your circle — the friends screen that is only friends.** "See all"
@@ -15768,7 +15770,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.6...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.7...HEAD
+[1.8.7]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.6...app-v1.8.7
 [1.8.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.5...app-v1.8.6
 [1.8.5]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.4...app-v1.8.5
 [1.8.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.3...app-v1.8.4
