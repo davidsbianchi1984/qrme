@@ -6,6 +6,71 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The voice follows what is already connected.** "You shouldn't have to
+  go to the settings menus to be using something that's already connected
+  to your device." When the set of audio devices changes — an earbud
+  connecting mid-conversation — the one playing element re-pins itself to
+  the system's current default output, moving the sentence already in the
+  air, on the platforms that let a page choose at all; the ones that
+  refuse (iOS) route to the default themselves, which is the same
+  behaviour from the other side. And the Voice screen now says which
+  output the voice is on, wherever the platform reveals device names.
+
+### Fixed
+
+- **The room's ears work on an iPhone now — both of them, and mid-reply.**
+  Three defects, one afternoon of field reports. The barge-in meter
+  opened a second microphone stream whenever the room spoke, and iOS
+  keeps one capture alive by muting the other — so the recorded ear went
+  deaf the moment the room started talking, and the profile "wants to
+  finish its entire paragraph." The recorded ear's own analyser now hears
+  the person lean in, on the one stream already standing, and stops the
+  voice on the word it is on; the second-stream meter stays for the
+  recogniser path and stands down while a recording holds the mic. The
+  composer's 🎤 had no fallback at all — it returned silently on the
+  refused recogniser — and now records a take that lands in the field.
+  And focusing the composer no longer zooms the whole stage: it was the
+  one input the 16-px rule missed.
+
+- **A seat wears its person's face.** The blank avatar is only for a
+  person with no picture anywhere: a seat with no own picture put up now
+  borrows the portrait of the account's *self* profile — the one portrait
+  in the system that is a picture OF this person, by that profile's own
+  declaration. Fictional and other-person portraits stay off human seats,
+  exactly as before.
+
+- **The room's furniture, per the owner's list.** The way out was
+  rendered under the footsteps chip and scrolled away with the page — it
+  is fixed to the viewport now, below the chip, on screen for as long as
+  the room is. The transcript takes the finger in the flowed layout, so
+  the chat scrolls. The strip's duplicate 📎 is gone (the composer's
+  stays, beside the caption it belongs to), and "Put a picture up" left
+  the seat menu — the background button carries the room's decorating.
+  The unreadable 💬 is a worded button now: *Let it talk first.*
+
+- **Auto-send now fires on the iPhone's ear too, and the pause is 3½
+  seconds.** The recorded ear's silence clock only started after a voice —
+  so the empty take after a finished sentence, the very signal auto-send
+  waits on, recorded forever, and the person stood at "Listening…" holding
+  words the Send button was promised not to be needed for. A take that
+  hears nothing now ends on the talk face's clock, and its ending sends
+  the words already standing. One constant for both ears, retuned from
+  4½ to 3½ seconds by its owner's second field report.
+
+- **The first sentence no longer plays into the earbud's gear change.** A
+  Bluetooth earbud that has just given its microphone back takes a second
+  or two climbing from phone-call mode into music mode, and a reply that
+  started the instant the mic closed put its first words into that climb —
+  quiet and tinny, or clipped, at any volume. The microphone paths (the
+  recorded ear, the barge-in meter, the walking strip, the dictation
+  meter) now report the moment their tracks stop, and every play path
+  waits out what remains of a 1.5-second grace before the first piece
+  only — with the first piece's synthesis fetch running during the grace,
+  so the ordinary turn waits for nothing it wasn't already paying the
+  network.
+
 ### Changed
 
 - **The loudness rail is the shell's now.** It began on the Voice screen —

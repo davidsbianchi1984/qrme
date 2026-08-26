@@ -4,7 +4,7 @@ import { api, getBase, type Avatar, type Briefing, type DialerPosture,
          type Escalated, type MyPerson } from "../api";
 import { Briefcase } from "../Briefcase";
 import { Refusal } from "../Refusal";
-import { openTheEar, plainVoice, speakInPieces } from "../spoken";
+import { micClosed, openTheEar, plainVoice, speakInPieces } from "../spoken";
 import { TalkRail } from "../TalkRail";
 import { Waveform } from "../Waveform";
 import { presenceOf, presenceKey, animatedIn } from "../presence";
@@ -12,6 +12,12 @@ import { useSession } from "../store";
 import { putAway, whenPutAway } from "../away";
 import { canRecord, recordAsked, type Recording } from "../roomear";
 import { startWalking } from "../walk";
+
+/** The pause that sends, on both ears: quiet this long with words standing
+ *  fires the same press the Send button does. On the recogniser it is the
+ *  poll threshold; on the recorded ear it caps the empty take whose ending
+ *  is the send signal. */
+const SILENCE_SENDS_MS = 3500;
 
 interface Doc { id: string; name: string | null; url: string;
                 ai_marked: boolean }
@@ -348,18 +354,21 @@ export function Chat({ onPlans }: {
   // session never ends a turn on its own, so the words stood in the box
   // until somebody pressed Send — on a talk surface whose whole design is
   // listen, send, speak, listen again. Half a second of polling against a
-  // timestamp the ears stamp; 4.5s of quiet with words standing fires the
-  // same press the Send button does, then flushes the recogniser session
-  // so its settled text cannot resurrect what was already sent. The
-  // recorded ear sends through its own silent-turn fork instead — its
-  // turns already end on silence, and two senders would race.
+  // timestamp the ears stamp; SILENCE_SENDS_MS of quiet with words
+  // standing fires the same press the Send button does, then flushes the
+  // recogniser session so its settled text cannot resurrect what was
+  // already sent. The recorded ear sends through its own silent-turn fork
+  // instead — its turns already end on silence, and two senders would
+  // race. One constant for both paths, tuned by its owner twice: "four
+  // seconds, five seconds" first, then "3-4 sec" from a phone still
+  // waiting — the pause should feel like a pause, not a stall.
   useEffect(() => {
     if (!talking) return;
     const t = window.setInterval(() => {
       if (earMode.current !== "rec" || !wantsEar.current) return;
       if (busyRef.current || !heardText.current.trim()) return;
       if (!lastWords.current
-          || Date.now() - lastWords.current < 4500) return;
+          || Date.now() - lastWords.current < SILENCE_SENDS_MS) return;
       lastWords.current = 0;
       setHeard("");
       sendRef.current();
@@ -505,8 +514,17 @@ export function Chat({ onPlans }: {
     setListening(true);
     let recording: Recording;
     try {
+      // The quiet cap is what makes auto-send work on this path at all: a
+      // take that hears nothing must END for its "nothing was heard" to
+      // reach the fork below that sends the words already standing. The
+      // recorder's own silence clock only starts after a voice, so
+      // without the cap a silent take — the pause after a finished
+      // sentence — recorded forever, and the person stood at
+      // "Listening…" holding words the Send button was promised not to
+      // be needed for.
       recording = await recordAsked(
-        session.interactorId, session.interactorToken || "");
+        session.interactorId, session.interactorToken || "",
+        undefined, SILENCE_SENDS_MS);
     } catch {
       if (!live()) return;
       wantsEar.current = false;
@@ -599,6 +617,9 @@ export function Chat({ onPlans }: {
           window.clearInterval(tick);
           stream.getTracks().forEach((t) => t.stop());
           void ctx.close().catch(() => {});
+          // A meter is still a microphone to the earbud — the next reply
+          // waits out the mode-switch grace (spoken.ts).
+          micClosed();
         },
       };
     } catch { /* no meter is not no recording */ }

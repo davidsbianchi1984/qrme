@@ -25,6 +25,7 @@
 // It is a fallback and not a replacement. A deployment with no transcriber
 // answers 503 and the recogniser stays the ordinary way in.
 import { api } from "./api";
+import { micClosed } from "./spoken";
 
 /** A recording in progress. `stop` ends it early; `done` resolves with the
  *  words, or rejects with whatever the door said. */
@@ -66,11 +67,12 @@ export async function recordTurn(
   roomId: string, interactorId: string, token: string,
   speakingNow: () => boolean,
   onLevel?: (level: number) => void,
+  onBarge?: () => void,
 ): Promise<Recording> {
   return open(async (blob) => {
     const heard = await api.heardInRoom(roomId, interactorId, blob, token);
     return (heard.text || "").trim();
-  }, speakingNow, onLevel);
+  }, speakingNow, onLevel, undefined, onBarge);
 }
 
 /** The same ear pointed at a conversation instead of a room: one recorded
@@ -82,17 +84,30 @@ export async function recordTurn(
 export async function recordAsked(
   interactorId: string, token: string,
   onLevel?: (level: number) => void,
+  quietEndsMs?: number,
 ): Promise<Recording> {
   return open(
     async (blob) => (await api.heard(interactorId, blob, token)).trim(),
-    () => false, onLevel);
+    () => false, onLevel, quietEndsMs);
 }
 
-/** The recording itself, held apart from the door the words go through. */
+/** The recording itself, held apart from the door the words go through.
+ *
+ *  `quietEndsMs`, when given, ends a take that never heard a voice at all
+ *  after that many milliseconds. Without it a fully silent take runs
+ *  forever — the silence clock below only starts once something voiced has
+ *  been heard — which is fine for a room waiting for anyone to speak, and
+ *  exactly wrong for a conversation where the empty take IS the signal:
+ *  the talk face's auto-send waits on that take ending, and a person who
+ *  finished their sentence stood at "Listening…" with a Send button they
+ *  were promised they would not need. Opt-in per caller, because only the
+ *  caller knows whether its silence means "nothing yet" or "go". */
 async function open(
   transcribe: (blob: Blob) => Promise<string>,
   speakingNow: () => boolean,
   onLevel?: (level: number) => void,
+  quietEndsMs?: number,
+  onBarge?: () => void,
 ): Promise<Recording> {
   const stream = await navigator.mediaDevices.getUserMedia({
     // Asked for by name rather than hoped for. This is the one echo
@@ -114,6 +129,7 @@ async function open(
   // door at all.
   let voiced = false;
   let watched = false;
+  let bargeFired = false;
 
   const stopWatching = () => {
     if (watcher) { window.clearInterval(watcher); watcher = 0; }
@@ -134,6 +150,7 @@ async function open(
       analyser.fftSize = 1024;
       ctx.createMediaStreamSource(stream).connect(analyser);
       const wave = new Uint8Array(analyser.fftSize);
+      const born = Date.now();
       let lastVoice = Date.now();
       watcher = window.setInterval(() => {
         analyser.getByteTimeDomainData(wave);
@@ -145,7 +162,25 @@ async function open(
         onLevel?.(Math.min(1, peak / 40));
         const bar = speakingNow() ? BARGE_PEAK : QUIET_FLOOR;
         if (peak > bar) { voiced = true; lastVoice = Date.now(); }
+        // Somebody leaning in over the room's voice, read off THIS
+        // recording's own analyser. The meter (below) does the same job
+        // for the recogniser path with a second stream — but a platform
+        // that allows one live capture at a time (iOS) mutes the first
+        // stream when a second opens, so on the recorded path the barge
+        // has to come from the one stream that is already standing.
+        // Once per take, like the meter: interrupting is a thing you do,
+        // not a state you enter.
+        if (!bargeFired && speakingNow() && peak > BARGE_PEAK) {
+          bargeFired = true;
+          onBarge?.();
+        }
         if (voiced && Date.now() - lastVoice > SILENCE_ENDS_MS) {
+          if (rec.state !== "inactive") rec.stop();
+        }
+        // A take that heard nothing ends too, where the caller asked it
+        // to — its rejection ("nothing was heard in that") is the very
+        // signal the talk face's auto-send waits on.
+        if (!voiced && quietEndsMs && Date.now() - born > quietEndsMs) {
           if (rec.state !== "inactive") rec.stop();
         }
       }, 100);
@@ -160,6 +195,10 @@ async function open(
     rec.onstop = async () => {
       stopWatching();
       stream.getTracks().forEach((t) => t.stop());
+      // The earbud starts its climb back to music mode here, not at the
+      // button press — spoken.ts holds the reply's first piece until the
+      // climb has had its second (the mode-switch grace).
+      micClosed();
       const blob = new Blob(chunks, { type: rec.mimeType || "audio/webm" });
       if (!blob.size) { refused(new Error("nothing was recorded")); return; }
       // The energy gate. A platform with no analyser cannot tell, so it
@@ -248,5 +287,8 @@ export async function meterWhileSpeaking(
     window.clearInterval(watcher);
     stream.getTracks().forEach((t) => t.stop());
     void ctx.close().catch(() => {});
+    // Same as the recorder above: the meter held a real microphone, and
+    // the piece that plays next should wait out the earbud's switch.
+    micClosed();
   };
 }

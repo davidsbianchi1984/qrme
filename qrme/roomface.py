@@ -204,12 +204,40 @@ def pictures_in(room_id: str) -> dict:
     a directory anybody holding a room id may page through, and the room
     read is already the narrower door — these are the people who can see
     each other's names and camera states anyway.
+
+    A person who never put a picture up wears the portrait of their
+    account's SELF profile, when they have one. The owner's second field
+    report, seat blank beside a profile wearing his face: "I've already
+    set my profile photo... the blank avatar is only for users that do
+    not assign a photo." A `self` profile is the account holder's own
+    likeness by that profile's own declaration — the one portrait in the
+    system that is a picture OF this person — so borrowing it onto their
+    seat says nothing the profile has not already said. `fictional` and
+    `other_person` portraits stay off human seats, exactly as before: a
+    face that is not yours does not become yours by being on your
+    account. Earliest self profile wins, so the answer is stable.
     """
-    rows = db.connect().execute(
-        "SELECT i.id AS id, i.avatar_url AS url FROM interactors i"
+    conn = db.connect()
+    rows = conn.execute(
+        "SELECT i.id AS id, i.avatar_url AS url, i.account_id AS account"
+        " FROM interactors i"
         " JOIN room_participants p ON p.ref_id = i.id"
         " WHERE p.room_id=? AND p.kind='user'", (room_id,)).fetchall()
-    return {r["id"]: r["url"] for r in rows if r["url"]}
+    out = {}
+    for r in rows:
+        url = r["url"]
+        if not url and r["account"]:
+            own = conn.execute(
+                "SELECT avatar FROM profiles"
+                " WHERE owner_id=? AND kind='self'"
+                "   AND avatar IS NOT NULL AND avatar != ''"
+                " ORDER BY created_at, rowid LIMIT 1",
+                (r["account"],)).fetchone()
+            if own:
+                url = own["avatar"]
+        if url:
+            out[r["id"]] = url
+    return out
 
 
 def showing_in(room_id: str) -> dict:

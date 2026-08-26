@@ -8637,6 +8637,9 @@ const CHROME: Table = {
   "voice.spoken.unbind": {
     en: "Unbind", es: "Desvincular", fr: "Délier", de: "Lösen", pt: "Desvincular", it: "Scollega", ja: "解除する", zh: "解绑", hi: "हटाएँ", ar: "افصل",
   },
+  "voice.spoken.through": {
+    en: "Playing through {device}", es: "Sonando por {device}", fr: "Diffusé via {device}", de: "Wiedergabe über {device}", pt: "A tocar por {device}", it: "In riproduzione su {device}", ja: "{device} で再生中", zh: "通过 {device} 播放", hi: "{device} से बज रहा है", ar: "يُشغَّل عبر {device}",
+  },
   "voice.spoken.test": {
     en: "Say a line", es: "Di una frase", fr: "Dire une phrase", de: "Einen Satz sagen", pt: "Dizer uma frase", it: "Di' una frase", ja: "一言話す", zh: "说一句", hi: "एक पंक्ति बोलो", ar: "قل جملة",
   },
@@ -8697,9 +8700,6 @@ const CHROME: Table = {
   "ins.face.cameraoff": {
     en: "Camera off", es: "Apagar cámara", fr: "Couper la caméra", de: "Kamera aus", pt: "Desligar câmara", it: "Spegni fotocamera", ja: "カメラを切る", zh: "关闭摄像头", hi: "कैमरा बंद", ar: "أوقف الكاميرا",
   },
-  "ins.face.photo": {
-    en: "Put a picture up", es: "Poner una foto", fr: "Mettre une photo", de: "Bild hochladen", pt: "Pôr uma foto", it: "Metti una foto", ja: "写真を出す", zh: "放一张照片", hi: "एक तस्वीर लगाएँ", ar: "ضع صورة",
-  },
   "ins.face.nomask": {
     en: "No mask", es: "Sin máscara", fr: "Sans masque", de: "Keine Maske", pt: "Sem máscara", it: "Nessuna maschera", ja: "マスクなし", zh: "不戴面具", hi: "कोई मुखौटा नहीं", ar: "بلا قناع",
   },
@@ -8734,7 +8734,7 @@ const CHROME: Table = {
     en: "Say it", es: "Decirlo", fr: "Le dire", de: "Sagen", pt: "Dizer", it: "Dillo", ja: "言う", zh: "说出来", hi: "कह दीजिए", ar: "قُلها",
   },
   "ins.letthemtalk": {
-    en: "Let them talk", es: "Déjalos hablar", fr: "Laissez-les parler", de: "Lass sie reden", pt: "Deixe-os falar", it: "Lasciali parlare", ja: "話させる", zh: "让他们说话", hi: "उन्हें बोलने दें", ar: "دعهم يتكلّمون",
+    en: "Let it talk first", es: "Deja que hable primero", fr: "Laissez-le parler d'abord", de: "Lass es zuerst reden", pt: "Deixe-o falar primeiro", it: "Lascialo parlare prima", ja: "先に話させる", zh: "让它先说", hi: "पहले इसे बोलने दें", ar: "دعه يتكلّم أولًا",
   },
   "ins.watermarked": {
     en: "Everything a profile says here is watermarked as synthetic media, at the moment it is said. A room with anybody under 18 in it runs strict moderation for everyone.", es: "Todo lo que un perfil dice aquí lleva marca de agua como medio sintético, en el momento en que se dice. Una sala con alguien menor de 18 dentro aplica moderación estricta para todos.", fr: "Tout ce qu'un profil dit ici est filigrané comme média synthétique, au moment même où c'est dit. Une salle où se trouve une personne de moins de 18 ans applique une modération stricte pour tout le monde.", de: "Alles, was ein Profil hier sagt, wird als synthetisches Medium mit einem Wasserzeichen versehen, im Moment des Sagens. Ein Raum, in dem jemand unter 18 ist, läuft für alle mit strenger Moderation.", pt: "Tudo o que um perfil diz aqui leva marca de água como meio sintético, no momento em que é dito. Uma sala com alguém com menos de 18 anos aplica moderação estrita para todos.", it: "Tutto ciò che un profilo dice qui viene filigranato come media sintetico, nel momento in cui viene detto. Una stanza in cui c'è qualcuno sotto i 18 anni applica moderazione severa per tutti.", ja: "ここでプロフィールが言うことはすべて、言われたその瞬間に合成メディアとして電子透かしが入ります。18 歳未満の人がいる部屋では、全員に対して厳格なモデレーションが働きます。", zh: "档案在这里说的每一句话，都会在出口的那一刻被打上合成媒体的水印。只要房间里有未满 18 岁的人，对所有人都会启用严格审核。", hi: "यहाँ कोई प्रोफ़ाइल जो भी कहती है, कहे जाने के उसी क्षण उस पर कृत्रिम माध्यम का वॉटरमार्क लग जाता है। जिस कमरे में 18 से कम उम्र का कोई हो, वहाँ सबके लिए सख़्त मॉडरेशन चलता है।", ar: "كل ما يقوله ملف هنا يُوسم بعلامة مائية بوصفه وسيطًا اصطناعيًا، لحظة قوله. وأي غرفة فيها من هو دون الثامنة عشرة تعمل بمراجعة صارمة على الجميع.",
@@ -8768,9 +8768,6 @@ const CHROME: Table = {
   },
   "ins.link.ask": {
     en: "Paste the link", es: "Pega el enlace", fr: "Collez le lien", de: "Link einfügen", pt: "Cole a ligação", it: "Incolla il link", ja: "リンクを貼り付けてください", zh: "粘贴链接", hi: "लिंक चिपकाएँ", ar: "الصق الرابط",
-  },
-  "ins.files": {
-    en: "Attach a photo, a video or a file", es: "Adjunta una foto, un vídeo o un archivo", fr: "Joindre une photo, une vidéo ou un fichier", de: "Foto, Video oder Datei anhängen", pt: "Anexar uma foto, um vídeo ou um ficheiro", it: "Allega una foto, un video o un file", ja: "写真・動画・ファイルを添付", zh: "添加照片、视频或文件", hi: "फ़ोटो, वीडियो या फ़ाइल जोड़ें", ar: "أرفق صورة أو فيديو أو ملفًا",
   },
   "ins.mute": {
     en: "Mute your microphone", es: "Silencia tu micrófono", fr: "Couper votre micro", de: "Mikrofon stummschalten", pt: "Silenciar o seu microfone", it: "Disattiva il microfono", ja: "マイクをミュート", zh: "关闭你的麦克风", hi: "अपना माइक्रोफ़ोन बंद करें", ar: "اكتم الميكروفون",

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { putAway, whenPutAway } from "./away";
 import { isEcho } from "./echo";
-import { plainVoice } from "./spoken";
+import { micClosed, plainVoice } from "./spoken";
 import { t as tr } from "./l10n";
 import { onWalk, stopWalking, walking, type Walking } from "./walk";
 
@@ -166,6 +166,9 @@ export function WalkAlong() {
     mr.ondataavailable = (e) => { if (e.data.size) parts.push(e.data); };
     mr.onstop = () => {
       stream.getTracks().forEach((t) => t.stop());
+      // The reply that follows this slice waits out the earbud's switch
+      // back to music mode — spoken.ts's mode-switch grace.
+      micClosed();
       if (!live()) return;
       const clip = new Blob(parts, { type: mr.mimeType || "audio/webm" });
       void heardClip(w, mine, clip);

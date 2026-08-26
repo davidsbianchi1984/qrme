@@ -1392,6 +1392,12 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   background: rgba(10, 12, 32, 0.55); backdrop-filter: blur(6px); }
 .rs-chatpill input { flex: 1; min-width: 0; border: none; outline: none;
   background: transparent; color: #fff; font-size: 13px; }
+/* 16px on a phone like every other input — the breakpoint's bare `input`
+   rule loses to this selector's specificity, so the one field it missed
+   was the room's composer, and iOS zoomed the whole stage on focus. */
+@media (max-width: 760px) {
+  .rs-chatpill input { font-size: 16px; }
+}
 .rs-chatpill input::placeholder { color: rgba(255, 255, 255, 0.55); }
 .rs-chatbtn { border: none; background: rgba(255, 255, 255, 0.12);
   color: #fff; border-radius: 50%; width: 26px; height: 26px;
@@ -1543,6 +1549,18 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .screen.room-place .rs-voicebar {
   position: static; left: auto; right: auto; bottom: auto;
   flex: 0 0 auto; padding: 0 2px; }
+/* And in the flowed layout the log takes the finger itself. The
+   lines-only rule on `.rs-chatlog` is for the stage overlay, where a
+   rectangle of dead air over a seat would eat the double-tap — here the
+   log overlaps no seat, and a drag that starts in the gap between two
+   bubbles was going to the page instead of the transcript: "won't let
+   me scroll the chat." `touch-action: pan-y` says so to the browser
+   before it guesses. */
+.screen.room-place .rs-chatlog {
+  pointer-events: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
 
 /* Two columns, as drawn — not `auto-fill`, which on a wide window turns
  * six people into a strip of thumbnails. Three when the window is wide
@@ -1564,10 +1582,18 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
  * Round and the size of a touch target, because it is the one control a
  * person reaches for when they want out. */
 .room-out {
-  position: absolute;
-  top: 14px;
-  right: 16px;
-  z-index: 6;
+  /* Fixed now, not absolute. Anchoring to the room container (the last
+   * fix) kept the door inside the room, but two things still hid it: the
+   * footsteps chip is FIXED at the same corner on a higher layer and sat
+   * exactly on top of it, and an absolute door scrolls away with the
+   * page — the second field report asked for a way home from a room the
+   * person was standing in with the ✕ nominally rendered. A fixed door
+   * resolves against the viewport, so it is on screen for as long as the
+   * room is, and it starts below the chip instead of under it. */
+  position: fixed;
+  top: 30px;
+  right: 10px;
+  z-index: 85;
   width: 32px;
   height: 32px;
   display: inline-flex;
@@ -1679,6 +1705,12 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 }
 .rs-round:hover:not(:disabled) { transform: translateY(-1px); }
 .rs-round:disabled { opacity: .45; cursor: default; }
+/* A strip button that says its job in words — for the one whose glyph
+   nobody could read. Same height and rim as its round neighbours, wide
+   enough for its sentence. */
+.rs-round.rs-worded { width: auto; border-radius: 999px;
+  padding: 0 12px; font-size: 11px; font-weight: 600;
+  white-space: nowrap; }
 /* The rims the drawing gives each one, so they are told apart at a glance
    rather than by reading five identical circles. */
 .rs-round.link   { border-color: rgba(159, 216, 232, 0.45); }

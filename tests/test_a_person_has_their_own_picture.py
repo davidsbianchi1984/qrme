@@ -250,13 +250,25 @@ def test_each_picture_has_its_own_control_where_it_belongs():
     by the doors staying distinct, not by the buttons sharing a row. The
     room block must NOT grow the own-picture button back: two buttons for
     one visible outcome is a menu.
+
+    Then "put a picture up" left too, same reasoning one round later and
+    in the owner's own words: "delete put a picture up because background
+    already does that." The seat's face is the person's own picture, set
+    on Identity; the room's remaining decoration is what stands BEHIND
+    them. So the room now holds ONE picture control — the background —
+    and the guard holds the door count down the way it once held it up:
+    neither retired button comes back.
     """
     block = INSIDE[INSIDE.index('<div className="rs-controls">'):]
     block = block[:block.index("</select>")]
-    for key in ("ins.face.photo", "ins.face.background"):
-        assert key in block, f"{key} has no control in the room"
-    for door in ("api.uploadRoomFace", "api.uploadRoomBackground"):
-        assert door in block, f"{door} is not wired to anything"
+    assert "ins.face.background" in block, (
+        "the background has no control in the room")
+    assert "api.uploadRoomBackground" in block, (
+        "api.uploadRoomBackground is not wired to anything")
+    assert "ins.face.photo" not in block, (
+        '"put a picture up" is back in the room — the owner removed it '
+        "because the background button already carries the room's "
+        "decorating, and the seat's face is the person's own picture")
     # Quoted, because `ins.face.mine` is a substring of `ins.face.mineoff`
     # — the take-it-down button, which stays. The third guard today whose
     # first draft matched more than it meant.

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, type VoiceprintStatus , type ProfileVoice } from "../api";
 import { Refusal } from "../Refusal";
-import { playClip } from "../spoken";
+import { hearingThrough, playClip } from "../spoken";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { useSession } from "../store";
 
@@ -32,6 +32,20 @@ export function Voice({ onPlans }: {
   const [bound, setBound] = useState<ProfileVoice | null>(null);
   const [voiceId, setVoiceId] = useState("");
   const [voiceLabel, setVoiceLabel] = useState("");
+  // The output the voice is on, refreshed whenever a device comes or goes.
+  const [outName, setOutName] = useState("");
+  useEffect(() => {
+    let gone = false;
+    const ask = () => {
+      void hearingThrough().then((n) => { if (!gone) setOutName(n); });
+    };
+    ask();
+    navigator.mediaDevices?.addEventListener?.("devicechange", ask);
+    return () => {
+      gone = true;
+      navigator.mediaDevices?.removeEventListener?.("devicechange", ask);
+    };
+  }, []);
 
   const pid = session.profileId;
 
@@ -332,6 +346,17 @@ export function Voice({ onPlans }: {
             </>
           )}
         </div>
+        {/* Which output the voice is on — the earbud already in the
+            person's ear, when there is one. Named only where the platform
+            reveals names (they unlock with mic permission); a guessed
+            device on a settings screen is worse than no line. Follows
+            `devicechange`, so plugging in mid-visit updates the sentence
+            the way it updates the sound. */}
+        {outName && (
+          <div className="muted small">
+            {fill(tr("voice.spoken.through", lang), { device: outName })}
+          </div>
+        )}
       </div>
       {/* The loudness rail lived here first; it belongs to the shell now
           (LoudnessRail.tsx) so the screens that actually play a voice —

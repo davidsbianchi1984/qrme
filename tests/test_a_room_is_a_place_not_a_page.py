@@ -181,17 +181,25 @@ def test_the_door_is_painted_inside_the_room():
     looked for on its sibling — so this checks the containing block rather
     than the element, which is the half that was actually missing.
     """
-    block = CSS[CSS.index(".screen.room-place {"):]
-    block = block[:block.index("}")]
-    assert "position: relative" in block, (
-        "the room is not a containing block, so its absolutely positioned "
-        "door lands outside it")
     door = CSS[CSS.index(".room-out {"):]
     door = door[:door.index("}")]
-    assert "position: absolute" in door, (
-        "the door moved off absolute positioning — if so, the containing "
-        "block above is no longer what makes it reachable, and this guard "
-        "needs rewriting rather than deleting")
+    # Rewritten as its own last line instructed. The door is FIXED now:
+    # anchored to the container it was still under the footsteps chip
+    # (fixed at the same corner, higher layer) and it scrolled away with
+    # the page — the second field report asked for a way home while
+    # standing in a room whose ✕ was nominally rendered. Fixed resolves
+    # against the viewport, which cannot scroll it away and cannot paint
+    # it outside the screen, so the containing-block half of the old
+    # guard has nothing left to hold; what is worth holding now is that
+    # the door sits BELOW the chip's corner instead of under it.
+    assert "position: fixed" in door, (
+        "the door moved off fixed positioning — reachability now depends "
+        "on what it resolves against; rewrite this guard with the new "
+        "reasoning rather than deleting it")
+    m = re.search(r"top:\s*(\d+)px", door)
+    assert m and int(m.group(1)) >= 26, (
+        "the door is back in the footsteps chip's corner — the chip is "
+        "fixed at top 6px on a higher layer and sat exactly on top of it")
 
 
 def test_the_door_actually_leaves():
@@ -286,10 +294,22 @@ def test_the_scene_heading_goes_when_the_room_arrives():
 
 def test_the_strip_has_the_controls_the_drawing_has():
     """Screen 103 draws five round controls beside the composer. The field
-    report named them on the way past, and threw one out."""
-    for cls in ("rs-round link", "rs-round files", "rs-round mic",
+    report named them on the way past, and threw one out.
+
+    Then the owner threw out a second: the strip's 📎 clicked the same
+    picker as the composer's 📎, inches away — two buttons, one act — and
+    "since there's already a paper clip, remove the paper clip that's
+    right by the green microphone." The DOOR is untouched: the composer's
+    button still opens it, and the assert below holds that half so the
+    capability cannot leave with its duplicate."""
+    for cls in ("rs-round link", "rs-round mic",
                 "rs-round invite", "rs-round share"):
         assert f'"{cls}' in INSIDE, f"{cls} is missing from the room's strip"
+    assert '"rs-round files' not in INSIDE, (
+        "the strip's duplicate paperclip is back beside the composer's")
+    assert "sharePick.current?.click()" in INSIDE, (
+        "the share door has no button at all — the duplicate left and "
+        "took the capability with it")
 
 
 def test_the_heart_did_not_survive_and_should_not_come_back():
@@ -308,7 +328,10 @@ def test_every_control_in_the_strip_does_something():
     changes nothing anybody else can see."""
     strip = INSIDE[INSIDE.index('<div className="rs-strip">'):]
     strip = strip[:strip.index("      </div>")]
-    for wired in ("setDraft(", "sharePick.current?.click()", "flipTalking",
+    # `sharePick.current?.click()` left this list with the strip's
+    # duplicate paperclip — the composer's button holds that door now,
+    # and the guard above holds the door.
+    for wired in ("setDraft(", "flipTalking",
                   "setAsking(true)", "clipboard",
                   # Lending the profiles your microphone. It had a card of
                   # its own; the card is gone and the door is here, beside

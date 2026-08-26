@@ -91,6 +91,52 @@ let ear: HTMLAudioElement | null = null;
 // deliberate exception, and it belongs to those surfaces, not to playback.
 // ------------------------------------------------------------------------
 
+// ------------------------------------------------------------------------
+// The mode-switch grace.
+//
+// The loudness comment above ends at "open no microphone, ever" — but a
+// Bluetooth earbud that has JUST given its microphone back is not yet out
+// of phone-call mode: the switch back to music mode takes it a second or
+// two, and a reply that starts the instant the mic closes plays its first
+// words into the tail of that switch — quiet and tinny, or clipped — even
+// though nothing holds the mic any more.
+//
+// So the paths that do hold a microphone (roomear, the walking strip, the
+// dictation meter) report the moment they let it go, and the play paths
+// below wait out what remains of the grace before the FIRST piece only.
+// Pieces after the first ride an earbud already back in music mode and
+// wait for nothing — and the first piece's synthesis fetch runs DURING
+// the grace, so on the ordinary turn most of the wait was already being
+// paid to the network and nobody notices the rest.
+//
+//     asked     does the reply start promptly
+//     mattered  does its first sentence arrive in the mode the rest of
+//               it will play in
+// ------------------------------------------------------------------------
+
+/** A second or two, per the field report; the low end of it, because the
+ *  grace only delays a reply when the mic closed under two seconds ago
+ *  and the fetch has not already covered the gap. */
+const MIC_GRACE_MS = 1500;
+
+let micClosedAt = 0;
+
+/** A surface that held a microphone just let it go. Call it where the
+ *  tracks actually stop — not where a button was pressed, which can be
+ *  seconds earlier. */
+export function micClosed(): void {
+  micClosedAt = Date.now();
+}
+
+/** Resolves once the earbud has had its switch back. Instant almost
+ *  always: whenever no mic closed within the grace window. */
+function afterMicGrace(): Promise<void> {
+  const left = MIC_GRACE_MS - (Date.now() - micClosedAt);
+  return left > 0
+    ? new Promise((go) => window.setTimeout(go, left))
+    : Promise.resolve();
+}
+
 const LOUDNESS_KEY = "qrme.loudness";
 
 function storedLoudness(): number {
@@ -219,6 +265,7 @@ export async function playClip(blob: Blob): Promise<void> {
   if (!ear) ear = new Audio();
   const src = URL.createObjectURL(blob);
   try {
+    await afterMicGrace();
     await playPiece(ear, src);
   } finally {
     URL.revokeObjectURL(src);
@@ -260,7 +307,10 @@ export async function speakInPieces(
 
   // The first piece is played before the handle exists, for the same
   // reason the first piece is fetched before it: a refusal here has to
-  // reach the caller as a rejection while it can still fall back.
+  // reach the caller as a rejection while it can still fall back. The
+  // grace sits after the fetch on purpose — the network already ran
+  // during the earbud's switch, so this usually waits for nothing.
+  await afterMicGrace();
   const firstSrc = URL.createObjectURL(first);
   let playing = playPiece(el, firstSrc);
   try {
@@ -321,6 +371,57 @@ function started(el: HTMLAudioElement): Promise<void> {
   });
 }
 
+// ------------------------------------------------------------------------
+// Sensing what is connected.
+//
+// Field report, asked for by name: "you shouldn't have to go there [the
+// settings menus] to be using something that's already connected to your
+// device and you're primarily using." The voice should come out of the
+// earbud that is already in the person's ear, including the one that
+// connects mid-conversation.
+//
+// Two halves. The follower below re-pins the one playing element to the
+// system's current default output whenever the set of devices changes —
+// on the platforms that let a page choose at all (`setSinkId`; Chrome,
+// Edge). The platforms that refuse (iOS, Safari) route every element to
+// the system default themselves, which is the same behaviour arrived at
+// from the other side — so the follower simply does nothing there rather
+// than existing as a broken switch. And `hearingThrough` names the device
+// the voice is on, for a screen that wants to SAY it — empty wherever the
+// platform hides device labels (they unlock with mic permission), because
+// a guessed name on a settings screen is worse than no line.
+// ------------------------------------------------------------------------
+
+type Sinkable = HTMLAudioElement & { setSinkId?: (id: string) => Promise<void> };
+
+function followTheDefault(): void {
+  if (typeof navigator === "undefined") return;
+  navigator.mediaDevices?.addEventListener?.("devicechange", () => {
+    const el = ear as Sinkable | null;
+    // "" is the spec's name for "the system default, whatever it now is".
+    // Re-asserting it moves a piece already in the air onto the earbud
+    // that just connected — the mid-sentence case a person actually hits.
+    if (el?.setSinkId) void el.setSinkId("").catch(() => { /* kept: system routing */ });
+  });
+}
+followTheDefault();
+
+/** The name of the output the voice plays through, or "" where the
+ *  platform withholds it. Ask again on `devicechange` — the answer moves
+ *  with the earbud. */
+export async function hearingThrough(): Promise<string> {
+  try {
+    const devs = await navigator.mediaDevices.enumerateDevices();
+    const outs = devs.filter((d) => d.kind === "audiooutput");
+    const def = outs.find((d) => d.deviceId === "default") ?? outs[0];
+    // Chrome labels the default "Default - <name>"; the person's word for
+    // it is the <name>.
+    return (def?.label ?? "").replace(/^default( -|:)?\s*/i, "");
+  } catch {
+    return "";
+  }
+}
+
 /** The device's own voice, awaited.
  *
  * What stands in when `speakInPieces` rejects — no binding, no engine, or a
@@ -333,12 +434,12 @@ function started(el: HTMLAudioElement): Promise<void> {
  */
 export function plainVoice(text: string, lang: string): Promise<void> {
   if (!("speechSynthesis" in window)) return Promise.resolve();
-  return new Promise((done) => {
+  return afterMicGrace().then(() => new Promise((done) => {
     const u = new SpeechSynthesisUtterance(text);
     u.lang = lang;
     u.volume = loudness;
     u.onend = () => done();
     u.onerror = () => done();
     window.speechSynthesis.speak(u);
-  });
+  }));
 }

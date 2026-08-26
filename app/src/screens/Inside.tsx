@@ -7,8 +7,8 @@ import { Refusal } from "../Refusal";
 import { plainVoice, speakInPieces, type Speaking } from "../spoken";
 import { useSession } from "../store";
 import { putAway, whenPutAway } from "../away";
-import { canRecord, meterWhileSpeaking, recordTurn, type Recording }
-  from "../roomear";
+import { canRecord, meterWhileSpeaking, recordAsked, recordTurn,
+         type Recording } from "../roomear";
 
 /**
  * Inside a room.
@@ -239,7 +239,6 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // has nothing of its own to fetch. Their own profile's is the honest
   // stand-in — with a rule attached, below.
   const [myFace, setMyFace] = useState<Avatar | null>(null);
-  const picker = useRef<HTMLInputElement>(null);
   // Which of the device's cameras. "user" is the selfie side; flipping asks
   // for the other and the effect below re-acquires the stream.
   const [facing, setFacing] = useState<"user" | "environment">("user");
@@ -429,7 +428,11 @@ export function Inside({ onPlans, start = "", onLeave }: {
     //
     // Nobody listening in silence loses anything: they were not talking, so
     // there is no interruption to recognise.
-    if (wantTalking.current && !closeMeter.current) {
+    // …and never while the recorded ear stands: its recording carries its
+    // own barge detection (standRecordedEar), and a second capture on iOS
+    // mutes the first — the meter opening was the recorded ear going deaf
+    // every time the room spoke.
+    if (wantTalking.current && !closeMeter.current && !taping.current) {
       barged.current = false;
       void meterWhileSpeaking(() => {
         barged.current = true;
@@ -1145,8 +1148,18 @@ export function Inside({ onPlans, start = "", onLeave }: {
     while (wantTalking.current && !dozing.current) {
       let turn: Recording;
       try {
+        // The barge callback rides the recording's own analyser: on this
+        // path the meter's second stream must NOT open (iOS keeps one
+        // capture alive and mutes the other — which was this ear hearing
+        // nothing the moment the room spoke), so the one stream standing
+        // is also the one that hears somebody lean in, and the voice
+        // stops on the word it is on instead of finishing the paragraph.
         turn = await recordTurn(open, me, token,
-                                () => speaking.current, undefined);
+                                () => speaking.current, undefined,
+                                () => {
+                                  barged.current = true;
+                                  nowSaying.current?.stop();
+                                });
       } catch {
         // The microphone itself was refused. Nothing to retry into.
         setEarFault(tr("ins.ear.blocked", lang));
@@ -1343,6 +1356,31 @@ export function Inside({ onPlans, start = "", onLeave }: {
     if (talking) stopTalking(); else startTalking();
   }
 
+  /** The composer's recorded dictation: one take per press, ended by the
+   *  2.5s silence (or the button again), the words landing in the field.
+   *  The iPhone's road into the draft box — its recogniser refuses, and
+   *  until this fork the 🎤 by the text bar simply did nothing there:
+   *  `flipDictation` returned on a refused service with no fallback and
+   *  no sentence, on the same screen whose talk ear already forked. */
+  async function dictRecorded() {
+    if (!token || dictation.current) return;
+    let recording: Recording;
+    try {
+      recording = await recordAsked(me, token);
+    } catch {
+      setEarFault(tr("ins.ear.blocked", lang));
+      return;
+    }
+    dictation.current = { stop: () => recording.stop() };
+    setDictating(true);
+    try {
+      const text = await recording.done;
+      if (text) setDraft((d) => (d ? d + " " : "") + text);
+    } catch { /* a quiet take leaves the draft alone */ }
+    dictation.current = null;
+    setDictating(false);
+  }
+
   function flipDictation() {
     if (dictating) {
       dictation.current?.stop();
@@ -1355,7 +1393,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
       webkitSpeechRecognition?: new () => SpeechRec;
     };
     const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
-    if (!SR) return;
+    // No recogniser, or one this platform already refused: record instead
+    // — same fork, same reasoning as the standing ear above.
+    if (!SR || recorderOnly.current) {
+      if (canRecord()) void dictRecorded();
+      return;
+    }
     const rec = new SR();
     rec.lang = navigator.language || "en";
     rec.interimResults = false;
@@ -1370,7 +1413,26 @@ export function Inside({ onPlans, start = "", onLeave }: {
       const text = parts.join(" ").trim();
       if (text) setDraft((d) => (d ? d + " " : "") + text);
     };
-    rec.onend = () => { dictation.current = null; setDictating(false); };
+    // The refusal fork, which this recogniser never had: on iOS the
+    // constructor exists, the service refuses, and the refusal fell
+    // through `onend` as a silent close — a 🎤 that did nothing, reported
+    // from the phone this product is mostly used on. Same codes, same
+    // second ear as the standing ear's fork.
+    rec.onerror = (e: { error?: string }) => {
+      const code = e.error || "";
+      if ((code === "service-not-allowed" || code === "not-allowed"
+           || code === "network") && canRecord()) {
+        recorderOnly.current = true;
+        dictation.current = null;
+        void dictRecorded();
+      }
+    };
+    // The refused session's `onend` arrives while the recorded take is
+    // standing up; clearing state here would orphan its stop button.
+    rec.onend = () => {
+      if (recorderOnly.current) return;
+      dictation.current = null; setDictating(false);
+    };
     rec.start();
     dictation.current = { stop: () => rec.stop() };
     setDictating(true);
@@ -1530,10 +1592,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
                   const clean = url.trim();
                   if (clean) setDraft((d) => (d ? d + " " : "") + clean);
                 }}>🔗</button>
-        <button className="rs-round files" disabled={busy || !token}
-                aria-label={tr("ins.files", lang)}
-                title={tr("ins.files", lang)}
-                onClick={() => sharePick.current?.click()}>📎</button>
+        {/* No paperclip here any more. The strip's 📎 and the composer's
+            📎 both clicked the same picker — two buttons, one act, inches
+            apart, and the owner asked for the second one gone by name.
+            The composer's stays: it sits beside the words a caption would
+            be typed into. Same call as the picture buttons: one door per
+            act. */}
         {/* The microphone, in every room.
          *
          * It was offered only in voice rooms, on the reasoning that a chat
@@ -1599,13 +1663,21 @@ export function Inside({ onPlans, start = "", onLeave }: {
          * here rather than out of the product — deleting the only door to
          * a capability is a different act from removing a second copy of
          * one. Sending a message already makes them reply; this is for
-         * when you want to hear them without adding a line. */}
-        <button className="rs-round talkers" disabled={busy || !token || !open}
+         * when you want to hear them without adding a line.
+         *
+         * In words now, not a glyph. It wore 💬 the way its neighbours
+         * wear theirs, and the owner's report was blunt: "nobody knows
+         * what that speech bubble means." The other buttons depict what
+         * they do; this one only had a caption a phone never shows, and
+         * a control whose meaning lives in a tooltip has no meaning on
+         * the device this product is mostly used on. */}
+        <button className="rs-round rs-worded talkers"
+                disabled={busy || !token || !open}
                 aria-label={tr("ins.letthemtalk", lang)}
                 title={tr("ins.letthemtalk", lang)}
                 onClick={act(async () => {
                   await api.advanceRoom(open, token);
-                })}>💬</button>
+                })}>{tr("ins.letthemtalk", lang)}</button>
         <button className="rs-round share" disabled={!open}
                 aria-label={tr("ins.handover", lang)}
                 title={tr("ins.handover", lang)}
@@ -2242,21 +2314,13 @@ export function Inside({ onPlans, start = "", onLeave }: {
                         {tr("ins.face.flip", lang)}
                       </button>
                     )}
-                    <button className="chip" disabled={busy}
-                            onClick={() => picker.current?.click()}>
-                      {tr("ins.face.photo", lang)}
-                    </button>
-                    <input ref={picker} type="file" accept="image/*"
-                           style={{ display: "none" }}
-                           onChange={(e) => {
-                             const file = e.target.files?.[0];
-                             e.target.value = "";
-                             if (file) {
-                               act(async () => {
-                                 await api.uploadRoomFace(open, me, file, token);
-                               })();
-                             }
-                           }} />
+                    {/* "Put a picture up" is gone from this menu, picker
+                        and all — the owner's call, by name: "delete put
+                        a picture up because background already does
+                        that." The seat's picture is the person's own
+                        (ownPic, set on Identity); what a person
+                        decorates from here is the room behind them,
+                        which is the Background button below. */}
                     {/* There is deliberately no "my own picture" button
                         here any more. It sat beside "put a picture up"
                         doing what read as the same thing, and the owner
