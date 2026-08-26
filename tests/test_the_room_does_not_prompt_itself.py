@@ -271,13 +271,23 @@ def test_interrupting_stops_the_queue_and_not_just_the_sentence() -> None:
 
 def test_the_typed_send_interrupts_too() -> None:
     """Somebody who types while a profile talks has said what they want as
-    plainly as speaking it."""
+    plainly as speaking it.
+
+    The interrupt now lives in ``sendText`` — the one sender that typed
+    drafts and dictated takes both stand on — so it is read there, and
+    ``sendDraft`` is read for the delegation that carries it."""
     code = _stripped()
-    send = re.search(r"async function sendDraft\(\)(.*?)\n  \}", code, re.S)
-    assert send, "sendDraft moved — this guard reads it by name"
+    send = re.search(r"async function sendText\(text: string\)(.*?)\n  \}",
+                     code, re.S)
+    assert send, "sendText moved — this guard reads it by name"
     assert "personTakesTheTurn()" in send.group(1), (
         "sending typed text leaves the profile talking over the reply it is "
         "about to get")
+    draft = re.search(r"async function sendDraft\(\)(.*?)\n  \}", code, re.S)
+    assert draft, "sendDraft moved — this guard reads it by name"
+    assert "sendText(" in draft.group(1), (
+        "sendDraft no longer rides sendText — the interrupt this guard "
+        "watches would not reach the typed send")
 
 
 def test_speaking_over_the_profile_is_submitting_text() -> None:
