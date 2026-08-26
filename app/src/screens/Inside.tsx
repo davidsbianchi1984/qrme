@@ -247,7 +247,19 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // that fills its box leaves nowhere for buttons to live politely, so they
   // hide — and a double-tap or a long press brings them back. Both gestures,
   // because neither is discoverable and two chances beat one.
-  const [reveal, setReveal] = useState(false);
+  const [reveal, setReveal] = useState(true);
+  // `reveal` is the ONE truth for whether your seat's controls are drawn.
+  // It used to matter only over a live camera — the render condition was
+  // `!faceLive || reveal`, so on a seat showing a picture or initials the
+  // buttons were permanently on and the double-tap flipped a flag nothing
+  // read. Field report, from the owner's seat: "when users have what they
+  // want on their frame, they can double tap out of all those menus and it
+  // just renders what they wanted it to show, not a bunch of buttons."
+  // The effect keeps the old reflexes — putting a face up tucks the
+  // controls away, a bare seat offers them — and the gesture overrides in
+  // either state, both directions.
+  const myShowing = scene?.faces?.[me]?.showing || "";
+  useEffect(() => { setReveal(!myShowing); }, [myShowing]);
   // Three pickers, three different destinations: the room's photo, the
   // person's own picture, and the background behind them.
   const bgPicker = useRef<HTMLInputElement | null>(null);
@@ -2009,7 +2021,10 @@ export function Inside({ onPlans, start = "", onLeave }: {
               // now, and the face fills the frame the way the camera does.
               const picShown = face?.showing === "photo" && !!face.media_url;
               const picLive = isMe && picShown;
-              const faceLive = camLive || picLive;
+              // `faceLive` used to gate the controls; `reveal` is the one
+              // truth now and the effect above tucks them away when a
+              // face goes up. camLive and picLive keep their other work.
+              void picLive;
               return (
               <div key={s.id}
                    className={"rs-tile" + (isTalking(s) ? " talking" : "")
@@ -2130,9 +2145,17 @@ export function Inside({ onPlans, start = "", onLeave }: {
                               ? (aiFaces[s.id].asset as string)
                               : getBase() + aiFaces[s.id].asset} />
                 ) : (
-                  <span className="rs-face">
-                    {(s.display || "?").split(/\s+/)
-                      .map((w) => w[0]).join("").slice(0, 2)}
+                  // A person with no picture yet is a silhouette, not a
+                  // letter. "Y" for *You* read as a monogram nobody chose —
+                  // the blank-avatar shape says "no photo yet" in the
+                  // language every other product already taught, and the
+                  // person's own picture takes the frame the moment it is
+                  // set on the Identity screen. Profiles keep their
+                  // initials: theirs are a name's, not a pronoun's.
+                  <span className="rs-face" aria-hidden="true">
+                    {s.kind === "user" ? "👤"
+                      : (s.display || "?").split(/\s+/)
+                          .map((w) => w[0]).join("").slice(0, 2)}
                   </span>
                 )}
                 <span className="rs-name">{s.display}</span>
@@ -2198,7 +2221,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
                     {wearing.disclosure}
                   </span>
                 )}
-                {isMe && (!faceLive || reveal) && (
+                {isMe && reveal && (
                   <div className="rs-controls">
                     <button className="chip" disabled={busy}
                             aria-pressed={face?.showing === "camera"}
