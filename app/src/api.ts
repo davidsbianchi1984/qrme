@@ -5140,6 +5140,23 @@ export const api = {
   ownPicture: (interactorId: string, token: string) =>
     req<{ interactor_id: string; url: string | null; ai_marked: boolean }>(
       `/interactors/${interactorId}/picture`, { token }),
+  // -- the people in your phone (qrme/contacts.py). Names and whether a
+  // shell matched each to an account here; the numbers never come back.
+  decideContacts: (interactorId: string, consented: boolean, token: string) =>
+    req<{ consented: boolean }>(
+      `/interactors/${encodeURIComponent(interactorId)}/contacts/grant`,
+      { method: "PUT", body: { consented }, token }),
+  syncContacts: (interactorId: string,
+                 entries: { name: string; number: string }[],
+                 token: string) =>
+    req<{ held: number; skipped: number; sealed: boolean }>(
+      `/interactors/${encodeURIComponent(interactorId)}/contacts`,
+      { method: "PUT", body: { entries }, token }),
+  contactsBook: (interactorId: string, token: string) =>
+    req<{ book: { id: string; name: string; holds_account: boolean;
+                  added_at: string }[];
+          held: number }>(
+      `/interactors/${encodeURIComponent(interactorId)}/contacts`, { token }),
   setOwnPicture: async (interactorId: string, file: File, token: string) => {
     const res = await fetch(getBase() +
       `/interactors/${encodeURIComponent(interactorId)}/picture` +

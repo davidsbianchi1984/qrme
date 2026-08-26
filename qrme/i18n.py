@@ -7433,6 +7433,42 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'hi': "वह आवाज़ इस परिनियोजन में पहले से किसी की है — वॉइस संदर्भ उसी खाते से बँधता है जो उसे लाया, और यह किसी और का है। प्रोवाइडर की सतह पर अपनी आवाज़ बनाएँ और उसका id बाँधें",
         'ar': "هذا الصوت محجوز بالفعل في هذا النشر — مرجع الصوت يرتبط بالحساب الذي جلبه، وهذا يخص شخصًا آخر. أنشئ صوتك أنت على واجهة المزوّد واربط معرّفه بدلًا من ذلك",
     },
+    # -- the people in your phone (qrme/contacts.py) -------------------------
+    ("nothing here can see the people in your phone: turn on contacts in "
+     "what may be seen of you. It is off until you do, because most of what "
+     "is in there is somebody else"): {
+        'es': "nada aquí puede ver a las personas de tu teléfono: activa contactos en lo que puede verse de ti. Está apagado hasta que lo hagas, porque la mayor parte de lo que hay ahí es de otra persona",
+        'fr': "rien ici ne peut voir les personnes de votre téléphone : activez les contacts dans ce qui peut être vu de vous. C'est désactivé tant que vous ne le faites pas, car l'essentiel de ce qui s'y trouve appartient à quelqu'un d'autre",
+        'de': "nichts hier kann die Menschen in deinem Telefon sehen: schalte Kontakte ein unter dem, was von dir gesehen werden darf. Es ist aus, bis du es tust, denn das meiste darin ist jemand anderes",
+        'pt': "nada aqui pode ver as pessoas do seu telefone: ative os contactos no que pode ser visto de si. Fica desligado até o fazer, porque a maior parte do que lá está é de outra pessoa",
+        'it': "niente qui può vedere le persone nel tuo telefono: attiva i contatti in ciò che può essere visto di te. Resta spento finché non lo fai, perché la maggior parte di ciò che c'è dentro è qualcun altro",
+        'ja': "ここでは電話の連絡先の人たちを見ることはできません。あなたについて見てよいものの設定で連絡先をオンにしてください。オンにするまでオフのままです。中身の大半は他人のものだからです",
+        'zh': "这里无法看到你手机里的联系人：请在“可以看到你的什么”里打开联系人。在你打开之前它一直是关的，因为里面大多是别人的信息",
+        'hi': "यहाँ कुछ भी आपके फ़ोन के लोगों को नहीं देख सकता: आपके बारे में क्या देखा जा सकता है में संपर्क चालू करें। जब तक आप नहीं करते यह बंद रहता है, क्योंकि उसमें ज़्यादातर कोई और है",
+        'ar': "لا شيء هنا يستطيع رؤية الأشخاص في هاتفك: فعّل جهات الاتصال ضمن ما يمكن رؤيته عنك. يبقى مغلقًا حتى تفعل، لأن معظم ما فيه يخص شخصًا آخر",
+    },
+    ("this book is sealed into the vault and no vault was supplied"): {
+        'es': "esta libreta está sellada en la bóveda y no se proporcionó ninguna bóveda",
+        'fr': "ce carnet est scellé dans le coffre et aucun coffre n'a été fourni",
+        'de': "dieses Buch ist im Tresor versiegelt und kein Tresor wurde bereitgestellt",
+        'pt': "esta lista está selada no cofre e nenhum cofre foi fornecido",
+        'it': "questa rubrica è sigillata nel caveau e nessun caveau è stato fornito",
+        'ja': "この連絡帳は保管庫に封印されていますが、保管庫が渡されていません",
+        'zh': "这本通讯录封存在保管库中，但没有提供保管库",
+        'hi': "यह सूची तिजोरी में सील है और कोई तिजोरी नहीं दी गई",
+        'ar': "هذا الدفتر مختوم في الخزانة ولم تُقدَّم أي خزانة",
+    },
+    ("the sealed book is not in the vault"): {
+        'es': "la libreta sellada no está en la bóveda",
+        'fr': "le carnet scellé n'est pas dans le coffre",
+        'de': "das versiegelte Buch ist nicht im Tresor",
+        'pt': "a lista selada não está no cofre",
+        'it': "la rubrica sigillata non è nel caveau",
+        'ja': "封印された連絡帳が保管庫にありません",
+        'zh': "封存的通讯录不在保管库中",
+        'hi': "सील की गई सूची तिजोरी में नहीं है",
+        'ar': "الدفتر المختوم ليس في الخزانة",
+    },
 }
 
 
@@ -7576,6 +7612,12 @@ _WHERE_MARKERS = ("body", "query", "path", "header", "cookie")
 #: A field with no row keeps its identifier, exactly as before, and is recorded
 #: in `tests/field_labels_unmapped.txt`.
 _FIELD_LABELS: dict[str, dict[str, str]] = {
+    # `consented` and `number` in the SIBLINGS' exact words — the shared
+    # field vocabulary is one voice across the estate, and JIM had both
+    # first.
+    'consented': {'en': 'Consent', 'es': 'Consentimiento', 'fr': 'Consentement', 'de': 'Einwilligung', 'pt': 'Consentimento', 'it': 'Consenso', 'ja': '同意', 'zh': '同意', 'hi': 'सहमति', 'ar': 'الموافقة'},
+    'number': {'en': "Their number, for the language", 'es': 'Su número, para el idioma', 'fr': "Leur numéro, pour la langue", 'de': 'Ihre Nummer, für die Sprache', 'pt': 'O número deles, para o idioma', 'it': 'Il loro numero, per la lingua', 'ja': '相手の番号（言語の判断用）', 'zh': '对方号码（用于判断语言）', 'hi': 'उनका नंबर, भाषा के लिए', 'ar': 'رقمهم، لتحديد اللغة'},
+    'peer_id': {'en': 'Their account here, when a shell matched one', 'es': 'Su cuenta aquí, cuando la app la reconoció', 'fr': 'Leur compte ici, quand une application l’a reconnu', 'de': 'Deren Konto hier, wenn eine App es erkannt hat', 'pt': 'A conta deles aqui, quando a app a reconheceu', 'it': 'Il loro account qui, quando un’app l’ha riconosciuto', 'ja': '相手のここでのアカウント（アプリが照合できた場合）', 'zh': '对方在这里的账户（应用匹配到时）', 'hi': 'उनका यहाँ का खाता, जब ऐप ने मिलाया हो', 'ar': 'حسابهم هنا، عندما يطابقه تطبيق'},
     'every_hours': {'en': 'Repeats every (hours)', 'es': 'Se repite cada (horas)', 'fr': 'Se répète toutes les (heures)', 'de': 'Wiederholt sich alle (Stunden)', 'pt': 'Repete-se a cada (horas)', 'it': 'Si ripete ogni (ore)', 'ja': '繰り返し間隔（時間）', 'zh': '重复间隔（小时）', 'hi': 'हर (घंटे) में दोहराए', 'ar': 'يتكرر كل (ساعات)'},
     'listed': {'en': 'Listed in the browse pool', 'es': 'Listado en el directorio', 'fr': 'Listé dans l’annuaire', 'de': 'Im Verzeichnis gelistet', 'pt': 'Listado no diretório', 'it': 'Elencato nell’elenco', 'ja': '一覧に掲載', 'zh': '列入浏览目录', 'hi': 'ब्राउज़ सूची में सूचीबद्ध', 'ar': 'مدرج في الدليل'},
     'voice_id': {'en': 'Voice ID from the engine', 'es': 'ID de voz del motor', 'fr': 'ID de voix du moteur', 'de': 'Stimm-ID der Engine', 'pt': 'ID de voz do motor', 'it': 'ID voce del motore', 'ja': 'エンジンのボイスID', 'zh': '引擎的声音 ID', 'hi': 'इंजन की वॉइस ID', 'ar': 'معرّف الصوت من المحرّك'},

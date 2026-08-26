@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { isEcho, RECENT_TURNS } from "../echo";
-import { api, getBase, type Avatar, type MicsHere, type RoomFaces,
+import { accountApi, api, getBase, type Avatar, type MicsHere, type RoomFaces,
          type RoomMsg } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
@@ -546,6 +546,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
   const [myFriends, setMyFriends] = useState<
     { profile_id: string; display_name: string;
       avatar?: string | null; handle?: string | null }[] | null>(null);
+  // The account's own profiles, offered beside the friends — "I can add
+  // that profile's, or my friends, or beta testers." A person's own
+  // stable is the first thing they reach for when peopling a room, and
+  // the panel listed only friends: one row and a field of empty space.
+  const [myStable, setMyStable] = useState<
+    { profile_id: string; shown_as: string }[] | null>(null);
   const askCard = useRef<HTMLDivElement>(null);
   // The held overlay — screen 104. Press and hold, or double tap, anywhere
   // in the room and three options come up over it; tap anywhere else and
@@ -1001,16 +1007,22 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // the room asking a question it had already been answered. So the ear
   // opens on the way in, and the control below becomes the MUTE.
   //
-  // Only in a spoken room: a chat room's microphone stays a decision,
-  // because there the medium is typing and an ear opening itself would
-  // be the product taking a liberty nobody asked for.
+  // EVERY room now, not only the spoken ones. "Only in a spoken room"
+  // held that a chat room's medium is typing and an ear opening itself
+  // there would be a liberty — and the owner overruled it in his own
+  // words: "when you jump in a room, I shouldn't have to press any
+  // buttons... you should be able to just speak right away. The text
+  // bar is there for the blind or people that just like to type." A
+  // room is a place you speak; typing is the alternative, not the
+  // default. The mic button stays the MUTE, and put-away still closes
+  // everything — the liberty being taken is the one being asked for.
   useEffect(() => {
-    if (!spokenRoom || !canDictate) return;
+    if (!canDictate) return;
     startTalking();
-    // `open` in the deps so moving between voice rooms re-opens the ear
+    // `open` in the deps so moving between rooms re-opens the ear
     // in the new one; the teardown above has already closed the old.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [spokenRoom, open, canDictate]);
+  }, [open, canDictate]);
 
   // The strip's person-plus. Outside a room the invite form is a card on
   // the page and scrolling to it is right; inside one the page is a place
@@ -1758,6 +1770,13 @@ export function Inside({ onPlans, start = "", onLeave }: {
     api.friends(session.profileId)
       .then((r) => setMyFriends(r.friends))
       .catch(() => setMyFriends([]));
+    if (session.accountId && session.accountToken && myStable === null) {
+      accountApi.heldProfiles(session.accountId, session.accountToken)
+        .then((r) => setMyStable(
+          r.profiles.map((p) => ({ profile_id: p.profile_id,
+                                   shown_as: p.shown_as }))))
+        .catch(() => setMyStable([]));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [asking, session.profileId]);
 
@@ -1856,6 +1875,33 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 already seated is shown and not pressable: a row that
                 re-invites somebody sitting in the room is a press that
                 cannot mean anything. */}
+            {/* Your own stable first: the profiles this account holds,
+                each a press away from a seat. Same rows, same rule —
+                seated is shown and not pressable. */}
+            {myStable !== null && myStable.length > 0 && (
+              <>
+                <p className="rh-note">{tr("ins.ask.stable", lang)}</p>
+                <div className="rh-list">
+                  {myStable.map((p) => {
+                    const seated = seats.some((s) => s.id === p.profile_id);
+                    return (
+                      <button key={p.profile_id} className="rh-friend"
+                              disabled={busy || !token || seated}
+                              onClick={() => {
+                                setAsking(false); void askIn(p.profile_id);
+                              }}>
+                        <span className="rh-friend-name">{p.shown_as}</span>
+                        {seated && (
+                          <span className="muted small">
+                            {tr("ins.ask.here", lang)}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
             {myFriends !== null && myFriends.length > 0 && (
               <>
                 <p className="rh-note">{tr("ins.ask.yours", lang)}</p>

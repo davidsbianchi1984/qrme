@@ -111,11 +111,26 @@ export function Chat({ onPlans }: {
   // turns ago's input. Assigned every render, read at fire time.
   const heardText = useRef("");
   const busyRef = useRef(false);
-  const sendRef = useRef<() => void>(() => {});
+  const sendRef = useRef<(override?: string) => void>(() => {});
   // When words last arrived from either ear, and which ear is live.
   // "rec" is the platform recogniser, "tape" the recorded fallback.
   const lastWords = useRef(0);
   const earMode = useRef<"rec" | "tape" | null>(null);
+  // The talk roll's scroll: pinned to the newest line only while the
+  // person is already at the bottom — scrolled back to reread, it stays
+  // where they put it. The room's log holds the same bargain.
+  const talkRoll = useRef<HTMLDivElement | null>(null);
+  const rollPinned = useRef(true);
+  function watchRoll() {
+    const box = talkRoll.current;
+    if (!box) return;
+    rollPinned.current =
+      box.scrollHeight - box.scrollTop - box.clientHeight < 24;
+  }
+  useEffect(() => {
+    const box = talkRoll.current;
+    if (box && rollPinned.current) box.scrollTop = box.scrollHeight;
+  }, [msgs]);
   const [error, setError] = useState<unknown>(null);
   // Where you are (spec clause 1): optional context the reply adapts to.
   // Off until opened, empty until filled — nothing is inferred or collected.
@@ -522,9 +537,18 @@ export function Chat({ onPlans }: {
       // sentence — recorded forever, and the person stood at
       // "Listening…" holding words the Send button was promised not to
       // be needed for.
+      // The quiet cap ONLY while words are standing — it exists to end
+      // the empty take whose ending sends them. With nothing to send, an
+      // open take is the right state and the cap was pure churn: every
+      // 3.5s it closed the take and opened a fresh capture, and on an
+      // iPhone each getUserMedia re-acquisition interrupts the audio
+      // session — which was the profile's reply stalling and resuming in
+      // the owner's ear, on rhythm, all the way through. An uncapped
+      // empty take still ends the moment it is needed to: a voice makes
+      // it voiced, and voiced takes end on their own silence.
       recording = await recordAsked(
         session.interactorId, session.interactorToken || "",
-        undefined, SILENCE_SENDS_MS);
+        undefined, prior.trim() ? SILENCE_SENDS_MS : undefined);
     } catch {
       if (!live()) return;
       wantsEar.current = false;
@@ -542,6 +566,20 @@ export function Chat({ onPlans }: {
       setHeard(text);
       setInput(text);
       if (text.trim()) lastWords.current = Date.now();
+      // A voiced take that ended, ended ON SILENCE — the recorder's own
+      // 2.5s clock is what closed it. That IS the pause that sends, and
+      // this path used to prove it twice: it restarted with the words as
+      // `prior` and waited for the NEXT take to come up empty (3.5s more)
+      // before sending, so every turn cost ~6 seconds of quiet after the
+      // last word. "Is there a way to speed up the response time?" — this
+      // is the way. Send now; the ear reopens clean behind the send.
+      if (said.trim() && text.trim() && !busyRef.current
+          && wantsEar.current && !putAway()) {
+        setHeard("");
+        sendRef.current(text);
+        void talkRecord("");
+        return;
+      }
       if (wantsEar.current && !putAway()) { void talkRecord(text); return; }
       setListening(false);
     } catch (e) {
@@ -813,8 +851,12 @@ export function Chat({ onPlans }: {
   heardText.current = input;
   busyRef.current = busy;
 
-  async function send() {
-    const message = input.trim();
+  // `override` exists for the one caller that cannot wait for a render:
+  // the recorded ear sends the instant its voiced take ends, and the
+  // state it just set has not reached this closure yet — passing the
+  // words directly is what keeps the send and the screen agreeing.
+  async function send(override?: string) {
+    const message = (override ?? input).trim();
     if (!message || !session.profileId || !session.interactorId) return;
     // Send is the press the spoken reply will ride on.
     if (speakOn || talking) openTheEar();
@@ -1219,11 +1261,28 @@ export function Chat({ onPlans }: {
               — a person who missed a sentence had to close the face and read
               the chat behind it.
 
+              And it SCROLLS now. The first cut hid the overflow — a glance,
+              with the full record in the chat behind — and the owner's
+              report was direct: "it's still not letting me scroll the chat.
+              If I miss something it said I wanna go back and read it." The
+              room's log solved the same problem the same way: the box takes
+              the finger, the first child's margin pins the newest line to
+              the bottom, and the pin only holds while you are already
+              there — scrolled up, it stays where you put it.
+
                   asked     can I see the back-and-forth here
-                  mattered  newest at the bottom, gone by four lines up */}
+                  mattered  can I get back to the sentence I missed */}
           {msgs.some((m) => m.text) && (
-            <div className="talk-roll" aria-live="polite">
-              {msgs.filter((m) => m.text).slice(-6).map((m, i) => (
+            <div className="talk-roll" aria-live="polite"
+                 ref={(el) => {
+                   // Pinned from the first paint: a box that mounts at
+                   // scrollTop 0 shows the OLDEST line, and the person
+                   // opened the face mid-conversation.
+                   talkRoll.current = el;
+                   if (el && rollPinned.current) el.scrollTop = el.scrollHeight;
+                 }}
+                 onScroll={watchRoll}>
+              {msgs.filter((m) => m.text).slice(-30).map((m, i) => (
                 <div key={i}
                      className={"talk-roll-line" + (m.who === "you" ? " mine" : "")}>
                   {m.text}
@@ -1467,7 +1526,8 @@ export function Chat({ onPlans }: {
         {/* An arrow, not the word: on a phone the spelt-out Send was
             width the input needed more. The name stays for the screen
             reader and the tooltip. */}
-        <button className="primary chat-send" onClick={send} disabled={busy}
+        <button className="primary chat-send" onClick={() => void send()}
+                disabled={busy}
                 aria-label={tr("chat.send", lang)}
                 title={tr("chat.send", lang)}>↑</button>
         {/* And this one hands the whole conversation over to voice. It sits

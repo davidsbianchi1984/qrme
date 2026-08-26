@@ -8355,6 +8355,9 @@ const CHROME: Table = {
   "ins.ear.platform": {
     en: "This platform refused the recogniser, so pressing again will not help — on iPhone and iPad the browser has a microphone button but no speech service of its own. Type here instead; nothing else in the room is blocked.", es: "Esta plataforma rechazó el reconocedor, así que volver a pulsar no ayudará: en iPhone y iPad el navegador tiene botón de micrófono pero no servicio de voz propio. Escribe aquí; nada más de la sala está bloqueado.", fr: "Cette plateforme a refusé le reconnaisseur ; réappuyer n'y changera rien — sur iPhone et iPad le navigateur a un bouton micro mais pas de service vocal propre. Écrivez ici ; rien d'autre n'est bloqué dans le salon.", de: "Diese Plattform hat den Erkenner verweigert, erneutes Drücken hilft nicht — auf iPhone und iPad hat der Browser eine Mikrofontaste, aber keinen eigenen Sprachdienst. Tippe stattdessen hier; sonst ist nichts im Raum blockiert.", pt: "Esta plataforma recusou o reconhecedor, por isso carregar outra vez não ajuda — no iPhone e no iPad o navegador tem botão de microfone mas não tem serviço de voz próprio. Escreve aqui; mais nada na sala está bloqueado.", it: "Questa piattaforma ha rifiutato il riconoscitore, quindi premere di nuovo non serve: su iPhone e iPad il browser ha un pulsante microfono ma nessun servizio vocale proprio. Scrivi qui; nient'altro nella stanza è bloccato.", ja: "このプラットフォームは音声認識を拒否したため、もう一度押しても変わりません。iPhone と iPad のブラウザにはマイクボタンはあっても音声サービスがありません。ここに入力してください。ルームの他の機能は使えます。", zh: "此平台拒绝了语音识别，再按也没用 — iPhone 和 iPad 的浏览器有麦克风按钮，却没有自己的语音服务。请在这里打字；房间里其他功能都没被挡住。", hi: "इस प्लेटफ़ॉर्म ने पहचानकर्ता अस्वीकार किया, दोबारा दबाने से कुछ नहीं होगा — iPhone और iPad के ब्राउज़र में माइक बटन तो है पर अपनी वाक् सेवा नहीं। यहाँ टाइप करें; कक्ष में और कुछ भी रुका नहीं है।", ar: "رفضت هذه المنصّة المُتعرِّف، والضغط مجددًا لن يفيد — في iPhone و iPad يوجد زر ميكروفون في المتصفح لكن دون خدمة كلام خاصة به. اكتب هنا؛ لا شيء آخر في الغرفة محجوب.",
   },
+  "ins.ask.stable": {
+    en: "Your own profiles", es: "Tus propios perfiles", fr: "Vos propres profils", de: "Deine eigenen Profile", pt: "Os seus próprios perfis", it: "I tuoi profili", ja: "あなた自身のプロフィール", zh: "你自己的档案", hi: "आपकी अपनी प्रोफ़ाइलें", ar: "ملفاتك الشخصية",
+  },
   "ins.ask.yours": {
     en: "Your friends", es: "Tus amistades", fr: "Vos amis", de: "Deine Freund:innen", pt: "Os teus amigos", it: "I tuoi amici", ja: "あなたの友だち", zh: "你的好友", hi: "आपके मित्र", ar: "أصدقاؤك",
   },
@@ -8549,6 +8552,30 @@ const CHROME: Table = {
   },
   "idn.mymem.gone": {
     en: "this profile has been deleted", es: "este perfil fue borrado", fr: "ce profil a été supprimé", de: "dieses Profil wurde gelöscht", pt: "este perfil foi apagado", it: "questo profilo è stato cancellato", ja: "このプロフィールは削除されました", zh: "该档案已被删除", hi: "यह प्रोफ़ाइल मिटा दी गई है", ar: "حُذف هذا الملف",
+  },
+  "idn.book": {
+    en: "The people in your phone", es: "Las personas de tu teléfono", fr: "Les personnes de votre téléphone", de: "Die Menschen in deinem Telefon", pt: "As pessoas do seu telefone", it: "Le persone nel tuo telefono", ja: "電話の連絡先の人たち", zh: "你手机里的联系人", hi: "आपके फ़ोन के लोग", ar: "الأشخاص في هاتفك",
+  },
+  "idn.book.lead": {
+    en: "Synced from your device under a grant you can withdraw — names stay, numbers never come back out, and withdrawing drops the book.", es: "Sincronizado desde tu dispositivo bajo un permiso que puedes retirar: los nombres se quedan, los números nunca vuelven a salir, y retirarlo elimina la libreta.", fr: "Synchronisé depuis votre appareil sous une autorisation révocable — les noms restent, les numéros ne ressortent jamais, et retirer l'autorisation supprime le carnet.", de: "Von deinem Gerät synchronisiert unter einer widerrufbaren Erlaubnis — Namen bleiben, Nummern kommen nie zurück, und der Widerruf löscht das Buch.", pt: "Sincronizado do seu dispositivo sob uma permissão que pode retirar — os nomes ficam, os números nunca voltam a sair, e retirar apaga a lista.", it: "Sincronizzato dal tuo dispositivo sotto un permesso revocabile — i nomi restano, i numeri non escono mai, e revocare cancella la rubrica.", ja: "取り消せる許可のもとで端末から同期します。名前は残り、番号は決して出ていかず、取り消せば連絡帳は消えます。", zh: "在可撤回的授权下从你的设备同步——名字保留，号码绝不返回，撤回即删除通讯录。", hi: "एक वापस लेने योग्य अनुमति के तहत आपके डिवाइस से सिंक — नाम रहते हैं, नंबर कभी बाहर नहीं आते, और वापस लेने पर सूची हट जाती है।", ar: "تُزامن من جهازك بموجب إذن يمكنك سحبه — تبقى الأسماء، ولا تخرج الأرقام أبدًا، وسحب الإذن يحذف الدفتر.",
+  },
+  "idn.book.sync": {
+    en: "Sync from this device", es: "Sincronizar desde este dispositivo", fr: "Synchroniser depuis cet appareil", de: "Von diesem Gerät synchronisieren", pt: "Sincronizar deste dispositivo", it: "Sincronizza da questo dispositivo", ja: "この端末から同期", zh: "从此设备同步", hi: "इस डिवाइस से सिंक करें", ar: "مزامنة من هذا الجهاز",
+  },
+  "idn.book.withdraw": {
+    en: "Withdraw and drop the book", es: "Retirar y borrar la libreta", fr: "Retirer et supprimer le carnet", de: "Widerrufen und das Buch löschen", pt: "Retirar e apagar a lista", it: "Revoca e cancella la rubrica", ja: "取り消して連絡帳を消す", zh: "撤回并删除通讯录", hi: "वापस लें और सूची हटाएँ", ar: "اسحب الإذن واحذف الدفتر",
+  },
+  "idn.book.held": {
+    en: "{n} people held", es: "{n} personas guardadas", fr: "{n} personnes conservées", de: "{n} Personen gehalten", pt: "{n} pessoas guardadas", it: "{n} persone conservate", ja: "{n} 人を保持", zh: "已保存 {n} 人", hi: "{n} लोग रखे गए", ar: "{n} شخصًا محفوظًا",
+  },
+  "idn.book.account": {
+    en: "has an account here", es: "tiene cuenta aquí", fr: "a un compte ici", de: "hat hier ein Konto", pt: "tem conta aqui", it: "ha un account qui", ja: "ここにアカウントあり", zh: "在这里有账户", hi: "यहाँ खाता है", ar: "لديه حساب هنا",
+  },
+  "idn.book.more": {
+    en: "…and {n} more", es: "…y {n} más", fr: "…et {n} de plus", de: "…und {n} weitere", pt: "…e mais {n}", it: "…e altri {n}", ja: "…ほか {n} 人", zh: "…还有 {n} 人", hi: "…और {n} लोग", ar: "…و{n} آخرون",
+  },
+  "idn.book.nopicker": {
+    en: "This browser cannot hand its contacts over — the phone app is the road for this one", es: "Este navegador no puede entregar sus contactos: la aplicación del teléfono es el camino para esto", fr: "Ce navigateur ne peut pas transmettre ses contacts — l'application du téléphone est la voie pour cela", de: "Dieser Browser kann seine Kontakte nicht übergeben — die Telefon-App ist hier der Weg", pt: "Este navegador não pode entregar os contactos — a aplicação do telefone é o caminho para isto", it: "Questo browser non può consegnare i contatti — l'app del telefono è la strada per questo", ja: "このブラウザは連絡先を渡せません — これはスマホアプリからどうぞ", zh: "此浏览器无法交出联系人——这项请使用手机应用", hi: "यह ब्राउज़र संपर्क नहीं दे सकता — इसके लिए फ़ोन ऐप ही रास्ता है", ar: "لا يستطيع هذا المتصفح تسليم جهات الاتصال — تطبيق الهاتف هو الطريق لهذا",
   },
   "idn.mypic": {
     en: "My own picture", es: "Mi propia foto", fr: "Ma propre photo", de: "Mein eigenes Bild", pt: "A minha própria foto", it: "La mia foto", ja: "自分の写真", zh: "我自己的照片", hi: "मेरी अपनी तस्वीर", ar: "صورتي الخاصة",

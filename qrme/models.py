@@ -174,6 +174,24 @@ class TurnEdit(BaseModel):
     content: str
 
 
+class ContactEntry(BaseModel):
+    """One row of a device's address book, as the device holds it. `number`
+    arrives however the phone formats it — qrme/contacts.py keeps only the
+    recognisable tail. `peer_id` is set by a shell that already matched this
+    contact to an account here; absent otherwise, never guessed."""
+    name: str
+    number: str
+    peer_id: str | None = None
+
+
+class ContactsSync(BaseModel):
+    entries: list[ContactEntry] = []
+
+
+class ContactsGrant(BaseModel):
+    consented: bool
+
+
 class QuietHoursSet(BaseModel):
     # UTC-hour window [start, end) during which no unprompted outreach is sent;
     # both None clears it. A window may wrap midnight (start > end).

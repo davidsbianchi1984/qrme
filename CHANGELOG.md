@@ -6,7 +6,19 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.8.6] - 2026-08-27
+
 ### Added
+
+- **The people in your phone — QRME's half.** The estate's address book
+  reached QRME: a grant that is the person's own (off until chosen, its
+  one switch also the withdrawal — turning it off drops the book from
+  both custodies), a synced source that replaces and is never typed, the
+  recognisable tail kept and the numbers never returned, sealed into the
+  vault where the plan has one and platform custody otherwise. The
+  Identity screen carries the card — sync through the browser's picker
+  where the platform offers one, the honest sentence where it does not —
+  and the three native shells' backlogs record the doors they owe.
 
 - **The deployment has eyes.** The owner shared two filings in one
   afternoon and the profile refused both, correctly: one was
@@ -33,6 +45,41 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   output the voice is on, wherever the platform reveals device names.
 
 ### Fixed
+
+- **The invite panel offers your own stable.** The 👤+ panel listed
+  only friends — one row and a field of empty space. Your account's own
+  profiles sit at the top now, each a press away from a seat, seated
+  ones shown and not pressable, and the list runs deeper before it
+  scrolls.
+
+- **A room listens the moment you step in — every room.** "You should
+  be able to just speak right away" — the ear opened itself only in
+  voice rooms and waited for a press in chat rooms; the press is gone,
+  the text bar stays for those who type, the mic button stays the mute,
+  and put-away still closes everything. And the flowed room's composer
+  stepped out from under the loudness rail, which was sitting on the
+  send arrow.
+
+- **A turn answers seconds sooner.** The recorded ear proved the pause
+  twice: a voiced take already ends on 2.5 seconds of silence, and the
+  send then waited through a further empty take before firing — every
+  turn cost about six quiet seconds. The take's own silence is the pause
+  that sends now, so the send fires the moment your finished sentence
+  comes back.
+
+- **The talk roll scrolls.** "If I miss something it said I wanna go
+  back and read it" — the roll holds the last thirty turns now, pinned
+  to the newest line only while you are at the bottom; scrolled back, it
+  stays where you put it.
+
+- **The reply no longer stutters in the earbud.** The talk face's
+  recorded ear cycled an empty take every 3.5 seconds while the profile
+  spoke — the quiet cap that makes auto-send fire was running even with
+  nothing to send — and each fresh microphone capture interrupted the
+  iPhone's audio session: the reply stalled and resumed on that rhythm,
+  all the way through. The cap now runs only while words are standing;
+  an empty take stays open, which is the right state and also the quiet
+  one.
 
 - **The room's ears work on an iPhone now — both of them, and mid-reply.**
   Three defects, one afternoon of field reports. The barge-in meter
@@ -15602,7 +15649,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.5...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.6...HEAD
+[1.8.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.5...app-v1.8.6
 [1.8.5]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.4...app-v1.8.5
 [1.8.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.3...app-v1.8.4
 [1.8.3]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.2...app-v1.8.3

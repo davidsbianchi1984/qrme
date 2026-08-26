@@ -9,7 +9,8 @@ from datetime import date
 
 from fastapi import APIRouter, HTTPException, Request, Response
 
-from .. import (adaptation, auth, briefcase, companion, db, engagement, i18n,
+from .. import (adaptation, auth, briefcase, companion, contacts, db,
+                engagement, i18n,
                 llm, moderation, offline, persona, referral, remembrance,
                 roles, scrape, voiceprint, watermark)
 from ..common import (require_may_publish, 
@@ -22,6 +23,7 @@ from ..common import (require_may_publish,
 )
 from ..models import (
     ChatRequest, ChatResponse, ComposeRequest, EngagementOut, Feedback,
+    ContactsGrant, ContactsSync,
     InteractorCreate, MemoryForget, MemoryStrike, MessageOut, QuietHoursSet,
     RehearsalOpen, RehearsalSay, RelationshipSet, TurnEdit, VoiceConsent,
     VoiceBind, VoiceSample, VoiceSay,
@@ -254,6 +256,61 @@ def clear_own_picture(interactor_id: str, request: Request) -> dict:
         (interactor_id,))
     conn.commit()
     return {"interactor_id": interactor_id, "url": None, "ai_marked": False}
+
+
+@router.put("/interactors/{interactor_id}/contacts/grant")
+def decide_contacts(interactor_id: str, body: ContactsGrant,
+                    request: Request) -> dict:
+    """The one switch for the people in your phone (qrme/contacts.py).
+
+    Off until chosen, because most of an address book is somebody else.
+    Turning it off drops the book — both custodies — right here: nobody
+    should have to find a second control to make this one mean what it
+    says. Your own token, like the picture that has your face on it: a
+    person's book is guarded exactly as their photograph is.
+    """
+    interactor_or_404(interactor_id)
+    require_interactor(interactor_id, request)
+    return contacts.decide(interactor_id, body.consented,
+                           pdi=request.app.state.pdi)
+
+
+@router.put("/interactors/{interactor_id}/contacts")
+def sync_contacts(interactor_id: str, body: ContactsSync,
+                  request: Request) -> dict:
+    """Replace the book with what the device has — the only write.
+
+    A synced source, never something people type: the entries come off the
+    device under the grant above. Sealed into PDI where the person's plan
+    has a vault, platform custody otherwise — one book, one withdrawal,
+    either way (the module says why, at length).
+    """
+    interactor_or_404(interactor_id)
+    require_interactor(interactor_id, request)
+    try:
+        return contacts.sync(interactor_id,
+                             [e.model_dump() for e in body.entries],
+                             pdi=request.app.state.pdi)
+    except contacts.NotGranted as exc:
+        raise HTTPException(403, i18n.raised(exc)) from None
+
+
+@router.get("/interactors/{interactor_id}/contacts")
+def contacts_book(interactor_id: str, request: Request) -> dict:
+    """Everybody in the synced book — names and whether a shell matched
+    them to an account here, never the numbers back out."""
+    interactor_or_404(interactor_id)
+    require_interactor(interactor_id, request)
+    try:
+        return {"book": contacts.book(interactor_id,
+                                      pdi=request.app.state.pdi),
+                "held": contacts.held(interactor_id)}
+    except contacts.NotGranted as exc:
+        raise HTTPException(403, i18n.raised(exc)) from None
+    except contacts.VaultUnreachable as exc:
+        # *You know nobody* and *I could not open your book* are different
+        # sentences; 503 keeps them apart on the wire too.
+        raise HTTPException(503, str(exc)) from None
 
 
 @router.put("/interactors/{interactor_id}/quiet-hours")

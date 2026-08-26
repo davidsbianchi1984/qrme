@@ -207,6 +207,55 @@ export function Identity({ onPlans, onPassing }: {
       .catch(() => setMyPic(null));
   }
   useEffect(reloadMyPic, [iAm, myToken]);
+  // The people in your phone — the book, or the reason there is none.
+  // The refusal is the information: not granted says so in the person's
+  // own language, and the switch is on the same card.
+  const [book, setBook] = useState<
+    { book: { id: string; name: string; holds_account: boolean;
+              added_at: string }[]; held: number } | null>(null);
+  const [bookError, setBookError] = useState<string | null>(null);
+  function reloadBook() {
+    if (!iAm || !myToken) return;
+    api.contactsBook(iAm, myToken)
+      .then((b) => { setBook(b); setBookError(null); })
+      .catch((e) => { setBook(null); setBookError((e as Error).message); });
+  }
+  useEffect(reloadBook, [iAm, myToken]);
+  /** The device's book, through the browser's own picker. A synced
+   *  source, never something people type; where the platform offers no
+   *  picker the honest sentence stands in, and the shell backlogs carry
+   *  the native road. Picking IS the grant: the switch is flipped on the
+   *  same press that hands the book over, and the withdraw button is the
+   *  way back. */
+  async function syncBook() {
+    if (!iAm || !myToken) return;
+    const nav = navigator as unknown as {
+      contacts?: {
+        select: (props: string[], opts: { multiple: boolean })
+          => Promise<{ name?: string[]; tel?: string[] }[]>;
+      };
+    };
+    if (!nav.contacts?.select) {
+      setBookError(tr("idn.book.nopicker", lang));
+      return;
+    }
+    let picked: { name?: string[]; tel?: string[] }[];
+    try {
+      picked = await nav.contacts.select(["name", "tel"], { multiple: true });
+    } catch {
+      return; // closed the picker; nothing to say
+    }
+    const entries = picked.flatMap((person) =>
+      (person.tel || []).map((number) => ({
+        name: (person.name || [])[0] || "", number })));
+    if (!entries.length) return;
+    setError(null); setNote(null);
+    try {
+      await api.decideContacts(iAm, true, myToken);
+      await api.syncContacts(iAm, entries, myToken);
+      reloadBook();
+    } catch (e) { fail(e); }
+  }
   const [confirmEnd, setConfirmEnd] = useState<"" | "sunset" | "delete">("");
   // Everything this person holds, across every profile they have talked
   // to. Loaded on a press rather than on mount: it is the single most
@@ -754,6 +803,53 @@ export function Identity({ onPlans, onPassing }: {
                      setNote(tr("idn.mypic.saved", lang));
                    } catch (err) { fail(err); }
                  }} />
+        </div>
+      )}
+
+      {/* The people in your phone — QRME's half of the estate's address
+          book (qrme/contacts.py). A synced source, never typed; names
+          come back and the numbers never do. */}
+      {iAm && myToken && (
+        <div className="card">
+          <h3>{tr("idn.book", lang)}</h3>
+          <p className="muted small">{tr("idn.book.lead", lang)}</p>
+          {bookError && <p className="muted small">{bookError}</p>}
+          {book && (
+            <p className="muted small">
+              {fill(tr("idn.book.held", lang),
+                    { n: String(book.held) })}
+            </p>
+          )}
+          {book && book.book.slice(0, 30).map((c) => (
+            <div className="row" key={c.id}>
+              <span style={{ flex: 1 }}>{c.name}</span>
+              {c.holds_account && (
+                <span className="muted small">
+                  {tr("idn.book.account", lang)}
+                </span>
+              )}
+            </div>
+          ))}
+          {book && book.book.length > 30 && (
+            <p className="muted small">
+              {fill(tr("idn.book.more", lang),
+                    { n: String(book.book.length - 30) })}
+            </p>
+          )}
+          <div className="row">
+            <button onClick={() => void syncBook()}>
+              {tr("idn.book.sync", lang)}
+            </button>
+            {book && (
+              <button onClick={async () => {
+                setError(null); setNote(null);
+                try {
+                  await api.decideContacts(iAm, false, myToken);
+                  reloadBook();
+                } catch (e) { fail(e); }
+              }}>{tr("idn.book.withdraw", lang)}</button>
+            )}
+          </div>
         </div>
       )}
 

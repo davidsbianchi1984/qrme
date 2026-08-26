@@ -106,17 +106,26 @@ def test_nothing_said_means_nothing_can_echo():
 
 # -- the ear stands open -----------------------------------------------------
 
-def test_entering_a_voice_room_opens_the_ear():
-    assert re.search(r"if \(!spokenRoom \|\| !canDictate\) return;\s*\n\s*"
+def test_entering_any_room_opens_the_ear():
+    """Every room now, not only the spoken ones.
+
+    The first version of this pair held chat rooms exempt — "the medium
+    there is typing, and an ear opening itself would be the product taking
+    a liberty nobody asked for" — and the owner overruled it in his own
+    words: "when you jump in a room, I shouldn't have to press any
+    buttons... you should be able to just speak right away. The text bar
+    is there for the blind or people that just like to type." A room is a
+    place you speak; typing is the alternative, not the default. What
+    stays guarded is the shape of the liberty: the ear opens on ENTRY to
+    a place the person chose to walk into, the mic button is the mute,
+    and put-away closes everything.
+    """
+    assert re.search(r"if \(!canDictate\) return;\s*\n\s*"
                      r"startTalking\(\);", INSIDE), (
-        "nothing opens the microphone on the way into a voice room — the "
-        "press the field report asked to remove is still the only way in")
-
-
-def test_a_chat_room_is_left_alone():
-    """The medium there is typing, and an ear opening itself would be the
-    product taking a liberty nobody asked for."""
-    assert "!spokenRoom || !canDictate" in INSIDE
+        "nothing opens the microphone on the way into a room — the press "
+        "the field reports asked to remove, twice, is still the only way in")
+    assert "!spokenRoom || !canDictate" not in INSIDE, (
+        "the chat-room exemption is back; the owner removed it by name")
 
 
 def test_the_silence_that_sends_is_in_the_range_that_was_asked_for():

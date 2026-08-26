@@ -2005,6 +2005,38 @@ CREATE TABLE IF NOT EXISTS voice_releases (
 CREATE INDEX IF NOT EXISTS idx_voice_releases
     ON voice_releases (provider, voice_id);
 
+-- The people in a person's phone, synced under a grant they can withdraw.
+-- Interactor-keyed: the book belongs to the PERSON, never to a profile —
+-- most of what is in an address book is somebody else, which is why the
+-- grant is off until chosen and withdrawal drops the rows rather than
+-- stopping the sync. `digits` is the number's recognisable tail only
+-- (qrme/contacts.py); the full number never enters this schema at all.
+CREATE TABLE IF NOT EXISTS contact_grants (
+    interactor_id TEXT PRIMARY KEY REFERENCES interactors(id),
+    consented     INTEGER NOT NULL DEFAULT 0,
+    decided_at    TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS contacts (
+    id            TEXT PRIMARY KEY,
+    interactor_id TEXT NOT NULL REFERENCES interactors(id),
+    name          TEXT NOT NULL,
+    digits        TEXT NOT NULL,        -- the tail, never the whole number
+    peer_id       TEXT,                 -- a QRME interactor this contact IS,
+                                        -- when a shell already knows; never
+                                        -- guessed here
+    added_at      TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_contacts_person
+    ON contacts (interactor_id, digits);
+-- Where a sealed book lives instead (see qrme/contacts.py: one book, one
+-- withdrawal, whichever custody the plan chose).
+CREATE TABLE IF NOT EXISTS contact_books (
+    interactor_id TEXT PRIMARY KEY REFERENCES interactors(id),
+    vault_key     TEXT NOT NULL,
+    held          INTEGER NOT NULL,
+    sealed_at     TEXT NOT NULL
+);
+
 -- Somebody's matter: what they said was wrong with the app, their profiles or
 -- the platform, and what happened to it. Distinct from `feedback` (a
 -- suggestion box nobody replies to) and from `problem_reports` (counters with

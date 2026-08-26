@@ -921,12 +921,20 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    scroll bookkeeping, and the mask fades the older lines out at the top
    instead of cutting them. Overflow is hidden, not scrolled — the roll is a
    glance at what was just said, and the full record is the chat behind it. */
+/* Scrolls now — "if I miss something it said I wanna go back and read
+   it." `margin-top: auto` on the first child pins the newest line to the
+   bottom without `justify-content: flex-end`, which makes overflowing
+   content unreachable at the top in some browsers — the same bargain the
+   room's log struck, for the same report. */
 .talk-roll { max-width: 480px; width: 100%; max-height: 6.2em;
-  flex: 0 0 auto; overflow: hidden;
-  display: flex; flex-direction: column; justify-content: flex-end;
+  flex: 0 0 auto; overflow-y: auto; overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch; touch-action: pan-y;
+  display: flex; flex-direction: column;
   gap: 4px; font-size: 14px; line-height: 1.4; text-align: left;
+  scrollbar-width: thin;
   -webkit-mask-image: linear-gradient(to top, #000 55%, transparent);
   mask-image: linear-gradient(to top, #000 55%, transparent); }
+.talk-roll > :first-child { margin-top: auto; }
 .talk-roll-line { color: var(--t2); }
 .talk-roll-line.mine { color: var(--txt); text-align: right; }
 
@@ -1548,7 +1556,12 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .screen.room-place .rs-chatstrip,
 .screen.room-place .rs-voicebar {
   position: static; left: auto; right: auto; bottom: auto;
-  flex: 0 0 auto; padding: 0 2px; }
+  flex: 0 0 auto; padding: 0 2px;
+  /* Out from under the loudness rail. The rail is fixed to the
+     viewport's right edge (~34px deep at right: 6) and this strip ran
+     the full width — so the rail sat on the send arrow, reported with a
+     screenshot. The rail moves nothing, so the room moves itself. */
+  margin-right: 38px; }
 /* And in the flowed layout the log takes the finger itself. The
    lines-only rule on `.rs-chatlog` is for the stage overlay, where a
    rectangle of dead air over a seat would eat the double-tap — here the
@@ -1820,7 +1833,10 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
  * id box underneath has to stay reachable. */
 .rh-list {
   display: flex; flex-direction: column; gap: 4px;
-  max-height: 40vh; overflow-y: auto;
+  /* 60vh, up from 40 — "look at all that empty space at the bottom of
+     the screen that we could fill the list with." Still a scroll, not a
+     page: the id box underneath stays reachable. */
+  max-height: 60vh; overflow-y: auto;
   margin: 0 -4px; padding: 0 4px;
 }
 .rh-friend {
