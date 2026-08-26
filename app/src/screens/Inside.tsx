@@ -250,7 +250,6 @@ export function Inside({ onPlans, start = "", onLeave }: {
   const [reveal, setReveal] = useState(false);
   // Three pickers, three different destinations: the room's photo, the
   // person's own picture, and the background behind them.
-  const mePicker = useRef<HTMLInputElement | null>(null);
   const bgPicker = useRef<HTMLInputElement | null>(null);
   const hold = useRef<number | null>(null);
   // The local preview. Rendering is the device's, exactly as `overlays` says —
@@ -1537,7 +1536,13 @@ export function Inside({ onPlans, start = "", onLeave }: {
          * Field report, from a chat room: "it should stay illuminated if
          * it stays on when you just click that and it's illuminated you
          * should be able to just speak". So: press to open, it stays lit
-         * while it listens, and five seconds of silence sends. */}
+         * while it listens, and five seconds of silence sends.
+         *
+         * One glyph, two states — lit and dim — rather than a slashed
+         * speaker for the idle case. The slash read as "sound is muted"
+         * on a button that actually means "press to talk", and the owner
+         * asked for it gone by name. The lit/dim treatment was already
+         * the design; the slash was never carrying information. */}
         {canDictate && (
           <button className={"rs-round mic" + (talking ? " live" : "")}
                   aria-pressed={talking}
@@ -1545,7 +1550,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
                                       : tr("ins.unmute", lang)}
                   title={talking ? tr("ins.mute", lang)
                                  : tr("ins.unmute", lang)}
-                  onClick={flipTalking}>{talking ? "🎙" : "🔇"}</button>
+                  onClick={flipTalking}>🎙</button>
         )}
         <button className="rs-round invite" disabled={busy || !token}
                 aria-label={tr("ins.ask.title", lang)}
@@ -2229,27 +2234,16 @@ export function Inside({ onPlans, start = "", onLeave }: {
                                })();
                              }
                            }} />
-                    {/* Your own picture — the PERSON's, not this room's.
-                        Two pictures, two buttons, and the difference is
-                        which one follows you out of here: the one above is
-                        what you are showing in THIS room, this is who you
-                        are in all of them. */}
-                    <button className="chip" disabled={busy}
-                            onClick={() => mePicker.current?.click()}>
-                      {tr("ins.face.mine", lang)}
-                    </button>
-                    <input ref={mePicker} type="file" accept="image/*"
-                           style={{ display: "none" }}
-                           onChange={(e) => {
-                             const file = e.target.files?.[0];
-                             e.target.value = "";
-                             if (file) {
-                               act(async () => {
-                                 await api.setOwnPicture(me, file, token);
-                                 load();
-                               })();
-                             }
-                           }} />
+                    {/* There is deliberately no "my own picture" button
+                        here any more. It sat beside "put a picture up"
+                        doing what read as the same thing, and the owner
+                        asked for it gone by name: the circle DEFAULTS to
+                        the person's own picture — the seat falls through
+                        to it whenever nothing is put up for this room —
+                        and the picture itself is set once, on the
+                        Identity screen, not per room. Two buttons for one
+                        visible outcome is a menu, and the menu problem is
+                        the one this product keeps choosing not to have. */}
                     {/* Taking your own picture down. Offered only when
                         there is one, and separate from the room's own
                         "back to a name in a box" — that clears what you

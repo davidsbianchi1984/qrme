@@ -8460,9 +8460,6 @@ const CHROME: Table = {
   "ins.file.why.unmapped": {
     en: "its fonts could not be followed", es: "no se pudieron interpretar sus fuentes", fr: "ses polices n'ont pas pu être suivies", de: "seinen Schriften konnte nicht gefolgt werden", pt: "não foi possível seguir os seus tipos de letra", it: "non è stato possibile seguire i suoi caratteri", ja: "フォントを追うことができませんでした", zh: "无法解读它的字体", hi: "इसके फ़ॉन्ट पढ़े नहीं जा सके", ar: "تعذّر تتبّع خطوطه",
   },
-  "ins.face.mine": {
-    en: "My own picture", es: "Mi propia foto", fr: "Ma propre photo", de: "Mein eigenes Bild", pt: "A minha própria foto", it: "La mia foto", ja: "自分の写真", zh: "我自己的照片", hi: "मेरी अपनी तस्वीर", ar: "صورتي الخاصة",
-  },
   "ins.face.background": {
     en: "Background", es: "Fondo", fr: "Arrière-plan", de: "Hintergrund", pt: "Fundo", it: "Sfondo", ja: "背景", zh: "背景", hi: "पृष्ठभूमि", ar: "الخلفية",
   },
