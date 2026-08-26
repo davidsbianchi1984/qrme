@@ -8,6 +8,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **Green is live, red is muted.** Rooms open listening now, and the
+  owner met the red ring on arrival and read it as muted — so the pair
+  swaps to the traffic-light reading: green while the ear is running
+  (the state a room opens in), red only after you press it to mute.
+
 - **The room's dictation yields, then sends.** The composer's mic
   opened a second capture while the standing ear (which every room now
   opens on entry) held the first — and iOS mutes the elder stream, so

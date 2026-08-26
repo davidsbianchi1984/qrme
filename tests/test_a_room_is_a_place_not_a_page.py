@@ -349,21 +349,30 @@ def test_the_paperclip_takes_photos_video_and_files():
         assert kind in picker, f"the attach picker refuses {kind}"
 
 
-def test_live_is_the_loud_state():
-    """The recording-light convention, by the owner's own call — asked as a
-    question and answered once: red means the microphone is hot, green means
-    it is safe to sneeze. The first cut had these reversed and the owner
-    read the room wrong twice before saying so.
+def test_live_is_the_green_state():
+    """Green means live, red means muted — the owner's NEWEST call, and the
+    second reversal of this pair, both on the record.
+
+    First cut: green-hot (nobody's call). His first correction:
+    recording-light — red is hot, green is safe to sneeze. Then rooms
+    started opening live (1.8.6), he met the red ring on arrival and read
+    it as muted: "it should show green and the microphone is live and
+    running when you show up; it only shows red when a user presses it
+    and the microphone becomes muted." A traffic-light reading beat a
+    recording-light reading in the moment that counts — arrival — and the
+    reading the room's owner reaches for is the one this holds.
 
         asked     which state is the alarming one
-        mattered  an open microphone is not a thing to be vague about
+        mattered  an open microphone is not a thing to be vague about —
+                  and if this pair reverses a third time, the answer is
+                  words on the button, not another swap
     """
     live = CSS[CSS.index(".rs-round.mic.live"):]
     live = live[:live.index("}")]
-    assert "224, 85, 85" in live, "a live microphone does not read as hot"
+    assert "123, 196, 127" in live, "a live microphone does not read as go"
     block = CSS[CSS.index(".rs-round.mic:not(.live)"):]
     block = block[:block.index("}")]
-    assert "123, 196, 127" in block, "muted does not read as safe"
+    assert "224, 85, 85" in block, "muted does not read as stopped"
 
 
 def test_the_seat_marks_are_only_drawn_where_the_fact_exists():

@@ -1765,18 +1765,26 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
  * be vague about.
  */
 .rs-round.mic.live {
-  border-color: rgba(224, 85, 85, 0.95);
-  background: rgba(224, 85, 85, 0.28);
-  color: #ffc9c9;
-  box-shadow: 0 0 0 3px rgba(224, 85, 85, 0.22);
+  border-color: rgba(123, 196, 127, 0.95);
+  background: rgba(123, 196, 127, 0.24);
+  color: #d3f5d6;
+  box-shadow: 0 0 0 3px rgba(123, 196, 127, 0.22);
 }
-/* And muted is the other half of the same sentence. Red means the mic is
-   hot — the recording-light convention, by the owner's own call — and
-   green means it is safe to sneeze. The first cut had these reversed and
-   the owner read the room wrong twice before saying so. */
+/* And muted is the other half of the same sentence. GREEN means live now
+   and RED means muted — the owner's newest call, reversing his earlier
+   one: rooms open listening since 1.8.6, he met the red ring on arrival
+   and read it as "muted" — "it should show green and the microphone is
+   live and running when you show up; it only shows red when a user
+   presses it and the microphone becomes muted." That is a traffic-light
+   reading (green = go), where the earlier call was a recording-light
+   reading (red = hot). Both are defensible; the person whose room it is
+   has now read it both ways, and the reading he reaches for on arrival
+   is the one that wins. Third reversal of this pair — if it happens
+   again, the answer is words on the button, not another swap. */
 .rs-round.mic:not(.live) {
-  border-color: rgba(123, 196, 127, 0.85);
-  background: rgba(123, 196, 127, 0.16);
+  border-color: rgba(224, 85, 85, 0.9);
+  background: rgba(224, 85, 85, 0.2);
+  color: #ffc9c9;
 }
 
 /* The invite lives further down the page; pressing the strip's button
