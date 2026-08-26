@@ -8,6 +8,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **Sharing files says what it is doing, takes several at once, and
+  reads faster.** A scanned file costs the eyes tens of seconds, and the
+  room greyed out silently for the duration — working, and reading as
+  frozen. The share runs outside the room-wide busy state now, with a
+  line naming the file being read and which of how many; the picker
+  takes multiple files in one go; and the eyes rasterise at 150 dpi
+  instead of 200 — print reads fine there, at roughly half the time per
+  page.
+
 - **Your own profiles seat on the press.** The invite panel sent your
   own profile an invitation — into an inbox only that profile's owner
   token can answer, which the console holds for one profile at a time —

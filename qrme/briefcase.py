@@ -878,7 +878,13 @@ def _ocr_text(data: bytes) -> str:
         held.write_bytes(data)
         try:
             subprocess.run(
-                ["pdftoppm", "-r", "200", "-gray", "-png",
+                # 150 dpi, down from 200: print-size glyphs OCR fine at
+                # 150, and half the pixels is roughly half the time per
+                # page — the field report on the first live pass was "why
+                # are they taking so long?", from a person sharing four
+                # scans in a row. The language gate keeps the honesty
+                # whatever the resolution.
+                ["pdftoppm", "-r", "150", "-gray", "-png",
                  "-f", "1", "-l", str(_OCR_PAGES),
                  str(held), str(Path(work) / "page")],
                 capture_output=True, timeout=120, check=True)

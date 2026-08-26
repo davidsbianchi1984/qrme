@@ -1486,13 +1486,33 @@ export function Inside({ onPlans, start = "", onLeave }: {
     await sendText(text);
   }
 
-  async function shareFile(file: File) {
-    if (!token) return;
+  /** Hand files to the room — several at once, each named while it is
+   *  being read. NOT through `act`: that greys the whole room for the
+   *  duration, and a scanned PDF takes the eyes tens of seconds — the
+   *  field report was "it froze, it won't let me do anything", about a
+   *  room that was working. The note is the difference between waiting
+   *  and doubting. */
+  async function shareFiles(files: File[]) {
+    if (!token || files.length === 0) return;
     const caption = draft.trim() || undefined;
     setDraft("");
-    await act(async () => {
-      await api.shareInRoom(open, me, file, token, caption);
-    })();
+    setError(null);
+    for (let i = 0; i < files.length; i++) {
+      setNote(tr("ins.file.reading", lang)
+        .replace("{name}", files[i].name)
+        .replace("{n}", String(i + 1))
+        .replace("{m}", String(files.length)));
+      try {
+        await api.shareInRoom(open, me, files[i], token,
+                              i === 0 ? caption : undefined);
+      } catch (e) {
+        setError(e);
+        break;
+      }
+      load();
+    }
+    setNote(null);
+    load();
   }
 
   /** A person's own picture, absolute — theirs, and the same in every room
@@ -2737,12 +2757,15 @@ export function Inside({ onPlans, start = "", onLeave }: {
              * record is for reading. */}
             {/* The file picker stays: the strip's own attach button
                 clicks it, so it is this row's one surviving job. */}
-            <input ref={sharePick} type="file" style={{ display: "none" }}
+            <input ref={sharePick} type="file" multiple
+                   style={{ display: "none" }}
                    accept="image/*,video/*,.pdf,.docx,.xlsx,.pptx,.zip,.txt"
                    onChange={(e) => {
-                     const f = e.target.files?.[0];
+                     // All of them — "maybe we can do select multiple
+                     // files so we can just give it all at once".
+                     const picked = Array.from(e.target.files ?? []);
                      e.target.value = "";
-                     if (f) void shareFile(f);
+                     if (picked.length) void shareFiles(picked);
                    }} />
             <p className="muted small">{tr("ins.watermarked", lang)}</p>
           </div>
