@@ -3774,7 +3774,11 @@ export const api = {
    *  nothing filters on it. `cloned` is a label, not a gate. */
   voiceLibrary: () =>
     req<{ voices: { id: string; name: string; gender: string; note: string;
-                    cloned: boolean }[] }>("/voices"),
+                    cloned: boolean }[];
+          /** False when the provider could not be asked and the list is
+           *  the built-in fallback; `note` then carries the sentence to
+           *  show. The silent version of this cost a field afternoon. */
+          library_reached?: boolean; note?: string | null }>("/voices"),
   profileVoice: (profileId: string) =>
     req<ProfileVoice>(`/profiles/${profileId}/voice`),
   setProfileVoice: (profileId: string,

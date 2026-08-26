@@ -1511,7 +1511,7 @@ def profile_voice(profile_id: str) -> dict:
 
 
 @router.get("/voices")
-def voice_library() -> dict:
+def voice_library(request: Request) -> dict:
     """The voices a profile can be pointed at.
 
     Binding was an opaque id typed by hand — true to how the provider
@@ -1525,7 +1525,16 @@ def voice_library() -> dict:
     on the server and no credential rides the answer.
     """
     from .. import spoken
-    return {"voices": spoken.library()}
+    voices, reached = spoken.library_with_reach()
+    # `library_reached` and its sentence: the fallback used to be silent,
+    # and the silence cost a field afternoon — an owner whose key had died
+    # saw only the built-in characters, their cloned voice gone from the
+    # list with nothing anywhere saying why.
+    return {"voices": voices, "library_reached": reached,
+            "note": None if reached else i18n.tr_public(
+                "The voice provider could not be reached, so these are the "
+                "built-in voices \u2014 cloned voices come back when it "
+                "answers.", i18n.refusal_language(request))}
 
 
 @router.put("/profiles/{profile_id}/voice")

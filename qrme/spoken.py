@@ -117,6 +117,11 @@ def _as_voice(v: dict) -> dict:
 
 
 def library() -> list[dict]:
+    """The voices, alone — the callers that only render a picker."""
+    return library_with_reach()[0]
+
+
+def library_with_reach() -> tuple[list[dict], bool]:
     """The voices on this deployment's account.
 
     Binding a voice was `PUT /profiles/{id}/voice` with an opaque
@@ -131,14 +136,21 @@ def library() -> list[dict]:
     Falls back rather than failing, and caches for five minutes: opening
     the screen is not a request per render, and a provider having an
     afternoon must not empty the list somebody is choosing from.
+
+    The second half of the return is whether the provider actually
+    answered. Falling back USED to be silent, and the silence cost a
+    field afternoon: an owner whose key had died saw only the built-in
+    characters, their own cloned voice gone from the list with nothing
+    anywhere saying why. The fallback stays; the screen gets to say it
+    is one.
     """
     key = os.environ.get("ELEVENLABS_API_KEY", "").strip()
     if not key or offline.enabled():
-        return FALLBACK_VOICES
+        return FALLBACK_VOICES, False
     now = time.monotonic()
     hit = _library_cache.get(key)
     if hit and now - hit[0] < _LIBRARY_TTL:
-        return hit[1]
+        return hit[1], True
     url = f"{_HOST}/v1/voices"
     try:
         offline.allow(url, "listing the voices this deployment can offer")
@@ -146,12 +158,12 @@ def library() -> list[dict]:
         with urllib.request.urlopen(req, timeout=20) as resp:
             rows = (json.loads(resp.read() or b"{}") or {}).get("voices") or []
     except Exception:
-        return FALLBACK_VOICES
+        return FALLBACK_VOICES, False
     voices = [_as_voice(v) for v in rows if v.get("voice_id")]
     if not voices:
-        return FALLBACK_VOICES
+        return FALLBACK_VOICES, False
     _library_cache[key] = (now, voices)
-    return voices
+    return voices, True
 
 
 def bound(profile_id: str) -> dict:

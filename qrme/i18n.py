@@ -419,6 +419,32 @@ _PUBLIC: dict[str, dict[str, str]] = {
 }
 
 
+_PUBLIC["The voice provider could not be reached, so these are the "
+        "built-in voices \u2014 cloned voices come back when it answers."] = {
+    'es': 'No se pudo contactar con el proveedor de voz, así que estas son '
+          'las voces integradas \u2014 las voces clonadas vuelven cuando '
+          'responda.',
+    'fr': "Le fournisseur de voix n'a pas pu être contacté, voici donc les "
+          "voix intégrées \u2014 les voix clonées reviennent quand il répond.",
+    'de': 'Der Stimmenanbieter war nicht erreichbar, daher sind dies die '
+          'eingebauten Stimmen \u2014 geklonte Stimmen kehren zurück, sobald '
+          'er antwortet.',
+    'pt': 'Não foi possível contactar o fornecedor de voz, por isso estas '
+          'são as vozes integradas \u2014 as vozes clonadas voltam quando '
+          'ele responder.',
+    'it': 'Non è stato possibile contattare il fornitore di voci, quindi '
+          'queste sono le voci integrate \u2014 le voci clonate tornano '
+          'quando risponde.',
+    'ja': '音声プロバイダーに接続できなかったため、これらは内蔵の声です \u2014 '
+          '接続が戻るとクローンの声も戻ります。',
+    'zh': '无法联系语音提供方，因此这些是内置声音 \u2014 待其恢复后，克隆声音会重新出现。',
+    'hi': 'वॉइस प्रदाता से संपर्क नहीं हो सका, इसलिए ये अंतर्निर्मित आवाज़ें हैं \u2014 '
+          'जब वह जवाब देगा तो क्लोन आवाज़ें वापस आ जाएँगी।',
+    'ar': 'تعذر الوصول إلى مزوّد الأصوات، لذا هذه هي الأصوات المدمجة \u2014 '
+          'تعود الأصوات المستنسخة عندما يستجيب.',
+}
+
+
 _PUBLIC['\u2014 cut off here, not finished. Ask me to continue.'] = {
     'es': '\u2014 cortado aqu\u00ed, no terminado. P\u00eddeme que siga.',
     'fr': "\u2014 coup\u00e9 ici, pas fini. Demandez-moi de continuer.",
