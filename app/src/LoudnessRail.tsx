@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { setSpokenLoudness, spokenLoudness } from "./spoken";
 import { t as tr, visitorLang } from "./l10n";
 
@@ -25,20 +25,28 @@ import { t as tr, visitorLang } from "./l10n";
 export function LoudnessRail() {
   const lang = visitorLang();
   const [loud, setLoud] = useState(() => spokenLoudness());
+  // Asleep by default -- "let's hide the volume button... reappear but
+  // fade away after a short while." A control pinned over every screen
+  // earns its keep by being invisible until wanted: asleep, it is a
+  // faint sliver tucked into the edge; touched, it wakes whole; left
+  // alone three seconds, it fades back. The phone's own volume keys
+  // never reach a web page (no browser exposes them), so the wakes are
+  // the ones a page can actually see: a touch on the sliver, a drag on
+  // the slider. Position, layer and look moved to styles.css so the
+  // sleep transform can win -- an inline transform outranks any class.
+  const [awake, setAwake] = useState(false);
+  const dozer = useRef<number | null>(null);
+  function wake() {
+    setAwake(true);
+    if (dozer.current) window.clearTimeout(dozer.current);
+    dozer.current = window.setTimeout(() => setAwake(false), 3000);
+  }
   return (
-    <div className="loudness-rail" title={tr("voice.spoken.loud", lang)}
-         style={{ position: "fixed", right: 6, top: "50%",
-                  transform: "translateY(-50%)",
-                  // Above the talk overlay (60) and the room stage (80):
-                  // those are the screens the sound comes out of, and a
-                  // rail underneath them is the old problem in a new
-                  // place. Below the footsteps (90) and the version
-                  // guard (100), which outrank everything by design.
-                  zIndex: 85,
-                  display: "flex", flexDirection: "column",
-                  alignItems: "center", gap: 4, padding: "8px 2px",
-                  borderRadius: 12, background: "rgba(20,18,40,0.55)" }}>
-      <span className="muted small" aria-hidden="true">
+    <div className={"loudness-rail" + (awake ? " awake" : " asleep")}
+         title={tr("voice.spoken.loud", lang)}
+         onPointerEnter={wake} onPointerDown={wake}
+         onTouchStart={wake}>
+      <span className="muted small loudness-count" aria-hidden="true">
         {Math.round(loud * 100)}%
       </span>
       <input type="range" min={5} max={100} step={5}
@@ -50,6 +58,7 @@ export function LoudnessRail() {
                const v = Number(e.target.value) / 100;
                setLoud(v);
                setSpokenLoudness(v);
+               wake();
              }} />
     </div>
   );

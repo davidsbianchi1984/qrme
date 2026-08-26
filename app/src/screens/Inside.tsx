@@ -1376,21 +1376,38 @@ export function Inside({ onPlans, start = "", onLeave }: {
    *  no sentence, on the same screen whose talk ear already forked. */
   async function dictRecorded() {
     if (!token || dictation.current) return;
+    // One capture at a time — iOS mutes the elder stream when a second
+    // opens, the lesson the barge-in meter already paid for. Rooms open
+    // the standing ear on entry now, so the ear that is already holding
+    // the microphone yields to the dictation and stands back up when it
+    // is done; without this the press "did nothing" because the take it
+    // opened was the one iOS muted.
+    const wasStanding = wantTalking.current;
+    if (wasStanding) {
+      wantTalking.current = false;
+      taping.current?.stop();
+      talkRec.current?.stop();
+    }
     let recording: Recording;
     try {
       recording = await recordAsked(me, token);
     } catch {
       setEarFault(tr("ins.ear.blocked", lang));
+      if (wasStanding) startTalking();
       return;
     }
     dictation.current = { stop: () => recording.stop() };
     setDictating(true);
     try {
       const text = await recording.done;
-      if (text) setDraft((d) => (d ? d + " " : "") + text);
-    } catch { /* a quiet take leaves the draft alone */ }
+      // "It starts recording, you can stop it, it transcribes and sends
+      // automatically" — the words go as a turn, not into a field
+      // somebody must then find the send for.
+      if (text) await sendText(text);
+    } catch { /* a quiet take sends nothing */ }
     dictation.current = null;
     setDictating(false);
+    if (wasStanding) startTalking();
   }
 
   function flipDictation() {
@@ -1450,16 +1467,23 @@ export function Inside({ onPlans, start = "", onLeave }: {
     setDictating(true);
   }
 
-  async function sendDraft() {
-    if (!draft.trim() || !token || busy) return;
-    const text = draft;
-    setDraft("");
+  /** One turn, from whichever door the words came through — the typed
+   *  draft and the dictated take end at the same send. */
+  async function sendText(text: string) {
+    if (!text.trim() || !token || busy) return;
     personTakesTheTurn();
     const cut = cutOff.current;
     cutOff.current = null;
     await act(async () => {
       await api.sayInRoom(open, me, text, token, cut || undefined);
     })();
+  }
+
+  async function sendDraft() {
+    if (!draft.trim()) return;
+    const text = draft;
+    setDraft("");
+    await sendText(text);
   }
 
   async function shareFile(file: File) {

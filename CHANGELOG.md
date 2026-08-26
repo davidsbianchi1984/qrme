@@ -8,6 +8,24 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- **The room's dictation yields, then sends.** The composer's mic
+  opened a second capture while the standing ear (which every room now
+  opens on entry) held the first — and iOS mutes the elder stream, so
+  the press recorded silence and "did nothing". The standing ear yields
+  while you dictate and stands back up after; and the take transcribes
+  and sends as a turn on its own, instead of landing in a field whose
+  send you must then find.
+
+- **The rail sleeps.** The loudness rail is a faint sliver tucked into
+  the edge until touched; awake, it is itself; left alone three seconds,
+  it fades back. (A page cannot see the phone's own volume keys — no
+  browser exposes them — so the wakes are the touch and the drag.)
+
+- **Handing a file over from the talk face stays on the talk face.**
+  Choosing a file from the + menu used to land you on the page's
+  briefcase card, under the overlay, with no way back. The overlay says
+  "Handed over — they're reading it" and the face stays up.
+
 - **The guide knows where you're standing.** Asked where to attach a
   file, a profile described the Chat composer's briefcase to somebody
   standing in a room — every door it named existed, none were where the

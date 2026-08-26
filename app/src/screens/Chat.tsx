@@ -280,7 +280,16 @@ export function Chat({ onPlans }: {
     setShooting(true);
     api.importFile(session.profileId, session.interactorId, file,
                    tr("chat.camera.note", lang))
-      .then(() => setBcOpen(true))   // land where it went, not nowhere
+      // Land where it went — WHEN the person is on the page. From the
+      // talk face, "where it went" is the conversation they are standing
+      // in: opening the briefcase card dropped them under the overlay
+      // with no way back ("I didn't have a way out when I got in
+      // there"), so the overlay says it in a line instead and the face
+      // stays up.
+      .then(() => {
+        if (talking) setHeard(tr("chat.talk.handed", lang));
+        else setBcOpen(true);
+      })
       .catch(setError)
       .finally(() => setShooting(false));
   };

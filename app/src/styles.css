@@ -522,6 +522,25 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .tile-label.linkish { background: none; border: 0; cursor: pointer;
   color: inherit; font: inherit; padding: 0; text-align: left; }
 
+/* The loudness rail's whole look lives here so the sleep transform can
+   win — an inline transform outranks any class. Asleep it is a faint
+   sliver tucked into the edge ("let's hide the volume button"); awake it
+   is the rail as it was. The transition is the fade-away. */
+.loudness-rail {
+  position: fixed; right: 6px; top: 50%; z-index: 85;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px; padding: 8px 2px; border-radius: 12px;
+  background: rgba(20, 18, 40, 0.55);
+  transform: translateY(-50%);
+  transition: opacity .4s ease, transform .4s ease;
+}
+.loudness-rail.awake { opacity: 1; }
+.loudness-rail.asleep {
+  opacity: 0.28;
+  transform: translateY(-50%) translateX(72%);
+}
+.loudness-rail.asleep .loudness-count { visibility: hidden; }
+
 /* The footsteps in the corner: how many people hold accounts here. A quiet
    chip, not a banner — it shares the fixed layer with the version guard but
    never competes with it for attention. */
