@@ -154,6 +154,36 @@ def library() -> list[dict]:
     return voices
 
 
+def _shared(provider: str, voice_id: str) -> bool:
+    """Whether a voice belongs to nobody, and so to everybody.
+
+    The claim in :func:`bind` exists for one case — a voice made of a real
+    person's throat, claimable by whoever reads its id off a public payload.
+    The library's premade voices are not that case: nobody's throat, offered
+    to every account by the deployment's own picker. The first live binding
+    refusal this module ever produced was over **Daniel**, the first row of
+    :data:`FALLBACK_VOICES` — the picker offered him to everybody, and the
+    claim handed him to whichever account clicked first.
+
+        asked     is this voice already spoken for
+        mattered  was it anybody's to speak for in the first place
+
+    So the line is the provider's own ``cloned`` mark, which is the fact the
+    claim was written to protect. A voice the library does not know stays
+    claimable — when nothing can say a voice is nobody's, it is treated as
+    somebody's, because the cost of the two mistakes is nothing alike.
+    ``library()`` never raises: no key, offline mode and a provider outage
+    all fall back to the static premade five, so this answer needs no
+    network to stay true for them.
+    """
+    if provider not in PROVIDERS:
+        return False
+    for v in library():
+        if v["id"] == voice_id:
+            return not v.get("cloned")
+    return False
+
+
 def bound(profile_id: str) -> dict:
     """Which voice this profile speaks with, or the empty binding.
 
@@ -188,6 +218,11 @@ def bind(profile_id: str, provider: str, voice_id: str,
     voice id can bind it. Now the first account to bind an id holds it —
     their own profiles may share it, another account is refused by name
     of the problem, and unbinding everywhere releases the claim.
+
+    The claim stops at :func:`_shared`. A premade library voice is
+    nobody's throat and the picker offers it to every account, so it is
+    everybody's to bind; what the claim holds is a voice the provider
+    marks as somebody's own.
     """
     conn = db.connect()
     if not voice_id.strip():
@@ -203,7 +238,7 @@ def bind(profile_id: str, provider: str, voice_id: str,
         " WHERE v.provider=? AND v.voice_id=? AND p.owner_id !="
         " (SELECT owner_id FROM profiles WHERE id=?) LIMIT 1",
         (provider, voice_id.strip(), profile_id)).fetchone()
-    if claimed is not None:
+    if claimed is not None and not _shared(provider, voice_id.strip()):
         raise SpokenError(
             "that voice is already spoken for on this deployment — a voice "
             "reference binds to the account that brought it, and this one "

@@ -17,6 +17,23 @@ So the first account to bind an id holds it. Their own profiles may share
 it — one person's voice on that person's own cast is the product working —
 another account is refused with the reason, and unbinding everywhere
 releases the claim.
+
+## Where the claim stops
+
+The first live refusal this claim ever produced was over **Daniel** — the
+premade British voice on the first row of the deployment's own picker.
+Nobody's throat, offered to every account, and the claim handed him to
+whichever account clicked first: a roster row everybody is shown that only
+one account could have.
+
+    asked     is this voice already spoken for
+    mattered  was it anybody's to speak for in the first place
+
+So the claim is bounded by the provider's own ``cloned`` mark, which is the
+fact it was written to protect. Premade library voices are everybody's; a
+voice the library does not know stays claimable, because when nothing can
+say a voice is nobody's it is treated as somebody's — the ids these tests
+invent land on that side, which is why the guards above needed no change.
 """
 
 from __future__ import annotations
@@ -77,3 +94,40 @@ def test_a_different_voice_id_is_untouched_by_the_claim(client):
     pid_b, tok_b = a_profile(client, "owner-g", "Gus")
     assert _bind(client, pid_a, tok_a, voice="v-one").status_code == 200
     assert _bind(client, pid_b, tok_b, voice="v-two").status_code == 200
+
+
+DANIEL = "onwK4e9ZLuTAKqWW03F9"
+
+
+def test_a_premade_library_voice_is_everybodys(client):
+    """Two accounts, one stock voice, no refusal. The picker offers it to
+    both of them, and a picker that offers what the claim then refuses is
+    the defect this guard exists to keep out."""
+    from qrme import spoken
+    assert any(v["id"] == DANIEL and not v["cloned"]
+               for v in spoken.FALLBACK_VOICES)
+    pid_a, tok_a = a_profile(client, "owner-h", "Hal")
+    pid_b, tok_b = a_profile(client, "owner-i", "Ida")
+    assert _bind(client, pid_a, tok_a, voice=DANIEL).status_code == 200
+    assert _bind(client, pid_b, tok_b, voice=DANIEL).status_code == 200
+    assert client.get(f"/profiles/{pid_b}/voice").json()["speaks"] is True
+
+
+def test_the_boundary_is_the_cloned_mark_and_not_the_list(client):
+    """`_shared` reads what the library says a voice is, not which file the
+    id happens to sit in — a cloned voice that reached the library keeps
+    the claim, however it got there."""
+    from qrme import spoken
+    cloned = dict(spoken.FALLBACK_VOICES[0], id="v-somebodys-throat",
+                  cloned=True)
+    spoken.FALLBACK_VOICES.append(cloned)
+    try:
+        pid_a, tok_a = a_profile(client, "owner-j", "Jo")
+        pid_b, tok_b = a_profile(client, "owner-k", "Kim")
+        assert _bind(client, pid_a, tok_a,
+                     voice="v-somebodys-throat").status_code == 200
+        r = _bind(client, pid_b, tok_b, voice="v-somebodys-throat")
+        assert r.status_code == 422
+        assert "already spoken for" in r.text
+    finally:
+        spoken.FALLBACK_VOICES.pop()
