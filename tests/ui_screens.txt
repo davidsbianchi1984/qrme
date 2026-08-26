@@ -1,4 +1,4 @@
-# status: floor — 68 rows
+# status: floor — 69 rows
 #
 # Which console surface each screen drawing depicts.
 #
@@ -61,6 +61,7 @@ Solitude        192
 Chat            6,45,83
 Desk            69,70
 Friends         84
+Circle          204
 Home            5
 Memory          7
 Relationships   8

@@ -3809,6 +3809,23 @@ SCREENS = [
     # line the backend refuses to cross: the help box answers and never
     # settles, so `answered` is drawn as a question with two buttons rather
     # than as a tick.
+    # 204: the circle. The friends screen that is only friends — the
+    # workbench (search, add, remove) and the storefront both showed the
+    # whole pool, and "see all my friends" landed a person among strangers
+    # with an offer on every card. The last card is the rule the screen
+    # exists to keep: nothing here is for sale, nobody here is new.
+    dict(num=204, title="Your Circle", sub="Everyone you added, and what they do",
+         accent="brand", tab=0, cards=[
+        dict(icon="heart", color="green", k="Only your friends",
+             s="nobody you have not added",
+             pill=("6", "good")),
+        dict(icon="page", color="brand", k="What each one does",
+             s="the blurb and the tags, per face"),
+        dict(icon="home", color="cyan", k="A face is a door",
+             s="press one, land on their page"),
+        dict(icon="lock", color="amber", k="No offers here",
+             s="adding people lives elsewhere"),
+    ], button=("See all, across from Top friends", "brand")),
     dict(num=203, title="Get Help", sub="Your matter, and what happened to it",
          accent="amber", tab=0, cards=[
         dict(icon="lock", color="amber", k="No account needed",

@@ -7,7 +7,8 @@ import { useSession } from "../store";
 export function Home({ go, onVisit, onInside }: {
   go: (t: "chat" | "relationships" | "memory" | "blend" | "simulate"
         | "campaigns" | "org" | "plans" | "friends"
-        | "identity" | "stranger" | "rooms" | "studio") => void;
+        | "identity" | "stranger" | "rooms" | "studio"
+        | "circle") => void;
   /** Press a face and land on that person's homepage. */
   onVisit: (profileId: string) => void;
   /** Land inside a room opened from here. The homepage is where the owner
@@ -113,11 +114,20 @@ export function Home({ go, onVisit, onInside }: {
 
       {pals.length > 0 && (
         <div className="top-friends">
-          {/* The label is the door to the whole list; a face is the door
-              to that person. */}
-          <button className="tile-label linkish" onClick={() => go("friends")}>
-            {tr("hom.friends", lang)}
-          </button>
+          {/* The label is the door to the workbench (add, remove, search);
+              a face is the door to that person; "See all" is the door to
+              the circle — every friend, described, and nobody who is not
+              one. Three doors because they answer three different asks. */}
+          <div className="tf-head">
+            <button className="tile-label linkish"
+                    onClick={() => go("friends")}>
+              {tr("hom.friends", lang)}
+            </button>
+            <button className="tile-label linkish"
+                    onClick={() => go("circle")}>
+              {tr("hom.seeall", lang)}
+            </button>
+          </div>
           <div className="friends-row">
             {pals.map((f) => (
               // Their homepage, not a card about them. What stood here read

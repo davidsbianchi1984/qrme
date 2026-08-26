@@ -302,6 +302,10 @@ button.danger { background: rgba(224,104,122,0.14) !important; color: var(--red)
 }
 /* The front page's top friends: the same faces the spaces use. */
 .top-friends { margin: 4px 0 18px; }
+/* The row's two doors, held apart: the label opens the workbench, See all
+   opens the circle. Space-between so "across from" reads literally. */
+.tf-head { display: flex; justify-content: space-between;
+           align-items: baseline; }
 .friends-row { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; }
 .friends-row button {
   background: none; border: 0; padding: 0; display: flex;

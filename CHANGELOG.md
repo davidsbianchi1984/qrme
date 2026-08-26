@@ -8,6 +8,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Your circle — the friends screen that is only friends.** "See all"
+  now sits across from Top friends on the homepage and opens a new
+  screen: everyone you have added, in the descriptive card style — the
+  face, what they do, their tags — and no add button anywhere, because
+  everybody here has already been added. The Friends tab stays the
+  workbench (search, add, remove, the whole pool); the circle is the
+  list itself. The one door out is on the empty state, where Discover
+  is the right answer. And on Discover, the card of somebody already
+  added now says **Friends** instead of offering "Add friend" to a
+  person it had already taken up on it — the label is the state, and a
+  fresh add flips the card without a reload.
+
 - **A friend you walk in with is not a stranger.** The same profile that
   held your files and your history in chat met you as a stranger in a
   room: the chat door carries the pair's briefcase and recalled moments

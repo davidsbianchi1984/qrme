@@ -9050,6 +9050,26 @@ const CHROME: Table = {
   "hom.friends": {
     en: "Top friends", es: "Mejores amigos", fr: "Meilleurs amis", de: "Engste Freunde", pt: "Melhores amigos", it: "Migliori amici", ja: "トップフレンド", zh: "挚友", hi: "खास दोस्त", ar: "أفضل الأصدقاء",
   },
+  // The door to the circle — the whole list, described, friends only.
+  "hom.seeall": {
+    en: "See all", es: "Ver todos", fr: "Tout voir", de: "Alle ansehen", pt: "Ver todos", it: "Vedi tutti", ja: "すべて見る", zh: "查看全部", hi: "सभी देखें", ar: "عرض الكل",
+  },
+  // Your circle: the friends screen that is only friends. The Friends tab
+  // is the workbench (search, add, remove, the whole pool); this is the
+  // list itself, with what each of them does — and no offer on any card,
+  // because everybody here has already been added.
+  "crc.title": {
+    en: "Your circle", es: "Tu círculo", fr: "Votre cercle", de: "Dein Kreis", pt: "O seu círculo", it: "La tua cerchia", ja: "あなたのサークル", zh: "你的圈子", hi: "आपका दायरा", ar: "دائرتك",
+  },
+  "crc.pitch": {
+    en: "Everyone you have added, and what they do", es: "Todos los que has añadido, y a qué se dedican", fr: "Toutes les personnes ajoutées, et ce qu'elles font", de: "Alle, die du hinzugefügt hast, und was sie tun", pt: "Todos os que adicionou, e o que fazem", it: "Tutti quelli che hai aggiunto, e cosa fanno", ja: "追加した全員と、それぞれの得意分野", zh: "你添加的每个人，以及他们的专长", hi: "आपके जोड़े हुए सभी लोग, और वे क्या करते हैं", ar: "كل من أضفتهم، وما يفعلونه",
+  },
+  "crc.empty": {
+    en: "Nobody in your circle yet.", es: "Aún no hay nadie en tu círculo.", fr: "Personne dans votre cercle pour le moment.", de: "Noch niemand in deinem Kreis.", pt: "Ainda não há ninguém no seu círculo.", it: "Ancora nessuno nella tua cerchia.", ja: "まだサークルに誰もいません。", zh: "你的圈子里还没有人。", hi: "आपके दायरे में अभी कोई नहीं है।", ar: "لا أحد في دائرتك بعد.",
+  },
+  "crc.meet": {
+    en: "Meet somebody", es: "Conoce a alguien", fr: "Rencontrer quelqu'un", de: "Jemanden kennenlernen", pt: "Conhecer alguém", it: "Conosci qualcuno", ja: "誰かに会ってみる", zh: "去认识一下", hi: "किसी से मिलें", ar: "تعرّف على أحد",
+  },
   "hom.chatwith": {
     en: "Chat with {name}", es: "Chatear con {name}", fr: "Discuter avec {name}", de: "Mit {name} chatten", pt: "Conversar com {name}", it: "Chatta con {name}", ja: "{name} とチャット", zh: "与 {name} 聊天", hi: "{name} से चैट करें", ar: "دردش مع {name}",
   },
@@ -9333,6 +9353,12 @@ const CHROME: Table = {
   },
   "dsc.addfriend": {
     en: "Add friend", es: "Añadir amistad", fr: "Ajouter en ami", de: "Als Freund:in hinzufügen", pt: "Adicionar amigo", it: "Aggiungi agli amici", ja: "友だちに追加", zh: "加为好友", hi: "मित्र बनाएँ", ar: "أضِف صديقًا",
+  },
+  // The card of somebody already added. The label is the state — the
+  // storefront button offered "Add friend" to people it had already taken
+  // up on it, which reads as a button that never worked.
+  "dsc.friends": {
+    en: "Friends", es: "Amistad hecha", fr: "Déjà amis", de: "Befreundet", pt: "Amigos", it: "Già amici", ja: "友だち", zh: "已是好友", hi: "मित्र", ar: "أصدقاء",
   },
   "dsc.signin": {
     en: "Sign in first.", es: "Inicia sesión primero.", fr: "Connectez-vous d'abord.", de: "Meld dich zuerst an.", pt: "Inicie sessão primeiro.", it: "Accedi prima.", ja: "先にサインインしてください。", zh: "请先登录。", hi: "पहले साइन इन करें।", ar: "سجّل الدخول أولًا.",

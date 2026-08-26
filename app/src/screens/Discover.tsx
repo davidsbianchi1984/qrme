@@ -38,6 +38,11 @@ export function Discover({ onPlans, onVisit }: {
     verified?: boolean;
   };
   const [cards, setCards] = useState<Card[]>([]);
+  // Who is already on the list. Every card said "Add friend", including
+  // the ones added long ago — the button was an offer to people it had
+  // already taken up on it. The label is the state: an added friend's
+  // card says "Friends", and only a stranger's card offers.
+  const [pals, setPals] = useState<Set<string>>(new Set());
   const [headCount, setHeadCount] = useState<number | null>(null);
   const [tag, setTag] = useState("");
   const [busy, setBusy] = useState(false);
@@ -76,6 +81,12 @@ export function Discover({ onPlans, onVisit }: {
       .catch((e) => setError(e));
   }
   useEffect(() => load(), []);
+  useEffect(() => {
+    if (!session.profileId) return;
+    api.friends(session.profileId)
+      .then((r) => setPals(new Set(r.friends.map((f) => f.profile_id))))
+      .catch(() => setPals(new Set()));
+  }, [session.profileId]);
 
   async function installStarters() {
     setBusy(true); setError(null); setNote(null);
@@ -102,6 +113,9 @@ export function Discover({ onPlans, onVisit }: {
       // console telling a person something it was told was not true.
       setNote(said.added ? tr("dsc.added", lang)
                          : tr("dsc.already", lang));
+      // Either verdict means the friendship stands now, and the card's
+      // button should say so without a reload.
+      setPals((was) => new Set(was).add(profileId));
     } catch (e) { setError(e); }
     finally { setBusy(false); }
   }
@@ -184,10 +198,16 @@ export function Discover({ onPlans, onVisit }: {
             <div className="tag-row">
               {c.tags.slice(0, 4).map((t) => <span key={t} className="tag">{t}</span>)}
             </div>
-            <button className="primary" disabled={busy}
-                    onClick={() => befriend(c.profile_id)}>
-              {tr("dsc.addfriend", lang)}
-            </button>
+            {pals.has(c.profile_id) ? (
+              <button className="primary is-friends" disabled>
+                {tr("dsc.friends", lang)}
+              </button>
+            ) : (
+              <button className="primary" disabled={busy}
+                      onClick={() => befriend(c.profile_id)}>
+                {tr("dsc.addfriend", lang)}
+              </button>
+            )}
           </div>
         ))}
       </div>

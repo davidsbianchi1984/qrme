@@ -9,6 +9,7 @@ import { Profile } from "./screens/Profile";
 import { Chat } from "./screens/Chat";
 import { Delegate } from "./screens/Delegate";
 import { Desk } from "./screens/Desk";
+import { Circle } from "./screens/Circle";
 import { Discover } from "./screens/Discover";
 import { Market } from "./screens/Market";
 import { Shops } from "./screens/Shops";
@@ -73,7 +74,7 @@ import { WatchLights } from "./WatchLights";
 // `profile` is deliberately not in NAV: somebody else's homepage is a place
 // you are taken to by pressing their face, not a standing destination — the
 // same reason `passing` is reachable and unlisted.
-type Tab = "profile" | "home" | "agent" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "allowed" | "stranger" | "themark" | "inwords" | "remainder" | "plugins" | "named" | "passing" | "robots" | "placements" | "plans" | "access" | "matters" | "settings";
+type Tab = "profile" | "home" | "circle" | "agent" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "allowed" | "stranger" | "themark" | "inwords" | "remainder" | "plugins" | "named" | "passing" | "robots" | "placements" | "plans" | "access" | "matters" | "settings";
 
 // `art` is the one tab whose mark is a picture rather than a glyph. Kept as a
 // second, optional field rather than widening `icon` to a node: the nav guards
@@ -361,6 +362,11 @@ export function App() {
         )}
         {tab === "chat" && <Chat onPlans={toPlans} />}
         {tab === "discover" && <Discover onPlans={toPlans} onVisit={visitProfile} />}
+        {/* Reached from the homepage's "See all", not from the rail — like
+            a profile visit, it is a place you go from somewhere, and the
+            rail's Friends entry stays the workbench. */}
+        {tab === "circle" && <Circle onVisit={visitProfile}
+                 onMeet={() => setTab("discover")} />}
         {tab === "market" && <Market onPlans={toPlans} />}
         {tab === "shop" && <Shops onPlans={toPlans} />}
         {tab === "corner" && <Corner onPlans={toPlans} />}
