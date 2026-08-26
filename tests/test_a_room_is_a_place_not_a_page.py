@@ -649,10 +649,17 @@ def test_lending_says_which_way_it_points():
     """Lending and taking back are different acts, and one label for both
     tells you nothing about which way the microphone is currently
     pointing."""
-    block = INSIDE[INSIDE.index('className={"rs-round lend"'):]
+    # `rs-worded` joined the class when the toggle went from glyph to
+    # words — the glyph read as "a person in a doorway" on a Windows
+    # handheld, the third strip control in two rounds whose meaning
+    # lived in a tooltip no phone shows.
+    block = INSIDE[INSIDE.index('className={"rs-round rs-worded lend"'):]
     block = block[:block.index("</button>")]
     assert 'tr("ins.takeback"' in block and 'tr("ins.lendmic"' in block
     assert "aria-pressed={lentByMe}" in block
+    # The label IS the state: both sentences are rendered as the button's
+    # text, not only as aria strings.
+    assert block.count('tr("ins.lendmic"') >= 2 or "lentByMe ? tr(" in block
 
 
 def test_a_lent_microphone_is_visible_across_the_room():

@@ -1654,8 +1654,8 @@ export function Inside({ onPlans, start = "", onLeave }: {
          * Two states, not one, because lending and taking back are
          * different acts and a toggle that says "microphone" for both
          * tells you nothing about which way it is pointing. */}
-        {/* In words now, like "Let it talk first" and for the same
-            report — the glyph read as "a person in a doorway" on a
+        {/* In words now, the way "Let it talk first" went and for the
+            same report — the glyph read as "a person in a doorway" on a
             Windows handheld and the press looked dead because the only
             feedback was a note below the fold. The label IS the state:
             it says which way the toggle is pointing before the press

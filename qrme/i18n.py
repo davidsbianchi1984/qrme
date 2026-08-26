@@ -7615,6 +7615,7 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     # `consented` and `number` in the SIBLINGS' exact words — the shared
     # field vocabulary is one voice across the estate, and JIM had both
     # first.
+    'standing': {'en': 'The screen you are on', 'es': 'La pantalla en la que estás', 'fr': "L'écran où vous êtes", 'de': 'Der Bildschirm, auf dem du bist', 'pt': 'O ecrã em que está', 'it': 'La schermata in cui sei', 'ja': '今いる画面', 'zh': '你所在的屏幕', 'hi': 'आप जिस स्क्रीन पर हैं', 'ar': 'الشاشة التي أنت عليها'},
     'consented': {'en': 'Consent', 'es': 'Consentimiento', 'fr': 'Consentement', 'de': 'Einwilligung', 'pt': 'Consentimento', 'it': 'Consenso', 'ja': '同意', 'zh': '同意', 'hi': 'सहमति', 'ar': 'الموافقة'},
     'number': {'en': "Their number, for the language", 'es': 'Su número, para el idioma', 'fr': "Leur numéro, pour la langue", 'de': 'Ihre Nummer, für die Sprache', 'pt': 'O número deles, para o idioma', 'it': 'Il loro numero, per la lingua', 'ja': '相手の番号（言語の判断用）', 'zh': '对方号码（用于判断语言）', 'hi': 'उनका नंबर, भाषा के लिए', 'ar': 'رقمهم، لتحديد اللغة'},
     'peer_id': {'en': 'Their account here, when a shell matched one', 'es': 'Su cuenta aquí, cuando la app la reconoció', 'fr': 'Leur compte ici, quand une application l’a reconnu', 'de': 'Deren Konto hier, wenn eine App es erkannt hat', 'pt': 'A conta deles aqui, quando a app a reconheceu', 'it': 'Il loro account qui, quando un’app l’ha riconosciuto', 'ja': '相手のここでのアカウント（アプリが照合できた場合）', 'zh': '对方在这里的账户（应用匹配到时）', 'hi': 'उनका यहाँ का खाता, जब ऐप ने मिलाया हो', 'ar': 'حسابهم هنا، عندما يطابقه تطبيق'},
