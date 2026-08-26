@@ -30,6 +30,10 @@ export function Voice({ onPlans }: {
   const [spoken, setSpoken] = useState<{ basis: string; disclosure: string } | null>(null);
 
   const [bound, setBound] = useState<ProfileVoice | null>(null);
+  // The binding card's own refusals, shown IN the card. They used to ride
+  // the screen-top surface, which sits a full page above this card — a
+  // refused bind read as a click that did nothing.
+  const [voiceError, setVoiceError] = useState<unknown>(null);
   const [voiceId, setVoiceId] = useState("");
   const [voiceLabel, setVoiceLabel] = useState("");
   // The output the voice is on, refreshed whenever a device comes or goes.
@@ -57,9 +61,16 @@ export function Voice({ onPlans }: {
   const [library, setLibrary] = useState<
     { id: string; name: string; gender: string; note: string;
       cloned: boolean }[]>([]);
+  // Why the list is thinner than it should be, when it is. The fallback
+  // used to arrive indistinguishable from the real library, and an owner
+  // whose cloned voice had vanished from the picker had nothing anywhere
+  // saying why — the sentence comes from the server, in their language.
+  const [libraryNote, setLibraryNote] = useState<string | null>(null);
   useEffect(() => {
-    api.voiceLibrary().then((r) => setLibrary(r.voices || []))
-      .catch(() => setLibrary([]));
+    api.voiceLibrary().then((r) => {
+      setLibrary(r.voices || []);
+      setLibraryNote(r.library_reached === false ? (r.note || null) : null);
+    }).catch(() => setLibrary([]));
   }, []);
 
   async function load() {
@@ -75,6 +86,15 @@ export function Voice({ onPlans }: {
     setBusy(true); setError(null);
     try { await fn(); await load(); }
     catch (e) { setError(e); }
+    finally { setBusy(false); }
+  }
+
+  /** The binding card's variant: same shape, its own surface. */
+  async function runVoice(fn: () => Promise<unknown>) {
+    if (!pid) return;
+    setBusy(true); setVoiceError(null);
+    try { await fn(); await load(); }
+    catch (e) { setVoiceError(e); }
     finally { setBusy(false); }
   }
 
@@ -234,6 +254,10 @@ export function Voice({ onPlans }: {
       <div className="card">
         <h3>{tr("voice.spoken.title", lang)}</h3>
         <p className="muted small">{tr("voice.spoken.lead", lang)}</p>
+        <Refusal error={voiceError} onPlans={onPlans} variant="inline" />
+        {libraryNote && (
+          <p className="muted small">{"\u26a0\ufe0f"} {libraryNote}</p>
+        )}
         {bound?.speaks && (
           <p className="small">
             {tr("voice.spoken.bound", lang)}{" "}
@@ -251,7 +275,7 @@ export function Voice({ onPlans }: {
           <div className="row">
             {!bound.released ? (
               <button disabled={busy}
-                      onClick={() => run(async () => {
+                      onClick={() => runVoice(async () => {
                         await api.releaseProfileVoice(
                           pid as string, session.ownerToken as string);
                       })}>
@@ -259,7 +283,7 @@ export function Voice({ onPlans }: {
               </button>
             ) : (
               <button disabled={busy}
-                      onClick={() => run(async () => {
+                      onClick={() => runVoice(async () => {
                         await api.reclaimProfileVoice(
                           pid as string, session.ownerToken as string);
                       })}>
@@ -312,7 +336,7 @@ export function Voice({ onPlans }: {
         </div>
         <div className="row">
           <button disabled={busy || !pid || !session.ownerToken || !voiceId.trim()}
-                  onClick={() => run(async () => {
+                  onClick={() => runVoice(async () => {
                     await api.setProfileVoice(pid as string,
                       { voice_id: voiceId.trim(), label: voiceLabel.trim() },
                       session.ownerToken as string);
@@ -323,14 +347,14 @@ export function Voice({ onPlans }: {
           {bound?.speaks && (
             <>
               <button disabled={busy}
-                      onClick={() => run(async () => {
+                      onClick={() => runVoice(async () => {
                         await api.setProfileVoice(pid as string,
                           { voice_id: "" }, session.ownerToken as string);
                       })}>
                 {tr("voice.spoken.unbind", lang)}
               </button>
               <button disabled={busy}
-                      onClick={() => run(async () => {
+                      onClick={() => runVoice(async () => {
                         const blob = await api.sayInProfileVoice(
                           pid as string, tr("voice.spoken.bound", lang),
                           session.ownerToken as string);
