@@ -3492,6 +3492,9 @@ export interface ProfileVoice {
   label: string;
   bound_at: string | null;
   speaks: boolean;
+  /** The owner's recorded waiver: anybody on this deployment may bind
+   *  this voice. False for everything not deliberately let go. */
+  released: boolean;
 }
 
 export const api = {
@@ -3782,6 +3785,15 @@ export const api = {
                             label?: string }, token: string) =>
     req<ProfileVoice>(`/profiles/${profileId}/voice`,
                       { method: "PUT", body, token }),
+  /** The owner's waiver, on the record: anybody on this deployment may
+   *  bind this voice. Reclaiming ends it and unbinds every other
+   *  account's copy — the history stays. */
+  releaseProfileVoice: (profileId: string, token: string) =>
+    req<{ provider: string; voice_id: string; released: boolean }>(
+      `/profiles/${profileId}/voice/release`, { method: "POST", token }),
+  reclaimProfileVoice: (profileId: string, token: string) =>
+    req<{ provider: string; voice_id: string; released: boolean }>(
+      `/profiles/${profileId}/voice/release`, { method: "DELETE", token }),
   sayInProfileVoice: async (profileId: string, text: string,
                             token: string): Promise<Blob> => {
     const res = await fetch(getBase() + `/profiles/${profileId}/voice/say`, {

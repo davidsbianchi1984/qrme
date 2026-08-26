@@ -8625,6 +8625,15 @@ const CHROME: Table = {
   "voice.spoken.save": {
     en: "Bind it", es: "Vincularla", fr: "La lier", de: "Binden", pt: "Vincular", it: "Collegala", ja: "結び付ける", zh: "绑定", hi: "जोड़ें", ar: "اربطه",
   },
+  "voice.spoken.released": {
+    en: "everybody here may use it — your waiver is on record", es: "todos aquí pueden usarla: tu renuncia queda registrada", fr: "tout le monde ici peut l'utiliser — votre renonciation est enregistrée", de: "alle hier dürfen sie nutzen — dein Verzicht ist festgehalten", pt: "todos aqui podem usá-la — a sua renúncia fica registada", it: "tutti qui possono usarla — la tua rinuncia è registrata", ja: "ここにいる全員が使えます — あなたの権利放棄は記録されています", zh: "这里的所有人都可以使用它——你的弃权已被记录", hi: "यहाँ सब इसे इस्तेमाल कर सकते हैं — आपका अधिकार-त्याग दर्ज है", ar: "يمكن للجميع هنا استخدامه — تنازلك مسجّل",
+  },
+  "voice.spoken.release": {
+    en: "Let everybody here use this voice", es: "Permitir que todos aquí usen esta voz", fr: "Laisser tout le monde ici utiliser cette voix", de: "Diese Stimme für alle hier freigeben", pt: "Deixar todos aqui usarem esta voz", it: "Lascia che tutti qui usino questa voce", ja: "ここにいる全員にこの声の使用を許可する", zh: "允许这里的所有人使用这个声音", hi: "यहाँ सबको यह आवाज़ इस्तेमाल करने दें", ar: "اسمح للجميع هنا باستخدام هذا الصوت",
+  },
+  "voice.spoken.reclaim": {
+    en: "Take the voice back", es: "Recuperar la voz", fr: "Reprendre la voix", de: "Die Stimme zurücknehmen", pt: "Retomar a voz", it: "Riprendi la voce", ja: "声を取り戻す", zh: "收回这个声音", hi: "आवाज़ वापस लीजिए", ar: "استرجع الصوت",
+  },
   "voice.spoken.unbind": {
     en: "Unbind", es: "Desvincular", fr: "Délier", de: "Lösen", pt: "Desvincular", it: "Scollega", ja: "解除する", zh: "解绑", hi: "हटाएँ", ar: "افصل",
   },

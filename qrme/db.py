@@ -1989,6 +1989,22 @@ CREATE TABLE IF NOT EXISTS profile_voices (
     bound_at   TEXT NOT NULL
 );
 
+-- A voice its owner released for everybody on this deployment. The row IS
+-- the waiver: who let it go and when, and -- if they took it back -- when
+-- that happened. History stays: the live release is the newest row with
+-- reclaimed_at NULL. Only a cloned voice ever needs one; the library's
+-- premades are nobody's and never claimed (see qrme/spoken.py `_shared`).
+CREATE TABLE IF NOT EXISTS voice_releases (
+    id           TEXT PRIMARY KEY,
+    provider     TEXT NOT NULL,
+    voice_id     TEXT NOT NULL,
+    released_by  TEXT NOT NULL,          -- the owner account that held it
+    released_at  TEXT NOT NULL,
+    reclaimed_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_voice_releases
+    ON voice_releases (provider, voice_id);
+
 -- Somebody's matter: what they said was wrong with the app, their profiles or
 -- the platform, and what happened to it. Distinct from `feedback` (a
 -- suggestion box nobody replies to) and from `problem_reports` (counters with

@@ -224,7 +224,35 @@ export function Voice({ onPlans }: {
           <p className="small">
             {tr("voice.spoken.bound", lang)}{" "}
             <strong>{bound.label || bound.voice_id}</strong>
+            {bound.released && <> · {tr("voice.spoken.released", lang)}</>}
           </p>
+        )}
+        {/* The owner's waiver. Releasing is a recorded decision — who and
+            when — and everything under "What always holds" still holds:
+            the watermark rides every utterance whoever binds it, and every
+            voice NOT released keeps its claim exactly as before. Taking it
+            back unbinds every other account's copy, the way withdrawing
+            the voiceprint silences the voice. */}
+        {bound?.speaks && session.ownerToken && (
+          <div className="row">
+            {!bound.released ? (
+              <button disabled={busy}
+                      onClick={() => run(async () => {
+                        await api.releaseProfileVoice(
+                          pid as string, session.ownerToken as string);
+                      })}>
+                {tr("voice.spoken.release", lang)}
+              </button>
+            ) : (
+              <button disabled={busy}
+                      onClick={() => run(async () => {
+                        await api.reclaimProfileVoice(
+                          pid as string, session.ownerToken as string);
+                      })}>
+                {tr("voice.spoken.reclaim", lang)}
+              </button>
+            )}
+          </div>
         )}
         {/* The picker. Binding was an opaque id typed by hand — true to how
             the provider works, and not something a person building a

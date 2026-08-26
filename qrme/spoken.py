@@ -184,6 +184,104 @@ def _shared(provider: str, voice_id: str) -> bool:
     return False
 
 
+def released(provider: str, voice_id: str):
+    """The live release of a voice, or None.
+
+    A release is its owner's recorded waiver -- *anybody on this deployment
+    may bind this voice* -- and it lives as a row rather than a flag so that
+    taking it back keeps the history: who let it go, when, and when it came
+    back. The claim in :func:`bind` steps aside while one is live.
+    """
+    return db.connect().execute(
+        "SELECT * FROM voice_releases WHERE provider=? AND voice_id=?"
+        " AND reclaimed_at IS NULL ORDER BY released_at DESC LIMIT 1",
+        (provider, voice_id)).fetchone()
+
+
+def _owner_of(profile_id: str) -> str:
+    row = db.connect().execute(
+        "SELECT owner_id FROM profiles WHERE id=?", (profile_id,)).fetchone()
+    return row["owner_id"] if row else ""
+
+
+def release(profile_id: str) -> dict:
+    """The owner lets everybody on this deployment use this voice.
+
+    The waiver the claim was always going to need: the first cloned voice on
+    this deployment was its owner's own, made to be handed around -- *anybody
+    can use it, I am waiving my rights to it* -- and the claim, doing its
+    job, refused every account but the one that brought it.
+
+        asked     may this voice be everybody's
+        mattered  did the person it is made of say so, on the record
+
+    Owner-only by construction: the route requires the profile's owner, and
+    the voice released is the one this profile is bound to -- nobody can
+    release a voice they do not hold. A premade is refused rather than
+    ignored: a control that does nothing would report a waiver nobody made.
+    Releasing an already-released voice returns the standing release.
+    """
+    row = bound(profile_id)
+    if not row["speaks"]:
+        raise SpokenError(NOTHING_TO_RELEASE)
+    if _shared(row["provider"], row["voice_id"]):
+        raise SpokenError(ALREADY_EVERYBODYS)
+    live = released(row["provider"], row["voice_id"])
+    if live is None:
+        conn = db.connect()
+        conn.execute(
+            "INSERT INTO voice_releases (id, provider, voice_id, released_by,"
+            " released_at) VALUES (?,?,?,?,?)",
+            (db.new_id("vrl"), row["provider"], row["voice_id"],
+             _owner_of(profile_id), db.utcnow()))
+        conn.commit()
+        live = released(row["provider"], row["voice_id"])
+    return {"provider": row["provider"], "voice_id": row["voice_id"],
+            "released": True, "released_at": live["released_at"]}
+
+
+def reclaim(profile_id: str) -> dict:
+    """The owner takes the voice back.
+
+    Only the account that released it may -- a waiver is personal, and so is
+    withdrawing one. Every other account's binding of the voice goes with it,
+    the way :mod:`qrme.voiceprint` withdraws: the release was the only thing
+    that made those bindings legitimate, and a copy that keeps speaking after
+    the owner said stop is the objection made real. The release row stays,
+    reclaimed_at filled -- the history is the point.
+    """
+    row = bound(profile_id)
+    if not row["speaks"]:
+        raise SpokenError(NOTHING_TO_RELEASE)
+    live = released(row["provider"], row["voice_id"])
+    owner = _owner_of(profile_id)
+    if live is None or live["released_by"] != owner:
+        raise SpokenError(NOT_YOURS_TO_RECLAIM)
+    conn = db.connect()
+    conn.execute("UPDATE voice_releases SET reclaimed_at=? WHERE id=?",
+                 (db.utcnow(), live["id"]))
+    conn.execute(
+        "DELETE FROM profile_voices WHERE provider=? AND voice_id=? AND"
+        " profile_id IN (SELECT id FROM profiles WHERE owner_id != ?)",
+        (row["provider"], row["voice_id"], owner))
+    conn.commit()
+    return {"provider": row["provider"], "voice_id": row["voice_id"],
+            "released": False, "reclaimed_at": live["id"] and db.utcnow()}
+
+
+#: Release refused: nothing is bound, so there is nothing to let go of.
+NOTHING_TO_RELEASE = ("this profile speaks with nothing -- bind the voice "
+                      "before releasing it for everybody")
+
+#: Release refused on a premade: the waiver would be nobody's to make.
+ALREADY_EVERYBODYS = ("that voice is already everybody's -- the library's "
+                      "premade voices are never claimed")
+
+#: Reclaim refused: a waiver is personal, and so is withdrawing one.
+NOT_YOURS_TO_RECLAIM = ("only the account that released a voice may take it "
+                        "back")
+
+
 def bound(profile_id: str) -> dict:
     """Which voice this profile speaks with, or the empty binding.
 
@@ -195,10 +293,13 @@ def bound(profile_id: str) -> dict:
         (profile_id,)).fetchone()
     if row is None:
         return {"profile_id": profile_id, "provider": "", "voice_id": "",
-                "label": "", "bound_at": None, "speaks": False}
+                "label": "", "bound_at": None, "speaks": False,
+                "released": False}
     return {"profile_id": profile_id, "provider": row["provider"],
             "voice_id": row["voice_id"], "label": row["label"],
-            "bound_at": row["bound_at"], "speaks": True}
+            "bound_at": row["bound_at"], "speaks": True,
+            "released": released(row["provider"], row["voice_id"])
+            is not None}
 
 
 def bind(profile_id: str, provider: str, voice_id: str,
@@ -238,7 +339,8 @@ def bind(profile_id: str, provider: str, voice_id: str,
         " WHERE v.provider=? AND v.voice_id=? AND p.owner_id !="
         " (SELECT owner_id FROM profiles WHERE id=?) LIMIT 1",
         (provider, voice_id.strip(), profile_id)).fetchone()
-    if claimed is not None and not _shared(provider, voice_id.strip()):
+    if (claimed is not None and not _shared(provider, voice_id.strip())
+            and released(provider, voice_id.strip()) is None):
         raise SpokenError(
             "that voice is already spoken for on this deployment — a voice "
             "reference binds to the account that brought it, and this one "

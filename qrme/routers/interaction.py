@@ -1543,6 +1543,33 @@ def bind_profile_voice(profile_id: str, body: VoiceBind,
         raise HTTPException(422, i18n.raised(exc)) from None
 
 
+@router.post("/profiles/{profile_id}/voice/release")
+def release_profile_voice(profile_id: str, request: Request) -> dict:
+    """The owner lets everybody on this deployment use this profile's bound
+    voice. A recorded waiver, not a setting: who released it and when stays
+    on the row, and taking it back keeps the history."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    from .. import spoken
+    try:
+        return spoken.release(profile_id)
+    except spoken.SpokenError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
+
+
+@router.delete("/profiles/{profile_id}/voice/release")
+def reclaim_profile_voice(profile_id: str, request: Request) -> dict:
+    """The owner takes the voice back. Only the account that released it
+    may, and every other account's binding of it goes with the waiver."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    from .. import spoken
+    try:
+        return spoken.reclaim(profile_id)
+    except spoken.SpokenError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
+
+
 @router.post("/profiles/{profile_id}/voice/say")
 def say_in_profile_voice(profile_id: str, body: VoiceSay,
                          request: Request) -> Response:

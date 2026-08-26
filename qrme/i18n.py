@@ -7386,6 +7386,39 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'ar': 'يتطلب هذا النشر مفتاح تسجيل لإنشاء ملف تعريف — أرسله في ترويسة '
               'x-signup-key',
     },
+    "this profile speaks with nothing -- bind the voice before releasing it for everybody": {
+        'es': "este perfil no habla con nada: vincula la voz antes de liberarla para todos",
+        'fr': "ce profil ne parle avec rien — liez la voix avant de la libérer pour tout le monde",
+        'de': "dieses Profil spricht mit nichts — binde die Stimme, bevor du sie für alle freigibst",
+        'pt': "este perfil não fala com nada — vincule a voz antes de a libertar para todos",
+        'it': "questo profilo non parla con nulla: associa la voce prima di liberarla per tutti",
+        'ja': "このプロフィールにはまだ声がありません。皆に開放する前に、まず声をバインドしてください",
+        'zh': "这个档案还没有绑定声音——先绑定声音，再把它开放给所有人",
+        'hi': "यह प्रोफ़ाइल अभी किसी आवाज़ से नहीं बोलती — सबके लिए छोड़ने से पहले आवाज़ को बाँधिए",
+        'ar': "هذا الملف لا يتحدث بأي صوت — اربط الصوت أولًا قبل إتاحته للجميع",
+    },
+    "that voice is already everybody's -- the library's premade voices are never claimed": {
+        'es': "esa voz ya es de todos: las voces prediseñadas de la biblioteca nunca se reclaman",
+        'fr': "cette voix appartient déjà à tout le monde — les voix préfabriquées de la bibliothèque ne sont jamais réservées",
+        'de': "diese Stimme gehört schon allen — die vorgefertigten Stimmen der Bibliothek werden nie beansprucht",
+        'pt': "essa voz já é de todos — as vozes pré-feitas da biblioteca nunca são reclamadas",
+        'it': "quella voce è già di tutti: le voci predefinite della libreria non vengono mai rivendicate",
+        'ja': "その声はすでに皆のものです。ライブラリの既製の声が占有されることはありません",
+        'zh': "那个声音本来就是所有人的——声音库的预制声音从不被认领",
+        'hi': "वह आवाज़ पहले से सबकी है — लाइब्रेरी की बनी-बनाई आवाज़ों पर कभी दावा नहीं होता",
+        'ar': "ذلك الصوت ملك للجميع أصلًا — أصوات المكتبة الجاهزة لا تُحجز أبدًا",
+    },
+    "only the account that released a voice may take it back": {
+        'es': "solo la cuenta que liberó una voz puede recuperarla",
+        'fr': "seul le compte qui a libéré une voix peut la reprendre",
+        'de': "nur das Konto, das eine Stimme freigegeben hat, kann sie zurücknehmen",
+        'pt': "só a conta que libertou uma voz pode retomá-la",
+        'it': "solo l'account che ha liberato una voce può riprendersela",
+        'ja': "声を開放したアカウントだけが、それを取り戻せます",
+        'zh': "只有开放这个声音的账户才能把它收回",
+        'hi': "जिस खाते ने आवाज़ छोड़ी थी, वही उसे वापस ले सकता है",
+        'ar': "فقط الحساب الذي أتاح الصوت يمكنه استرجاعه",
+    },
     ("that voice is already spoken for on this deployment — a voice "
      "reference binds to the account that brought it, and this one "
      "belongs to somebody else. Make your own voice on the "
