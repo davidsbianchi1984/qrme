@@ -251,11 +251,18 @@ def test_the_screen_sends_the_interactor_token_not_the_owners():
     lines = [ln for ln in src.splitlines() if "ownerToken" in ln]
     assert lines, ("the accept door lost its owner token — an invited "
                    "profile of your own can no longer be seated")
+    # Second exception, the panels dock: the rail's owner panels read
+    # through the owner's token for the one profile the session owns —
+    # `dockOwner` is gated on `=== session.profileId` where it is made,
+    # and it reaches the rail's own doors, never a room-speaking one.
+    # Both shapes quoted exactly, per the loose-guard lesson.
     for ln in lines:
         assert ("acceptRoomInvite" in ln
-                or "if (session.ownerToken" in ln), (
+                or "if (session.ownerToken" in ln
+                or "=== session.profileId ? session.ownerToken" in ln
+                or "ownerToken={dockOwner}" in ln), (
             "the owner token reaches something other than the accept "
-            f"door:\n    {ln.strip()}")
+            f"door or the panels dock:\n    {ln.strip()}")
 
 
 def test_the_screen_says_the_microphone_is_seen_by_everyone():

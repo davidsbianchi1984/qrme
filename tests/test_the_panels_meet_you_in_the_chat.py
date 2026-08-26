@@ -23,11 +23,12 @@ CSS = (SRC / "styles.css").read_text(encoding="utf-8")
 def test_the_rail_is_in_the_main_chat_not_only_the_overlay():
     stripped = re.sub(r"/\*.*?\*/", "", CHAT, flags=re.S)
     stripped = re.sub(r"^\s*//.*$", "", stripped, flags=re.M)
-    assert stripped.count("<TalkRail") >= 2, (
-        "the four panels are back to being a voice-only feature")
-    dock = stripped[stripped.index('className="chat-rail-dock"') - 200:
-                    stripped.index('className="chat-rail-dock"')]
-    assert "!talking" in dock, (
+    at = stripped.index('className="chat-rail-dock"')
+    assert "<TalkRail" in stripped[at:at + 600], (
+        "the dock stands and its rail is gone")
+    assert "<TalkRail" in stripped[:at], (
+        "the overlay lost its rail — the dock is now the only telling")
+    assert "!talking" in stripped[at - 200:at], (
         "the dock draws under the overlay's own rail while talking")
 
 

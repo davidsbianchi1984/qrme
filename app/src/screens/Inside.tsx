@@ -196,6 +196,13 @@ export function Inside({ onPlans, start = "", onLeave }: {
   const [draft, setDraft] = useState("");
   // Whose four panels the dock shows, in a room with several profiles.
   const [railFor, setRailFor] = useState<string | null>(null);
+  const dockedProfile = railFor
+    || seats.find((s) => s.kind === "profile")?.id || null;
+  // The owner's two panels open only for the profile this session owns —
+  // the token is read by the rail's own doors and never speaks into the
+  // room (test_knowing_the_id_is_not_being_here names this line).
+  const dockOwner =
+    dockedProfile === session.profileId ? session.ownerToken || null : null;
   const [scene, setScene] = useState<RoomFaces | null>(null);
   // The room's own channel, read off the join answer. `chat`, `voice` and
   // `video` present flat; `ar` and `vr` are the two the homepage sells as
@@ -2807,14 +2814,10 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 </div>
               )}
               <TalkRail
-                profileId={railFor
-                  || seats.find((s) => s.kind === "profile")!.id}
+                profileId={dockedProfile!}
                 interactorId={me || null}
                 lang={lang}
-                ownerToken={(railFor
-                  || seats.find((s) => s.kind === "profile")!.id)
-                    === session.profileId
-                  ? (session.ownerToken || null) : null}
+                ownerToken={dockOwner}
                 interactorToken={token || null}
                 onError={setError} />
             </div>

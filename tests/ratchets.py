@@ -909,7 +909,7 @@ RATCHETS: tuple[Ratchet, ...] = (
             "the siblings the thinnest autonomous root imports"),
     Ratchet("ratchet.files", 20, _ratchet_files,
             "the ratchet records this suite keeps"),
-    Ratchet("gallery.tables", 9, _gallery_tables,
+    Ratchet("gallery.tables", 15, _gallery_tables,
             "the gallery tables the README carries"),
     Ratchet("route.verbs_min", 4, _verbs_min,
             "the distinct verbs the thinnest-reading shell reports"),
