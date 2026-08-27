@@ -135,9 +135,9 @@ struct AvatarSection: View {
         .task {
             if shelf.isEmpty,
                let s = try? await ApiClient.shared.avatarMarket() {
-                shelf = s.sources
-                if !s.sources.contains(where: { $0.key == chosenSource }),
-                   let first = s.sources.first {
+                shelf = s.skin_sources
+                if !s.skin_sources.contains(where: { $0.key == chosenSource }),
+                   let first = s.skin_sources.first {
                     chosenSource = first.key
                 }
             }
@@ -237,7 +237,7 @@ struct PageSection: View {
                         let p = try await ApiClient.shared.page(
                             id: state.pid!)
                         let t = p.tagline ?? "—"
-                        line = (p.theme?.label ?? "—") + " · " + t
+                        line = (p.page_theme?.label ?? "—") + " · " + t
                     }
                 }.font(.caption).disabled(busy)
                 Button(L10n.t("pg.themes", state.language)) {
@@ -315,7 +315,7 @@ struct SurfaceSection: View {
                     run {
                         let c = try await ApiClient.shared.composition(
                             id: state.pid!)
-                        line = (c.sources ?? []).compactMap(\.name)
+                        line = (c.composition_sources ?? []).compactMap(\.name)
                             .joined(separator: " · ")
                     }
                 }.font(.caption).disabled(busy)

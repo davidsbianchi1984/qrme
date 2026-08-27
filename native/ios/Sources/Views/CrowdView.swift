@@ -78,9 +78,9 @@ struct CrowdSection: View {
                 }
             }.font(.caption).disabled(busy || targetId.isEmpty)
             if let counts {
-                Text("♥ \(counts.likes ?? 0) · 💬 \(counts.comments ?? 0)"
+                Text("♥ \(counts.likes ?? 0) · 💬 \(counts.comments_count ?? 0)"
                      + " · ↗ \(counts.shares ?? 0)"
-                     + " · ⊕ \(counts.subscribers ?? 0)")
+                     + " · ⊕ \(counts.subscribers_count ?? 0)")
                     .font(.caption2).foregroundStyle(Theme.t2)
             }
             ForEach(subs, id: \.identity) { s in

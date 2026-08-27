@@ -352,7 +352,7 @@ struct VoiceView: View {
         act {
             _ = try await ApiClient.shared.addVoiceSample(
                 id: profileId, token: token, source: "direct",
-                seconds: sample.seconds, turns: sample.turns,
+                seconds: sample.seconds, turns: sample.turns_count,
                 reference: sample.reference)
         }
     }

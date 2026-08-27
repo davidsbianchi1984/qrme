@@ -237,7 +237,7 @@ struct ReachSection: View {
                             interactorId: state.interactorId ?? "",
                             rating: "up",
                             token: state.interactorToken ?? "")
-                        line = o.rating ?? "—"
+                        line = "score \(o.score ?? 0)"
                     }
                 }.font(.caption).disabled(busy
                                           || state.interactorId == nil)
@@ -248,7 +248,7 @@ struct ReachSection: View {
                             interactorId: state.interactorId ?? "",
                             rating: "down",
                             token: state.interactorToken ?? "")
-                        line = o.rating ?? "—"
+                        line = "score \(o.score ?? 0)"
                     }
                 }.font(.caption).disabled(busy
                                           || state.interactorId == nil)

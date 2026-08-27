@@ -169,7 +169,7 @@ struct StreamSection: View {
         defer { busy = false }
         do {
             let page = try await ApiClient.shared.publicFeed(cursor: after)
-            cards = after == nil ? page.items : cards + page.items
+            cards = after == nil ? page.cards : cards + page.cards
             cursor = page.cursor
         } catch {
             // A stream that cannot load is a quiet shelf, not an error page.

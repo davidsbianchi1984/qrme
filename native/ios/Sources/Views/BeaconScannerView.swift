@@ -140,7 +140,7 @@ private struct BeaconOverlay: View {
                     portrait
                     // Drawn from the same payload as the face, so the two
                     // cannot come apart.
-                    Text(card.watermark)
+                    Text(card.watermark_line)
                         .font(.system(size: 11, weight: .bold))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 8).padding(.vertical, 4)
@@ -283,7 +283,7 @@ final class BeaconScanner: NSObject, ObservableObject,
             let card = BeaconCard(
                 profileId: json["profile_id"] as? String ?? beaconId,
                 displayName: json["display_name"] as? String ?? "",
-                watermark: json["watermark"] as? String ?? "",
+                watermark: json["watermark_line"] as? String ?? "",
                 portrait: (json["portrait"] as? String).flatMap(URL.init),
                 label: json["label"] as? String,
                 sharedRoom: json["shared_room"] is String,

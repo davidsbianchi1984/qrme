@@ -33,7 +33,7 @@ struct MemorySection: View {
             Text(L10n.t("mem.title", state.language))
                 .font(.headline).foregroundStyle(Theme.txt)
             ForEach(rows) { m in
-                Text("\(m.interactor_name) · \(m.turns)")
+                Text("\(m.interactor_name) · \(m.turns_count)")
                     .font(.caption2).foregroundStyle(Theme.t2)
             }
             TextField(L10n.t("mem.id", state.language), text: $visitorId)
@@ -208,7 +208,7 @@ struct PairSection: View {
                         let t = try await ApiClient.shared.thread(
                             id: state.pid!, interactorId: visitorId,
                             token: state.token!)
-                        line = "\(t.messages.count)"
+                        line = "\(t.thread_turns.count)"
                     }
                 }.font(.caption).disabled(busy || visitorId.isEmpty)
                 Button(L10n.t("who.engagement", state.language)) {
@@ -341,7 +341,7 @@ struct RecordSection: View {
                         let s = try await ApiClient.shared.profileStats(
                             id: state.pid!, token: state.token!)
                         line = "\(s.sessions) · \(s.memory_entries) · "
-                            + "\(s.interactors) · \(s.sources)"
+                            + "\(s.interactors) · \(s.sources_count)"
                     }
                 }.font(.caption).disabled(busy)
             }
@@ -350,15 +350,15 @@ struct RecordSection: View {
                     run {
                         let out = try await ApiClient.shared.exportProfile(
                             id: state.pid!, token: state.token!)
-                        line = "\(out.messages.count) · "
-                            + "\(out.posts.count) · \(out.sources.count)"
+                        line = "\(out.message_rows.count) · "
+                            + "\(out.post_rows.count) · \(out.source_rows.count)"
                     }
                 }.font(.caption).disabled(busy)
                 Button(L10n.t("rec.feed", state.language)) {
                     run {
                         let f = try await ApiClient.shared.feed(
                             id: state.pid!)
-                        line = "\(f.posts.count) · "
+                        line = "\(f.feed_posts.count) · "
                             + f.ranked_on.joined(separator: ", ")
                     }
                 }.font(.caption).disabled(busy)
@@ -384,8 +384,8 @@ struct RecordSection: View {
                         let out = try await ApiClient.shared.exportHandoff(
                             id: state.pid!, ticket: redeemTicket)
                         redeemTicket = ""
-                        line = "\(out.messages.count) · "
-                            + "\(out.posts.count) · \(out.sources.count)"
+                        line = "\(out.message_rows.count) · "
+                            + "\(out.post_rows.count) · \(out.source_rows.count)"
                     }
                 }.font(.caption).disabled(busy || redeemTicket.isEmpty)
             }
@@ -567,7 +567,7 @@ struct ExitSection: View {
                     run {
                         let r = try await ApiClient.shared.siblings(
                             id: state.pid!, token: state.token!)
-                        line = (r.profiles ?? [])
+                        line = (r.siblings ?? [])
                             .map { $0.display_name ?? $0.id }
                             .joined(separator: " · ")
                     }

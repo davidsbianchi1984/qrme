@@ -580,7 +580,7 @@ struct DealsSection: View {
                     if let deal {
                         let line = (deal.work ?? "") + " · " + deal.state
                         Text(line).font(.caption).foregroundStyle(Theme.t2)
-                        ForEach(deal.items ?? []) { item in
+                        ForEach(deal.deal_items ?? []) { item in
                             HStack {
                                 let row = item.name + " · " + item.kind
                                 Text(row).font(.caption2)

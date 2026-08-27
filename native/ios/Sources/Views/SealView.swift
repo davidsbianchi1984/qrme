@@ -693,7 +693,7 @@ struct CampaignSection: View {
                             campaignId: campaignId)
                         let name = c.title ?? ""
                         line = "\(name) · \(c.raised ?? 0)"
-                             + " / \(c.goal ?? 0) · \(c.status ?? "")"
+                             + " / \(c.goal_amount ?? 0) · \(c.status ?? "")"
                     }
                 }
                 Button(L10n.t("camp.close", state.language)) {

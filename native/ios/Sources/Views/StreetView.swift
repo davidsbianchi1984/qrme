@@ -42,7 +42,7 @@ struct BeaconSection: View {
                         line = (c.age_wall ?? false)
                             ? (c.note ?? "18+")
                             : (c.display_name ?? "—") + " · "
-                              + (c.watermark ?? "")
+                              + (c.watermark_line ?? "")
                     }
                 }.font(.caption).disabled(busy || beaconId.isEmpty)
                 Button(L10n.t("bcn.desk", state.language)) {
