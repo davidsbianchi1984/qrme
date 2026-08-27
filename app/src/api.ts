@@ -4906,7 +4906,7 @@ export const api = {
       { method: "POST", body: { registry_id: registryId }, token }),
   paintFace: (profileId: string, words: string, token: string) =>
     req<Avatar>(`/profiles/${profileId}/avatar/painted`,
-      { method: "POST", body: { words }, token }),
+      { method: "POST", body: { direction: words }, token }),
   retireFace: (registryId: string, because: string, token?: string) =>
     req<RegistryRow>(`/avatars/registry/${registryId}`,
       { method: "DELETE", body: { because }, token }),

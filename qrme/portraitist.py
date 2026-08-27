@@ -29,7 +29,7 @@ import json
 import os
 import urllib.request
 
-from . import avatars, persona
+from . import avatars, offline, persona
 
 _URL = "https://api.openai.com/v1/images/generations"
 _MODEL_ENV = "QRME_IMAGE_MODEL"
@@ -75,6 +75,7 @@ def paint(profile: dict, words: str = "") -> tuple[bytes, str, dict]:
     prompt = describe(profile, words)
     params = {"model": os.environ.get(_MODEL_ENV, _DEFAULT_MODEL),
               "size": "1024x1024", "quality": "medium"}
+    offline.allow(_URL, "painting a portrait from this profile's brief")
     body = json.dumps({"prompt": prompt, **params}).encode()
     req = urllib.request.Request(
         _URL, data=body,

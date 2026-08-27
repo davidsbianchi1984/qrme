@@ -4092,6 +4092,12 @@ const CHROME: Table = {
   "rem.look.go": {
     en: "Fetch it", es: "Traerlo", fr: "Le récupérer", de: "Holen", pt: "Buscá-lo", it: "Recuperalo", ja: "取得する", zh: "取回", hi: "लाएँ", ar: "أحضره",
   },
+  "rem.shelf.retire": {
+    en: "Withdraw this face everywhere", es: "Retirar este rostro de todas partes", fr: "Retirer ce visage partout", de: "Dieses Gesicht überall zurückziehen", pt: "Retirar este rosto de todo o lado", it: "Ritira questo volto ovunque", ja: "この顔をすべての場所から取り下げる", zh: "在所有地方撤回这张面孔", hi: "इस चेहरे को हर जगह से हटाएँ", ar: "اسحب هذا الوجه من كل مكان",
+  },
+  "rem.shelf.retired": {
+    en: "Withdrawn everywhere.", es: "Retirado de todas partes.", fr: "Retiré partout.", de: "Überall zurückgezogen.", pt: "Retirado de todo o lado.", it: "Ritirato ovunque.", ja: "すべての場所から取り下げました。", zh: "已在所有地方撤回。", hi: "हर जगह से हटा दिया गया।", ar: "سُحب من كل مكان.",
+  },
   "rem.shelf": {
     en: "The shelf", es: "El estante", fr: "L'étagère", de: "Das Regal", pt: "A prateleira", it: "Lo scaffale", ja: "シェルフ", zh: "货架", hi: "शेल्फ़", ar: "الرف",
   },

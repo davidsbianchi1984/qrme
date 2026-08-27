@@ -127,7 +127,7 @@ def test_no_painting_key_refuses_in_a_sentence(client, monkeypatch):
     monkeypatch.delenv("QRME_IMAGE_KEY", raising=False)
     profile = make_profile(client, kind="fictional")
     r = client.post(f"/profiles/{profile['id']}/avatar/painted",
-                    json={"words": "kind eyes"})
+                    json={"direction": "kind eyes"})
     assert r.status_code == 503
     assert "no painting service" in r.json()["detail"]
 
@@ -150,7 +150,7 @@ def test_painted_lands_with_provenance_age_and_mark(client, monkeypatch):
         return _png((10, 200, 120)), prompt, {"model": "fake"}
     monkeypatch.setattr(portraitist, "paint", fake_paint)
     r = client.post(f"/profiles/{profile['id']}/avatar/painted",
-                    json={"words": "a small smile"})
+                    json={"direction": "a small smile"})
     assert r.status_code == 201, r.text
     assert "years old" in seen["prompt"], "the face did not age"
     assert "invented person" in seen["prompt"], (

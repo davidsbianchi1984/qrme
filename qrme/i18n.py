@@ -7686,6 +7686,11 @@ _WHERE_MARKERS = ("body", "query", "path", "header", "cookie")
 #: A field with no row keeps its identifier, exactly as before, and is recorded
 #: in `tests/field_labels_unmapped.txt`.
 _FIELD_LABELS: dict[str, dict[str, str]] = {
+    # The avatar registry's three form fields (qrme/routers/avatars.py),
+    # worded as the card asks them.
+    "registry_id": {"en": "Which face", "es": "Qué rostro", "fr": "Quel visage", "de": "Welches Gesicht", "pt": "Qual rosto", "it": "Quale volto", "ja": "どの顔", "zh": "哪张面孔", "hi": "कौन-सा चेहरा", "ar": "أي وجه"},
+    "direction": {"en": "Your own direction", "es": "Tu propia indicación", "fr": "Votre propre direction", "de": "Deine eigene Richtung", "pt": "A sua própria indicação", "it": "La tua indicazione", "ja": "あなたの指示", "zh": "你的指示", "hi": "आपका अपना निर्देश", "ar": "توجيهك الخاص"},
+    "because": {"en": "Why it is being withdrawn", "es": "Por qué se retira", "fr": "Pourquoi il est retiré", "de": "Warum es zurückgezogen wird", "pt": "Porque está a ser retirado", "it": "Perché viene ritirato", "ja": "取り下げる理由", "zh": "撤回的原因", "hi": "इसे क्यों हटाया जा रहा है", "ar": "سبب سحبه"},
     # `consented` and `number` in the SIBLINGS' exact words — the shared
     # field vocabulary is one voice across the estate, and JIM had both
     # first.

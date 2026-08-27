@@ -757,14 +757,35 @@ export function Remainder() {
             <p className="muted small">{tr("rem.shelf.pitch", lang)}</p>
             <div className="row" style={{ flexWrap: "wrap" }}>
               {[...myFaces, ...shelf].map((f) => (
-                <button key={f.id} className="pp-face" disabled={!me || !token}
-                        title={f.source}
-                        onClick={() => go(
-                          () => api.claimFace(me, f.id, token),
-                          () => setSaid(tr("rem.avatar.done", lang)))}>
-                  <img src={getBase() + f.asset} alt={f.source} width={64}
-                       height={64} style={{ borderRadius: 12 }} />
-                </button>
+                <span key={f.id} style={{ position: "relative" }}>
+                  <button className="pp-face" disabled={!me || !token}
+                          title={f.source}
+                          onClick={() => go(
+                            () => api.claimFace(me, f.id, token),
+                            () => setSaid(tr("rem.avatar.done", lang)))}>
+                    <img src={getBase() + f.asset} alt={f.source} width={64}
+                         height={64} style={{ borderRadius: 12 }} />
+                  </button>
+                  {/* Your own faces can be withdrawn — the takedown as a
+                      data operation: the row keeps its record, and every
+                      profile it was backing falls back at once. */}
+                  {myFaces.some((m2) => m2.id === f.id)
+                    && session.accountToken && (
+                    <button className="talk-panel-close"
+                            aria-label={tr("rail.close", lang)}
+                            title={tr("rem.shelf.retire", lang)}
+                            onClick={() => go(async () => {
+                              await api.retireFace(
+                                f.id, "withdrawn by its owner",
+                                session.accountToken);
+                              const r = await api.myShelf(
+                                session.accountId!, session.accountToken!);
+                              setMyFaces(r.shelf);
+                            }, () => setSaid(tr("rem.shelf.retired", lang)))}>
+                      ✕
+                    </button>
+                  )}
+                </span>
               ))}
             </div>
           </>

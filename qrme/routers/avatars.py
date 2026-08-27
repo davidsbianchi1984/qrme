@@ -121,7 +121,7 @@ class RegistryClaim(BaseModel):
 
 
 class Painted(BaseModel):
-    words: str = Field(default="", max_length=300,
+    direction: str = Field(default="", max_length=300,
                        description="The owner's own direction, added to the "
                                    "house style and the profile's brief.")
 
@@ -214,7 +214,7 @@ def paint_face(profile_id: str, body: Painted, request: Request) -> dict:
             "a real person's face is never painted from words — attach a "
             "photograph under a recorded grant instead")))
     try:
-        data, prompt, params = portraitist.paint(profile, body.words)
+        data, prompt, params = portraitist.paint(profile, body.direction)
     except portraitist.PaintingUnavailable as exc:
         raise HTTPException(503, i18n.raised(exc)) from None
     minted = avatarreg.mint(data=data, source="prompted",

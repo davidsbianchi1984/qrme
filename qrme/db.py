@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS profiles (
     watermark_design  TEXT,                   -- JSON {mark, label}: owner-designed
                                               -- display watermark; the AI
                                               -- designation itself is invariant
+    avatar_ref        TEXT,                   -- the face's registry row (qrme/avatarreg.py)
     avatar            TEXT,                   -- rendered portrait (asset ref or
                                               -- URL); served only through
                                               -- avatars.render(), which attaches
