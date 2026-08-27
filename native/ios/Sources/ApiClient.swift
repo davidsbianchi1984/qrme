@@ -6227,7 +6227,7 @@ struct RosterOut: Decodable {
         let display_name: String?
         let anonymous: Bool?
     }
-    let siblings: [Sibling]?
+    let profiles: [Sibling]?
 }
 
 struct SucceedOut: Decodable {

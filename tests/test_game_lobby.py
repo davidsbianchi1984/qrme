@@ -74,7 +74,7 @@ def test_a_session_can_hold_several_of_your_own_profiles_and_agents(client):
     board = client.get(f"/gaming/sessions/{sid}/lobby",
                        headers=auth_header(host)).json()
     assert board["profiles"] == 2 and board["agents"] == 1
-    assert board["members"][0]["host"] is True
+    assert board["seats"][0]["host"] is True
 
 
 def test_the_session_profile_is_derived_not_stored(client):
@@ -85,8 +85,8 @@ def test_the_session_profile_is_derived_not_stored(client):
     sid = _session(client, host)
     board = gamelobby.roster(sid)
 
-    assert board["members"][0]["member_id"] == host["id"]
-    assert board["members"][0]["seat_id"] is None       # derived
+    assert board["seats"][0]["member_id"] == host["id"]
+    assert board["seats"][0]["seat_id"] is None       # derived
     rows = db.connect().execute(
         "SELECT COUNT(*) AS n FROM game_lobby WHERE session_id=?",
         (sid,)).fetchone()["n"]
@@ -108,7 +108,7 @@ def test_every_member_says_what_it_is(client):
     gamelobby.seat(sid, "player", sam["id"], "teammate", callsign="samhain")
 
     kinds = {m["member_id"]: m["synthetic"]
-             for m in gamelobby.roster(sid)["members"]}
+             for m in gamelobby.roster(sid)["seats"]}
     assert kinds[host["id"]] is True     # the session's own profile
     assert kinds[wid] is True            # the agent
     assert kinds[sam["id"]] is False     # the person
@@ -122,7 +122,7 @@ def test_an_agent_carries_its_light(client):
     waiting = _workflow(host["id"], status="awaiting_input")
     gamelobby.seat(sid, "agent", waiting, "coach")
 
-    agent = [m for m in gamelobby.roster(sid)["members"]
+    agent = [m for m in gamelobby.roster(sid)["seats"]
              if m["member_kind"] == "agent"][0]
     assert agent["light"]["light"] == "amber"
     assert agent["light"]["needs_you"] is True
@@ -155,7 +155,7 @@ def test_the_cap_counts_the_sessions_own_profile(client):
         gamelobby.seat(sid, "agent", _workflow(host["id"]), "spotter")
 
     board = gamelobby.roster(sid)
-    synthetic = [m for m in board["members"] if m["synthetic"]]
+    synthetic = [m for m in board["seats"] if m["synthetic"]]
     assert len(synthetic) == gamelobby.MAX_SYNTHETIC
     assert board["synthetic_seats_left"] == 0
 

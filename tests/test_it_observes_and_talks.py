@@ -106,8 +106,8 @@ def test_the_roster_says_which_members_are_synthetic(client):
     count in a corner."""
     p, head, sid = _session(client, "acct_roster")
     roster = client.get(f"/gaming/sessions/{sid}/lobby", headers=head).json()
-    assert roster["members"], "the session's own profile is not seated"
-    for m in roster["members"]:
+    assert roster["seats"], "the session's own profile is not seated"
+    for m in roster["seats"]:
         assert "synthetic" in m and m["is"], (
             "a member with no statement of what it is")
     assert roster["profiles"] >= 1

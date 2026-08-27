@@ -2763,7 +2763,7 @@ public sealed partial class PeoplePage : Page
             var r = await ApiClient.Shared.Siblings(
                 AppState.Current.Pid!, AppState.Current.Token!);
             StatusText.Text = string.Join(" \u00b7 ",
-                (r.Siblings ?? []).Select(x => x.DisplayName ?? x.ProfileId));
+                (r.Profiles ?? []).Select(x => x.DisplayName ?? x.ProfileId));
         });
 
     private async void OnExitMemorial(object sender, RoutedEventArgs e) =>

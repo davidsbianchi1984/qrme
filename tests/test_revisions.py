@@ -175,7 +175,7 @@ def test_a_reply_written_before_an_edit_is_flagged_stale(client):
                  headers=auth_header(p))
 
     entries = client.get(f"/profiles/{p['id']}/thread/{who}",
-                         headers=auth_header(p)).json()["messages"]
+                         headers=auth_header(p)).json()["thread_turns"]
     reply = [e for e in entries if e["id"] == theirs[0]][0]
     assert reply["answers_stale_text"] is True
     assert "answered the earlier wording" in reply["stale_note"]
@@ -186,7 +186,7 @@ def test_an_unedited_conversation_flags_nothing(client):
     who = make_interactor(client)
     _exchange(client, p, who)
     entries = client.get(f"/profiles/{p['id']}/thread/{who}",
-                         headers=auth_header(p)).json()["messages"]
+                         headers=auth_header(p)).json()["thread_turns"]
     assert entries
     assert not any(e["answers_stale_text"] for e in entries)
     assert not any(e["edited"] for e in entries)

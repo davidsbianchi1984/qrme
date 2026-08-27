@@ -100,7 +100,7 @@ def test_watch_shows_the_live_throttle(client):
     client.put(f"/profiles/{pid}/steering",
                json={"values": {"pace": 85, "autonomy": 40}})
     face = client.get(f"/profiles/{pid}/watch").json()
-    assert face["profile"]["throttle"] == {"pace": 85, "autonomy": 40}
+    assert face["chip"]["throttle"] == {"pace": 85, "autonomy": 40}
 
 
 def test_steering_is_owner_only(client, profile_id):

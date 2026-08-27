@@ -317,7 +317,7 @@ def test_the_write_answers_more_than_the_read(client):
                         json={"rating": "up"}, headers=uhead).json()
     read = client.get(f"/profiles/{p['id']}/engagement/{uid}",
                       headers=uhead).json()
-    assert "contributed" in wrote and "last_seen" in wrote
+    assert "cloud_contributed" in wrote and "last_seen" in wrote
     assert "contributed" not in read and "last_seen" not in read
 
 

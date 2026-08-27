@@ -221,5 +221,5 @@ def test_a_person_sees_both_sides_of_their_lending(client):
 
 def test_the_route_publishes_its_own_terms(client):
     r = client.get("/skill-grants/vocabulary").json()
-    assert "two people open a grant; either one alone closes it" in r["terms"]
+    assert "two people open a grant; either one alone closes it" in r["ground_rules"]
     assert {s["key"] for s in r["surfaces"]} == set(sharing.SURFACES)

@@ -4816,7 +4816,7 @@ export const api = {
   // badge, and which of them could. Owner-only — it is the linkage between
   // somebody's separate personas, which is the thing anonymity protects.
   siblings: (profileId: string, token: string) =>
-    req<{ owner_id: string; siblings: Sibling[] }>(
+    req<{ owner_id: string; profiles: Sibling[] }>(
       `/profiles/${profileId}/siblings`, { token }),
 
   verification: (profileId: string, token: string) =>
@@ -4873,7 +4873,7 @@ export const api = {
         token }),
 
   avatarMarket: () =>
-    req<{ sources: { key: string; name: string; how: string }[]; note: string }>(
+    req<{ skin_sources: { key: string; name: string; how: string }[]; note: string }>(
       "/avatars/market"),
   importAvatar: (profileId: string, body: { source: string; asset: string;
                                             extra?: string[];

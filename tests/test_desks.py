@@ -35,7 +35,7 @@ def test_a_desk_never_carries_the_ai_watermark(client):
     assert card["ai"] is False
     assert card["human"] is True
     assert "watermark" not in card
-    assert card["feed"]["watermark"] is None
+    assert card["feed"]["watermark_line"] is None
     assert card["feed"]["ai"] is False
 
 
@@ -270,7 +270,7 @@ def test_a_verified_adult_sees_the_stream(client):
     assert card["age_wall"] is False
     assert card["display_name"] == "Sable"
     assert card["ai"] is False
-    assert card["feed"]["watermark"] is None
+    assert card["feed"]["watermark_line"] is None
 
     view = client.get(f"/desks/{created['desk_id']}/view.webp", headers=headers)
     assert view.status_code == 200
@@ -444,7 +444,7 @@ def test_the_scanned_card_says_person_in_json_too(client):
     assert card["ai"] is False and card["human"] is True
     assert card["designation"] == desks.DESIGNATION
     assert card["beacon"]["label"] == "shop door"
-    assert card["feed"]["watermark"] is None
+    assert card["feed"]["watermark_line"] is None
 
 
 def test_a_stranger_can_reach_the_bell_from_the_sticker(client):

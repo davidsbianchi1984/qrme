@@ -261,7 +261,7 @@ def test_the_scan_card_carries_the_mark_with_the_face(client):
     assert card.status_code == 200
     body = card.json()
     assert body["age_wall"] is False
-    assert body["watermark"], "the mark travels with the card"
+    assert body["watermark_line"], "the mark travels with the card"
     assert "portrait_marked" in body, (
         "a surface QRME does not control needs to know whether compositing "
         "is mandatory or merely additive")

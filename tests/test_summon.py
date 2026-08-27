@@ -49,11 +49,11 @@ def test_summon_by_hashtag(client):
 
     hit = client.get("/summon", params={"ref": "#gardening"}).json()
     assert hit["type"] == "tag"
-    assert [c["profile_id"] for c in hit["profiles"]] == [garden["id"]]
+    assert [c["profile_id"] for c in hit["summoned"]] == [garden["id"]]
 
     anon = client.get("/summon", params={"ref": "#fiction"}).json()
     from qrme import identity
-    assert anon["profiles"][0]["display_name"].startswith("Anonymous ")
+    assert anon["summoned"][0]["display_name"].startswith("Anonymous ")
 
 
 def test_beacon_left_behind_and_scanned(client):

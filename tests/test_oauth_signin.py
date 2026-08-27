@@ -17,7 +17,7 @@ def _id_token(email, name="Signer"):
 
 
 def test_unconfigured_providers_say_so(client):
-    listed = client.get("/auth/oauth/providers").json()["providers"]
+    listed = client.get("/auth/oauth/providers").json()["signin_providers"]
     assert {p["provider"] for p in listed} == {"google", "apple"}
     for p in listed:
         assert p["configured"] is False and "setup" in p

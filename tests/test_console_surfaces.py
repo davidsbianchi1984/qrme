@@ -24,7 +24,7 @@ def test_the_vault_lists_conversations_by_name(client, profile_id):
     assert len(rows) == 1
     assert rows[0]["interactor_name"] == "June Bianchi"
     assert rows[0]["profile_name"] == "Dana"
-    assert rows[0]["turns"] >= 2                  # her turn and the reply
+    assert rows[0]["turns_count"] >= 2                  # her turn and the reply
     assert "interactor_id" in rows[0]             # the handle for erasing
 
 

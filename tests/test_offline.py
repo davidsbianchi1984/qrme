@@ -92,7 +92,7 @@ def test_offline_contribution_is_inert(offline_client):
         f"/profiles/{p['id']}/interactions/{user}/feedback",
         json={"rating": "up"}, headers=as_interactor(user)).json()
     # No cloud attached → nothing is ever contributed.
-    assert fb["contributed"] is False
+    assert fb["cloud_contributed"] is False
 
 
 def test_online_default_allows_external_transmission(client):

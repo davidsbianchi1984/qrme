@@ -38,7 +38,7 @@ def test_contributions_are_logged_verbatim(cloud_pair):
     client, fake = cloud_pair()
     p = make_profile(client, cloud_contribution=True)
     user = make_interactor(client)
-    assert _chat_and_uprate(client, p, user)["contributed"] is True
+    assert _chat_and_uprate(client, p, user)["cloud_contributed"] is True
 
     view = client.get(f"/profiles/{p['id']}/cloud-contribution").json()
     assert len(view["contributed"]) == 1
@@ -70,7 +70,7 @@ def test_revoke_stops_future_and_deletes_past(cloud_pair):
 
     # And a fresh up-rating no longer contributes anything.
     r = _chat_and_uprate(client, p, user)
-    assert r["contributed"] is False
+    assert r["cloud_contributed"] is False
     assert fake.contributions == []
 
 

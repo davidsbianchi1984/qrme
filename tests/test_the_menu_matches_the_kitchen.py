@@ -151,7 +151,7 @@ def test_every_connector_in_the_catalog_can_be_connected(client, profile_id):
     connect first and collect afterwards — so the catalog's own contract is with
     this endpoint, not with collect.
     """
-    catalog = client.get("/connectors/catalog").json()["providers"]
+    catalog = client.get("/connectors/catalog").json()["app_providers"]
     pairs = [(p["provider"], app["app"])
              for p in catalog for app in (p.get("apps") or [])]
     _check(

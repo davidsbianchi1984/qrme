@@ -217,7 +217,7 @@ def test_like_comment_and_share_all_work_on_a_post(client):
     assert r.json()["url"] == f"/posts/{post['id']}"
 
     counts = client.get(f"/posts/{post['id']}/audience").json()
-    assert counts["likes"] == 1 and counts["comments"] == 1
+    assert counts["likes"] == 1 and counts["comments_count"] == 1
     assert counts["shares"] == 1
 
 

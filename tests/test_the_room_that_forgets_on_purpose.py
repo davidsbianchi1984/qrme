@@ -25,7 +25,7 @@ def test_the_rehearsal_replies_and_the_relationship_never_hears_it(
     assert r.status_code == 200, r.text
     turn = r.json()
     assert turn["reply"]
-    assert turn["turns"] == 1
+    assert turn["turns_count"] == 1
     assert turn["remembered"] is False
 
     # Nothing reached the places the relationship remembers from.
@@ -40,7 +40,7 @@ def test_the_rehearsal_replies_and_the_relationship_never_hears_it(
     r = client.request(
         "DELETE", f"/profiles/{profile_id}/rehearsal/{room['id']}")
     assert r.status_code == 200
-    assert r.json() == {"id": room["id"], "turns": 1, "erased": True}
+    assert r.json() == {"id": room["id"], "turns_count": 1, "erased": True}
     n = conn.execute("SELECT COUNT(*) AS n FROM rehearsals").fetchone()["n"]
     assert n == 0
     # The closed room is gone, not archived.

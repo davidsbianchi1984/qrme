@@ -282,12 +282,12 @@ export function Identity({ onPlans, onPassing }: {
     }).catch(fail);
     api.emblems().then((r) => setEmblems(r.emblems)).catch(() => undefined);
     api.avatarBriefs().then((r) => setBriefs(r.briefs)).catch(() => undefined);
-    api.avatarMarket().then((r) => setMarket(r.sources)).catch(() => undefined);
+    api.avatarMarket().then((r) => setMarket(r.skin_sources)).catch(() => undefined);
   }, []);
 
   function reload() {
     if (!me || !token) return;
-    api.siblings(me, token).then((r) => setRoster(r.siblings)).catch(fail);
+    api.siblings(me, token).then((r) => setRoster(r.profiles)).catch(fail);
     api.verification(me, token).then(setVerification).catch(fail);
     api.verifiable(me, token).then(setVerifiable).catch(() => setVerifiable(null));
     api.anonymity(me, token).then(setAnon).catch(fail);

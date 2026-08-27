@@ -40,14 +40,14 @@ def _pool(client):
 def test_a_new_profile_is_listed_without_being_asked(client):
     pid, _ = a_profile(client, "owner-p1", "Paula")
     pool = _pool(client)
-    assert pid in [p["profile_id"] for p in pool["profiles"]]
+    assert pid in [p["profile_id"] for p in pool["found"]]
 
 
 def test_the_head_count_counts_real_and_synthetic_together(client):
     real, _ = a_profile(client, "owner-p2", "Rita", kind="self")
     synth, _ = a_profile(client, "owner-p2", "Sage", kind="fictional")
     pool = _pool(client)
-    ids = [p["profile_id"] for p in pool["profiles"]]
+    ids = [p["profile_id"] for p in pool["found"]]
     assert real in ids and synth in ids
     assert pool["head_count"] == len(ids) or pool["head_count"] >= len(ids)
     assert pool["kind_counts"].get("self", 0) >= 1
@@ -59,13 +59,13 @@ def test_private_leaves_the_pool_and_the_search_and_can_come_back(client):
     r = client.put(f"/profiles/{pid}/listing", json={"listed": False},
                    headers=head(tok))
     assert r.status_code == 200 and r.json()["listed"] is False
-    assert pid not in [p["profile_id"] for p in _pool(client)["profiles"]]
+    assert pid not in [p["profile_id"] for p in _pool(client)["found"]]
     found = client.get("/people", params={"q": "Quinn Uniquename"}).json()
     assert pid not in [p["profile_id"] for p in found["found"]]
     # And back in — reversible both ways, like anonymity.
     client.put(f"/profiles/{pid}/listing", json={"listed": True},
                headers=head(tok))
-    assert pid in [p["profile_id"] for p in _pool(client)["profiles"]]
+    assert pid in [p["profile_id"] for p in _pool(client)["found"]]
 
 
 def test_going_private_moves_the_head_count(client):
@@ -86,4 +86,4 @@ def test_an_anonymous_profile_never_browses(client):
     pid, tok = a_profile(client, "owner-p6", "Vera")
     client.put(f"/profiles/{pid}/anonymity", json={"anonymous": True},
                headers=head(tok))
-    assert pid not in [p["profile_id"] for p in _pool(client)["profiles"]]
+    assert pid not in [p["profile_id"] for p in _pool(client)["found"]]

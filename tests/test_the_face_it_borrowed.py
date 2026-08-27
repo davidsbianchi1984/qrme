@@ -24,7 +24,7 @@ What the tests hold:
 def test_the_market_shelf_names_its_sources_and_their_exports(client):
     r = client.get("/avatars/market")
     assert r.status_code == 200
-    sources = r.json()["sources"]
+    sources = r.json()["skin_sources"]
     keys = {s["key"] for s in sources}
     assert {"ready_player_me", "bitmoji", "meta_avatar",
             "apple_memoji", "other"} <= keys

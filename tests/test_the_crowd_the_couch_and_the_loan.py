@@ -141,7 +141,7 @@ def test_a_skill_is_lent_used_written_down_and_ends_when_closed(client):
     a, ha = _mk(client, "Ana")
     b, hb = _mk(client, "Ben")
     vocab = client.get("/skill-grants/vocabulary").json()
-    assert any("never copied" in t for t in vocab["terms"])
+    assert any("never copied" in t for t in vocab["ground_rules"])
     surface = vocab["surfaces"][0]["key"]
     kind = vocab["skill_kinds"][0]["key"]
     grant = client.post("/skill-grants", json={

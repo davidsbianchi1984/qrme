@@ -196,8 +196,8 @@ def test_the_objector_can_read_the_timeline_of_their_own_case(client, monkeypatc
     r = client.get(f"/objections/{obj['id']}/timeline")
     assert r.status_code == 200, r.text
     body = r.json()
-    assert [e["event"] for e in body["events"]] == ["opened", "reattested"]
-    assert [e["actor"] for e in body["events"]] == ["objector", "owner"]
+    assert [e["event"] for e in body["timeline_events"]] == ["opened", "reattested"]
+    assert [e["actor"] for e in body["timeline_events"]] == ["objector", "owner"]
     assert body["status"] == "open" and body["reattested"] is True
 
 
@@ -230,7 +230,7 @@ def test_the_timeline_carries_no_free_text_from_anybody(client):
             "reason — the timeline carries what happened, not what anybody "
             "wrote")
     body = client.get(f"/objections/{obj['id']}/timeline").json()
-    assert all("detail" not in e for e in body["events"])
+    assert all("detail" not in e for e in body["timeline_events"])
 
 
 @pytest.mark.parametrize("action,expected", [

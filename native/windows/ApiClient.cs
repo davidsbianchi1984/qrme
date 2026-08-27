@@ -5682,13 +5682,8 @@ public record MemorialCard(
     [property: JsonPropertyName("relationships_touched")]
     int? RelationshipsTouched);
 
-public record RosterSibling(
-    [property: JsonPropertyName("profile_id")] string ProfileId,
-    [property: JsonPropertyName("display_name")] string? DisplayName,
-    [property: JsonPropertyName("anonymous")] bool? Anonymous);
-
 public record RosterOut(
-    [property: JsonPropertyName("siblings")] RosterSibling[]? Siblings);
+    [property: JsonPropertyName("profiles")] HeldProfile[]? Profiles);
 
 public record AvatarLikeness(
     [property: JsonPropertyName("real_person")] bool? RealPerson,

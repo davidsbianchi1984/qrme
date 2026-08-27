@@ -129,7 +129,7 @@ def test_the_ledger_is_readable_and_the_feed_says_why(client):
     assert s["memory_entries"] >= 2
     out = client.get(f"/profiles/{p['id']}/export",
                      headers=auth_header(p)).json()
-    assert len(out["messages"]) >= 2
+    assert len(out["message_rows"]) >= 2
     q = make_profile(client, owner_id="owner-2", display_name="Quinn")
     assert client.get(f"/profiles/{p['id']}/export",
                       headers=auth_header(q)).status_code == 403

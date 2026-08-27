@@ -26,7 +26,7 @@ from tests.test_capabilities import make_profile
 
 def _pool_ids(client) -> set[str]:
     body = client.get("/people/browse").json()
-    return {p["profile_id"] for p in body["profiles"]}
+    return {p["profile_id"] for p in body["found"]}
 
 
 def _listed_ids(client) -> set[str]:
@@ -69,7 +69,7 @@ def test_the_head_count_counts_the_pool(client):
     make_profile(client, display_name="One More")
     after = client.get("/people/browse").json()
     assert after["head_count"] == before + 1
-    assert after["head_count"] == len(after["profiles"])
+    assert after["head_count"] == len(after["found"])
 
 
 def test_every_pool_row_says_which_kind_of_face_it_has(client):
@@ -77,7 +77,7 @@ def test_every_pool_row_says_which_kind_of_face_it_has(client):
     able to draw it, so the row carries the same server-decided answer the
     marketplace card does — no client re-derives it from an asset path."""
     make_profile(client, display_name="Has A Face")
-    rows = client.get("/people/browse").json()["profiles"]
+    rows = client.get("/people/browse").json()["found"]
     assert rows
     for r in rows:
         assert "avatar_kind" in r
@@ -96,5 +96,5 @@ def test_every_pool_row_says_which_kind_of_face_it_has(client):
 
 def test_a_listed_profile_is_not_listed_twice(client):
     """Merging two sources must not double a profile that is in both."""
-    ids = [p["profile_id"] for p in client.get("/people/browse").json()["profiles"]]
+    ids = [p["profile_id"] for p in client.get("/people/browse").json()["found"]]
     assert len(ids) == len(set(ids))

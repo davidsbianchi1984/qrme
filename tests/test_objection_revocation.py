@@ -29,12 +29,12 @@ def test_lifecycle_writes_an_audit_trail(client):
     client.post(f"/objections/{obj['id']}/resolve", json={"outcome": "dismiss"})
 
     audit = client.get(f"/objections/{obj['id']}/audit").json()
-    events = [e["event"] for e in audit["events"]]
+    events = [e["event"] for e in audit["audit_events"]]
     assert events == ["opened", "reattested", "dismissed"]
-    assert {e["actor"] for e in audit["events"]} == {"objector", "owner", "reviewer"}
+    assert {e["actor"] for e in audit["audit_events"]} == {"objector", "owner", "reviewer"}
     # No PDI configured in this test app, so nothing is vault-sealed.
     assert audit["vault_backed"] is False
-    assert all(e["sealed"] is False for e in audit["events"])
+    assert all(e["sealed"] is False for e in audit["audit_events"])
 
 
 def test_uphold_records_uphold_and_termination_events(client):
@@ -43,7 +43,7 @@ def test_uphold_records_uphold_and_termination_events(client):
         "profile_id": p["id"], "objector_ref": "ref"}).json()
     client.post(f"/objections/{obj['id']}/resolve", json={"outcome": "uphold"})
     events = [e["event"] for e in
-              client.get(f"/objections/{obj['id']}/audit").json()["events"]]
+              client.get(f"/objections/{obj['id']}/audit").json()["audit_events"]]
     assert events == ["opened", "upheld", "terminated"]
 
 
@@ -75,7 +75,7 @@ def test_events_are_sealed_into_the_pdi_vault(pdi_pair):
 
     audit = client.get(f"/objections/{obj['id']}/audit").json()
     assert audit["vault_backed"] is True
-    opened = audit["events"][0]
+    opened = audit["audit_events"][0]
     assert opened["sealed"] is True
     # The sealed copy is really in the vault under the reported key.
     assert opened["pdi_key"] in fake.store

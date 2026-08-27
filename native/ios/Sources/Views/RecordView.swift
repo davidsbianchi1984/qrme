@@ -567,7 +567,7 @@ struct ExitSection: View {
                     run {
                         let r = try await ApiClient.shared.siblings(
                             id: state.pid!, token: state.token!)
-                        line = (r.siblings ?? [])
+                        line = (r.profiles ?? [])
                             .map { $0.display_name ?? $0.id }
                             .joined(separator: " · ")
                     }

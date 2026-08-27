@@ -35,7 +35,7 @@ export function SkinPicker({ profileId, token, onError, onChanged }: {
   const [worn, setWorn] = useState<Avatar | null>(null);
 
   useEffect(() => {
-    api.avatarMarket().then((r) => setSources(r.sources)).catch(() => setSources([]));
+    api.avatarMarket().then((r) => setSources(r.skin_sources)).catch(() => setSources([]));
   }, []);
   useEffect(() => { void reload(); }, [profileId]);
 

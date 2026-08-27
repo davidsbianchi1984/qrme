@@ -166,7 +166,7 @@ def test_stats_dashboard(client):
     assert stats["memory_entries"] == 2          # user turn + reply
     assert stats["moderation_pass_rate"] == 1.0
     assert stats["relationship_graph"] == 1
-    assert stats["sources"] == 1
+    assert stats["sources_count"] == 1
     assert stats["surfaces"] == ["chat"]
 
 
@@ -182,7 +182,7 @@ def test_owner_edit_export_delete(client):
 
     export = client.get(f"/profiles/{p['id']}/export").json()
     assert export["profile"]["id"] == p["id"]
-    assert len(export["messages"]) == 2
+    assert len(export["message_rows"]) == 2
 
     deleted = client.delete(f"/profiles/{p['id']}").json()["deleted"]
     assert deleted["profile"] == 1 and deleted["messages"] == 2

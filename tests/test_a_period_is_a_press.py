@@ -228,8 +228,8 @@ def test_the_audience_view_counts_without_naming_anybody(client):
     client.post(f"/profiles/{p['id']}/subscribe", headers=fhead,
                 json={"tier": "follow"})
     view = client.get(f"/profiles/{p['id']}/audience", headers=head).json()
-    assert view["subscribers"] == 1
-    for key in ("likes", "comments", "shares"):
+    assert view["subscribers_count"] == 1
+    for key in ("likes", "comments_count", "shares"):
         assert isinstance(view[key], int)
     assert "subscriber_names" not in view and "who" not in view
 

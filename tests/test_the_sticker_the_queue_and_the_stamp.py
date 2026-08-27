@@ -53,7 +53,7 @@ def test_the_overlay_never_draws_the_face_without_the_disclosure(client):
     card = client.get(f"/b/{b['id']}/card",
                       headers={"authorization": ""}).json()
     assert card["display_name"]
-    assert card["watermark"], \
+    assert card["watermark_line"], \
         "the face travelled without the disclosure to draw with it"
     # An unknown code is told so by name, not with an empty card.
     r = client.get("/b/bcn_nothing/card", headers={"authorization": ""})
@@ -146,7 +146,7 @@ def test_a_review_requires_having_actually_talked_to_it(client):
     assert r.status_code == 201, r.text
     board = client.get(f"/profiles/{p['id']}/reviews",
                        headers={"authorization": ""}).json()
-    assert board["rating"]["count"] == 1
+    assert board["rating_summary"]["count"] == 1
     assert any(row["rating"] == 5 for row in board["reviews"])
 
 

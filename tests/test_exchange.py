@@ -48,7 +48,7 @@ def test_both_signatures_open_it(client):
     after = exchange.get(x["id"])
     assert after["state"] == "signed"
     assert after["channel"]["open"] is True
-    assert len(after["channel"]["items"]) == 2
+    assert len(after["channel"]["deal_items"]) == 2
 
 
 def test_a_stranger_cannot_sign(client):
@@ -149,7 +149,7 @@ def test_signing_does_not_deliver_anything(client):
     exchange.sign(x["id"], GUEST)
     after = exchange.get(x["id"])
     assert after["channel"]["auto_download"] is False
-    assert all(i["accepted_at"] is None for i in after["items"])
+    assert all(i["accepted_at"] is None for i in after["deal_items"])
 
 
 def test_each_item_is_accepted_by_its_receiver_only(client):
@@ -158,7 +158,7 @@ def test_each_item_is_accepted_by_its_receiver_only(client):
     x = _drafted()
     exchange.sign(x["id"], HOST)
     exchange.sign(x["id"], GUEST)
-    theirs = [i for i in x["items"] if i["direction"] == "host_to_guest"][0]
+    theirs = [i for i in x["deal_items"] if i["direction"] == "host_to_guest"][0]
     with pytest.raises(exchange.ExchangeError) as err:
         exchange.accept_item(x["id"], theirs["id"], HOST)
     assert "only the side receiving" in str(err.value)
@@ -169,14 +169,14 @@ def test_nothing_can_be_accepted_before_both_sign(client):
     x = _drafted()
     exchange.sign(x["id"], HOST)
     with pytest.raises(exchange.ExchangeError):
-        exchange.accept_item(x["id"], x["items"][0]["id"], GUEST)
+        exchange.accept_item(x["id"], x["deal_items"][0]["id"], GUEST)
 
 
 def test_delivered_only_once_every_item_is_taken(client):
     x = _drafted()
     exchange.sign(x["id"], HOST)
     exchange.sign(x["id"], GUEST)
-    a, b = x["items"]
+    a, b = x["deal_items"]
     recv = {"host_to_guest": GUEST, "guest_to_host": HOST}
     exchange.accept_item(x["id"], a["id"], recv[a["direction"]])
     assert exchange.get(x["id"])["state"] == "signed"
@@ -290,7 +290,7 @@ def test_the_whole_exchange_goes_through_over_http(client):
                 json={"actor_id": guest})
     chan = client.get(f"/exchanges/{xid}/channel", headers=gh).json()
     assert chan["open"] is True and chan["auto_download"] is False
-    assert len(chan["items"]) == len(x.KINDS)
+    assert len(chan["deal_items"]) == len(x.KINDS)
 
     # The executable kinds carry their warning across the wire.
     doc = client.get(f"/exchanges/{xid}", headers=gh).json()
@@ -298,7 +298,7 @@ def test_the_whole_exchange_goes_through_over_http(client):
     assert doc["runs_warning"] is not None
 
     # Each item is accepted by the side receiving it — and only that side.
-    for item in chan["items"]:
+    for item in chan["deal_items"]:
         receiver, their = ((guest, gh) if item["direction"] == "host_to_guest"
                            else (host, hh))
         sender, senders = (host, hh) if receiver == guest else (guest, gh)
@@ -311,4 +311,4 @@ def test_the_whole_exchange_goes_through_over_http(client):
 
     done = client.get(f"/exchanges/{xid}", headers=hh).json()
     assert done["state"] == "delivered"
-    assert all(i["accepted_at"] for i in done["items"])
+    assert all(i["accepted_at"] for i in done["deal_items"])

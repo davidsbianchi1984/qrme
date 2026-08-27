@@ -112,7 +112,7 @@ def test_you_cannot_accept_delivery_on_somebody_elses_behalf(client):
                 headers=_tok(a))
     client.post(f"/exchanges/{x['id']}/sign", json={"actor_id": _owner(b)},
                 headers=_tok(b))
-    item = client.get(f"/exchanges/{x['id']}", headers=_tok(a)).json()["items"][0]
+    item = client.get(f"/exchanges/{x['id']}", headers=_tok(a)).json()["deal_items"][0]
 
     r = client.post(f"/exchanges/{x['id']}/items/{item['id']}/accept",
                     json={"actor_id": _owner(b)}, headers=_tok(a))

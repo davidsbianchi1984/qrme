@@ -67,7 +67,7 @@ def test_the_composition_is_readable_by_anyone(client):
     client.headers.pop("authorization", None)
     r = client.get(f"/profiles/{made['id']}/composition")
     assert r.status_code == 200
-    assert len(r.json()["sources"]) == 2
+    assert len(r.json()["composition_sources"]) == 2
     # A non-hybrid has no composition to show.
     assert client.get(f"/profiles/{a['id']}/composition").status_code == 404
 

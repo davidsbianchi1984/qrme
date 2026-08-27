@@ -250,7 +250,7 @@ def test_the_empty_rating_carries_a_sentence_rather_than_a_zero(client):
     average. A `note` says so, because "0.0 from 0 reviews" reads as a bad
     score rather than an absent one."""
     p, _ = _owner(client, "acct_norev")
-    rating = client.get(f"/profiles/{p['id']}/reviews").json()["rating"]
+    rating = client.get(f"/profiles/{p['id']}/reviews").json()["rating_summary"]
     assert rating["average"] is None and rating["count"] == 0
     assert rating.get("note"), "nothing to show instead of a phantom zero"
 
@@ -263,8 +263,8 @@ def test_a_review_from_somebody_who_talked_lands(client):
                           "body": "very helpful"})
     assert r.status_code == 201, r.text
     view = client.get(f"/profiles/{p['id']}/reviews").json()
-    assert view["rating"]["average"] == 5.0 and view["rating"]["count"] == 1
-    assert view["rating"]["distribution"]["5"] == 1
+    assert view["rating_summary"]["average"] == 5.0 and view["rating_summary"]["count"] == 1
+    assert view["rating_summary"]["distribution"]["5"] == 1
 
 
 # --- correcting your own turn ------------------------------------------------
@@ -280,13 +280,13 @@ def test_an_edit_marks_the_reply_that_answered_the_old_wording(client):
     who, head = _talker(client, p["id"])
     thread = client.get(f"/profiles/{p['id']}/thread/{who['id']}",
                         headers=head).json()
-    mine = next(m for m in thread["messages"] if m["role"] == "interactor")
+    mine = next(m for m in thread["thread_turns"] if m["role"] == "interactor")
 
     client.patch(f"/profiles/{p['id']}/messages/{mine['id']}", headers=head,
                  json={"interactor_id": who["id"],
                        "content": "hello there, actually"})
     after = client.get(f"/profiles/{p['id']}/thread/{who['id']}",
-                       headers=head).json()["messages"]
+                       headers=head).json()["thread_turns"]
     edited = next(m for m in after if m["id"] == mine["id"])
     assert edited["edited"] is True and edited["content"].endswith("actually")
     assert any(m["answers_stale_text"] for m in after
@@ -303,7 +303,7 @@ def test_retracting_needs_a_body_saying_who(client):
     who, head = _talker(client, p["id"])
     thread = client.get(f"/profiles/{p['id']}/thread/{who['id']}",
                         headers=head).json()
-    mine = next(m for m in thread["messages"] if m["role"] == "interactor")
+    mine = next(m for m in thread["thread_turns"] if m["role"] == "interactor")
 
     bodyless = client.request(
         "DELETE", f"/profiles/{p['id']}/messages/{mine['id']}", headers=head)

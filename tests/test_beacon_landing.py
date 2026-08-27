@@ -339,7 +339,7 @@ def test_the_card_is_small_enough_to_fetch_while_the_camera_runs(client):
     # with no face is sent the frame — so the field was a second answer to a
     # question that has one, and on a hidden profile it was a monogram of the
     # name being hidden.
-    assert set(card) == {"profile_id", "display_name", "watermark", "portrait",
+    assert set(card) == {"profile_id", "display_name", "watermark_line", "portrait",
                          "portrait_marked", "label", "shared_room",
                          "open_url", "age_wall"}
 
@@ -349,7 +349,7 @@ def test_the_mark_travels_with_the_face(client):
     disclosure to draw beside it."""
     pid, _ = _profile(client)
     card = client.get(f"/b/{_beacon(client, pid)['id']}/card").json()
-    assert card["watermark"] == "✦ AI · Marcus Bell"
+    assert card["watermark_line"] == "✦ AI · Marcus Bell"
 
 
 def test_the_rated_card_carries_nothing_to_leak(client):

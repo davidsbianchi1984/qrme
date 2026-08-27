@@ -1,4 +1,4 @@
-# status: closed — 0 rows
+# status: backlog — 0 rows
 # ceiling: 0
 #
 # One wire field name carrying more than one type across this product's API.
@@ -18,7 +18,7 @@
 # (comments_count, subscribers_count, entries_count, items_count,
 # turns_count, messages_count, offerings_count, sources_count), and a
 # record that shared a name with a different shape gets its own
-# (deal_items, cards, seats, thread_turns, summoned, found, siblings,
+# (deal_items, cards, seats, thread_turns, summoned, found,
 # app_providers, signin_providers, rating_summary, scopes, ground_rules,
 # page_theme, composition_sources, timeline_events, audit_events,
 # goal_amount, watermark_line, message_rows / post_rows / source_rows).
@@ -31,6 +31,10 @@
 # the route never sends. Unifying the records fixed the count and deleted
 # a fiction in the same edit. FeedbackOut.rating was the other fiction:
 # the feedback route echoes the engagement record, never the rating.
+# `profiles` closed both ways at once: browse and summon got their own
+# names (found, summoned), and the roster and the account's held list
+# turned out to be one function serving one shape through two doors —
+# one record now decodes both.
 #
 # One name arrived while closing: renaming FeedbackOut's field exposed
 # `contributed` carrying bool beside ContributionRow[] — the feedback

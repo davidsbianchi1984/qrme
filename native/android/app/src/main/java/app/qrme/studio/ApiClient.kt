@@ -3038,7 +3038,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
     suspend fun grantTerms(): List<String> {
         val o = JSONObject(request("/skill-grants/vocabulary"))
         val out = mutableListOf<String>()
-        o.optJSONArray("terms")?.let { a ->
+        o.optJSONArray("ground_rules")?.let { a ->
             for (i in 0 until a.length()) out.add(a.getString(i))
         }
         return out
@@ -4515,7 +4515,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
     suspend fun siblings(id: String, token: String): String {
         val o = JSONObject(request("/profiles/$id/siblings",
             token = token))
-        val arr = o.optJSONArray("siblings")
+        val arr = o.optJSONArray("profiles")
         return (0 until (arr?.length() ?: 0)).joinToString(" \u00b7 ") {
             arr!!.getJSONObject(it).optString("display_name")
         }

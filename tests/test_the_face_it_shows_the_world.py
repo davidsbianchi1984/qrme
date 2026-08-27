@@ -199,7 +199,7 @@ def test_the_wrist_sees_the_lights_and_acts_through_the_same_doors(client):
     face = client.get(f"/profiles/{p['id']}/watch",
                       headers=auth_header(p)).json()
     assert any(a["id"] == wf["id"] for a in face["agents"])
-    assert face["profile"]["light"] in ("green", "orange", "red")
+    assert face["chip"]["light"] in ("green", "orange", "red")
     # One tap advances the same workflow the full apps drive.
     r = client.post(f"/profiles/{p['id']}/watch/act",
                     json={"target": "workflow", "id": wf["id"],

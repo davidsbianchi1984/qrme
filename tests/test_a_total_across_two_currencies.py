@@ -166,7 +166,7 @@ def test_a_payout_settles_one_currency_and_says_which(client):
     assert r.status_code == 201, r.text
     out = r.json()
     assert out["currency"] == "USD"
-    assert out["total_amount"] == 200.0 and out["entries"] == 2
+    assert out["total_amount"] == 200.0 and out["entries_count"] == 2
     assert out["remaining"] == ["JPY"], (
         "a receipt that does not say money is still owed reads as 'paid'")
 

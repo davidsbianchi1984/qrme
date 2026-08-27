@@ -161,8 +161,8 @@ def test_the_named_keys_survive_for_the_clients_that_read_them(client,
     """The four a person opening their own bundle should not have to hunt
     for, and which the suite gateway and the console both read by name."""
     body = client.get(f"/profiles/{profile_id}/export").json()
-    for key in ("profile", "sources", "relationships", "messages",
-                "engagement", "posts", "surfaces", "tables"):
+    for key in ("profile", "source_rows", "relationships", "message_rows",
+                "engagement", "post_rows", "surfaces", "tables"):
         assert key in body, f"the export no longer carries {key!r}"
 
 

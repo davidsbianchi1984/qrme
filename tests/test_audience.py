@@ -118,7 +118,7 @@ def test_a_blocked_comment_is_not_counted(client):
                 json={"body": "my ssn is 123-45-6789"},
                 headers=_viewer(client, "Ada"))
     counts = client.get(f"/profiles/{prof['id']}/audience").json()
-    assert counts["comments"] == 0
+    assert counts["comments_count"] == 0
 
 
 def test_you_can_withdraw_your_own_comment_only(client):
@@ -346,7 +346,8 @@ def test_the_audience_call_answers_everything_a_client_renders(client):
                 headers=who)
 
     out = client.get(f"/profiles/{prof['id']}/audience", headers=who).json()
-    assert out == {"likes": 1, "comments": 1, "shares": 1, "subscribers": 1,
+    assert out == {"likes": 1, "comments_count": 1, "shares": 1,
+                   "subscribers_count": 1,
                    "you_liked": True, "your_subscription": "follow"}
 
 

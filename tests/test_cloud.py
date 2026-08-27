@@ -102,7 +102,7 @@ def test_contribution_requires_opt_in_and_is_anonymized(cloud_pair):
     up = client.post(
         f"/profiles/{consenting['id']}/interactions/{user}/feedback",
         json={"rating": "up"}, headers=as_interactor(user)).json()
-    assert up["contributed"] is True
+    assert up["cloud_contributed"] is True
     payload = fake.contributions[0]
     blob = json.dumps(payload)
     assert payload["source"] == "qrme" and payload["quality"] == "positive"
@@ -115,7 +115,7 @@ def test_contribution_requires_opt_in_and_is_anonymized(cloud_pair):
     quiet = client.post(
         f"/profiles/{private['id']}/interactions/{user}/feedback",
         json={"rating": "up"}, headers=as_interactor(user)).json()
-    assert quiet["contributed"] is False
+    assert quiet["cloud_contributed"] is False
     assert len(fake.contributions) == 1
 
     # Down-votes are never contributed either.
@@ -124,7 +124,7 @@ def test_contribution_requires_opt_in_and_is_anonymized(cloud_pair):
     down = client.post(
         f"/profiles/{consenting['id']}/interactions/{user}/feedback",
         json={"rating": "down"}, headers=as_interactor(user)).json()
-    assert down["contributed"] is False
+    assert down["cloud_contributed"] is False
     assert len(fake.contributions) == 1
 
 
