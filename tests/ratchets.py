@@ -1082,7 +1082,7 @@ RATCHETS: tuple[Ratchet, ...] = (
     Ratchet("console.nav_tabs", 40, _nav_tabs,
             "tabs the console navigation declares — the floor under the "
             "check that every one of them has a label"),
-    Ratchet("avatars.skin_shelf", 6, _skin_shelf,
+    Ratchet("avatars.skin_shelf", 12, _skin_shelf,
             "systems a face can be imported from — the floor under the "
             "check that a source picker is picking between things"),
 )
