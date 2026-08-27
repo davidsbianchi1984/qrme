@@ -24,6 +24,12 @@ dependencies = [
     # signature module that parsed assertions without verifying them would
     # produce records that only look like evidence.
     "cryptography>=41",
+    # The AI mark burned into minted portraits (qrme/avatarreg.py). The
+    # offline marking tool argued against an imaging library in the
+    # runtime — for request-time redraws. Minting is the other case: the
+    # mark is drawn once, when a face is made, like the document
+    # watermark.
+    "pillow>=10",
 ]
 
 [project.optional-dependencies]

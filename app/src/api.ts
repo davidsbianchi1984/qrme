@@ -1861,6 +1861,13 @@ export type Avatar = {
   };
 };
 
+export type RegistryRow = {
+  id: string; source: string; provider: string;
+  provider_asset_id: string | null; asset: string;
+  rights: { likeness: string; basis: string | null };
+  status: string; marked: boolean; prompt_text?: string | null;
+};
+
 export type AvatarBrief = {
   handle: string; portrait: string; style: string; prompt?: string;
   asset?: string | null;
@@ -4870,6 +4877,39 @@ export const api = {
     req<Avatar>(`/profiles/${profileId}/avatar/import`,
       { method: "POST", body, token }),
 
+  // -- the avatar registry (qrme/avatarreg.py): one face ledger ------------
+  avatarShelf: () =>
+    req<{ shelf: RegistryRow[]; starters: unknown[] }>("/avatars/library"),
+  stockShelf: async (file: File, provider = "elevenlabs") => {
+    const res = await fetch(getBase()
+        + `/avatars/library?provider=${encodeURIComponent(provider)}`,
+      { method: "POST",
+        headers: { "x-signup-key": getSignupKey() }, body: file });
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || res.statusText);
+    return JSON.parse(text) as RegistryRow;
+  },
+  myShelf: (accountId: string, token: string) =>
+    req<{ shelf: RegistryRow[] }>(`/accounts/${accountId}/avatars`, { token }),
+  stockMyShelf: async (accountId: string, token: string, file: File,
+                       likeness: "invented" | "self" = "invented") => {
+    const res = await fetch(getBase()
+        + `/accounts/${accountId}/avatars?likeness=${likeness}`,
+      { method: "POST",
+        headers: { authorization: `Bearer ${token}` }, body: file });
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || res.statusText);
+    return JSON.parse(text) as RegistryRow;
+  },
+  claimFace: (profileId: string, registryId: string, token: string) =>
+    req<Avatar>(`/profiles/${profileId}/avatar/claim`,
+      { method: "POST", body: { registry_id: registryId }, token }),
+  paintFace: (profileId: string, words: string, token: string) =>
+    req<Avatar>(`/profiles/${profileId}/avatar/painted`,
+      { method: "POST", body: { words }, token }),
+  retireFace: (registryId: string, because: string, token?: string) =>
+    req<RegistryRow>(`/avatars/registry/${registryId}`,
+      { method: "DELETE", body: { because }, token }),
   avatarBriefs: () =>
     req<{ style: string; briefs: AvatarBrief[] }>("/avatars/briefs"),
   avatarBrief: (handle: string) =>

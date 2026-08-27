@@ -234,6 +234,53 @@ _PUBLIC: dict[str, dict[str, str]] = {
     # A profile that fenced a document and said nothing outside it. Handing
     # somebody a page without a word is a stranger thing than this product
     # should do on its own, so the turn gets a sentence.
+    # The avatar registry's two refusals (qrme/routers/avatars.py).
+    ("a real person's face is never painted from words — attach a "
+     "photograph under a recorded grant instead"): {
+        "es": "el rostro de una persona real nunca se pinta a partir de palabras — adjunta una fotografía bajo un permiso registrado",
+        "fr": "le visage d'une personne réelle ne se peint jamais à partir de mots — joignez une photographie sous une autorisation enregistrée",
+        "de": "das Gesicht einer echten Person wird nie aus Worten gemalt — füge stattdessen ein Foto unter einer festgehaltenen Einwilligung bei",
+        "pt": "o rosto de uma pessoa real nunca se pinta a partir de palavras — anexe uma fotografia sob uma permissão registada",
+        "it": "il volto di una persona reale non si dipinge mai dalle parole — allega una fotografia sotto un consenso registrato",
+        "ja": "実在の人物の顔を言葉から描くことはありません。記録された同意のもとで写真を添付してください",
+        "zh": "真实的人的面孔绝不会凭文字生成——请在已记录的授权下附上照片",
+        "hi": "किसी वास्तविक व्यक्ति का चेहरा शब्दों से कभी नहीं बनाया जाता — दर्ज अनुमति के तहत एक फ़ोटो संलग्न करें",
+        "ar": "وجه شخص حقيقي لا يُرسم من الكلمات أبدًا — أرفق صورة بموجب إذن مسجّل",
+    },
+    ("no painting service is configured — the deployment has no "
+     "image key"): {
+        "es": "no hay un servicio de pintura configurado — el despliegue no tiene clave de imágenes",
+        "fr": "aucun service de peinture n'est configuré — le déploiement n'a pas de clé d'images",
+        "de": "kein Maldienst ist eingerichtet — die Installation hat keinen Bildschlüssel",
+        "pt": "nenhum serviço de pintura está configurado — a instalação não tem chave de imagens",
+        "it": "nessun servizio di pittura è configurato — l'installazione non ha una chiave immagini",
+        "ja": "画像生成サービスが設定されていません。この環境には画像キーがありません",
+        "zh": "未配置绘制服务——此部署没有图像密钥",
+        "hi": "कोई पेंटिंग सेवा कॉन्फ़िगर नहीं है — इस परिनियोजन में इमेज कुंजी नहीं है",
+        "ar": "لا توجد خدمة رسم مهيأة — لا يملك هذا النشر مفتاح صور",
+    },
+    ("no such registry row"): {
+        "es": "no existe esa entrada del registro",
+        "fr": "aucune entrée de registre de ce nom",
+        "de": "kein solcher Registereintrag",
+        "pt": "não existe essa entrada do registo",
+        "it": "nessuna voce del registro con quel nome",
+        "ja": "そのレジストリ行はありません",
+        "zh": "没有这样的注册表行",
+        "hi": "ऐसी कोई रजिस्ट्री पंक्ति नहीं है",
+        "ar": "لا يوجد سجل بهذا المعرف",
+    },
+    ("exactly one of bytes or an asset reference"): {
+        "es": "exactamente uno: bytes o una referencia de recurso",
+        "fr": "exactement l'un des deux : des octets ou une référence d'actif",
+        "de": "genau eines von beiden: Bytes oder eine Asset-Referenz",
+        "pt": "exatamente um: bytes ou uma referência de recurso",
+        "it": "esattamente uno: byte o un riferimento a una risorsa",
+        "ja": "バイト列かアセット参照のどちらか一方だけです",
+        "zh": "字节或资源引用，二者只能择一",
+        "hi": "बाइट्स या एसेट संदर्भ — दोनों में से ठीक एक",
+        "ar": "واحد فقط: بايتات أو مرجع أصل",
+    },
     "Here it is.": {
         "es": "Aquí lo tienes.", "fr": "Le voici.", "de": "Hier ist es.",
         "pt": "Aqui está.", "it": "Eccolo.", "ja": "こちらです。",
@@ -839,6 +886,8 @@ def refusal_language(request) -> str:
 #: translation, `field` as a slot: the field name is the API's own and is the
 #: same string in every language.
 MUST_BE_ONE_OF = "{field} must be one of {choices}"
+#: A registry face that is retired or disputed (qrme/avatarreg.py).
+FACE_UNAVAILABLE = "that face is {status} and cannot be claimed"
 SAY_CEILING = ("an utterance is at most {max} characters — synthesis is "
                "billed per character, and a wall beats a surprise")
 ENGINE_REFUSED = ("the voice engine refused ({code}) — the binding may name "
@@ -1070,6 +1119,17 @@ TEMPLATES = (MUST_BE_ONE_OF, SAY_CEILING, ENGINE_REFUSED,
              NO_COLLECT_SUPPORT, CANNOT_RUN_ONBOARD_LLM)
 
 _TEMPLATES: dict[str, dict[str, str]] = {
+    ("that face is {status} and cannot be claimed"): {
+        "es": "ese rostro está {status} y no puede reclamarse",
+        "fr": "ce visage est {status} et ne peut pas être réclamé",
+        "de": "dieses Gesicht ist {status} und kann nicht beansprucht werden",
+        "pt": "esse rosto está {status} e não pode ser reivindicado",
+        "it": "quel volto è {status} e non può essere rivendicato",
+        "ja": "その顔は{status}のため使用できません",
+        "zh": "该面孔处于 {status} 状态，无法认领",
+        "hi": "वह चेहरा {status} है और लिया नहीं जा सकता",
+        "ar": "هذا الوجه {status} ولا يمكن المطالبة به",
+    },
     SAY_CEILING: {
         'es': 'una locución tiene como máximo {max} caracteres — la síntesis se cobra por carácter, y un muro es mejor que una sorpresa',
         'fr': "une prise de parole fait au plus {max} caractères — la synthèse se facture au caractère, et un mur vaut mieux qu'une surprise",

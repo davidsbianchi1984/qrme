@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { api, uploadMedia, type AppConnector, type ConnectorCatalogue,
+import { api, getBase, uploadMedia, type AppConnector, type ConnectorCatalogue,
+         type RegistryRow,
          type Excursion, type FeedbackBoard, type GameSession, type Inquiry,
          type Letter, type LookoutList, type LookoutPage,
          type PackDetail, type Visited,
@@ -102,6 +103,19 @@ export function Remainder() {
   const [limits, setLimits] = useState<
     { image: { max_bytes: number }; video: { max_bytes: number } } | null>(null);
   const [avatarAsset, setAvatarAsset] = useState("");
+  // The registry's shelf (qrme/avatarreg.py): the deployment's faces and
+  // your own, claimable onto this profile; and the painted road.
+  const [shelf, setShelf] = useState<RegistryRow[]>([]);
+  const [myFaces, setMyFaces] = useState<RegistryRow[]>([]);
+  const [paintWords, setPaintWords] = useState("");
+
+  useEffect(() => {
+    api.avatarShelf().then((r) => setShelf(r.shelf)).catch(() => undefined);
+    if (session.accountId && session.accountToken) {
+      api.myShelf(session.accountId, session.accountToken)
+        .then((r) => setMyFaces(r.shelf)).catch(() => undefined);
+    }
+  }, [session.accountId, session.accountToken]);
 
   const [socialId, setSocialId] = useState("");
   const [collectText, setCollectText] = useState("");
@@ -732,6 +746,59 @@ export function Remainder() {
           () => api.setAvatar(me, avatarAsset, token),
           () => { setAvatarAsset(""); setSaid(tr("rem.avatar.done", lang)); })}>
           {tr("rem.avatar.set", lang)}
+        </button>
+
+        {/* The shelf: the deployment's faces and your own, one press to
+            claim. Every synthetic face on it already wears the burned AI
+            mark; a takedown clears it from every profile at once. */}
+        {(shelf.length > 0 || myFaces.length > 0) && (
+          <>
+            <h4>{tr("rem.shelf", lang)}</h4>
+            <p className="muted small">{tr("rem.shelf.pitch", lang)}</p>
+            <div className="row" style={{ flexWrap: "wrap" }}>
+              {[...myFaces, ...shelf].map((f) => (
+                <button key={f.id} className="pp-face" disabled={!me || !token}
+                        title={f.source}
+                        onClick={() => go(
+                          () => api.claimFace(me, f.id, token),
+                          () => setSaid(tr("rem.avatar.done", lang)))}>
+                  <img src={getBase() + f.asset} alt={f.source} width={64}
+                       height={64} style={{ borderRadius: 12 }} />
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+        {session.accountId && session.accountToken && (
+          <label className="chip">
+            <input type="file" accept="image/*" hidden
+                   onChange={(e) => {
+                     const f = e.target.files?.[0];
+                     e.target.value = "";
+                     if (!f) return;
+                     go(async () => {
+                       await api.stockMyShelf(session.accountId!,
+                                              session.accountToken!, f);
+                       const r = await api.myShelf(session.accountId!,
+                                                   session.accountToken!);
+                       setMyFaces(r.shelf);
+                     }, () => setSaid(tr("rem.shelf.stocked", lang)));
+                   }} />
+            {tr("rem.shelf.add", lang)}
+          </label>
+        )}
+
+        {/* Painted from words — the prompted road, refused in a sentence
+            when the deployment holds no image key. */}
+        <h4>{tr("rem.paint", lang)}</h4>
+        <p className="muted small">{tr("rem.paint.pitch", lang)}</p>
+        <input value={paintWords}
+               onChange={(e) => setPaintWords(e.target.value)}
+               placeholder={tr("rem.paint.ph", lang)} />
+        <button disabled={!me || !token} onClick={() => go(
+          () => api.paintFace(me, paintWords, token),
+          () => { setPaintWords(""); setSaid(tr("rem.avatar.done", lang)); })}>
+          {tr("rem.paint.go", lang)}
         </button>
       </div>
 

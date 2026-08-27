@@ -42,3 +42,16 @@ POST /interactors/{interactor_id}/heard
 # lives today.
 POST /profiles/{profile_id}/voice/release
 DELETE /profiles/{profile_id}/voice/release
+
+# The avatar registry (qrme/avatarreg.py) — the face ledger's doors. The
+# console carries the whole card: the shelf, claiming, painting from
+# words, stocking, retiring. The shells' portrait screens follow with
+# their own round, the way the voice card's controls did — a rights
+# surface ships first where its language lives.
+GET /avatars/library
+POST /avatars/library
+GET /accounts/{account_id}/avatars
+POST /accounts/{account_id}/avatars
+POST /profiles/{profile_id}/avatar/claim
+POST /profiles/{profile_id}/avatar/painted
+DELETE /avatars/registry/{registry_id}

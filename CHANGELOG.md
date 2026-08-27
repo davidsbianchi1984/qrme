@@ -6,6 +6,27 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The avatar registry: one face ledger, three roads in.** Every face
+  a ledger row — source, provider, opaque provider id, prompt and
+  params kept for reproducibility, rights required, status, checksum —
+  and no surface ever calls a provider: the render pipeline reads the
+  same shape it always read, so a provider swap, a re-generation or a
+  takedown is a data operation. The deployment's shelf holds the faces
+  the operator stocks (exported once from ElevenLabs' own surface —
+  the signup key is the operator's secret) and never empties: the 34
+  starter portraits back it, the voice library's own rule. Accounts
+  keep personal shelves on their own tokens. One press claims a face
+  onto a profile; retiring a row clears it from every claimant at once;
+  a disputed face refuses new claims while keeping its record. Painted
+  from words lands too: the house style, the profile's own brief, and
+  its age as it is today — the aging the persona has had for releases,
+  finally reaching the face — behind an image-key seam that refuses in
+  a sentence when unconfigured. Two rules ride every row: a synthetic
+  face gets the AI mark burned into its bytes at mint, and an authentic
+  photograph never does.
+
 ## [1.8.8] - 2026-08-27
 
 ### Fixed

@@ -1267,6 +1267,30 @@ CREATE INDEX IF NOT EXISTS idx_game_lobby_live
 -- robot) — throttle/behavior dials as JSON of dial -> 0..100; absent dials
 -- read as the 50 default. Steering, not piloting: shapes style/pace/behavior
 -- only — never identity, boundaries, age-gating, or the command allowlist.
+-- The avatar registry (qrme/avatarreg.py): one ledger for every face,
+-- whatever road it arrived by. Rows are retired, never deleted — a face
+-- that was ever shown is a fact the record keeps.
+CREATE TABLE IF NOT EXISTS avatar_registry (
+    id                TEXT PRIMARY KEY,
+    owner_account_id  TEXT,               -- NULL = the deployment's library
+    profile_id        TEXT,               -- NULL until claimed
+    source            TEXT NOT NULL,      -- seeded | prompted | curated_library | uploaded
+    provider          TEXT NOT NULL,      -- elevenlabs | internal | ...
+    provider_asset_id TEXT,               -- opaque; a foreign key we do not control
+    prompt_text       TEXT,               -- kept for reproducibility and disputes
+    generation_params TEXT,               -- provider-shaped JSON, stored as given
+    asset             TEXT NOT NULL,      -- the serving URI of the master
+    render_variants   TEXT,               -- JSON: surface -> URI
+    rights            TEXT NOT NULL,      -- JSON: {likeness, basis}
+    status            TEXT NOT NULL DEFAULT 'active',
+                                          -- active | pending | failed | retired | disputed
+    checksum          TEXT,               -- SHA-256 of the master bytes
+    marked            INTEGER NOT NULL DEFAULT 0,  -- AI mark burned into the bytes
+    created_at        TEXT NOT NULL,
+    retired_at        TEXT,
+    retired_because   TEXT
+);
+
 CREATE TABLE IF NOT EXISTS steering_settings (
     subject_id TEXT PRIMARY KEY,       -- profile_id or robot_id
     dials      TEXT NOT NULL DEFAULT '{}',   -- JSON: dial name -> 0..100
@@ -2818,6 +2842,9 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # to the person.
     ("interactors", "avatar_id", "TEXT"),
     ("interactors", "avatar_url", "TEXT"),
+    # The face's registry row, beside the rendered asset it produced —
+    # so a takedown can find every profile a retired row was backing.
+    ("profiles", "avatar_ref", "TEXT"),
 )
 
 

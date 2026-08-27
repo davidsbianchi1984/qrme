@@ -4092,6 +4092,30 @@ const CHROME: Table = {
   "rem.look.go": {
     en: "Fetch it", es: "Traerlo", fr: "Le récupérer", de: "Holen", pt: "Buscá-lo", it: "Recuperalo", ja: "取得する", zh: "取回", hi: "लाएँ", ar: "أحضره",
   },
+  "rem.shelf": {
+    en: "The shelf", es: "El estante", fr: "L'étagère", de: "Das Regal", pt: "A prateleira", it: "Lo scaffale", ja: "シェルフ", zh: "货架", hi: "शेल्फ़", ar: "الرف",
+  },
+  "rem.shelf.pitch": {
+    en: "Faces this deployment offers, and your own — one press claims one for this profile. Every synthetic face already wears the AI mark in its pixels.", es: "Rostros que ofrece este despliegue, y los tuyos: una pulsación reclama uno para este perfil. Cada rostro sintético ya lleva la marca de IA en sus píxeles.", fr: "Les visages offerts par ce déploiement, et les vôtres — une pression en réclame un pour ce profil. Chaque visage synthétique porte déjà la marque IA dans ses pixels.", de: "Gesichter, die diese Installation anbietet, und deine eigenen — ein Druck beansprucht eines für dieses Profil. Jedes synthetische Gesicht trägt die KI-Marke bereits in seinen Pixeln.", pt: "Rostos que esta instalação oferece, e os seus — um toque reivindica um para este perfil. Cada rosto sintético já traz a marca de IA nos píxeis.", it: "I volti offerti da questa installazione, e i tuoi — una pressione ne rivendica uno per questo profilo. Ogni volto sintetico porta già il segno IA nei pixel.", ja: "この環境が提供する顔とあなた自身の顔。1回押せばこのプロフィールのものになります。合成の顔はすべてピクセルにAIマークが入っています。", zh: "此部署提供的面孔，以及你自己的——按一下即可认领给此档案。每张合成面孔的像素中都已带有 AI 标记。", hi: "इस परिनियोजन द्वारा दिए गए चेहरे, और आपके अपने — एक दबाव से इस प्रोफ़ाइल के लिए एक मिल जाता है। हर सिंथेटिक चेहरे के पिक्सेल में AI चिह्न पहले से है।", ar: "الوجوه التي يقدمها هذا النشر، ووجوهك أنت — ضغطة واحدة تطالب بواحد لهذا الملف. كل وجه اصطناعي يحمل علامة الذكاء الاصطناعي في بكسلاته.",
+  },
+  "rem.shelf.add": {
+    en: "Add a face to your shelf", es: "Añade un rostro a tu estante", fr: "Ajouter un visage à votre étagère", de: "Ein Gesicht in dein Regal legen", pt: "Adicionar um rosto à sua prateleira", it: "Aggiungi un volto al tuo scaffale", ja: "自分のシェルフに顔を追加", zh: "把一张面孔加入你的货架", hi: "अपने शेल्फ़ में एक चेहरा जोड़ें", ar: "أضف وجهًا إلى رفك",
+  },
+  "rem.shelf.stocked": {
+    en: "On your shelf.", es: "En tu estante.", fr: "Sur votre étagère.", de: "In deinem Regal.", pt: "Na sua prateleira.", it: "Sul tuo scaffale.", ja: "シェルフに追加しました。", zh: "已加入你的货架。", hi: "आपके शेल्फ़ पर।", ar: "على رفك.",
+  },
+  "rem.paint": {
+    en: "Painted from words", es: "Pintado con palabras", fr: "Peint à partir de mots", de: "Aus Worten gemalt", pt: "Pintado a partir de palavras", it: "Dipinto dalle parole", ja: "言葉から描く", zh: "以文字绘制", hi: "शब्दों से चित्रित", ar: "مرسوم من الكلمات",
+  },
+  "rem.paint.pitch": {
+    en: "A portrait in the house style, from this profile's own brief, at the age it is today — the mark burned in as it is made. Fictional profiles only.", es: "Un retrato en el estilo de la casa, a partir de la descripción del propio perfil, con la edad que tiene hoy — la marca se graba al crearlo. Solo perfiles ficticios.", fr: "Un portrait dans le style maison, d'après la fiche du profil, à l'âge qu'il a aujourd'hui — la marque gravée à la création. Profils fictifs uniquement.", de: "Ein Porträt im Hausstil, aus der eigenen Beschreibung des Profils, im heutigen Alter — die Marke wird beim Erstellen eingebrannt. Nur fiktive Profile.", pt: "Um retrato no estilo da casa, a partir da descrição do próprio perfil, com a idade que tem hoje — a marca gravada ao criar. Apenas perfis fictícios.", it: "Un ritratto nello stile della casa, dalla scheda del profilo, all'età che ha oggi — il segno impresso alla creazione. Solo profili di fantasia.", ja: "ハウススタイルの肖像。プロフィール自身の設定から、今日の年齢で描かれ、作成時にマークが焼き込まれます。架空のプロフィールのみ。", zh: "以本店风格绘制的肖像，取自档案自身的简介，呈现今天的年龄——生成时即烙入标记。仅限虚构档案。", hi: "हाउस शैली में एक चित्र, प्रोफ़ाइल के अपने विवरण से, आज की उम्र में — बनते समय ही चिह्न अंकित। केवल काल्पनिक प्रोफ़ाइल।", ar: "صورة بأسلوب الدار، من وصف الملف نفسه، بعمره اليوم — تُحرق العلامة عند إنشائها. للملفات الخيالية فقط.",
+  },
+  "rem.paint.ph": {
+    en: "your own direction (optional)", es: "tu propia indicación (opcional)", fr: "votre propre direction (facultatif)", de: "deine eigene Richtung (optional)", pt: "a sua própria indicação (opcional)", it: "la tua indicazione (facoltativa)", ja: "あなたの指示（任意）", zh: "你的指示（可选）", hi: "आपका अपना निर्देश (वैकल्पिक)", ar: "توجيهك الخاص (اختياري)",
+  },
+  "rem.paint.go": {
+    en: "Paint it", es: "Píntalo", fr: "Peignez-le", de: "Mal es", pt: "Pinte-o", it: "Dipingilo", ja: "描く", zh: "绘制", hi: "चित्र बनाएं", ar: "ارسمه",
+  },
   "rem.avatar": {
     en: "Its portrait", es: "Su retrato", fr: "Son portrait", de: "Sein Porträt", pt: "O seu retrato", it: "Il suo ritratto", ja: "その肖像", zh: "它的肖像", hi: "इसका चित्र", ar: "صورته",
   },
