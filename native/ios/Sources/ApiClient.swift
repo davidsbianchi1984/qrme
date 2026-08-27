@@ -7044,6 +7044,9 @@ struct WidgetLimits: Decodable {
     let allowances: Caps
     let available: Bool
     let unavailable_because: String?
+}
+
+extension ApiClient {
     // -- the people in your phone (qrme/contacts.py) -------------------------
     // Granted, synced, read back, withdrawn — the same three doors the
     // console holds, on the interactor's own token. The sync REPLACES the
@@ -7088,5 +7091,4 @@ struct WidgetLimits: Decodable {
         try await request("/interactors/\(interactorId)/contacts",
                           token: token)
     }
-
 }
