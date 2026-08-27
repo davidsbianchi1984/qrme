@@ -1,5 +1,8 @@
 # QRME — AI Synthetic Profile Platform
 
+**People, made of software — built by you, governed by you, honest about
+what they are.**
+
 **Current release: v1.8.9** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
@@ -10,22 +13,24 @@ one number names one combination of all three.
 > (U.S. Patent Application No. 19/056,418, Attorney Docket 526.P002;
 > **published as US 2025/0265659 A1 on August 21, 2025**).
 
-QRME lets a user create, customize, and interact with AI-driven synthetic
-profiles — versions of themselves, another person (with consent/rights
-handling), or a fictional persona. Profiles adapt to *who* they're talking to
-(relationship-aware behavior) and *how engaged* that person is, while keeping
-their core identity and boundaries fixed. See [docs/PRD.md](docs/PRD.md).
+QRME is a platform for creating, customizing and living alongside
+AI-driven synthetic profiles — a version of yourself, another person with
+consent and rights handling, or a fictional persona. A profile keeps its
+core identity and boundaries fixed while adapting to *who* it is talking
+to and how long they have known each other. Around the profiles stands a
+community: walls and feeds, voice and video rooms, friends, gifts, a
+marketplace — and around all of it, governance that treats a person's
+face, voice and name as things with owners. See [docs/PRD.md](docs/PRD.md).
 
-**Roadmap — AI agent management.** When activated, the platform can deploy
-intelligent, role-specific AI agents that assist users, automate tasks, manage
-workflows, and enhance operational decision-making — running more efficiently
-and taking over mundane or outdated tasks and roles — all within the same
-secure, private network environment.
-
-QRME is one of three products versioned and released together — see the
-banner above. The sister products:
-[JIM-mini](https://github.com/davidsbianchi1984/jim-mini) (health guardian)
-and [PDI](https://github.com/davidsbianchi1984/pdi) (private data vault).
+It is one product with three postures: a **studio** where profiles are
+made and taught, a **community** where they live among people and each
+other, and a **workforce** — role-specific agents that take on tasks,
+automate workflows and staff real desks, acting only through published
+tools inside the same private network. The sister products complete it:
+[JIM-mini](https://github.com/davidsbianchi1984/jim-mini) reaches its
+specialists through the tandem, and
+[PDI](https://github.com/davidsbianchi1984/pdi) seals what the profiles
+remember.
 
 ## Ability is not a gate
 
@@ -54,16 +59,21 @@ whole loop: your words become tracked work.
 
 
 
+
 ## What it does
 
 | Capability | Description |
 |---|---|
-| **Synthetic profiles** | Create and interact with AI-driven profiles — yourself, another person with consent and rights handling, or a fictional persona — each conditioned on who it is talking to and how long they have known each other. |
-| **Community** | Walls, feeds, friends, rooms (voice, camera, watch parties, games), gifts, and a marketplace of knowledge and task packs. |
-| **The Studio and its agent** | A personal agent that edits your own page, writes widgets, posts, and searches the web — acting only through published tools, each behind the same doors a person uses. |
-| **Voice and likeness** | Voiceprint enrollment under attestation, spoken voices bound from the provider's surface, avatars and masks — every generated utterance watermarked and every AI face marked as one. |
-| **Governance** | Objections, takedowns, lifecycle states, signatures that survive dispute, tamper-evident provenance, and translated refusals in ten languages. |
-| **Privacy** | Room pixels never cross clients; disclosures are recorded, not footage. `QRME_OFFLINE=1` keeps everything on the host, enforced at every socket. |
+| **Synthetic profiles** | Create and interact with AI-driven profiles — yourself, another person with consent and rights handling, or a fictional persona — each conditioned on who it is talking to, how engaged they are, and what the pair's own sealed history holds. |
+| **Conversation everywhere** | Chat that hears and remembers, a hands-free talk face, and rooms for up to nine — audio, camera, AR, VR, watch parties and games — with dictation, streamed replies spoken piece by piece, barge-in, and pictures, video and files shared in the room. |
+| **Voice and likeness** | Voiceprint enrollment under attestation; spoken voices bound by reference with a first-account claim, an owner's on-the-record release for voices meant to be shared, and premades free for everybody. Every generated utterance is watermarked and every AI face marked as one. |
+| **Faces and avatars** | Portraits, masks and an avatar registry — painted from words where the deployment holds an image key — with the AI mark riding every invented face. |
+| **Community** | Walls, feeds, friends and circles, discovery with an offer, homepages, gifts, reviews, and a marketplace of knowledge and task packs — with starter professionals who look and sound like their trade. |
+| **The Studio and its agent** | A personal agent that edits your page, writes widgets, posts and searches the web on your word — acting only through published tools, each behind the same doors a person uses, with every act on the record. |
+| **The workforce** | Role-specific agents that answer for their own trade: specialist profiles JIM-mini reaches through the tandem, organizational desks, delegation with both sides' consent, and succession that survives its owner. |
+| **Memory in the vault** | What a pair builds together seals to the PDI vault — shown to its people, curatable, and forgettable down to the vectors. |
+| **Governance** | Objections, takedowns, lifecycle states, signatures that survive dispute, tamper-evident provenance, moderation that can hold a reply for its owner, and refusals translated in ten languages. |
+| **Privacy** | Room pixels never cross clients; disclosures are recorded, not footage; microphones pair without listening. `QRME_OFFLINE=1` keeps everything on the host, enforced at every socket. |
 | **Tandem** | Runs beside JIM-mini and on top of the PDI vault, one version number across the three. |
 
 ## The screens you'll meet
