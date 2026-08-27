@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-08-27
+
 ### Added
 
 - **The open door: the inverted connection.** The oldest still-open ask
@@ -34,6 +36,56 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   toggle the console has carried beside the binding since the release
   ledger shipped. Three shell backlogs shrink by the pair of rows that
   promised it.
+
+### Fixed
+
+- **The room hears an iPhone.** Safari wears two masks when the ear is
+  refused — `service-not-allowed` and `network` — and only the first was
+  forking the standing ear to the recorded ear, so an iPhone room sat
+  deaf. Both fork now. The hear-loop's first look primes to the present
+  instead of reading scrollback into a page that never got a speech
+  grant; the voice queue wears a three-second watchdog so a synthesis
+  engine that never starts cannot hold the speaking lock; opening the
+  ear primes speech synthesis inside the tap that granted it; and a
+  voice that fails in the room queue notes the block on screen and lets
+  the next turn through instead of dying silently.
+- **The seat is honest about itself.** A background-only seat stops
+  painting the initial circle over the chosen backdrop; a visible ⚙️
+  button on each seat opens the per-seat settings only a double-tap
+  reached before (the double-tap stays); and the dock mints owner
+  tokens for every held profile, so all four panels stand for any
+  profile the account holds, not just the one that created the room.
+
+### Changed
+
+- **Twenty-one names each say one thing.** The wire-collision ledger's
+  whole backlog, closed the way JIM closed its twenty and PDI its two:
+  counts stop wearing their collection's name (`comments_count`,
+  `subscribers_count`, `entries_count`, `items_count`, `turns_count`,
+  `messages_count`, `offerings_count`, `sources_count`) and records
+  that shared a name with a different shape get their own —
+  `deal_items`, `cards`, `seats`, `thread_turns`, `summoned`, `found`,
+  `app_providers`, `signin_providers`, `rating_summary`, `scopes`,
+  `ground_rules`, `page_theme`, `composition_sources`,
+  `timeline_events`, `audit_events`, `goal_amount`, `watermark_line`,
+  `skin_sources`, and the export bundle's
+  `message_rows`/`post_rows`/`source_rows` — across the backend and all
+  four clients. Three client fictions died on the way (a rating the
+  feedback route never echoes, a watermark line that rides inside
+  `display`, a doubled display record), the roster and the account's
+  held list turned out to be one shape behind two doors, and
+  `contributed` was renamed `cloud_contributed` before it could become
+  the next collision. From here a two-meaning wire name is a failing
+  guard, not a backlog row.
+- **Two floors joined the registry.** The body-route sweep's liveness
+  floor (`routes.body_taking`, 210 against 262) and the termination
+  audit's (`erase.capability_tables`, 7 against 8) are ratchets with
+  live measures; the seven rows left in the unregistered-floors ledger
+  each carry the reason they stay literals.
+- **The front page says what the platform became.** The README leads
+  with the three postures — studio, community, workforce — and a
+  what-it-does table sized to the product, keeping every screen gallery
+  and the release history intact.
 
 ## [1.8.9] - 2026-08-27
 
@@ -15922,7 +15974,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.9...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.9.0...HEAD
+[1.9.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.9...app-v1.9.0
 [1.8.9]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.8...app-v1.8.9
 [1.8.8]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.7...app-v1.8.8
 [1.8.7]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.6...app-v1.8.7

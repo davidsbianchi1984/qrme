@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v1.8.9** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v1.9.0** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -275,6 +275,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **1.9.0** | **The room hears an iPhone, and every name says one thing** — Safari's second refusal mask forks to the recorded ear so an iPhone room stops sitting deaf, the voice queue wears a watchdog, the hear-loop primes to the present, seats show a visible ⚙️ beside the double-tap, a background-only seat stops painting its circle, and the dock mints owner tokens for every held profile; the wire-collision ledger closes its whole twenty-one-row backlog across the backend and all four clients, two floors join the live-measured registry, and the front page leads with the three postures |
 | **1.8.9** | **One face ledger, three roads in** — the avatar registry: the deployment's shelf and your own with named faces, a fuller import market, painted-from-words at the profile's own age, the AI mark burned at mint, takedowns as data operations; the room strip slims, the invite shows its waiting seat, and the panels dock fits every phone |
 | **1.8.8** | **The estate answers for itself** — profiles turn all their dials on request, with nine new ones and the guidance teaching every modification by its ends; the four panels gained their exits (tap outside, a red close); the paperclip is the phone's own chooser with the carried-things card behind its own door; the room walks with you on the person-walking button, every seat in its own voice through the room's echo door; the people in your phone reach all three native shells; and the README shows the screens you'll meet |
 | **1.8.7** | **The room grows hands, eyes and a memory — and the circle is only yours** — a link pasted into a room is fetched once and read to every seat; a room profile hands documents over as real files (and as multi-page PDFs when asked, from a built-in writer proven by the estate's own reader), with a stuttered fence filing the furthest draft; your own profile remembers you in a room — briefcase and recalled moments walk in when the room's one human is the other half of the pair, and a second human keeps all pair memory out; "See all" opens Your circle, friends only in the descriptive card style, while Discover's card of somebody already added says Friends; the 👤+ panel reaches the Windows handheld, your own profile seats on the press, rooms open with a live green mic, the lend button says which way it points, the loudness rail sleeps until touched, and shares take several files with a named reading in progress |
