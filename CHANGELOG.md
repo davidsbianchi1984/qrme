@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.8.8] - 2026-08-27
+
 ### Fixed
 
 - **The dial guidance teaches every modification, not just humor.** The
@@ -15845,7 +15847,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.7...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.8...HEAD
+[1.8.8]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.7...app-v1.8.8
 [1.8.7]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.6...app-v1.8.7
 [1.8.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.5...app-v1.8.6
 [1.8.5]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.4...app-v1.8.5
