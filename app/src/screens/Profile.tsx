@@ -224,7 +224,7 @@ export function Profile({ profileId, onBack, onPlans, onVisit, onInside }: {
           sanitised in storage rather than here — a renderer never sees raw
           markup, so no renderer can forget to clean it. */}
       <div className="card pp-hero"
-           style={{ borderColor: accent, background: page?.theme?.bg }}>
+           style={{ borderColor: accent, background: page?.page_theme?.bg }}>
         <h3 style={{ color: accent }}>
           {home?.headline || page?.tagline || name}
         </h3>

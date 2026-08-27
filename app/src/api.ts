@@ -72,7 +72,7 @@ export function setLlmKey(key: string) {
 // account is what owns — its id is the owner_id profiles are created under.
 export const oauthApi = {
   providers: () =>
-    req<{ providers: { provider: string; name: string; configured: boolean;
+    req<{ signin_providers: { provider: string; name: string; configured: boolean;
                        setup?: string }[] }>(`/auth/oauth/providers`),
   start: (provider: string) =>
     req<{ url: string; state: string }>(
@@ -681,7 +681,7 @@ export type ReviewsView = {
   profile_id: string;
   /** `average` and `distribution` are absent until somebody has reviewed —
    *  the empty case carries a `note` instead, and the screen shows it. */
-  rating: {
+  rating_summary: {
     average: number | null; count: number;
     note?: string;
     distribution?: Record<string, number>;
@@ -703,7 +703,7 @@ export type ThreadMessage = {
 
 export type ThreadView = {
   profile_id: string; interactor_id: string;
-  messages: ThreadMessage[];
+  thread_turns: ThreadMessage[];
 };
 
 export type MessageRevision = Record<string, unknown>;
@@ -971,7 +971,7 @@ export type Seat = {
 
 export type Lobby = {
   session_id: string; game: string; platform: string;
-  members: Seat[];
+  seats: Seat[];
   people: number; profiles: number; agents: number;
   synthetic_seats_left: number;
   maturity: string;
@@ -983,7 +983,7 @@ export type Lobby = {
  *  believes every callsign is a person will address them as people. */
 export type LobbyContext = {
   game: string;
-  members: { callsign: string | null; role: string; synthetic: boolean }[];
+  seats: { callsign: string | null; role: string; synthetic: boolean }[];
   people: number;
   synthetic_here: number;
   maturity: string;
@@ -1046,8 +1046,8 @@ export type GiftsView = {
 };
 
 export type AudienceView = {
-  likes: number; comments: number; shares: number;
-  subscribers: number;
+  likes: number; comments_count: number; shares: number;
+  subscribers_count: number;
   you_liked: boolean;
   your_subscription: Subscription | null;
 };
@@ -1067,7 +1067,7 @@ export interface DmMessage {
   body: string; sent_at: string;
 }
 export interface DmThread {
-  other_id: string; other_name?: string | null; messages: number;
+  other_id: string; other_name?: string | null; messages_count: number;
   last_at: string;
 }
 export interface Homepage {
@@ -1080,14 +1080,14 @@ export interface Homepage {
 
 export interface ShopCard {
   id: string; profile_id: string; name: string; blurb?: string | null;
-  tag?: string | null; seller: string; offerings: number;
+  tag?: string | null; seller: string; offerings_count: number;
 }
 export interface ShopOffering {
   id: string; shop_id: string; kind: string; title: string;
   blurb?: string | null; price: number; currency: string;
   availability: string; retired: number;
 }
-export interface ShopDetail extends Omit<ShopCard, "offerings"> {
+export interface ShopDetail extends Omit<ShopCard, "offerings_count"> {
   offerings: ShopOffering[];
 }
 export interface ShopOrder {
@@ -1214,7 +1214,7 @@ export interface Stats {
   relationship_graph: number;
   engagement_avg: number;
   interactors: number;
-  sources: number;
+  sources_count: number;
   posts: number;
   surfaces: string[];
 }
@@ -1288,7 +1288,7 @@ export interface CampaignOut {
   profile_id: string;
   title: string;
   cause?: string | null;
-  goal: number;
+  goal_amount: number;
   raised: number;
   donors: number;
   status: string;
@@ -1353,7 +1353,7 @@ export interface PairInfo {
 // The wrist's glanceable payload (GET /profiles/{id}/watch), reused by the
 // always-on lights widget: counts and the profile chip are all it reads.
 export interface WatchFace {
-  profile: {
+  chip: {
     id: string; display_name: string; status: string;
     light: "green" | "orange" | "red"; pending_approvals: number;
   };
@@ -1364,7 +1364,7 @@ export interface WatchFace {
 // FIG. 800's voiceprint (qrme/voiceprint.py) — permission, enrollment,
 // characteristics, print.
 export interface VoiceEnrollment {
-  samples: number; seconds: number; turns: number;
+  samples: number; seconds: number; turns_count: number;
   mean_turn_seconds: number | null; mean_chars_per_turn: number | null;
   by_source: Record<string, number>;
   ready: boolean; needs: string[];
@@ -1383,7 +1383,7 @@ export interface VoiceprintStatus {
 export interface ObjectionTimeline {
   objection_id: string; profile_id: string; status: string;
   reattested: boolean; vault_backed: boolean; note: string;
-  events: { id: string; event: string; actor: string;
+  timeline_events: { id: string; event: string; actor: string;
             sealed: boolean; at: string }[];
 }
 
@@ -1459,7 +1459,7 @@ export interface WatermarkRecovery {
 export type Grant = {
   id: string;
   token: string;
-  scope: string[];
+  scopes: string[];
   revoked: boolean;
 };
 
@@ -1590,7 +1590,7 @@ export type Exchange = {
   fee: number; fee_note: string;
   state: "draft" | "proposed" | "signed" | "delivered" | "closed" | "withdrawn";
   created_at: string;
-  items: ExchangeItem[];
+  deal_items: ExchangeItem[];
   /** Names only — the screen lists these before anybody signs. */
   runs_on_your_machine: string[];
   runs_warning: string | null;
@@ -1616,7 +1616,7 @@ export type Exchange = {
 /** Two shapes, not one. A closed channel says why; an open one says what. */
 export type ExchangeChannel =
   | { open: false; reason: string; unsigned: string[] }
-  | { open: true; items: ExchangeItem[]; fingerprint: string;
+  | { open: true; deal_items: ExchangeItem[]; fingerprint: string;
       auto_download: boolean; note: string };
 
 export type ExchangeVocabulary = {
@@ -1663,7 +1663,7 @@ export type SkillGrantVocabulary = {
   surfaces: { key: string; means: string }[];
   skill_kinds: { key: string; means: string }[];
   states: string[];
-  terms: string[];
+  ground_rules: string[];
 };
 
 export type PartyVideo = {
@@ -1929,7 +1929,7 @@ export type PageOffer = {
 
 export type ProfilePage = {
   profile_id: string;
-  theme: Theme;
+  page_theme: Theme;
   accent: string | null; layout: string;
   tagline: string | null;
   about: string | null;
@@ -1961,7 +1961,7 @@ export type Front = {
   ai_disclosure: string;
   verification: Verification;
   skills: unknown[]; experience: unknown[];
-  rating: { average: number | null; count: number; note?: string };
+  rating_summary: { average: number | null; count: number; note?: string };
   reviews: unknown[];
   talked_with: number; interactions: number; adult: boolean;
 };
@@ -2123,7 +2123,7 @@ export type RobotCatalogue = {
 };
 
 export type ConnectorCatalogue = {
-  providers: { provider: string; label: string;
+  app_providers: { provider: string; label: string;
                apps: { app: string; label: string; capabilities: string[];
                        directions: string[]; needs_first: string }[] }[];
   app_count: number; provider_count: number;
@@ -2256,7 +2256,7 @@ export type ObjectionAudit = {
   /** False when no vault is configured — and the screen says so, because
    *  "tamper-evident" is a claim that depends on it. */
   vault_backed: boolean;
-  events: ObjectionEvent[];
+  audit_events: ObjectionEvent[];
 };
 
 /** What any of resolve / withdraw / revoke returns. */
@@ -2453,7 +2453,7 @@ export type DeskCard = {
   };
   portrait: string | null;
   feed: { url: string; live: boolean; note: string;
-          watermark: string | null; ai: boolean };
+          watermark_line: string | null; ai: boolean };
 };
 
 export type BellRung = {
@@ -2510,7 +2510,7 @@ export type PlacedBeacon = {
 export type BeaconScanCard = {
   profile_id?: string;
   display_name?: string;
-  watermark?: string;
+  watermark_line?: string;
   portrait?: string | null;
   /** Whether the disclosure is already burned into the image. A surface QRME
    *  does not control needs to know if compositing is mandatory. */
@@ -2615,7 +2615,7 @@ export type PackSummary = {
   id: string; industry: string; audience: string; title: string;
   blurb: string | null; publisher: string; price: number; currency: string;
   free: boolean; origin: string; origin_url: string | null; rated: boolean;
-  items: number; installs: number;
+  items_count: number; installs: number;
 };
 
 /** Seeding is idempotent, and says so by counting both sides. A press that
@@ -2984,7 +2984,7 @@ export type EarningsStatement = {
  *  of it" are distinguishable without a second request. */
 export type PayoutReceipt = {
   payout_id: string; owner_id: string; total_amount: number; currency: string;
-  entries: number; at: string; remaining: string[]; note: string;
+  entries_count: number; at: string; remaining: string[]; note: string;
 };
 
 /** How this profile and one person are going.
@@ -3088,7 +3088,7 @@ export type Summoned = {
   type: "handle" | "tag" | "beacon";
   ref: string;
   profile?: SummonCard;
-  profiles?: SummonCard[];
+  summoned?: SummonCard[];
   label?: string;
   location?: string | null;
   scans?: number;
@@ -3246,7 +3246,7 @@ export type PackDetail = {
   id: string; industry: string; audience: string; title: string;
   blurb: string; publisher: string; price: number; currency: string;
   free: boolean; origin: string; origin_url: string; rated: boolean;
-  items: number; installs: number; item_titles: string[];
+  items_count: number; installs: number; item_titles: string[];
 };
 
 export type PackRegistry = {
@@ -3399,7 +3399,7 @@ export interface FeedItem {
 /** One page of the public stream. `rules` is the server saying, in words a
  *  screen can show, what it will and will not play without being asked. */
 export interface FeedPage {
-  items: FeedItem[];
+  cards: FeedItem[];
   cursor: string | null;
   counts: { video: number; offsite: number; room: number; desk: number;
             party: number };
@@ -3734,7 +3734,7 @@ export const api = {
   // profile is listed until its owner goes private; the switch below is
   // that door, per profile and reversible both ways.
   browsePeople: () =>
-    req<{ profiles: { profile_id: string; display_name: string;
+    req<{ found: { profile_id: string; display_name: string;
                       handle: string | null; avatar: string | null;
                       // "ai" | "real_photo" | null, decided server side by
                       // `avatars.kind_of` — the badge is not optional, so
@@ -4816,7 +4816,7 @@ export const api = {
   // badge, and which of them could. Owner-only — it is the linkage between
   // somebody's separate personas, which is the thing anonymity protects.
   siblings: (profileId: string, token: string) =>
-    req<{ owner_id: string; profiles: Sibling[] }>(
+    req<{ owner_id: string; siblings: Sibling[] }>(
       `/profiles/${profileId}/siblings`, { token }),
 
   verification: (profileId: string, token: string) =>

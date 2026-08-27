@@ -109,7 +109,7 @@ export function Grants({ onPlans }: {
         <div className="card">
           <h3>{tr("grt.terms", lang)}</h3>
           {/* The backend's own four sentences. */}
-          <ul className="small">{vocab.terms.map((t) => <li key={t}>{t}</li>)}</ul>
+          <ul className="small">{vocab.ground_rules.map((t) => <li key={t}>{t}</li>)}</ul>
         </div>
       )}
 

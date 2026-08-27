@@ -74,7 +74,7 @@ public sealed partial class PostsPage : Page
         try
         {
             var page = await ApiClient.Shared.PublicFeed();
-            _stream = page.Items ?? new List<FeedCard>();
+            _stream = page.Cards ?? new List<FeedCard>();
             _streamCursor = page.Cursor;
         }
         catch
@@ -150,7 +150,7 @@ public sealed partial class PostsPage : Page
             try
             {
                 var page = await ApiClient.Shared.PublicFeed(_streamCursor);
-                _stream.AddRange(page.Items ?? new List<FeedCard>());
+                _stream.AddRange(page.Cards ?? new List<FeedCard>());
                 _streamCursor = page.Cursor;
             }
             catch { }

@@ -271,7 +271,7 @@ export function Visiting() {
               <strong>{scanned.display_name}</strong>
               {scanned.label && <span className="muted"> · {scanned.label}</span>}
             </p>
-            <p className="small">{scanned.watermark}</p>
+            <p className="small">{scanned.watermark_line}</p>
             <p className="muted small">
               {scanned.portrait_marked
                 ? tr("vis.marked", lang) : tr("vis.unmarked", lang)}

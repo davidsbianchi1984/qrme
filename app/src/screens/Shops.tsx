@@ -147,7 +147,7 @@ export function Shops({ onPlans }: {
         {cards.map((s) => (
           <div key={s.id} className="row" style={{ justifyContent: "space-between" }}>
             <span>{s.name} · <span className="muted small">{s.seller}
-              {s.tag ? ` · ${s.tag}` : ""} · {s.offerings}</span></span>
+              {s.tag ? ` · ${s.tag}` : ""} · {s.offerings_count}</span></span>
             <button onClick={() => browse(s.id)}>{tr("shops.browse", lang)}</button>
           </div>
         ))}

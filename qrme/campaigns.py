@@ -114,7 +114,7 @@ def view(campaign_id: str) -> dict | None:
         " WHERE campaign_id=?", (campaign_id,)).fetchone()
     return {
         "id": row["id"], "profile_id": row["profile_id"],
-        "title": row["title"], "cause": row["cause"], "goal": row["goal"],
+        "title": row["title"], "cause": row["cause"], "goal_amount": row["goal"],
         "status": row["status"], "raised": round(raised, 2),
         "donors": donors, "created_at": row["created_at"],
         "proceeds_to": designation(row["profile_id"]),

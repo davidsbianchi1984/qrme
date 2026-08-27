@@ -1010,7 +1010,7 @@ def give_feedback(profile_id: str, interactor_id: str, body: Feedback,
     # at the gateway; the exact payload is logged locally so the owner can
     # always see precisely what left.
     cloud = request.app.state.cloud
-    result["contributed"] = False
+    result["cloud_contributed"] = False
     if (body.rating == "up" and profile["cloud_contribution"]
             and cloud is not None):
         exchange = anonymized_exchange(profile, profile_id, interactor_id)
@@ -1024,8 +1024,8 @@ def give_feedback(profile_id: str, interactor_id: str, body: Feedback,
                 "purpose": profile["purpose"],
                 "exchange": exchange,
             }
-            result["contributed"] = cloud.contribute(payload)
-            if result["contributed"]:
+            result["cloud_contributed"] = cloud.contribute(payload)
+            if result["cloud_contributed"]:
                 conn = db.connect()
                 conn.execute(
                     "INSERT INTO contribution_log (ref, profile_id, payload,"
@@ -1104,7 +1104,7 @@ def open_rehearsal(profile_id: str, body: RehearsalOpen,
         (rehearsal_id, profile_id, body.interactor_id, scenario,
          db.utcnow()))
     conn.commit()
-    return {"id": rehearsal_id, "scenario": scenario, "turns": 0,
+    return {"id": rehearsal_id, "scenario": scenario, "turns_count": 0,
             "remembered": False}
 
 
@@ -1142,7 +1142,7 @@ def rehearse(profile_id: str, rehearsal_id: str, body: RehearsalSay,
                  (json.dumps(transcript), rehearsal_id))
     conn.commit()
     return {"id": rehearsal_id, "reply": reply,
-            "turns": len(transcript) // 2, "remembered": False}
+            "turns_count": len(transcript) // 2, "remembered": False}
 
 
 @router.delete("/profiles/{profile_id}/rehearsal/{rehearsal_id}")
@@ -1157,7 +1157,7 @@ def close_rehearsal(profile_id: str, rehearsal_id: str,
     conn = db.connect()
     conn.execute("DELETE FROM rehearsals WHERE id=?", (rehearsal_id,))
     conn.commit()
-    return {"id": rehearsal_id, "turns": turns, "erased": True}
+    return {"id": rehearsal_id, "turns_count": turns, "erased": True}
 
 
 # -- Persistent memory management (PRD 6.4) ----------------------------------
@@ -1182,7 +1182,7 @@ def list_memories(profile_id: str, request: Request) -> list[dict]:
         "interactor_id": r["interactor_id"],
         "interactor_name": r["display_name"] or "someone unnamed",
         "profile_name": profile["display_name"],
-        "turns": r["turns"],
+        "turns_count": r["turns"],
         "last_at": r["last_at"],
     } for r in rows]
 

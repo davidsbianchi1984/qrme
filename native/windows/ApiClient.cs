@@ -14,18 +14,18 @@ namespace QrmeStudio;
 public record RehearsalRoom(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("scenario")] string Scenario,
-    [property: JsonPropertyName("turns")] int Turns,
+    [property: JsonPropertyName("turns_count")] int TurnsCount,
     [property: JsonPropertyName("remembered")] bool Remembered);
 
 public record RehearsalTurn(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("reply")] string Reply,
-    [property: JsonPropertyName("turns")] int Turns,
+    [property: JsonPropertyName("turns_count")] int TurnsCount,
     [property: JsonPropertyName("remembered")] bool Remembered);
 
 public record RehearsalClosed(
     [property: JsonPropertyName("id")] string Id,
-    [property: JsonPropertyName("turns")] int Turns,
+    [property: JsonPropertyName("turns_count")] int TurnsCount,
     [property: JsonPropertyName("erased")] bool Erased);
 
 public record ProfileCreated(
@@ -59,12 +59,9 @@ public record ContentProvenance(
     [property: JsonPropertyName("disclaimer")] string Disclaimer);
 
 // The visible mark riding on every AI render (always displayed).
-public record WatermarkDisplay(
-    [property: JsonPropertyName("line")] string Line);
-
 public record WatermarkBrief(
     [property: JsonPropertyName("watermark_id")] string? WatermarkId,
-    [property: JsonPropertyName("display")] WatermarkDisplay? Display);
+    [property: JsonPropertyName("display")] WatermarkDesign? Display);
 
 public record WatermarkDesign(
     [property: JsonPropertyName("mark")] string Mark,
@@ -100,7 +97,7 @@ public record VoiceThreshold(
 public record VoiceEnrollment(
     [property: JsonPropertyName("samples")] int Samples,
     [property: JsonPropertyName("seconds")] double Seconds,
-    [property: JsonPropertyName("turns")] int Turns,
+    [property: JsonPropertyName("turns_count")] int TurnsCount,
     [property: JsonPropertyName("mean_turn_seconds")] double? MeanTurnSeconds,
     [property: JsonPropertyName("ready")] bool Ready,
     [property: JsonPropertyName("needs")] string[] Needs,
@@ -167,7 +164,7 @@ public record FoundPeople(
 public record BrowsePool(
     [property: JsonPropertyName("head_count")] int HeadCount,
     [property: JsonPropertyName("kind_counts")] Dictionary<string, int> KindCounts,
-    [property: JsonPropertyName("profiles")] FoundPerson[] Profiles);
+    [property: JsonPropertyName("found")] FoundPerson[] Found);
 
 public record PoolListing(
     [property: JsonPropertyName("profile_id")] string ProfileId,
@@ -329,7 +326,7 @@ public record ObjectionTimeline(
     [property: JsonPropertyName("reattested")] bool Reattested,
     [property: JsonPropertyName("vault_backed")] bool VaultBacked,
     [property: JsonPropertyName("note")] string Note,
-    [property: JsonPropertyName("events")] ObjectionTimelineEvent[] Events);
+    [property: JsonPropertyName("timeline_events")] ObjectionTimelineEvent[] TimelineEvents);
 
 public record InteractorCreated(
     [property: JsonPropertyName("id")] string Id,
@@ -392,7 +389,7 @@ public record EarningsStatement(
 public record PayoutReceipt(
     [property: JsonPropertyName("payout_id")] string PayoutId,
     [property: JsonPropertyName("total_amount")] double TotalAmount,
-    [property: JsonPropertyName("entries")] int Entries);
+    [property: JsonPropertyName("entries_count")] int EntriesCount);
 
 public record RelationshipState(
     [property: JsonPropertyName("relationship_type")] string RelationshipType,
@@ -517,7 +514,7 @@ public record CatalogProvider(
     [property: JsonPropertyName("apps")] CatalogApp[] Apps);
 
 public record AppsCatalog(
-    [property: JsonPropertyName("providers")] CatalogProvider[] Providers);
+    [property: JsonPropertyName("app_providers")] CatalogProvider[] AppProviders);
 
 public record AppConn(
     [property: JsonPropertyName("id")] string Id,
@@ -598,7 +595,7 @@ public record SummonResult(
     [property: JsonPropertyName("location")] string? Location,
     [property: JsonPropertyName("scans")] int? Scans,
     [property: JsonPropertyName("profile")] SummonCard? Profile,
-    [property: JsonPropertyName("profiles")] SummonCard[]? Profiles);
+    [property: JsonPropertyName("summoned")] SummonCard[]? Summoned);
 
 public record Pack(
     [property: JsonPropertyName("id")] string Id,
@@ -612,7 +609,7 @@ public record Pack(
     [property: JsonPropertyName("free")] bool Free,
     [property: JsonPropertyName("origin")] string Origin,
     [property: JsonPropertyName("origin_url")] string? OriginUrl,
-    [property: JsonPropertyName("items")] int Items,
+    [property: JsonPropertyName("items_count")] int ItemsCount,
     [property: JsonPropertyName("installs")] int Installs);
 
 public record PackRegistry(
@@ -2898,7 +2895,9 @@ public sealed class ApiClient
     }
 
     public record MarketSource(string Key, string Name, string How);
-    public record MarketShelf(MarketSource[] Sources, string Note);
+    public record MarketShelf(
+        [property: JsonPropertyName("skin_sources")] MarketSource[] SkinSources,
+        [property: JsonPropertyName("note")] string Note);
 
     public Task<MarketShelf> AvatarMarket() =>
         Send<MarketShelf>(Get("/avatars/market"));
@@ -4860,7 +4859,7 @@ public record DmMessageRow(
 public record DmThreadRow(
     [property: JsonPropertyName("other_id")] string OtherId,
     [property: JsonPropertyName("other_name")] string? OtherName,
-    [property: JsonPropertyName("messages")] int Messages);
+    [property: JsonPropertyName("messages_count")] int MessagesCount);
 
 public record DmThreadBox(
     [property: JsonPropertyName("threads")] DmThreadRow[] Threads);
@@ -4884,7 +4883,7 @@ public record ShopCard(
     [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("seller")] string Seller,
     [property: JsonPropertyName("tag")] string? Tag,
-    [property: JsonPropertyName("offerings")] int Offerings);
+    [property: JsonPropertyName("offerings_count")] int OfferingsCount);
 
 public record ShopOffering(
     [property: JsonPropertyName("id")] string Id,
@@ -5071,7 +5070,7 @@ public record ExchangeDeal(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("work")] string? Work,
     [property: JsonPropertyName("state")] string State,
-    [property: JsonPropertyName("items")] ExchangeItemRow[]? Items);
+    [property: JsonPropertyName("deal_items")] ExchangeItemRow[]? DealItems);
 
 public record ExchangeBox(
     [property: JsonPropertyName("exchanges")] ExchangeDeal[] Exchanges);
@@ -5085,9 +5084,9 @@ public record ShareOut([property: JsonPropertyName("url")] string? Url);
 
 public record AudienceCounts(
     [property: JsonPropertyName("likes")] int Likes,
-    [property: JsonPropertyName("comments")] int Comments,
+    [property: JsonPropertyName("comments_count")] int CommentsCount,
     [property: JsonPropertyName("shares")] int Shares,
-    [property: JsonPropertyName("subscribers")] int Subscribers);
+    [property: JsonPropertyName("subscribers_count")] int SubscribersCount);
 
 public record SubscribeOut([property: JsonPropertyName("tier")] string? Tier);
 
@@ -5141,7 +5140,7 @@ public record PartyContext(
     string? YouHaveNotSeenIt);
 
 public record GrantVocabulary(
-    [property: JsonPropertyName("terms")] string[] Terms);
+    [property: JsonPropertyName("ground_rules")] string[] GroundRules);
 
 public record GrantCard(
     [property: JsonPropertyName("id")] string? Id,
@@ -5353,7 +5352,7 @@ public record ObjectionEvent(
 
 public record ObjectionAudit(
     [property: JsonPropertyName("status")] string? Status,
-    [property: JsonPropertyName("events")] ObjectionEvent[]? Events);
+    [property: JsonPropertyName("audit_events")] ObjectionEvent[]? AuditEvents);
 
 public record LobbyVocabulary(
     [property: JsonPropertyName("rules")] string[]? Rules);
@@ -5365,7 +5364,7 @@ public record LobbySeatRow(
     [property: JsonPropertyName("callsign")] string? Callsign);
 
 public record LobbyRoster(
-    [property: JsonPropertyName("members")] LobbySeatRow[]? Members);
+    [property: JsonPropertyName("seats")] LobbySeatRow[]? Seats);
 
 public record LobbyLeft([property: JsonPropertyName("seated")] bool? Seated,
     [property: JsonPropertyName("id")] string? Id);
@@ -5458,7 +5457,7 @@ public record CampaignCard(
     [property: JsonPropertyName("id")] string? Id,
     [property: JsonPropertyName("title")] string? Title,
     [property: JsonPropertyName("raised")] double? Raised,
-    [property: JsonPropertyName("goal")] double? Goal,
+    [property: JsonPropertyName("goal_amount")] double? GoalAmount,
     [property: JsonPropertyName("status")] string? Status);
 
 public record WorkflowCard(
@@ -5495,7 +5494,7 @@ public record TriageOut(
 public record TaskGrant(
     [property: JsonPropertyName("id")] string? Id,
     [property: JsonPropertyName("token")] string? Token,
-    [property: JsonPropertyName("scope")] string[]? Scope,
+    [property: JsonPropertyName("scopes")] string[]? Scopes,
     [property: JsonPropertyName("revoked")] bool? Revoked);
 
 public record TaskOut(
@@ -5544,7 +5543,7 @@ public record SpecialistRow(
 public record MemoryRow(
     [property: JsonPropertyName("interactor_id")] string InteractorId,
     [property: JsonPropertyName("interactor_name")] string? InteractorName,
-    [property: JsonPropertyName("turns")] int Turns);
+    [property: JsonPropertyName("turns_count")] int TurnsCount);
 
 public record RemembranceOut(
     [property: JsonPropertyName("content")] string? Content,
@@ -5606,7 +5605,7 @@ public record ThreadTurn(
     [property: JsonPropertyName("content")] string? Content);
 
 public record ThreadOut(
-    [property: JsonPropertyName("messages")] ThreadTurn[] Messages);
+    [property: JsonPropertyName("thread_turns")] ThreadTurn[] ThreadTurns);
 
 public record EngagementCard(
     [property: JsonPropertyName("sessions")] int? Sessions,
@@ -5633,18 +5632,18 @@ public record TransparencyCard(
     [property: JsonPropertyName("policy")] string? Policy);
 
 public record ExportOut(
-    [property: JsonPropertyName("messages")] JsonElement[] Messages,
-    [property: JsonPropertyName("posts")] JsonElement[] Posts,
-    [property: JsonPropertyName("sources")] JsonElement[] Sources);
+    [property: JsonPropertyName("message_rows")] JsonElement[] MessageRows,
+    [property: JsonPropertyName("post_rows")] JsonElement[] PostRows,
+    [property: JsonPropertyName("source_rows")] JsonElement[] SourceRows);
 
 public record StatsCard(
     [property: JsonPropertyName("sessions")] int Sessions,
     [property: JsonPropertyName("memory_entries")] int MemoryEntries,
     [property: JsonPropertyName("interactors")] int Interactors,
-    [property: JsonPropertyName("sources")] int Sources);
+    [property: JsonPropertyName("sources_count")] int SourcesCount);
 
 public record FeedOut(
-    [property: JsonPropertyName("posts")] JsonElement[] Posts,
+    [property: JsonPropertyName("feed_posts")] JsonElement[] FeedPosts,
     [property: JsonPropertyName("ranked_on")] string[] RankedOn,
     [property: JsonPropertyName("never_ranked_on")] string[] NeverRankedOn);
 
@@ -5689,7 +5688,7 @@ public record RosterSibling(
     [property: JsonPropertyName("anonymous")] bool? Anonymous);
 
 public record RosterOut(
-    [property: JsonPropertyName("profiles")] RosterSibling[]? Profiles);
+    [property: JsonPropertyName("siblings")] RosterSibling[]? Siblings);
 
 public record AvatarLikeness(
     [property: JsonPropertyName("real_person")] bool? RealPerson,
@@ -5762,7 +5761,7 @@ public record PageTheme(
 /// unable to show the thing it exists to show.
 /// </summary>
 public record PageCard(
-    [property: JsonPropertyName("theme")] PageTheme? Theme,
+    [property: JsonPropertyName("page_theme")] PageTheme? Theme,
     [property: JsonPropertyName("tagline")] string? Tagline,
     [property: JsonPropertyName("about")] string? About,
     [property: JsonPropertyName("accent")] string? Accent = null,
@@ -5804,7 +5803,7 @@ public record CompositionSource(
     [property: JsonPropertyName("aspect")] string? Aspect);
 
 public record CompositionCard(
-    [property: JsonPropertyName("sources")] CompositionSource[]? Sources,
+    [property: JsonPropertyName("composition_sources")] CompositionSource[]? CompositionSources,
     [property: JsonPropertyName("policy")] string? Policy);
 
 public record EmbodimentRow(
@@ -5847,7 +5846,7 @@ public record WatchSummary(
     [property: JsonPropertyName("stopped")] int Stopped);
 
 public record WatchFaceCard(
-    [property: JsonPropertyName("profile")] WatchChip Profile,
+    [property: JsonPropertyName("chip")] WatchChip Chip,
     [property: JsonPropertyName("summary")] WatchSummary Summary,
     [property: JsonPropertyName("haptic")] string? Haptic);
 
@@ -5901,7 +5900,7 @@ public record OAuthDoor(
     [property: JsonPropertyName("configured")] bool? Configured);
 
 public record OAuthProviderList(
-    [property: JsonPropertyName("providers")] OAuthDoor[] Providers);
+    [property: JsonPropertyName("signin_providers")] OAuthDoor[] SigninProviders);
 
 public record OAuthStartOut(
     [property: JsonPropertyName("provider")] string? Provider,
@@ -5957,7 +5956,7 @@ public record CampaignRow(
     [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("title")] string? Title,
     [property: JsonPropertyName("cause")] string? Cause,
-    [property: JsonPropertyName("goal")] double? Goal,
+    [property: JsonPropertyName("goal_amount")] double? GoalAmount,
     [property: JsonPropertyName("raised")] double? Raised,
     [property: JsonPropertyName("donors")] int? Donors,
     [property: JsonPropertyName("status")] string? Status);
@@ -6002,7 +6001,7 @@ public record LocalProviderRow(
     [property: JsonPropertyName("business")] bool? Business);
 
 public record FeedPage(
-    [property: JsonPropertyName("items")] List<FeedCard>? Items,
+    [property: JsonPropertyName("cards")] List<FeedCard>? Cards,
     [property: JsonPropertyName("cursor")] string? Cursor);
 
 /// <summary>One card of the public stream. <c>Plays</c> is the server's
@@ -6038,7 +6037,7 @@ public record FeedFacade(
 public record BeaconOverlayCard(
     [property: JsonPropertyName("profile_id")] string? ProfileId,
     [property: JsonPropertyName("display_name")] string? DisplayName,
-    [property: JsonPropertyName("watermark")] string? Watermark,
+    [property: JsonPropertyName("watermark_line")] string? WatermarkLine,
     [property: JsonPropertyName("age_wall")] bool? AgeWall,
     [property: JsonPropertyName("note")] string? Note);
 
@@ -6079,7 +6078,7 @@ public record ReviewRow(
 
 public record ReviewBoard(
     [property: JsonPropertyName("profile_id")] string? ProfileId,
-    [property: JsonPropertyName("rating")] ReviewRating? Rating,
+    [property: JsonPropertyName("rating_summary")] ReviewRating? RatingSummary,
     [property: JsonPropertyName("reviews")] ReviewRow[] Reviews);
 
 public record ReviewOut(
@@ -6224,7 +6223,8 @@ public record QuietHoursOut(
     [property: JsonPropertyName("quiet_end")] int? QuietEnd);
 
 public record FeedbackOut(
-    [property: JsonPropertyName("rating")] string? Rating);
+    [property: JsonPropertyName("score")] double? Score,
+    [property: JsonPropertyName("cloud_contributed")] bool CloudContributed);
 
 public record ReferralRow(
     [property: JsonPropertyName("id")] string? Id,
@@ -6237,13 +6237,9 @@ public record LicenseGrantOut(
     [property: JsonPropertyName("profile_id")] string? ProfileId,
     [property: JsonPropertyName("price")] double? Price);
 
-public record PerceiveWatermark(
-    [property: JsonPropertyName("line")] string? Line);
-
 public record PerceiveOut(
     [property: JsonPropertyName("guidance")] string? Guidance,
-    [property: JsonPropertyName("watermark")]
-    PerceiveWatermark? Watermark);
+    [property: JsonPropertyName("watermark")] WatermarkBrief? Watermark);
 
 public record MicPlace(
     [property: JsonPropertyName("surface")] string? Surface,

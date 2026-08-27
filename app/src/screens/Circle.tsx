@@ -49,13 +49,13 @@ export function Circle({ onVisit, onMeet }: {
     Promise.all([
       api.friends(session.profileId),
       api.browsePeople().catch(
-        () => ({ profiles: [], head_count: 0, kind_counts: {} } as
+        () => ({ found: [], head_count: 0, kind_counts: {} } as
                  Awaited<ReturnType<typeof api.browsePeople>>)),
       api.marketplace().catch(
         () => [] as Awaited<ReturnType<typeof api.marketplace>>),
     ]).then(([mine, pool, listings]) => {
       const said = new Map(listings.map((l) => [l.profile_id, l]));
-      const faces = new Map(pool.profiles.map((p) => [p.profile_id, p]));
+      const faces = new Map(pool.found.map((p) => [p.profile_id, p]));
       setRows(mine.friends.map((f) => {
         const l = said.get(f.profile_id);
         const p = faces.get(f.profile_id);

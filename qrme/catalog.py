@@ -334,6 +334,6 @@ def catalog() -> dict:
                           "capabilities": c["capabilities"],
                           "directions": c["directions"],
                           "needs_first": c["needs_first"]})
-    return {"providers": list(groups.values()),
+    return {"app_providers": list(groups.values()),
             "app_count": len(CONNECTORS),
             "provider_count": len(groups)}

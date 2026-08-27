@@ -338,7 +338,7 @@ def beacon_card(beacon_id: str, request: Request) -> dict:
         "display_name": name,
         # The mark travels with the card, so an overlay cannot draw the face
         # without also having been handed the disclosure to draw with it.
-        "watermark": art["watermark"]["line"],
+        "watermark_line": art["watermark"]["line"],
         # Absolute, because the overlay is a native client building a URL —
         # a root-relative path is a valid href in a browser and a broken URL
         # everywhere else.
@@ -395,7 +395,7 @@ def summon(ref: str, request: Request) -> dict:
             if profile["adult_mode"] and not adult_viewer:
                 continue
             cards.append(_card(profile))
-        return {"type": "tag", "ref": ref, "profiles": cards}
+        return {"type": "tag", "ref": ref, "summoned": cards}
 
     beacon = conn.execute("SELECT * FROM beacons WHERE id=?", (ref,)).fetchone()
     if beacon is None:

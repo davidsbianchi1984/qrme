@@ -544,12 +544,12 @@ def counts(kind: str, target_id: str, viewer_id: str | None = None) -> dict:
     """The numbers a client renders next to the buttons, in one call."""
     out = {
         "likes": likes(kind, target_id),
-        "comments": len([c for c in comments(kind, target_id)
+        "comments_count": len([c for c in comments(kind, target_id)
                          if c["status"] == "approved"]),
         "shares": share_count(kind, target_id),
     }
     if kind in SUBJECTS:
-        out["subscribers"] = len(subscribers(kind, target_id))
+        out["subscribers_count"] = len(subscribers(kind, target_id))
     if viewer_id:
         out["you_liked"] = liked_by(kind, target_id, viewer_id)
         if kind in SUBJECTS:

@@ -314,7 +314,7 @@ export function Robots({ onPlans }: { onPlans: () => void }) {
             })}
           </p>
         )}
-        {connectors?.providers.map((prov) => (
+        {connectors?.app_providers.map((prov) => (
           <p className="small" key={prov.provider}>
             <strong>{prov.label}</strong>:{" "}
             {prov.apps.map((a) => a.label).join(", ")}

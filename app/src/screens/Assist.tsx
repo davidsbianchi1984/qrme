@@ -367,13 +367,13 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
       {reviews && (
         <div className="card">
           <h3>{tr("asst.said", lang)}</h3>
-          {reviews.rating.count === 0 ? (
-            <p className="muted small">{reviews.rating.note}</p>
+          {reviews.rating_summary.count === 0 ? (
+            <p className="muted small">{reviews.rating_summary.note}</p>
           ) : (
             <p className="small">
               {fill(tr("asst.said.from", lang),
-                    { avg: reviews.rating.average?.toFixed(1),
-                      count: reviews.rating.count })}
+                    { avg: reviews.rating_summary.average?.toFixed(1),
+                      count: reviews.rating_summary.count })}
             </p>
           )}
           {reviews.reviews.map((r) => (
@@ -415,7 +415,7 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
         <div className="card">
           <h3>{tr("asst.you", lang)}</h3>
           <p className="muted small">{tr("asst.you.lead", lang)}</p>
-          {thread.messages.map((m) => (
+          {thread.thread_turns.map((m) => (
             <div key={m.id}>
               <p className="small">
                 <strong>{m.role === "profile" ? tr("asst.who.it", lang) : tr("asst.who.you", lang)}</strong>:{" "}

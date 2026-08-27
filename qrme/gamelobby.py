@@ -309,7 +309,7 @@ def roster(session_id: str) -> dict:
         "session_id": session_id,
         "game": session["game"],
         "platform": session["platform"],
-        "members": members,
+        "seats": members,
         "people": len(people),
         "profiles": len([m for m in members if m["member_kind"] == "profile"]),
         "agents": len([m for m in members if m["member_kind"] == "agent"]),
@@ -359,8 +359,8 @@ def prompt_context(session_id: str) -> dict:
     board = roster(session_id)
     return {
         "game": board["game"],
-        "members": [{"callsign": m["callsign"], "role": m["role"],
-                     "synthetic": m["synthetic"]} for m in board["members"]],
+        "seats": [{"callsign": m["callsign"], "role": m["role"],
+                     "synthetic": m["synthetic"]} for m in board["seats"]],
         "people": board["people"],
         "synthetic_here": board["profiles"] + board["agents"],
         "maturity": board["maturity"],

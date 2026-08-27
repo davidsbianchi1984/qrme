@@ -186,7 +186,7 @@ export function Corner({ onPlans }: {
           <div key={t.other_id} className="row"
                style={{ justifyContent: "space-between" }}>
             <span>{t.other_name || t.other_id} ·{" "}
-              <span className="muted small">{t.messages}</span></span>
+              <span className="muted small">{t.messages_count}</span></span>
             <button onClick={() => openThread(t.other_id)}>
               {tr("corner.open", lang)}</button>
           </div>

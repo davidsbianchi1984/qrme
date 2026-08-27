@@ -128,7 +128,7 @@ def shops(tag: str | None = None) -> list[dict]:
         if tag and (r["tag"] or "").lower() != tag.lower():
             continue
         d = dict(r)
-        d["offerings"] = _count_offerings(r["id"])
+        d["offerings_count"] = _count_offerings(r["id"])
         out.append(d)
     return out
 

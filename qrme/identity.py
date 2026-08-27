@@ -280,7 +280,7 @@ def roster(owner_id: str) -> dict:
         })
     return {
         "owner_id": owner_id,
-        "profiles": profiles,
+        "siblings": profiles,
         "count": len(profiles),
         "verified_profile": held,
         "note": ("none of your profiles is verified" if held is None else

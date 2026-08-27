@@ -58,7 +58,7 @@ function AccountGate() {
   const [oauthWaiting, setOauthWaiting] = useState(false);
 
   useEffect(() => {
-    oauthApi.providers().then((r) => setOauthDoors(r.providers)).catch(() => {});
+    oauthApi.providers().then((r) => setOauthDoors(r.signin_providers)).catch(() => {});
   }, []);
 
   async function signInWith(provider: string) {

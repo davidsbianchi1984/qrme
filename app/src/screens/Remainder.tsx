@@ -149,7 +149,7 @@ export function Remainder() {
       setConnCatalog(c);
       // The play card's platform picker draws from the catalog's gaming
       // provider; land the selection on a real key the moment we know them.
-      const consoles = c.providers.find((p) => p.provider === "gaming")?.apps;
+      const consoles = c.app_providers.find((p) => p.provider === "gaming")?.apps;
       if (consoles?.length && !consoles.some((a) => a.app === "steam")) {
         setPlatform(consoles[0].app);
       }
@@ -233,7 +233,7 @@ export function Remainder() {
             <p className="muted small">
               {fill(tr("rem.mods.counts", lang), {
                 pub: shopWindow.publisher,
-                items: shopWindow.items,
+                items: shopWindow.items_count,
                 installs: shopWindow.installs,
               })}
               {shopWindow.rated && " · 18+"}
@@ -300,7 +300,7 @@ export function Remainder() {
                   setConnApp(e.target.value === "*" ? "*" : "");
                 }}>
                   <option value="">{tr("rem.apps.pick", lang)}</option>
-                  {connCatalog.providers.map((p) => (
+                  {connCatalog.app_providers.map((p) => (
                     <option key={p.provider} value={p.provider}>{p.label}</option>
                   ))}
                   <option value="*">{tr("rem.apps.all", lang)}</option>
@@ -310,7 +310,7 @@ export function Remainder() {
                 <select value={connApp} disabled={!connProvider}
                         onChange={(e) => setConnApp(e.target.value)}>
                   <option value="">{tr("rem.apps.pick", lang)}</option>
-                  {connProvider !== "*" && connCatalog.providers
+                  {connProvider !== "*" && connCatalog.app_providers
                     .find((p) => p.provider === connProvider)
                     ?.apps.map((a) => (
                       <option key={a.app} value={a.app}>{a.label}</option>
@@ -323,7 +323,7 @@ export function Remainder() {
                         // "All of the above" is a list, not a wildcard the
                         // backend knows: connect each pair, one honest call
                         // per app.
-                        const pairs = connCatalog.providers
+                        const pairs = connCatalog.app_providers
                           .filter((p) => connProvider === "*"
                                          || p.provider === connProvider)
                           .flatMap((p) => p.apps
@@ -342,7 +342,7 @@ export function Remainder() {
               </button>
             </div>
             {connProvider && connApp && (() => {
-              const entry = connCatalog.providers
+              const entry = connCatalog.app_providers
                 .find((p) => p.provider === connProvider)
                 ?.apps.find((a) => a.app === connApp);
               return entry ? (
@@ -646,7 +646,7 @@ export function Remainder() {
             its gaming provider — a field report typed into a bare text box
             and asked for "a connector console or gaming account" instead. */}
         {(() => {
-          const consoles = connCatalog?.providers
+          const consoles = connCatalog?.app_providers
             .find((p) => p.provider === "gaming")?.apps || [];
           return consoles.length > 0 ? (
             <select value={platform}

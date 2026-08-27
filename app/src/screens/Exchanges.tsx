@@ -159,8 +159,8 @@ export function Exchanges({ onPlans }: {
               <strong>{x.work}</strong>
               <div className="muted small">
                 {fill(tr("exc.row", lang), {
-                  ind: x.industry, state: x.state, n: x.items.length,
-                  s: x.items.length === 1 ? "" : "s",
+                  ind: x.industry, state: x.state, n: x.deal_items.length,
+                  s: x.deal_items.length === 1 ? "" : "s",
                 })}
                 {x.unsigned.length > 0 && <>{" "}
                   {fill(tr("exc.row.tosign", lang), { n: x.unsigned.length })}
@@ -200,10 +200,10 @@ export function Exchanges({ onPlans }: {
 
           <div className="card">
             <h3>{tr("exc.manifest", lang)}</h3>
-            {open.items.length === 0 && (
+            {open.deal_items.length === 0 && (
               <p className="muted small">{tr("exc.manifest.none", lang)}</p>
             )}
-            {open.items.map((it) => (
+            {open.deal_items.map((it) => (
               <div key={it.id} className="row">
                 <div style={{ flex: 1 }}>
                   <strong>{it.name}</strong>
@@ -333,8 +333,8 @@ export function Exchanges({ onPlans }: {
             {open.channel.open ? (
               <>
                 <p className="small">{fill(tr("exc.move.yes", lang), {
-                  n: open.channel.items.length,
-                  s: open.channel.items.length === 1 ? "" : "s",
+                  n: open.channel.deal_items.length,
+                  s: open.channel.deal_items.length === 1 ? "" : "s",
                 })}</p>
                 <p className="muted small">{open.channel.note}</p>
               </>

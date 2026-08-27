@@ -87,7 +87,7 @@ def avatar_market() -> dict:
     already have a face in, each with how to export it. Imports, not
     integrations — the provider's license governs the avatar, and QRME never
     holds a provider credential."""
-    return {"sources": list(avatars.MARKET),
+    return {"skin_sources": list(avatars.MARKET),
             "note": "export your avatar on the provider's own surface, then "
                     "import the image or link here — the AI badge and the "
                     "likeness record ride on it like any other portrait"}

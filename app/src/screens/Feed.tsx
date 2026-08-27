@@ -65,7 +65,7 @@ export function Feed({ onPlans, onParty }: {
     setBusy(true);
     api.publicFeed(after ?? undefined, session.profileId ?? undefined)
       .then((r) => {
-        setItems((prev) => (after ? [...prev, ...r.items] : r.items));
+        setItems((prev) => (after ? [...prev, ...r.cards] : r.cards));
         setCursor(r.cursor);
         setRules(r.rules);
       })

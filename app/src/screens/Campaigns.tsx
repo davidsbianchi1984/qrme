@@ -178,7 +178,7 @@ export function Campaigns({ onPlans }: {
           <p>
             {fill(tr("cmp.raised", lang), {
               raised: <b>${c.raised.toFixed(2)}</b>,
-              goal: `$${c.goal.toFixed(2)}`,
+              goal: `$${c.goal_amount.toFixed(2)}`,
             })}
             {" · "}
             {c.donors === 1

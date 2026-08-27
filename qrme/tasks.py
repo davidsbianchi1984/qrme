@@ -26,7 +26,7 @@ def create_grant(profile_id: str, scope: list[str] | None) -> dict:
         (grant_id, profile_id, json.dumps(scope or ["*"]), token, db.utcnow()),
     )
     conn.commit()
-    return {"id": grant_id, "token": token, "scope": scope or ["*"],
+    return {"id": grant_id, "token": token, "scopes": scope or ["*"],
             "revoked": False}
 
 

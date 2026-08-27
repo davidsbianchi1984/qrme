@@ -236,7 +236,7 @@ def objection_audit(objection_id: str, request: Request) -> dict:
         "profile_id": obj["profile_id"],
         "status": obj["status"],
         "vault_backed": request.app.state.pdi is not None,
-        "events": events,
+        "audit_events": events,
     }
 
 
@@ -282,7 +282,7 @@ def objection_timeline(objection_id: str, request: Request,
             "status": obj["status"],
             "reattested": bool(obj["reattested"]),
             "vault_backed": request.app.state.pdi is not None,
-            "events": [
+            "timeline_events": [
                 {"id": r["id"], "event": r["event"], "actor": r["actor"],
                  "sealed": r["pdi_key"] is not None, "at": r["created_at"]}
                 for r in rows

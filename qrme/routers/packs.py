@@ -43,7 +43,7 @@ def _summary(row: dict) -> dict:
             "currency": row["currency"], "free": row["price"] == 0,
             "origin": row["origin"], "origin_url": row["origin_url"],
             "rated": bool(row["rated"]),
-            "items": items, "installs": installs}
+            "items_count": items, "installs": installs}
 
 
 @router.get("/packs")

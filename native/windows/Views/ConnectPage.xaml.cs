@@ -228,7 +228,7 @@ public sealed partial class ConnectPage : Page
         try
         {
             var cat = await ApiClient.Shared.ConnectorCatalog();
-            _catalog = cat.Providers
+            _catalog = cat.AppProviders
                 .SelectMany(p => p.Apps.Select(a => new CatalogVm
                 {
                     Provider = p.Provider,

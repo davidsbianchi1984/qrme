@@ -287,7 +287,7 @@ export function Identity({ onPlans, onPassing }: {
 
   function reload() {
     if (!me || !token) return;
-    api.siblings(me, token).then((r) => setRoster(r.profiles)).catch(fail);
+    api.siblings(me, token).then((r) => setRoster(r.siblings)).catch(fail);
     api.verification(me, token).then(setVerification).catch(fail);
     api.verifiable(me, token).then(setVerifiable).catch(() => setVerifiable(null));
     api.anonymity(me, token).then(setAnon).catch(fail);

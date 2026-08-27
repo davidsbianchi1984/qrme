@@ -96,7 +96,7 @@ export function Named({ onPlans }: { onPlans: () => void }) {
               {campaign.cause && ` — ${campaign.cause}`}
               <br />
               {fill(tr("nmd.raised", lang), {
-                raised: campaign.raised, goal: campaign.goal,
+                raised: campaign.raised, goal: campaign.goal_amount,
                 status: campaign.status,
                 donors: campaign.donors === 1
                   ? fill(tr("nmd.donor", lang), { n: campaign.donors })

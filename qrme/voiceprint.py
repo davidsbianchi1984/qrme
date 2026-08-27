@@ -170,7 +170,7 @@ def analyze(profile_id: str) -> dict:
     return {
         "samples": samples,
         "seconds": seconds,
-        "turns": turns,
+        "turns_count": turns,
         "mean_turn_seconds": round(seconds / turns, 2) if turns else None,
         "mean_chars_per_turn": round(chars / turns, 1) if turns and chars else None,
         "by_source": by_source,

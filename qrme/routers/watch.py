@@ -148,7 +148,7 @@ def watch_face(profile_id: str, request: Request) -> dict:
                + sum(1 for r in robots if r["light"] == "red")
                + (1 if profile_light == "red" else 0))
     return {
-        "profile": {"id": profile_id,
+        "chip": {"id": profile_id,
                     "display_name": profile["display_name"],
                     "status": profile["status"], "light": profile_light,
                     "pending_approvals": pending,

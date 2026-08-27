@@ -120,7 +120,7 @@ public sealed partial class WithoutAnAccountPage : Page
         {
             var t = await ApiClient.Shared.ObjectionTimeline(id);
             TimelineList.Children.Clear();
-            if (t.Events.Length == 0)
+            if (t.TimelineEvents.Length == 0)
             {
                 TimelineList.Children.Add(new TextBlock
                 {
@@ -129,7 +129,7 @@ public sealed partial class WithoutAnAccountPage : Page
                     TextWrapping = TextWrapping.Wrap,
                 });
             }
-            foreach (var ev in t.Events)
+            foreach (var ev in t.TimelineEvents)
             {
                 var line = L10n.T($"obj.event.{ev.Event}", lang)
                     + " · " + L10n.T($"obj.actor.{ev.Actor}", lang)
