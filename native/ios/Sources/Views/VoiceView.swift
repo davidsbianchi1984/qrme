@@ -261,6 +261,31 @@ struct VoiceView: View {
                     .font(.caption).foregroundStyle(Theme.t2)
                     .disabled(busy)
                 }
+                // The owner's waiver, the pair the console's card has
+                // carried since it shipped: release the voice to everybody
+                // on this deployment, and take it back. A recorded waiver,
+                // never a silent flag — the card says which way it stands.
+                HStack(spacing: 8) {
+                    Button(L10n.t(b.released == true ? "nsv.reclaim"
+                                                     : "nsv.release",
+                                  state.language)) {
+                        act {
+                            if b.released == true {
+                                _ = try await ApiClient.shared
+                                    .reclaimSpokenVoice(id: profileId,
+                                                        token: token)
+                            } else {
+                                _ = try await ApiClient.shared
+                                    .releaseSpokenVoice(id: profileId,
+                                                        token: token)
+                            }
+                            binding = try await ApiClient.shared
+                                .spokenVoice(id: profileId)
+                        }
+                    }
+                    .font(.caption).foregroundStyle(Theme.t2)
+                    .disabled(busy)
+                }
             } else {
                 TextField(L10n.t("nsv.id.ph", state.language), text: $bindId)
                     .font(.subheadline).foregroundStyle(Theme.txt)

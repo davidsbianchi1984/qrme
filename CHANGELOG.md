@@ -21,6 +21,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   contract grows from four refusals to five, each its own sentence,
   and the fifth is the recipient's to lift.
 
+- **The voice waiver reaches the phones and the desktop.** Release a
+  bound spoken voice for everybody on the deployment — and take it back
+  — from the native voice screens on iOS, Android and Windows, the same
+  toggle the console has carried beside the binding since the release
+  ledger shipped. Three shell backlogs shrink by the pair of rows that
+  promised it.
+
 ## [1.8.9] - 2026-08-27
 
 ### Added

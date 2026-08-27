@@ -2286,12 +2286,35 @@ actor ApiClient {
         let label: String
         let bound_at: String?
         let speaks: Bool
+        let released: Bool?
+    }
+
+    struct VoiceRelease: Decodable {
+        let provider: String
+        let voice_id: String
+        let released: Bool
     }
 
     /// Which voice this profile speaks with, or the empty binding — one
     /// shape either way, so the screen never special-cases the common case.
     func spokenVoice(id: String) async throws -> SpokenBinding {
         try await request("/profiles/\(id)/voice")
+    }
+
+    /// The owner's recorded waiver: anybody on this deployment may bind
+    /// this voice — and taking it back keeps the history. The pair the
+    /// console's Spoken voice card has carried since the waiver shipped;
+    /// this shell's card follows with this round, as its backlog promised.
+    func releaseSpokenVoice(id: String, token: String) async throws
+        -> VoiceRelease {
+        try await request("/profiles/\(id)/voice/release", method: "POST",
+                          token: token)
+    }
+
+    func reclaimSpokenVoice(id: String, token: String) async throws
+        -> VoiceRelease {
+        try await request("/profiles/\(id)/voice/release", method: "DELETE",
+                          token: token)
     }
 
     /// The owner points the profile at a voice made on the engine's own

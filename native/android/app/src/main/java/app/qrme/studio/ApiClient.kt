@@ -2093,11 +2093,13 @@ object ApiClient {
     // surface, and one utterance of audio back (qrme/spoken.py) ----
 
     data class SpokenBinding(val provider: String, val voiceId: String,
-                             val label: String, val speaks: Boolean)
+                             val label: String, val speaks: Boolean,
+                             val released: Boolean)
 
     private fun spokenBindingOf(o: JSONObject) = SpokenBinding(
         o.optString("provider", ""), o.optString("voice_id", ""),
-        o.optString("label", ""), o.optBoolean("speaks", false))
+        o.optString("label", ""), o.optBoolean("speaks", false),
+        o.optBoolean("released", false))
 
     /** Which voice this profile speaks with, or the empty binding — one
      *  shape either way, so the screen never special-cases the common case. */
@@ -2111,6 +2113,18 @@ object ApiClient {
                                 label: String): SpokenBinding =
         spokenBindingOf(JSONObject(request("/profiles/$id/voice", "PUT",
             JSONObject().put("voice_id", voiceId).put("label", label), token)))
+
+    /** The owner's recorded waiver: anybody on this deployment may bind
+     *  this voice — and taking it back keeps the history. The pair the
+     *  console's card has carried since the waiver shipped; this shell's
+     *  card follows with this round, as its backlog promised. */
+    suspend fun releaseSpokenVoice(id: String, token: String) {
+        request("/profiles/$id/voice/release", "POST", JSONObject(), token)
+    }
+
+    suspend fun reclaimSpokenVoice(id: String, token: String) {
+        request("/profiles/$id/voice/release", "DELETE", token = token)
+    }
 
     /** One utterance, synthesized server-side and watermarked there. Raw
      *  bytes rather than the shared helper, because this answer is sound. */

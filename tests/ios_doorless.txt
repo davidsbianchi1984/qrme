@@ -27,22 +27,6 @@ POST /rooms/{room_id}/heard
 # slower, costlier ear than the one it already has — a door that exists to
 # empty a backlog is worse than an honest row.
 POST /interactors/{interactor_id}/heard
-
-# The owner's waiver on a spoken voice — release it for everybody on the
-# deployment, and take it back. The console carries both doors on the
-# Spoken voice card, beside the binding they govern; this shell's voice
-# screen follows with its own round, the way the rest of that card did.
-#
-#     asked     can this client reach the route
-#     mattered  is the decision reachable where the binding already is
-#
-# Recorded rather than rushed, because a release is a rights decision:
-# a control that ships on one surface first should ship where its owner
-# can read what it does, and the console is where the card's language
-# lives today.
-POST /profiles/{profile_id}/voice/release
-DELETE /profiles/{profile_id}/voice/release
-
 # The avatar registry (qrme/avatarreg.py) — the face ledger's doors. The
 # console carries the whole card: the shelf, claiming, painting from
 # words, stocking, retiring. The shells' portrait screens follow with

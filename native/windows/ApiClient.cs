@@ -116,7 +116,13 @@ public record SpokenBinding(
     [property: JsonPropertyName("provider")] string Provider,
     [property: JsonPropertyName("voice_id")] string VoiceId,
     [property: JsonPropertyName("label")] string Label,
-    [property: JsonPropertyName("speaks")] bool Speaks);
+    [property: JsonPropertyName("speaks")] bool Speaks,
+    [property: JsonPropertyName("released")] bool Released);
+
+public record VoiceRelease(
+    [property: JsonPropertyName("provider")] string Provider,
+    [property: JsonPropertyName("voice_id")] string VoiceId,
+    [property: JsonPropertyName("released")] bool Released);
 
 public record WebSearchRow(
     [property: JsonPropertyName("title")] string Title,
@@ -1082,6 +1088,13 @@ public sealed class ApiClient
     {
         var req = new HttpRequestMessage(HttpMethod.Put, path) { Content = JsonContent.Create(body) };
         if (token is not null) req.Headers.Add("authorization", $"Bearer {token}");
+        return req;
+    }
+
+    private static HttpRequestMessage Delete(string path, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete, path);
+        req.Headers.Add("authorization", $"Bearer {token}");
         return req;
     }
 
@@ -2282,6 +2295,17 @@ public sealed class ApiClient
                                                string voiceId, string label) =>
         Send<SpokenBinding>(Put($"/profiles/{id}/voice",
             new { voice_id = voiceId, label }, token));
+
+    /// <summary>The owner's waiver: let everybody on this deployment bind
+    /// the voice this profile speaks with. A recorded release, not a
+    /// setting — who let it go and when stays on the ledger.</summary>
+    public Task<VoiceRelease> ReleaseSpokenVoice(string id, string token) =>
+        Send<VoiceRelease>(Post($"/profiles/{id}/voice/release", new { }, token));
+
+    /// <summary>Take the voice back. Everybody else's binding of it goes
+    /// with the waiver; the release row stays, reclaimed.</summary>
+    public Task<VoiceRelease> ReclaimSpokenVoice(string id, string token) =>
+        Send<VoiceRelease>(Delete($"/profiles/{id}/voice/release", token));
 
     /// <summary>One utterance, synthesized server-side and watermarked
     /// there. Raw bytes rather than the decoding helper, because this answer
