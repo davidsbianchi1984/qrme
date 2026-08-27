@@ -16,6 +16,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The panels have their exits.** A tap anywhere outside the open panel
+  minimises it, and a little red close sits at its top — the only way
+  out used to be re-pressing the box that opened it.
+
 - **The room walks with you.** The person-walking button, in the room's
   own strip: press it and the room conversation rides the walk-along
   strip — back to the home screen, into other apps on a phone — heard

@@ -69,8 +69,21 @@ export function TalkRail({
       </div>
 
       {open && (
+        // The way out, twice over — the field report: "the only way to
+        // exit is pressing the same button you used to get in." A tap
+        // anywhere outside the panel minimises it (the scrim is the
+        // whole screen, transparent, and sits under the panel), and the
+        // red close at the top is the exit a person can see.
+        <div className="talk-panel-scrim" aria-hidden="true"
+             onClick={() => setOpen(null)} />
+      )}
+      {open && (
         <div className="card talk-panel" role="region"
              aria-label={tr(`rail.${open}`, lang)}>
+          <button className="talk-panel-close"
+                  aria-label={tr("rail.close", lang)}
+                  title={tr("rail.close", lang)}
+                  onClick={() => setOpen(null)}>✕</button>
           {open === "profile" && (
             <ProfilePanel profileId={profileId} lang={lang}
                           onError={onError} />

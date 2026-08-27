@@ -9627,6 +9627,9 @@ const CHROME: Table = {
   // The rail beside the face: who they are, what they hold about you, what
   // you are to each other, and how they behave. Two of the four are the
   // owner's, and the rail draws only what the person can actually open.
+  "rail.close": {
+    en: "Close", es: "Cerrar", fr: "Fermer", de: "Schließen", pt: "Fechar", it: "Chiudi", ja: "閉じる", zh: "关闭", hi: "बंद करें", ar: "إغلاق",
+  },
   "rail.group": {
     en: "About this conversation", es: "Sobre esta conversación", fr: "À propos de cette conversation", de: "Über dieses Gespräch", pt: "Sobre esta conversa", it: "Su questa conversazione", ja: "この会話について", zh: "关于这次对话", hi: "इस बातचीत के बारे में", ar: "عن هذه المحادثة",
   },

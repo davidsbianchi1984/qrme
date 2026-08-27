@@ -59,3 +59,25 @@ def test_the_rail_reaches_the_rooms_too():
     assert '=== session.profileId' in inside, (
         "the owner token is handed to profiles the session does not own — "
         "two of the four buttons become refusals")
+
+
+def test_the_panel_has_its_exits():
+    """Field report: "the only way to exit is pressing the same button you
+    used to get in." Two exits now — a tap anywhere outside (the scrim),
+    and the red close a person can see at the top."""
+    rail = (SRC / "TalkRail.tsx").read_text(encoding="utf-8")
+    stripped = re.sub(r"/\*.*?\*/", "", rail, flags=re.S)
+    scrim_at = stripped.index("talk-panel-scrim")
+    assert "setOpen(null)" in stripped[scrim_at:scrim_at + 200], (
+        "the scrim no longer closes the panel — tap-outside is decoration")
+    close_at = stripped.index("talk-panel-close")
+    assert "setOpen(null)" in stripped[close_at:close_at + 300], (
+        "the red close no longer closes the panel")
+    block = CSS[CSS.index(".talk-panel-close"):]
+    block = block[:block.index("}")]
+    assert "224, 85, 85" in block, (
+        'the close lost its red — "a little red at the top" was the ask')
+    scrim = CSS[CSS.index(".talk-panel-scrim"):]
+    scrim = scrim[:scrim.index("}")]
+    assert "fixed" in scrim and "inset: 0" in scrim, (
+        "the scrim no longer covers the screen, so outside is not tappable")
