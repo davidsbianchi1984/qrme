@@ -16,6 +16,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The room walks with you.** The person-walking button, in the room's
+  own strip: press it and the room conversation rides the walk-along
+  strip — back to the home screen, into other apps on a phone — heard
+  through your own transcription ear, every seat's reply spoken in its
+  own bound voice out there, each one announced through the same echo
+  door as every voice in the room, and named per speaker when more than
+  one seat answers.
+
 - **The people in your phone reach the phones.** The three contact doors
   — granted, synced, read back, withdrawn — leave the shell backlogs and
   land as real screens: iOS reads the device's own contacts behind

@@ -8,6 +8,7 @@ import { Refusal } from "../Refusal";
 import { plainVoice, speakInPieces, type Speaking } from "../spoken";
 import { useSession } from "../store";
 import { putAway, whenPutAway } from "../away";
+import { startWalking } from "../walk";
 import { canRecord, meterWhileSpeaking, recordAsked, recordTurn,
          type Recording } from "../roomear";
 
@@ -1730,6 +1731,69 @@ export function Inside({ onPlans, start = "", onLeave }: {
                             : tr("ins.lent", lang))}>
           {lentByMe ? tr("ins.takeback", lang) : tr("ins.lendmic", lang)}
         </button>
+        {/* The room walks with you — the person-walking button the owner
+            asked for by name: navigate back to the home screen, or the
+            device's own, while staying in the room. Same bargain as the
+            chat's walk: a press, a label, and the strip that says it is
+            listening. The room's turn is handed over the way every
+            walkable surface hands its own — the strip stays ignorant of
+            what it carries. Replies from several seats arrive as one
+            piece with each speaker named, and they are spoken in the
+            device's voice out there: the room's own voices belong to the
+            room's own speakers, and the walk does not pretend
+            otherwise. */}
+        <button className="rs-round walk" disabled={!open || !me || !token}
+                aria-label={tr("chat.walk", lang)}
+                title={tr("chat.walk", lang)}
+                onClick={() => {
+                  const rid = open, iid = me, itok = token;
+                  const name = roomName.trim() || tr("ins.title", lang);
+                  // The last turn's replies, kept beside the walk so `say`
+                  // can give each seat its own bound voice — the strip
+                  // hands back one text, and a room is not one speaker.
+                  let lastSaid: RoomMsg[] = [];
+                  startWalking({
+                    shownName: name,
+                    lang,
+                    ...(iid && itok ? {
+                      hears: (audio: Blob) => api.heard(iid, audio, itok),
+                    } : {}),
+                    say: async () => {
+                      for (const m of lastSaid) {
+                        if (!m.content) continue;
+                        // Announced through the same door as every other
+                        // voice in the room: the walk can speak while the
+                        // room's own standing ear is still open, and an
+                        // unannounced voice is an echo waiting to be a
+                        // prompt.
+                        roomSpeaks(m.content);
+                        try {
+                          const s = await speakInPieces(
+                            m.sender_id as string, m.content, itok);
+                          await s.done;
+                        } catch {
+                          // No binding, no engine, a refusal to play —
+                          // the device's own voice stands in, per seat,
+                          // so one voiceless profile cannot silence the
+                          // room out on the walk either.
+                          await plainVoice(m.content, lang);
+                        } finally {
+                          roomFellQuiet();
+                        }
+                      }
+                    },
+                    take: async (message) => {
+                      const r = await api.sayInRoom(rid, iid, message, itok);
+                      lastSaid = r.replies;
+                      const said = r.replies
+                        .filter((m) => m.content)
+                        .map((m) => r.replies.length > 1
+                          ? `${m.from}: ${m.content}` : m.content)
+                        .join("\n\n");
+                      return { text: said, offline: false };
+                    },
+                  });
+                }}>🚶</button>
         {/* Letting the profiles talk without you saying anything. The one
          * control on the card below that was NOT a duplicate, so it moved
          * here rather than out of the product — deleting the only door to

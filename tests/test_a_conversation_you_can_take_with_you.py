@@ -150,7 +150,7 @@ def _braced(src: str, at: int) -> str:
 def _surfaces() -> dict[str, str]:
     """The console's conversations that can be carried."""
     return {name: (APP / f"screens/{name}").read_text(encoding="utf-8")
-            for name in ("Chat.tsx", "Agent.tsx")}
+            for name in ("Chat.tsx", "Agent.tsx", "Inside.tsx")}
 
 
 def test_the_strip_does_not_know_what_kind_of_conversation_it_carries():
