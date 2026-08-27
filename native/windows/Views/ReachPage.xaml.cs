@@ -184,6 +184,32 @@ public sealed partial class ReachPage : Page
         await ReloadPacks();
         await ReloadLicense();
         await ReloadEarnings();
+        await ReloadOpeners();
+    }
+
+    // -- The open door's other side (qrme/opendoor.py): who asked to hear
+    // from this profile first. Shown only when somebody has. --
+
+    private sealed record OpenerVm(string Line);
+
+    private async System.Threading.Tasks.Task ReloadOpeners()
+    {
+        var s = AppState.Current;
+        if (s.Pid is null || s.Token is null) return;
+        var lang = s.Language;
+        OpenersHead.Text = L10n.T("aud.doors", lang);
+        OpenersPitch.Text = L10n.T("aud.doors.pitch", lang);
+        try
+        {
+            var openers = (await ApiClient.Shared.DoorsOpenTo(
+                s.Pid, s.Token)).Openers;
+            OpenersList.ItemsSource = openers.Select(o => new OpenerVm(
+                $"{o.InteractorId} · " + L10n.T(
+                    $"aud.cad.{o.Cadence ?? "whenever"}", lang))).ToList();
+            OpenersCard.Visibility = openers.Length > 0
+                ? Visibility.Visible : Visibility.Collapsed;
+        }
+        catch { /* backend offline — leave hidden */ }
     }
 
     // -- Earnings: the creator's statement over the ledger --

@@ -21,6 +21,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   contract grows from four refusals to five, each its own sentence,
   and the fifth is the recipient's to lift.
 
+- **The open door reaches the phones and the desktop.** The chat
+  screens on iOS, Android and Windows gain the console's "Hear from
+  them first" toggle — your standing yes to this profile's unprompted
+  reach, on your own token — and the owner's Reach/Summon surfaces gain
+  the Audience card that lists who asked, with their chosen cadence.
+  Three shell backlogs shrink by the open door's three rows.
+
 - **The voice waiver reaches the phones and the desktop.** Release a
   bound spoken voice for everybody on the deployment — and take it back
   — from the native voice screens on iOS, Android and Windows, the same

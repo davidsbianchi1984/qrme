@@ -171,6 +171,9 @@ private struct SummonSection: View {
     @State private var found: SummonResult?
     @State private var error: String?
     @State private var scanning = false
+    // Who opened their door to this profile — the owner's view of the
+    // inverted connection (qrme/opendoor.py).
+    @State private var openers: [ApiClient.OpenerRow] = []
 
     var body: some View {
         ScrollView {
@@ -296,6 +299,24 @@ private struct SummonSection: View {
                     }
                 }.card()
 
+                // The open door's other side: an audience that asked,
+                // rather than one the profile reached for. The console's
+                // Audience card, carried here as the backlog promised.
+                if !openers.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(L10n.t("aud.doors", state.language))
+                            .font(.headline).foregroundStyle(Theme.txt)
+                        Text(L10n.t("aud.doors.pitch", state.language))
+                            .font(.caption).foregroundStyle(Theme.t2)
+                        ForEach(openers, id: \.interactor_id) { o in
+                            Text(o.interactor_id + " · "
+                                 + L10n.t("aud.cad.\(o.cadence ?? "whenever")",
+                                          state.language))
+                                .font(.caption).foregroundStyle(Theme.t2)
+                        }
+                    }.card()
+                }
+
                 if let error { Text(error).font(.footnote).foregroundStyle(Theme.red) }
             }.padding(20)
         }
@@ -310,6 +331,10 @@ private struct SummonSection: View {
     private func load() async {
         guard let pid = state.pid else { return }
         beacons = (try? await ApiClient.shared.beacons(id: pid)) ?? []
+        if let token = state.token {
+            openers = (try? await ApiClient.shared.doorsOpenTo(
+                profileId: pid, token: token)) ?? []
+        }
     }
 
     private func claim() {

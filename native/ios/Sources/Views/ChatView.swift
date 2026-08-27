@@ -38,6 +38,9 @@ struct ChatView: View {
     @State private var escalated: Escalated?
     @State private var said = ""
     @State private var waiverSig = ""
+    // Whether this person's door is open to this profile's unprompted
+    // reach — the receiver's own standing yes (qrme/opendoor.py).
+    @State private var doorOpen = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -47,6 +50,23 @@ struct ChatView: View {
                         Text(L10n.t("tab.chat", state.language)).font(.title2.bold()).foregroundStyle(Theme.txt)
                         Text(L10n.fill("nchat.sub", state.language, ["name": state.displayName]))
                             .font(.footnote).foregroundStyle(Theme.t2)
+
+                        // The open door (qrme/opendoor.py): the inverted
+                        // connection. YOUR standing yes to this profile
+                        // reaching you first — yours to open, yours to
+                        // close, on your own token.
+                        if state.interactorId != nil {
+                            Button {
+                                toggleDoor()
+                            } label: {
+                                Text("🔔 " + L10n.t("chat.door", state.language)
+                                     + (doorOpen ? " ✓" : ""))
+                                    .font(.caption)
+                                    .foregroundStyle(doorOpen ? Theme.brandA
+                                                              : Theme.t2)
+                            }
+                            .onAppear { loadDoor() }
+                        }
 
                         // --- what this profile can do, before trouble ----
                         Text(L10n.t("esc.hdr", state.language))
@@ -238,6 +258,30 @@ struct ChatView: View {
                 .disabled(draft.isEmpty || busy)
             }
             .padding(.horizontal, 20).padding(.bottom, 12)
+        }
+    }
+
+    private func loadDoor() {
+        guard let iid = state.interactorId, let tok = state.interactorToken,
+              let pid = state.pid else { return }
+        Task {
+            let doors = (try? await ApiClient.shared.myOpenDoors(
+                interactorId: iid, token: tok)) ?? []
+            doorOpen = doors.contains { $0.profile_id == pid && $0.open }
+        }
+    }
+
+    private func toggleDoor() {
+        guard let iid = state.interactorId, let tok = state.interactorToken,
+              let pid = state.pid else { return }
+        let next = !doorOpen
+        Task {
+            do {
+                let standing = try await ApiClient.shared.setOpenDoor(
+                    interactorId: iid, profileId: pid, open: next,
+                    cadence: "whenever", token: tok)
+                doorOpen = standing.open
+            } catch { self.error = error.localizedDescription }
         }
     }
 

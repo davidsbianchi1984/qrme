@@ -124,6 +124,28 @@ public record VoiceRelease(
     [property: JsonPropertyName("voice_id")] string VoiceId,
     [property: JsonPropertyName("released")] bool Released);
 
+// The open door (qrme/opendoor.py): a person's standing yes, and the
+// owner's view of who gave one.
+public record DoorStanding(
+    [property: JsonPropertyName("open")] bool Open,
+    [property: JsonPropertyName("cadence")] string? Cadence);
+
+public record DoorRow(
+    [property: JsonPropertyName("profile_id")] string ProfileId,
+    [property: JsonPropertyName("open")] bool Open,
+    [property: JsonPropertyName("cadence")] string? Cadence);
+
+public record DoorListing(
+    [property: JsonPropertyName("doors")] DoorRow[] Doors);
+
+public record OpenerRow(
+    [property: JsonPropertyName("interactor_id")] string InteractorId,
+    [property: JsonPropertyName("cadence")] string? Cadence,
+    [property: JsonPropertyName("opened_at")] string OpenedAt);
+
+public record OpenerListing(
+    [property: JsonPropertyName("openers")] OpenerRow[] Openers);
+
 public record WebSearchRow(
     [property: JsonPropertyName("title")] string Title,
     [property: JsonPropertyName("url")] string Url,
@@ -2306,6 +2328,26 @@ public sealed class ApiClient
     /// with the waiver; the release row stays, reclaimed.</summary>
     public Task<VoiceRelease> ReclaimSpokenVoice(string id, string token) =>
         Send<VoiceRelease>(Delete($"/profiles/{id}/voice/release", token));
+
+    // ---- the open door: the receiver's standing yes (qrme/opendoor.py) ----
+
+    /// <summary>YOUR standing yes to this profile reaching you first —
+    /// yours to open, yours to close, on your own token.</summary>
+    public Task<DoorStanding> SetOpenDoor(string interactorId,
+                                          string profileId, bool open,
+                                          string cadence, string token) =>
+        Send<DoorStanding>(Put(
+            $"/interactors/{interactorId}/open-door/{profileId}",
+            new { hear_first = open, cadence }, token));
+
+    public Task<DoorListing> MyOpenDoors(string interactorId, string token) =>
+        Send<DoorListing>(Get($"/interactors/{interactorId}/open-doors",
+                              token));
+
+    /// <summary>The owner's view of the inverted connection: an audience
+    /// that asked, rather than one the profile reached for.</summary>
+    public Task<OpenerListing> DoorsOpenTo(string profileId, string token) =>
+        Send<OpenerListing>(Get($"/profiles/{profileId}/open-doors", token));
 
     /// <summary>One utterance, synthesized server-side and watermarked
     /// there. Raw bytes rather than the decoding helper, because this answer

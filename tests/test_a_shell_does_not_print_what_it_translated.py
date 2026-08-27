@@ -149,6 +149,13 @@ SHELLS = {
 #: server sends is displayed as sent, so the fallback has to be the word the
 #: server would have sent.
 RECORDED = {
+    # The cadence the open-door routes speak (qrme/opendoor.py): a wire
+    # value handed to the API and a key suffix for `aud.cad.*` — never
+    # prose on the screen. The row `aud.cad.whenever` happens to read
+    # "whenever" in English, which is what tripped this.
+    ('android', 'whenever'),
+    ('ios', 'whenever'),
+    ('windows', 'whenever'),
     ('windows', 'restricted'),
     ('ios', 'grandchild'),
     ('ios', 'professional'),

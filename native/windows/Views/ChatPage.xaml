@@ -17,6 +17,11 @@
                        Foreground="{StaticResource QrmeTxtBrush}" />
             <TextBlock x:Name="Subtitle" Foreground="{StaticResource QrmeT2Brush}"
                        FontSize="13" TextWrapping="Wrap" />
+            <!-- The open door (qrme/opendoor.py): the inverted connection.
+                 YOUR standing yes to this profile reaching you first —
+                 yours to open, yours to close, on your own token. -->
+            <Button x:Name="DoorButton" Click="OnDoorToggle"
+                    Visibility="Collapsed" HorizontalAlignment="Left" />
         </StackPanel>
 
         <ScrollViewer Grid.Row="1" Margin="0,12">
