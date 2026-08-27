@@ -704,6 +704,14 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   border-radius: 0 0 16px 16px;
   background: linear-gradient(transparent 0, rgba(5, 3, 15, 0.88) 22px); }
 
+.rs-gear { position: absolute; bottom: 8px; right: 8px; z-index: 4;
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--line, #3a3a55);
+  background: color-mix(in srgb, var(--bg, #14142a) 72%, transparent);
+  color: var(--txt, #eee); font-size: 16px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; }
+.rs-gear:hover { background: var(--bg2, #22224a); }
 .rs-hint { position: absolute; top: 8px; right: 8px; z-index: 3;
   font-size: 8px; letter-spacing: .04em; color: #efecff; opacity: .75;
   background: rgba(5,3,15,0.45); border-radius: 7px; padding: 2px 6px; }

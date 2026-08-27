@@ -207,8 +207,36 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // The owner's two panels open only for the profile this session owns —
   // the token is read by the rail's own doors and never speaks into the
   // room (test_knowing_the_id_is_not_being_here names this line).
+  // The account's other profiles count too: a room seating a profile you
+  // own — just not the one this session is standing in — used to hide the
+  // two owner panels, and "two of the buttons are missing" is how that
+  // reads from a phone. The account token can mint an owner capability
+  // for any held profile, so the dock does, once, and shows all four.
+  const [mintedOwner, setMintedOwner] = useState<Record<string, string>>({});
+  useEffect(() => {
+    const pid = dockedProfile;
+    if (!pid || pid === session.profileId || mintedOwner[pid]) return;
+    if (!session.accountId || !session.accountToken) return;
+    let gone = false;
+    accountApi.heldProfiles(session.accountId, session.accountToken)
+      .then((held) => {
+        if (gone || !held.profiles.some((r) => r.profile_id === pid)) return null;
+        return accountApi.mintOwnerToken(
+          session.accountId as string, pid, session.accountToken as string);
+      })
+      .then((minted) => {
+        if (!gone && minted?.owner_token) {
+          setMintedOwner((m) => ({ ...m, [pid]: minted.owner_token }));
+        }
+      })
+      .catch(() => undefined);
+    return () => { gone = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dockedProfile, session.profileId, session.accountId,
+      session.accountToken]);
   const dockOwner =
-    dockedProfile === session.profileId ? session.ownerToken || null : null;
+    dockedProfile === session.profileId ? session.ownerToken || null
+      : (dockedProfile && mintedOwner[dockedProfile]) || null;
   const [scene, setScene] = useState<RoomFaces | null>(null);
   // The room's own channel, read off the join answer. `chat`, `voice` and
   // `video` present flat; `ar` and `vr` are the two the homepage sells as
@@ -892,8 +920,17 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // start a second voice over the first.
   useEffect(() => {
     if (!hearAll || speaking.current || transcript.length === 0) return;
-    const start = heardUpTo.current === null ? 0
-      : transcript.findIndex((m) => m.id === heardUpTo.current) + 1;
+    // The first look primes and says nothing: entering a room is not a
+    // request to have the scrollback read aloud — the toggle's own
+    // comment promised this and the null case contradicted it, trying to
+    // speak the whole backlog into a page whose voices the platform had
+    // not granted yet. On an iPhone that wedged the queue for good.
+    if (heardUpTo.current === null) {
+      heardUpTo.current = transcript[transcript.length - 1].id;
+      return;
+    }
+    const start =
+      transcript.findIndex((m) => m.id === heardUpTo.current) + 1;
     const fresh = transcript.slice(Math.max(start, 0))
       .filter((m) => m.sender_kind === "profile" && m.sender_id && m.content);
     heardUpTo.current = transcript[transcript.length - 1].id;
@@ -921,7 +958,14 @@ export function Inside({ onPlans, start = "", onLeave }: {
             if (why) setEarNote(why);
             roomSpeaks(m.content || "");
             setVoicing({ kind: "profile", id: m.sender_id as string });
-            await plainVoice(m.content || "", lang);
+            try {
+              await plainVoice(m.content || "", lang);
+            } catch {
+              // Even the stand-in refused. Say so where the person is
+              // looking, and keep the queue moving — one silent turn must
+              // not silence the room.
+              setEarNote(tr("ins.ear.blocked", lang));
+            }
             setVoicing(null);
             roomFellQuiet();
             continue;
@@ -1329,6 +1373,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
         fatal = true; setEarFault(tr("ins.ear.platform", lang));
       } else if (code === "audio-capture") {
         fatal = true; setEarFault(tr("ins.ear.nomic", lang));
+      } else if (code === "network" && canRecord()) {
+        // iOS wears two masks for the same refusal: `service-not-allowed`
+        // some days and `network` others — the chat overlay met the second
+        // in the field. Same fork, same second ear, nothing lost.
+        recorderOnly.current = true;
+        fatal = true;
       } else if (code === "network") {
         fatal = true; setEarFault(tr("ins.ear.unreachable", lang));
       }
@@ -2400,6 +2450,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
                        src={(aiFaces[s.id].asset as string).startsWith("http")
                               ? (aiFaces[s.id].asset as string)
                               : getBase() + aiFaces[s.id].asset} />
+                ) : behind ? (
+                  // A chosen background with nothing standing in front of
+                  // it IS the seat's face. The silhouette circle used to
+                  // sit on top — "the whole circle needs to disappear so
+                  // that only the background shows."
+                  null
                 ) : (
                   // A person with no picture yet is a silhouette, not a
                   // letter. "Y" for *You* read as a monogram nobody chose —
@@ -2415,6 +2471,20 @@ export function Inside({ onPlans, start = "", onLeave }: {
                   </span>
                 )}
                 <span className="rs-name">{s.display}</span>
+                {/* The door the double-tap hides. The gesture stays — and
+                    a visible gear sits on your own tile, because a control
+                    nobody can see is a control nobody has. */}
+                {isMe && (
+                  <button className="rs-gear" type="button"
+                          aria-label={tr("ins.face.settings", lang)}
+                          title={tr("ins.face.settings", lang)}
+                          onClick={(e) => { e.stopPropagation();
+                                            setReveal((v) => !v); }}
+                          onDoubleClick={(e) => e.stopPropagation()}
+                          onPointerDown={(e) => e.stopPropagation()}>
+                    {"\u2699\uFE0F"}
+                  </button>
+                )}
                 {/* The mark, top left, on the synthetic seats and no others —
                     the way the screen this is drawn from does it, and the way
                     the rest of the platform does it.

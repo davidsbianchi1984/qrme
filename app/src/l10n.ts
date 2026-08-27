@@ -8781,6 +8781,9 @@ const CHROME: Table = {
   "ins.face.flip": {
     en: "Flip camera", es: "Girar la cámara", fr: "Changer de caméra", de: "Kamera wechseln", pt: "Virar a câmara", it: "Cambia fotocamera", ja: "カメラを切り替える", zh: "翻转摄像头", hi: "कैमरा पलटें", ar: "اقلب الكاميرا",
   },
+  "ins.face.settings": {
+    en: "Seat settings", es: "Ajustes del asiento", fr: "R\u00e9glages du si\u00e8ge", de: "Sitz-Einstellungen", pt: "Defini\u00e7\u00f5es do lugar", it: "Impostazioni del posto", ja: "\u5ea7\u5e2d\u306e\u8a2d\u5b9a", zh: "\u5ea7\u4f4d\u8bbe\u7f6e", hi: "\u0938\u0940\u091f \u0938\u0947\u091f\u093f\u0902\u0917\u094d\u0938", ar: "\u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0627\u0644\u0645\u0642\u0639\u062f",
+  },
   "ins.face.hint": {
     en: "Double-tap or hold for controls", es: "Toca dos veces o mantén pulsado para los controles", fr: "Touchez deux fois ou maintenez pour les commandes", de: "Doppeltippen oder halten für die Bedienelemente", pt: "Toque duas vezes ou segure para os controlos", it: "Tocca due volte o tieni premuto per i comandi", ja: "ダブルタップまたは長押しで操作を表示", zh: "双击或长按显示控制项", hi: "नियंत्रण के लिए दो बार टैप करें या दबाए रखें", ar: "انقر مرّتين أو اضغط مطوّلًا لإظهار الأزرار",
   },
