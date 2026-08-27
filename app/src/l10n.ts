@@ -8007,7 +8007,7 @@ const CHROME: Table = {
     en: "Video", es: "Vídeo", fr: "Vidéo", de: "Video", pt: "Vídeo", it: "Video", ja: "ビデオ", zh: "视频", hi: "वीडियो", ar: "فيديو",
   },
   "chat.share.file": {
-    en: "Document", es: "Documento", fr: "Document", de: "Dokument", pt: "Documento", it: "Documento", ja: "書類", zh: "文件", hi: "दस्तावेज़", ar: "مستند",
+    en: "File", es: "Archivo", fr: "Fichier", de: "Datei", pt: "Ficheiro", it: "File", ja: "ファイル", zh: "文件", hi: "फ़ाइल", ar: "ملف",
   },
   "chat.talk.again": {
     en: "Speak again", es: "Habla de nuevo", fr: "Parler encore", de: "Noch einmal sprechen", pt: "Falar novamente", it: "Parla di nuovo", ja: "もう一度話す", zh: "再说一次", hi: "फिर से बोलें", ar: "تحدث مرة أخرى",
@@ -9744,7 +9744,7 @@ const CHROME: Table = {
     en: "Silent", es: "En silencio", fr: "Silencieux", de: "Still", pt: "Em silêncio", it: "In silenzio", ja: "無音", zh: "静默", hi: "मौन", ar: "صامت",
   },
   "chat.camera": {
-    en: "Show it something", es: "Muéstrale algo", fr: "Montrez-lui quelque chose", de: "Zeig ihm etwas", pt: "Mostra-lhe algo", it: "Mostragli qualcosa", ja: "何かを見せる", zh: "给它看点东西", hi: "इसे कुछ दिखाएँ", ar: "أرِه شيئًا",
+    en: "Camera", es: "Cámara", fr: "Appareil photo", de: "Kamera", pt: "Câmara", it: "Fotocamera", ja: "カメラ", zh: "相机", hi: "कैमरा", ar: "الكاميرا",
   },
   "chat.camera.note": {
     en: "a photo I took just now", es: "una foto que acabo de tomar", fr: "une photo que je viens de prendre", de: "ein Foto, das ich gerade gemacht habe", pt: "uma foto que acabei de tirar", it: "una foto appena scattata", ja: "今撮った写真", zh: "我刚拍的一张照片", hi: "अभी ली गई एक तस्वीर", ar: "صورة التقطتها للتو",

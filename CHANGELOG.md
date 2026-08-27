@@ -16,6 +16,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Two labels renamed on the share menu.** "Show it something" is
+  Camera and "Document" is File, in all ten languages — the words a
+  phone's own sheets use.
+
 - **The paperclip is the phone's own chooser.** Give-them-something-to-
   read opens the device's photo/camera/file window in place instead of
   jumping to the card at the bottom; the handover says "handed over —
