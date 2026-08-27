@@ -23,6 +23,22 @@ services.
 It matters for what does *not* belong here. A row is added when this agent
 needs it to finish somebody's matter, not because a sibling product has one.
 
+## The support-desk decision, made and recorded
+
+Whether the agent may *file* a support matter as the person was an open
+question for a round, and the answer is **no — it directs, the person
+files**. Two reasons, both structural. The containment guards hold every
+agent tool to a named profile through the owner's door, and ``/matters``
+is deliberately account-level and claim-friendly — its door exists for
+the person locked out of the account they are complaining about. Filing
+by proxy would puncture the one rule the agent's whole containment
+argument stands on, to save a person one screen they can reach even
+signed out. The desk is already nameable everywhere it needs to be: the
+Matters door rides ``productmap.DOORS`` (so the agent and every profile
+can point at it by name), and the help box's ``matters`` phrasings reach
+the Get Help lesson. Direction is the remit; the filing stays a human
+act, with the claim in a human hand.
+
 ## Three tables, three different questions
 
 The word *capability* is already spoken for twice in this product, and neither
