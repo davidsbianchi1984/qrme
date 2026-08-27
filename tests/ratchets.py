@@ -130,6 +130,19 @@ def _erase_scoped() -> int:
     return len(scoped_tables())
 
 
+def _body_routes_count() -> int:
+    from qrme.api import app
+
+    from .test_the_refusal_that_handed_the_body_back import _body_routes
+    return len(_body_routes(app))
+
+
+def _capability_tables_count() -> int:
+    from .test_termination_revokes_more_than_the_owners_token import (
+        _capability_tables)
+    return len(_capability_tables())
+
+
 def _route_shapes() -> int:
     from .test_a_screen_expects_the_shape_the_route_returns import route_shapes
     return len(route_shapes())
@@ -1071,6 +1084,12 @@ RATCHETS: tuple[Ratchet, ...] = (
             "tables this suite can put a probe row into"),
     Ratchet("erase.scoped_tables", 55, _erase_scoped,
             "tables the schema scopes to a single profile"),
+    Ratchet("erase.capability_tables", 7, _capability_tables_count,
+            "profile-scoped tables carrying a revocation flag or a live "
+            "token — what termination must reach"),
+    Ratchet("routes.body_taking", 210, _body_routes_count,
+            "routes that read a request body, as the refusal sweep fills "
+            "their paths"),
     Ratchet("route.declared_shapes", 350, _route_shapes,
             "routes whose answer is decisively a list or an object"),
     Ratchet("markup.strings_scanned", 16, _markup_strings,
