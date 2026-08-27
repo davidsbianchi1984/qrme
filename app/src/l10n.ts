@@ -8119,6 +8119,15 @@ const CHROME: Table = {
   "chat.door": {
     en: "Hear from them first", es: "Escúchalos primero", fr: "Les entendre en premier", de: "Zuerst von ihnen hören", pt: "Ouvi-los primeiro", it: "Sentirli per primi", ja: "先に連絡をもらう", zh: "让它先联系你", hi: "पहले उनसे सुनें", ar: "اسمع منهم أولًا",
   },
+  "aud.cad.daily": {
+    en: "daily", es: "a diario", fr: "quotidien", de: "täglich", pt: "diário", it: "quotidiano", ja: "毎日", zh: "每天", hi: "रोज़ाना", ar: "يوميًا",
+  },
+  "aud.cad.weekly": {
+    en: "weekly", es: "semanal", fr: "hebdomadaire", de: "wöchentlich", pt: "semanal", it: "settimanale", ja: "毎週", zh: "每周", hi: "साप्ताहिक", ar: "أسبوعيًا",
+  },
+  "aud.cad.whenever": {
+    en: "whenever", es: "cuando sea", fr: "quand il veut", de: "wann immer", pt: "quando for", it: "quando capita", ja: "いつでも", zh: "随时", hi: "जब भी", ar: "متى شاء",
+  },
   "aud.doors": {
     en: "Doors open to this profile", es: "Puertas abiertas a este perfil", fr: "Portes ouvertes à ce profil", de: "Für dieses Profil offene Türen", pt: "Portas abertas a este perfil", it: "Porte aperte a questo profilo", ja: "このプロフィールに開かれた扉", zh: "向此档案敞开的门", hi: "इस प्रोफ़ाइल के लिए खुले दरवाज़े", ar: "أبواب مفتوحة لهذا الملف",
   },

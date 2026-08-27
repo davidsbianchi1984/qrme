@@ -266,7 +266,8 @@ export function Audience({ onPlans }: { onPlans: () => void }) {
           <p className="muted small">{tr("aud.doors.pitch", lang)}</p>
           {openers.map((o) => (
             <p key={o.interactor_id} className="muted small">
-              {o.interactor_id} · {o.cadence || "whenever"}
+              {o.interactor_id} · {tr(
+                `aud.cad.${o.cadence || "whenever"}`, lang)}
             </p>
           ))}
         </div>
