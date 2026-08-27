@@ -55,3 +55,11 @@ POST /accounts/{account_id}/avatars
 POST /profiles/{profile_id}/avatar/claim
 POST /profiles/{profile_id}/avatar/painted
 DELETE /avatars/registry/{registry_id}
+
+# The open door (qrme/opendoor.py) — the receiver's standing yes to a
+# profile's unprompted reach. The console carries the toggle in the
+# chat's + menu and the owner's openers card on Audience; the shells'
+# chat menus follow with their own round.
+PUT /interactors/{interactor_id}/open-door/{profile_id}
+GET /interactors/{interactor_id}/open-doors
+GET /profiles/{profile_id}/open-doors

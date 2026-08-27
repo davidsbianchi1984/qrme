@@ -1,14 +1,16 @@
 """Reaching out first, and the four separate things that stop it.
 
-A profile may message somebody unprompted only if its owner switched that on,
-and even then three more gates stand in the way. They refuse in **four
-different sentences**, and the difference is the whole point — a screen that
+A profile may message somebody unprompted only if its owner switched that on
+AND the person asked to hear from it first (qrme/opendoor.py — the inverted
+connection), and even then three more gates stand in the way. They refuse in
+**five different sentences**, and the difference is the whole point — a screen that
 collapsed them into "can't right now" would be discarding the only thing the
 owner can act on:
 
 | | who lifts it | how |
 |---|---|---|
 | reactive-only (403) | the owner | turn outreach on |
+| door closed (403) | **the recipient** | open their door |
 | awaiting a reply (429) | the recipient | reply once |
 | rate cap (429) | time | wait out the interval |
 | quiet hours (429) | **the recipient** | change their own window |
@@ -67,6 +69,11 @@ def _cast(client, account="acct_reach", scope="proactive", interval=24):
     head = {"authorization": f"Bearer {p['owner_token']}"}
     client.post(f"/memberships/{account}", json={"plan": "pro"}, headers=head)
     fan = client.post("/interactors", json={"display_name": "Ana"}).json()
+    # The fifth gate (qrme/opendoor.py): outreach now needs the person's
+    # own standing yes. Opened here so each test isolates ITS gate; the
+    # closed-door refusal has its own test below with the door left shut.
+    from qrme import opendoor
+    opendoor.set_door(fan["id"], p["id"], open_=True)
     return p, head, fan["id"], {"authorization": f"Bearer {fan['token']}"}
 
 
@@ -154,7 +161,26 @@ def test_the_four_refusals_are_four_different_sentences(client):
     said.add(client.post(f"/profiles/{p['id']}/proactive/{uid}",
                          headers=head).json()["detail"])
 
-    assert len(said) == 4, f"two refusals say the same thing: {said}"
+    p, head, uid, uhead = _cast(client, "acct_r4")
+    from qrme import opendoor
+    opendoor.set_door(uid, p["id"], open_=False)
+    said.add(client.post(f"/profiles/{p['id']}/proactive/{uid}",
+                         headers=head).json()["detail"])
+
+    assert len(said) == 5, f"two refusals say the same thing: {said}"
+
+
+def test_a_closed_door_stops_it_and_the_recipient_holds_the_handle(client):
+    """The fifth refusal, and the inversion itself: the owner's scope says
+    the profile is willing; reach still needs the person's standing yes.
+    Closing the door stops the reach the same minute, whatever else is
+    true."""
+    p, head, uid, uhead = _cast(client, "acct_door")
+    from qrme import opendoor
+    opendoor.set_door(uid, p["id"], open_=False)
+    r = client.post(f"/profiles/{p['id']}/proactive/{uid}", headers=head)
+    assert r.status_code == 403
+    assert "door is open" in r.json()["detail"]
 
 
 # --- quiet hours belong to the person ---------------------------------------

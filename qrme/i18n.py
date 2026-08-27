@@ -259,6 +259,18 @@ _PUBLIC: dict[str, dict[str, str]] = {
         "hi": "कोई पेंटिंग सेवा कॉन्फ़िगर नहीं है — इस परिनियोजन में इमेज कुंजी नहीं है",
         "ar": "لا توجد خدمة رسم مهيأة — لا يملك هذا النشر مفتاح صور",
     },
+    ("they have not asked to hear from this profile first — "
+     "unprompted reach goes only to people whose door is open"): {
+        "es": "no han pedido oír primero de este perfil — el contacto no solicitado solo llega a quienes tienen la puerta abierta",
+        "fr": "ils n'ont pas demandé à entendre ce profil en premier — la prise de contact spontanée ne va qu'aux personnes dont la porte est ouverte",
+        "de": "sie haben nicht darum gebeten, zuerst von diesem Profil zu hören — unaufgeforderte Kontaktaufnahme erreicht nur Menschen mit offener Tür",
+        "pt": "não pediram para ouvir primeiro este perfil — o contacto não solicitado só chega a quem tem a porta aberta",
+        "it": "non hanno chiesto di sentire prima questo profilo — il contatto non richiesto arriva solo a chi ha la porta aperta",
+        "ja": "このプロフィールから先に連絡をもらうことを求めていません。求められていない連絡は、扉を開けた人にだけ届きます",
+        "zh": "他们没有请求先听到这个档案的消息——未经请求的联系只送达敞开门的人",
+        "hi": "उन्होंने इस प्रोफ़ाइल से पहले सुनने के लिए नहीं कहा — बिन मांगी पहुँच केवल उन्हीं तक जाती है जिनका दरवाज़ा खुला है",
+        "ar": "لم يطلبوا أن يسمعوا من هذا الملف أولًا — التواصل غير المطلوب يصل فقط إلى من فتحوا بابهم",
+    },
     ("no such registry row"): {
         "es": "no existe esa entrada del registro",
         "fr": "aucune entrée de registre de ce nom",
@@ -7686,6 +7698,9 @@ _WHERE_MARKERS = ("body", "query", "path", "header", "cookie")
 #: A field with no row keeps its identifier, exactly as before, and is recorded
 #: in `tests/field_labels_unmapped.txt`.
 _FIELD_LABELS: dict[str, dict[str, str]] = {
+    # The open door's two fields (qrme/routers/interaction.py).
+    "hear_first": {"en": "Hear from them first", "es": "Escúchalos primero", "fr": "Les entendre en premier", "de": "Zuerst von ihnen hören", "pt": "Ouvi-los primeiro", "it": "Sentirli per primi", "ja": "先に連絡をもらう", "zh": "让它先联系你", "hi": "पहले उनसे सुनें", "ar": "اسمع منهم أولًا"},
+    "cadence": {"en": "How often is welcome", "es": "Con qué frecuencia es bienvenido", "fr": "À quelle fréquence", "de": "Wie oft willkommen ist", "pt": "Com que frequência é bem-vindo", "it": "Quanto spesso è gradito", "ja": "どのくらいの頻度なら歓迎か", "zh": "多久一次合适", "hi": "कितनी बार स्वागत है", "ar": "كم مرة يكون مرحبًا به"},
     # The avatar registry's three form fields (qrme/routers/avatars.py),
     # worded as the card asks them.
     "registry_id": {"en": "Which face", "es": "Qué rostro", "fr": "Quel visage", "de": "Welches Gesicht", "pt": "Qual rosto", "it": "Quale volto", "ja": "どの顔", "zh": "哪张面孔", "hi": "कौन-सा चेहरा", "ar": "أي وجه"},

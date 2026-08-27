@@ -8,8 +8,9 @@ import re
 from datetime import date
 
 from fastapi import APIRouter, HTTPException, Request, Response
+from pydantic import BaseModel, Field
 
-from .. import (adaptation, auth, briefcase, companion, contacts, db,
+from .. import (adaptation, auth, briefcase, companion, contacts, db, opendoor,
                 engagement, i18n,
                 llm, moderation, offline, persona, referral, remembrance,
                 roles, scrape, voiceprint, watermark)
@@ -852,6 +853,51 @@ def list_posts(profile_id: str, request: Request) -> list[dict]:
 
 # -- Companion features: proactive check-ins and transparency ----------------
 
+# -- the open door: the receiver's standing yes (qrme/opendoor.py) -----------
+
+class DoorSet(BaseModel):
+    hear_first: bool
+    cadence: str = Field(default="whenever", max_length=10,
+                         description="How often is welcome: daily, weekly, "
+                                     "or whenever — the profile's own pace.")
+
+
+@router.put("/interactors/{interactor_id}/open-door/{profile_id}")
+def set_open_door(interactor_id: str, profile_id: str, body: DoorSet,
+                  request: Request) -> dict:
+    """Open or close your door to one profile's unprompted reach.
+
+    The inverted connection: the person subscribes to the profile,
+    rather than the profile reaching them. Yours to open and yours to
+    close, on your own token; closing keeps the record and stops the
+    reach the same minute."""
+    require_interactor(interactor_id, request)
+    profile_or_404(profile_id)
+    try:
+        return opendoor.set_door(interactor_id, profile_id,
+                                 open_=body.hear_first,
+                                 cadence=body.cadence)
+    except ValueError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
+
+
+@router.get("/interactors/{interactor_id}/open-doors")
+def my_open_doors(interactor_id: str, request: Request) -> dict:
+    """Every standing yes you hold — open ones first, closed ones kept."""
+    require_interactor(interactor_id, request)
+    return {"doors": opendoor.mine(interactor_id),
+            "cadences": list(opendoor.CADENCES)}
+
+
+@router.get("/profiles/{profile_id}/open-doors")
+def doors_open_to(profile_id: str, request: Request) -> dict:
+    """Who asked to hear from this profile first — the owner's view of
+    an audience that asked, rather than one the profile reached for."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    return {"openers": opendoor.openers(profile_id)}
+
+
 @router.post("/profiles/{profile_id}/proactive/{interactor_id}")
 def proactive_checkin(profile_id: str, interactor_id: str,
                       request: Request) -> dict:
@@ -866,6 +912,13 @@ def proactive_checkin(profile_id: str, interactor_id: str,
         raise HTTPException(
             403, "this profile is reactive-only; its owner has not enabled "
                  "proactive outreach")
+    # The inverted connection (qrme/opendoor.py): the owner's scope says
+    # the profile is WILLING to reach out; reach still needs the person's
+    # own standing yes. Both consents, neither implying the other.
+    from .. import opendoor
+    if not opendoor.is_open(interactor_id, profile_id):
+        raise HTTPException(403, i18n.raised(
+            RuntimeError(opendoor.DOOR_CLOSED)))
     blocked = proactive_gate(profile, interactor)
     if blocked is not None:
         raise HTTPException(429, blocked)     # anti-spam: rate cap / quiet / await

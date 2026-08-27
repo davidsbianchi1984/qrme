@@ -8116,6 +8116,15 @@ const CHROME: Table = {
   "chat.talk.trouble.network": {
     en: "The speech service could not be reached. Tap to talk to try again.", es: "No se pudo contactar con el servicio de voz. Toca para hablar e inténtalo otra vez.", fr: "Le service de reconnaissance vocale est injoignable. Touche pour parler et réessayer.", de: "Der Spracherkennungsdienst war nicht erreichbar. Tipp zum Sprechen und versuch es erneut.", pt: "Não foi possível contactar o serviço de voz. Toca para falar e tenta de novo.", it: "Il servizio vocale non è raggiungibile. Tocca per parlare e riprova.", ja: "音声認識サービスに接続できませんでした。タップして話すともう一度試せます。", zh: "无法连接语音服务。点按说话再试一次。", hi: "स्पीच सेवा तक नहीं पहुँच पाए। बोलने के लिए टैप करके फिर कोशिश करो।", ar: "تعذّر الوصول إلى خدمة التعرّف على الكلام. اضغط للتحدّث وحاول مرّة أخرى.",
   },
+  "chat.door": {
+    en: "Hear from them first", es: "Escúchalos primero", fr: "Les entendre en premier", de: "Zuerst von ihnen hören", pt: "Ouvi-los primeiro", it: "Sentirli per primi", ja: "先に連絡をもらう", zh: "让它先联系你", hi: "पहले उनसे सुनें", ar: "اسمع منهم أولًا",
+  },
+  "aud.doors": {
+    en: "Doors open to this profile", es: "Puertas abiertas a este perfil", fr: "Portes ouvertes à ce profil", de: "Für dieses Profil offene Türen", pt: "Portas abertas a este perfil", it: "Porte aperte a questo profilo", ja: "このプロフィールに開かれた扉", zh: "向此档案敞开的门", hi: "इस प्रोफ़ाइल के लिए खुले दरवाज़े", ar: "أبواب مفتوحة لهذا الملف",
+  },
+  "aud.doors.pitch": {
+    en: "People who asked to hear from it first — an audience that asked, rather than one it reached for. Unprompted outreach goes only to them.", es: "Personas que pidieron oírlo primero: una audiencia que lo pidió, no una que el perfil buscó. El contacto no solicitado solo les llega a ellas.", fr: "Des personnes qui ont demandé à l'entendre en premier — un public qui a demandé, pas un public démarché. La prise de contact spontanée ne va qu'à elles.", de: "Menschen, die darum baten, zuerst von ihm zu hören — ein Publikum, das fragte, statt eines, nach dem gegriffen wurde. Unaufgeforderte Kontaktaufnahme erreicht nur sie.", pt: "Pessoas que pediram para ouvi-lo primeiro — uma audiência que pediu, não uma que o perfil procurou. O contacto não solicitado só chega a elas.", it: "Persone che hanno chiesto di sentirlo per prime — un pubblico che ha chiesto, non uno cercato. Il contatto non richiesto arriva solo a loro.", ja: "先に連絡をもらうことを求めた人たち。プロフィールが手を伸ばした相手ではなく、自ら求めた聴衆です。求められていない連絡は彼らにだけ届きます。", zh: "请求先收到它消息的人——是主动请求的受众，而非被触达的受众。未经请求的联系只送达他们。", hi: "जिन लोगों ने पहले सुनने के लिए कहा — ऐसे दर्शक जिन्होंने खुद मांगा। बिन मांगी पहुँच केवल उन्हीं तक जाती है।", ar: "أشخاص طلبوا أن يسمعوا منه أولًا — جمهور طلب بنفسه، لا جمهور مدّ الملف يده إليه. التواصل غير المطلوب يصلهم وحدهم.",
+  },
   "chat.carried": {
     en: "What they're carrying", es: "Lo que llevan", fr: "Ce qu'ils portent", de: "Was sie bei sich tragen", pt: "O que estão a carregar", it: "Cosa portano con sé", ja: "持っているもの", zh: "它携带的内容", hi: "वे क्या साथ रखे हैं", ar: "ما يحملونه",
   },

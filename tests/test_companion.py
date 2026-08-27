@@ -39,6 +39,8 @@ def test_proactive_requires_owner_opt_in(client):
     assert r.status_code == 403
 
     willing = make_profile(client, interaction_scope="proactive")
+    from qrme import opendoor
+    opendoor.set_door(user, willing["id"], open_=True)
     r = client.post(f"/profiles/{willing['id']}/proactive/{user}")
     assert r.status_code == 200
     body = r.json()
