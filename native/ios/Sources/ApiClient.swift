@@ -2286,12 +2286,35 @@ actor ApiClient {
         let label: String
         let bound_at: String?
         let speaks: Bool
+        let released: Bool?
+    }
+
+    struct VoiceRelease: Decodable {
+        let provider: String
+        let voice_id: String
+        let released: Bool
     }
 
     /// Which voice this profile speaks with, or the empty binding — one
     /// shape either way, so the screen never special-cases the common case.
     func spokenVoice(id: String) async throws -> SpokenBinding {
         try await request("/profiles/\(id)/voice")
+    }
+
+    /// The owner's recorded waiver: anybody on this deployment may bind
+    /// this voice — and taking it back keeps the history. The pair the
+    /// console's Spoken voice card has carried since the waiver shipped;
+    /// this shell's card follows with this round, as its backlog promised.
+    func releaseSpokenVoice(id: String, token: String) async throws
+        -> VoiceRelease {
+        try await request("/profiles/\(id)/voice/release", method: "POST",
+                          token: token)
+    }
+
+    func reclaimSpokenVoice(id: String, token: String) async throws
+        -> VoiceRelease {
+        try await request("/profiles/\(id)/voice/release", method: "DELETE",
+                          token: token)
     }
 
     /// The owner points the profile at a voice made on the engine's own
@@ -3351,6 +3374,51 @@ extension ApiClient {
     func audienceCounts(kind: String, targetId: String,
                         token: String) async throws -> AudienceCounts {
         try await request("/\(kind)/\(targetId)/audience", token: token)
+    }
+
+    // ---- the open door: the receiver's standing yes (qrme/opendoor.py) ----
+
+    struct DoorStanding: Decodable {
+        let open: Bool
+        let cadence: String?
+    }
+    struct DoorRow: Decodable {
+        let profile_id: String
+        let open: Bool
+        let cadence: String?
+    }
+    struct OpenerRow: Decodable {
+        let interactor_id: String
+        let cadence: String?
+        let opened_at: String
+    }
+
+    /// YOUR standing yes to this profile reaching you first — yours to
+    /// open, yours to close, on your own token.
+    func setOpenDoor(interactorId: String, profileId: String, open: Bool,
+                     cadence: String, token: String) async throws -> DoorStanding {
+        try await request("/interactors/\(interactorId)/open-door/\(profileId)",
+                          method: "PUT",
+                          body: ["hear_first": open, "cadence": cadence],
+                          token: token)
+    }
+
+    func myOpenDoors(interactorId: String,
+                     token: String) async throws -> [DoorRow] {
+        struct Out: Decodable { let doors: [DoorRow] }
+        let got: Out = try await request(
+            "/interactors/\(interactorId)/open-doors", token: token)
+        return got.doors
+    }
+
+    /// The owner's view of the inverted connection: an audience that asked,
+    /// rather than one the profile reached for.
+    func doorsOpenTo(profileId: String,
+                     token: String) async throws -> [OpenerRow] {
+        struct Out: Decodable { let openers: [OpenerRow] }
+        let got: Out = try await request(
+            "/profiles/\(profileId)/open-doors", token: token)
+        return got.openers
     }
 
     func subscribe(kind: String, subjectId: String,

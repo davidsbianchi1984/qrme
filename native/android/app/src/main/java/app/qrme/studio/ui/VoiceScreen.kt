@@ -310,6 +310,18 @@ fun VoiceScreen(vm: StudioViewModel) {
                         act { ApiClient.bindSpokenVoice(pid, token, "", "") }
                     }
                 }
+                // The owner's waiver: release the voice to everybody on
+                // this deployment, and take it back. The console's pair,
+                // carried here as the backlog promised.
+                Pill(L10n.t(if (b.released) "nsv.reclaim" else "nsv.release",
+                            vm.language), Qrme.Card, enabled = !busy) {
+                    val pid = vm.pid ?: return@Pill
+                    val token = vm.token ?: return@Pill
+                    act {
+                        if (b.released) ApiClient.reclaimSpokenVoice(pid, token)
+                        else ApiClient.releaseSpokenVoice(pid, token)
+                    }
+                }
             } else {
                 labeledField(L10n.t("nsv.id.ph", vm.language), bindId, "…") { bindId = it }
                 labeledField(L10n.t("nsv.label.ph", vm.language), bindLabel, "…") { bindLabel = it }

@@ -4883,6 +4883,21 @@ export const api = {
       { method: "POST", body, token }),
 
   // -- the avatar registry (qrme/avatarreg.py): one face ledger ------------
+  // -- the open door: the receiver's standing yes (qrme/opendoor.py) -------
+  setOpenDoor: (interactorId: string, profileId: string, open: boolean,
+                cadence: string, token: string) =>
+    req<{ open: boolean; cadence: string | null }>(
+      `/interactors/${interactorId}/open-door/${profileId}`,
+      { method: "PUT", body: { hear_first: open, cadence }, token }),
+  myOpenDoors: (interactorId: string, token: string) =>
+    req<{ doors: { profile_id: string; open: boolean;
+                   cadence: string | null }[];
+          cadences: string[] }>(
+      `/interactors/${interactorId}/open-doors`, { token }),
+  doorsOpenTo: (profileId: string, token: string) =>
+    req<{ openers: { interactor_id: string; cadence: string | null;
+                     opened_at: string }[] }>(
+      `/profiles/${profileId}/open-doors`, { token }),
   avatarShelf: () =>
     req<{ shelf: RegistryRow[]; starters: unknown[] }>("/avatars/library"),
   stockShelf: async (file: File, provider = "elevenlabs", label = "") => {

@@ -105,6 +105,9 @@
                                     Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
                             <Button x:Name="UnbindButton" Click="OnUnbind" />
                         </StackPanel>
+                        <!-- The owner's waiver: release the voice to everybody
+                             on this deployment, and take it back. -->
+                        <Button x:Name="ReleaseButton" Click="OnReleaseToggle" />
                     </StackPanel>
                 </StackPanel>
             </Border>

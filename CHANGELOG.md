@@ -6,6 +6,35 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The open door: the inverted connection.** The oldest still-open ask
+  — somebody subscribing to the agent, rather than the agent reaching
+  them — lands as the receiver's standing yes. Unprompted reach now
+  requires the person to have opened their door to that profile ("Hear
+  from them first", in the chat's + menu), yours to open and yours
+  alone to close; closing keeps the record and stops the reach the same
+  minute. The door's cadence — daily, weekly, whenever — binds
+  alongside the owner's rate cap, the looser of the two, so a
+  subscription can slow a profile and never hurry one. The owner reads
+  who asked on the Audience screen; nobody else can. The outreach
+  contract grows from four refusals to five, each its own sentence,
+  and the fifth is the recipient's to lift.
+
+- **The open door reaches the phones and the desktop.** The chat
+  screens on iOS, Android and Windows gain the console's "Hear from
+  them first" toggle — your standing yes to this profile's unprompted
+  reach, on your own token — and the owner's Reach/Summon surfaces gain
+  the Audience card that lists who asked, with their chosen cadence.
+  Three shell backlogs shrink by the open door's three rows.
+
+- **The voice waiver reaches the phones and the desktop.** Release a
+  bound spoken voice for everybody on the deployment — and take it back
+  — from the native voice screens on iOS, Android and Windows, the same
+  toggle the console has carried beside the binding since the release
+  ledger shipped. Three shell backlogs shrink by the pair of rows that
+  promised it.
+
 ## [1.8.9] - 2026-08-27
 
 ### Added

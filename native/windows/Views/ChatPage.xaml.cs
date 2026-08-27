@@ -232,13 +232,56 @@ public sealed partial class ChatPage : Page
         return i > 0 && i < Roles.Length ? Roles[i].Value : null;
     }
 
-    protected override void OnNavigatedTo(NavigationEventArgs e)
+    protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
         Subtitle.Text = L10n.Fill("nchat.sub", AppState.Current.Language,
                                   ("name", AppState.Current.DisplayName));
         RehearsalBox.PlaceholderText = L10n.T("cht.rh.scenario.ph");
         RehearsalButton.Content = L10n.T("cht.rh.open");
         MessagesList.ItemsSource = _messages;
+        await LoadDoor();
+    }
+
+    // Whether this person's door is open to this profile's unprompted
+    // reach — the receiver's own standing yes (qrme/opendoor.py).
+    private bool _doorOpen;
+
+    private void RenderDoor()
+    {
+        DoorButton.Content = "\uD83D\uDD14 " + L10n.T("chat.door")
+            + (_doorOpen ? " \u2713" : "");
+        DoorButton.Visibility = Visibility.Visible;
+    }
+
+    private async System.Threading.Tasks.Task LoadDoor()
+    {
+        var s = AppState.Current;
+        if (s.InteractorId is null || s.InteractorToken is null
+            || s.Pid is null) return;
+        try
+        {
+            var doors = (await ApiClient.Shared.MyOpenDoors(
+                s.InteractorId, s.InteractorToken)).Doors;
+            _doorOpen = doors.Any(d => d.ProfileId == s.Pid && d.Open);
+        }
+        catch { /* backend offline — leave the default */ }
+        RenderDoor();
+    }
+
+    private async void OnDoorToggle(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        if (s.InteractorId is null || s.InteractorToken is null
+            || s.Pid is null) return;
+        try
+        {
+            var standing = await ApiClient.Shared.SetOpenDoor(
+                s.InteractorId, s.Pid, !_doorOpen, "whenever",
+                s.InteractorToken);
+            _doorOpen = standing.Open;
+            RenderDoor();
+        }
+        catch (Exception ex) { ErrorText.Text = ex.Message; }
     }
 
     private string? _rehearsalId;

@@ -257,6 +257,17 @@ export function Chat({ onPlans }: {
   // here — so a person could give a starter they had just met a document,
   // and could not give one to the profile built from their own life.
   const [bcOpen, setBcOpen] = useState(false);
+  // Whether this person's door is open to this profile's unprompted
+  // reach — the receiver's own standing yes (qrme/opendoor.py).
+  const [doorOpen, setDoorOpen] = useState(false);
+  useEffect(() => {
+    if (!session.interactorId || !session.interactorToken
+        || !session.profileId) return;
+    api.myOpenDoors(session.interactorId, session.interactorToken)
+      .then((r) => setDoorOpen(r.doors.some(
+        (d) => d.profile_id === session.profileId && d.open)))
+      .catch(() => undefined);
+  }, [session.interactorId, session.interactorToken, session.profileId]);
   // The composer's +. Five tools lived as full-size buttons in the bar and
   // the text box paid for it — the field report could not even see it. The
   // mic, the box and Send stay; everything else folds here.
@@ -1460,6 +1471,24 @@ export function Chat({ onPlans }: {
                     onClick={() => { setPlusOpen(false); setBcOpen((o) => !o); }}>
               🗂 {tr("chat.carried", lang)}{bcOpen ? " ✓" : ""}
             </button>
+            {/* The open door (qrme/opendoor.py): the inverted connection.
+                YOUR standing yes to this profile reaching you first —
+                yours to open, yours to close, on your own token. */}
+            {session.interactorId && session.interactorToken && (
+              <button role="menuitem" aria-pressed={doorOpen}
+                      onClick={() => {
+                        setPlusOpen(false);
+                        const next = !doorOpen;
+                        void api.setOpenDoor(session.interactorId!,
+                                             session.profileId!, next,
+                                             "whenever",
+                                             session.interactorToken!)
+                          .then((r) => setDoorOpen(r.open))
+                          .catch(setError);
+                      }}>
+                🔔 {tr("chat.door", lang)}{doorOpen ? " ✓" : ""}
+              </button>
+            )}
             <button role="menuitem"
                     disabled={!session.profileId || !session.interactorId}
                     onClick={() => { setPlusOpen(false); camRef.current?.click(); }}>

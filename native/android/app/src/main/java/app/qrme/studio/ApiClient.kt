@@ -2092,12 +2092,21 @@ object ApiClient {
     // ---- The spoken voice: a reference to a voice made on the engine's own
     // surface, and one utterance of audio back (qrme/spoken.py) ----
 
-    data class SpokenBinding(val provider: String, val voiceId: String,
-                             val label: String, val speaks: Boolean)
+    // The open door (qrme/opendoor.py): a person's standing yes, and the
+// owner's view of who gave one.
+data class DoorRow(val profileId: String, val open: Boolean,
+                   val cadence: String?)
+data class OpenerRow(val interactorId: String, val cadence: String?,
+                     val openedAt: String)
+
+data class SpokenBinding(val provider: String, val voiceId: String,
+                             val label: String, val speaks: Boolean,
+                             val released: Boolean)
 
     private fun spokenBindingOf(o: JSONObject) = SpokenBinding(
         o.optString("provider", ""), o.optString("voice_id", ""),
-        o.optString("label", ""), o.optBoolean("speaks", false))
+        o.optString("label", ""), o.optBoolean("speaks", false),
+        o.optBoolean("released", false))
 
     /** Which voice this profile speaks with, or the empty binding — one
      *  shape either way, so the screen never special-cases the common case. */
@@ -2111,6 +2120,54 @@ object ApiClient {
                                 label: String): SpokenBinding =
         spokenBindingOf(JSONObject(request("/profiles/$id/voice", "PUT",
             JSONObject().put("voice_id", voiceId).put("label", label), token)))
+
+    /** The owner's recorded waiver: anybody on this deployment may bind
+     *  this voice — and taking it back keeps the history. The pair the
+     *  console's card has carried since the waiver shipped; this shell's
+     *  card follows with this round, as its backlog promised. */
+    suspend fun releaseSpokenVoice(id: String, token: String) {
+        request("/profiles/$id/voice/release", "POST", JSONObject(), token)
+    }
+
+    suspend fun reclaimSpokenVoice(id: String, token: String) {
+        request("/profiles/$id/voice/release", "DELETE", token = token)
+    }
+
+    // ---- the open door: the receiver's standing yes (qrme/opendoor.py) ----
+
+    /** YOUR standing yes to this profile reaching you first — yours to
+     *  open, yours to close, on your own token. */
+    suspend fun setOpenDoor(interactorId: String, profileId: String,
+                            open: Boolean, cadence: String,
+                            token: String): Boolean =
+        request("/interactors/$interactorId/open-door/$profileId", "PUT",
+            JSONObject().put("hear_first", open).put("cadence", cadence),
+            token).optBoolean("open", false)
+
+    suspend fun myOpenDoors(interactorId: String,
+                            token: String): List<DoorRow> {
+        val arr = request("/interactors/$interactorId/open-doors",
+            token = token).getJSONArray("doors")
+        return (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            DoorRow(o.getString("profile_id"), o.optBoolean("open", false),
+                if (o.isNull("cadence")) null else o.optString("cadence"))
+        }
+    }
+
+    /** The owner's view of the inverted connection: an audience that
+     *  asked, rather than one the profile reached for. */
+    suspend fun doorsOpenTo(profileId: String,
+                            token: String): List<OpenerRow> {
+        val arr = request("/profiles/$profileId/open-doors",
+            token = token).getJSONArray("openers")
+        return (0 until arr.length()).map { i ->
+            val o = arr.getJSONObject(i)
+            OpenerRow(o.getString("interactor_id"),
+                if (o.isNull("cadence")) null else o.optString("cadence"),
+                o.optString("opened_at", ""))
+        }
+    }
 
     /** One utterance, synthesized server-side and watermarked there. Raw
      *  bytes rather than the shared helper, because this answer is sound. */

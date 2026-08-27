@@ -116,7 +116,35 @@ public record SpokenBinding(
     [property: JsonPropertyName("provider")] string Provider,
     [property: JsonPropertyName("voice_id")] string VoiceId,
     [property: JsonPropertyName("label")] string Label,
-    [property: JsonPropertyName("speaks")] bool Speaks);
+    [property: JsonPropertyName("speaks")] bool Speaks,
+    [property: JsonPropertyName("released")] bool Released);
+
+public record VoiceRelease(
+    [property: JsonPropertyName("provider")] string Provider,
+    [property: JsonPropertyName("voice_id")] string VoiceId,
+    [property: JsonPropertyName("released")] bool Released);
+
+// The open door (qrme/opendoor.py): a person's standing yes, and the
+// owner's view of who gave one.
+public record DoorStanding(
+    [property: JsonPropertyName("open")] bool Open,
+    [property: JsonPropertyName("cadence")] string? Cadence);
+
+public record DoorRow(
+    [property: JsonPropertyName("profile_id")] string ProfileId,
+    [property: JsonPropertyName("open")] bool Open,
+    [property: JsonPropertyName("cadence")] string? Cadence);
+
+public record DoorListing(
+    [property: JsonPropertyName("doors")] DoorRow[] Doors);
+
+public record OpenerRow(
+    [property: JsonPropertyName("interactor_id")] string InteractorId,
+    [property: JsonPropertyName("cadence")] string? Cadence,
+    [property: JsonPropertyName("opened_at")] string OpenedAt);
+
+public record OpenerListing(
+    [property: JsonPropertyName("openers")] OpenerRow[] Openers);
 
 public record WebSearchRow(
     [property: JsonPropertyName("title")] string Title,
@@ -1082,6 +1110,13 @@ public sealed class ApiClient
     {
         var req = new HttpRequestMessage(HttpMethod.Put, path) { Content = JsonContent.Create(body) };
         if (token is not null) req.Headers.Add("authorization", $"Bearer {token}");
+        return req;
+    }
+
+    private static HttpRequestMessage Delete(string path, string token)
+    {
+        var req = new HttpRequestMessage(HttpMethod.Delete, path);
+        req.Headers.Add("authorization", $"Bearer {token}");
         return req;
     }
 
@@ -2282,6 +2317,37 @@ public sealed class ApiClient
                                                string voiceId, string label) =>
         Send<SpokenBinding>(Put($"/profiles/{id}/voice",
             new { voice_id = voiceId, label }, token));
+
+    /// <summary>The owner's waiver: let everybody on this deployment bind
+    /// the voice this profile speaks with. A recorded release, not a
+    /// setting — who let it go and when stays on the ledger.</summary>
+    public Task<VoiceRelease> ReleaseSpokenVoice(string id, string token) =>
+        Send<VoiceRelease>(Post($"/profiles/{id}/voice/release", new { }, token));
+
+    /// <summary>Take the voice back. Everybody else's binding of it goes
+    /// with the waiver; the release row stays, reclaimed.</summary>
+    public Task<VoiceRelease> ReclaimSpokenVoice(string id, string token) =>
+        Send<VoiceRelease>(Delete($"/profiles/{id}/voice/release", token));
+
+    // ---- the open door: the receiver's standing yes (qrme/opendoor.py) ----
+
+    /// <summary>YOUR standing yes to this profile reaching you first —
+    /// yours to open, yours to close, on your own token.</summary>
+    public Task<DoorStanding> SetOpenDoor(string interactorId,
+                                          string profileId, bool open,
+                                          string cadence, string token) =>
+        Send<DoorStanding>(Put(
+            $"/interactors/{interactorId}/open-door/{profileId}",
+            new { hear_first = open, cadence }, token));
+
+    public Task<DoorListing> MyOpenDoors(string interactorId, string token) =>
+        Send<DoorListing>(Get($"/interactors/{interactorId}/open-doors",
+                              token));
+
+    /// <summary>The owner's view of the inverted connection: an audience
+    /// that asked, rather than one the profile reached for.</summary>
+    public Task<OpenerListing> DoorsOpenTo(string profileId, string token) =>
+        Send<OpenerListing>(Get($"/profiles/{profileId}/open-doors", token));
 
     /// <summary>One utterance, synthesized server-side and watermarked
     /// there. Raw bytes rather than the decoding helper, because this answer

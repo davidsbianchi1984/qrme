@@ -1613,6 +1613,9 @@ fun ChatScreen(vm: StudioViewModel) {
     var escalated by remember { mutableStateOf<Escalated?>(null) }
     var escSaid by remember { mutableStateOf("") }
     var waiverSig by remember { mutableStateOf("") }
+    // Whether this person's door is open to this profile's unprompted
+    // reach — the receiver's own standing yes (qrme/opendoor.py).
+    var doorOpen by remember { mutableStateOf(false) }
 
     fun loadMine() {
         vm.call({ ApiClient.myPeople(vm.interactorId!!, vm.interactorToken!!) }) { r ->
@@ -1811,6 +1814,35 @@ fun ChatScreen(vm: StudioViewModel) {
             Text(L10n.t("tab.chat", vm.language), color = Qrme.Txt, fontSize = 22.sp, fontWeight = FontWeight.Bold)
             Text(L10n.fill("nchat.sub", vm.language, mapOf("name" to vm.displayName)),
                 color = Qrme.T2, fontSize = 13.sp)
+            // The open door (qrme/opendoor.py): the inverted connection.
+            // YOUR standing yes to this profile reaching you first —
+            // yours to open, yours to close, on your own token.
+            if (vm.interactorId != null) {
+                LaunchedEffect(vm.pid) {
+                    val iid = vm.interactorId; val tok = vm.interactorToken
+                    val pid = vm.pid
+                    if (iid != null && tok != null && pid != null) {
+                        vm.call({ ApiClient.myOpenDoors(iid, tok) }) { r ->
+                            doorOpen = r.getOrDefault(emptyList())
+                                .any { it.profileId == pid && it.open }
+                        }
+                    }
+                }
+                TextButton(onClick = {
+                    val iid = vm.interactorId ?: return@TextButton
+                    val tok = vm.interactorToken ?: return@TextButton
+                    val pid = vm.pid ?: return@TextButton
+                    vm.call({ ApiClient.setOpenDoor(iid, pid, !doorOpen,
+                        "whenever", tok) }) { r ->
+                        r.fold({ doorOpen = it }, { error = it.message })
+                    }
+                }) {
+                    Text("\ud83d\udd14 " + L10n.t("chat.door", vm.language)
+                            + (if (doorOpen) " \u2713" else ""),
+                        color = if (doorOpen) Qrme.BrandA else Qrme.T2,
+                        fontSize = 13.sp)
+                }
+            }
             whatItCanDo()
             bringSomebodyReal()
             messages.forEach { m ->
@@ -3103,8 +3135,16 @@ private fun SummonPanel(vm: StudioViewModel) {
     var found by remember { mutableStateOf<SummonResult?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     var scanning by remember { mutableStateOf(false) }
+    // Who opened their door to this profile — the owner's view of the
+    // inverted connection (qrme/opendoor.py).
+    var openers by remember { mutableStateOf<List<OpenerRow>>(emptyList()) }
     val uriHandler = LocalUriHandler.current
-    fun reload() { vm.call({ ApiClient.beacons(vm.pid!!) }) { r -> beacons = r.getOrDefault(emptyList()) } }
+    fun reload() {
+        vm.call({ ApiClient.beacons(vm.pid!!) }) { r -> beacons = r.getOrDefault(emptyList()) }
+        vm.call({ ApiClient.doorsOpenTo(vm.pid!!, vm.token!!) }) { r ->
+            openers = r.getOrDefault(emptyList())
+        }
+    }
     LaunchedEffect(Unit) { reload() }
 
     if (scanning) {
@@ -3200,6 +3240,23 @@ private fun SummonPanel(vm: StudioViewModel) {
                     Text(L10n.fill("nmg.found.beacon", vm.language,
                             mapOf("label" to (f.label ?: ""), "n" to "${f.scans ?: 0}")),
                         color = Qrme.T2, fontSize = 11.sp)
+            }
+        }
+        // The open door's other side: an audience that asked, rather than
+        // one the profile reached for. The console's Audience card, carried
+        // here as the backlog promised.
+        if (openers.isNotEmpty()) {
+            Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(L10n.t("aud.doors", vm.language), color = Qrme.Txt,
+                    fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(L10n.t("aud.doors.pitch", vm.language), color = Qrme.T2,
+                    fontSize = 11.sp)
+                openers.forEach { o ->
+                    Text(o.interactorId + " · "
+                            + L10n.t("aud.cad.${o.cadence ?: "whenever"}",
+                                     vm.language),
+                        color = Qrme.T2, fontSize = 12.sp)
+                }
             }
         }
         error?.let { Text(it, color = Qrme.Red, fontSize = 13.sp) }

@@ -47,6 +47,11 @@ export function Audience({ onPlans }: { onPlans: () => void }) {
   const [gifts, setGifts] = useState<GiftsView | null>(null);
   const [view, setView] = useState<AudienceView | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
+  // Who opened their door to this profile — an audience that asked,
+  // rather than one the profile reached for (qrme/opendoor.py).
+  const [openers, setOpeners] = useState<
+    { interactor_id: string; cadence: string | null;
+      opened_at: string }[]>([]);
 
   const [tier, setTier] = useState("follow");
   const [price, setPrice] = useState(5);
@@ -73,6 +78,11 @@ export function Audience({ onPlans }: { onPlans: () => void }) {
     }
   }
   useEffect(load, [me, token, interactorToken]);
+  useEffect(() => {
+    if (!me || !token) return;
+    api.doorsOpenTo(me, token).then((r) => setOpeners(r.openers))
+      .catch(() => undefined);
+  }, [me, token]);
 
   const act = (fn: () => Promise<unknown>, said?: string) => async () => {
     setError(null); setNote(null); setBusy(true);
@@ -249,6 +259,20 @@ export function Audience({ onPlans }: { onPlans: () => void }) {
           </p>
         ))}
       </div>
-    </div>
+    
+      {openers.length > 0 && (
+        <div className="card">
+          <h3>{tr("aud.doors", lang)}</h3>
+          <p className="muted small">{tr("aud.doors.pitch", lang)}</p>
+          {openers.map((o) => (
+            <p key={o.interactor_id} className="muted small">
+              {o.interactor_id} · {tr(
+                `aud.cad.${o.cadence || "whenever"}`, lang)}
+            </p>
+          ))}
+        </div>
+      )}
+
+</div>
   );
 }

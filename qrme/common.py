@@ -241,11 +241,17 @@ def proactive_gate(profile: dict, interactor: dict) -> str | None:
     if row["awaiting_reply"]:
         return "awaiting a reply since the last outreach — not sending again"
     if row["last_outreach_at"]:
-        interval = timedelta(hours=profile["proactive_min_interval_hours"])
+        # The door's own pace binds alongside the owner's cap — the
+        # looser of the two, made binding on both (qrme/opendoor.py): a
+        # weekly door slows a daily profile; nothing speeds one up.
+        from . import opendoor
+        hours = max(profile["proactive_min_interval_hours"],
+                    opendoor.cadence_hours(interactor["id"], profile["id"]))
+        interval = timedelta(hours=hours)
         last = datetime.fromisoformat(row["last_outreach_at"])
         if now - last < interval:
             return (f"rate cap: at most one unprompted outreach per "
-                    f"{profile['proactive_min_interval_hours']}h")
+                    f"{hours}h")
     return None
 
 

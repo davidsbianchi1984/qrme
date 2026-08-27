@@ -3,7 +3,7 @@ quiet-hours, and suppression until the recipient replies."""
 
 from datetime import datetime, timedelta, timezone
 
-from qrme import db
+from qrme import db, opendoor
 from tests.test_capabilities import as_owner, make_interactor, make_profile
 
 
@@ -11,9 +11,17 @@ def _proactive_profile(client):
     return make_profile(client, interaction_scope="proactive")
 
 
+def _welcomed(client, profile):
+    """An interactor whose door is open to this profile — the standing
+    yes every outreach now requires (qrme/opendoor.py)."""
+    user = make_interactor(client)
+    opendoor.set_door(user, profile["id"], open_=True)
+    return user
+
+
 def test_rate_cap_blocks_a_second_outreach_within_the_window(client):
     p = _proactive_profile(client)
-    user = make_interactor(client)
+    user = _welcomed(client, p)
     assert client.post(f"/profiles/{p['id']}/proactive/{user}").status_code == 200
     # A second immediate outreach is rate-capped.
     second = client.post(f"/profiles/{p['id']}/proactive/{user}")
@@ -25,7 +33,7 @@ def test_reply_lifts_suppression_but_rate_cap_still_applies(client):
     p = _proactive_profile(client)
     as_owner(client, p)
     client.patch(f"/profiles/{p['id']}", json={"proactive_min_interval_hours": 0})
-    user = make_interactor(client)
+    user = _welcomed(client, p)
 
     assert client.post(f"/profiles/{p['id']}/proactive/{user}").status_code == 200
     # Still awaiting a reply → suppressed even with a 0h rate cap.
@@ -39,7 +47,7 @@ def test_reply_lifts_suppression_but_rate_cap_still_applies(client):
 
 def test_rate_cap_allows_again_after_the_interval(client):
     p = _proactive_profile(client)
-    user = make_interactor(client)
+    user = _welcomed(client, p)
     client.post(f"/profiles/{p['id']}/proactive/{user}")
     # Simulate 25h passing and a prior reply (clear the awaiting flag).
     past = (datetime.now(timezone.utc) - timedelta(hours=25)).isoformat()
@@ -56,6 +64,7 @@ def test_quiet_hours_suppress_outreach(client):
     who = client.post("/interactors",
                       json={"display_name": "Q"}).json()
     quiet_user, tok = who["id"], who["token"]
+    opendoor.set_door(quiet_user, p["id"], open_=True)
 
     # Set a quiet window covering the current UTC hour.
     now_h = datetime.now(timezone.utc).hour

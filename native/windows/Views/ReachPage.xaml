@@ -91,6 +91,28 @@
                                        Foreground="{StaticResource QrmeT2Brush}" />
                         </StackPanel>
                     </Border>
+                    <!-- The open door's other side: an audience that asked,
+                         rather than one the profile reached for. The
+                         console's Audience card, carried here as the
+                         backlog promised. -->
+                    <Border x:Name="OpenersCard" Visibility="Collapsed"
+                            Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                            BorderThickness="1" CornerRadius="16" Padding="16">
+                        <StackPanel Spacing="6">
+                            <TextBlock x:Name="OpenersHead" FontWeight="Bold" FontSize="16"
+                                       Foreground="{StaticResource QrmeTxtBrush}" />
+                            <TextBlock x:Name="OpenersPitch" FontSize="11" TextWrapping="Wrap"
+                                       Foreground="{StaticResource QrmeT2Brush}" />
+                            <ItemsControl x:Name="OpenersList">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Line}" FontSize="12"
+                                                   Foreground="{StaticResource QrmeT2Brush}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
                     <TextBlock x:Name="SummonError" Foreground="{StaticResource QrmeRedBrush}" FontSize="13"
                                TextWrapping="Wrap" Visibility="Collapsed" />
                 </StackPanel>

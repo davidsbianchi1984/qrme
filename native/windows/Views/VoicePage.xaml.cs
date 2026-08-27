@@ -104,6 +104,8 @@ public sealed partial class VoicePage : Page
         catch (Exception ex) { ShowError(ex.Message); }
     }
 
+    private bool _voiceReleased;
+
     private void RenderSpoken(SpokenBinding b)
     {
         var lang = AppState.Current.Language;
@@ -112,6 +114,11 @@ public sealed partial class VoicePage : Page
         if (b.Speaks)
             BoundText.Text = L10n.T("nsv.bound", lang) + " "
                 + (b.Label is { Length: > 0 } ? b.Label : b.VoiceId);
+        // The waiver's face says which way it toggles: released voices
+        // offer the reclaim, held ones offer the release.
+        _voiceReleased = b.Released;
+        ReleaseButton.Content = L10n.T(
+            b.Released ? "nsv.reclaim" : "nsv.release", lang);
     }
 
     private void Render(VoiceprintStatus s)
@@ -286,6 +293,16 @@ public sealed partial class VoicePage : Page
     private async void OnUnbind(object sender, RoutedEventArgs e) =>
         await Call(async (pid, token) => RenderSpoken(
             await ApiClient.Shared.BindSpokenVoice(pid, token, "", "")));
+
+    private async void OnReleaseToggle(object sender, RoutedEventArgs e) =>
+        await Call(async (pid, token) =>
+        {
+            if (_voiceReleased)
+                await ApiClient.Shared.ReclaimSpokenVoice(pid, token);
+            else
+                await ApiClient.Shared.ReleaseSpokenVoice(pid, token);
+            RenderSpoken(await ApiClient.Shared.SpokenVoice(pid));
+        });
 
     private async void OnSay(object sender, RoutedEventArgs e) =>
         await Call(async (pid, token) =>

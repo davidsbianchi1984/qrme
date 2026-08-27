@@ -1271,6 +1271,18 @@ CREATE INDEX IF NOT EXISTS idx_game_lobby_live
 -- The avatar registry (qrme/avatarreg.py): one ledger for every face,
 -- whatever road it arrived by. Rows are retired, never deleted — a face
 -- that was ever shown is a fact the record keeps.
+-- The open door (qrme/opendoor.py): the receiver's standing yes to a
+-- profile's unprompted reach. Closing keeps the row — a yes withdrawn
+-- is a different fact from a yes never given.
+CREATE TABLE IF NOT EXISTS open_doors (
+    interactor_id TEXT NOT NULL,
+    profile_id    TEXT NOT NULL,
+    cadence       TEXT NOT NULL DEFAULT 'whenever',
+    opened_at     TEXT NOT NULL,
+    closed_at     TEXT,
+    UNIQUE (interactor_id, profile_id)
+);
+
 CREATE TABLE IF NOT EXISTS avatar_registry (
     id                TEXT PRIMARY KEY,
     owner_account_id  TEXT,               -- NULL = the deployment's library
