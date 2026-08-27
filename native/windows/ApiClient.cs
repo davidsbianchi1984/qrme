@@ -4753,6 +4753,38 @@ public sealed class ApiClient
                                         string token) =>
         Send<WidgetAnswer>(Post($"/profiles/{profileId}/widgets/{widgetId}/run",
                                 new { }, token));
+    // -- the people in your phone (qrme/contacts.py) -------------------------
+    // Granted, synced, read back, withdrawn — on the interactor's token.
+    // Classic Windows holds no system address book, so this shell's sync is
+    // the rows a person types in; the honesty is the same: the sync
+    // REPLACES the book, and flipping the grant off drops it server-side.
+
+    public sealed class ContactBookRow
+    {
+        public string id { get; init; } = "";
+        public string name { get; init; } = "";
+        public bool holds_account { get; init; }
+    }
+
+    public sealed class ContactBook
+    {
+        public List<ContactBookRow> book { get; init; } = new();
+        public int held { get; init; }
+    }
+
+    public Task DecideContacts(string interactorId, bool consented,
+                               string token) =>
+        Send<JsonElement>(Put($"/interactors/{interactorId}/contacts/grant",
+            new { consented }, token));
+
+    public Task SyncContacts(string interactorId,
+                             IEnumerable<object> entries, string token) =>
+        Send<JsonElement>(Put($"/interactors/{interactorId}/contacts",
+            new { entries }, token));
+
+    public Task<ContactBook> ContactsBook(string interactorId, string token) =>
+        Send<ContactBook>(Get($"/interactors/{interactorId}/contacts", token));
+
 }
 public record DmMessageRow(
     [property: JsonPropertyName("id")] string Id,

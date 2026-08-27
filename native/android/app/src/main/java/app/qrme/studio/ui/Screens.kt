@@ -886,6 +886,79 @@ fun SettingsScreen(vm: StudioViewModel) {
         Text(L10n.t("tab.settings", vm.language), color = Qrme.Txt, fontSize = 22.sp,
             fontWeight = FontWeight.Bold)
 
+        // The people in your phone (qrme/contacts.py) — the shell's own
+        // road for the three contact doors: granted, synced, read back,
+        // withdrawn, on the interactor's token. The sync REPLACES the
+        // book; withdrawing the grant drops it server-side.
+        run {
+            var book by remember { mutableStateOf<List<ApiClient.ContactRow>>(emptyList()) }
+            var held by remember { mutableStateOf(0) }
+            var bookNote by remember { mutableStateOf<String?>(null) }
+            val ctx = LocalContext.current
+            val iam = vm.interactorId
+            val itok = vm.interactorToken
+            fun readBook() {
+                if (iam == null || itok == null) return
+                vm.call({ ApiClient.contactsBook(iam, itok) }) { r ->
+                    r.getOrNull()?.let { (rows, n) -> book = rows; held = n }
+                }
+            }
+            fun readAndSync() {
+                if (iam == null || itok == null) return
+                val entries = mutableListOf<Pair<String, String>>()
+                ctx.contentResolver.query(
+                    android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                    arrayOf(
+                        android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                        android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER),
+                    null, null, null)?.use { cur ->
+                    while (cur.moveToNext()) {
+                        val name = cur.getString(0) ?: continue
+                        val number = cur.getString(1) ?: continue
+                        if (name.isNotBlank()) entries.add(name to number)
+                    }
+                }
+                vm.call({
+                    ApiClient.decideContacts(iam, true, itok)
+                    ApiClient.syncContacts(iam, entries, itok)
+                }) { readBook() }
+            }
+            val askContacts = rememberLauncherForActivityResult(
+                ActivityResultContracts.RequestPermission()) { allowed ->
+                // The refusal is said, never swallowed — with where the
+                // switch lives.
+                if (allowed) readAndSync()
+                else bookNote = L10n.t("book.denied", vm.language)
+            }
+            LaunchedEffect(iam) { readBook() }
+            if (iam != null && itok != null) {
+                Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(L10n.t("book.title", vm.language), color = Qrme.Txt,
+                        fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(L10n.t("book.lead", vm.language), color = Qrme.T2, fontSize = 12.sp)
+                    SmallAction(L10n.t("book.sync", vm.language)) {
+                        askContacts.launch(android.Manifest.permission.READ_CONTACTS)
+                    }
+                    if (held > 0) {
+                        Text(L10n.t("book.held", vm.language).replace("{n}", held.toString()),
+                            color = Qrme.T2, fontSize = 12.sp)
+                        book.take(30).forEach { row ->
+                            Text(if (row.holdsAccount)
+                                    "${row.name} · ${L10n.t("book.account", vm.language)}"
+                                 else row.name,
+                                color = Qrme.Txt, fontSize = 13.sp)
+                        }
+                        SmallAction(L10n.t("book.withdraw", vm.language)) {
+                            vm.call({ ApiClient.decideContacts(iam, false, itok) }) {
+                                book = emptyList(); held = 0
+                            }
+                        }
+                    }
+                    bookNote?.let { Text(it, color = Qrme.T2, fontSize = 12.sp) }
+                }
+            }
+        }
+
         // 0.58.0. The console has offered this since 0.4.3 and the phones
         // never did: a key set there was used there, and the deployment's key
         // used here, on the same account.

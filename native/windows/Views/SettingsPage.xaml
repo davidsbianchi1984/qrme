@@ -22,6 +22,31 @@
                 </StackPanel>
             </Border>
 
+            <!-- The people in your phone (qrme/contacts.py). Classic
+                 Windows holds no system address book, so this shell's sync
+                 is the rows a person types — one per line, name then
+                 number. The honesty is unchanged: the sync REPLACES the
+                 book, and withdrawing drops it server-side. -->
+            <Border x:Name="BookCard" Background="{StaticResource QrmeCardBrush}" BorderBrush="{StaticResource QrmeLineBrush}"
+                    BorderThickness="1" CornerRadius="16" Padding="16">
+                <StackPanel Spacing="10">
+                    <TextBlock x:Name="BookHead" FontWeight="Bold" FontSize="16"
+                               Foreground="{StaticResource QrmeTxtBrush}" />
+                    <TextBlock x:Name="BookLead" TextWrapping="Wrap" FontSize="12"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <TextBox x:Name="BookLines" AcceptsReturn="True" MinHeight="72"
+                             TextWrapping="Wrap" />
+                    <Button x:Name="BookSyncButton" Click="OnBookSync"
+                            Background="{StaticResource QrmeBrandABrush}" Foreground="White" />
+                    <TextBlock x:Name="BookHeld" FontSize="12"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                    <ItemsControl x:Name="BookList" />
+                    <Button x:Name="BookWithdrawButton" Click="OnBookWithdraw" />
+                    <TextBlock x:Name="BookNote" FontSize="12" TextWrapping="Wrap"
+                               Foreground="{StaticResource QrmeT2Brush}" />
+                </StackPanel>
+            </Border>
+
             <!-- 0.58.0. The console has offered this since 0.4.3 and the
                  shells never did: a key set there was used there, and the
                  deployment's key used here, on the same profile. -->

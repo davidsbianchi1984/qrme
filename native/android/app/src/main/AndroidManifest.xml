@@ -4,6 +4,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Reading a beacon sticker in the live viewfinder. Frames are analysed
          and discarded; nothing is recorded or uploaded. -->
+    <!-- The people in your phone: read once per press of sync, never in
+         the background. Names and one number each go up under a grant the
+         person can withdraw; withdrawing drops the book server-side. -->
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera.any" android:required="false" />
     <!-- Enrolling the owner's own voice. The recording is written to this

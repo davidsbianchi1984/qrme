@@ -16,6 +16,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The people in your phone reach the phones.** The three contact doors
+  — granted, synced, read back, withdrawn — leave the shell backlogs and
+  land as real screens: iOS reads the device's own contacts behind
+  NSContactsUsageDescription, Android behind READ_CONTACTS with the
+  refusal said in the reader's language, and Windows — which holds no
+  system address book — takes typed rows, one per line, with the same
+  honesty: the sync replaces the book, names stay, numbers never come
+  back out, withdrawing drops the book.
+
 - **Nine new dials on the steering catalog.** Empathy, encouragement,
   patience, storytelling, technicality, spontaneity, sarcasm and emoji
   join the behavior shelf, and profanity joins intimacy on the adult

@@ -97,6 +97,12 @@ public sealed partial class SettingsPage : Page
         KeyBox.Header = L10n.T("set.key.label", lang);
         KeyBox.PlaceholderText = L10n.T("set.key.ph", lang);
         SaveKeyButton.Content = L10n.T("action.save", lang);
+
+        BookHead.Text = L10n.T("book.title", lang);
+        BookLead.Text = L10n.T("book.lead", lang);
+        BookLines.PlaceholderText = L10n.T("book.lines", lang);
+        BookSyncButton.Content = L10n.T("book.sync", lang);
+        BookWithdrawButton.Content = L10n.T("book.withdraw", lang);
         KeyBox.Password = AppState.Current.LlmKey;
 
         InviteHead.Text = L10n.T("set.invite", lang);
@@ -214,7 +220,8 @@ public sealed partial class SettingsPage : Page
         ProblemsFetchButton.Content = L10n.T("prob.fetch");
     }
 
-    protected override async void OnNavigatedTo(NavigationEventArgs e) => await Reload();
+    protected override async void OnNavigatedTo(NavigationEventArgs e)
+    { await Reload(); await ReadBook(); }
 
     private async System.Threading.Tasks.Task Reload()
     {
@@ -1048,4 +1055,78 @@ public sealed partial class SettingsPage : Page
         AppState.Current.RememberSignupKey(InviteBox.Password);
         InviteBox.Password = AppState.Current.SignupKey;
     }
+    // -- the people in your phone (qrme/contacts.py) -------------------------
+    // Classic Windows holds no system address book, so the sync here is the
+    // rows a person types — one per line, name then number, split on the
+    // last comma so a name may carry its own. The grant is its own door and
+    // goes first; withdrawing drops the book server-side.
+
+    private async System.Threading.Tasks.Task ReadBook()
+    {
+        var s = AppState.Current;
+        if (s.InteractorId is null || s.InteractorToken is null)
+        {
+            BookCard.Visibility = Visibility.Collapsed;
+            return;
+        }
+        try
+        {
+            var got = await ApiClient.Shared.ContactsBook(
+                s.InteractorId, s.InteractorToken);
+            BookHeld.Text = L10n.T("book.held", s.Language)
+                .Replace("{n}", got.held.ToString());
+            BookHeld.Visibility =
+                got.held > 0 ? Visibility.Visible : Visibility.Collapsed;
+            BookWithdrawButton.Visibility = BookHeld.Visibility;
+            BookList.ItemsSource = got.book
+                .Take(30)
+                .Select(r => r.holds_account
+                    ? $"{r.name} · {L10n.T("book.account", s.Language)}"
+                    : r.name)
+                .ToList();
+        }
+        catch (Exception ex) { BookNote.Text = ex.Message; }
+    }
+
+    private async void OnBookSync(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        if (s.InteractorId is null || s.InteractorToken is null) return;
+        var entries = new List<object>();
+        foreach (var line in (BookLines.Text ?? "").Split('\n'))
+        {
+            var cut = line.LastIndexOf(',');
+            if (cut <= 0 || cut >= line.Length - 1) continue;
+            var name = line[..cut].Trim();
+            var number = line[(cut + 1)..].Trim();
+            if (name.Length > 0 && number.Length > 0)
+                entries.Add(new { name, number });
+        }
+        try
+        {
+            BookNote.Text = "";
+            await ApiClient.Shared.DecideContacts(
+                s.InteractorId, true, s.InteractorToken);
+            await ApiClient.Shared.SyncContacts(
+                s.InteractorId, entries, s.InteractorToken);
+            await ReadBook();
+        }
+        catch (Exception ex) { BookNote.Text = ex.Message; }
+    }
+
+    private async void OnBookWithdraw(object sender, RoutedEventArgs e)
+    {
+        var s = AppState.Current;
+        if (s.InteractorId is null || s.InteractorToken is null) return;
+        try
+        {
+            await ApiClient.Shared.DecideContacts(
+                s.InteractorId, false, s.InteractorToken);
+            BookList.ItemsSource = new List<string>();
+            BookHeld.Visibility = Visibility.Collapsed;
+            BookWithdrawButton.Visibility = Visibility.Collapsed;
+        }
+        catch (Exception ex) { BookNote.Text = ex.Message; }
+    }
+
 }

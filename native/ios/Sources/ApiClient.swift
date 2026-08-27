@@ -7044,4 +7044,49 @@ struct WidgetLimits: Decodable {
     let allowances: Caps
     let available: Bool
     let unavailable_because: String?
+    // -- the people in your phone (qrme/contacts.py) -------------------------
+    // Granted, synced, read back, withdrawn — the same three doors the
+    // console holds, on the interactor's own token. The sync REPLACES the
+    // book (a sync is the phone's current truth, not an accretion), and
+    // flipping the grant off drops the book server-side.
+
+    struct ContactRow: Decodable {
+        let id: String
+        let name: String
+        let holds_account: Bool
+        let added_at: String
+    }
+
+    struct ContactBook: Decodable {
+        let book: [ContactRow]
+        let held: Int
+    }
+
+    func decideContacts(interactorId: String, consented: Bool,
+                        token: String) async throws -> [String: Bool] {
+        try await request("/interactors/\(interactorId)/contacts/grant",
+                          method: "PUT", body: ["consented": consented],
+                          token: token)
+    }
+
+    struct ContactsSynced: Decodable {
+        let held: Int
+        let skipped: Int
+        let sealed: Bool
+    }
+
+    func syncContacts(interactorId: String,
+                      entries: [[String: String]],
+                      token: String) async throws -> ContactsSynced {
+        try await request("/interactors/\(interactorId)/contacts",
+                          method: "PUT", body: ["entries": entries],
+                          token: token)
+    }
+
+    func contactsBook(interactorId: String,
+                      token: String) async throws -> ContactBook {
+        try await request("/interactors/\(interactorId)/contacts",
+                          token: token)
+    }
+
 }

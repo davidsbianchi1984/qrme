@@ -41,6 +41,13 @@ targets:
           - UIInterfaceOrientationLandscapeRight
         # Required before AVCaptureSession may run: iOS terminates the app
         # outright if a camera is opened without this string.
+        # The people in your phone. Read once per press of sync, never in the
+        # background: names and one number each go up under a grant the
+        # person can withdraw, and withdrawing drops the book server-side.
+        NSContactsUsageDescription: >-
+          QRME syncs the names in your contacts, with your permission, so a
+          profile can recognise who a caller is to you. Numbers are matched
+          and never shown back; withdrawing the permission deletes the book.
         NSCameraUsageDescription: >-
           QRME reads beacon QR codes so a profile can appear on the sticker
           in front of you. Frames stay on the device; only the code's id is

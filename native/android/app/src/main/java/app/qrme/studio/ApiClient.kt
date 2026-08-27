@@ -5590,6 +5590,46 @@ object ApiClient {
             o.optString("said").ifEmpty { null },
             o.optString("message").ifEmpty { null }, value)
     }
+    // -- the people in your phone (qrme/contacts.py) -------------------------
+    // Granted, synced, read back, withdrawn — on the interactor's token.
+    // The sync REPLACES the book, and flipping the grant off drops it.
+
+    data class ContactRow(val id: String, val name: String,
+                          val holdsAccount: Boolean)
+
+    suspend fun decideContacts(interactorId: String, consented: Boolean,
+                               token: String) {
+        request("/interactors/$interactorId/contacts/grant", "PUT",
+                JSONObject().put("consented", consented), token)
+    }
+
+    suspend fun syncContacts(interactorId: String,
+                             entries: List<Pair<String, String>>,
+                             token: String): Int {
+        val body = JSONObject().put("entries", JSONArray().apply {
+            entries.forEach {
+                put(JSONObject().put("name", it.first).put("number", it.second))
+            }
+        })
+        val said = JSONObject(
+            request("/interactors/$interactorId/contacts", "PUT", body, token))
+        return said.optInt("held", 0)
+    }
+
+    suspend fun contactsBook(interactorId: String,
+                             token: String): Pair<List<ContactRow>, Int> {
+        val said = JSONObject(
+            request("/interactors/$interactorId/contacts", token = token))
+        val rows = mutableListOf<ContactRow>()
+        val book = said.optJSONArray("book") ?: JSONArray()
+        for (i in 0 until book.length()) {
+            val row = book.getJSONObject(i)
+            rows.add(ContactRow(row.getString("id"), row.getString("name"),
+                                row.optBoolean("holds_account", false)))
+        }
+        return rows to said.optInt("held", 0)
+    }
+
 }
 
 data class DmThread(val otherId: String, val otherName: String?, val messages: Int)

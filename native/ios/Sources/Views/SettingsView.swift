@@ -26,6 +26,11 @@ struct SettingsView: View {
                 Text(L10n.t("tab.settings", state.language))
                     .font(.title2.bold()).foregroundStyle(Theme.txt)
 
+                // The people in your phone — the shell's own road for the
+                // three contact doors the console can only offer where a
+                // browser has a picker.
+                ContactsBookSection()
+
                 VStack(alignment: .leading, spacing: 10) {
                     Text(L10n.t("ns.model", state.language)).font(.headline).foregroundStyle(Theme.txt)
                     Text(L10n.t("ns.model.sub", state.language))

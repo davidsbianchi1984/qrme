@@ -42,11 +42,3 @@ POST /interactors/{interactor_id}/heard
 # lives today.
 POST /profiles/{profile_id}/voice/release
 DELETE /profiles/{profile_id}/voice/release
-
-# The people in your phone (qrme/contacts.py). The native shells are the
-# real road for this one — a device's address book is theirs to read and
-# the web picker exists on almost none of them — so these are recorded as
-# owed rather than absent: the shell that syncs is the shell that grants.
-PUT /interactors/{interactor_id}/contacts/grant
-PUT /interactors/{interactor_id}/contacts
-GET /interactors/{interactor_id}/contacts
