@@ -1171,8 +1171,18 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    holds at every width; the opened panel swings out to the left of the
    column rather than into it. */
 .chat-rail-dock .talk-rail { position: fixed; right: 6px;
-                             top: calc(50% + 96px); transform: none;
+                             top: calc(50% + 84px); transform: none;
                              flex-direction: column; z-index: 84; }
+/* Compact in the dock — the field report circled four boxes and could
+   not see all four: at the overlay's size the column's tail slid under
+   the room's bottom strip on a phone. Smaller here, and never taller
+   than the space under the dial, scrolling inside itself before it
+   ever hides a box. */
+.chat-rail-dock .talk-rail-btn { min-width: 52px; padding: 5px 4px;
+                                 font-size: 15px; border-radius: 11px; }
+.chat-rail-dock .talk-rail-label { font-size: 8.5px; max-width: 50px; }
+.chat-rail-dock .talk-rail { max-height: calc(50vh - 100px);
+                             overflow-y: auto; }
 .chat-rail-dock .talk-panel { position: fixed; right: 76px; top: 50%;
                               transform: translateY(-50%); z-index: 86;
                               width: min(86vw, 560px); }
@@ -2024,3 +2034,9 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 /* The carried-things card can be put away — the red close needs a
    positioned parent to sit in the corner of. */
 .bc-card { position: relative; }
+
+/* A seat for the yes that has not happened yet: invited, dimmed, and
+   labelled — never a microphone, never a voice. */
+.rs-waiting { opacity: 0.45; display: flex; flex-direction: column;
+              align-items: center; justify-content: center; gap: 6px;
+              border-style: dashed; }

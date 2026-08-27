@@ -194,6 +194,11 @@ export function Inside({ onPlans, start = "", onLeave }: {
   const [mics, setMics] = useState<MicsHere | null>(null);
   const [seats, setSeats] = useState<
     { kind: string; id: string; display: string }[]>([]);
+  // Profiles asked in whose owners have not yet said yes — drawn as
+  // waiting frames, so the press that invited somebody visibly did
+  // something ("they never showed up a new frame").
+  const [invited, setInvited] = useState<
+    { kind: string; id: string; display: string }[]>([]);
   const [draft, setDraft] = useState("");
   // Whose four panels the dock shows, in a room with several profiles.
   const [railFor, setRailFor] = useState<string | null>(null);
@@ -653,6 +658,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
     api.joinRoom(open, token)
       .then((r) => {
         setSeats(r.participants);
+        setInvited(r.invited ?? []);
         setChannel(r.channel);
         // The name, so the box shows what the room is called rather than
         // an empty field somebody has to guess the current value of.
@@ -1709,28 +1715,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
          * Two states, not one, because lending and taking back are
          * different acts and a toggle that says "microphone" for both
          * tells you nothing about which way it is pointing. */}
-        {/* In words now, the way "Let it talk first" went and for the
-            same report — the glyph read as "a person in a doorway" on a
-            Windows handheld and the press looked dead because the only
-            feedback was a note below the fold. The label IS the state:
-            it says which way the toggle is pointing before the press
-            and after it. */}
-        <button className={"rs-round rs-worded lend" + (lentByMe ? " live" : "")}
-                disabled={busy || !token || !me || !open}
-                aria-pressed={lentByMe}
-                aria-label={lentByMe ? tr("ins.takeback", lang)
-                                     : tr("ins.lendmic", lang)}
-                title={tr("ins.micpitch", lang)}
-                onClick={act(async () => {
-                  if (lentByMe) {
-                    await api.takeBackMicInRoom(open, me, token);
-                  } else {
-                    await api.lendMicInRoom(open, me, token);
-                  }
-                }, lentByMe ? tr("ins.takenback", lang)
-                            : tr("ins.lent", lang))}>
-          {lentByMe ? tr("ins.takeback", lang) : tr("ins.lendmic", lang)}
-        </button>
+
         {/* The room walks with you — the person-walking button the owner
             asked for by name: navigate back to the home screen, or the
             device's own, while staying in the room. Same bargain as the
@@ -1794,26 +1779,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
                     },
                   });
                 }}>🚶</button>
-        {/* Letting the profiles talk without you saying anything. The one
-         * control on the card below that was NOT a duplicate, so it moved
-         * here rather than out of the product — deleting the only door to
-         * a capability is a different act from removing a second copy of
-         * one. Sending a message already makes them reply; this is for
-         * when you want to hear them without adding a line.
-         *
-         * In words now, not a glyph. It wore 💬 the way its neighbours
-         * wear theirs, and the owner's report was blunt: "nobody knows
-         * what that speech bubble means." The other buttons depict what
-         * they do; this one only had a caption a phone never shows, and
-         * a control whose meaning lives in a tooltip has no meaning on
-         * the device this product is mostly used on. */}
-        <button className="rs-round rs-worded talkers"
-                disabled={busy || !token || !open}
-                aria-label={tr("ins.letthemtalk", lang)}
-                title={tr("ins.letthemtalk", lang)}
-                onClick={act(async () => {
-                  await api.advanceRoom(open, token);
-                })}>{tr("ins.letthemtalk", lang)}</button>
+
         <button className="rs-round share" disabled={!open}
                 aria-label={tr("ins.handover", lang)}
                 title={tr("ins.handover", lang)}
@@ -1936,6 +1902,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
       }
       setNote(tr("ins.ask.sent", lang));
       setGuestId("");
+      load();
     } catch (e) { setError(e); } finally { setBusy(false); }
   }
 
@@ -2159,12 +2126,48 @@ export function Inside({ onPlans, start = "", onLeave }: {
             <input value={roomId} onChange={(e) => setRoomId(e.target.value)}
                    placeholder={tr("ins.roomid.ph", lang)} style={{ flex: 1 }} />
           )}
-          {inRoom ? (
+          {inRoom ? (<>
             <button disabled={busy || !token || !roomName.trim()}
                     onClick={() => void saveName()}>
               {tr("ins.roomname.save", lang)}
             </button>
-          ) : (
+
+            {/* The microphone lend, out of the strip on the owner's word
+                ("get rid of the lend button") and into the room's own
+                settings card — moved, not deleted: this is the one door
+                to lending your microphone in a room, and deleting the
+                only door to a capability is a different act from moving
+                it below the fold. In words, both directions, exactly as
+                before. */}
+            <button className={"rs-round rs-worded lend" + (lentByMe ? " live" : "")}
+                    disabled={busy || !token || !me || !open}
+                    aria-pressed={lentByMe}
+                    aria-label={lentByMe ? tr("ins.takeback", lang)
+                                         : tr("ins.lendmic", lang)}
+                    title={tr("ins.micpitch", lang)}
+                    onClick={act(async () => {
+                      if (lentByMe) {
+                        await api.takeBackMicInRoom(open, me, token);
+                      } else {
+                        await api.lendMicInRoom(open, me, token);
+                      }
+                    }, lentByMe ? tr("ins.takenback", lang)
+                                : tr("ins.lent", lang))}>
+              {lentByMe ? tr("ins.takeback", lang) : tr("ins.lendmic", lang)}
+            </button>
+
+            {/* Let it talk first — out of the strip on the same word as
+                the lend ("get rid of the let it talk first button too")
+                and into this card beside it. The one door to hearing the
+                profiles without adding a line, kept rather than deleted. */}
+            <button className="rs-round rs-worded talkers"
+                    disabled={busy || !token || !open}
+                    aria-label={tr("ins.letthemtalk", lang)}
+                    title={tr("ins.letthemtalk", lang)}
+                    onClick={act(async () => {
+                      await api.advanceRoom(open, token);
+                    })}>{tr("ins.letthemtalk", lang)}</button>
+          </>) : (
             <button disabled={busy || !open || !token} onClick={act(async () => {
               setEntered(true);
               load();
@@ -2600,6 +2603,22 @@ export function Inside({ onPlans, start = "", onLeave }: {
               </div>
               );
             })}
+            {/* The waiting seats: invited, not yet accepted. Dimmed and
+                labelled, never a microphone or a voice — a frame for the
+                yes that has not happened yet. */}
+            {invited.map((g) => (
+              <div key={"inv-" + g.id} className="rs-tile rs-waiting">
+                <span className="friend-photo friend-initials"
+                      aria-hidden="true">
+                  {g.display.split(/\s+/).map((w) => w[0]).join("")
+                    .slice(0, 2)}
+                </span>
+                <strong>{g.display}</strong>
+                <span className="muted small">
+                  {tr("ins.ask.waiting", lang)}
+                </span>
+              </div>
+            ))}
             {/* The conversation, worn on the room itself — the gallery's
                 design (screens 96–98, 105) the flat card below never
                 delivered until a field report held the mockups up next

@@ -4066,7 +4066,8 @@ export const api = {
       { method: "POST", body: { profile_id: profileId }, token: ownerToken }),
   joinRoom: (roomId: string, token: string) =>
     req<{ id: string; topic?: string | null; channel: string;
-          participants: { kind: string; id: string; display: string }[] }>(
+          participants: { kind: string; id: string; display: string }[];
+          invited?: { kind: string; id: string; display: string }[] }>(
       `/rooms/${roomId}/join`, { method: "POST", token }),
   // The room's name, changed from inside it. Authorized like speaking: a
   // participant, held by their own token — naming somebody else's room

@@ -6,6 +6,20 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **The room strip slims to what a hand reaches for.** The microphone
+  lend and "Let it talk first" move out of the strip and into the
+  room's own settings card — moved, never deleted: each is the one door
+  to its capability, and both keep their worded, direction-stating
+  labels. The invite that "never showed up a new frame" now does: a
+  profile asked in stands as a dimmed waiting seat until its owner says
+  yes, and the join answer carries the standing invites so every screen
+  can draw them. And the four panels dock compacts — smaller boxes,
+  never taller than the space under the dial, scrolling inside itself
+  before it ever hides a box — so all four are reachable in every chat
+  and every room on a phone.
+
 ### Added
 
 - **The avatar registry: one face ledger, three roads in.** Every face

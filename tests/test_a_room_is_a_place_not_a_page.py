@@ -332,13 +332,16 @@ def test_every_control_in_the_strip_does_something():
     # duplicate paperclip — the composer's button holds that door now,
     # and the guard above holds the door.
     for wired in ("setDraft(", "flipTalking",
-                  "setAsking(true)", "clipboard",
-                  # Lending the profiles your microphone. It had a card of
-                  # its own; the card is gone and the door is here, beside
-                  # the handover it sits next to in meaning — both hand
-                  # something of yours to somebody else.
-                  "api.lendMicInRoom(", "api.takeBackMicInRoom("):
+                  "setAsking(true)", "clipboard"):
         assert wired in strip, f"the strip has a control with no {wired}"
+    # Two controls moved out of the strip on the owner's word ("get rid
+    # of the lend button... and the let-it-talk-first button too") and
+    # into the room's settings card. Moved, never deleted — each is the
+    # one door to its capability, so the door is held wherever it lives
+    # rather than pinned to the strip.
+    for wired in ("api.lendMicInRoom(", "api.takeBackMicInRoom(",
+                  "api.advanceRoom("):
+        assert wired in INSIDE, f"the only door is gone entirely: {wired}"
 
 
 def test_the_paperclip_takes_photos_video_and_files():

@@ -8397,6 +8397,9 @@ const CHROME: Table = {
   "ins.ask.yours": {
     en: "Your friends", es: "Tus amistades", fr: "Vos amis", de: "Deine Freund:innen", pt: "Os teus amigos", it: "I tuoi amici", ja: "あなたの友だち", zh: "你的好友", hi: "आपके मित्र", ar: "أصدقاؤك",
   },
+  "ins.ask.waiting": {
+    en: "invited — waiting for their yes", es: "invitado — esperando su sí", fr: "invité — en attente de son oui", de: "eingeladen — wartet auf ihr Ja", pt: "convidado — à espera do sim", it: "invitato — in attesa del suo sì", ja: "招待済み — 相手の承諾待ち", zh: "已邀请——等待对方同意", hi: "आमंत्रित — उनकी हाँ की प्रतीक्षा", ar: "مدعو — بانتظار موافقته",
+  },
   "ins.ask.here": {
     en: "already here", es: "ya está aquí", fr: "déjà présent", de: "schon hier", pt: "já está aqui", it: "già qui", ja: "すでに参加中", zh: "已在房间", hi: "पहले से यहाँ", ar: "موجود بالفعل",
   },

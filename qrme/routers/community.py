@@ -715,7 +715,27 @@ def join_room(room_id: str, request: Request) -> dict:
              "display": _display(p["kind"], p["ref_id"])}
             for p in _participants(room_id)
         ],
+        # The invites still standing — so the press that asked somebody in
+        # visibly did something. Field report: "I tried adding a friend...
+        # they never showed up a new frame." Their frame shows as waiting,
+        # and it becomes a seat when their owner says yes — the consent
+        # shape on the wire is unchanged.
+        "invited": _standing_invites(room_id),
     }
+
+
+def _standing_invites(room_id: str) -> list[dict]:
+    """Profiles asked into this room whose owners have not yet said yes.
+    The invite IS the inbox event (see invite_to_room), so this is one
+    read of the same row `accept` checks — never a second record."""
+    rows = db.connect().execute(
+        "SELECT profile_id FROM inbox_events WHERE kind='room_invite'"
+        " AND ref=? AND profile_id NOT IN (SELECT ref_id FROM"
+        " room_participants WHERE room_id=? AND kind='profile')"
+        " ORDER BY created_at", (room_id, room_id)).fetchall()
+    return [{"kind": "profile", "id": r["profile_id"],
+             "display": _display("profile", r["profile_id"])}
+            for r in rows]
 
 
 @router.post("/rooms/{room_id}/invite", status_code=201)
