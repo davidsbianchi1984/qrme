@@ -2020,3 +2020,7 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
                     border: 0; cursor: pointer; line-height: 1;
                     background: rgb(224, 85, 85); color: #fff;
                     font-size: 13px; font-weight: 700; }
+
+/* The carried-things card can be put away — the red close needs a
+   positioned parent to sit in the corner of. */
+.bc-card { position: relative; }

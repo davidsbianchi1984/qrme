@@ -8083,6 +8083,9 @@ const CHROME: Table = {
   "chat.talk.trouble.network": {
     en: "The speech service could not be reached. Tap to talk to try again.", es: "No se pudo contactar con el servicio de voz. Toca para hablar e inténtalo otra vez.", fr: "Le service de reconnaissance vocale est injoignable. Touche pour parler et réessayer.", de: "Der Spracherkennungsdienst war nicht erreichbar. Tipp zum Sprechen und versuch es erneut.", pt: "Não foi possível contactar o serviço de voz. Toca para falar e tenta de novo.", it: "Il servizio vocale non è raggiungibile. Tocca per parlare e riprova.", ja: "音声認識サービスに接続できませんでした。タップして話すともう一度試せます。", zh: "无法连接语音服务。点按说话再试一次。", hi: "स्पीच सेवा तक नहीं पहुँच पाए। बोलने के लिए टैप करके फिर कोशिश करो।", ar: "تعذّر الوصول إلى خدمة التعرّف على الكلام. اضغط للتحدّث وحاول مرّة أخرى.",
   },
+  "chat.carried": {
+    en: "What they're carrying", es: "Lo que llevan", fr: "Ce qu'ils portent", de: "Was sie bei sich tragen", pt: "O que estão a carregar", it: "Cosa portano con sé", ja: "持っているもの", zh: "它携带的内容", hi: "वे क्या साथ रखे हैं", ar: "ما يحملونه",
+  },
   "chat.talk.handed": {
     en: "Handed over — they're reading it", es: "Entregado: lo están leyendo", fr: "Remis — en cours de lecture", de: "Übergeben — es wird gelesen", pt: "Entregue — estão a lê-lo", it: "Consegnato — lo stanno leggendo", ja: "渡しました — 読んでいます", zh: "已交给它——正在阅读", hi: "सौंप दिया — पढ़ा जा रहा है", ar: "سُلِّم — يقرأونه الآن",
   },

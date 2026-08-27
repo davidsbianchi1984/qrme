@@ -16,6 +16,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The paperclip is the phone's own chooser.** Give-them-something-to-
+  read opens the device's photo/camera/file window in place instead of
+  jumping to the card at the bottom; the handover says "handed over —
+  they're reading it" in a line; and the carried-things card opens only
+  from its own menu row, with a red close of its own.
+
 - **The panels have their exits.** A tap anywhere outside the open panel
   minimises it, and a little red close sits at its top — the only way
   out used to be re-pressing the box that opened it.

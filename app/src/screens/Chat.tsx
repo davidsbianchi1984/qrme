@@ -286,9 +286,13 @@ export function Chat({ onPlans }: {
       // with no way back ("I didn't have a way out when I got in
       // there"), so the overlay says it in a line instead and the face
       // stays up.
+      // The same report, second screen: "it takes you to that other
+      // screen at the bottom... there's no escaping it." The main chat
+      // now gets the same line the talk face earned, and the card opens
+      // only when somebody asks to see what is carried.
       .then(() => {
         if (talking) setHeard(tr("chat.talk.handed", lang));
-        else setBcOpen(true);
+        else setVoiceNote(tr("chat.talk.handed", lang));
       })
       .catch(setError)
       .finally(() => setShooting(false));
@@ -1421,7 +1425,11 @@ export function Chat({ onPlans }: {
       )}
 
       {bcOpen && session.profileId && session.interactorId && (
-        <div className="card">
+        <div className="card bc-card">
+          <button className="talk-panel-close"
+                  aria-label={tr("rail.close", lang)}
+                  title={tr("rail.close", lang)}
+                  onClick={() => setBcOpen(false)}>✕</button>
           <Briefcase profileId={session.profileId}
                      interactorId={session.interactorId}
                      name={session.profile?.display_name || ""}
@@ -1439,9 +1447,18 @@ export function Chat({ onPlans }: {
       <div className="composer">
         {plusOpen && (
           <div className="agent-plus composer-plus" role="menu">
+            {/* The paperclip is the phone's own chooser — photo, camera,
+                file — not a trip to the card at the bottom: "I wanted it
+                just onboard, window only." The chooser input has no
+                accept, which is what makes a phone offer all three. */}
+            <button role="menuitem"
+                    disabled={!session.profileId || !session.interactorId}
+                    onClick={() => { setPlusOpen(false); docRef.current?.click(); }}>
+              📎 {tr("prf.bc.heading", lang)}
+            </button>
             <button role="menuitem"
                     onClick={() => { setPlusOpen(false); setBcOpen((o) => !o); }}>
-              📎 {tr("prf.bc.heading", lang)}{bcOpen ? " ✓" : ""}
+              🗂 {tr("chat.carried", lang)}{bcOpen ? " ✓" : ""}
             </button>
             <button role="menuitem"
                     disabled={!session.profileId || !session.interactorId}

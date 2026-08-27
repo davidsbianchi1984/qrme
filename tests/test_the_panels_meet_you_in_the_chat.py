@@ -81,3 +81,22 @@ def test_the_panel_has_its_exits():
     scrim = scrim[:scrim.index("}")]
     assert "fixed" in scrim and "inset: 0" in scrim, (
         "the scrim no longer covers the screen, so outside is not tappable")
+
+
+def test_the_paperclip_is_the_phones_own_chooser():
+    """Second telling of the same report: "I wanted it just onboard,
+    window only — not the full screen at the bottom." The paperclip opens
+    the device's chooser (the accept-less input is what makes a phone
+    offer photo, camera and file), the handover says so in a line, and
+    the carried-things card opens only when asked — with a red close."""
+    stripped = re.sub(r"/\*.*?\*/", "", CHAT, flags=re.S)
+    stripped = re.sub(r"\{/\*.*?\*/\}", "", stripped, flags=re.S)
+    clip = stripped.index("📎")
+    assert "docRef.current?.click()" in stripped[clip - 300:clip + 300], (
+        "the paperclip is back to a trip to the card at the bottom")
+    assert "setBcOpen(true)" not in stripped.replace(
+        "setBcOpen((o) => !o)", ""), (
+        "a handover still jumps the person to the card")
+    card = stripped.index("bc-card")
+    assert "talk-panel-close" in stripped[card:card + 400], (
+        "the carried-things card has no way out again")
