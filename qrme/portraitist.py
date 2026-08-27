@@ -75,7 +75,8 @@ def paint(profile: dict, words: str = "") -> tuple[bytes, str, dict]:
     prompt = describe(profile, words)
     params = {"model": os.environ.get(_MODEL_ENV, _DEFAULT_MODEL),
               "size": "1024x1024", "quality": "medium"}
-    offline.allow(_URL, "painting a portrait from this profile's brief")
+    offline.allow(_URL, "painting a portrait from this profile's brief",
+                  on_behalf_of=profile["id"])
     body = json.dumps({"prompt": prompt, **params}).encode()
     req = urllib.request.Request(
         _URL, data=body,

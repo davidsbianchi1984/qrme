@@ -66,6 +66,10 @@ OWN_DOOR = {
     "sources": ("qrme/routers/profiles.py",
                 r'@router\.post\("/profiles/\{profile_id\}/sources"'),
     "avatar": ("qrme/avatars.py", r"SET avatar="),
+    # The face's ledger row: written by claim (which refuses retired and
+    # disputed rows) and cleared by retire, never by PATCH — the checks
+    # are the door.
+    "avatar_ref": ("qrme/avatarreg.py", r"SET avatar_ref="),
     "watermark_design": ("qrme/watermark.py", r"SET watermark_design="),
     "unlisted": ("qrme/friends.py", r"SET unlisted="),
     "demographics": ("qrme/routers/steering.py", r"SET demographics="),
