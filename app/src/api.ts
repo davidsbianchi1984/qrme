@@ -1862,7 +1862,7 @@ export type Avatar = {
 };
 
 export type RegistryRow = {
-  id: string; source: string; provider: string;
+  id: string; source: string; provider: string; label?: string | null;
   provider_asset_id: string | null; asset: string;
   rights: { likeness: string; basis: string | null };
   status: string; marked: boolean; prompt_text?: string | null;
@@ -4881,9 +4881,10 @@ export const api = {
   // -- the avatar registry (qrme/avatarreg.py): one face ledger ------------
   avatarShelf: () =>
     req<{ shelf: RegistryRow[]; starters: unknown[] }>("/avatars/library"),
-  stockShelf: async (file: File, provider = "elevenlabs") => {
+  stockShelf: async (file: File, provider = "elevenlabs", label = "") => {
     const res = await fetch(getBase()
-        + `/avatars/library?provider=${encodeURIComponent(provider)}`,
+        + `/avatars/library?provider=${encodeURIComponent(provider)}`
+        + `&label=${encodeURIComponent(label)}`,
       { method: "POST",
         headers: { "x-signup-key": getSignupKey() }, body: file });
     const text = await res.text();
@@ -4893,9 +4894,11 @@ export const api = {
   myShelf: (accountId: string, token: string) =>
     req<{ shelf: RegistryRow[] }>(`/accounts/${accountId}/avatars`, { token }),
   stockMyShelf: async (accountId: string, token: string, file: File,
-                       likeness: "invented" | "self" = "invented") => {
+                       likeness: "invented" | "self" = "invented",
+                       label = "") => {
     const res = await fetch(getBase()
-        + `/accounts/${accountId}/avatars?likeness=${likeness}`,
+        + `/accounts/${accountId}/avatars?likeness=${likeness}`
+        + `&label=${encodeURIComponent(label)}`,
       { method: "POST",
         headers: { authorization: `Bearer ${token}` }, body: file });
     const text = await res.text();

@@ -4092,6 +4092,9 @@ const CHROME: Table = {
   "rem.look.go": {
     en: "Fetch it", es: "Traerlo", fr: "Le récupérer", de: "Holen", pt: "Buscá-lo", it: "Recuperalo", ja: "取得する", zh: "取回", hi: "लाएँ", ar: "أحضره",
   },
+  "rem.shelf.name.ph": {
+    en: "what this face is called (optional)", es: "cómo se llama este rostro (opcional)", fr: "comment s'appelle ce visage (facultatif)", de: "wie dieses Gesicht heißt (optional)", pt: "como se chama este rosto (opcional)", it: "come si chiama questo volto (facoltativo)", ja: "この顔の名前（任意）", zh: "这张面孔的名字（可选）", hi: "इस चेहरे का नाम (वैकल्पिक)", ar: "اسم هذا الوجه (اختياري)",
+  },
   "rem.shelf.retire": {
     en: "Withdraw this face everywhere", es: "Retirar este rostro de todas partes", fr: "Retirer ce visage partout", de: "Dieses Gesicht überall zurückziehen", pt: "Retirar este rosto de todo o lado", it: "Ritira questo volto ovunque", ja: "この顔をすべての場所から取り下げる", zh: "在所有地方撤回这张面孔", hi: "इस चेहरे को हर जगह से हटाएँ", ar: "اسحب هذا الوجه من كل مكان",
   },

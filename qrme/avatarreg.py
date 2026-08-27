@@ -120,7 +120,7 @@ def _burn(data: bytes) -> bytes:
 
 def mint(*, data: bytes | None = None, asset: str | None = None,
          source: str, provider: str = "internal",
-         provider_asset_id: str | None = None,
+         provider_asset_id: str | None = None, label: str | None = None,
          owner_account_id: str | None = None,
          prompt_text: str | None = None,
          generation_params: dict | None = None,
@@ -158,12 +158,12 @@ def mint(*, data: bytes | None = None, asset: str | None = None,
     conn = db.connect()
     conn.execute(
         "INSERT INTO avatar_registry (id, owner_account_id, profile_id,"
-        " source, provider, provider_asset_id, prompt_text,"
+        " source, provider, provider_asset_id, label, prompt_text,"
         " generation_params, asset, render_variants, rights, status,"
         " checksum, marked, created_at)"
-        " VALUES (?,?,?,?,?,?,?,?,?,?,?,'active',?,?,?)",
+        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,'active',?,?,?)",
         (row_id, owner_account_id, None, source, provider,
-         provider_asset_id, prompt_text,
+         provider_asset_id, (label or "").strip()[:80] or None, prompt_text,
          json.dumps(generation_params) if generation_params else None,
          asset, json.dumps({"portrait": asset}),
          json.dumps({"likeness": likeness, "basis": basis}),

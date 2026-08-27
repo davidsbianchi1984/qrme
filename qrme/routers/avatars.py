@@ -141,7 +141,8 @@ def avatar_library() -> dict:
 @router.post("/avatars/library", status_code=201,
              dependencies=[Depends(auth.require_signup_key)])
 async def stock_library(request: Request, provider: str = "elevenlabs",
-                        provider_asset_id: str = "") -> dict:
+                        provider_asset_id: str = "",
+                        label: str = "") -> dict:
     """The operator stocks the deployment's shelf — raw image bytes,
     exported once from the provider's own surface (ElevenLabs offers no
     listing API for its avatars; the export is the road). Synthetic by
@@ -153,7 +154,7 @@ async def stock_library(request: Request, provider: str = "elevenlabs",
     return avatarreg.mint(data=data, source="curated_library",
                           provider=provider,
                           provider_asset_id=provider_asset_id or None,
-                          likeness="invented")
+                          label=label or None, likeness="invented")
 
 
 @router.get("/accounts/{account_id}/avatars")
@@ -167,7 +168,8 @@ def account_shelf(account_id: str, request: Request) -> dict:
 async def stock_own_shelf(account_id: str, request: Request,
                           likeness: str = "invented",
                           provider: str = "internal",
-                          provider_asset_id: str = "") -> dict:
+                          provider_asset_id: str = "",
+                          label: str = "") -> dict:
     """A face onto your own shelf — your own provider export, or your own
     photograph. `likeness=self` says it is really you, and an authentic
     photograph is never AI-marked; anything invented is, at mint."""
@@ -180,6 +182,7 @@ async def stock_own_shelf(account_id: str, request: Request,
         raise HTTPException(422, "the upload arrived empty")
     return avatarreg.mint(data=data, source="uploaded", provider=provider,
                           provider_asset_id=provider_asset_id or None,
+                          label=label or None,
                           owner_account_id=account_id, likeness=likeness,
                           store_for=account_id)
 

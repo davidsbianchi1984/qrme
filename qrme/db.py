@@ -1278,6 +1278,8 @@ CREATE TABLE IF NOT EXISTS avatar_registry (
     source            TEXT NOT NULL,      -- seeded | prompted | curated_library | uploaded
     provider          TEXT NOT NULL,      -- elevenlabs | internal | ...
     provider_asset_id TEXT,               -- opaque; a foreign key we do not control
+    label             TEXT,               -- what the face is called on the
+                                          -- shelf ("David Bianchi")
     prompt_text       TEXT,               -- kept for reproducibility and disputes
     generation_params TEXT,               -- provider-shaped JSON, stored as given
     asset             TEXT NOT NULL,      -- the serving URI of the master

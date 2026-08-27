@@ -173,3 +173,32 @@ def test_both_refusals_speak_ten_languages():
         for lang in ("es", "fr", "de", "pt", "it", "ja", "zh", "hi", "ar"):
             assert i18n.tr_public(text, lang) != text, (
                 f"{text[:40]}... is English in {lang}")
+
+
+def test_a_face_carries_its_name(client, monkeypatch):
+    """"Mine in particular, I made there — it should say David Bianchi."
+    A label rides the row from the stock door to the shelf."""
+    monkeypatch.setenv("QRME_SIGNUP_KEY", "op-secret")
+    ok = client.post("/avatars/library?provider=elevenlabs"
+                     "&label=David%20Bianchi",
+                     content=_png((60, 60, 160)),
+                     headers={"x-signup-key": "op-secret"})
+    assert ok.status_code == 201, ok.text
+    assert ok.json()["label"] == "David Bianchi"
+    shelf = client.get("/avatars/library").json()["shelf"]
+    assert any(r.get("label") == "David Bianchi" for r in shelf)
+
+
+def test_the_market_names_many_companies_and_the_default_leads():
+    """The same format the model keys took: many options, and the
+    deployment's own — ElevenLabs — first on the owner's word."""
+    from qrme import avatars
+    keys = [m["key"] for m in avatars.MARKET]
+    assert keys[0] == "elevenlabs", "the owner's provider no longer leads"
+    for expected in ("ready_player_me", "roblox", "vroid_hub", "dicebear",
+                     "gravatar", "heygen", "avaturn"):
+        assert expected in keys, f"{expected} fell off the market"
+    for m in avatars.MARKET:
+        assert m["key"] and m["name"] and m["how"], (
+            "a market row without its export instructions is a name with "
+            "no road")

@@ -6,6 +6,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.8.9] - 2026-08-27
+
+### Added
+
+- **Named faces, and a fuller market.** Registry rows carry a label —
+  the owner's own ElevenLabs avatar reads "David Bianchi" on the shelf
+  — set at the stock doors and shown under every face. The import
+  market grows to the model-keys format: many companies, one default
+  leading — Roblox, VRoid Hub, Avaturn, DiceBear, Gravatar and HeyGen
+  join, each with honest export instructions.
+
 ### Changed
 
 - **The room strip slims to what a hand reaches for.** The microphone
@@ -15882,7 +15893,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.8...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.9...HEAD
+[1.8.9]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.8...app-v1.8.9
 [1.8.8]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.7...app-v1.8.8
 [1.8.7]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.6...app-v1.8.7
 [1.8.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.5...app-v1.8.6

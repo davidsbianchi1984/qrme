@@ -108,6 +108,7 @@ export function Remainder() {
   const [shelf, setShelf] = useState<RegistryRow[]>([]);
   const [myFaces, setMyFaces] = useState<RegistryRow[]>([]);
   const [paintWords, setPaintWords] = useState("");
+  const [faceLabel, setFaceLabel] = useState("");
 
   useEffect(() => {
     api.avatarShelf().then((r) => setShelf(r.shelf)).catch(() => undefined);
@@ -763,8 +764,14 @@ export function Remainder() {
                           onClick={() => go(
                             () => api.claimFace(me, f.id, token),
                             () => setSaid(tr("rem.avatar.done", lang)))}>
-                    <img src={getBase() + f.asset} alt={f.source} width={64}
+                    <img src={getBase() + f.asset}
+                         alt={f.label || f.source} width={64}
                          height={64} style={{ borderRadius: 12 }} />
+                    {/* The face's own name — "mine in particular, I made
+                        there, it should say David Bianchi." */}
+                    {f.label && (
+                      <span className="muted small">{f.label}</span>
+                    )}
                   </button>
                   {/* Your own faces can be withdrawn — the takedown as a
                       data operation: the row keeps its record, and every
@@ -791,6 +798,11 @@ export function Remainder() {
           </>
         )}
         {session.accountId && session.accountToken && (
+          <input value={faceLabel}
+                 onChange={(e) => setFaceLabel(e.target.value)}
+                 placeholder={tr("rem.shelf.name.ph", lang)} />
+        )}
+        {session.accountId && session.accountToken && (
           <label className="chip">
             <input type="file" accept="image/*" hidden
                    onChange={(e) => {
@@ -799,7 +811,9 @@ export function Remainder() {
                      if (!f) return;
                      go(async () => {
                        await api.stockMyShelf(session.accountId!,
-                                              session.accountToken!, f);
+                                              session.accountToken!, f,
+                                              "invented", faceLabel);
+                       setFaceLabel("");
                        const r = await api.myShelf(session.accountId!,
                                                    session.accountToken!);
                        setMyFaces(r.shelf);

@@ -390,6 +390,24 @@ MARKET: tuple[dict, ...] = (
     {"key": "nintendo_mii", "name": "Nintendo Mii",
      "how": "On Switch, pose your Mii in the editor and take a screenshot, "
             "then upload or paste it here."},
+    {"key": "roblox", "name": "Roblox",
+     "how": "Open your Roblox profile, save the avatar headshot image, then "
+            "upload or paste it here."},
+    {"key": "vroid_hub", "name": "VRoid Hub",
+     "how": "On your character's VRoid Hub page, save a portrait render, "
+            "then upload or paste it here."},
+    {"key": "avaturn", "name": "Avaturn",
+     "how": "Export your Avaturn avatar's portrait render, then upload or "
+            "paste it here."},
+    {"key": "dicebear", "name": "DiceBear",
+     "how": "Generate an avatar at dicebear.com, download the image, then "
+            "upload or paste it here."},
+    {"key": "gravatar", "name": "Gravatar",
+     "how": "Save your Gravatar profile image, then upload or paste it "
+            "here."},
+    {"key": "heygen", "name": "HeyGen",
+     "how": "In HeyGen, save a still portrait of your avatar, then upload "
+            "or paste it here."},
     {"key": "other", "name": "Somewhere else",
      "how": "Any avatar you have the right to use: upload the image or "
             "paste a direct link."},
