@@ -1096,7 +1096,7 @@ RATCHETS: tuple[Ratchet, ...] = (
             "f-strings in this package that build markup"),
     Ratchet("suite.guard_names", 1900, _guard_names,
             "test functions this suite declares"),
-    Ratchet("sweep.files_parsed", 175, _files_swept,
+    Ratchet("sweep.files_parsed", 280, _files_swept,
             "test files the bare-floor sweep can read"),
     # 40 against 51, not the 20 this was first written with. That 20 came
     # from the sibling product, where it is four-fifths of a 24-tab console
