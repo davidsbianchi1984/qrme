@@ -1669,6 +1669,12 @@ CREATE TABLE IF NOT EXISTS raised_characters (
     words_taught       INTEGER NOT NULL DEFAULT 0,
     lessons_passed     INTEGER NOT NULL DEFAULT 0,
     questions_answered INTEGER NOT NULL DEFAULT 0,
+    -- The three time controls (build-order step three): the life's own
+    -- calendar, where the guardian currently stands on it (NULL = the
+    -- present), and — on a branched life — whose day it grew from.
+    sim_day            INTEGER NOT NULL DEFAULT 1,
+    visiting_day       INTEGER,
+    branch_of          TEXT,
     created_at         TEXT NOT NULL
 );
 
@@ -1676,7 +1682,11 @@ CREATE TABLE IF NOT EXISTS growth_record (
     id         TEXT PRIMARY KEY,
     profile_id TEXT NOT NULL REFERENCES profiles(id),
     kind       TEXT NOT NULL,   -- began|word|lesson|answer|stage_door|switch
+                                --  |away_day|saved_question|branched
     note       TEXT NOT NULL,
+    -- The day of the life this entry landed on. NULL on rows written
+    -- before the calendar existed; read as day 1.
+    sim_day    INTEGER,
     at         TEXT NOT NULL
 );
 
@@ -2929,6 +2939,18 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # the person lifted the ten-turn governor in words.
     ("room_messages", "aimed_at", "TEXT"),
     ("rooms", "free_run", "INTEGER NOT NULL DEFAULT 0"),
+    # The three time controls (docs/raise.md, build-order step three).
+    # `sim_day` is the life's own calendar — day 1 is the day the guardian
+    # entered; fast-forward moves it and nothing else does. `visiting_day`
+    # set means the guardian stands on an earlier day (NULL = the present).
+    # `branch_of` names the life this one was branched from, so the copy
+    # can always say what it is. growth_record.sim_day stamps each entry
+    # with the day it landed on; rows from before the calendar read as
+    # day 1, which is honest — they all landed before time had hands.
+    ("raised_characters", "sim_day", "INTEGER NOT NULL DEFAULT 1"),
+    ("raised_characters", "visiting_day", "INTEGER"),
+    ("raised_characters", "branch_of", "TEXT"),
+    ("growth_record", "sim_day", "INTEGER"),
 )
 
 

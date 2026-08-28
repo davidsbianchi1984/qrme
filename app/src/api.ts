@@ -1913,10 +1913,14 @@ export type RaisedCharacter = {
   milestones: { turns_together: number; words_taught: number;
                 lessons_passed: number; questions_answered: number };
   next_stage: string | null; next_stage_at: number | null;
+  // The three time controls: the life's own calendar (day 1 = the day
+  // the guardian entered), where the guardian stands on it (null = the
+  // present), and — on a branched life — whose day it grew from.
+  sim_day: number; visiting_day: number | null; branch_of: string | null;
   created_at: string;
 };
 export type GrowthEntry = { id: string; kind: string; note: string;
-                            at: string };
+                            sim_day: number; at: string };
 
 /** What sunsetting did. `archive_key` is non-null only where a vault holds it. */
 export type Sunset = {
@@ -5003,6 +5007,23 @@ export const api = {
     req<{ switches: Record<string, unknown>; warning: string | null }>(
       `/raise/${profileId}/switches`,
       { method: "PATCH", body: { changes }, token }),
+  /** Rewind as presence: stand on a lived day (null = the present). */
+  raiseVisit: (profileId: string, simDay: number | null, token: string) =>
+    req<RaisedCharacter>(`/raise/${profileId}/visit`,
+      { method: "POST", body: { sim_day: simDay }, token }),
+  /** Fast-forward: simulated days lived from the record alone. */
+  raiseForward: (profileId: string, days: number, token: string) =>
+    req<{ days: number; while_away: GrowthEntry[];
+          stage_door: GrowthEntry | null; character: RaisedCharacter }>(
+      `/raise/${profileId}/forward`, { method: "POST", body: { days },
+                                       token }),
+  /** Rewind as a second life: the record to a day, raised differently. */
+  raiseBranch: (profileId: string,
+                body: { sim_day: number; display_name: string },
+                token: string) =>
+    req<{ profile_id: string; owner_token: string; display_name: string;
+          kind: string; character: RaisedCharacter }>(
+      `/raise/${profileId}/branch`, { method: "POST", body, token }),
   // The operator's one-button shelf fill: tries the provider's catalog
   // under the deployment key. `note` is a machine word — "stocked", or
   // "provider_door_closed" while the provider has no listing API — so

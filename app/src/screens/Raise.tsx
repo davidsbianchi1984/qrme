@@ -62,11 +62,18 @@ export function Raise({ onPlans }: { onPlans: () => void }) {
   const [teaching, setTeaching] = useState("word");
   const [what, setWhat] = useState("");
 
+  // The three time controls.
+  const [visitDay, setVisitDay] = useState(1);
+  const [fwdDays, setFwdDays] = useState(7);
+  const [branchName, setBranchName] = useState("");
+  const [away, setAway] = useState<GrowthEntry[]>([]);
+
   useEffect(() => {
     api.raiseDoors().then(setDoors).catch(setError);
   }, []);
 
   useEffect(() => {
+    setAway([]);
     if (!open) { setWho(null); setAlbum([]); return; }
     api.raiseCharacter(open.id, open.token).then(setWho).catch(setError);
     api.raiseAlbum(open.id, open.token)
@@ -111,6 +118,48 @@ export function Raise({ onPlans }: { onPlans: () => void }) {
         setNote(tr("raise.dooropened", lang)
           .replace("{stage}", r.character.stage.replace("_", " ")));
       }
+    } catch (e) { setError(e); } finally { setBusy(false); }
+  }
+
+  async function visit(day: number | null) {
+    if (!open) return;
+    setBusy(true); setError(null); setNote(null);
+    try {
+      setWho(await api.raiseVisit(open.id, day, open.token));
+    } catch (e) { setError(e); } finally { setBusy(false); }
+  }
+
+  async function fastForward() {
+    if (!open) return;
+    setBusy(true); setError(null); setNote(null);
+    try {
+      const r = await api.raiseForward(open.id, fwdDays, open.token);
+      setWho(r.character);
+      setAway(r.while_away);
+      const back = await api.raiseAlbum(open.id, open.token);
+      setAlbum(back.entries);
+      if (r.stage_door) {
+        setNote(tr("raise.dooropened", lang)
+          .replace("{stage}", r.character.stage.replace("_", " ")));
+      }
+    } catch (e) { setError(e); } finally { setBusy(false); }
+  }
+
+  async function branch() {
+    if (!open || !branchName.trim()) return;
+    setBusy(true); setError(null); setNote(null);
+    try {
+      const made = await api.raiseBranch(
+        open.id, { sim_day: visitDay, display_name: branchName.trim() },
+        open.token);
+      const entry = { id: made.profile_id, token: made.owner_token,
+                      name: made.display_name };
+      hold(entry);
+      setHeld(heldList());
+      setOpen(entry);
+      setBranchName("");
+      setAway([]);
+      setNote(tr("raise.branched", lang));
     } catch (e) { setError(e); } finally { setBusy(false); }
   }
 
@@ -176,6 +225,83 @@ export function Raise({ onPlans }: { onPlans: () => void }) {
           </div>
 
           <div className="card">
+            <h3>{tr("raise.time", lang)}</h3>
+            <p className="muted small">{tr("raise.time.sub", lang)}</p>
+            <p className="small">
+              {tr("raise.time.day", lang)
+                .replace("{n}", String(who.sim_day))}
+            </p>
+            {who.visiting_day != null ? (
+              <div className="row">
+                <span className="small" style={{ flex: 1 }}>
+                  🕰️ {tr("raise.visiting", lang)
+                    .replace("{n}", String(who.visiting_day))}
+                </span>
+                <button className="chip" disabled={busy}
+                        onClick={() => void visit(null)}>
+                  {tr("raise.return", lang)}
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="row">
+                  <input type="number" min={1} max={who.sim_day}
+                         value={visitDay} style={{ width: 80 }}
+                         aria-label={tr("raise.visit.go", lang)}
+                         onChange={(e) =>
+                           setVisitDay(Number(e.target.value))} />
+                  <button className="chip" disabled={busy}
+                          onClick={() => void visit(visitDay)}>
+                    {tr("raise.visit.go", lang)}
+                  </button>
+                  {who.switches.time_controls === "unlocked" && (
+                    <>
+                      <input value={branchName} style={{ flex: 1 }}
+                             placeholder={tr("raise.branch.ph", lang)}
+                             onChange={(e) =>
+                               setBranchName(e.target.value)} />
+                      <button className="chip"
+                              disabled={busy || !branchName.trim()}
+                              onClick={() => void branch()}>
+                        {tr("raise.branch.go", lang)}
+                      </button>
+                    </>
+                  )}
+                </div>
+                <div className="row">
+                  <span className="muted small">
+                    {tr("raise.forward.days", lang)}
+                  </span>
+                  <input type="number" min={1} value={fwdDays}
+                         style={{ width: 80 }}
+                         aria-label={tr("raise.forward.days", lang)}
+                         onChange={(e) =>
+                           setFwdDays(Number(e.target.value))} />
+                  <button className="chip" disabled={busy}
+                          onClick={() => void fastForward()}>
+                    ⏩ {tr("raise.forward.go", lang)}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+
+          {away.length > 0 && (
+            <div className="card">
+              <h3>{tr("raise.away", lang)}</h3>
+              {away.map((e) => (
+                <p key={e.id} className="small">
+                  <span className="muted">
+                    {tr("raise.time.day", lang)
+                      .replace("{n}", String(e.sim_day))}
+                  </span>{" · "}
+                  {e.kind === "saved_question" ? "💭 " : ""}{e.note}
+                </p>
+              ))}
+            </div>
+          )}
+
+          <div className="card">
             <h3>{tr("raise.teach", lang)}</h3>
             <p className="muted small">{tr("raise.teach.sub", lang)}</p>
             <div className="row">
@@ -188,9 +314,12 @@ export function Raise({ onPlans }: { onPlans: () => void }) {
               </select>
               <input value={what} style={{ flex: 1 }}
                      placeholder={tr("raise.teach.ph", lang)}
+                     disabled={who.visiting_day != null}
                      onChange={(e) => setWhat(e.target.value)}
                      onKeyDown={(e) => e.key === "Enter" && void teach()} />
-              <button className="primary" disabled={busy || !what.trim()}
+              <button className="primary"
+                      disabled={busy || !what.trim()
+                                || who.visiting_day != null}
                       onClick={() => void teach()}>
                 {tr("raise.teach.go", lang)}
               </button>
@@ -223,8 +352,13 @@ export function Raise({ onPlans }: { onPlans: () => void }) {
             )}
             {album.map((e) => (
               <p key={e.id} className="small">
-                <span className="muted">{e.at.slice(0, 10)}</span>{" · "}
-                {e.kind === "stage_door" ? "🚪 " : ""}{e.note}
+                <span className="muted">
+                  {tr("raise.time.day", lang)
+                    .replace("{n}", String(e.sim_day))}
+                </span>{" · "}
+                {e.kind === "stage_door" ? "🚪 " : ""}
+                {e.kind === "saved_question" ? "💭 " : ""}
+                {e.kind === "branched" ? "🌿 " : ""}{e.note}
               </p>
             ))}
           </div>

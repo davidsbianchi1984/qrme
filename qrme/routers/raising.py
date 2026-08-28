@@ -133,6 +133,97 @@ def album(profile_id: str, request: Request) -> dict:
     return {"profile_id": profile_id, "entries": raising.album(profile_id)}
 
 
+class VisitIn(BaseModel):
+    #: The lived day to stand on; null comes back to the present.
+    sim_day: int | None = Field(None, ge=1)
+
+
+@router.post("/raise/{profile_id}/visit")
+def visit(profile_id: str, body: VisitIn, request: Request) -> dict:
+    """Rewind as presence: step back to a lived day and the character
+    speaks as they were, knowing only what the record held by then.
+    Read-only — teaching and growth wait for the present — and refused
+    outright on a sealed timeline, which is lived forward only."""
+    profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    try:
+        return raising.visit(profile_id, profile["owner_id"], body.sim_day)
+    except raising.RaiseError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
+
+
+class ForwardIn(BaseModel):
+    #: Simulated days to live while you're away. Capped at thirty per
+    #: jump everywhere but the unlocked (sandbox) time controls.
+    days: int = Field(..., ge=1)
+
+
+@router.post("/raise/{profile_id}/forward")
+def forward(profile_id: str, body: ForwardIn, request: Request) -> dict:
+    """Fast-forward: days lived from the record alone — practicing what
+    was taught, saving questions for you, quiet days said honestly.
+    Growth accrues at a discount: your attention stays the main
+    ingredient, so away time never replaces the relationship."""
+    profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    try:
+        return raising.forward(profile_id, profile["owner_id"], body.days)
+    except raising.RaiseError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
+
+
+class BranchIn(BaseModel):
+    #: The lived day the new life grows from, and its own name.
+    sim_day: int = Field(..., ge=1)
+    display_name: str = Field(..., min_length=1, max_length=80)
+
+
+@router.post("/raise/{profile_id}/branch", status_code=201)
+def branch(profile_id: str, body: BranchIn, request: Request) -> dict:
+    """Rewind as a second life: the record up to a lived day, copied
+    into a NEW character raised differently from there. The original is
+    never overwritten — the branch stands beside it, and the law rides
+    along (a childhood day branched is a childhood raised: family
+    forever). Unlocked time controls only."""
+    profile = profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    try:
+        # Checked BEFORE the profile is minted — the creation door's
+        # no-orphan discipline, kept by the branch door too.
+        raising.branch_check(profile_id, profile["owner_id"], body.sim_day)
+    except raising.RaiseError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
+
+    new_id = db.new_id("prf")
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO profiles (id, owner_id, kind, display_name, persona,"
+        " demographics, sources, anonymous, adult_mode, interaction_scope,"
+        " moderation_mode, aging_enabled, maturity, cloud_contribution,"
+        " terms_version, terms_accepted_at, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        (new_id, profile["owner_id"], "raised", body.display_name,
+         "A raised character: grown through interaction, starting from "
+         "almost nothing. Everything they know was taught.",
+         json.dumps({}), json.dumps([]), 0, 0, "private", "auto", 0,
+         "balanced", 0, profile["terms_version"],
+         db.utcnow(), db.utcnow()))
+    conn.commit()
+    made = raising.branch(profile_id, profile["owner_id"], body.sim_day,
+                          new_id)
+    # The law at the row, same as the creation door: a branch standing
+    # in (or grown from) a childhood runs strict whatever anybody types.
+    if (made["stage"] in raising.CHILDHOOD
+            or made["started_stage"] in raising.CHILDHOOD):
+        conn.execute("UPDATE profiles SET maturity='strict' WHERE id=?",
+                     (new_id,))
+        conn.commit()
+    token = auth.issue("owner", new_id)
+    return {"profile_id": new_id, "owner_token": token,
+            "display_name": body.display_name, "kind": "raised",
+            "character": made}
+
+
 class TeachIn(BaseModel):
     #: word | lesson | answer — a word taught, a lesson passed, or an
     #: answer to one of their questions.

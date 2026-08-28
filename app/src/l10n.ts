@@ -578,6 +578,42 @@ const CHROME: Table = {
   "raise.begin.go": {
     en: "Begin the life", es: "Comenzar la vida", fr: "Commencer la vie", de: "Das Leben beginnen", pt: "Começar a vida", it: "Comincia la vita", ja: "命を始める", zh: "开始这段生命", hi: "जीवन शुरू करें", ar: "ابدأ الحياة",
   },
+  "raise.time": {
+    en: "The three time controls", es: "Los tres controles del tiempo", fr: "Les trois contrôles du temps", de: "Die drei Zeitregler", pt: "Os três controlos do tempo", it: "I tre controlli del tempo", ja: "3つの時間コントロール", zh: "三个时间控制", hi: "समय के तीन नियंत्रण", ar: "ضوابط الزمن الثلاثة",
+  },
+  "raise.time.sub": {
+    en: "Watch the days, visit a lived one, or let days pass while you're away. The record is never overwritten.", es: "Mira los días, visita uno ya vivido, o deja pasar días mientras no estás. El registro nunca se sobrescribe.", fr: "Regardez les jours, visitez un jour vécu, ou laissez passer des jours en votre absence. Le registre n'est jamais réécrit.", de: "Sieh die Tage, besuche einen gelebten, oder lass Tage vergehen, während du fort bist. Die Aufzeichnung wird nie überschrieben.", pt: "Veja os dias, visite um já vivido, ou deixe passar dias enquanto está fora. O registo nunca é reescrito.", it: "Guarda i giorni, visita uno vissuto, o lascia passare giorni mentre sei via. Il registro non viene mai sovrascritto.", ja: "日々を見る、生きた日を訪ねる、留守の間に日々を進める。記録は決して上書きされません。", zh: "看看这些日子，探访活过的一天，或让日子在你不在时流逝。记录永不被覆盖。", hi: "दिनों को देखिए, जिए हुए दिन पर जाइए, या दूर रहते दिन बीतने दीजिए। अभिलेख कभी मिटाया नहीं जाता।", ar: "شاهد الأيام، أو زر يومًا معيشًا، أو دع الأيام تمضي في غيابك. السجل لا يُكتب فوقه أبدًا.",
+  },
+  "raise.time.day": {
+    en: "Day {n} of this life", es: "Día {n} de esta vida", fr: "Jour {n} de cette vie", de: "Tag {n} dieses Lebens", pt: "Dia {n} desta vida", it: "Giorno {n} di questa vita", ja: "この命の {n} 日目", zh: "这段生命的第 {n} 天", hi: "इस जीवन का दिन {n}", ar: "اليوم {n} من هذه الحياة",
+  },
+  "raise.visiting": {
+    en: "Visiting day {n} — everything after it hasn't happened yet. Teaching waits for the present.", es: "Visitando el día {n} — todo lo posterior aún no ha pasado. Enseñar espera al presente.", fr: "En visite au jour {n} — tout ce qui suit n'est pas encore arrivé. Enseigner attend le présent.", de: "Zu Besuch an Tag {n} — alles danach ist noch nicht geschehen. Lehren wartet auf die Gegenwart.", pt: "De visita ao dia {n} — tudo o que vem depois ainda não aconteceu. Ensinar espera pelo presente.", it: "In visita al giorno {n} — tutto ciò che segue non è ancora accaduto. Insegnare aspetta il presente.", ja: "{n} 日目を訪問中 — その後のことはまだ起きていません。教えるのは現在に戻ってから。", zh: "正在探访第 {n} 天——之后的一切尚未发生。教导要等回到现在。", hi: "दिन {n} की मुलाक़ात — उसके बाद का कुछ अभी हुआ ही नहीं। सिखाना वर्तमान की प्रतीक्षा करता है।", ar: "في زيارة لليوم {n} — كل ما بعده لم يحدث بعد. التعليم ينتظر الحاضر.",
+  },
+  "raise.visit.go": {
+    en: "Visit this day", es: "Visitar este día", fr: "Visiter ce jour", de: "Diesen Tag besuchen", pt: "Visitar este dia", it: "Visita questo giorno", ja: "この日を訪ねる", zh: "探访这一天", hi: "इस दिन पर जाएँ", ar: "زر هذا اليوم",
+  },
+  "raise.return": {
+    en: "Return to the present", es: "Volver al presente", fr: "Revenir au présent", de: "Zur Gegenwart zurück", pt: "Voltar ao presente", it: "Torna al presente", ja: "現在に戻る", zh: "回到现在", hi: "वर्तमान में लौटें", ar: "عُد إلى الحاضر",
+  },
+  "raise.forward.go": {
+    en: "Fast-forward", es: "Avanzar rápido", fr: "Avance rapide", de: "Vorspulen", pt: "Avançar rápido", it: "Avanti veloce", ja: "早送り", zh: "快进", hi: "फ़ास्ट-फ़ॉरवर्ड", ar: "تقديم سريع",
+  },
+  "raise.forward.days": {
+    en: "Days away", es: "Días fuera", fr: "Jours d'absence", de: "Tage fort", pt: "Dias fora", it: "Giorni via", ja: "留守の日数", zh: "离开的天数", hi: "दूर के दिन", ar: "أيام الغياب",
+  },
+  "raise.away": {
+    en: "While you were away", es: "Mientras no estabas", fr: "Pendant votre absence", de: "Während du fort warst", pt: "Enquanto esteve fora", it: "Mentre eri via", ja: "留守のあいだに", zh: "你不在的时候", hi: "जब आप दूर थे", ar: "في غيابك",
+  },
+  "raise.branch.go": {
+    en: "Branch from this day", es: "Ramificar desde este día", fr: "Créer une branche depuis ce jour", de: "Von diesem Tag abzweigen", pt: "Ramificar deste dia", it: "Crea un ramo da questo giorno", ja: "この日から分岐", zh: "从这一天分支", hi: "इस दिन से शाखा", ar: "افرع من هذا اليوم",
+  },
+  "raise.branch.ph": {
+    en: "The new life's name", es: "El nombre de la nueva vida", fr: "Le nom de la nouvelle vie", de: "Der Name des neuen Lebens", pt: "O nome da nova vida", it: "Il nome della nuova vita", ja: "新しい命の名前", zh: "新生命的名字", hi: "नए जीवन का नाम", ar: "اسم الحياة الجديدة",
+  },
+  "raise.branched": {
+    en: "A second life stands beside the first — same days behind, raised differently from here.", es: "Una segunda vida está junto a la primera — los mismos días detrás, criada distinto desde aquí.", fr: "Une seconde vie se tient à côté de la première — les mêmes jours derrière, élevée autrement à partir d'ici.", de: "Ein zweites Leben steht neben dem ersten — dieselben Tage dahinter, von hier an anders großgezogen.", pt: "Uma segunda vida está ao lado da primeira — os mesmos dias atrás, criada diferente daqui.", it: "Una seconda vita sta accanto alla prima — gli stessi giorni alle spalle, cresciuta diversamente da qui.", ja: "二つ目の命が最初の命の隣に立ちました — 同じ日々を背に、ここから別の育ち方をします。", zh: "第二段生命立于第一段之侧——身后同样的日子，从这里开始被不同地养育。", hi: "दूसरा जीवन पहले के पास खड़ा है — पीछे वही दिन, यहाँ से अलग ढंग से पला।", ar: "حياة ثانية تقف بجانب الأولى — الأيام نفسها خلفها، تُربّى بشكل مختلف من هنا.",
+  },
   "nav.solitude": {
     en: "My Attention", es: "Mi atención", fr: "Mon attention", de: "Meine Aufmerksamkeit", pt: "A minha atenção", it: "La mia attenzione", ja: "マイアテンション", zh: "我的注意力", hi: "मेरा ध्यान", ar: "انتباهي",
   },
