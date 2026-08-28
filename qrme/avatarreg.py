@@ -200,6 +200,31 @@ def shelf(owner_account_id: str | None = None) -> list[dict]:
     return [row(r["id"]) for r in rows]
 
 
+def set_variant(registry_id: str, name: str, asset: str) -> dict:
+    """Record another rendering of the same face.
+
+    A row's `asset` is the still every surface already draws; a variant
+    is another FORM of that same face — today the `.glb` the forge
+    builds from a photograph, which the seats draw in three dimensions.
+
+    One row rather than two, and that is the whole point of putting it
+    here: a face with a model and a face with only a portrait are the
+    same face, so a takedown, a dispute or a claim done once is true for
+    both. Split across two rows, each of those would have to be done
+    twice to be done at all — which is the failure the ledger exists to
+    make impossible.
+    """
+    got = row(registry_id)
+    variants = dict(got["render_variants"])
+    variants[name] = asset
+    conn = db.connect()
+    conn.execute(
+        "UPDATE avatar_registry SET render_variants=? WHERE id=?",
+        (json.dumps(variants), registry_id))
+    conn.commit()
+    return row(registry_id)
+
+
 def claim(registry_id: str, profile_id: str) -> dict:
     """Point a profile's face at a registry row.
 

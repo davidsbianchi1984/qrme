@@ -369,9 +369,20 @@ MARKET: tuple[dict, ...] = (
     {"key": "elevenlabs", "name": "ElevenLabs",
      "how": "In ElevenLabs, open My Avatars, save your avatar's portrait "
             "image, then upload or paste it here."},
-    {"key": "ready_player_me", "name": "Ready Player Me",
-     "how": "Open your avatar at readyplayer.me, use Share/Export to get the "
-            "portrait image or the .glb link, and paste it here."},
+    # Ready Player Me stood second on this list from its first day, and is
+    # gone: Netflix bought the company in December 2025 and shut the public
+    # platform, the avatar creator and the developer APIs on 31 January
+    # 2026. The row is struck rather than left standing, because a shelf
+    # that sends somebody to a dead service is worse than a shelf one row
+    # shorter. Avatars already exported as `.glb` files still work — they
+    # are ordinary files — but nothing served from that company's servers
+    # does, so a face already imported under this name keeps its
+    # provenance and simply cannot be pointed at again.
+    #
+    # It left the standing lesson behind it: the road that MAKES a face
+    # runs on this deployment's own machine (qrme/avatarforge.py), and a
+    # provider is a slot rather than a foundation. A vendor's acquisition
+    # should cost a deployment one environment variable, never a release.
     {"key": "bitmoji", "name": "Bitmoji (Snap)",
      "how": "In the Bitmoji or Snapchat app, share a sticker of your avatar "
             "to save it as an image, then upload or paste it here."},

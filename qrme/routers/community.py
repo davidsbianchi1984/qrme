@@ -32,6 +32,7 @@ from ..models import (
     HandoffCreate, ListingCreate, ListingPlace, MarketAssist, MarketPrefs,
     ProviderCreate, ReferralPrepare, ReferralRelease, ReferralReply,
     RoomCreate, RoomFace, RoomInvite, RoomMessage, RoomMicLend, RoomRename,
+    RoomSitOut,
 )
 from .. import i18n
 
@@ -98,8 +99,8 @@ def _participants(room_id: str) -> list[dict]:
     # for rotation." Unordered, the rotation reshuffled whenever SQLite
     # felt like it, which is a rotation in name only.
     rows = db.connect().execute(
-        "SELECT kind, ref_id FROM room_participants WHERE room_id=?"
-        " ORDER BY rowid", (room_id,)).fetchall()
+        "SELECT kind, ref_id, sitting_out FROM room_participants"
+        " WHERE room_id=? ORDER BY rowid", (room_id,)).fetchall()
     return [dict(r) for r in rows]
 
 
@@ -655,6 +656,20 @@ def _room_cast(participants: list[dict]) -> list[dict]:
             for q in participants if q["kind"] == "profile"]
 
 
+def _nobody_waiting(participants: list[dict]) -> bool:
+    """Whether every person in the room has sat out.
+
+    The governor exists to hand the room back to a person — "then pauses
+    and waits for user's response". A room whose people have all sat out
+    has nobody to hand it back to, and pausing there is the product
+    waiting for somebody who said they were stepping away. The seat that
+    sits back in restores the wait for everybody, because one person
+    present is a person to pause for.
+    """
+    people = [p for p in participants if p["kind"] == "user"]
+    return bool(people) and all(p.get("sitting_out") for p in people)
+
+
 @router.post("/rooms", status_code=201)
 def create_room(body: RoomCreate) -> dict:
     conn = db.connect()
@@ -816,6 +831,12 @@ def join_room(room_id: str, request: Request) -> dict:
         # and it becomes a seat when their owner says yes — the consent
         # shape on the wire is unchanged.
         "invited": _standing_invites(room_id),
+        # Whether THIS seat is sitting out of the room's waiting, so a
+        # reopened room paints the button the way it was left rather than
+        # the way a fresh browser assumes.
+        "sitting_out": bool(next(
+            (p.get("sitting_out") for p in _participants(room_id)
+             if p["kind"] == "user" and p["ref_id"] == who), 0)),
     }
 
 
@@ -1529,6 +1550,50 @@ def room_message(room_id: str, body: RoomMessage, request: Request) -> dict:
     return {"message": sent, "replies": replies}
 
 
+@router.post("/rooms/{room_id}/sit-out")
+def room_sit_out(room_id: str, body: RoomSitOut, request: Request) -> dict:
+    """A person's seat steps out of the rotation's waiting, or back in.
+
+    The field ask, in its own words: *"a sit out button for the user
+    orchestrating chats... that stops rotation and allows the other
+    synthetic profiles to go back-and-forth or have their own rotation
+    while your spot sits out, and un-tap that button to sit back in."*
+
+    What sits out is the WAITING, not the seat: the person stays in the
+    room, still reads every turn, still holds the microphone and the
+    send button, and one word from them puts them back in the middle of
+    it. What stops is the room pausing to hand them the floor — the
+    governor's hand-back has nobody to hand to while everybody present
+    has stepped away, so the profiles keep their own rotation.
+
+    Kept on the seat rather than in the browser: a room the person
+    reopens tomorrow is the room they left, and a second device shows
+    the same posture rather than arguing with the first.
+    """
+    _room_or_404(room_id)
+    who = _require_in_room(room_id, request)
+    conn = db.connect()
+    row = conn.execute(
+        "SELECT kind FROM room_participants WHERE room_id=? AND ref_id=?",
+        (room_id, who)).fetchone()
+    if row is None or row["kind"] != "user":
+        # A profile's owner holds their profile's seat, and a profile
+        # sitting out of its own rotation is not what this is for — it
+        # is the person's spot that steps aside.
+        raise HTTPException(
+            422, "only a person's own seat can sit out of a room")
+    conn.execute(
+        "UPDATE room_participants SET sitting_out=? WHERE room_id=?"
+        "  AND ref_id=?", (1 if body.out else 0, room_id, who))
+    conn.commit()
+    participants = _participants(room_id)
+    return {"sitting_out": bool(body.out),
+            # Whether the room now runs without waiting for anybody —
+            # the state the screen paints, said by the server rather
+            # than guessed from one seat's switch.
+            "nobody_waiting": _nobody_waiting(participants)}
+
+
 @router.post("/rooms/{room_id}/advance", status_code=201)
 def room_advance(room_id: str, request: Request) -> dict:
     """Profiles take a turn unprompted — profile↔profile rooms run on this.
@@ -1552,9 +1617,14 @@ def room_advance(room_id: str, request: Request) -> dict:
     # the person lifted it in words.
     cast = _room_cast(participants)
     history = _approved_history(room_id)
+    # A room whose people have all sat out has nobody to pause for, so
+    # the governor's hand-back would be a wait on somebody who said they
+    # were stepping away: the profiles keep their own rotation until a
+    # seat sits back in.
     speaker_seat = society.next_speaker(cast, history,
                                         _spoken_counts(history),
-                                        bool(room.get("free_run")))
+                                        bool(room.get("free_run"))
+                                        or _nobody_waiting(participants))
     if speaker_seat is None:
         return {"replies": [], "paused": True}
     return {"replies": _profile_turns(room, participants,

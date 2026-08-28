@@ -728,6 +728,8 @@ export function Inside({ onPlans, start = "", onLeave }: {
         setSeats(r.participants);
         setInvited(r.invited ?? []);
         setChannel(r.channel);
+        // The seat's own posture, as the server holds it.
+        setSittingOut(!!r.sitting_out);
         // The name, so the box shows what the room is called rather than
         // an empty field somebody has to guess the current value of.
         setRoomName(r.topic || "");
@@ -792,10 +794,32 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // hidden tabs anyway, and pretending otherwise would be a lie.
   const [socPaused, setSocPaused] = useState(false);
   const chained = useRef<string | null>(null);
+  /** This seat sitting out of the room's waiting. Server-held (the seat
+   *  row), so a reopened room is the room you left — the state arrives
+   *  with the join and every tap writes it back. */
+  const [sittingOut, setSittingOut] = useState(false);
+
+  async function flipSitOut() {
+    if (!open || !token) return;
+    const want = !sittingOut;
+    try {
+      const r = await api.sitOutOfRoom(open, want, token);
+      setSittingOut(r.sitting_out);
+      // Sitting out un-pauses the room: the governor's hand-back was
+      // waiting for the person who just stepped away, and sitting back
+      // in restores the wait by the same rule on the server.
+      if (r.nobody_waiting) setSocPaused(false);
+    } catch (e) { setError(e); }
+  }
   useEffect(() => {
     if (!open || !token || socPaused || transcript.length === 0) return;
     const newest = transcript[transcript.length - 1];
-    if (newest.sender_kind !== "profile" || !newest.aimed_at) return;
+    // Aimed profile→profile talk chains itself. While this seat sits
+    // out, so does everything else: the room was told nobody is waiting
+    // for the floor, so an unaimed turn is not the room stopping — it
+    // is the rotation's next seat's turn to speak.
+    if (newest.sender_kind !== "profile") return;
+    if (!newest.aimed_at && !sittingOut) return;
     if (chained.current === newest.id) return;
     chained.current = newest.id;
     const t = window.setTimeout(() => {
@@ -2531,6 +2555,29 @@ export function Inside({ onPlans, start = "", onLeave }: {
                      if (hold.current) window.clearTimeout(hold.current);
                      hold.current = null;
                    } : undefined}>
+                {/* The sit-out, on your own frame's left corner. The field
+                    ask: "a sit out button for the user orchestrating
+                    chats... that stops rotation and allows the other
+                    synthetic profiles to go back-and-forth while your spot
+                    sits out, and un-tap that button to sit back in."
+                    What sits out is the WAITING, not the seat — you still
+                    read every turn, still hold the microphone, and one
+                    word puts you back in the middle of it. */}
+                {isMe && (
+                  <button className={"rs-sitout" + (sittingOut ? " out" : "")}
+                          type="button"
+                          aria-pressed={sittingOut}
+                          title={sittingOut ? tr("ins.sitin.hint", lang)
+                                            : tr("ins.sitout.hint", lang)}
+                          aria-label={sittingOut ? tr("ins.sitin", lang)
+                                                 : tr("ins.sitout", lang)}
+                          onClick={(e) => { e.stopPropagation();
+                                            void flipSitOut(); }}
+                          onDoubleClick={(e) => e.stopPropagation()}
+                          onPointerDown={(e) => e.stopPropagation()}>
+                    {sittingOut ? "▶" : "⏸"}
+                  </button>
+                )}
                 {/* What is behind the person, drawn first so everything
                     else sits on top of it. Never on a seat showing a live
                     camera: cutting somebody out of their own video frame

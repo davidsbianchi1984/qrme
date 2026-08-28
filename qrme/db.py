@@ -126,6 +126,10 @@ CREATE TABLE IF NOT EXISTS room_participants (
     room_id TEXT NOT NULL REFERENCES rooms(id),
     kind    TEXT NOT NULL,   -- user | profile
     ref_id  TEXT NOT NULL,
+    -- A person's seat sitting out: the room stops waiting on them and
+    -- the profiles keep their own rotation. Off until they tap it, and
+    -- off again the moment they sit back in.
+    sitting_out INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (room_id, ref_id)
 );
 
@@ -2939,6 +2943,12 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # the person lifted the ten-turn governor in words.
     ("room_messages", "aimed_at", "TEXT"),
     ("rooms", "free_run", "INTEGER NOT NULL DEFAULT 0"),
+    # The sit-out: a person's seat steps out of the room's waiting so the
+    # profiles keep their own rotation, and steps back in on a tap. Per
+    # SEAT rather than per room — one person sitting out is not everybody
+    # sitting out, and the room waits again the moment one of them sits
+    # back in.
+    ("room_participants", "sitting_out", "INTEGER NOT NULL DEFAULT 0"),
     # The three time controls (docs/raise.md, build-order step three).
     # `sim_day` is the life's own calendar — day 1 is the day the guardian
     # entered; fast-forward moves it and nothing else does. `visiting_day`

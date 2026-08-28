@@ -14,7 +14,8 @@ from pydantic import BaseModel, Field
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from .. import auth, avatarreg, avatars, portraitist, presentation, skins
+from .. import (auth, avatarforge, avatarreg, avatars, media, portraitist,
+                presentation, skins)
 from ..common import profile_or_404, require_owner
 from .. import i18n
 
@@ -87,6 +88,81 @@ class AvatarImport(BaseModel):
                     " linking their ElevenLabs avatar records it here, so"
                     " the face's provenance names the exact record it"
                     " came from.")
+
+
+@router.get("/avatars/forge")
+def forge_doors() -> dict:
+    """Whether a photograph can become a face on this deployment, and how
+    it may be framed.
+
+    Public, and answered before anybody uploads anything: a console that
+    draws the upload road on a deployment with no forge is a button that
+    fails, and a person who has just chosen a photo of themselves is the
+    worst possible moment to discover it.
+    """
+    return avatarforge.doors()
+
+
+class ForgeFace(BaseModel):
+    photo: str = Field(min_length=1,
+                       description="The photograph, base64. It is used to "
+                                   "build the face and not stored as the "
+                                   "upload — what is kept is the head it "
+                                   "became.")
+    shot: str = Field("face", max_length=10,
+                      description="How the photo is framed: face, upper "
+                                  "(torso) or full (body).")
+
+
+@router.post("/profiles/{profile_id}/avatar/forge", status_code=201)
+def forge_face(profile_id: str, body: ForgeFace, request: Request) -> dict:
+    """A photograph becomes this profile's face — geometry, skin and a
+    mouth — on this deployment's own hardware.
+
+    The road the avatar market never was: not an import of somebody
+    else's render, but a face made here, from a picture, with morph
+    targets a renderer can drive. Ready Player Me was the alternative
+    and Netflix closed it; the paid replacements start at eight hundred
+    dollars a month. This runs on the box the rest of the stack runs on.
+
+    The likeness is **the owner's own**, and so the AI mark is not
+    burned into it: stamping an authentic face as synthetic is the very
+    failure the mark exists to prevent, run backwards. What is synthetic
+    is this profile speaking through the face, and that credential rides
+    the presentation and watermark layers every surface already reads.
+    """
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    import base64 as _b64
+    try:
+        photo = _b64.b64decode(body.photo, validate=True)
+    except Exception:
+        raise HTTPException(422, i18n.tr_public(
+            "the photograph is not valid base64", i18n.DEFAULT)) from None
+    try:
+        made = avatarforge.from_photo(photo, shot=body.shot)
+    except avatarforge.ForgeError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
+
+    # The still and the model are stored as this profile's own media, and
+    # the registry row carries both: the portrait as the asset every
+    # surface already draws, the `.glb` in the row's variants, so a face
+    # that has a body is the same row as one that does not.
+    portrait = media.save(profile_id, made["portrait"], name="portrait.png",
+                          alt="a portrait built from a photograph")
+    model = media.save(profile_id, made["model"], name="head.glb",
+                       alt="a head built from a photograph")
+    row = avatarreg.mint(
+        asset=portrait["url"], source="photos", provider="forge",
+        label=None, owner_account_id=None, likeness="self",
+        basis="built from the owner's own photograph in this deployment's "
+              "forge")
+    avatarreg.set_variant(row["id"], "model", model["url"])
+    avatarreg.claim(row["id"], profile_id)
+    return {"registry_id": row["id"], "portrait": portrait["url"],
+            "model": model["url"],
+            "blendshapes": made["blendshapes"],
+            "avatar": avatars.render(profile_id)}
 
 
 @router.get("/avatars/market")

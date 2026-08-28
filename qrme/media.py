@@ -105,6 +105,15 @@ def _sniff(data: bytes, name: str | None = None) -> tuple[str, str]:
     # which safe label it is served under — never trusted beyond the list.
     if data[:4] == b"%PDF":
         return "file", ".pdf"
+    # A 3-D model, which this product now MAKES rather than only accepts:
+    # the forge (qrme/avatarforge.py) answers a glTF binary built from one
+    # photograph. Its magic is the format's own four bytes, so the label is
+    # proved exactly the way every other kind here is — and it files under
+    # `file` rather than growing a fourth kind, because nothing about
+    # storing it differs from a document. Only its extension has to be
+    # true, so the console's renderer is handed a `.glb` and not a `.txt`.
+    if data[:4] == b"glTF":
+        return "file", ".glb"
     if data[:4] == b"PK\x03\x04":
         ext = _named_ext(name)
         return "file", ext if ext in _PK_EXTS else ".zip"

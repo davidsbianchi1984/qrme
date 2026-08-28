@@ -141,13 +141,56 @@ def aim_of(text: str, cast: list[dict]) -> dict | None:
                  if re.search(rf"\b{re.escape(name)}\b", low)]
     if len(mentioned) == 1:
         return mentioned[0]
+    # A near miss is still a name. Reported from the field: a profile
+    # aimed at "[to: Dr. Lena Whitcomba]" — one letter past the seat's
+    # own "Dr. Lena Whitcomb" — and exact matching handed the turn to
+    # nobody, so the room stalled while the bracket sat on screen naming
+    # her. Models mistype the names they are told; a person reading the
+    # transcript would not hesitate, and neither should the rotation.
+    #
+    # Deliberately narrow: only when ONE seat is close, so a near miss
+    # never guesses between two people. The threshold rides on the
+    # name's own length rather than a flat count of letters, and the
+    # first name is tried on its own — a turn that says "Lena" has said
+    # who it means.
+    close = [seat for name, seat in named if _near(name, low)]
+    if len(close) == 1:
+        return close[0]
     return None
 
 
+def _near(name: str, text: str) -> bool:
+    """Whether ``text`` contains something close enough to ``name`` to be
+    that name mistyped — the full name, or its first name alone."""
+    from difflib import SequenceMatcher
+
+    words = re.findall(r"[\w'-]+", text)
+    for target in {name, name.split()[0]}:
+        span = len(target.split())
+        # A ratio of 0.85 catches a letter added, dropped or swapped in
+        # a name of ordinary length and refuses two different names.
+        for i in range(len(words) - span + 1):
+            window = " ".join(words[i:i + span])
+            if len(window) < 4:
+                continue          # short words are too easy to match
+            if SequenceMatcher(None, target, window).ratio() >= 0.85:
+                return True
+    return False
+
+
 #: The marker a profile's own turn may open with, taught in the room
-#: prompt: "[to: Ada]". Parsed off the front and stored as the turn's
-#: aim, so the next turn goes to the seat it was for.
-_AIM_MARK = re.compile(r"^\s*\[to:\s*([^\]]+)\]\s*", re.I)
+#: prompt: "[to: Ada]". Parsed out and stored as the turn's aim, so the
+#: next turn goes to the seat it was for.
+#:
+#: NOT anchored to the head, and that is a field correction: a turn that
+#: answered one seat and then turned to another put its second marker
+#: mid-paragraph — "[to: Dr. Lena Whitcomb] Sorry — Lena. Your caveat
+#: lands." — and a `^`-anchored pattern read the whole thing as unaimed
+#: while the reader watched the bracket sit there in plain text, aimed
+#: at nobody. A marker is a marker wherever the turn puts it; the LAST
+#: one wins, because a turn that changes who it is talking to ends
+#: pointed at the seat it turned to.
+_AIM_MARK = re.compile(r"\[to:\s*([^\]]+)\]\s*", re.I)
 
 #: And the summons: "[invite: Ada]" anywhere in the turn — "offer to or
 #: be prompted to invite other synthetic profiles of relevance."
@@ -155,11 +198,16 @@ _INVITE_MARK = re.compile(r"\[invite:\s*([^\]]+)\]", re.I)
 
 
 def split_aim(content: str) -> tuple[str, str | None]:
-    """``(content_without_marker, aimed_display_or_None)``."""
-    m = _AIM_MARK.match(content or "")
-    if not m:
+    """``(content_without_markers, aimed_display_or_None)``.
+
+    Every marker comes out of the words — a bracket left mid-paragraph is
+    the defect this was reported as — and the LAST one is the turn's aim.
+    """
+    found = list(_AIM_MARK.finditer(content or ""))
+    if not found:
         return content, None
-    return content[m.end():].strip(), m.group(1).strip()
+    return (_AIM_MARK.sub("", content).strip(),
+            found[-1].group(1).strip())
 
 
 def split_summons(content: str) -> tuple[str, list[str]]:

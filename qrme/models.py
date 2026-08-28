@@ -354,6 +354,17 @@ class RoomParticipant(BaseModel):
     id: str
 
 
+class RoomSitOut(BaseModel):
+    """A person's seat stepping out of the room's waiting, or back in.
+
+    One boolean, because it is one button: tapped is out, tapped again is
+    in. `out` on the wire rather than `sitting_out` — the seat's column
+    carries the state, the request carries the act.
+    """
+
+    out: bool = True
+
+
 class RoomInvite(BaseModel):
     """Who is being asked into a room, or who is answering.
 

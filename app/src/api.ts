@@ -4129,8 +4129,16 @@ export const api = {
   joinRoom: (roomId: string, token: string) =>
     req<{ id: string; topic?: string | null; channel: string;
           participants: { kind: string; id: string; display: string }[];
-          invited?: { kind: string; id: string; display: string }[] }>(
+          invited?: { kind: string; id: string; display: string }[];
+          /** Whether THIS seat is sitting out of the room's waiting —
+           *  so a reopened room paints the button as it was left. */
+          sitting_out?: boolean }>(
       `/rooms/${roomId}/join`, { method: "POST", token }),
+  /** Step this seat out of the room's waiting, or back in. The profiles
+   *  keep their own rotation while every person present sits out. */
+  sitOutOfRoom: (roomId: string, out: boolean, token: string) =>
+    req<{ sitting_out: boolean; nobody_waiting: boolean }>(
+      `/rooms/${roomId}/sit-out`, { method: "POST", body: { out }, token }),
   // The room's name, changed from inside it. Authorized like speaking: a
   // participant, held by their own token — naming somebody else's room
   // from outside it is not a thing this product offers.
