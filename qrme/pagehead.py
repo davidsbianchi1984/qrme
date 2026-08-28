@@ -125,7 +125,12 @@ def console_policy() -> str:
         "script-src 'self'",
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: blob:",
-        "media-src 'self' blob:",
+        # `data:` is the one-sample silent WAV the speech layer plays to
+        # unlock audio on a first user gesture (app/src/spoken.ts,
+        # SILENCE). Without it every visit logged a CSP violation in the
+        # tester's console — the sound still worked through blob: urls,
+        # but a red line on every load is a defect report nobody filed.
+        "media-src 'self' blob: data:",
         "connect-src 'self'",
         "manifest-src 'self'",
         "worker-src 'self'",

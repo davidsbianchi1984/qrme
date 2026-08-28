@@ -56,7 +56,11 @@ CALLERS = {
 #: And the console, which had it right and is here so the check reads the same
 #: question of all four clients rather than treating the phones as a special
 #: case. The odd-client-out is a thing this estate has been bitten by.
-CONSOLE = REPO / "app/src/SkinPicker.tsx"
+#: The deck lives on the Identity screen now — SkinPicker.tsx was the
+#: orphan component a whole deploy night was lost to (finished features
+#: nothing mounted), and it is gone so no guard can assert on an
+#: unmounted file again.
+CONSOLE = REPO / "app/src/screens/Identity.tsx"
 
 
 def test_the_shelf_still_names_more_than_one_system():

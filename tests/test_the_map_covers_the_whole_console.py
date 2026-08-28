@@ -151,7 +151,7 @@ def test_what_somebody_says_reaches_the_screen_they_meant():
     for said, surface in [
             ("how do I book a session with you", "Desk"),
             ("can I get my money out", "Selling"),
-            ("I want to change my avatar", "SkinPicker"),
+            ("I want to change my avatar", "SkinTiles"),
             ("what do you remember about me", "Memory"),
             ("how much does this cost", "Plans"),
             ("can you speak spanish", "InWords"),

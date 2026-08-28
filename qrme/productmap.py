@@ -178,13 +178,11 @@ DOORS: tuple[Door, ...] = (
     Door("Presence", "Presence tab",
          "how this profile presents itself, everywhere it is seen",
          ("presence", "how i look", "appearance", "avatar", "portrait")),
-    Door("SkinPicker", "the avatar deck on Identity",
-         "choosing what a profile wears",
+    Door("SkinTiles", "the avatar deck on Identity",
+         "choosing what a profile wears, from the faces there are to "
+         "choose from",
          ("avatar", "avatar deck", "change my picture", "pick a face",
-          "skin")),
-    Door("SkinTiles", "the avatar tiles",
-         "the faces there are to choose from",
-         ("avatar tiles", "which faces", "face options")),
+          "skin", "avatar tiles", "which faces", "face options")),
     Door("AvatarStage", "the avatar full screen",
          "the avatar taking the whole screen, with the wardrobe rail — "
          "prompt, apparel, physique and gender — over the one painting "

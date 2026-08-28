@@ -53,7 +53,6 @@
 
 Blend           142
 Briefcase       6,197
-SkinPicker      44,156
 AvatarStage     205
 SkinTiles       44
 TalkRail        198
