@@ -6,6 +6,33 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-08-28
+
+### Added
+
+- **The timeline gets hands** (docs/raise.md, build-order step three) —
+  the three time controls over a raised life. *Watch*: every Album
+  entry lands on a day of the life's own calendar. *Rewind*: visit a
+  lived day and the character speaks as they were, knowing only what
+  the record held by then — read-only, teaching and growth wait for
+  the present; or branch the record into a second life raised
+  differently from that day, the original never overwritten. *Fast-
+  forward*: simulated days lived from the record alone — practiced
+  lessons, questions saved for the guardian, honest waiting — growth
+  at a discount so attention stays the main ingredient, capped at
+  thirty days everywhere but the sandbox. The sealed trail refuses
+  both rewinds, and a childhood day branched is a childhood raised:
+  family forever.
+
+### Fixed
+
+- The avatar's second circle says what it is — the word "avatar" under
+  the figure, in all ten languages.
+- The avatar screen is a takeover: opening it hides the room entirely
+  (the stage now outranks every panel and dock), only the figure and
+  the red ✕ remain, and in AR/VR rooms the environment alone shows
+  through behind the figure.
+
 ## [2.1.0] - 2026-08-28
 
 ### Added
@@ -16069,7 +16096,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.1.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.2.0...HEAD
+[2.2.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.1.0...app-v2.2.0
 [2.1.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.0.1...app-v2.1.0
 [2.0.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.0.0...app-v2.0.1
 [2.0.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.9.0...app-v2.0.0

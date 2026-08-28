@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v2.1.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v2.2.0** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -288,6 +288,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **2.2.0** | **The timeline gets hands** — Raise's three time controls: every Album entry on a day of the life's own calendar; visits that rewind the voice read-only to a lived day; branches that copy the record into a second life raised differently (the original never overwritten); fast-forward days lived from the record alone with saved questions waiting — plus the avatar screen made a true takeover with its red close, and the word “avatar” under the seat pair's second circle |
 | **2.1.0** | **Raise — grow your own** — the fourth profile kind: a raised character started from a temperament seed and a chosen life stage, taught word by word, its stage doors earned through milestones and its whole life kept in an append-only Album; four preset doors that are only switch bundles, a mortality switch that says its warning every time, and the law that a childhood is family forever |
 | **2.0.1** | **The platform grows its own eyes, and the room becomes a society** — shared pictures and screenshots read, videos heard and their frames described, watch parties actually watchable, screens shown to rooms and the agent one frame at a time; rooms take aimed turns by seat rotation, invited profiles jump in on their own, summon each other by relevance and collaborate on tasks, with a ten-turn governor steered by words instead of the retired toggle; the service worker evicts its own ghosts |
 | **2.0.0** | **The avatar takes the screen, and every headset has a road in** — a second ring beside every portrait opens the full-screen wardrobe (prompt bar, chips, physique & gender) over the one painting door; guests may restyle a profile until its owner flips the new `guest_styling` switch; the avatar deck opens on the deployment's default faces with one-tap claiming and a pull door for the provider's catalog; the Rooms screen's XR shelf covers Steam, Meta, Apple, PICO, HTC and Android XR with honest browser roads |

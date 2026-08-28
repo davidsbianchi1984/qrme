@@ -2097,10 +2097,31 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .rail-ask-row { display: flex; gap: 8px; margin-top: 8px; }
 .rail-ask-row input { flex: 1; min-width: 0; }
 
-/* The full-screen face: the background-photo takeover, worn by an avatar. */
+/* The full-screen face: the background-photo takeover, worn by an avatar.
+   92 because the takeover is a takeover — the field call: "once clicked
+   into the avatar screen... the old screen must not be visible anymore."
+   The room's own chrome tops out at 88 and the footsteps at 90; only the
+   version guard (100) still outranks the stage. */
 .avatar-stage {
-  position: fixed; inset: 0; z-index: 60; background: #05070f;
+  position: fixed; inset: 0; z-index: 92; background: #05070f;
   display: flex; align-items: center; justify-content: center;
+}
+/* And while the stage is up, the room's chrome leaves the screen rather
+   than waiting dimly under it: panels, docks, cards, seats, strips. In
+   an AR/VR room only the environment (the passthrough, the turntable
+   floor) stays, showing through the clear stage behind the figure. The
+   wardrobe card is the stage's own and stays. */
+.staging .card:not(.wardrobe),
+.staging .talk-overlay,
+.staging .talk-panel,
+.staging .talk-panel-scrim,
+.staging .chat-rail-dock,
+.staging .room-dock-picker,
+.staging .walk-strip,
+.staging .stage-seat,
+.staging .stage-note,
+.staging .stage-leave {
+  display: none;
 }
 .stage-face { width: 100%; height: 100%; object-fit: cover; }
 .stage-empty { color: var(--muted, #8b90a8); padding: 24px; }
@@ -2111,8 +2132,10 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 }
 .stage-close {
   position: absolute; top: 12px; right: 12px; z-index: 62;
-  width: 40px; height: 40px; border-radius: 50%;
-  border: 1px solid var(--line); background: rgba(5,7,15,0.65); color: #fff;
+  width: 40px; height: 40px; border-radius: 50%; border: 0;
+  /* Red, like the panels' close — "only the avatar screen with the red
+     X to back out of it." The one visible exit wears the exit color. */
+  background: rgb(224, 85, 85); color: #fff; font-weight: 700;
 }
 /* In an AR or VR room the scene stays visible behind the figure — the
    avatar stands in the environment instead of on a black card. */
@@ -2151,8 +2174,15 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
    the figure, each its own door. The avatar's wears the accent ring so
    the two read as different doors, not a double exposure. */
 .rs-pair {
-  display: flex; gap: 8px; align-items: center; justify-content: center;
+  display: flex; gap: 8px; align-items: flex-start; justify-content: center;
   max-width: 100%;
+}
+/* The word under the second circle — "it must say avatar under the
+   photo". Tops aligned above so the first circle stays put while its
+   neighbor wears the caption. */
+.rs-cap {
+  display: block; margin-top: 2px; font-size: 10px; line-height: 1.2;
+  color: var(--muted, #8b90a8); text-align: center;
 }
 .rs-circle-btn {
   background: none; border: none; padding: 0; cursor: pointer;

@@ -578,6 +578,9 @@ const CHROME: Table = {
   "raise.begin.go": {
     en: "Begin the life", es: "Comenzar la vida", fr: "Commencer la vie", de: "Das Leben beginnen", pt: "Começar a vida", it: "Comincia la vita", ja: "命を始める", zh: "开始这段生命", hi: "जीवन शुरू करें", ar: "ابدأ الحياة",
   },
+  "ins.pair.avatar": {
+    en: "avatar", es: "avatar", fr: "avatar", de: "Avatar", pt: "avatar", it: "avatar", ja: "アバター", zh: "头像", hi: "अवतार", ar: "الأفاتار",
+  },
   "raise.time": {
     en: "The three time controls", es: "Los tres controles del tiempo", fr: "Les trois contrôles du temps", de: "Die drei Zeitregler", pt: "Os três controlos do tempo", it: "I tre controlli del tempo", ja: "3つの時間コントロール", zh: "三个时间控制", hi: "समय के तीन नियंत्रण", ar: "ضوابط الزمن الثلاثة",
   },

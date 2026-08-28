@@ -2173,7 +2173,8 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // screen is for, read by somebody deciding whether to open it — and a
   // person already standing in the room has decided.
   return (
-    <div className={"screen" + (inRoom ? " room-place" : "")}
+    <div className={"screen" + (inRoom ? " room-place" : "")
+                    + (staged ? " staging" : "")}
          onPointerDownCapture={() => {
            if (!earWaiting) return;
            setEarWaiting(false);
@@ -2628,6 +2629,13 @@ export function Inside({ onPlans, start = "", onLeave }: {
                              return art.startsWith("http")
                                ? art : getBase() + art;
                            })()} />
+                      {/* The word under the second circle — the field
+                          call: "it must say avatar under the photo",
+                          so the pair never reads as a double
+                          exposure. */}
+                      <span className="rs-cap">
+                        {tr("ins.pair.avatar", lang)}
+                      </span>
                     </button>
                   </div>
                 ) : behind ? (
