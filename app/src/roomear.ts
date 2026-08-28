@@ -103,6 +103,32 @@ export async function recordTurn(
   }, speakingNow, onLevel, undefined, onBarge);
 }
 
+/** One take, handed back as the audio itself.
+ *
+ *  The voice memo's recorder: same stream, same analyser, same
+ *  voiced-or-nothing gate as every other take — but what comes back is
+ *  the file, because the memo IS the message. The room's share door
+ *  reads the words out of it server-side, so the person's voice is what
+ *  their seat says and the transcript still knows what it meant. A take
+ *  that never heard a voice rejects instead of resolving, so silence
+ *  sends nothing. */
+export async function recordRaw(
+  onLevel?: (level: number) => void,
+  quietEndsMs?: number,
+): Promise<{ stop: () => void; done: Promise<Blob> }> {
+  let taken: Blob | null = null;
+  const rec = await open(
+    async (blob) => { taken = blob; return ""; },
+    () => false, onLevel, quietEndsMs);
+  return {
+    stop: rec.stop,
+    done: rec.done.then(() => {
+      if (!taken) throw new Error("nothing was recorded");
+      return taken;
+    }),
+  };
+}
+
 /** The same ear pointed at a conversation instead of a room: one recorded
  *  turn, transcribed through `/interactors/{id}/heard`. The chat overlay,
  *  its dictation bar and the studio orb fall back to this when the

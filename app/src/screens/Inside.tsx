@@ -9,7 +9,7 @@ import { plainVoice, speakInPieces, type Speaking } from "../spoken";
 import { useSession } from "../store";
 import { putAway, whenPutAway } from "../away";
 import { startWalking } from "../walk";
-import { canRecord, meterWhileSpeaking, recordAsked, recordTurn,
+import { canRecord, meterWhileSpeaking, recordRaw, recordTurn,
          type Recording } from "../roomear";
 
 /**
@@ -202,7 +202,17 @@ export function Inside({ onPlans, start = "", onLeave }: {
   const [draft, setDraft] = useState("");
   // Whose four panels the dock shows, in a room with several profiles.
   const [railFor, setRailFor] = useState<string | null>(null);
+  const [mintedOwner, setMintedOwner] = useState<Record<string, string>>({});
+  // Prefer a seat this session can hold the key for — the person's own
+  // profile first, then any the account has minted for — so the four
+  // panels stand whole by default. "It worked before" was exactly this:
+  // the docked profile used to be one they owned. First-profile stays
+  // the fallback so an all-starter room still docks something.
   const dockedProfile = railFor
+    || seats.find((s) => s.kind === "profile"
+                  && s.id === session.profileId)?.id
+    || seats.find((s) => s.kind === "profile"
+                  && !!mintedOwner[s.id])?.id
     || seats.find((s) => s.kind === "profile")?.id || null;
   // The owner's two panels open only for the profile this session owns —
   // the token is read by the rail's own doors and never speaks into the
@@ -212,7 +222,6 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // two owner panels, and "two of the buttons are missing" is how that
   // reads from a phone. The account token can mint an owner capability
   // for any held profile, so the dock does, once, and shows all four.
-  const [mintedOwner, setMintedOwner] = useState<Record<string, string>>({});
   useEffect(() => {
     const pid = dockedProfile;
     if (!pid || pid === session.profileId || mintedOwner[pid]) return;
@@ -352,6 +361,10 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // (iOS Safari does not), the same bargain the Agent screen struck.
   const [dictating, setDictating] = useState(false);
   const [dictLevel, setDictLevel] = useState(0);
+  /** The last few seconds of levels, oldest first — the heartbeat line's
+   *  memory. A ref so 10Hz level ticks do not re-render on their own;
+   *  `dictLevel` is the tick that redraws it. */
+  const dictWave = useRef<number[]>([]);
   const dictDropped = useRef(false);
   const dictation = useRef<{ stop: () => void } | null>(null);
   // Talking INTO a voice room: the same recogniser, but what it hears is
@@ -1475,9 +1488,17 @@ export function Inside({ onPlans, start = "", onLeave }: {
       taping.current?.stop();
       talkRec.current?.stop();
     }
-    let recording: Recording;
+    let recording: { stop: () => void; done: Promise<Blob> };
     try {
-      recording = await recordAsked(me, token, (lvl) => setDictLevel(lvl));
+      dictWave.current = [];
+      recording = await recordRaw((lvl) => {
+        dictWave.current.push(lvl);
+        if (dictWave.current.length > 72) dictWave.current.shift();
+        setDictLevel(lvl);
+      // A take that never hears a voice ends itself after five quiet
+      // seconds and sends nothing — "cut it off if it doesn't pick up
+      // anything in a few seconds."
+      }, 5000);
     } catch {
       setEarFault(tr("ins.ear.blocked", lang));
       if (wasStanding) startTalking();
@@ -1487,16 +1508,23 @@ export function Inside({ onPlans, start = "", onLeave }: {
     dictation.current = { stop: () => recording.stop() };
     setDictating(true);
     try {
-      const text = await recording.done;
-      // Into the box, not out the door. The earlier design sent the words
-      // as a turn the moment they arrived; the field report asked for the
-      // phone's own shape instead — a recording strip in the text bar,
-      // and the words landing where the cursor is, still yours to read
-      // and edit before the arrow sends them.
-      if (text && !dictDropped.current) {
-        setDraft((d) => (d ? d + " " : "") + text);
+      const blob = await recording.done;
+      // The memo IS the message. The share door stores the audio as this
+      // person's bubble and reads the words out of it into the transcript
+      // (the upload-hears rails); advance asks the profile for the turn
+      // that answers them. One voice in, one reply back, no text bubble
+      // pretending the person typed.
+      if (!dictDropped.current && open) {
+        const kind = (blob.type || "audio/webm").split(";")[0];
+        const ext = kind.includes("mp4") ? "m4a"
+          : kind.includes("mpeg") ? "mp3" : "webm";
+        const file = new File([blob], `voice-memo.${ext}`, { type: kind });
+        await api.shareInRoom(open, me, file, token);
+        await api.advanceRoom(open, token);
+        api.roomMessages(open, token).then(setTranscript)
+          .catch(() => { /* the poll will carry it */ });
       }
-    } catch { /* a quiet take writes nothing */ }
+    } catch { /* a quiet take sends nothing */ }
     dictation.current = null;
     setDictating(false);
     setDictLevel(0);
@@ -1711,14 +1739,21 @@ export function Inside({ onPlans, start = "", onLeave }: {
                     dictDropped.current = true;
                     dictation.current?.stop();
                   }}>✕</button>
-          <div className="dict-bars" aria-hidden="true">
-            {Array.from({ length: 14 }, (_, i) => (
-              <span key={i} style={{
-                height: `${4 + Math.min(22, dictLevel
-                  * (0.5 + 0.5 * Math.sin(i * 1.7 + dictLevel / 9)) / 4)}px`,
-              }} />
-            ))}
-          </div>
+          {/* The universal recording mark and the heartbeat line: a red
+            * dot that pulses, and the take's own levels drawn as one
+            * moving trace — flat when the room is quiet, spiking with a
+            * voice, so the line itself says "this is being heard." */}
+          <span className="dict-dot" aria-hidden="true"
+                style={{ transform: `scale(${1 + dictLevel * 0.5})` }} />
+          <svg className="dict-wave" viewBox="0 0 144 28"
+               preserveAspectRatio="none" aria-hidden="true">
+            <polyline fill="none" strokeWidth="2"
+              points={(dictWave.current.length
+                ? dictWave.current : [0]).map((v, i, arr) =>
+                  `${(144 * i) / Math.max(arr.length - 1, 1)},` +
+                  `${14 - Math.min(12, v * 26)
+                     * (i % 2 === 0 ? 1 : -1)}`).join(" ")} />
+          </svg>
           <button className="rs-chatbtn dict-stop"
                   aria-label={tr("ins.rec.stop", lang)}
                   title={tr("ins.rec.stop", lang)}
@@ -3036,6 +3071,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 interactorId={me || null}
                 lang={lang}
                 ownerToken={dockOwner}
+                onAsk={(words) => void sendText(words)}
                 interactorToken={token || null}
                 onError={setError} />
             </div>

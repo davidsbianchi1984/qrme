@@ -145,34 +145,46 @@ def test_the_first_touch_is_the_grant_the_phone_wanted():
         "is the grant")
 
 
-def test_the_take_lives_in_the_bar_and_lands_in_the_box():
-    """The 🎤 by the paperclip, on the phone's own terms: pressing it turns
-    the text bar into a recording strip — cancel, a level that moves when
-    you do, stop — and the words land in the draft box, still yours to
-    read and edit before the arrow sends them. The earlier design sent
-    them as a turn the moment they arrived, and the field report asked
-    for this shape instead."""
-    assert 'className="rs-chatpill dict-strip"' in INSIDE, (
-        "no strip replaces the bar while a take is open")
-    assert "recordAsked(me, token, (lvl) => setDictLevel(lvl))" in INSIDE, (
-        "the strip's level is decoration — nothing feeds it the microphone")
-    assert re.search(r"dictDropped\.current\)\s*\{\s*\n\s*"
-                     r"setDraft", INSIDE), (
-        "the words no longer land in the box")
-    assert "if (text) await sendText(text);" not in INSIDE, (
-        "a take still sends itself — the words must wait in the box")
+def test_the_take_is_the_message_and_the_line_says_it_is_heard():
+    """The 🎤 by the paperclip, third design and the owner's words both
+    times: the strip wears the universal recording mark (a pulsing red
+    dot) and a heartbeat line drawn from the take's own levels — "users
+    know their audio is being recorded inside that line" — a take that
+    hears nothing ends itself in a few quiet seconds and sends nothing,
+    and what a voiced take sends is THE AUDIO: the share door stores the
+    bubble and reads the words into the transcript, and advance asks the
+    profile for the turn that answers them."""
+    assert 'className="dict-dot"' in INSIDE, (
+        "no recording mark — a red border on a button is an alarm, not a "
+        "recording sign")
+    assert 'className="dict-wave"' in INSIDE and "polyline" in INSIDE, (
+        "no heartbeat line — dots do not say 'this is being heard'")
+    assert re.search(r"recordRaw\(", INSIDE), (
+        "the take no longer records the audio itself")
+    assert re.search(r"recordRaw\([^)]*\n[^)]*\n[^)]*\n[^)]*5000", INSIDE,
+                     re.S) or ", 5000)" in INSIDE, (
+        "a silent take never ends itself")
+    assert "api.shareInRoom(open, me, file, token)" in INSIDE, (
+        "the memo no longer sends as an audio file")
+    assert "api.advanceRoom(open, token)" in INSIDE, (
+        "nothing asks the profile for the turn that answers the memo")
 
 
-def test_all_four_rail_buttons_stand_without_the_key():
-    """"There should be four." A session without the owner's key used to
-    lose two rail buttons silently, which reads from a phone as broken
-    rather than locked. The buttons stand, and the panel says what opens
-    them."""
+def test_all_four_rail_buttons_stand_and_nobody_signs_in_twice():
+    """"There should be four" — and "users have already signed into their
+    accounts; best not pester them." A session without the owner's key
+    keeps all four buttons, the dock prefers a seat the session can hold
+    the key for, and an unowned profile's owner panels open onto the door
+    a visitor really has: asking, sent into the conversation itself."""
     rail = (REPO / "app/src/TalkRail.tsx").read_text(encoding="utf-8")
     assert "OWNERS.includes(p)) return !!ownerToken" not in rail, (
         "the owner panels vanish again without the key")
-    assert 'tr("rail.locked", lang)' in rail, (
-        "a locked panel opens onto nothing instead of the way to the key")
+    assert "AskPanel" in rail and 'tr("rail.ask", lang)' in rail, (
+        "an unowned panel opens onto nothing instead of the ask")
+    assert "rail.locked" not in rail, (
+        "the sign-in errand came back")
+    assert re.search(r"s\.id === session\.profileId\)\?\.id", INSIDE), (
+        "the dock no longer prefers a seat this session owns")
     assert "!spokenRoom || !canDictate" not in INSIDE, (
         "the chat-room exemption is back; the owner removed it by name")
 

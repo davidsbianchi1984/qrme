@@ -8400,6 +8400,15 @@ const CHROME: Table = {
     hi: "इस ब्राउज़र में वाक् पहचान नहीं है, इसलिए यहाँ कमरे में बोलने का विकल्प नहीं है — टाइप कीजिए, कमरा फिर भी बोलकर उत्तर देगा।",
     ar: "هذا المتصفح لا يملك التعرّف على الكلام، لذا لا يُعرض التحدّث في هذه الغرفة هنا — اكتب بدلًا من ذلك، وستظل الغرفة تجيب بصوت مسموع.",
   },
+  "rail.ask": {
+    en: "These two are the owner’s — but you can just ask. Say what you’d like changed and they’ll take it from there.", es: "Estos dos son del propietario, pero puedes pedirlo sin más. Di qué te gustaría cambiar y ellos se encargan.", fr: "Ces deux-là appartiennent au propriétaire — mais tu peux simplement demander. Dis ce que tu voudrais changer et ils s’en chargent.", de: "Diese beiden gehören dem Eigentümer — aber du kannst einfach fragen. Sag, was du dir anders wünschst, und sie kümmern sich darum.", pt: "Estes dois são do proprietário — mas você pode simplesmente pedir. Diga o que gostaria de mudar e eles cuidam do resto.", it: "Questi due sono del proprietario — ma puoi semplicemente chiedere. Di’ cosa vorresti cambiare e ci penseranno loro.", ja: "この2つはオーナーのものですが、頼むだけで大丈夫。変えてほしいことを伝えれば、あとは任せられます。", zh: "这两个属于所有者——但你可以直接开口。说出你想改变什么，他们会处理。", hi: "ये दोनों मालिक के हैं — लेकिन आप बस कह सकते हैं। बताइए क्या बदलना है और वे संभाल लेंगे।", ar: "هذان للمالك — لكن يمكنك أن تطلب ببساطة. قل ما تودّ تغييره وسيتولون الأمر.",
+  },
+  "rail.ask.ph": {
+    en: "Ask for a change…", es: "Pide un cambio…", fr: "Demande un changement…", de: "Bitte um eine Änderung…", pt: "Peça uma mudança…", it: "Chiedi una modifica…", ja: "変更をお願いする…", zh: "提出想要的改变…", hi: "बदलाव के लिए कहें…", ar: "اطلب تغييرًا…",
+  },
+  "rail.ask.send": {
+    en: "Ask", es: "Pedir", fr: "Demander", de: "Fragen", pt: "Pedir", it: "Chiedi", ja: "頼む", zh: "开口", hi: "कहें", ar: "اطلب",
+  },
   "ins.ear.tap": {
     en: "Tap anywhere and the room hears you", es: "Toca en cualquier parte y la sala te escucha", fr: "Touchez n’importe où et la salle vous entend", de: "Tipp irgendwohin, und der Raum hört dich", pt: "Toque em qualquer lugar e a sala ouve você", it: "Tocca ovunque e la stanza ti sente", ja: "どこかをタップすると、ルームがあなたの声を聞きます", zh: "点按任意位置，房间就能听到你", hi: "कहीं भी टैप करें और कमरा आपको सुनेगा", ar: "المس أي مكان وستسمعك الغرفة",
   },
@@ -8408,9 +8417,6 @@ const CHROME: Table = {
   },
   "ins.rec.cancel": {
     en: "Never mind", es: "Olvídalo", fr: "Laisser tomber", de: "Doch nicht", pt: "Deixa pra lá", it: "Lascia stare", ja: "やっぱりやめる", zh: "算了", hi: "रहने दें", ar: "لا عليك",
-  },
-  "rail.locked": {
-    en: "These two open with the owner’s key. Sign in to your account on the Identity screen and they unlock for every profile you hold.", es: "Estos dos se abren con la llave del propietario. Inicia sesión en tu cuenta en la pantalla de Identidad y se desbloquean para cada perfil que tengas.", fr: "Ces deux-là s’ouvrent avec la clé du propriétaire. Connectez-vous à votre compte sur l’écran Identité et ils se déverrouillent pour chaque profil que vous détenez.", de: "Diese beiden öffnen sich mit dem Schlüssel des Eigentümers. Melde dich auf dem Identitätsbildschirm bei deinem Konto an, und sie entsperren sich für jedes Profil, das du hältst.", pt: "Estes dois abrem com a chave do proprietário. Entre na sua conta na tela de Identidade e eles se desbloqueiam para cada perfil que você possui.", it: "Questi due si aprono con la chiave del proprietario. Accedi al tuo account nella schermata Identità e si sbloccano per ogni profilo che possiedi.", ja: "この2つはオーナーの鍵で開きます。アイデンティティ画面でアカウントにサインインすると、保有するすべてのプロフィールで解錠されます。", zh: "这两个面板需要所有者的钥匙。在身份页面登录你的账户，你持有的每个档案都会解锁。", hi: "ये दोनों मालिक की चाबी से खुलते हैं। पहचान स्क्रीन पर अपने खाते में साइन इन करें और ये आपके हर प्रोफ़ाइल के लिए खुल जाएँगे।", ar: "هذان الاثنان يُفتحان بمفتاح المالك. سجّل الدخول إلى حسابك في شاشة الهوية وسيُفتحان لكل ملف تملكه.",
   },
   "ins.ear.blocked": {
     en: "The microphone was refused — allow it for this site in the browser, then press the mic again.", es: "El micrófono fue rechazado: permítelo para este sitio en el navegador y pulsa el micro otra vez.", fr: "Le microphone a été refusé — autorisez-le pour ce site dans le navigateur, puis réappuyez sur le micro.", de: "Das Mikrofon wurde verweigert — erlaube es für diese Seite im Browser und drücke das Mikro erneut.", pt: "O microfone foi recusado — permite-o para este site no navegador e carrega no micro outra vez.", it: "Il microfono è stato rifiutato: consentilo per questo sito nel browser, poi premi di nuovo il microfono.", ja: "マイクが拒否されました。ブラウザでこのサイトに許可してから、もう一度マイクを押してください。", zh: "麦克风被拒绝 — 请在浏览器中为此网站允许后，再按一次麦克风。", hi: "माइक्रोफ़ोन अस्वीकार हुआ — ब्राउज़र में इस साइट के लिए अनुमति दें, फिर माइक दोबारा दबाएँ।", ar: "رُفض الميكروفون — اسمح به لهذا الموقع في المتصفح ثم اضغط الميكروفون مجددًا.",

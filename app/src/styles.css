@@ -446,7 +446,7 @@ button.danger { background: rgba(224,104,122,0.14) !important; color: var(--red)
 .voice-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
 button.mic { background: rgba(255,255,255,0.06); border: 1px solid var(--line);
   border-radius: 999px; padding: 10px 16px; font-weight: 600; color: var(--txt); }
-button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red, #f85149); }
+button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--green, #7bc47f); }
 
 /* An honest amber: the reply arrived, but not from who the user picked.
    Distinct from .error (red) — nothing failed to deliver; it degraded. */
@@ -2063,13 +2063,36 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 }
 /* The take in progress, living where the text bar was. */
 .dict-strip { align-items: center; gap: 10px; }
-.dict-bars {
-  flex: 1; display: flex; align-items: center; justify-content: center;
-  gap: 3px; min-height: 30px;
+.dict-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #f85149; flex: none;
+  animation: dict-dot-pulse 1.2s ease-in-out infinite;
+  transition: transform 90ms linear;
 }
-.dict-bars span {
-  width: 3px; min-height: 4px; border-radius: 2px;
-  background: var(--accent, #7b5cff);
-  transition: height 90ms linear;
+@keyframes dict-dot-pulse {
+  0%, 100% { opacity: 1; } 50% { opacity: 0.45; }
+}
+.dict-wave {
+  flex: 1; height: 28px; min-width: 0;
+}
+.dict-wave polyline {
+  stroke: var(--accent, #7b5cff);
 }
 .dict-stop { font-size: 1.05rem; }
+
+/* The panel behaves: a card, not a wall. It caps well under the viewport,
+   scrolls inside itself, and — the field report's exact words — never
+   "grabs the background of the chat room": overscroll containment ends
+   the wheel at the panel's own edge. */
+.talk-panel {
+  max-height: 60vh; max-width: 420px;
+  overflow-y: auto; overscroll-behavior: contain;
+}
+/* All four buttons in frame: the dock pins to the chat's visible corner
+   and never flows below the fold. */
+.chat-rail-dock {
+  position: sticky; bottom: 8px; align-self: flex-end;
+  max-height: 70vh; overflow: visible;
+}
+.rail-ask-row { display: flex; gap: 8px; margin-top: 8px; }
+.rail-ask-row input { flex: 1; min-width: 0; }
