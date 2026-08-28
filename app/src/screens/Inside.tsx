@@ -2259,72 +2259,20 @@ export function Inside({ onPlans, start = "", onLeave }: {
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
-      {/* One card, two jobs, decided by whether you are in a room yet.
-       *
-       *     asked     which room do you want
-       *     mattered  and once you are in it, what is it called
-       *
-       * Outside: the id box and Go in, as before. Inside: the same place
-       * becomes the room's NAME and the button becomes Save — which is
-       * where a person already is when they notice the name is wrong.
-       * Field request: "that's a good place to edit your room name while
-       * you're already in, and the button that says Go in — I just need to
-       * say Save and it'll save the name." */}
-      <div className="card">
-        <h3>{inRoom ? tr("ins.roomname", lang) : tr("ins.whichroom", lang)}</h3>
-        <div className="row">
-          {inRoom ? (
-            <input value={roomName}
-                   onChange={(e) => setRoomName(e.target.value)}
-                   onKeyDown={(e) => { if (e.key === "Enter") void saveName(); }}
-                   placeholder={tr("ins.roomname.ph", lang)}
-                   style={{ flex: 1 }} />
-          ) : (
+      {/* The bottom card belongs to the doorway, not the room. It used
+       * to stay after entry as the naming-and-controls card, and the
+       * field report retired that: "Get rid of the bottom purple room
+       * name — you just could've set that up before they joined." The
+       * name is chosen at creation (Rooms) and still editable behind
+       * your own seat's ⚙️, where the lend and let-them-talk doors
+       * moved too — moved, not deleted: each is still a capability's
+       * one door. Inside a room, the scene owns the whole screen. */}
+      {!inRoom && (
+        <div className="card">
+          <h3>{tr("ins.whichroom", lang)}</h3>
+          <div className="row">
             <input value={roomId} onChange={(e) => setRoomId(e.target.value)}
                    placeholder={tr("ins.roomid.ph", lang)} style={{ flex: 1 }} />
-          )}
-          {inRoom ? (<>
-            <button disabled={busy || !token || !roomName.trim()}
-                    onClick={() => void saveName()}>
-              {tr("ins.roomname.save", lang)}
-            </button>
-
-            {/* The microphone lend, out of the strip on the owner's word
-                ("get rid of the lend button") and into the room's own
-                settings card — moved, not deleted: this is the one door
-                to lending your microphone in a room, and deleting the
-                only door to a capability is a different act from moving
-                it below the fold. In words, both directions, exactly as
-                before. */}
-            <button className={"rs-round rs-worded lend" + (lentByMe ? " live" : "")}
-                    disabled={busy || !token || !me || !open}
-                    aria-pressed={lentByMe}
-                    aria-label={lentByMe ? tr("ins.takeback", lang)
-                                         : tr("ins.lendmic", lang)}
-                    title={tr("ins.micpitch", lang)}
-                    onClick={act(async () => {
-                      if (lentByMe) {
-                        await api.takeBackMicInRoom(open, me, token);
-                      } else {
-                        await api.lendMicInRoom(open, me, token);
-                      }
-                    }, lentByMe ? tr("ins.takenback", lang)
-                                : tr("ins.lent", lang))}>
-              {lentByMe ? tr("ins.takeback", lang) : tr("ins.lendmic", lang)}
-            </button>
-
-            {/* Let it talk first — out of the strip on the same word as
-                the lend ("get rid of the let it talk first button too")
-                and into this card beside it. The one door to hearing the
-                profiles without adding a line, kept rather than deleted. */}
-            <button className="rs-round rs-worded talkers"
-                    disabled={busy || !token || !open}
-                    aria-label={tr("ins.letthemtalk", lang)}
-                    title={tr("ins.letthemtalk", lang)}
-                    onClick={act(async () => {
-                      await api.advanceRoom(open, token);
-                    })}>{tr("ins.letthemtalk", lang)}</button>
-          </>) : (
             <button disabled={busy || !open || !token} onClick={act(async () => {
               setEntered(true);
               load();
@@ -2345,12 +2293,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
             })}>
               {tr("ins.goin", lang)}
             </button>
+          </div>
+          {!token && (
+            <p className="muted small">{tr("ins.signinperson", lang)}</p>
           )}
         </div>
-        {!token && (
-          <p className="muted small">{tr("ins.signinperson", lang)}</p>
-        )}
-      </div>
+      )}
 
       {/* Who is coming, chosen on the way in rather than after arriving.
        *
@@ -2776,6 +2724,49 @@ export function Inside({ onPlans, start = "", onLeave }: {
                         {tr("ins.face.hereoff", lang)}
                       </button>
                     )}
+                    {/* The room's own controls, behind the same gear as
+                        your seat's — the bottom card they lived on left
+                        the room ("you just could've set that up before
+                        they joined"), and each of these is still a
+                        capability's one door: the name, the microphone
+                        lend, and letting the profiles talk first. */}
+                    <input value={roomName} disabled={busy}
+                           onChange={(e) => setRoomName(e.target.value)}
+                           onKeyDown={(e) => {
+                             if (e.key === "Enter") void saveName();
+                           }}
+                           aria-label={tr("ins.roomname", lang)}
+                           placeholder={tr("ins.roomname.ph", lang)} />
+                    <button className="chip"
+                            disabled={busy || !token || !roomName.trim()}
+                            onClick={() => void saveName()}>
+                      {tr("ins.roomname.save", lang)}
+                    </button>
+                    <button className={"rs-round rs-worded lend"
+                                       + (lentByMe ? " live" : "")}
+                            disabled={busy || !token || !me || !open}
+                            aria-pressed={lentByMe}
+                            aria-label={lentByMe ? tr("ins.takeback", lang)
+                                                 : tr("ins.lendmic", lang)}
+                            title={tr("ins.micpitch", lang)}
+                            onClick={act(async () => {
+                              if (lentByMe) {
+                                await api.takeBackMicInRoom(open, me, token);
+                              } else {
+                                await api.lendMicInRoom(open, me, token);
+                              }
+                            }, lentByMe ? tr("ins.takenback", lang)
+                                        : tr("ins.lent", lang))}>
+                      {lentByMe ? tr("ins.takeback", lang)
+                                : tr("ins.lendmic", lang)}
+                    </button>
+                    <button className="rs-round rs-worded talkers"
+                            disabled={busy || !token || !open}
+                            aria-label={tr("ins.letthemtalk", lang)}
+                            title={tr("ins.letthemtalk", lang)}
+                            onClick={act(async () => {
+                              await api.advanceRoom(open, token);
+                            })}>{tr("ins.letthemtalk", lang)}</button>
                     {/* The masks. Two records, not one: taking a mask off and
                         turning a camera off are different actions, so this
                         sits beside the three above rather than among them. */}

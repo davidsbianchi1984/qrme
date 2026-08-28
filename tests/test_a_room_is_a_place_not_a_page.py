@@ -610,22 +610,26 @@ def test_the_flat_page_keeps_its_containing_block():
 
 # -- the room's name, from inside it -----------------------------------------
 
-def test_the_room_can_be_named_from_inside_it():
-    """"That's a good place to edit your room name while you're already
-    in, and the button that says Go in — I just need to say Save."" """
-    assert "ins.roomname" in INSIDE
-    assert "api.renameRoom(" in INSIDE, "the Save button saves nothing"
+def test_the_bottom_card_left_the_room():
+    """The naming card used to stay after entry, and the field report
+    retired it: "Get rid of the bottom purple room name — you just
+    could've set that up before they joined." The doorway keeps its card
+    (which room, Go in); the room keeps only the scene."""
+    assert '{inRoom ? tr("ins.roomname"' not in INSIDE, (
+        "the two-job card is back, standing under the scene")
+    assert 'tr("ins.whichroom"' in INSIDE
+    assert 'tr("ins.goin"' in INSIDE, "the way into a room was replaced"
 
 
-def test_the_same_card_does_both_jobs():
-    """Outside a room it asks which one; inside it names the one you are
-    in. One place, because that is where a person already is when they
-    notice the name is wrong."""
-    block = INSIDE[INSIDE.index('{inRoom ? tr("ins.roomname"'):]
-    block = block[:block.index("{!token && (")]
-    assert 'tr("ins.whichroom"' in block
-    assert 'tr("ins.goin"' in block, "the way into a room was replaced"
+def test_the_room_can_still_be_renamed_behind_the_gear():
+    """Moved, not deleted: renaming is a capability with one door, and
+    that door lives in your own seat's reveal now — beside the microphone
+    lend and let-them-talk, which rode along off the retired card."""
+    block = INSIDE[INSIDE.index("{isMe && reveal && ("):]
     assert 'tr("ins.roomname.save"' in block
+    assert "api.renameRoom(" in INSIDE, "the Save button saves nothing"
+    assert 'tr("ins.lendmic"' in block
+    assert 'tr("ins.letthemtalk"' in block
 
 
 def test_the_name_box_shows_the_name_it_will_replace():
