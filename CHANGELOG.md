@@ -6,6 +6,54 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-08-28
+
+### Added
+
+- **The forge — a face built here, not bought** — the avatar shelf was an
+  import list and said so in its own comment: *"nothing here calls a
+  provider's API."* The road chosen to fix that was Ready Player Me,
+  which Netflix had bought and shut down (platform, creator and developer
+  APIs) on 31 January 2026; the two production replacements price their
+  API at eight hundred dollars a month. So the road that MAKES a face
+  runs on the deployment's own hardware: a sidecar (`docker/forge/`)
+  running MediaPipe's face landmarker turns one photograph — framed as
+  just the face, the upper torso, or the full body — into a textured 3-D
+  head whose morph targets carry ARKit's own names. `qrme/avatarforge.py`
+  is the one road to it and is honest when absent; the console draws the
+  upload only where a forge is configured; the registry carries the model
+  beside the portrait on ONE row, so a takedown done once is true for
+  both; and a face built from somebody's own photograph is their own
+  likeness, so the AI mark is not burned into it.
+- **The face speaks** — `Avatar3D` draws the head and drives `jawOpen`
+  from the audio the room is already playing piece by piece, looking
+  morph targets up BY NAME rather than by index. That is what keeps a
+  provider a slot rather than a foundation: the day somebody brings a
+  bought avatar, the renderer does not change.
+- **The sit-out** — a person's seat steps out of the room's waiting so
+  the profiles keep their own rotation, and steps back in on a tap. What
+  sits out is the waiting, not the seat: you still read every turn and
+  still hold the microphone. Held on the seat rather than in the browser,
+  so a room reopened tomorrow is the room you left.
+
+### Fixed
+
+- Ready Player Me is struck from the import shelf with the reason
+  recorded, its tile removed, and the three clients that opened their
+  picker ON it now take the server's own first row — a default naming one
+  vendor is a default that rots when that vendor does.
+- An aimed turn is answered even when the marker sits mid-paragraph and
+  even when the model mistypes the name: `[to: …]` is parsed wherever the
+  turn puts it (the last one wins), and a near-miss resolves when exactly
+  one seat is close, so a room no longer stalls with the bracket sitting
+  on screen naming somebody.
+- The room's ear re-opens the moment it falls quiet: a turn arriving
+  while a voice was playing hit the queue's lock and stayed silent until
+  the NEXT message re-fired it — which is why an invited profile's first
+  words were read and never heard.
+- A glTF binary is stored under its own name, proved by the format's own
+  magic bytes, so a renderer is handed a `.glb` rather than a `.txt`.
+
 ## [2.2.0] - 2026-08-28
 
 ### Added
@@ -16096,7 +16144,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.2.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.3.0...HEAD
+[2.3.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.2.0...app-v2.3.0
 [2.2.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.1.0...app-v2.2.0
 [2.1.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.0.1...app-v2.1.0
 [2.0.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.0.0...app-v2.0.1
