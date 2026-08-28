@@ -393,7 +393,8 @@ export function WatchParty({ onPlans, start }: {
               {!ctx.watching.seen && (
                 <button className="chip" disabled={watchBusy}
                         onClick={watchIt}>
-                  {tr(watchBusy ? "wp.watching" : "wp.watch", lang)}
+                  {watchBusy ? tr("wp.watching", lang)
+                             : tr("wp.watch", lang)}
                 </button>
               )}
               {ctx.watching.seen && (

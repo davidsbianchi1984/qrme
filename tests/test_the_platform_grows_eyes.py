@@ -97,7 +97,9 @@ def test_a_platform_page_cannot_be_watched():
     assert sentence in i18n._PUBLIC, "the refusal is not registered"
 
 
-def test_a_viewing_happens_once_per_subject(monkeypatch):
+def test_a_viewing_happens_once_per_subject(client, monkeypatch):
+    """`client` for the fresh database it brings — a viewing stored in a
+    previous run's database is exactly what this test must not read."""
     calls = {"n": 0}
 
     def fake_watch(url, on_behalf_of=None):
@@ -115,7 +117,7 @@ def test_a_viewing_happens_once_per_subject(monkeypatch):
     assert again["watched_at"] == first["watched_at"]
 
 
-def test_missing_machinery_stays_honest(monkeypatch):
+def test_missing_machinery_stays_honest(client, monkeypatch):
     monkeypatch.setattr(scrape, "watch_url", lambda *a, **k: None)
     assert watching.watch_link("https://example.com/gone.mp4") is None
 
