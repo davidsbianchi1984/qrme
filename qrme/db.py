@@ -1639,6 +1639,22 @@ CREATE TABLE IF NOT EXISTS post_videos (
     created_at TEXT NOT NULL
 );
 
+-- A viewing: what the platform's own eyes and ears made of one recording
+-- (qrme/watching.py). `subject` is the direct URL or media id watched;
+-- one row per subject, because a room of eight profiles must not watch
+-- the same video eight times on the owner's dime. `heard` is the ears'
+-- words, `seen` the seeing door's account of the pictures — each empty
+-- when that half of the machinery was absent, never invented.
+CREATE TABLE IF NOT EXISTS viewings (
+    id               TEXT NOT NULL,
+    subject          TEXT PRIMARY KEY,
+    heard            TEXT NOT NULL DEFAULT '',
+    seen             TEXT NOT NULL DEFAULT '',
+    duration_seconds REAL,
+    language         TEXT,
+    watched_at       INTEGER NOT NULL
+);
+
 -- One row per attempted "Sign in with ..." (qrme/oauth.py). result holds the
 -- finished session until the console claims it, exactly once.
 CREATE TABLE IF NOT EXISTS oauth_states (

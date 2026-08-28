@@ -1022,6 +1022,22 @@ LESSONS: tuple[dict, ...] = (
          screens=(205,),
          try_it="Tap the avatar ring beside any portrait, then the "
                 "clothes-hanger button."),
+    dict(key="thewatching", chapter="Talking together",
+         title="The platform's own eyes",
+         what="Share a picture and the profiles in the room read it — a "
+              "screenshot is read for its text, which is how a phone "
+              "hands over its screen. Share a video and it is heard and "
+              "its frames described, so the room can talk about what is "
+              "on screen, not just what was said. On a computer, the "
+              "screen button hands the room one frame of your own screen "
+              "through the browser's picker — a statement, not a feed. "
+              "In a watch party, anybody can have the video watched "
+              "once (direct video links; platform pages only hand over "
+              "a player, and the room says so), and the panel shows "
+              "exactly what the eyes and ears took in. The agent takes "
+              "a shown picture or screen the same way, and answers to "
+              "what is actually on it.",
+         screens=(155,)),
     dict(key="presence", chapter="Being yourself",
          title="Where it is seen",
          what="Three different audiences, and they are not the same. Your own "

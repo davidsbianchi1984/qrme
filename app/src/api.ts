@@ -1728,7 +1728,11 @@ export type PostedLine = {
 export type PartyContext = {
   watching: { title: string; platform: string;
               description_available: boolean;
-              transcript_available: boolean };
+              transcript_available: boolean;
+              /** The viewing, once a member has the video watched: the
+               *  ears' words and the seeing door's account. Empty until
+               *  then — never invented. */
+              heard: string; seen: string };
   position_s: number; playing: boolean;
   recent: { who: string; said: string; at: number | null }[];
   you_have_not_seen_it: boolean;
@@ -3460,6 +3464,10 @@ export interface AgentTurn {
    *  arguments it chose, handed back untouched to `authoringAct`. */
   asks: { tool: string; arguments: Record<string, unknown>;
            says: string } | null;
+  /** What the platform's eyes read off a picture shown for this turn —
+   *  returned beside the reply so the person can see exactly what their
+   *  agent was told. Null when nothing was shown. */
+  seen?: string | null;
 }
 
 export interface MatterStep {
@@ -3991,9 +3999,10 @@ export const api = {
   // something a person can actually do.
   authoringTurn: (profileId: string, said: string,
                   history: { role: string; content: string }[],
-                  token: string) =>
+                  token: string, shown?: string) =>
     req<AgentTurn>(`/profiles/${profileId}/authoring/turn`,
-      { method: "POST", body: { said, history }, token }),
+      { method: "POST",
+        body: { said, history, ...(shown ? { shown } : {}) }, token }),
   // The press. The arguments go back exactly as the turn showed them — a
   // console that rebuilt them would make the sentence on screen a summary of
   // what happens rather than the thing being agreed to.
@@ -4803,6 +4812,12 @@ export const api = {
   // has not seen, instead of taking on trust that it was given one.
   watchPartyContext: (partyId: string, token: string) =>
     req<PartyContext>(`/watch-parties/${partyId}/context`, { token }),
+  /** Have the party's video actually watched — the platform's own eyes and
+   *  ears. Once per video; every profile in the party reads the viewing. */
+  watchPartyWatch: (partyId: string, token: string) =>
+    req<{ party_id: string; subject: string; heard: boolean; seen: boolean;
+          duration_seconds: number | null }>(
+      `/watch-parties/${partyId}/watch`, { method: "POST", token }),
 
   endWatchParty: (partyId: string, hostId: string, token: string) =>
     req<PartyEnded>(`/watch-parties/${partyId}/end`,

@@ -145,6 +145,69 @@ def transcribe_bytes(data: bytes, on_behalf_of: str | None = None) -> dict | Non
             "language": out.get("language")}
 
 
+#: How many frames of a viewing travel onward to a describer. The sidecar
+#: sends up to eight; a caller that pays per image keeps the cap here.
+MAX_FRAMES = 8
+
+
+def _viewing_from(out: dict) -> dict | None:
+    """The shared shape of both watch doors' answers: words when there was
+    speech, frames when there were pictures, None when the sidecar's
+    answer holds neither — the caller keeps the held-not-watched posture."""
+    text = (out.get("text") or "").strip()
+    frames = [f for f in (out.get("frames") or []) if f][:MAX_FRAMES]
+    if not text and not frames:
+        return None
+    return {"text": text[:_MAX_RENDERED], "frames": frames,
+            "duration_seconds": out.get("duration_seconds"),
+            "language": out.get("language")}
+
+
+def watch_url(url: str, on_behalf_of: str | None = None) -> dict | None:
+    """The whole viewing of a recording — the words said in it AND a
+    handful of frames showing what is on its screen — from the same ears
+    sidecar, through its ``/watch`` door. Or None, covering every kind of
+    missing machinery the same way the transcribed fetch does: no sidecar,
+    a refusal, a timeout, a file that yields neither sound nor pictures."""
+    base = os.environ.get("QRME_EARS_URL", "").strip()
+    if not base:
+        return None
+    offline.allow(url, "the watched fetch", on_behalf_of)
+    req = urllib.request.Request(
+        base.rstrip("/") + "/watch",
+        data=json.dumps({"url": url}).encode("utf-8"),
+        headers={"content-type": "application/json"}, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=300) as resp:
+            out = json.loads(resp.read(_MAX_BYTES * 32)
+                             .decode("utf-8", errors="replace"))
+    except Exception:  # noqa: BLE001 — missing eyes are the caller's decision
+        return None
+    return _viewing_from(out)
+
+
+def watch_bytes(data: bytes, on_behalf_of: str | None = None) -> dict | None:
+    """The same viewing for a recording already in hand — an upload —
+    via the sidecar's ``/watch-file`` door, with the transcribe-bytes
+    posture throughout: the gate sees the sidecar's own address, and a
+    missing answer is None, never an invention."""
+    base = os.environ.get("QRME_EARS_URL", "").strip()
+    if not base or not data:
+        return None
+    offline.allow(base, "the eyes' bytes door", on_behalf_of)
+    req = urllib.request.Request(
+        base.rstrip("/") + "/watch-file", data=data,
+        headers={"content-type": "application/octet-stream"},
+        method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=300) as resp:
+            out = json.loads(resp.read(_MAX_BYTES * 32)
+                             .decode("utf-8", errors="replace"))
+    except Exception:  # noqa: BLE001 — missing eyes are the caller's decision
+        return None
+    return _viewing_from(out)
+
+
 def fetch_rendered(url: str, on_behalf_of: str | None = None) -> dict | None:
     """The page as a person meets it, from the stack's rendering sidecar
     (``QRME_RENDERER_URL``) — or None, so the caller can fall back to

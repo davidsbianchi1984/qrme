@@ -796,6 +796,67 @@ def _extract(text: str, marker: str) -> str | None:
 
 
 # --------------------------------------------------------------------------- #
+# The seeing door
+# --------------------------------------------------------------------------- #
+
+#: Room for an account of what pictures show. Longer than a chat turn —
+#: an account is read by a model, not spoken to a person — but bounded,
+#: because a viewing is a summary and not a second copy of the video.
+MAX_ACCOUNT_TOKENS = 700
+
+
+def look(prompt: str, frames_b64: list[str],
+         media_type: str = "image/jpeg") -> str | None:
+    """What a set of pictures shows, in words — the platform's one road
+    from pixels to text. Frames pulled from a video, a shared screenshot,
+    a grabbed screen: all pass here. ``media_type`` names what the bytes
+    are — one kind per call, because one viewing is one artifact.
+
+    Only the Anthropic road can see today, on the deployment's own key —
+    the per-profile provider choice governs *speech*, and a profile bound
+    to a voice-only provider still watches through the house eyes, the
+    way it already hears through the house ears. None is the answer for
+    every kind of missing sight — offline mode, no key, a refusal, an
+    outage — so the caller keeps the held-not-seen posture instead of
+    inventing a description.
+    """
+    frames = [f for f in frames_b64 if f]
+    if not frames:
+        return None
+    from . import offline
+    if offline.enabled():
+        return None
+    key = _env_value("anthropic")
+    if not key and os.environ.get("QRME_LLM") != "anthropic":
+        return None
+    try:
+        import anthropic
+        client = anthropic.Anthropic(api_key=key) if key \
+            else anthropic.Anthropic()
+        content: list[dict] = [
+            {"type": "image",
+             "source": {"type": "base64", "media_type": media_type,
+                        "data": f}}
+            for f in frames]
+        content.append({"type": "text", "text": prompt})
+        response = client.messages.create(
+            model=MODEL,
+            max_tokens=MAX_ACCOUNT_TOKENS,
+            system=("You describe exactly what the supplied pictures show, "
+                    "for someone who cannot see them. Concrete and plain: "
+                    "what is on screen, any readable text, what changes "
+                    "across the frames. Never guess at what is not shown."),
+            messages=[{"role": "user", "content": content}],
+        )
+        text = "".join(b.text for b in response.content
+                       if b.type == "text").strip()
+        return text or None
+    except Exception:  # noqa: BLE001 — missing sight is the caller's decision
+        logger.info("the seeing door could not answer", exc_info=True)
+        return None
+
+
+# --------------------------------------------------------------------------- #
 # Low-level HTTP (stdlib only, matching qrme.cloud / qrme.pdi_client)
 # --------------------------------------------------------------------------- #
 

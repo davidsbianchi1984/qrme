@@ -259,6 +259,65 @@ _PUBLIC: dict[str, dict[str, str]] = {
         "hi": "कोई पेंटिंग सेवा कॉन्फ़िगर नहीं है — इस परिनियोजन में इमेज कुंजी नहीं है",
         "ar": "لا توجد خدمة رسم مهيأة — لا يملك هذا النشر مفتاح صور",
     },
+    ("that platform hands over a player, not the recording — only "
+     "a direct video or audio link can be watched"): {
+        "es": "esa plataforma entrega un reproductor, no la grabación — solo se puede ver un enlace directo de vídeo o audio",
+        "fr": "cette plateforme fournit un lecteur, pas l'enregistrement — seul un lien direct vidéo ou audio peut être visionné",
+        "de": "diese Plattform liefert einen Player, nicht die Aufnahme — nur ein direkter Video- oder Audiolink kann angeschaut werden",
+        "pt": "essa plataforma entrega um reprodutor, não a gravação — só um link direto de vídeo ou áudio pode ser assistido",
+        "it": "quella piattaforma consegna un lettore, non la registrazione — solo un link diretto video o audio può essere guardato",
+        "ja": "そのプラットフォームが渡すのはプレーヤーであり録画ではありません。視聴できるのは動画か音声への直接リンクだけです",
+        "zh": "该平台提供的是播放器而不是录像——只能观看直接的视频或音频链接",
+        "hi": "वह प्लेटफ़ॉर्म प्लेयर देता है, रिकॉर्डिंग नहीं — केवल सीधा वीडियो या ऑडियो लिंक ही देखा जा सकता है",
+        "ar": "تلك المنصة تسلّم مشغّلًا لا التسجيل — لا يمكن مشاهدة إلا رابط فيديو أو صوت مباشر",
+    },
+    ("the deployment's ears are not answering — the recording "
+     "stays held, not watched"): {
+        "es": "los oídos del despliegue no responden — la grabación queda guardada, no vista",
+        "fr": "les oreilles du déploiement ne répondent pas — l'enregistrement reste conservé, pas visionné",
+        "de": "die Ohren der Installation antworten nicht — die Aufnahme bleibt verwahrt, nicht angeschaut",
+        "pt": "os ouvidos da instalação não respondem — a gravação fica guardada, não assistida",
+        "it": "le orecchie dell'installazione non rispondono — la registrazione resta custodita, non guardata",
+        "ja": "この環境の耳が応答しません。録画は保管されたままで、視聴はされていません",
+        "zh": "此部署的耳朵没有应答——录像仅被保存，未被观看",
+        "hi": "इस परिनियोजन के कान जवाब नहीं दे रहे — रिकॉर्डिंग रखी रहती है, देखी नहीं जाती",
+        "ar": "آذان هذا النشر لا تجيب — يبقى التسجيل محفوظًا، غير مُشاهَد",
+    },
+    ("the eyes read JPEG, PNG and WebP pictures — this file "
+     "is none of them"): {
+        "es": "los ojos leen imágenes JPEG, PNG y WebP — este archivo no es ninguna de ellas",
+        "fr": "les yeux lisent les images JPEG, PNG et WebP — ce fichier n'en est aucune",
+        "de": "die Augen lesen JPEG-, PNG- und WebP-Bilder — diese Datei ist keines davon",
+        "pt": "os olhos leem imagens JPEG, PNG e WebP — este arquivo não é nenhuma delas",
+        "it": "gli occhi leggono immagini JPEG, PNG e WebP — questo file non è nessuna di esse",
+        "ja": "目が読めるのは JPEG・PNG・WebP の画像です。このファイルはどれでもありません",
+        "zh": "眼睛能读取 JPEG、PNG 和 WebP 图片——这个文件都不是",
+        "hi": "आँखें JPEG, PNG और WebP चित्र पढ़ती हैं — यह फ़ाइल इनमें से कोई नहीं है",
+        "ar": "العيون تقرأ صور JPEG وPNG وWebP — هذا الملف ليس أيًا منها",
+    },
+    ("this deployment's seeing door is closed — no vision "
+     "key is configured"): {
+        "es": "la puerta de la vista de este despliegue está cerrada — no hay clave de visión configurada",
+        "fr": "la porte de la vue de ce déploiement est fermée — aucune clé de vision n'est configurée",
+        "de": "die Seh-Tür dieser Installation ist geschlossen — kein Sichtschlüssel ist eingerichtet",
+        "pt": "a porta da visão desta instalação está fechada — nenhuma chave de visão está configurada",
+        "it": "la porta della vista di questa installazione è chiusa — nessuna chiave di visione è configurata",
+        "ja": "この環境の視覚の扉は閉じています。視覚キーが設定されていません",
+        "zh": "此部署的视觉之门已关闭——未配置视觉密钥",
+        "hi": "इस परिनियोजन का देखने का द्वार बंद है — कोई विज़न कुंजी कॉन्फ़िगर नहीं है",
+        "ar": "باب الرؤية في هذا النشر مغلق — لا يوجد مفتاح رؤية مهيأ",
+    },
+    "this party has no video link to watch": {
+        "es": "esta reunión no tiene enlace de vídeo que ver",
+        "fr": "cette séance n'a pas de lien vidéo à visionner",
+        "de": "diese Runde hat keinen Videolink zum Anschauen",
+        "pt": "esta sessão não tem link de vídeo para assistir",
+        "it": "questa riunione non ha un link video da guardare",
+        "ja": "このパーティーには視聴する動画リンクがありません",
+        "zh": "这个聚会没有可观看的视频链接",
+        "hi": "इस पार्टी में देखने के लिए कोई वीडियो लिंक नहीं है",
+        "ar": "لا يوجد في هذا التجمّع رابط فيديو للمشاهدة",
+    },
     ("the owner keeps this wardrobe closed — only they can "
      "restyle this avatar"): {
         "es": "la persona propietaria mantiene este vestuario cerrado — solo ella puede cambiar el estilo de este avatar",
@@ -7759,6 +7818,7 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     # worded as the stage's card and the deck's box ask them.
     "guest_styling": {"en": "Visitors may restyle the avatar", "es": "Las visitas pueden cambiar el estilo del avatar", "fr": "Les visiteurs peuvent changer le style de l'avatar", "de": "Besucher dürfen den Avatar umstylen", "pt": "As visitas podem mudar o estilo do avatar", "it": "Chi visita può cambiare lo stile dell'avatar", "ja": "訪問者がアバターのスタイルを変えられる", "zh": "访客可以改变头像造型", "hi": "आने वाले अवतार का रूप बदल सकते हैं", "ar": "يمكن للزوّار تغيير مظهر الأفاتار"},
     "provider_asset_id": {"en": "The provider's own ID for this avatar", "es": "El ID del avatar en su proveedor", "fr": "L'ID de l'avatar chez le fournisseur", "de": "Die ID des Avatars beim Anbieter", "pt": "O ID do avatar no provedor", "it": "L'ID dell'avatar presso il provider", "ja": "プロバイダ側のアバターID", "zh": "服务商侧的头像 ID", "hi": "प्रदाता के यहाँ अवतार की ID", "ar": "معرّف الأفاتار لدى المزوّد"},
+    "shown": {"en": "The picture being shown for this turn", "es": "La imagen que se muestra en este turno", "fr": "L'image montrée pour ce tour", "de": "Das für diesen Zug gezeigte Bild", "pt": "A imagem mostrada nesta vez", "it": "L'immagine mostrata per questo turno", "ja": "このターンで見せる画像", "zh": "本轮展示的图片", "hi": "इस बारी में दिखाई जा रही तस्वीर", "ar": "الصورة المعروضة لهذا الدور"},
     # `consented` and `number` in the SIBLINGS' exact words — the shared
     # field vocabulary is one voice across the estate, and JIM had both
     # first.

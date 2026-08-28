@@ -1647,6 +1647,47 @@ export function Inside({ onPlans, start = "", onLeave }: {
     load();
   }
 
+  /** Whether this shell can hand over a live screen. Desktop browsers and
+   *  Android Chrome can; iOS Safari cannot, and there the road is the one
+   *  the phone already has — screenshot, then share it, and the same eyes
+   *  read it. The button simply is not drawn where the door cannot open. */
+  const canGrabScreen = typeof navigator !== "undefined"
+    && !!navigator.mediaDevices?.getDisplayMedia;
+
+  /** One frame of the person's own screen, handed to the room as an
+   *  ordinary share. The browser's own picker chooses the window — nothing
+   *  is captured before the person says which thing — one still is taken,
+   *  the capture stops, and the share door does the rest: moderation,
+   *  storage, and the eyes reading what is on it so the profiles can talk
+   *  about it. A frame, not a stream: showing a screen to the room is a
+   *  statement, not a surveillance feed. */
+  async function grabScreen() {
+    setError(null);
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia(
+        { video: true });
+      const video = document.createElement("video");
+      video.srcObject = stream;
+      video.muted = true;
+      await video.play();
+      // One breath, so the first painted frame is the screen, not black.
+      await new Promise((r) => setTimeout(r, 300));
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth || 1280;
+      canvas.height = video.videoHeight || 720;
+      canvas.getContext("2d")?.drawImage(video, 0, 0);
+      stream.getTracks().forEach((t) => t.stop());
+      const blob: Blob | null = await new Promise((r) =>
+        canvas.toBlob(r, "image/jpeg", 0.85));
+      if (blob) {
+        await shareFiles([new File([blob], "screen.jpg",
+                                   { type: "image/jpeg" })]);
+      }
+    } catch {
+      // The person closed the picker. Their call, not a banner.
+    }
+  }
+
   /** A person's own picture, absolute — theirs, and the same in every room
    *  they walk into. Sparse by design: a person who has not put one up has
    *  no entry, and the seat falls through to their initials. */
@@ -1776,6 +1817,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 aria-label={tr("ins.share", lang)}
                 title={tr("ins.share", lang)}
                 onClick={() => sharePick.current?.click()}>📎</button>
+        {canGrabScreen && (
+          <button className="rs-chatbtn" disabled={busy || !token}
+                  aria-label={tr("ins.screen", lang)}
+                  title={tr("ins.screen", lang)}
+                  onClick={() => void grabScreen()}>🖥️</button>
+        )}
         {canDictate && (
           <button className="rs-chatbtn" disabled={busy}
                   aria-pressed={dictating}

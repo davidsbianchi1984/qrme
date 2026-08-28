@@ -12,7 +12,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from .. import db, watchparty
+from .. import db, watching, watchparty
 from ..auth import principal
 from ..common import require_self
 from .. import i18n
@@ -233,6 +233,37 @@ def end(party_id: str, request: Request, body: SeekIn | None = None,
         return watchparty.end(party_id, who)
     except watchparty.PartyError as exc:
         raise _fail(exc) from None
+
+
+@router.post("/watch-parties/{party_id}/watch")
+def watch(party_id: str, request: Request) -> dict:
+    """Have the party's video actually watched — the platform's own eyes
+    and ears, made at home, instead of a plugin bought off a feed.
+
+    Any member can ask; the viewing is stored once and every profile in
+    the party reads the same one. Works on a direct video or audio link —
+    a platform page hands over a player, not the recording, and the 422
+    says so by name. A stack whose ears sidecar is not answering gets the
+    503 rather than a viewing invented from nothing.
+    """
+    member = _require_member(party_id, request)
+    party = watchparty.get(party_id)
+    video = party.get("video") or {}
+    url = (video.get("url") or "").strip()
+    if not url:
+        raise HTTPException(422, i18n.raised(RuntimeError(
+            "this party has no video link to watch")))
+    try:
+        viewing = watching.watch_link(url, member)
+    except watching.NothingToWatch as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
+    if viewing is None:
+        raise HTTPException(503, i18n.raised(RuntimeError(
+            "the deployment's ears are not answering — the recording "
+            "stays held, not watched")))
+    return {"party_id": party_id, "subject": url,
+            "heard": bool(viewing["heard"]), "seen": bool(viewing["seen"]),
+            "duration_seconds": viewing["duration_seconds"]}
 
 
 @router.get("/watch-parties/{party_id}/context")

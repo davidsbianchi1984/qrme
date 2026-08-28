@@ -48,3 +48,13 @@ GET /rooms/xr-platforms
 # operator holds the signup key at a desk, not on a phone. Console-only,
 # like the library stock door above it.
 POST /avatars/library/pull
+
+# POST /watch-parties/{party_id}/watch — have the party's video watched by
+# the platform's own eyes and ears (qrme/watching.py). The web console
+# holds this door on the party's context panel — the panel that shows
+# what a profile in the room is told. This shell draws no context panel
+# yet, and a watch button with no panel to land its viewing on would be
+# a binding with no caller — the exact failure unused_native_bindings.txt
+# was written to catch. The row leaves this backlog when the shell grows
+# the panel.
+POST /watch-parties/{party_id}/watch

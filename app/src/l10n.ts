@@ -249,6 +249,15 @@ const CHROME: Table = {
   "agent.plus": {
     en: "Attach or connect", es: "Adjuntar o conectar", fr: "Joindre ou connecter", de: "Anhängen oder verbinden", pt: "Anexar ou ligar", it: "Allega o collega", ja: "添付・接続", zh: "附加或连接", hi: "जोड़ें या कनेक्ट करें", ar: "إرفاق أو ربط",
   },
+  "agent.show.pic": {
+    en: "Show it a picture", es: "Muéstrale una imagen", fr: "Montrez-lui une image", de: "Zeig ihm ein Bild", pt: "Mostre-lhe uma imagem", it: "Mostragli un'immagine", ja: "画像を見せる", zh: "给它看一张图片", hi: "इसे एक चित्र दिखाएँ", ar: "أرِه صورة",
+  },
+  "agent.show.screen": {
+    en: "Show it your screen", es: "Muéstrale tu pantalla", fr: "Montrez-lui votre écran", de: "Zeig ihm deinen Bildschirm", pt: "Mostre-lhe o seu ecrã", it: "Mostragli il tuo schermo", ja: "画面を見せる", zh: "给它看你的屏幕", hi: "इसे अपनी स्क्रीन दिखाएँ", ar: "أرِه شاشتك",
+  },
+  "agent.show.grabbed": {
+    en: "your screen, one frame", es: "tu pantalla, un fotograma", fr: "votre écran, une image", de: "dein Bildschirm, ein Einzelbild", pt: "o seu ecrã, um quadro", it: "il tuo schermo, un fotogramma", ja: "あなたの画面・1コマ", zh: "你的屏幕，一帧", hi: "आपकी स्क्रीन, एक फ़्रेम", ar: "شاشتك، إطار واحد",
+  },
   "agent.ask.title": {
     en: "Ask for it in words", es: "Pídelo con palabras", fr: "Demandez-le avec des mots", de: "Sag es einfach", pt: "Peça por palavras", it: "Chiedilo a parole", ja: "言葉で頼む", zh: "用一句话说出来", hi: "शब्दों में कहिए", ar: "اطلبه بالكلمات",
   },
@@ -5750,6 +5759,18 @@ const CHROME: Table = {
   "wp.notseen": {
     en: " · it has not seen the video", es: " · no ha visto el vídeo", fr: " · il n'a pas vu la vidéo", de: " · es hat das Video nicht gesehen", pt: " · não viu o vídeo", it: " · non ha visto il video", ja: " · 動画は見ていません", zh: " · 它没有看过这段视频", hi: " · इसने वीडियो नहीं देखा", ar: " · لم يشاهد المقطع",
   },
+  "wp.watch": {
+    en: "Have it watched — the platform's own eyes and ears", es: "Haz que lo vea — los propios ojos y oídos de la plataforma", fr: "Faites-le visionner — les yeux et les oreilles de la plateforme elle-même", de: "Lass es anschauen — die eigenen Augen und Ohren der Plattform", pt: "Mande assistir — os próprios olhos e ouvidos da plataforma", it: "Fallo guardare — gli occhi e le orecchie della piattaforma stessa", ja: "視聴させる — プラットフォーム自身の目と耳で", zh: "让它被观看——平台自己的眼睛和耳朵", hi: "इसे दिखवाएँ — प्लेटफ़ॉर्म की अपनी आँखें और कान", ar: "اجعله يُشاهَد — عيون المنصة وآذانها",
+  },
+  "wp.watching": {
+    en: "Watching — fetching, listening, looking…", es: "Viendo — descargando, escuchando, mirando…", fr: "Visionnage — récupération, écoute, regard…", de: "Schaut — holt, hört, sieht…", pt: "A assistir — a buscar, ouvir, olhar…", it: "Guardando — scarico, ascolto, sguardo…", ja: "視聴中 — 取得・聴取・読み取り中…", zh: "观看中——获取、聆听、查看…", hi: "देखा जा रहा है — ला रहे, सुन रहे, देख रहे…", ar: "قيد المشاهدة — جلبٌ وإصغاءٌ ونظر…",
+  },
+  "wp.seen": {
+    en: "What is on its screen", es: "Qué hay en su pantalla", fr: "Ce qu'il y a à l'écran", de: "Was auf dem Bildschirm ist", pt: "O que está no ecrã", it: "Cosa c'è sullo schermo", ja: "画面に映っているもの", zh: "画面上是什么", hi: "इसकी स्क्रीन पर क्या है", ar: "ما الذي على شاشته",
+  },
+  "wp.heard": {
+    en: "The words said in it", es: "Las palabras dichas en él", fr: "Les mots qui y sont dits", de: "Die darin gesagten Worte", pt: "As palavras ditas nele", it: "Le parole dette al suo interno", ja: "その中で語られた言葉", zh: "其中说过的话", hi: "इसमें कहे गए शब्द", ar: "الكلمات المقولة فيه",
+  },
   "wp.cansee": {
     en: "It can see {n} recent line{s} and the position ({pos}s).", es: "Puede ver {n} líneas recientes y la posición ({pos} s).", fr: "Il voit {n} lignes récentes et la position ({pos} s).", de: "Es sieht {n} aktuelle Zeilen und die Position ({pos} s).", pt: "Vê {n} linhas recentes e a posição ({pos} s).", it: "Vede {n} righe recenti e la posizione ({pos} s).", ja: "直近の発言{n}件と再生位置（{pos}秒）が見えています。", zh: "它能看到最近的 {n} 条发言和播放位置（第 {pos} 秒）。", hi: "यह हाल की {n} पंक्तियाँ और स्थिति ({pos}से.) देख सकता है।", ar: "يرى {n} من الأسطر الأخيرة والموضع ({pos}ث).",
   },
@@ -8633,6 +8654,9 @@ const CHROME: Table = {
     zh: "浏览器的识别器无法连接其语音服务 — 你可以打字，回复仍会朗读",
     hi: "ब्राउज़र का पहचानकर्ता अपनी वाक् सेवा तक नहीं पहुँच सका — आप लिख सकते हैं, जवाब फिर भी बोला जाएगा",
     ar: "تعذّر على مُتعرِّف المتصفح الوصول إلى خدمة الكلام — يمكنك الكتابة، وسيظل الرد منطوقًا",
+  },
+  "ins.screen": {
+    en: "Show the room your screen — one frame, read by the profiles here", es: "Muestra tu pantalla a la sala — un solo fotograma, leído por los perfiles de aquí", fr: "Montrez votre écran à la salle — une seule image, lue par les profils présents", de: "Zeig dem Raum deinen Bildschirm — ein Einzelbild, gelesen von den Profilen hier", pt: "Mostre o seu ecrã à sala — um único quadro, lido pelos perfis daqui", it: "Mostra il tuo schermo alla stanza — un solo fotogramma, letto dai profili qui", ja: "画面をルームに見せる — 1コマだけ、ここのプロフィールが読み取ります", zh: "把你的屏幕给房间看——只取一帧，由这里的形象读取", hi: "कमरे को अपनी स्क्रीन दिखाएँ — एक ही फ़्रेम, यहाँ की प्रोफ़ाइलें पढ़ेंगी", ar: "أرِ الغرفة شاشتك — إطار واحد تقرؤه الملفات هنا",
   },
   "ins.share": {
     en: "Share a picture, video or file", es: "Comparte una imagen, video o archivo", fr: "Partagez une image, une vidéo ou un fichier", de: "Bild, Video oder Datei teilen", pt: "Partilhe uma imagem, vídeo ou ficheiro", it: "Condividi un'immagine, un video o un file", ja: "画像・動画・ファイルを共有", zh: "分享图片、视频或文件", hi: "चित्र, वीडियो या फ़ाइल साझा करें", ar: "شارك صورة أو فيديو أو ملفًا",

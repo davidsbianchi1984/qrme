@@ -181,6 +181,14 @@ DOORS: tuple[Door, ...] = (
          "door",
          ("full screen avatar", "wardrobe", "restyle", "change outfit",
           "dress the avatar", "physique", "render my avatar")),
+    Door("TheWatching", "the platform's eyes",
+         "the platform's own eyes and ears: shared pictures and "
+         "screenshots read, shared videos heard and their frames "
+         "described, a watch party's video actually watched, and a "
+         "screen shown to a room or the agent one frame at a time",
+         ("watch the video", "see my screen", "show my screen",
+          "read this screenshot", "look at this picture",
+          "what is on screen", "screen share", "the eyes")),
     Door("InWords", "Language & Name tab",
          "the words a profile uses, and the name it answers to",
          ("language", "my name", "what to call", "rename",
