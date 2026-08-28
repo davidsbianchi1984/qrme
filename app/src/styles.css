@@ -2114,12 +2114,38 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   width: 40px; height: 40px; border-radius: 50%;
   border: 1px solid var(--line); background: rgba(5,7,15,0.65); color: #fff;
 }
-.stage-wheel {
+/* In an AR or VR room the scene stays visible behind the figure — the
+   avatar stands in the environment instead of on a black card. */
+.avatar-stage.clear { background: rgba(5,7,15,0.35); }
+/* A whole figure is shown whole; only a face-crop fills the frame. */
+.stage-face.standing { object-fit: contain; }
+/* The rail of hidden windows down the right edge — prompt, wardrobe,
+   body — the same posture as the room's panel column. */
+.stage-rail {
   position: absolute; bottom: 18px; right: 16px; z-index: 62;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.stage-rail button {
   width: 46px; height: 46px; border-radius: 50%;
   border: 1px solid var(--line); background: rgba(5,7,15,0.65);
   font-size: 1.2rem;
 }
+.stage-rail button.lit { border-color: var(--accent, #7b7bff); }
+.ward-switch {
+  display: flex; align-items: center; gap: 8px; margin-top: 10px;
+  font-size: 0.85rem; color: var(--muted, #8b90a8);
+}
+/* The second ring on a seat or a chat header: the avatar beside the
+   portrait, tappable into the full-screen stage. */
+.rs-avring {
+  position: absolute; right: 8px; bottom: 30px; z-index: 4;
+  width: 34px; height: 34px; border-radius: 50%; padding: 0;
+  border: 2px solid var(--accent, #7b7bff);
+  background: rgba(5,7,15,0.65); color: #fff; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.rs-avring img { width: 100%; height: 100%; object-fit: cover; }
+.chat-head-ring { position: static; flex: 0 0 auto; }
 /* The wardrobe card: sized like a card, scrolls inside itself, never
    hands the wheel to the face behind it. */
 .wardrobe {

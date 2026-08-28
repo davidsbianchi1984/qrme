@@ -1205,6 +1205,10 @@ export interface Profile {
    *  another real person, a plan that can hold rated content — so there is
    *  no field to change it and the state is displayed read-only. */
   adult_mode?: boolean;
+  /** May the people this profile talks with restyle its avatar. On by
+   *  default; the owner's PATCH closes the wardrobe. The stage reads it
+   *  before offering a visitor the prompt bar. */
+  guest_styling?: boolean;
   owner_token?: string;
 }
 export interface Stats {

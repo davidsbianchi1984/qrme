@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { api, getBase, type Avatar, type Briefing, type DialerPosture,
          type Escalated, type MyPerson } from "../api";
+import { AvatarStage } from "../AvatarStage";
 import { Briefcase } from "../Briefcase";
 import { Refusal } from "../Refusal";
 import { micClosed, openTheEar, plainVoice, speakInPieces } from "../spoken";
@@ -232,6 +233,9 @@ export function Chat({ onPlans }: {
   // appears when the profile has no portrait yet.
   const [talking, setTalking] = useState(false);
   const [talkAvatar, setTalkAvatar] = useState<Avatar | null>(null);
+  // The avatar taken to the whole screen from the header's second ring —
+  // the same takeover the rooms' seat rings open, wardrobe rail and all.
+  const [stagedFace, setStagedFace] = useState(false);
   /** The name as the product requires it to be shown.
    *
    * `watermark.design()` on the server builds `AI · {name}` and forces the
@@ -976,6 +980,20 @@ export function Chat({ onPlans }: {
                       : getBase() + talkAvatar.asset}
                alt="" aria-hidden="true" />
         )}
+        {/* The second ring, beside the portrait: tap it and the avatar
+            takes the whole screen, wardrobe rail and all — the same
+            takeover the rooms' seat rings open. */}
+        {session.profileId && (
+          <button className="rs-avring chat-head-ring" type="button"
+                  aria-label={tr("stage.open", lang)}
+                  title={tr("stage.open", lang)}
+                  onClick={() => setStagedFace(true)}>
+            {talkAvatar?.asset
+              ? <img alt="" src={talkAvatar.asset.startsWith("http")
+                  ? talkAvatar.asset : getBase() + talkAvatar.asset} />
+              : <span aria-hidden="true">✦</span>}
+          </button>
+        )}
         <div className="chat-head-words">
           <h2>
             {fill(tr("chat.with", lang), { name: shownName })}
@@ -1689,6 +1707,16 @@ export function Chat({ onPlans }: {
                   }}>🚶</button>
         )}
       </div>
+      {stagedFace && session.profileId && (
+        <AvatarStage
+          profileId={session.profileId}
+          token={session.ownerToken || session.interactorToken || ""}
+          owned={!!session.ownerToken}
+          avatar={talkAvatar}
+          onClose={() => setStagedFace(false)}
+          onChanged={setTalkAvatar}
+          onError={setError} />
+      )}
     </div>
   );
 }

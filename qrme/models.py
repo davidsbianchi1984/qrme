@@ -97,6 +97,11 @@ class ProfileUpdate(BaseModel):
     aging_enabled: bool | None = None
     successor_owner: str | None = None
     cloud_contribution: bool | None = None
+    # May the people this profile talks with restyle its avatar — the
+    # wardrobe's guest switch. On by default; the owner's deliberate act
+    # is closing it. The paint door itself still holds the deepfake line
+    # (fictional faces only), whoever is prompting.
+    guest_styling: bool | None = None
     proactive_min_interval_hours: int | None = None   # anti-spam rate cap
     # What kind of thing this profile is.
     #
@@ -147,6 +152,9 @@ class ProfileOut(BaseModel):
     purpose: Purpose | None
     maturity: Maturity
     cloud_contribution: bool
+    # Public on purpose: a visitor standing in front of the wardrobe needs
+    # to know whether it opens for them before they start typing.
+    guest_styling: bool
     status: str                        # active | restricted | departed | terminated
     licensed_from: str | None = None   # source profile if a licensed derivative
     created_at: str

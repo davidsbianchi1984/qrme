@@ -144,6 +144,7 @@ export function SkinPicker({ profileId, token, onError, onChanged }: {
       )}
       {staged && worn && (
         <AvatarStage profileId={profileId} token={token} avatar={worn}
+                     owned
                      onClose={() => setStaged(false)}
                      onChanged={(a) => { setWorn(a); onChanged?.(a); }}
                      onError={onError} />

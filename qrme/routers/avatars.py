@@ -216,9 +216,23 @@ def paint_face(profile_id: str, body: Painted, request: Request) -> dict:
 
     House style, the profile's own brief, and its age as it is today.
     Fictional profiles only: a real face arrives by photograph and
-    recorded grant, never by prompt."""
+    recorded grant, never by prompt.
+
+    Who may prompt: the owner always, and — while the profile's
+    `guest_styling` switch is on, which it is by default — anyone signed
+    in and standing in front of it. The people a profile talks with get
+    to dress it; the owner's PATCH flips the switch when they'd rather
+    keep the wardrobe to themselves. The deepfake line above is not part
+    of the switch: it holds for every prompter including the owner."""
     profile = profile_or_404(profile_id)
-    require_owner(profile_id, request)
+    who = auth.principal(request)
+    if who != {"role": "owner", "subject_id": profile_id}:
+        if who is None:
+            raise HTTPException(401, "authentication required")
+        if not profile.get("guest_styling", 1):
+            raise HTTPException(403, i18n.raised(RuntimeError(
+                "the owner keeps this wardrobe closed — only they can "
+                "restyle this avatar")))
     if profile["kind"] != "fictional":
         raise HTTPException(403, i18n.raised(RuntimeError(
             "a real person's face is never painted from words — attach a "

@@ -359,6 +359,11 @@ def profile_out(row: dict, request: Request | None = None, *,
         purpose=row["purpose"],
         maturity=row["maturity"],
         cloud_contribution=bool(row["cloud_contribution"]),
+        # `.get` with the schema's own default: rows arrive here both as
+        # sqlite rows (always carrying the column) and as dicts built in
+        # creation paths that predate the wardrobe switch.
+        guest_styling=bool(row.get("guest_styling", 1)
+                           if hasattr(row, "get") else row["guest_styling"]),
         status=row["status"],
         licensed_from=row["licensed_from"],
         created_at=row["created_at"],

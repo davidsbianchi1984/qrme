@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { isEcho, RECENT_TURNS } from "../echo";
+import { AvatarStage } from "../AvatarStage";
 import { TalkRail } from "../TalkRail";
 import { accountApi, api, getBase, type Avatar, type MicsHere, type RoomFaces,
          type RoomMsg } from "../api";
@@ -292,6 +293,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // has nothing of its own to fetch. Their own profile's is the honest
   // stand-in — with a rule attached, below.
   const [myFace, setMyFace] = useState<Avatar | null>(null);
+  // The seat whose avatar has taken the screen — the second ring, beside
+  // the portrait. Tapping it opens the same full-screen render the avatar
+  // deck uses, wardrobe and all, for your own profile and for the one you
+  // are talking to alike; whether ITS wardrobe opens for you is the
+  // profile's own guest_styling switch, read by the stage itself.
+  const [staged, setStaged] = useState<string | null>(null);
   // Which of the device's cameras. "user" is the selfie side; flipping asks
   // for the other and the effect below re-acquires the stream.
   const [facing, setFacing] = useState<"user" | "environment">("user");
@@ -2571,6 +2578,32 @@ export function Inside({ onPlans, start = "", onLeave }: {
                   </span>
                 )}
                 <span className="rs-name">{s.display}</span>
+                {/* The second ring: the seat's avatar beside the seat's
+                    face. A profile seat's ring renders that profile; your
+                    own seat's ring renders YOUR profile's avatar. Tapping
+                    it takes the screen — the same takeover an uploaded
+                    background gets — with the wardrobe rail down the
+                    edge. */}
+                {(s.kind !== "user" || (isMe && !!session.profileId)) && (
+                  <button className="rs-avring" type="button"
+                          aria-label={tr("stage.open", lang)}
+                          title={tr("stage.open", lang)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setStaged(s.kind !== "user"
+                              ? s.id : (session.profileId as string));
+                          }}
+                          onDoubleClick={(e) => e.stopPropagation()}
+                          onPointerDown={(e) => e.stopPropagation()}>
+                    {(() => {
+                      const f = s.kind !== "user" ? aiFaces[s.id] : myFace;
+                      return f?.asset
+                        ? <img alt="" src={f.asset.startsWith("http")
+                            ? f.asset : getBase() + f.asset} />
+                        : <span aria-hidden="true">✦</span>;
+                    })()}
+                  </button>
+                )}
                 {/* The door the double-tap hides. The gesture stays — and
                     a visible gear sits on your own tile, because a control
                     nobody can see is a control nobody has. */}
@@ -3077,6 +3110,31 @@ export function Inside({ onPlans, start = "", onLeave }: {
             </div>
           )}
         </>
+      )}
+      {/* The avatar, taken to the screen from either ring. The token is
+          the strongest key this session holds for THAT profile — its
+          owner token when this is your own or one you hold minted, your
+          interactor token otherwise, which is exactly the guest the
+          wardrobe's switch is about. */}
+      {staged && (
+        <AvatarStage
+          clear={channel === "ar" || channel === "vr"}
+          profileId={staged}
+          token={(staged === session.profileId
+                    ? session.ownerToken
+                    : staged === dockedProfile ? dockOwner : null)
+                  || token}
+          owned={(staged === session.profileId && !!session.ownerToken)
+                 || (staged === dockedProfile && !!dockOwner
+                     && dockedProfile !== session.profileId)}
+          avatar={(staged === session.profileId ? myFace
+                     : aiFaces[staged]) || null}
+          onClose={() => setStaged(null)}
+          onChanged={(a) => {
+            setAiFaces((m) => ({ ...m, [staged]: a }));
+            if (staged === session.profileId) setMyFace(a);
+          }}
+          onError={setError} />
       )}
     </div>
   );

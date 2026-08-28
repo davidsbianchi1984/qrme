@@ -259,6 +259,18 @@ _PUBLIC: dict[str, dict[str, str]] = {
         "hi": "कोई पेंटिंग सेवा कॉन्फ़िगर नहीं है — इस परिनियोजन में इमेज कुंजी नहीं है",
         "ar": "لا توجد خدمة رسم مهيأة — لا يملك هذا النشر مفتاح صور",
     },
+    ("the owner keeps this wardrobe closed — only they can "
+     "restyle this avatar"): {
+        "es": "la persona propietaria mantiene este vestuario cerrado — solo ella puede cambiar el estilo de este avatar",
+        "fr": "la personne propriétaire garde ce vestiaire fermé — elle seule peut changer le style de cet avatar",
+        "de": "wer dieses Profil besitzt, hält die Garderobe geschlossen — nur diese Person kann den Stil dieses Avatars ändern",
+        "pt": "quem é dono do perfil mantém este guarda-roupa fechado — só essa pessoa pode mudar o estilo deste avatar",
+        "it": "chi possiede il profilo tiene chiuso questo guardaroba — solo quella persona può cambiare lo stile di questo avatar",
+        "ja": "所有者がこのワードローブを閉じています。所有者だけがこのアバターのスタイルを変えられます",
+        "zh": "所有者已关闭这个衣橱——只有所有者能改变这个头像的造型",
+        "hi": "मालिक ने यह वार्डरोब बंद रखा है — केवल वही इस अवतार का रूप बदल सकता है",
+        "ar": "المالك يُبقي خزانة الملابس هذه مغلقة — وحده يمكنه تغيير مظهر هذا الأفاتار",
+    },
     ("they have not asked to hear from this profile first — "
      "unprompted reach goes only to people whose door is open"): {
         "es": "no han pedido oír primero de este perfil — el contacto no solicitado solo llega a quienes tienen la puerta abierta",

@@ -32,6 +32,10 @@ CREATE TABLE IF NOT EXISTS profiles (
     base_age          INTEGER,
     appearance        TEXT NOT NULL DEFAULT '',  -- how the profile looks/presents
                                               -- (steering hub); rides on the prompt
+    guest_styling     INTEGER NOT NULL DEFAULT 1,  -- may the people a profile
+                                              -- talks with restyle its avatar;
+                                              -- the owner's switch, on until
+                                              -- the owner says otherwise
     consent_basis     TEXT,                   -- required when kind=other_person
     consent_attestor  TEXT,
     successor_owner   TEXT,                   -- legacy succession
@@ -2860,6 +2864,10 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # The face's registry row, beside the rendered asset it produced —
     # so a takedown can find every profile a retired row was backing.
     ("profiles", "avatar_ref", "TEXT"),
+    # The wardrobe's guest switch. Default 1 — the owner's deliberate act
+    # is closing the wardrobe, not opening it — matching the fresh-schema
+    # default above so an upgraded database behaves like a new one.
+    ("profiles", "guest_styling", "INTEGER NOT NULL DEFAULT 1"),
 )
 
 
