@@ -353,6 +353,14 @@ export function Inside({ onPlans, start = "", onLeave }: {
     () => localStorage.getItem("qrme.room.hear") !== "0");
   const heardUpTo = useRef<string | null>(null);
   const speaking = useRef(false);
+  // The ear re-opens when the room falls quiet. A turn that arrives
+  // WHILE a voice is playing hits the queue's guard and is dropped, and
+  // `speaking` is a ref — flipping it re-runs nothing. If the dropped
+  // turn was the last one said, it stayed silent until somebody else
+  // spoke: the field report was an invited profile's first words, seen
+  // on screen and never heard. Bumped at the end of every queue run so
+  // the effect looks again the moment the air is clear.
+  const [earTick, setEarTick] = useState(0);
   // Whose turn is being read aloud RIGHT NOW — an identity (kind + id),
   // for the talking light. Null when no voice is playing.
   const [voicing, setVoicing] = useState<{ kind: string; id: string } | null>(
@@ -1045,10 +1053,14 @@ export function Inside({ onPlans, start = "", onLeave }: {
       nowSaying.current = null;
       setVoicing(null);
       roomFellQuiet();
+      // Look again now the room is quiet: anything that arrived during
+      // this run is still past heardUpTo, and this is its turn.
+      setEarTick((t) => t + 1);
     })();
-    // heardUpTo/speaking are refs on purpose: the transcript is the signal.
+    // heardUpTo/speaking are refs on purpose: the transcript is the signal
+    // (and earTick is the queue telling itself the air is clear).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [transcript, hearAll, token]);
+  }, [transcript, hearAll, token, earTick]);
 
   // Switching rooms — or leaving the screen, which runs the same cleanup
   // — silences the old room's queue and its dictation. Without this, the
