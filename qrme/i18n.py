@@ -7744,6 +7744,10 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     "registry_id": {"en": "Which face", "es": "Qué rostro", "fr": "Quel visage", "de": "Welches Gesicht", "pt": "Qual rosto", "it": "Quale volto", "ja": "どの顔", "zh": "哪张面孔", "hi": "कौन-सा चेहरा", "ar": "أي وجه"},
     "direction": {"en": "Your own direction", "es": "Tu propia indicación", "fr": "Votre propre direction", "de": "Deine eigene Richtung", "pt": "A sua própria indicação", "it": "La tua indicazione", "ja": "あなたの指示", "zh": "你的指示", "hi": "आपका अपना निर्देश", "ar": "توجيهك الخاص"},
     "because": {"en": "Why it is being withdrawn", "es": "Por qué se retira", "fr": "Pourquoi il est retiré", "de": "Warum es zurückgezogen wird", "pt": "Porque está a ser retirado", "it": "Perché viene ritirato", "ja": "取り下げる理由", "zh": "撤回的原因", "hi": "इसे क्यों हटाया जा रहा है", "ar": "سبب سحبه"},
+    # The wardrobe's guest switch and the import form's provider id —
+    # worded as the stage's card and the deck's box ask them.
+    "guest_styling": {"en": "Visitors may restyle the avatar", "es": "Las visitas pueden cambiar el estilo del avatar", "fr": "Les visiteurs peuvent changer le style de l'avatar", "de": "Besucher dürfen den Avatar umstylen", "pt": "As visitas podem mudar o estilo do avatar", "it": "Chi visita può cambiare lo stile dell'avatar", "ja": "訪問者がアバターのスタイルを変えられる", "zh": "访客可以改变头像造型", "hi": "आने वाले अवतार का रूप बदल सकते हैं", "ar": "يمكن للزوّار تغيير مظهر الأفاتار"},
+    "provider_asset_id": {"en": "The provider's own ID for this avatar", "es": "El ID del avatar en su proveedor", "fr": "L'ID de l'avatar chez le fournisseur", "de": "Die ID des Avatars beim Anbieter", "pt": "O ID do avatar no provedor", "it": "L'ID dell'avatar presso il provider", "ja": "プロバイダ側のアバターID", "zh": "服务商侧的头像 ID", "hi": "प्रदाता के यहाँ अवतार की ID", "ar": "معرّف الأفاتار لدى المزوّد"},
     # `consented` and `number` in the SIBLINGS' exact words — the shared
     # field vocabulary is one voice across the estate, and JIM had both
     # first.

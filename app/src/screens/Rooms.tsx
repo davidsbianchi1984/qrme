@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "../api";
+import { api, type XrPlatform } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
@@ -42,10 +42,16 @@ export function Rooms({ onPlans, onInside }: {
     useState<{ profile_id: string; display_name: string }[]>([]);
   const [asking, setAsking] = useState<Record<string, string>>({});
   const [asked, setAsked] = useState<string | null>(null);
+  // The XR shelf: every headset on the market and its road into these
+  // rooms. The rooms are pages, so the road is the headset's own browser
+  // — the card says which, and marks the futures as futures.
+  const [xr, setXr] = useState<XrPlatform[]>([]);
 
   function load() {
     api.listRooms().then(setRooms).catch((e) => setError(e));
     api.listDesks().then(setDesks).catch(() => setDesks([]));
+    api.xrPlatforms().then((r) => setXr(r.xr_platforms))
+      .catch(() => setXr([]));
     api.roomTemplates().then(setTemplates).catch(() => setTemplates([]));
     // This profile's own friends. Without one signed in there is nobody to
     // offer, and the control below is absent rather than empty.
@@ -236,6 +242,40 @@ export function Rooms({ onPlans, onInside }: {
           </div>
         ))}
       </div>
+
+      {/* Headsets & glasses — the market, honestly. Steam, Meta, Apple
+          and the rest each get their row: the browser road that works
+          today, the VR/AR badges the hardware earns, and the sign-in and
+          native-app futures said as futures rather than buttons. */}
+      {xr.length > 0 && (
+        <div className="card">
+          <h3>{tr("rms.xr.title", lang)}</h3>
+          <p className="muted small">{tr("rms.xr.lead", lang)}</p>
+          {xr.map((p) => (
+            <div key={p.platform} className="room-row">
+              <b>{p.name}</b>
+              {p.wears.includes("vr") && (
+                <span className="tag ch-vr">{tr("rms.ch.vr", lang)}</span>
+              )}
+              {p.wears.includes("ar") && (
+                <span className="tag ch-ar">{tr("rms.ch.ar", lang)}</span>
+              )}
+              {p.open_now && (
+                <span className="muted small">
+                  {fill(tr("rms.xr.now", lang), { browser: p.browser })}
+                </span>
+              )}
+              {p.signin === "planned" && (
+                <span className="muted small">{tr("rms.xr.signin", lang)}</span>
+              )}
+              {p.signin === "unconfigured" && (
+                <span className="muted small">{tr("rms.xr.off", lang)}</span>
+              )}
+            </div>
+          ))}
+          <p className="muted small">{tr("rms.xr.app", lang)}</p>
+        </div>
+      )}
 
       <Refusal error={error} onPlans={onPlans} variant="inline" />
     </div>

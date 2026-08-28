@@ -90,26 +90,34 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
   // Canned prompts, not separate systems: a chip fills the bar with a
   // starting sentence the person can edit before painting. Age never
   // appears here — the render is always at the profile's own age.
-  const CHIPS: [string, string, Exclude<Rail, "prompt" | "all">][] = [
-    ["ward.apparel", "wearing a worn leather jacket", "looks"],
-    ["ward.apparel2", "in formal evening wear", "looks"],
-    ["ward.hair", "with a completely new hairstyle", "looks"],
-    ["ward.hair2", "with much shorter hair", "looks"],
-    ["ward.jewelry", "wearing a silver chain and rings", "looks"],
-    ["ward.backdrop", "against a warm sunset backdrop", "looks"],
-    ["ward.physique", "with a broader, stronger build", "body"],
-    ["ward.physique2", "with a slighter, leaner build", "body"],
-    ["ward.gender", "presenting more femininely", "body"],
-    ["ward.gender2", "presenting more masculinely", "body"],
+  const CHIPS: { key: string; seed: string;
+                 cat: Exclude<Rail, "prompt" | "all"> }[] = [
+    { key: "ward.apparel", seed: "wearing a worn leather jacket",
+      cat: "looks" },
+    { key: "ward.apparel2", seed: "in formal evening wear", cat: "looks" },
+    { key: "ward.hair", seed: "with a completely new hairstyle",
+      cat: "looks" },
+    { key: "ward.hair2", seed: "with much shorter hair", cat: "looks" },
+    { key: "ward.jewelry", seed: "wearing a silver chain and rings",
+      cat: "looks" },
+    { key: "ward.backdrop", seed: "against a warm sunset backdrop",
+      cat: "looks" },
+    { key: "ward.physique", seed: "with a broader, stronger build",
+      cat: "body" },
+    { key: "ward.physique2", seed: "with a slighter, leaner build",
+      cat: "body" },
+    { key: "ward.gender", seed: "presenting more femininely", cat: "body" },
+    { key: "ward.gender2", seed: "presenting more masculinely",
+      cat: "body" },
   ];
   const chips = rail === "looks" || rail === "body"
-    ? CHIPS.filter(([, , cat]) => cat === rail)
+    ? CHIPS.filter((c) => c.cat === rail)
     : CHIPS;
 
-  const RAIL: [Rail, string, string][] = [
-    ["prompt", "✏️", "stage.prompt"],
-    ["looks", "\u{1F457}", "stage.ward"],
-    ["body", "\u{1F9CD}", "stage.body"],
+  const RAIL: { key: Rail; glyph: string; labelKey: string }[] = [
+    { key: "prompt", glyph: "✏️", labelKey: "stage.prompt" },
+    { key: "looks", glyph: "\u{1F457}", labelKey: "stage.ward" },
+    { key: "body", glyph: "\u{1F9CD}", labelKey: "stage.body" },
   ];
 
   return (
@@ -124,11 +132,13 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
               title={tr("stage.close", lang)}
               onClick={onClose}>✕</button>
       <div className="stage-rail">
-        {RAIL.map(([key, glyph, label]) => (
-          <button key={key} className={rail === key ? "lit" : ""}
-                  aria-label={tr(label, lang)} title={tr(label, lang)}
-                  onClick={() => setRail((r) => r === key ? null : key)}>
-            {glyph}
+        {RAIL.map((w) => (
+          <button key={w.key} className={rail === w.key ? "lit" : ""}
+                  aria-label={tr(w.labelKey, lang)}
+                  title={tr(w.labelKey, lang)}
+                  onClick={() =>
+                    setRail((r) => r === w.key ? null : w.key)}>
+            {w.glyph}
           </button>
         ))}
         <button className={rail === "all" ? "lit" : ""} aria-pressed={!!rail}
@@ -157,10 +167,10 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
               </div>
               {rail !== "prompt" && (
                 <div className="ward-chips">
-                  {chips.map(([key, seed]) => (
-                    <button key={key} className="chip" disabled={busy}
-                            onClick={() => setWords(seed)}>
-                      {tr(key, lang)}
+                  {chips.map((c) => (
+                    <button key={c.key} className="chip" disabled={busy}
+                            onClick={() => setWords(c.seed)}>
+                      {tr(c.key, lang)}
                     </button>
                   ))}
                 </div>

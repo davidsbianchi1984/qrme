@@ -6,6 +6,43 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-08-28
+
+### Added
+
+- **The second ring, and the screen the avatar takes.** Beside every
+  portrait — the room seats, your own seat, the direct chat's header —
+  a second circle bound to the avatar. Tap it and the render takes the
+  whole screen the way an uploaded background does, preferring the whole
+  figure to the face crop, with a rail of hidden windows down the edge:
+  the prompt bar, the wardrobe (apparel, hair, jewelry, backdrop), the
+  body (physique, gender), and the wheel that opens everything. Every
+  window is a filter over the one painting door — house style, the
+  profile's own age, the AI mark burned in. In an AR or VR room the
+  stage clears so the figure stands in the environment.
+- **The wardrobe opens for guests — the owner holds the switch.** New
+  `guest_styling` fact on every profile, on by default: the people a
+  profile talks with may restyle its avatar, the owner's PATCH closes
+  the wardrobe, an anonymous caller never paints, and the deepfake line
+  (fictional faces only) holds for every prompter including the owner.
+  The refusal speaks all ten languages.
+- **Default faces, one tap.** The avatar deck opens with the
+  deployment's shelf as a grid — stocked from the operator's ElevenLabs
+  collection or any export — and tapping a face claims it through the
+  registry, so a retirement still reaches every wearer. A new
+  `POST /avatars/library/pull` door tries the provider's catalog under
+  the deployment key and answers honestly while that API stays closed;
+  imports carry `provider_asset_id` into provenance.
+- **The XR shelf: every headset on the market.** `GET
+  /rooms/xr-platforms` and the Rooms screen's "Headsets & glasses" card
+  cover Steam, Meta Quest, Apple Vision Pro, PICO, HTC Vive, Android XR
+  and the phone — each with its browser road that works today (the
+  rooms are WebXR pages), VR/AR badges, and sign-in and native-app
+  futures said as futures. Apple and Google sign-in states read from
+  the real OAuth doors.
+- Screen 205 (the avatar stage) joins the gallery, and the surface
+  manifest, field labels and sweep floor keep pace.
+
 ## [1.9.0] - 2026-08-27
 
 ### Added
@@ -15974,7 +16011,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.9.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.10.0...HEAD
+[1.10.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.9.0...app-v1.10.0
 [1.9.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.9...app-v1.9.0
 [1.8.9]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.8...app-v1.8.9
 [1.8.8]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.7...app-v1.8.8

@@ -3120,13 +3120,11 @@ export function Inside({ onPlans, start = "", onLeave }: {
         <AvatarStage
           clear={channel === "ar" || channel === "vr"}
           profileId={staged}
-          token={(staged === session.profileId
-                    ? session.ownerToken
+          token={(staged === session.profileId ? session.ownerToken
                     : staged === dockedProfile ? dockOwner : null)
                   || token}
-          owned={(staged === session.profileId && !!session.ownerToken)
-                 || (staged === dockedProfile && !!dockOwner
-                     && dockedProfile !== session.profileId)}
+          owned={!!(staged === session.profileId ? session.ownerToken
+                      : staged === dockedProfile ? dockOwner : null)}
           avatar={(staged === session.profileId ? myFace
                      : aiFaces[staged]) || null}
           onClose={() => setStaged(null)}

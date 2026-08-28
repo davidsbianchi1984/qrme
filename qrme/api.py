@@ -55,7 +55,8 @@ from .routers import (accounts as account_routes,
                       summon, tiers as tier_routes, tutorial,
                       visits as visit_routes,
                       viewfinder as viewfinder_routes, wall,
-                      watch, watchparty, watermarks)
+                      watch, watchparty, watermarks,
+                      xr as xr_routes)
 
 
 #: The unhandled-error path logs here and nowhere else: the traceback
@@ -69,7 +70,7 @@ def create_app(pdi_client: PDIClient | None = None,
     # cannot be added to the product and forgotten at one of its routes,
     # because no route opts in. See qrme/tiers.py for the table and for why
     # browsing stays open.
-    app = FastAPI(title="QRME", version="1.9.0",
+    app = FastAPI(title="QRME", version="1.10.0",
                   dependencies=[Depends(tiers.gate)])
 
     @app.get("/terms")
@@ -198,6 +199,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(earnings.router)
     app.include_router(organization_routes.router)
     app.include_router(watch.router)
+    app.include_router(xr_routes.router)
     app.include_router(watermarks.router)
     app.include_router(avatars.router)
     app.include_router(steering.router)

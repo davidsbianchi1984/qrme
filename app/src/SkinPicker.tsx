@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, getBase, type Avatar } from "./api";
+import { api, getBase, type Avatar, type RegistryRow } from "./api";
 import { AvatarStage } from "./AvatarStage";
 import { fill, t as tr, visitorLang } from "./l10n";
 import { SkinTiles, type SkinSource } from "./SkinTiles";
@@ -36,9 +36,17 @@ export function SkinPicker({ profileId, token, onError, onChanged }: {
   const [worn, setWorn] = useState<Avatar | null>(null);
   const [providerId, setProviderId] = useState("");
   const [staged, setStaged] = useState(false);
+  // The deployment's shelf: the default faces the operator stocked — the
+  // ElevenLabs collection under the house key, and whatever else was put
+  // up. Tapping one claims it, so "pick a default" is one press and not
+  // a form. The registry link is the point: a retired row leaves every
+  // profile that wore it at once.
+  const [shelfRows, setShelfRows] = useState<RegistryRow[]>([]);
 
   useEffect(() => {
     api.avatarMarket().then((r) => setSources(r.skin_sources)).catch(() => setSources([]));
+    api.avatarShelf().then((r) => setShelfRows(r.shelf))
+      .catch(() => setShelfRows([]));
   }, []);
   useEffect(() => { void reload(); }, [profileId]);
 
@@ -82,10 +90,41 @@ export function SkinPicker({ profileId, token, onError, onChanged }: {
     finally { setBusy(false); }
   }
 
+  async function wear(row: RegistryRow) {
+    setBusy(true); setNote("");
+    try {
+      await api.claimFace(profileId, row.id, token);
+      setNote(tr("idn.deck.done", lang));
+      await reload();
+    } catch (e) { onError(e); }
+    finally { setBusy(false); }
+  }
+
   const kind = worn?.presentation?.kind || "image";
 
   return (
     <div className="skin-picker">
+      {/* The default faces, first: most people pick, few import. */}
+      <div className="tile-label">{tr("idn.deck.defaults", lang)}</div>
+      <p className="muted small">{tr("idn.deck.defaults.sub", lang)}</p>
+      {shelfRows.length === 0 ? (
+        <p className="muted small">{tr("idn.deck.defaults.none", lang)}</p>
+      ) : (
+        <div className="shelf-grid">
+          {shelfRows.map((r) => (
+            <button key={r.id} className="shelf-face" disabled={busy}
+                    title={r.label || r.provider}
+                    aria-label={r.label || r.provider}
+                    onClick={() => void wear(r)}>
+              <img alt="" src={r.asset.startsWith("http")
+                ? r.asset : getBase() + r.asset} />
+              {r.marked && (
+                <span className="shelf-mark" aria-hidden="true">✦</span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="tile-label">{tr("idn.deck.market", lang)}</div>
       <p className="muted small">{tr("idn.deck.market.sub", lang)}</p>
       <SkinTiles sources={sources} chosen={chosen} onPick={setChosen}

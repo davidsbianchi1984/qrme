@@ -8,6 +8,8 @@ show the picture without also having been handed the disclosure.
 
 from __future__ import annotations
 
+import os
+
 from pydantic import BaseModel, Field
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -162,6 +164,49 @@ async def stock_library(request: Request, provider: str = "elevenlabs",
                           provider=provider,
                           provider_asset_id=provider_asset_id or None,
                           label=label or None, likeness="invented")
+
+
+@router.post("/avatars/library/pull")
+def pull_library(request: Request, provider: str = "elevenlabs") -> dict:
+    """Fill the deployment shelf from the provider's own catalog — the
+    operator's one-button road, honest about the door that isn't open.
+
+    ElevenLabs ships avatars in its studio today and no listing API
+    beside them (the voices catalog got /v1/voices; the avatars got a
+    gallery). So this door TRIES, and reports what it found: the day the
+    provider opens /v1/avatars, this same button fills the shelf,
+    provider_asset_id and all. Until then the export road stands —
+    download the renders from the studio and stock the shelf by upload —
+    and the answer says so in a machine word the console can translate
+    rather than a sentence pretending to be data."""
+    auth.require_signup_key(request)
+    if provider != "elevenlabs":
+        raise HTTPException(422, "only elevenlabs is wired for pulling")
+    key = os.environ.get("ELEVENLABS_API_KEY", "").strip()
+    if not key:
+        raise HTTPException(503, i18n.raised(RuntimeError(
+            "this deployment has no ELEVENLABS_API_KEY configured — the "
+            "binding exists, the engine does not")))
+    import json as _json
+    import urllib.request as _rq
+    try:
+        with _rq.urlopen(_rq.Request(
+                "https://api.elevenlabs.io/v1/avatars",
+                headers={"xi-api-key": key}), timeout=10) as r:
+            rows = _json.loads(r.read().decode("utf-8")).get("avatars", [])
+    except Exception:
+        return {"pulled": 0, "note": "provider_door_closed"}
+    minted = 0
+    for row in rows:
+        url = row.get("image_url") or row.get("preview_url")
+        if not url:
+            continue
+        avatarreg.mint(asset=url, source="curated_library",
+                       provider="elevenlabs",
+                       provider_asset_id=row.get("avatar_id"),
+                       label=row.get("name"), likeness="invented")
+        minted += 1
+    return {"pulled": minted, "note": "stocked"}
 
 
 @router.get("/accounts/{account_id}/avatars")

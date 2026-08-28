@@ -175,6 +175,12 @@ DOORS: tuple[Door, ...] = (
     Door("SkinTiles", "the avatar tiles",
          "the faces there are to choose from",
          ("avatar tiles", "which faces", "face options")),
+    Door("AvatarStage", "the avatar full screen",
+         "the avatar taking the whole screen, with the wardrobe rail — "
+         "prompt, apparel, physique and gender — over the one painting "
+         "door",
+         ("full screen avatar", "wardrobe", "restyle", "change outfit",
+          "dress the avatar", "physique", "render my avatar")),
     Door("InWords", "Language & Name tab",
          "the words a profile uses, and the name it answers to",
          ("language", "my name", "what to call", "rename",

@@ -1877,6 +1877,19 @@ export type AvatarBrief = {
   asset?: string | null;
 };
 
+/** One vendor on the XR shelf. These rooms are pages, so the honest road
+ *  in from any headset is its own browser — `browser` names it. Futures
+ *  say so: `native_app` stays "planned" until somebody actually ships
+ *  one, and `signin` is live / unconfigured / planned / none, read from
+ *  the real OAuth doors. */
+export type XrPlatform = {
+  platform: string; name: string; wears: string[];
+  browser: string;
+  open_now: boolean;
+  native_app: string;
+  signin: string;
+};
+
 /** What sunsetting did. `archive_key` is non-null only where a vault holds it. */
 export type Sunset = {
   status: string; farewells: number; memory: string;
@@ -4915,6 +4928,9 @@ export const api = {
     if (!res.ok) throw new Error(text || res.statusText);
     return JSON.parse(text) as RegistryRow;
   },
+  // The XR shelf: every headset that can stand in the rooms, and how.
+  xrPlatforms: () =>
+    req<{ xr_platforms: XrPlatform[] }>("/rooms/xr-platforms"),
   myShelf: (accountId: string, token: string) =>
     req<{ shelf: RegistryRow[] }>(`/accounts/${accountId}/avatars`, { token }),
   stockMyShelf: async (accountId: string, token: string, file: File,

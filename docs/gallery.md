@@ -601,6 +601,9 @@ is exactly how the old card came to be showing yours in place of theirs.
     <td align="center" width="25%"><a href="screens/203-get-help.svg"><img src="screens/203-get-help.svg" width="210" alt="Get help"></a><br><sub><b>203</b> · Get help · your matter, and what happened to it</sub></td>
     <td align="center" width="25%"><a href="screens/204-your-circle.svg"><img src="screens/204-your-circle.svg" width="210" alt="Your circle"></a><br><sub><b>204</b> · Your circle · everyone you added, and what they do</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="25%"><a href="screens/205-avatar-stage.svg"><img src="screens/205-avatar-stage.svg" width="210" alt="Avatar stage"></a><br><sub><b>205</b> · Avatar stage · the avatar takes the screen, wardrobe on the rail</sub></td>
+  </tr>
 </table>
 
 The strip changes with the room and only with the room. An audio room has no

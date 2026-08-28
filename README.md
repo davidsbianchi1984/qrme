@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v1.9.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v1.10.0** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -82,7 +82,7 @@ The majority of what a person actually encounters, with what each screen
 does — drawn at phone scale, and the same screens serve the web console
 on a computer and the installed app. The Android tellings live beside
 these in `docs/screens/android/`, the watch has its own gallery below,
-and the complete tour of all 204 is in [docs/gallery.md](docs/gallery.md).
+and the complete tour of all 205 is in [docs/gallery.md](docs/gallery.md).
 
 **Getting in**
 
@@ -275,6 +275,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **1.10.0** | **The avatar takes the screen, and every headset has a road in** — a second ring beside every portrait opens the full-screen wardrobe (prompt bar, chips, physique & gender) over the one painting door; guests may restyle a profile until its owner flips the new `guest_styling` switch; the avatar deck opens on the deployment's default faces with one-tap claiming and a pull door for the provider's catalog; the Rooms screen's XR shelf covers Steam, Meta, Apple, PICO, HTC and Android XR with honest browser roads |
 | **1.9.0** | **The room hears an iPhone, and every name says one thing** — Safari's second refusal mask forks to the recorded ear so an iPhone room stops sitting deaf, the voice queue wears a watchdog, the hear-loop primes to the present, seats show a visible ⚙️ beside the double-tap, a background-only seat stops painting its circle, and the dock mints owner tokens for every held profile; the wire-collision ledger closes its whole twenty-one-row backlog across the backend and all four clients, two floors join the live-measured registry, and the front page leads with the three postures |
 | **1.8.9** | **One face ledger, three roads in** — the avatar registry: the deployment's shelf and your own with named faces, a fuller import market, painted-from-words at the profile's own age, the AI mark burned at mint, takedowns as data operations; the room strip slims, the invite shows its waiting seat, and the panels dock fits every phone |
 | **1.8.8** | **The estate answers for itself** — profiles turn all their dials on request, with nine new ones and the guidance teaching every modification by its ends; the four panels gained their exits (tap outside, a red close); the paperclip is the phone's own chooser with the carried-things card behind its own door; the room walks with you on the person-walking button, every seat in its own voice through the room's echo door; the people in your phone reach all three native shells; and the README shows the screens you'll meet |

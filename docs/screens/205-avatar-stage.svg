@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="660" viewBox="0 0 320 660" role="img" aria-label="Avatar stage screen"><defs>
+      <linearGradient id="gScr" x1="0" y1="0" x2="0.6" y2="1">
+        <stop offset="0" stop-color="#181235"/><stop offset="1" stop-color="#0c0920"/></linearGradient>
+      <linearGradient id="gFrame" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#2a2352"/><stop offset="1" stop-color="#0a0818"/></linearGradient>
+      <linearGradient id="gCard" x1="0" y1="0" x2="0.4" y2="1">
+        <stop offset="0" stop-color="#201a48"/><stop offset="1" stop-color="#181240"/></linearGradient>
+      <linearGradient id="gBrand" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#7b5cff"/><stop offset="1" stop-color="#9d7bff"/></linearGradient>
+      <linearGradient id="gStage" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#241d52"/><stop offset="55%" stop-color="#120d30"/>
+        <stop offset="1" stop-color="#07050f"/></linearGradient>
+      <radialGradient id="halo" cx="50%" cy="34%" r="60%">
+        <stop offset="0" stop-color="#7b5cff" stop-opacity="0.35"/>
+        <stop offset="1" stop-color="#7b5cff" stop-opacity="0"/></radialGradient>
+      <radialGradient id="face" cx="38%" cy="30%" r="80%">
+        <stop offset="0" stop-color="#e8ddcb"/><stop offset="60%" stop-color="#caa98a"/>
+        <stop offset="100%" stop-color="#8f6f52"/></radialGradient>
+    </defs><rect x="10.0" y="12.0" width="300.0" height="636.0" rx="40" fill="url(#gFrame)"/><rect x="20.0" y="22.0" width="280.0" height="616.0" rx="31" fill="url(#gScr)"/><rect x="130.0" y="27.0" width="60.0" height="15.0" rx="7.5" fill="#05070d"/><text x="34.0" y="56.0" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif" font-size="11" font-weight="600" fill="#c7c9d9" text-anchor="start">9:41</text><rect x="264.0" y="50.0" width="20.0" height="11.0" rx="3" fill="none" stroke="#c7c9d9" stroke-width="1.1"/><rect x="266.0" y="52.0" width="14.0" height="7.0" rx="2" fill="#c7c9d9"/><rect x="284.6" y="53.5" width="2.0" height="5.0" rx="1" fill="#c7c9d9"/><path d="M251 55 a6 6 0 0 1 11 0" fill="none" stroke="#c7c9d9" stroke-width="1.3"/><circle cx="256.5" cy="59" r="1.2" fill="#c7c9d9"/>
+    <!-- the takeover: the avatar owns everything under the status bar -->
+    <rect x="20.0" y="66.0" width="280.0" height="572.0" rx="0" fill="url(#gStage)"/>
+    <ellipse cx="160" cy="230" rx="150" ry="170" fill="url(#halo)"/>
+    <!-- the whole figure, standing -->
+    <circle cx="160" cy="180" r="44" fill="url(#face)"/>
+    <path d="M120 172 q-6 -52 40 -54 q46 2 40 54 q-6 -34 -40 -34 q-34 0 -40 34 Z" fill="#3a2c22"/>
+    <path d="M112 320 q0 -66 48 -70 q48 4 48 70 l-8 130 q-40 14 -80 0 Z" fill="#274066"/>
+    <path d="M138 252 q22 18 44 0 l6 16 q-28 20 -56 0 Z" fill="#101426"/>
+    <path d="M112 320 q-16 44 -10 98 l14 3 q-4 -54 8 -85 Z" fill="#213658"/>
+    <path d="M208 320 q16 44 10 98 l-14 3 q4 -54 -8 -85 Z" fill="#213658"/>
+    <path d="M130 450 l-4 128 22 0 8 -110 8 110 22 0 -4 -128 Z" fill="#141a30"/>
+    <circle cx="160" cy="236" r="4.4" fill="#d9ccff"/>
+    <path d="M160 240 l0 10 M155 246 l10 0" stroke="#d9ccff" stroke-width="1.4"/>
+    <!-- the AI mark, the disclosure that travels with the picture -->
+    <rect x="32.0" y="76.0" width="52.0" height="19.0" rx="9.5" fill="rgba(5,7,15,0.72)"/>
+    <text x="58.0" y="89.0" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif" font-size="10" font-weight="700" fill="#f2effc" text-anchor="middle">✦ AI</text>
+    <!-- close, top right -->
+    <circle cx="276" cy="86" r="12" fill="rgba(5,7,15,0.72)" stroke="#302a60" stroke-width="1"/>
+    <path d="M271.5 81.5 l9 9 M280.5 81.5 l-9 9" stroke="#c7c9d9" stroke-width="1.6" stroke-linecap="round"/>
+    <!-- the rail of hidden windows: prompt, wardrobe, body, wheel -->
+    <circle cx="272" cy="360" r="15" fill="rgba(5,7,15,0.72)" stroke="#302a60" stroke-width="1"/>
+    <path d="M265 366 l9 -9 3 3 -9 9 -4 1 Z" fill="none" stroke="#c7c9d9" stroke-width="1.4" stroke-linejoin="round"/>
+    <circle cx="272" cy="398" r="15" fill="rgba(5,7,15,0.72)" stroke="#7b5cff" stroke-width="1.4"/>
+    <path d="M266 394 q6 -7 12 0 l-2 10 q-4 2 -8 0 Z" fill="none" stroke="#9d7bff" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M269 394 q3 3 6 0" fill="none" stroke="#9d7bff" stroke-width="1.4" stroke-linecap="round"/>
+    <circle cx="272" cy="436" r="15" fill="rgba(5,7,15,0.72)" stroke="#302a60" stroke-width="1"/>
+    <circle cx="272" cy="430" r="3.4" fill="none" stroke="#c7c9d9" stroke-width="1.4"/>
+    <path d="M272 434 l0 8 M266 438 l12 0 M272 442 l-4 6 M272 442 l4 6" fill="none" stroke="#c7c9d9" stroke-width="1.4" stroke-linecap="round"/>
+    <circle cx="272" cy="474" r="15" fill="rgba(5,7,15,0.72)" stroke="#302a60" stroke-width="1"/>
+    <circle cx="272" cy="474" r="5.4" fill="none" stroke="#c7c9d9" stroke-width="1.5"/>
+    <circle cx="272" cy="474" r="1.7" fill="#c7c9d9"/>
+    <!-- the wardrobe card the lit rail button opened -->
+    <rect x="32.0" y="500.0" width="216.0" height="126.0" rx="16" fill="url(#gCard)" stroke="#302a60" stroke-width="1"/>
+    <text x="44.0" y="521.0" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif" font-size="11.5" font-weight="600" fill="#f2effc" text-anchor="start">Say what changes — or tap a start</text>
+    <rect x="44.0" y="530.0" width="142.0" height="26.0" rx="9" fill="#0e0a26" stroke="#302a60" stroke-width="1"/>
+    <text x="52.0" y="547.0" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif" font-size="10" font-weight="400" fill="#6a6399" text-anchor="start">in formal evening wear…</text>
+    <rect x="192.0" y="530.0" width="44.0" height="26.0" rx="9" fill="url(#gBrand)"/>
+    <text x="214.0" y="547.0" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">Paint</text>
+    <rect x="44.0" y="564.0" width="62.0" height="18.0" rx="9" fill="rgba(123,92,255,0.16)"/>
+    <text x="75.0" y="576.5" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif" font-size="9" font-weight="600" fill="#9d7bff" text-anchor="middle">Leather jacket</text>
+    <rect x="112.0" y="564.0" width="52.0" height="18.0" rx="9" fill="rgba(123,92,255,0.16)"/>
+    <text x="138.0" y="576.5" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif" font-size="9" font-weight="600" fill="#9d7bff" text-anchor="middle">New hair</text>
+    <rect x="170.0" y="564.0" width="66.0" height="18.0" rx="9" fill="rgba(123,92,255,0.16)"/>
+    <text x="203.0" y="576.5" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif" font-size="9" font-weight="600" fill="#9d7bff" text-anchor="middle">Sunset backdrop</text>
+    <rect x="44.0" y="590.0" width="24.0" height="13.0" rx="6.5" fill="url(#gBrand)"/>
+    <circle cx="61.0" cy="596.5" r="4.6" fill="#fff"/>
+    <text x="76.0" y="600.5" font-family="-apple-system,BlinkMacSystemFont,'SF Pro Display','SF Pro Text','Segoe UI',Roboto,system-ui,sans-serif" font-size="9" font-weight="400" fill="#9a93c6" text-anchor="start">Visitors may restyle this avatar</text>
+    <rect x="118.0" y="631.0" width="84.0" height="4.0" rx="2" fill="rgba(255,255,255,0.6)"/></svg>
