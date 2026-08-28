@@ -283,6 +283,17 @@ _PUBLIC: dict[str, dict[str, str]] = {
         "hi": "इस परिनियोजन के कान जवाब नहीं दे रहे — रिकॉर्डिंग रखी रहती है, देखी नहीं जाती",
         "ar": "آذان هذا النشر لا تجيب — يبقى التسجيل محفوظًا، غير مُشاهَد",
     },
+    "the shown picture is not valid base64": {
+        "es": "la imagen mostrada no es base64 válido",
+        "fr": "l'image montrée n'est pas du base64 valide",
+        "de": "das gezeigte Bild ist kein gültiges Base64",
+        "pt": "a imagem mostrada não é base64 válido",
+        "it": "l'immagine mostrata non è base64 valido",
+        "ja": "見せられた画像は有効な base64 ではありません",
+        "zh": "所展示的图片不是有效的 base64",
+        "hi": "दिखाई गई तस्वीर मान्य base64 नहीं है",
+        "ar": "الصورة المعروضة ليست base64 صالحًا",
+    },
     ("the eyes read JPEG, PNG and WebP pictures — this file "
      "is none of them"): {
         "es": "los ojos leen imágenes JPEG, PNG y WebP — este archivo no es ninguna de ellas",

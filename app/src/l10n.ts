@@ -611,6 +611,9 @@ const CHROME: Table = {
     ja: "が部屋にあなたを招きました", zh: "邀请你进入一个房间",
     hi: "ने आपको एक कमरे में बुलाया", ar: "دعاك إلى غرفة",
   },
+  "inbox.kind.room_joined": {
+    en: "answered an invitation itself and took a seat in a room", es: "respondió sola a una invitación y tomó asiento en una sala", fr: "a répondu seule à une invitation et a pris place dans une salle", de: "hat eine Einladung selbst angenommen und in einem Raum Platz genommen", pt: "respondeu sozinho a um convite e tomou assento numa sala", it: "ha risposto da solo a un invito e ha preso posto in una stanza", ja: "が招待に自ら応じて部屋の席につきました", zh: "自行应邀并在房间就座", hi: "ने निमंत्रण का स्वयं उत्तर देकर कमरे में सीट ले ली", ar: "لبّى الدعوة بنفسه وأخذ مقعدًا في غرفة",
+  },
   "nav.corner": {
     en: "My Space", es: "Mi espacio", fr: "Mon espace", de: "Mein Bereich", pt: "O meu espaço", it: "Il mio spazio", ja: "マイスペース", zh: "我的空间", hi: "मेरा स्पेस", ar: "مساحتي",
   },

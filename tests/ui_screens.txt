@@ -1,4 +1,4 @@
-# status: floor — 70 rows
+# status: floor — 69 rows
 #
 # Which console surface each screen drawing depicts.
 #
