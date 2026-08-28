@@ -121,9 +121,58 @@ def test_entering_any_room_opens_the_ear():
     and put-away closes everything.
     """
     assert re.search(r"if \(!canDictate\) return;\s*\n\s*"
+                     r"byHand\.current = false;\s*\n\s*"
                      r"startTalking\(\);", INSIDE), (
         "nothing opens the microphone on the way into a room — the press "
         "the field reports asked to remove, twice, is still the only way in")
+
+
+def test_the_first_touch_is_the_grant_the_phone_wanted():
+    """iOS opens no microphone a touch didn't carry, so the entry above is
+    refused there with `not-allowed` — the phone waiting for a hand, not a
+    person saying no. The room's first touch anywhere is that hand: the
+    refusal of a machine-started ear raises `earWaiting` instead of a
+    fault, a pulsing chip says tap-anywhere in the reader's language, and
+    the root's pointer capture starts the ear inside the gesture. Without
+    each half of this the iPhone enters every room deaf, which is the
+    field report this exists for."""
+    assert "setEarWaiting(true)" in INSIDE, (
+        "a machine-started refusal must wait for a hand, not report a fault")
+    assert re.search(r"onPointerDownCapture=\{[^}]*\n?[^}]*earWaiting", INSIDE), (
+        "no touch anywhere opens the waiting ear")
+    assert 'tr("ins.ear.tap", lang)' in INSIDE, (
+        "the waiting ear says nothing — a person cannot know their tap "
+        "is the grant")
+
+
+def test_the_take_lives_in_the_bar_and_lands_in_the_box():
+    """The 🎤 by the paperclip, on the phone's own terms: pressing it turns
+    the text bar into a recording strip — cancel, a level that moves when
+    you do, stop — and the words land in the draft box, still yours to
+    read and edit before the arrow sends them. The earlier design sent
+    them as a turn the moment they arrived, and the field report asked
+    for this shape instead."""
+    assert 'className="rs-chatpill dict-strip"' in INSIDE, (
+        "no strip replaces the bar while a take is open")
+    assert "recordAsked(me, token, (lvl) => setDictLevel(lvl))" in INSIDE, (
+        "the strip's level is decoration — nothing feeds it the microphone")
+    assert re.search(r"dictDropped\.current\)\s*\{\s*\n\s*"
+                     r"setDraft", INSIDE), (
+        "the words no longer land in the box")
+    assert "if (text) await sendText(text);" not in INSIDE, (
+        "a take still sends itself — the words must wait in the box")
+
+
+def test_all_four_rail_buttons_stand_without_the_key():
+    """"There should be four." A session without the owner's key used to
+    lose two rail buttons silently, which reads from a phone as broken
+    rather than locked. The buttons stand, and the panel says what opens
+    them."""
+    rail = (REPO / "app/src/TalkRail.tsx").read_text(encoding="utf-8")
+    assert "OWNERS.includes(p)) return !!ownerToken" not in rail, (
+        "the owner panels vanish again without the key")
+    assert 'tr("rail.locked", lang)' in rail, (
+        "a locked panel opens onto nothing instead of the way to the key")
     assert "!spokenRoom || !canDictate" not in INSIDE, (
         "the chat-room exemption is back; the owner removed it by name")
 

@@ -2048,3 +2048,28 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .rs-waiting { opacity: 0.45; display: flex; flex-direction: column;
               align-items: center; justify-content: center; gap: 6px;
               border-style: dashed; }
+
+/* The room asking for a hand — iOS opens no microphone a touch didn't
+   carry, so the first touch anywhere is the grant and this chip says so. */
+.ear-tap {
+  position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+  z-index: 30; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--panel); color: var(--txt); padding: 8px 16px;
+  font-size: 0.85rem; box-shadow: 0 4px 18px rgba(0,0,0,.35);
+  animation: ear-tap-pulse 1.6s ease-in-out infinite;
+}
+@keyframes ear-tap-pulse {
+  0%, 100% { opacity: .85; } 50% { opacity: 1; }
+}
+/* The take in progress, living where the text bar was. */
+.dict-strip { align-items: center; gap: 10px; }
+.dict-bars {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  gap: 3px; min-height: 30px;
+}
+.dict-bars span {
+  width: 3px; min-height: 4px; border-radius: 2px;
+  background: var(--accent, #7b5cff);
+  transition: height 90ms linear;
+}
+.dict-stop { font-size: 1.05rem; }

@@ -351,6 +351,8 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // stays a decision. Only offered where the browser ships a recogniser
   // (iOS Safari does not), the same bargain the Agent screen struck.
   const [dictating, setDictating] = useState(false);
+  const [dictLevel, setDictLevel] = useState(0);
+  const dictDropped = useRef(false);
   const dictation = useRef<{ stop: () => void } | null>(null);
   // Talking INTO a voice room: the same recogniser, but what it hears is
   // said in the room rather than typed into a box. The two cannot run at
@@ -404,6 +406,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // The sibling screen already carries this fix and the comment explaining
   // it. This room never got it.
   const [earFault, setEarFault] = useState<string | null>(null);
+  /** The platform wants a touch before it will open a microphone — iOS
+   *  refuses a start no gesture carried. Not a fault: the person never
+   *  said no, the phone is waiting for their hand. The first touch
+   *  anywhere in the room is that hand. */
+  const [earWaiting, setEarWaiting] = useState(false);
+  const byHand = useRef(false);
   /** Until when the ear disbelieves itself.
    *
    *  Field report, from Windows this time and after the text guard had
@@ -1079,6 +1087,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // everything — the liberty being taken is the one being asked for.
   useEffect(() => {
     if (!canDictate) return;
+    byHand.current = false;
     startTalking();
     // `open` in the deps so moving between rooms re-opens the ear
     // in the new one; the teardown above has already closed the old.
@@ -1234,8 +1243,10 @@ export function Inside({ onPlans, start = "", onLeave }: {
                                   nowSaying.current?.stop();
                                 });
       } catch {
-        // The microphone itself was refused. Nothing to retry into.
-        setEarFault(tr("ins.ear.blocked", lang));
+        // The microphone itself was refused. By the person, if a person
+        // pressed; by a phone still waiting for a touch, if nobody did.
+        if (byHand.current) setEarFault(tr("ins.ear.blocked", lang));
+        else setEarWaiting(true);
         wantTalking.current = false;
         setTalking(false);
         return;
@@ -1359,7 +1370,9 @@ export function Inside({ onPlans, start = "", onLeave }: {
     rec.onerror = (e: { error?: string }) => {
       const code = e.error || "";
       if (code === "not-allowed") {
-        fatal = true; setEarFault(tr("ins.ear.blocked", lang));
+        fatal = true;
+        if (byHand.current) setEarFault(tr("ins.ear.blocked", lang));
+        else setEarWaiting(true);
       } else if (code === "service-not-allowed" && canRecord()) {
         // The platform refusing its own recogniser — iOS, every time. There
         // is a second ear, so this is a fork in the road rather than a dead
@@ -1432,7 +1445,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
 
   /** The control is now a mute, not a trigger. */
   function flipTalking() {
-    if (talking) stopTalking(); else startTalking();
+    if (talking) stopTalking(); else { byHand.current = true; startTalking(); }
   }
 
   /** The composer's recorded dictation: one take per press, ended by the
@@ -1457,23 +1470,29 @@ export function Inside({ onPlans, start = "", onLeave }: {
     }
     let recording: Recording;
     try {
-      recording = await recordAsked(me, token);
+      recording = await recordAsked(me, token, (lvl) => setDictLevel(lvl));
     } catch {
       setEarFault(tr("ins.ear.blocked", lang));
       if (wasStanding) startTalking();
       return;
     }
+    dictDropped.current = false;
     dictation.current = { stop: () => recording.stop() };
     setDictating(true);
     try {
       const text = await recording.done;
-      // "It starts recording, you can stop it, it transcribes and sends
-      // automatically" — the words go as a turn, not into a field
-      // somebody must then find the send for.
-      if (text) await sendText(text);
-    } catch { /* a quiet take sends nothing */ }
+      // Into the box, not out the door. The earlier design sent the words
+      // as a turn the moment they arrived; the field report asked for the
+      // phone's own shape instead — a recording strip in the text bar,
+      // and the words landing where the cursor is, still yours to read
+      // and edit before the arrow sends them.
+      if (text && !dictDropped.current) {
+        setDraft((d) => (d ? d + " " : "") + text);
+      }
+    } catch { /* a quiet take writes nothing */ }
     dictation.current = null;
     setDictating(false);
+    setDictLevel(0);
     if (wasStanding) startTalking();
   }
 
@@ -1673,6 +1692,32 @@ export function Inside({ onPlans, start = "", onLeave }: {
           </p>
         ))}
       </div>
+      {dictating ? (
+        /* The phone's own shape for a take in progress: cancel, a level
+         * that moves when you do, stop. Lives where the text bar was, so
+         * the words land exactly where you were about to type them. */
+        <div className="rs-chatpill dict-strip">
+          <button className="rs-chatbtn"
+                  aria-label={tr("ins.rec.cancel", lang)}
+                  title={tr("ins.rec.cancel", lang)}
+                  onClick={() => {
+                    dictDropped.current = true;
+                    dictation.current?.stop();
+                  }}>✕</button>
+          <div className="dict-bars" aria-hidden="true">
+            {Array.from({ length: 14 }, (_, i) => (
+              <span key={i} style={{
+                height: `${4 + Math.min(22, dictLevel
+                  * (0.5 + 0.5 * Math.sin(i * 1.7 + dictLevel / 9)) / 4)}px`,
+              }} />
+            ))}
+          </div>
+          <button className="rs-chatbtn dict-stop"
+                  aria-label={tr("ins.rec.stop", lang)}
+                  title={tr("ins.rec.stop", lang)}
+                  onClick={() => dictation.current?.stop()}>⏹</button>
+        </div>
+      ) : (
       <div className="rs-chatpill">
         <button className="rs-chatbtn" disabled={busy || !token}
                 aria-label={tr("ins.share", lang)}
@@ -1691,6 +1736,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 aria-label={tr("ins.sayit", lang)}
                 onClick={() => void sendDraft()}>➤</button>
       </div>
+      )}
       {/* The round controls screen 103 draws along the bottom.
        *
        *      asked     which buttons does the drawing have
@@ -1980,7 +2026,19 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // screen is for, read by somebody deciding whether to open it — and a
   // person already standing in the room has decided.
   return (
-    <div className={"screen" + (inRoom ? " room-place" : "")}>
+    <div className={"screen" + (inRoom ? " room-place" : "")}
+         onPointerDownCapture={() => {
+           if (!earWaiting) return;
+           setEarWaiting(false);
+           byHand.current = true;
+           setEarFault(null);
+           startTalking();
+         }}>
+      {earWaiting && (
+        <button className="ear-tap" type="button">
+          🎙 {tr("ins.ear.tap", lang)}
+        </button>
+      )}
       {inRoom && onAPhone && (
         // The gestures. Both, because neither is discoverable and two
         // chances beat one — the same reasoning the camera controls on

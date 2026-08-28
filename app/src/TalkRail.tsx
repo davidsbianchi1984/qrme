@@ -47,7 +47,6 @@ export function TalkRail({
   const panels: RailPanel[] =
     (["profile", "memory", "relationship", "controls"] as RailPanel[])
       .filter((p) => {
-        if (OWNERS.includes(p)) return !!ownerToken;
         if (p === "memory") return !!interactorId && !!pairToken;
         return true;
       });
@@ -98,12 +97,19 @@ export function TalkRail({
                                token={ownerToken} pairToken={pairToken}
                                lang={lang} onError={onError} />
           )}
-          {open === "relationship" && !interactorId && (
+          {open === "relationship" && ownerToken && !interactorId && (
             <p className="muted small">{tr("rail.rel.nobody", lang)}</p>
           )}
           {open === "controls" && ownerToken && (
             <ControlsPanel profileId={profileId} token={ownerToken}
                            lang={lang} onError={onError} />
+          )}
+          {/* "There should be four." The two owner panels used to vanish
+            * when this session held no owner key — which reads, from a
+            * phone, as two buttons missing rather than one key absent. The
+            * buttons stand now, and the panel says what opens them. */}
+          {OWNERS.includes(open) && !ownerToken && (
+            <p className="muted small">{tr("rail.locked", lang)}</p>
           )}
         </div>
       )}
