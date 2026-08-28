@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { api, getBase, type Anonymity, type Avatar, type AvatarBrief, type Deleted,
-         type Emblem, type IdentityVocabulary, type Memorial, type Sibling,
+import { api, getBase, getSignupKey, type Anonymity, type Avatar,
+         type AvatarBrief, type Deleted,
+         type Emblem, type IdentityVocabulary, type Memorial,
+         type RegistryRow, type Sibling,
          type Sunset, type Verifiable, type Verification } from "../api";
 import { Refusal } from "../Refusal";
 import { fill, t as tr, visitorLang } from "../l10n";
@@ -59,6 +61,14 @@ export function Identity({ onPlans, onPassing }: {
   const [marketKey, setMarketKey] = useState("ready_player_me");
   const [marketUrl, setMarketUrl] = useState("");
   const [marketTorso, setMarketTorso] = useState("");
+  // The provider's own id for an imported avatar (an ElevenLabs avatar
+  // id, a Ready Player Me GUID) — recorded into the registry row's
+  // provenance so the face remembers where it came from.
+  const [marketPid, setMarketPid] = useState("");
+  // The deployment's default faces: the shelf the operator stocked.
+  // Tapping one claims it through the registry, so a takedown later
+  // still reaches every profile that wore it.
+  const [shelfRows, setShelfRows] = useState<RegistryRow[]>([]);
   const [capturing, setCapturing] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -159,7 +169,9 @@ export function Identity({ onPlans, onPassing }: {
     try {
       await api.importAvatar(me,
         { source: marketKey, asset: marketUrl.trim(),
-          ...(marketTorso.trim() ? { torso: marketTorso.trim() } : {}) },
+          ...(marketTorso.trim() ? { torso: marketTorso.trim() } : {}),
+          ...(marketPid.trim()
+            ? { provider_asset_id: marketPid.trim() } : {}) },
         token);
       setNote(tr("idn.deck.done", lang));
       setMarketUrl("");
@@ -283,6 +295,8 @@ export function Identity({ onPlans, onPassing }: {
     api.emblems().then((r) => setEmblems(r.emblems)).catch(() => undefined);
     api.avatarBriefs().then((r) => setBriefs(r.briefs)).catch(() => undefined);
     api.avatarMarket().then((r) => setMarket(r.skin_sources)).catch(() => undefined);
+    api.avatarShelf().then((r) => setShelfRows(r.shelf))
+      .catch(() => setShelfRows([]));
   }, []);
 
   function reload() {
@@ -624,6 +638,50 @@ export function Identity({ onPlans, onPassing }: {
           </div>
         )}
 
+        {/* The deployment's default faces, first: most people pick, few
+            import. One tap claims through the registry — the road a
+            takedown can still travel. */}
+        <h4>{tr("idn.deck.defaults", lang)}</h4>
+        <p className="muted small">{tr("idn.deck.defaults.sub", lang)}</p>
+        {getSignupKey() && (
+          <button className="chip" onClick={async () => {
+            setError(null); setNote(null);
+            try {
+              const got = await api.pullShelf();
+              setNote(got.note === "provider_door_closed"
+                ? tr("idn.deck.pull.closed", lang)
+                : tr("idn.deck.done", lang));
+              const r = await api.avatarShelf();
+              setShelfRows(r.shelf);
+            } catch (e) { fail(e); }
+          }}>{tr("idn.deck.pull", lang)}</button>
+        )}
+        {shelfRows.length === 0 ? (
+          <p className="muted small">{tr("idn.deck.defaults.none", lang)}</p>
+        ) : (
+          <div className="shelf-grid">
+            {shelfRows.map((row) => (
+              <button key={row.id} className="shelf-face"
+                      title={row.label || row.provider}
+                      aria-label={row.label || row.provider}
+                      onClick={async () => {
+                        setError(null); setNote(null);
+                        try {
+                          await api.claimFace(me, row.id, token);
+                          setNote(tr("idn.deck.done", lang));
+                          reloadAvatar();
+                        } catch (e) { fail(e); }
+                      }}>
+                <img alt="" src={row.asset.startsWith("http")
+                  ? row.asset : getBase() + row.asset} />
+                {row.marked && (
+                  <span className="shelf-mark" aria-hidden="true">✦</span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+
         <h4>{tr("idn.deck.market", lang)}</h4>
         <p className="muted small">{tr("idn.deck.market.sub", lang)}</p>
         <div className="row">
@@ -641,6 +699,11 @@ export function Identity({ onPlans, onPassing }: {
           <input value={marketTorso}
                  placeholder={tr("idn.deck.torso.ph", lang)}
                  onChange={(e) => setMarketTorso(e.target.value)}
+                 style={{ flex: 1 }} />
+          <input value={marketPid}
+                 placeholder={tr("idn.deck.pid.ph", lang)}
+                 aria-label={tr("idn.deck.pid.ph", lang)}
+                 onChange={(e) => setMarketPid(e.target.value)}
                  style={{ flex: 1 }} />
           <button disabled={!marketUrl.trim()} onClick={importMarket}>
             {tr("idn.deck.import", lang)}

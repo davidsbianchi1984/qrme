@@ -22,6 +22,18 @@ REPO = Path(__file__).resolve().parents[1]
 STAGE = (REPO / "app" / "src" / "AvatarStage.tsx").read_text()
 INSIDE = (REPO / "app" / "src" / "screens" / "Inside.tsx").read_text()
 CHAT = (REPO / "app" / "src" / "screens" / "Chat.tsx").read_text()
+IDENTITY = (REPO / "app" / "src" / "screens" / "Identity.tsx").read_text()
+
+
+def test_the_deck_is_on_the_screen_people_actually_open():
+    """The defect a whole deploy night found: a component full of
+    finished features that nothing mounted. Asserting markup inside a
+    file proves the file, not the product — so the defaults grid, the
+    one-tap claim, the operator's pull and the provider-id box must
+    live in Identity.tsx, a screen the shell actually routes to."""
+    for needle in ("idn.deck.defaults", "claimFace", "pullShelf",
+                   "idn.deck.pid.ph", "shelf-grid"):
+        assert needle in IDENTITY, f"Identity lost {needle}"
 
 
 def test_the_ring_stands_on_the_seats_and_the_chat_header():
