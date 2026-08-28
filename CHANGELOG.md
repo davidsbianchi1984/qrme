@@ -6,6 +6,27 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-08-28
+
+### Added
+
+- **Raise — grow your own** (docs/raise.md, build-order step one plus the
+  console door). The fourth profile kind, `raised`, with its own creation
+  door: a temperament seed on three axes, a starting stage, and one of
+  four preset doors (storybook, caretaker, full trail, sandbox — each a
+  reopenable bundle of switches). Growth is an APPEND-ONLY record — the
+  Album — and stage doors (embryo → child → adolescent → young adult →
+  adult) open on earned milestones, never the clock: chat turns count
+  from the chat door, taught words, lessons and answers weigh more. The
+  persona carries the stage's voice and the WHOLE of what was taught; an
+  untaught life says it knows almost nothing. Mortality is off by
+  default and says its worded warning every time it turns on. The law is
+  not a switch: a character raised from a childhood is family forever
+  (enforced at the relationship door on the STARTED stage), and
+  childhood stages run at the strictest maturity, guardian-only. Screen
+  206, the Raise tab, ten languages, and the routes recorded on the
+  shell backlogs until the shells grow the tab.
+
 ## [2.0.1] - 2026-08-28
 
 ### Added
@@ -16048,7 +16069,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.0.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.1.0...HEAD
+[2.1.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.0.1...app-v2.1.0
 [2.0.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.0.0...app-v2.0.1
 [2.0.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.9.0...app-v2.0.0
 [1.9.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.9...app-v1.9.0
