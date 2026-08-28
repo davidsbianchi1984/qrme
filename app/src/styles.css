@@ -2146,6 +2146,33 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 }
 .rs-avring img { width: 100%; height: 100%; object-fit: cover; }
 .chat-head-ring { position: static; flex: 0 0 auto; }
+/* The twin circles on a profile seat: "an entire profile photo circle,
+   but for avatar" — two whole 72px faces side by side, the portrait and
+   the figure, each its own door. The avatar's wears the accent ring so
+   the two read as different doors, not a double exposure. */
+.rs-pair {
+  display: flex; gap: 8px; align-items: center; justify-content: center;
+  max-width: 100%;
+}
+.rs-circle-btn {
+  background: none; border: none; padding: 0; cursor: pointer;
+  border-radius: 50%; display: block; flex: 0 1 72px; min-width: 0;
+}
+/* The tile floor is 128px and two full 72px circles want 154px, so on the
+   narrowest phones both shrink together — still whole circles, never one
+   circle and a crumb. */
+.rs-pair .rs-photo { width: 100%; height: auto; aspect-ratio: 1 / 1; }
+.rs-avatar2 { border: 2px solid var(--accent, #7b7bff); }
+/* The portrait taken to the screen — the photo big and nothing else,
+   under the stage (z-59 beneath its 60) so opening the avatar from a
+   seat never fights the lightbox for the front. */
+.face-light {
+  position: fixed; inset: 0; z-index: 59; background: rgba(5,7,15,0.92);
+  display: flex; align-items: center; justify-content: center;
+}
+.face-light img {
+  max-width: 92vw; max-height: 92vh; border-radius: 12px;
+}
 /* The wardrobe card: sized like a card, scrolls inside itself, never
    hands the wheel to the face behind it. */
 .wardrobe {

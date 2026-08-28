@@ -299,6 +299,10 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // are talking to alike; whether ITS wardrobe opens for you is the
   // profile's own guest_styling switch, read by the stage itself.
   const [staged, setStaged] = useState<string | null>(null);
+  // The portrait taken to the screen — the OTHER circle of the pair.
+  // "You click to just see the profile photo": no rail, no wardrobe,
+  // just the picture big, and a tap anywhere puts it back.
+  const [shown, setShown] = useState<string | null>(null);
   // Which of the device's cameras. "user" is the selfie side; flipping asks
   // for the other and the effect below re-acquires the stream.
   const [facing, setFacing] = useState<"user" | "environment">("user");
@@ -2498,13 +2502,40 @@ export function Inside({ onPlans, start = "", onLeave }: {
                   </>
                 ) : s.kind !== "user" && aiFaces[s.id]?.asset
                     && !aiFaces[s.id]?.placeholder ? (
-                  // The profile's own portrait, in the same circle a person's
-                  // photo uses. The AI mark on this tile is the disclosure the
-                  // avatar route insists travels with the picture.
-                  <img className="rs-photo" alt={s.display}
-                       src={(aiFaces[s.id].asset as string).startsWith("http")
-                              ? (aiFaces[s.id].asset as string)
-                              : getBase() + aiFaces[s.id].asset} />
+                  // Two whole circles, not a circle and a badge — the
+                  // field correction that shaped this: "an entire profile
+                  // photo circle, but for avatar." The first is the
+                  // portrait and tapping it shows the picture big; the
+                  // second is the avatar's figure and tapping it opens
+                  // the full-screen stage, wardrobe rail and all.
+                  <div className="rs-pair">
+                    <button className="rs-circle-btn" type="button"
+                            aria-label={s.display}
+                            onClick={(e) => { e.stopPropagation();
+                              setShown((aiFaces[s.id].asset as string)
+                                .startsWith("http")
+                                ? (aiFaces[s.id].asset as string)
+                                : getBase() + aiFaces[s.id].asset); }}>
+                      <img className="rs-photo" alt={s.display}
+                           src={(aiFaces[s.id].asset as string)
+                                  .startsWith("http")
+                                  ? (aiFaces[s.id].asset as string)
+                                  : getBase() + aiFaces[s.id].asset} />
+                    </button>
+                    <button className="rs-circle-btn" type="button"
+                            aria-label={tr("stage.open", lang)}
+                            title={tr("stage.open", lang)}
+                            onClick={(e) => { e.stopPropagation();
+                                              setStaged(s.id); }}>
+                      <img className="rs-photo rs-avatar2" alt=""
+                           src={(() => {
+                             const art = aiFaces[s.id].torso
+                               || aiFaces[s.id].asset as string;
+                             return art.startsWith("http")
+                               ? art : getBase() + art;
+                           })()} />
+                    </button>
+                  </div>
                 ) : behind ? (
                   // A chosen background with nothing standing in front of
                   // it IS the seat's face. The silhouette circle used to
@@ -2526,13 +2557,16 @@ export function Inside({ onPlans, start = "", onLeave }: {
                   </span>
                 )}
                 <span className="rs-name">{s.display}</span>
-                {/* The second ring: the seat's avatar beside the seat's
-                    face. A profile seat's ring renders that profile; your
-                    own seat's ring renders YOUR profile's avatar. Tapping
-                    it takes the screen — the same takeover an uploaded
-                    background gets — with the wardrobe rail down the
-                    edge. */}
-                {(s.kind !== "user" || (isMe && !!session.profileId)) && (
+                {/* The avatar's door on the seats the pair cannot reach.
+                    A profile seat with a portrait draws the twin circles
+                    above and needs no badge — "no clear circles... I
+                    meant an entire profile photo circle, but for avatar."
+                    This small ring stays only where the frame is already
+                    spoken for: your own seat (camera, photo, silhouette)
+                    and a profile seat still waiting on its portrait. */}
+                {(s.kind !== "user"
+                    ? !(aiFaces[s.id]?.asset && !aiFaces[s.id]?.placeholder)
+                    : isMe && !!session.profileId) && (
                   <button className="rs-avring" type="button"
                           aria-label={tr("stage.open", lang)}
                           title={tr("stage.open", lang)}
@@ -3124,6 +3158,19 @@ export function Inside({ onPlans, start = "", onLeave }: {
             if (staged === session.profileId) setMyFace(a);
           }}
           onError={setError} />
+      )}
+      {/* The portrait, big. The first circle of the pair opens this —
+          the photo and nothing else, closed by a tap anywhere on it. */}
+      {shown && (
+        <div className="face-light" role="dialog" aria-modal="true"
+             onClick={() => setShown(null)}>
+          <img src={shown} alt="" />
+          <button className="stage-close" type="button"
+                  aria-label={tr("stage.close", lang)}
+                  onClick={() => setShown(null)}>
+            ✕
+          </button>
+        </div>
       )}
     </div>
   );
