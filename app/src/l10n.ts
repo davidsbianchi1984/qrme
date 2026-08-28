@@ -552,7 +552,7 @@ const CHROME: Table = {
     en: "Pick a stage, a door, and tilt the three axes — the rest is raised, not written.", es: "Elige una etapa, una puerta e inclina los tres ejes — el resto se cría, no se escribe.", fr: "Choisissez une étape, une porte, inclinez les trois axes — le reste s'élève, ne s'écrit pas.", de: "Wähle Stufe und Tür, neige die drei Achsen — der Rest wird großgezogen, nicht geschrieben.", pt: "Escolha uma fase, uma porta e incline os três eixos — o resto cria-se, não se escreve.", it: "Scegli una fase, una porta e inclina i tre assi — il resto si cresce, non si scrive.", ja: "段階と扉を選び、3つの軸を傾ける — あとは書くのではなく、育てるもの。", zh: "选一个阶段、一扇门，拨动三条轴——其余靠养育，而非书写。", hi: "अवस्था और द्वार चुनें, तीन अक्ष झुकाएँ — बाक़ी पाला जाता है, लिखा नहीं।", ar: "اختر مرحلة وبابًا وأمِل المحاور الثلاثة — والباقي يُربّى ولا يُكتب.",
   },
   "raise.name.ph": {
-    en: "Their name", es: "Su nombre", fr: "Leur nom", de: "Ihr Name", pt: "O nome deles", it: "Il loro nome", ja: "名前", zh: "名字", hi: "उनका नाम", ar: "اسمهم",
+    en: "Their name", es: "Su nombre", fr: "Leur nom", de: "Der Name", pt: "O nome deles", it: "Il loro nome", ja: "名前", zh: "名字", hi: "उनका नाम", ar: "اسمهم",
   },
   "raise.stage": {
     en: "The life stage they start at", es: "La etapa de vida en la que empiezan", fr: "L'étape de vie où ils commencent", de: "Die Lebensstufe, in der sie beginnen", pt: "A fase de vida em que começam", it: "La fase di vita in cui iniziano", ja: "始まりのライフステージ", zh: "起始的生命阶段", hi: "आरंभ की जीवन-अवस्था", ar: "مرحلة الحياة التي يبدؤون عندها",
@@ -576,7 +576,7 @@ const CHROME: Table = {
     en: "I accept the Terms", es: "Acepto los Términos", fr: "J'accepte les Conditions", de: "Ich akzeptiere die Bedingungen", pt: "Aceito os Termos", it: "Accetto i Termini", ja: "利用規約に同意します", zh: "我接受条款", hi: "मैं शर्तें स्वीकार करता/करती हूँ", ar: "أقبل الشروط",
   },
   "raise.begin.go": {
-    en: "Begin", es: "Comenzar", fr: "Commencer", de: "Beginnen", pt: "Começar", it: "Comincia", ja: "始める", zh: "开始", hi: "शुरू करें", ar: "ابدأ",
+    en: "Begin the life", es: "Comenzar la vida", fr: "Commencer la vie", de: "Das Leben beginnen", pt: "Começar a vida", it: "Comincia la vita", ja: "命を始める", zh: "开始这段生命", hi: "जीवन शुरू करें", ar: "ابدأ الحياة",
   },
   "nav.solitude": {
     en: "My Attention", es: "Mi atención", fr: "Mon attention", de: "Meine Aufmerksamkeit", pt: "A minha atenção", it: "La mia attenzione", ja: "マイアテンション", zh: "我的注意力", hi: "मेरा ध्यान", ar: "انتباهي",
