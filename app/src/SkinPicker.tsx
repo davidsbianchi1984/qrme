@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { api, getBase, type Avatar, type RegistryRow } from "./api";
+import { api, getBase, getSignupKey, type Avatar,
+         type RegistryRow } from "./api";
 import { AvatarStage } from "./AvatarStage";
 import { fill, t as tr, visitorLang } from "./l10n";
 import { SkinTiles, type SkinSource } from "./SkinTiles";
@@ -107,6 +108,27 @@ export function SkinPicker({ profileId, token, onError, onChanged }: {
       {/* The default faces, first: most people pick, few import. */}
       <div className="tile-label">{tr("idn.deck.defaults", lang)}</div>
       <p className="muted small">{tr("idn.deck.defaults.sub", lang)}</p>
+      {/* The operator's one-button fill, only where the operator's key
+          is held. It answers honestly: the provider has not opened its
+          avatars API yet, and the sentence says so instead of failing
+          mutely — the day the door opens, this button stocks the shelf. */}
+      {getSignupKey() && (
+        <button className="chip" disabled={busy}
+                onClick={async () => {
+                  setBusy(true); setNote("");
+                  try {
+                    const got = await api.pullShelf();
+                    setNote(got.note === "provider_door_closed"
+                      ? tr("idn.deck.pull.closed", lang)
+                      : tr("idn.deck.done", lang));
+                    const r = await api.avatarShelf();
+                    setShelfRows(r.shelf);
+                  } catch (e) { onError(e); }
+                  finally { setBusy(false); }
+                }}>
+          {tr("idn.deck.pull", lang)}
+        </button>
+      )}
       {shelfRows.length === 0 ? (
         <p className="muted small">{tr("idn.deck.defaults.none", lang)}</p>
       ) : (

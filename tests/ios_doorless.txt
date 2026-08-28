@@ -39,3 +39,12 @@ POST /accounts/{account_id}/avatars
 POST /profiles/{profile_id}/avatar/claim
 POST /profiles/{profile_id}/avatar/painted
 DELETE /avatars/registry/{registry_id}
+# GET /rooms/xr-platforms — the XR shelf is a discovery card the desktop
+# Rooms screen draws; the shells ARE two of the platforms it lists, so a
+# phone reading its own row adds nothing yet. Reachable when the native
+# rooms screens grow the card.
+GET /rooms/xr-platforms
+# POST /avatars/library/pull — the operator's one-button shelf fill; an
+# operator holds the signup key at a desk, not on a phone. Console-only,
+# like the library stock door above it.
+POST /avatars/library/pull

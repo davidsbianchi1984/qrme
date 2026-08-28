@@ -2819,6 +2819,17 @@ _PUBLIC.update(_PRIVILEGE_SENTENCES)
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    "only elevenlabs is wired for pulling": {
+        'es': "solo elevenlabs está conectado para el llenado automático",
+        'fr': "seul elevenlabs est branché pour le remplissage automatique",
+        'de': "nur elevenlabs ist für das automatische Befüllen angebunden",
+        'pt': "só o elevenlabs está ligado para o preenchimento automático",
+        'it': "solo elevenlabs è collegato per il riempimento automatico",
+        'ja': "自動取り込みに接続されているのはelevenlabsだけです",
+        'zh': "只有 elevenlabs 接入了自动拉取",
+        'hi': "स्वचालित खिंचाव के लिए केवल elevenlabs जुड़ा है",
+        'ar': "elevenlabs وحده موصول للسحب التلقائي",
+    },
     "a pane with no faces is the helper button on its own — set the state to 'handle' instead": {
         'es': "un panel sin caras es el botón de ayuda a solas: pon el estado en 'handle'",
         'fr': "un panneau sans visages n'est que le bouton d'assistance : mettez plutôt l'état à 'handle'",

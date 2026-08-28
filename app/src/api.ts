@@ -4931,6 +4931,18 @@ export const api = {
   // The XR shelf: every headset that can stand in the rooms, and how.
   xrPlatforms: () =>
     req<{ xr_platforms: XrPlatform[] }>("/rooms/xr-platforms"),
+  // The operator's one-button shelf fill: tries the provider's catalog
+  // under the deployment key. `note` is a machine word — "stocked", or
+  // "provider_door_closed" while the provider has no listing API — so
+  // the screen translates the truth instead of parsing a sentence.
+  pullShelf: async (provider = "elevenlabs") => {
+    const res = await fetch(getBase()
+        + `/avatars/library/pull?provider=${encodeURIComponent(provider)}`,
+      { method: "POST", headers: { "x-signup-key": getSignupKey() } });
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || res.statusText);
+    return JSON.parse(text) as { pulled: number; note: string };
+  },
   myShelf: (accountId: string, token: string) =>
     req<{ shelf: RegistryRow[] }>(`/accounts/${accountId}/avatars`, { token }),
   stockMyShelf: async (accountId: string, token: string, file: File,

@@ -1003,6 +1003,25 @@ LESSONS: tuple[dict, ...] = (
               "again does not spend it.",
          screens=(156,),
          try_it="Open Identity and look at the 'not withheld' column."),
+    dict(key="avatarstage", chapter="Being yourself",
+         title="The avatar takes the screen",
+         what="Beside every portrait — a room seat, your own seat, a "
+              "chat's header — sits a second ring bound to the avatar. Tap "
+              "it and the render takes the whole screen, standing figure "
+              "first, with a rail of round buttons down the edge: the "
+              "prompt bar, the wardrobe, physique and gender, and the "
+              "wheel that opens everything. Say what changes or tap a "
+              "starting chip; every look is painted at the profile's own "
+              "age with the AI mark burned in, through the platform's one "
+              "painting door. By default the people a profile talks with "
+              "may restyle it too — the owner's switch inside the wardrobe "
+              "closes that — and a real person's face is never painted "
+              "from words at all: it arrives by photograph under a "
+              "recorded grant. The deck also opens on the deployment's "
+              "default faces — tap one to wear it.",
+         screens=(205,),
+         try_it="Tap the avatar ring beside any portrait, then the "
+                "clothes-hanger button."),
     dict(key="presence", chapter="Being yourself",
          title="Where it is seen",
          what="Three different audiences, and they are not the same. Your own "
