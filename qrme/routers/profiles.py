@@ -55,6 +55,12 @@ def create_profile(body: ProfileCreate) -> dict:
         raise HTTPException(
             422, "hybrid profiles are created via POST /profiles/composite, "
                  "from at least two source profiles")
+    if body.kind == "raised":
+        # A raised life needs a stage, a preset and a guardian from birth —
+        # its own door records all three and writes the Album's first entry.
+        raise HTTPException(
+            422, "raised characters are created via POST /raise, with a "
+                 "stage, a preset and a temperament seed")
     owner_age = age_of(body.verification.birthdate)
     if owner_age < 18 and not body.verification.guardian_consent:
         raise HTTPException(403, "owners under 18 require parent/guardian consent")

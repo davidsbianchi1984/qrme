@@ -174,6 +174,15 @@ def build_system_prompt(
         if blend:
             parts.append(blend)
 
+    # A raised character carries its stage, its temperament seed and the
+    # WHOLE of what it has been taught — docs/raise.md: "what you teach
+    # it, it knows"; what nobody taught, it honestly does not.
+    if kind == "raised":
+        from . import raising
+        grown = raising.prompt_block(profile["id"])
+        if grown:
+            parts.append(grown)
+
     # The persona speaks its owner-set language everywhere: every surface
     # that builds a system prompt through here inherits the directive.
     from . import i18n

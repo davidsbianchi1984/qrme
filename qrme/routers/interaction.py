@@ -335,6 +335,15 @@ def set_relationship(profile_id: str, interactor_id: str,
     profile_or_404(profile_id)
     require_owner(profile_id, request)
     interactor_or_404(interactor_id)
+    # The law (docs/raise.md): romantic roles exist ONLY for raised
+    # characters STARTED at an adult stage. "A character raised from a
+    # child stage is family forever — that door never converts."
+    if body.relationship_type == "romantic_partner":
+        from .. import raising
+        if not raising.may_be_romantic(profile_id):
+            raise HTTPException(403, i18n.raised(RuntimeError(
+                "a character raised from a childhood is family forever "
+                "— that door never converts")))
     conn = db.connect()
     conn.execute(
         "INSERT INTO relationships (id, profile_id, interactor_id,"
@@ -747,6 +756,12 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
                       relationship,
                       engagement.get(profile_id, body.interactor_id),
                       biometrics=body.biometrics)
+
+    # A turn together IS the raising — docs/raise.md: milestones accrue
+    # from showing up, and stage doors are earned, never aged into. A
+    # no-op for the three ordinary kinds.
+    from .. import raising
+    raising.turn_taken(profile_id)
 
     # True only when the vault actually ranked the pair's seals and
     # answered from them — said, never assumed.

@@ -141,6 +141,15 @@ DOORS: tuple[Door, ...] = (
     Door("Rooms", "Rooms tab",
          "shared places — flat, AR and VR rooms",
          ("room", "meet in", "shared space", "vr", "ar")),
+    Door("Raise", "the Raise tab",
+         "growing your own: a raised character started from a temperament "
+         "seed and a stage, taught word by word, its stage doors earned "
+         "and its whole life kept in an append-only Album — presets as "
+         "reopenable switch bundles, and the law that a childhood is "
+         "family forever",
+         ("raise", "grow your own", "raise a character", "teach them",
+          "the album", "life stages", "tamagotchi", "raise a child",
+          "watch them grow")),
     Door("Inside", "the Room screen",
          "inside a room — the camera, the microphone, what is shared "
          "between the people in it (pictures and screenshots are read by "

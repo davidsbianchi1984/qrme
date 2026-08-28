@@ -27,6 +27,7 @@ from . import terms as terms_mod
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
 from .routers import studio
+from .routers import raising as raising_routes
 from .routers import (accounts as account_routes,
                       attention as attention_routes,
                       solitude as solitude_routes,
@@ -200,6 +201,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(organization_routes.router)
     app.include_router(watch.router)
     app.include_router(xr_routes.router)
+    app.include_router(raising_routes.router)
     app.include_router(watermarks.router)
     app.include_router(avatars.router)
     app.include_router(steering.router)

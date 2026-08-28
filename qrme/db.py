@@ -1651,6 +1651,35 @@ CREATE TABLE IF NOT EXISTS post_videos (
     created_at TEXT NOT NULL
 );
 
+-- Raise (docs/raise.md): the fourth kind's own tables. The character
+-- row is derived state — stage, counters, switches — beside an
+-- APPEND-ONLY growth record: rows in growth_record are written and
+-- never updated or deleted, which is what makes the Album a life and
+-- not a document. "The original life is never overwritten."
+CREATE TABLE IF NOT EXISTS raised_characters (
+    profile_id         TEXT PRIMARY KEY REFERENCES profiles(id),
+    guardian_id        TEXT NOT NULL,   -- the interactor raising them
+    stage              TEXT NOT NULL,   -- embryo|child|adolescent|young_adult|adult
+    started_stage      TEXT NOT NULL,   -- where the guardian ENTERED the timeline
+    preset             TEXT NOT NULL,   -- the door chosen at creation
+    switches           TEXT NOT NULL,   -- the bundle, reopenable
+    temperament        TEXT NOT NULL,   -- the seed the raising drifts
+    growth_points      INTEGER NOT NULL DEFAULT 0,
+    turns_together     INTEGER NOT NULL DEFAULT 0,
+    words_taught       INTEGER NOT NULL DEFAULT 0,
+    lessons_passed     INTEGER NOT NULL DEFAULT 0,
+    questions_answered INTEGER NOT NULL DEFAULT 0,
+    created_at         TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS growth_record (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    kind       TEXT NOT NULL,   -- began|word|lesson|answer|stage_door|switch
+    note       TEXT NOT NULL,
+    at         TEXT NOT NULL
+);
+
 -- A viewing: what the platform's own eyes and ears made of one recording
 -- (qrme/watching.py). `subject` is the direct URL or media id watched;
 -- one row per subject, because a room of eight profiles must not watch

@@ -49,6 +49,7 @@ import { Voice } from "./screens/Voice";
 import { Wall } from "./screens/Wall";
 import { Feed } from "./screens/Feed";
 import { Friends } from "./screens/Friends";
+import { Raise } from "./screens/Raise";
 import { Rooms } from "./screens/Rooms";
 import { Blend } from "./screens/Blend";
 import { Solitude } from "./screens/Solitude";
@@ -75,7 +76,7 @@ import { WatchLights } from "./WatchLights";
 // `profile` is deliberately not in NAV: somebody else's homepage is a place
 // you are taken to by pressing their face, not a standing destination — the
 // same reason `passing` is reachable and unlisted.
-type Tab = "profile" | "home" | "circle" | "agent" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "allowed" | "stranger" | "themark" | "inwords" | "remainder" | "plugins" | "named" | "passing" | "robots" | "placements" | "plans" | "access" | "matters" | "settings";
+type Tab = "profile" | "home" | "circle" | "agent" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "raise" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "allowed" | "stranger" | "themark" | "inwords" | "remainder" | "plugins" | "named" | "passing" | "robots" | "placements" | "plans" | "access" | "matters" | "settings";
 
 // `art` is the one tab whose mark is a picture rather than a glyph. Kept as a
 // second, optional field rather than widening `icon` to a node: the nav guards
@@ -98,6 +99,7 @@ const NAV: { id: Tab; label: string; icon: string; art?: string;
   { id: "blend", label: "Blend", icon: "🫱🏽‍🫲🏻", group: "create" },
   { id: "solitude", label: "My Attention", icon: "🪞", group: "profile" },
   { id: "simulate", label: "What If", icon: "🔮", group: "create" },
+  { id: "raise", label: "Raise", icon: "🌱", group: "create" },
   { id: "campaigns", label: "Campaigns", icon: "🎗", group: "business" },
   { id: "org", label: "Org", icon: "🏛", group: "business" },
   { id: "relationships", label: "Relationships", icon: "👥", group: "profile" },
@@ -375,6 +377,7 @@ export function App() {
         {tab === "feed" && <Feed onPlans={() => setTab("plans")}
           onParty={(id) => { setOpenParty(id); setTab("party"); }} />}
         {tab === "friends" && <Friends onPlans={toPlans} onVisit={visitProfile} />}
+        {tab === "raise" && <Raise onPlans={toPlans} />}
         {tab === "rooms" && <Rooms onPlans={toPlans} onInside={(id) => { primeMic(); setInsideRoom(id); setTab("inside"); }} />}
         {tab === "blend" && <Blend onPlans={toPlans} />}
         {tab === "solitude" && <Solitude />}

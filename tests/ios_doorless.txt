@@ -58,3 +58,17 @@ POST /avatars/library/pull
 # was written to catch. The row leaves this backlog when the shell grows
 # the panel.
 POST /watch-parties/{party_id}/watch
+
+# The Raise doors (docs/raise.md, round one). The web console holds all
+# six on the Raise tab — creation, the character, the Album, the teach
+# box, the switches. This shell has no Raise surface yet, and bindings
+# with no screen to live on are the exact failure
+# unused_native_bindings.txt was written to catch. The rows leave this
+# backlog when the shell grows the tab (build-order step 7 is "three
+# shells").
+GET /raise/doors
+POST /raise
+GET /raise/{profile_id}
+GET /raise/{profile_id}/album
+POST /raise/{profile_id}/teach
+PATCH /raise/{profile_id}/switches

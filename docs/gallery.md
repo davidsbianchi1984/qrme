@@ -603,6 +603,7 @@ is exactly how the old card came to be showing yours in place of theirs.
   </tr>
   <tr>
     <td align="center" width="25%"><a href="screens/205-avatar-stage.svg"><img src="screens/205-avatar-stage.svg" width="210" alt="Avatar stage"></a><br><sub><b>205</b> · Avatar stage · the avatar takes the screen, wardrobe on the rail</sub></td>
+    <td align="center" width="25%"><a href="screens/206-raise.svg"><img src="screens/206-raise.svg" width="210" alt="Raise"></a><br><sub><b>206</b> · Raise · grow your own — stages earned, the Album written and never edited</sub></td>
   </tr>
 </table>
 

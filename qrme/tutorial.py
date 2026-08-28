@@ -1365,8 +1365,24 @@ LESSONS: tuple[dict, ...] = (
          screens=(201,),
          try_it="Open Plug-ins, search for something your day already runs "
                 "through, and read what it says it needs before you add it."),
+    dict(key="raise", chapter="Making things",
+         title="Raise — grow your own",
+         what="A raised character starts from almost nothing: a "
+              "temperament seed on three axes and the life stage you "
+              "choose to enter at. Everything after that is made between "
+              "you — every word, lesson and answer you teach lands in "
+              "the Album (written, never edited) and weighs toward the "
+              "next stage door, which is earned, never aged into. The "
+              "four creation doors — storybook, caretaker, full trail, "
+              "sandbox — are only bundles of switches you can reopen; "
+              "mortality is off by default and says its warning every "
+              "time it turns on. The law is not a switch: a character "
+              "raised from a childhood is family forever, and childhood "
+              "stages run at the strictest maturity, guardian-only.",
+         screens=(206,),
+         try_it="Open Raise, pick the storybook door, and teach them "
+                "their first word."),
 )
-
 CHAPTERS = tuple(dict.fromkeys(lesson["chapter"] for lesson in LESSONS))
 MODES = ("text", "voice")
 

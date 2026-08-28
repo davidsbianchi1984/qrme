@@ -1894,6 +1894,30 @@ export type XrPlatform = {
   signin: string;
 };
 
+// ---------------------------------------------------------------------
+// Raise — grow your own (docs/raise.md). Fresh wire vocabulary: stage,
+// preset, temperament, milestones — no collisions with the profile door.
+// ---------------------------------------------------------------------
+export type RaiseDoors = {
+  stages: string[];
+  presets: Record<string, Record<string, unknown>>;
+  temperament_axes: string[];
+  mortality_warning: string;
+};
+export type RaisedCharacter = {
+  profile_id: string; guardian_id: string;
+  stage: string; started_stage: string; preset: string;
+  switches: Record<string, unknown>;
+  temperament: Record<string, number>;
+  growth_points: number;
+  milestones: { turns_together: number; words_taught: number;
+                lessons_passed: number; questions_answered: number };
+  next_stage: string | null; next_stage_at: number | null;
+  created_at: string;
+};
+export type GrowthEntry = { id: string; kind: string; note: string;
+                            at: string };
+
 /** What sunsetting did. `archive_key` is non-null only where a vault holds it. */
 export type Sunset = {
   status: string; farewells: number; memory: string;
@@ -4953,6 +4977,32 @@ export const api = {
   // The XR shelf: every headset that can stand in the rooms, and how.
   xrPlatforms: () =>
     req<{ xr_platforms: XrPlatform[] }>("/rooms/xr-platforms"),
+  /** Raise — the fourth kind's own doors. */
+  raiseDoors: () => req<RaiseDoors>("/raise/doors"),
+  raiseBegin: (body: { owner_id: string; display_name: string;
+                       stage: string; preset: string;
+                       temperament: Record<string, number>;
+                       verification: { birthdate: string;
+                                       guardian_consent?: boolean };
+                       terms_consent: boolean; language?: string }) =>
+    req<{ profile_id: string; owner_token: string; display_name: string;
+          kind: string; character: RaisedCharacter }>(
+      "/raise", { method: "POST", body }),
+  raiseCharacter: (profileId: string, token: string) =>
+    req<RaisedCharacter>(`/raise/${profileId}`, { token }),
+  raiseAlbum: (profileId: string, token: string) =>
+    req<{ profile_id: string; entries: GrowthEntry[] }>(
+      `/raise/${profileId}/album`, { token }),
+  raiseTeach: (profileId: string,
+               body: { teaching: string; what: string }, token: string) =>
+    req<{ taught: GrowthEntry; stage_door: GrowthEntry | null;
+          character: RaisedCharacter }>(
+      `/raise/${profileId}/teach`, { method: "POST", body, token }),
+  raiseSwitches: (profileId: string, changes: Record<string, unknown>,
+                  token: string) =>
+    req<{ switches: Record<string, unknown>; warning: string | null }>(
+      `/raise/${profileId}/switches`,
+      { method: "PATCH", body: { changes }, token }),
   // The operator's one-button shelf fill: tries the provider's catalog
   // under the deployment key. `note` is a machine word — "stocked", or
   // "provider_door_closed" while the provider has no listing API — so

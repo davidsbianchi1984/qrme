@@ -7,7 +7,12 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-ProfileKind = Literal["self", "other_person", "fictional", "hybrid"]
+# "raised" is the fourth kind (docs/raise.md): a developmental
+# character grown through interaction. It has its OWN creation door
+# (POST /raise) — the ordinary profile door refuses it, because a
+# raised life needs a stage, a preset and a guardian from birth.
+ProfileKind = Literal["self", "other_person", "fictional", "hybrid",
+                      "raised"]
 InteractionScope = Literal["reactive", "proactive"]
 ModerationMode = Literal["auto", "manual"]
 RelationshipType = Literal[
@@ -31,6 +36,26 @@ class Verification(BaseModel):
 
     birthdate: date
     guardian_consent: bool = False
+
+
+class RaiseCreate(BaseModel):
+    """The fourth kind's own creation door (docs/raise.md). Fresh wire
+    vocabulary — stage, preset, temperament — no collisions with the
+    ordinary profile door, by the one-name-one-type guard from day one."""
+
+    owner_id: str
+    display_name: str
+    #: Where the guardian ENTERS the timeline — any stage.
+    stage: str = "child"
+    #: One of the four doors: storybook | caretaker | full_trail | sandbox.
+    #: Every one is only a bundle of switches, reopenable later.
+    preset: str = "storybook"
+    #: The seed the raising drifts: warm_reserved / bold_careful /
+    #: silly_serious, each -100..100. Absent axes start at 0.
+    temperament: dict[str, int] = Field(default_factory=dict)
+    verification: Verification
+    terms_consent: bool = False
+    language: str | None = None
 
 
 class Consent(BaseModel):

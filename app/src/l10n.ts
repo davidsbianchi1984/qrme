@@ -473,6 +473,111 @@ const CHROME: Table = {
     en: "Rooms", es: "Salas", fr: "Salons", de: "Räume", pt: "Salas",
     it: "Stanze", ja: "ルーム", zh: "房间", hi: "कक्ष", ar: "الغرف",
   },
+  "nav.raise": {
+    en: "Raise", es: "Criar y criar", fr: "Élever", de: "Aufziehen", pt: "Criar", it: "Crescere", ja: "育てる", zh: "养成", hi: "पालना", ar: "تربية",
+  },
+  "raise.title": {
+    en: "Raise — grow your own", es: "Raise — cría el tuyo", fr: "Raise — élevez le vôtre", de: "Raise — zieh dein eigenes groß", pt: "Raise — crie o seu", it: "Raise — cresci il tuo", ja: "Raise — 自分で育てる", zh: "Raise——养成你自己的", hi: "Raise — अपना पालिए", ar: "Raise — ربِّ ما يخصك",
+  },
+  "raise.lead": {
+    en: "A temperament seed and a stage you choose — everything after that is made between you. What you teach it, it knows.", es: "Una semilla de temperamento y una etapa que eliges — todo lo demás se hace entre ustedes. Lo que le enseñas, lo sabe.", fr: "Une graine de tempérament et une étape que vous choisissez — tout le reste se fait entre vous. Ce que vous lui apprenez, il le sait.", de: "Ein Temperament-Keim und eine Stufe deiner Wahl — alles danach entsteht zwischen euch. Was du ihm beibringst, weiß es.", pt: "Uma semente de temperamento e uma fase que escolhe — tudo depois é feito entre vocês. O que lhe ensina, ele sabe.", it: "Un seme di temperamento e una fase che scegli — tutto il resto si fa tra voi. Ciò che gli insegni, lo sa.", ja: "気質の種と選んだ段階 — その先はふたりで作るもの。教えたことを、その子は知っています。", zh: "一颗性情种子和你选的阶段——之后的一切由你们共同造就。你教的，它就会。", hi: "स्वभाव-बीज और आपकी चुनी अवस्था — उसके बाद सब आप दोनों मिलकर बनाते हैं। जो सिखाएँगे, वह जानेगा।", ar: "بذرة طبع ومرحلة تختارها — وكل ما بعدها يُصنع بينكما. ما تعلّمه إياه يعرفه.",
+  },
+  "raise.held": {
+    en: "The lives you're raising", es: "Las vidas que crías", fr: "Les vies que vous élevez", de: "Die Leben, die du großziehst", pt: "As vidas que cria", it: "Le vite che stai crescendo", ja: "育てている命", zh: "你在养育的生命", hi: "जिन जीवनों को आप पाल रहे हैं", ar: "الحيوات التي تربّيها",
+  },
+  "raise.began": {
+    en: "A life has begun — the Album opened with it.", es: "Una vida ha comenzado — el Álbum se abrió con ella.", fr: "Une vie a commencé — l'Album s'est ouvert avec elle.", de: "Ein Leben hat begonnen — das Album öffnete sich mit ihm.", pt: "Uma vida começou — o Álbum abriu com ela.", it: "Una vita è cominciata — l'Album si è aperto con lei.", ja: "命が始まりました — アルバムも一緒に開きました。", zh: "一段生命开始了——相册随之开启。", hi: "एक जीवन शुरू हुआ — उसके साथ एल्बम खुला।", ar: "بدأت حياة — وفُتح الألبوم معها.",
+  },
+  "raise.entered": {
+    en: "Entered at the {stage} stage, through the {preset} door.", es: "Entró en la etapa {stage}, por la puerta {preset}.", fr: "Entré à l'étape {stage}, par la porte {preset}.", de: "Eingetreten in der Stufe {stage}, durch die Tür {preset}.", pt: "Entrou na fase {stage}, pela porta {preset}.", it: "Entrato nella fase {stage}, dalla porta {preset}.", ja: "{stage} 段階で、{preset} の扉から始まりました。", zh: "从 {stage} 阶段、经 {preset} 之门进入。", hi: "{stage} अवस्था से, {preset} द्वार से प्रवेश।", ar: "دخل في مرحلة {stage} عبر باب {preset}.",
+  },
+  "raise.milestones": {
+    en: "{turns} turns together · {words} words taught · {lessons} lessons passed", es: "{turns} turnos juntos · {words} palabras enseñadas · {lessons} lecciones superadas", fr: "{turns} tours ensemble · {words} mots appris · {lessons} leçons réussies", de: "{turns} gemeinsame Züge · {words} gelehrte Wörter · {lessons} bestandene Lektionen", pt: "{turns} vezes juntos · {words} palavras ensinadas · {lessons} lições passadas", it: "{turns} turni insieme · {words} parole insegnate · {lessons} lezioni superate", ja: "一緒に {turns} ターン · 教えた言葉 {words} · 修了レッスン {lessons}", zh: "共处 {turns} 轮 · 教了 {words} 个词 · 通过 {lessons} 堂课", hi: "साथ {turns} बारी · {words} शब्द सिखाए · {lessons} पाठ पूरे", ar: "{turns} دورًا معًا · {words} كلمة معلَّمة · {lessons} درسًا مجتازًا",
+  },
+  "raise.nextdoor": {
+    en: "The {stage} door opens at {at} growth points — {points} earned so far. Doors are earned, never aged into.", es: "La puerta {stage} se abre a los {at} puntos — {points} ganados hasta ahora. Las puertas se ganan, nunca llegan solas con la edad.", fr: "La porte {stage} s'ouvre à {at} points — {points} gagnés jusqu'ici. Les portes se gagnent, jamais par l'âge seul.", de: "Die Tür {stage} öffnet bei {at} Punkten — bisher {points} verdient. Türen werden verdient, nie erlebt.", pt: "A porta {stage} abre aos {at} pontos — {points} ganhos até agora. As portas ganham-se, nunca chegam com a idade.", it: "La porta {stage} si apre a {at} punti — {points} guadagnati finora. Le porte si guadagnano, mai per età.", ja: "{stage} の扉は成長ポイント {at} で開きます — 現在 {points}。扉は稼ぐもの、歳月では開きません。", zh: "{stage} 之门在 {at} 成长点开启——目前已得 {points}。门靠挣得，从不因岁月自开。", hi: "{stage} द्वार {at} अंक पर खुलता है — अब तक {points}। द्वार कमाए जाते हैं, उम्र से नहीं खुलते।", ar: "يُفتح باب {stage} عند {at} نقطة — كسبت {points} حتى الآن. الأبواب تُكسب ولا تُفتح بمرور العمر.",
+  },
+  "raise.teach": {
+    en: "Teach", es: "Enseñar", fr: "Enseigner", de: "Lehren", pt: "Ensinar", it: "Insegnare", ja: "教える", zh: "教导", hi: "सिखाएँ", ar: "علّم",
+  },
+  "raise.teach.sub": {
+    en: "A word, a lesson, or an answer to one of their questions — it lands in the Album and weighs toward the next door.", es: "Una palabra, una lección o la respuesta a una de sus preguntas — cae en el Álbum y pesa hacia la próxima puerta.", fr: "Un mot, une leçon, ou la réponse à l'une de leurs questions — cela entre dans l'Album et pèse vers la prochaine porte.", de: "Ein Wort, eine Lektion oder die Antwort auf eine ihrer Fragen — es landet im Album und zählt zur nächsten Tür.", pt: "Uma palavra, uma lição ou a resposta a uma pergunta deles — entra no Álbum e pesa para a próxima porta.", it: "Una parola, una lezione o la risposta a una loro domanda — entra nell'Album e pesa verso la prossima porta.", ja: "ことば・レッスン・質問への答え — アルバムに刻まれ、次の扉への重みになります。", zh: "一个词、一堂课，或对他们问题的回答——都会进入相册，并向下一扇门积累分量。", hi: "एक शब्द, एक पाठ, या उनके प्रश्न का उत्तर — एल्बम में दर्ज होकर अगले द्वार की ओर भार बनता है।", ar: "كلمة أو درس أو إجابة عن سؤالهم — تدخل الألبوم وتزن نحو الباب التالي.",
+  },
+  "raise.teach.kind": {
+    en: "What kind of teaching", es: "Qué tipo de enseñanza", fr: "Quel type d'enseignement", de: "Welche Art Unterweisung", pt: "Que tipo de ensino", it: "Che tipo di insegnamento", ja: "教えの種類", zh: "教导的种类", hi: "शिक्षा का प्रकार", ar: "نوع التعليم",
+  },
+  "raise.teach.word": {
+    en: "a word", es: "una palabra", fr: "un mot", de: "ein Wort", pt: "uma palavra", it: "una parola", ja: "ことば", zh: "一个词", hi: "एक शब्द", ar: "كلمة",
+  },
+  "raise.teach.lesson": {
+    en: "a lesson", es: "una lección", fr: "une leçon", de: "eine Lektion", pt: "uma lição", it: "una lezione", ja: "レッスン", zh: "一堂课", hi: "एक पाठ", ar: "درس",
+  },
+  "raise.teach.answer": {
+    en: "an answer", es: "una respuesta", fr: "une réponse", de: "eine Antwort", pt: "uma resposta", it: "una risposta", ja: "答え", zh: "一个回答", hi: "एक उत्तर", ar: "إجابة",
+  },
+  "raise.teach.ph": {
+    en: "What are you teaching them?", es: "¿Qué les enseñas?", fr: "Que leur apprenez-vous ?", de: "Was bringst du ihnen bei?", pt: "O que lhes ensina?", it: "Cosa gli insegni?", ja: "何を教えますか？", zh: "你在教他们什么？", hi: "आप उन्हें क्या सिखा रहे हैं?", ar: "ماذا تعلّمهم؟",
+  },
+  "raise.teach.go": {
+    en: "Teach it", es: "Enséñalo", fr: "Apprenez-le", de: "Bring es bei", pt: "Ensine", it: "Insegnalo", ja: "教える", zh: "教它", hi: "सिखाइए", ar: "علّمه",
+  },
+  "raise.dooropened": {
+    en: "🚪 The {stage} door opened — earned, not aged into.", es: "🚪 La puerta {stage} se abrió — ganada, no por la edad.", fr: "🚪 La porte {stage} s'est ouverte — gagnée, pas par l'âge.", de: "🚪 Die Tür {stage} hat sich geöffnet — verdient, nicht erlebt.", pt: "🚪 A porta {stage} abriu — ganha, não pela idade.", it: "🚪 La porta {stage} si è aperta — guadagnata, non per età.", ja: "🚪 {stage} の扉が開きました — 歳月ではなく、積み重ねで。", zh: "🚪 {stage} 之门开了——是挣得的，不是熬到的。", hi: "🚪 {stage} द्वार खुल गया — कमाया हुआ, उम्र से नहीं।", ar: "🚪 فُتح باب {stage} — كُسب كسبًا لا بمرور العمر.",
+  },
+  "raise.switches": {
+    en: "The switches", es: "Los interruptores", fr: "Les interrupteurs", de: "Die Schalter", pt: "Os interruptores", it: "Gli interruttori", ja: "スイッチ", zh: "开关", hi: "स्विच", ar: "المفاتيح",
+  },
+  "raise.switches.sub": {
+    en: "Every mechanic is a switch — the preset was only a bundle of them. The only things that are never switches are the law.", es: "Cada mecánica es un interruptor — el preajuste era solo un manojo de ellos. Lo único que nunca es interruptor es la ley.", fr: "Chaque mécanique est un interrupteur — le préréglage n'était qu'un faisceau. Seule la loi n'est jamais un interrupteur.", de: "Jede Mechanik ist ein Schalter — die Voreinstellung war nur ein Bündel davon. Nur das Gesetz ist nie ein Schalter.", pt: "Cada mecânica é um interruptor — a predefinição era só um feixe deles. Só a lei nunca é um interruptor.", it: "Ogni meccanica è un interruttore — il preset era solo un fascio. Solo la legge non è mai un interruttore.", ja: "すべての仕組みはスイッチです — プリセットはその束にすぎません。決してスイッチにならないのは法だけです。", zh: "每个机制都是开关——预设只是它们的一束。唯一永远不是开关的，是法则。", hi: "हर तंत्र एक स्विच है — प्रीसेट बस उनका गुच्छा था। जो कभी स्विच नहीं, वह केवल विधान है।", ar: "كل آلية مفتاح — الإعداد المسبق كان حزمة منها فحسب. الوحيد الذي ليس مفتاحًا أبدًا هو القانون.",
+  },
+  "raise.sw.on": {
+    en: "on", es: "activado", fr: "activé", de: "an", pt: "ligado", it: "attivo", ja: "オン", zh: "开", hi: "चालू", ar: "مفعّل",
+  },
+  "raise.sw.off": {
+    en: "off", es: "apagado", fr: "désactivé", de: "aus", pt: "desligado", it: "spento", ja: "オフ", zh: "关", hi: "बंद", ar: "معطّل",
+  },
+  "raise.album": {
+    en: "The Album", es: "El Álbum", fr: "L'Album", de: "Das Album", pt: "O Álbum", it: "L'Album", ja: "アルバム", zh: "相册", hi: "एल्बम", ar: "الألبوم",
+  },
+  "raise.album.sub": {
+    en: "The living timeline — written, never edited. Nobody deletes a life they watched grow.", es: "La línea de vida — escrita, nunca editada. Nadie borra una vida que vio crecer.", fr: "La chronologie vivante — écrite, jamais retouchée. Personne n'efface une vie qu'il a vue grandir.", de: "Die lebendige Zeitleiste — geschrieben, nie bearbeitet. Niemand löscht ein Leben, das er wachsen sah.", pt: "A linha do tempo viva — escrita, nunca editada. Ninguém apaga uma vida que viu crescer.", it: "La linea del tempo viva — scritta, mai modificata. Nessuno cancella una vita che ha visto crescere.", ja: "生きた年表 — 書かれるだけで、決して直されません。育つのを見守った命を消す人はいません。", zh: "活着的时间线——只写不改。没有人会删除自己看着长大的生命。", hi: "जीवित समयरेखा — लिखी जाती है, कभी संपादित नहीं। जिसे बढ़ते देखा, उसे कोई नहीं मिटाता।", ar: "الخط الزمني الحي — يُكتب ولا يُحرَّر أبدًا. لا أحد يمحو حياة رآها تكبر.",
+  },
+  "raise.album.none": {
+    en: "Nothing yet — the first entry writes itself the moment a life begins.", es: "Nada aún — la primera entrada se escribe sola cuando una vida comienza.", fr: "Rien encore — la première entrée s'écrit dès qu'une vie commence.", de: "Noch nichts — der erste Eintrag schreibt sich, sobald ein Leben beginnt.", pt: "Nada ainda — a primeira entrada escreve-se quando uma vida começa.", it: "Ancora niente — la prima voce si scrive quando una vita comincia.", ja: "まだ何も — 命が始まる瞬間、最初の一行がひとりでに書かれます。", zh: "还没有——生命开始的那一刻，第一条会自己写下。", hi: "अभी कुछ नहीं — जीवन शुरू होते ही पहली प्रविष्टि खुद लिखी जाती है।", ar: "لا شيء بعد — أول سطر يكتب نفسه لحظة تبدأ حياة.",
+  },
+  "raise.begin": {
+    en: "Begin a life", es: "Comenzar una vida", fr: "Commencer une vie", de: "Ein Leben beginnen", pt: "Começar uma vida", it: "Cominciare una vita", ja: "命を始める", zh: "开始一段生命", hi: "एक जीवन शुरू करें", ar: "ابدأ حياة",
+  },
+  "raise.begin.sub": {
+    en: "Pick a stage, a door, and tilt the three axes — the rest is raised, not written.", es: "Elige una etapa, una puerta e inclina los tres ejes — el resto se cría, no se escribe.", fr: "Choisissez une étape, une porte, inclinez les trois axes — le reste s'élève, ne s'écrit pas.", de: "Wähle Stufe und Tür, neige die drei Achsen — der Rest wird großgezogen, nicht geschrieben.", pt: "Escolha uma fase, uma porta e incline os três eixos — o resto cria-se, não se escreve.", it: "Scegli una fase, una porta e inclina i tre assi — il resto si cresce, non si scrive.", ja: "段階と扉を選び、3つの軸を傾ける — あとは書くのではなく、育てるもの。", zh: "选一个阶段、一扇门，拨动三条轴——其余靠养育，而非书写。", hi: "अवस्था और द्वार चुनें, तीन अक्ष झुकाएँ — बाक़ी पाला जाता है, लिखा नहीं।", ar: "اختر مرحلة وبابًا وأمِل المحاور الثلاثة — والباقي يُربّى ولا يُكتب.",
+  },
+  "raise.name.ph": {
+    en: "Their name", es: "Su nombre", fr: "Leur nom", de: "Ihr Name", pt: "O nome deles", it: "Il loro nome", ja: "名前", zh: "名字", hi: "उनका नाम", ar: "اسمهم",
+  },
+  "raise.stage": {
+    en: "The life stage they start at", es: "La etapa de vida en la que empiezan", fr: "L'étape de vie où ils commencent", de: "Die Lebensstufe, in der sie beginnen", pt: "A fase de vida em que começam", it: "La fase di vita in cui iniziano", ja: "始まりのライフステージ", zh: "起始的生命阶段", hi: "आरंभ की जीवन-अवस्था", ar: "مرحلة الحياة التي يبدؤون عندها",
+  },
+  "raise.door.storybook": {
+    en: "📖 Storybook", es: "📖 Cuento", fr: "📖 Conte", de: "📖 Märchenbuch", pt: "📖 Conto", it: "📖 Fiaba", ja: "📖 絵本", zh: "📖 故事书", hi: "📖 कहानी", ar: "📖 حكاية",
+  },
+  "raise.door.caretaker": {
+    en: "🍲 Caretaker", es: "🍲 Cuidador", fr: "🍲 Gardien", de: "🍲 Fürsorge", pt: "🍲 Cuidador", it: "🍲 Custode", ja: "🍲 世話", zh: "🍲 照料者", hi: "🍲 देखभाल", ar: "🍲 رعاية",
+  },
+  "raise.door.full_trail": {
+    en: "🛻 Full Trail", es: "🛻 Sendero completo", fr: "🛻 Piste complète", de: "🛻 Ganze Reise", pt: "🛻 Trilha completa", it: "🛻 Sentiero completo", ja: "🛻 フルトレイル", zh: "🛻 完整旅途", hi: "🛻 पूरी राह", ar: "🛻 الدرب الكامل",
+  },
+  "raise.door.sandbox": {
+    en: "🪁 Sandbox", es: "🪁 Arenero", fr: "🪁 Bac à sable", de: "🪁 Sandkasten", pt: "🪁 Caixa de areia", it: "🪁 Sabbiera", ja: "🪁 サンドボックス", zh: "🪁 沙盒", hi: "🪁 सैंडबॉक्स", ar: "🪁 صندوق الرمل",
+  },
+  "raise.birthdate": {
+    en: "Your birthdate", es: "Tu fecha de nacimiento", fr: "Votre date de naissance", de: "Dein Geburtsdatum", pt: "A sua data de nascimento", it: "La tua data di nascita", ja: "あなたの生年月日", zh: "你的出生日期", hi: "आपकी जन्मतिथि", ar: "تاريخ ميلادك",
+  },
+  "raise.terms": {
+    en: "I accept the Terms", es: "Acepto los Términos", fr: "J'accepte les Conditions", de: "Ich akzeptiere die Bedingungen", pt: "Aceito os Termos", it: "Accetto i Termini", ja: "利用規約に同意します", zh: "我接受条款", hi: "मैं शर्तें स्वीकार करता/करती हूँ", ar: "أقبل الشروط",
+  },
+  "raise.begin.go": {
+    en: "Begin", es: "Comenzar", fr: "Commencer", de: "Beginnen", pt: "Começar", it: "Comincia", ja: "始める", zh: "开始", hi: "शुरू करें", ar: "ابدأ",
+  },
   "nav.solitude": {
     en: "My Attention", es: "Mi atención", fr: "Mon attention", de: "Meine Aufmerksamkeit", pt: "A minha atenção", it: "La mia attenzione", ja: "マイアテンション", zh: "我的注意力", hi: "मेरा ध्यान", ar: "انتباهي",
   },
