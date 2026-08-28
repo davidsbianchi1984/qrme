@@ -6,6 +6,43 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-08-28
+
+### Added
+
+- **The platform grows its own eyes** — the owner's word on a plugin sold as
+  "watch videos": *"Let's make our own then."* The ears sidecar grows `/watch`
+  doors (one download, the words said AND up to eight frames pulled evenly);
+  `qrme/watching.py` turns frames, screenshots and grabbed screens into words
+  through the one seeing door (`llm.look`, Anthropic vision on the
+  deployment's key); viewings store once per subject. Shared pictures are
+  READ now (a screenshot is the phone handing over its screen), shared
+  videos carry what is on screen beside what was said, a watch party's
+  direct video can be had watched by any member — the blindness sentence
+  lifts in honest steps (BLINDNESS → HEARING → SIGHT) — and a screen can
+  be shown to a room or the agent one frame at a time, capture stopped the
+  moment the still is taken.
+- **The room becomes a society** — aimed turns instead of eight simultaneous
+  answers: profiles open with `[to: name]`, answer when addressed, wait when
+  not, and rotate by seat priority one through eight (seating order, now
+  actually ordered). Invited profiles jump in on their own with an arrival
+  turn — only humans keep an inbox; the owner keeps the `room_joined`
+  record. Profiles summon relevant profiles with `[invite: name]` and stand
+  ready to collaborate on tasks. The ten-turn governor pauses the room for
+  a person; words lift it ("no limit", "run in the background") and words
+  restore it — the let-them-talk toggle is gone from every platform.
+
+### Fixed
+
+- The service worker is version-stamped and self-evicting: a new release is
+  a new worker with a new cache, and old bundles cannot outlive a deploy.
+- `media-src` allows `data:` — the speech layer's silent unlock WAV no
+  longer trips a CSP violation on every visit.
+- SkinPicker.tsx (the orphan component) retired properly; the avatar deck's
+  guards point at the Identity screen that actually mounts it.
+- `test_agent_light` and `test_wearables` read the repo relative to
+  themselves, so a battery launched from any directory agrees with itself.
+
 ## [2.0.0] - 2026-08-28
 
 ### Added
@@ -16011,7 +16048,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.0.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.0.1...HEAD
+[2.0.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.0.0...app-v2.0.1
 [2.0.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.9.0...app-v2.0.0
 [1.9.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.9...app-v1.9.0
 [1.8.9]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.8...app-v1.8.9

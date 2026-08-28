@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v2.0.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v2.0.1** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -72,6 +72,8 @@ whole loop: your words become tracked work.
 | **The Studio and its agent** | A personal agent that edits your page, writes widgets, posts and searches the web on your word — acting only through published tools, each behind the same doors a person uses, with every act on the record. |
 | **The workforce** | Role-specific agents that answer for their own trade: specialist profiles JIM-mini reaches through the tandem, organizational desks, delegation with both sides' consent, and succession that survives its owner. |
 | **Memory in the vault** | What a pair builds together seals to the PDI vault — shown to its people, curatable, and forgettable down to the vectors. |
+| **The platform's eyes** | Shared pictures and screenshots are read (a screenshot is the phone's way of handing over its screen), shared videos are heard and their frames described, a watch party's direct video can be watched once for the whole room, and a screen can be shown to a room or the agent one frame at a time — every claimed sight a real one, made by the deployment's own ears-and-eyes sidecar. |
+| **The room society** | Eight seats that take turns: profiles announce who they speak to, answer when addressed, wait when not, rotate past your silent chair, join and summon each other on their own, collaborate on tasks — and pause after ten turns apiece, steered entirely by words, never a toggle. |
 | **Governance** | Objections, takedowns, lifecycle states, signatures that survive dispute, tamper-evident provenance, moderation that can hold a reply for its owner, and refusals translated in ten languages. |
 | **Privacy** | Room pixels never cross clients; disclosures are recorded, not footage; microphones pair without listening. `QRME_OFFLINE=1` keeps everything on the host, enforced at every socket. |
 | **Tandem** | Runs beside JIM-mini and on top of the PDI vault, one version number across the three. |
@@ -147,6 +149,17 @@ and the complete tour of all 205 is in [docs/gallery.md](docs/gallery.md).
     <td align="center" width="25%"><a href="docs/screens/130-choose-a-plan.svg"><img src="docs/screens/130-choose-a-plan.svg" width="165" alt="Choose a plan"></a><br><sub><b>130</b> · Choose a plan<br>what each tier adds, priced plainly</sub></td>
     <td align="center" width="25%"><a href="docs/screens/168-who-follows-and-what-they-pay.svg"><img src="docs/screens/168-who-follows-and-what-they-pay.svg" width="165" alt="Audience"></a><br><sub><b>168</b> · Audience<br>who follows a profile, and what they pay</sub></td>
     <td align="center" width="25%"><a href="docs/screens/145-where-the-money-goes.svg"><img src="docs/screens/145-where-the-money-goes.svg" width="165" alt="Where the money goes"></a><br><sub><b>145</b> · Where the money goes<br>every split, on the record</sub></td>
+  </tr>
+</table>
+
+**Together**
+
+<table>
+  <tr>
+    <td align="center" width="25%"><a href="docs/screens/205-avatar-stage.svg"><img src="docs/screens/205-avatar-stage.svg" width="165" alt="Avatar stage"></a><br><sub><b>205</b> · Avatar stage<br>the avatar full screen, wardrobe rail down the edge</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/155-watch-together.svg"><img src="docs/screens/155-watch-together.svg" width="165" alt="Watch party"></a><br><sub><b>155</b> · Watch party<br>watched together — and watchable by the platform's own eyes</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/156-who-this-is.svg"><img src="docs/screens/156-who-this-is.svg" width="165" alt="Identity"></a><br><sub><b>156</b> · Identity<br>who a profile is — and the avatar deck it dresses from</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/194-the-vastscape.svg"><img src="docs/screens/194-the-vastscape.svg" width="165" alt="A party you can find"></a><br><sub><b>194</b> · The vastscape<br>the wide view of everything running</sub></td>
   </tr>
 </table>
 
@@ -275,6 +288,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **2.0.1** | **The platform grows its own eyes, and the room becomes a society** — shared pictures and screenshots read, videos heard and their frames described, watch parties actually watchable, screens shown to rooms and the agent one frame at a time; rooms take aimed turns by seat rotation, invited profiles jump in on their own, summon each other by relevance and collaborate on tasks, with a ten-turn governor steered by words instead of the retired toggle; the service worker evicts its own ghosts |
 | **2.0.0** | **The avatar takes the screen, and every headset has a road in** — a second ring beside every portrait opens the full-screen wardrobe (prompt bar, chips, physique & gender) over the one painting door; guests may restyle a profile until its owner flips the new `guest_styling` switch; the avatar deck opens on the deployment's default faces with one-tap claiming and a pull door for the provider's catalog; the Rooms screen's XR shelf covers Steam, Meta, Apple, PICO, HTC and Android XR with honest browser roads |
 | **1.9.0** | **The room hears an iPhone, and every name says one thing** — Safari's second refusal mask forks to the recorded ear so an iPhone room stops sitting deaf, the voice queue wears a watchdog, the hear-loop primes to the present, seats show a visible ⚙️ beside the double-tap, a background-only seat stops painting its circle, and the dock mints owner tokens for every held profile; the wire-collision ledger closes its whole twenty-one-row backlog across the backend and all four clients, two floors join the live-measured registry, and the front page leads with the three postures |
 | **1.8.9** | **One face ledger, three roads in** — the avatar registry: the deployment's shelf and your own with named faces, a fuller import market, painted-from-words at the profile's own age, the AI mark burned at mint, takedowns as data operations; the room strip slims, the invite shows its waiting seat, and the panels dock fits every phone |
@@ -751,6 +765,15 @@ curl -s -X PUT localhost:8000/profiles/$PROFILE/relationships/$INTERACTOR \
 curl -s localhost:8000/profiles/$PROFILE/chat -H 'content-type: application/json' \
   -d '{"interactor_id": "'$INTERACTOR'", "message": "Tell me about your garden!"}'
 ```
+
+## Made by
+
+Founded, owned and directed by **David Bianchi**
+([davidsbianchi1984](https://github.com/davidsbianchi1984)) — the product
+vision, the field reports quoted throughout this codebase, and the tandem
+design that ties QRME to
+[JIM-mini](https://github.com/davidsbianchi1984/jim-mini) and
+[PDI](https://github.com/davidsbianchi1984/pdi) under one version number.
 
 ## License
 
