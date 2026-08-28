@@ -1022,22 +1022,6 @@ LESSONS: tuple[dict, ...] = (
          screens=(205,),
          try_it="Tap the avatar ring beside any portrait, then the "
                 "clothes-hanger button."),
-    dict(key="thewatching", chapter="Talking together",
-         title="The platform's own eyes",
-         what="Share a picture and the profiles in the room read it — a "
-              "screenshot is read for its text, which is how a phone "
-              "hands over its screen. Share a video and it is heard and "
-              "its frames described, so the room can talk about what is "
-              "on screen, not just what was said. On a computer, the "
-              "screen button hands the room one frame of your own screen "
-              "through the browser's picker — a statement, not a feed. "
-              "In a watch party, anybody can have the video watched "
-              "once (direct video links; platform pages only hand over "
-              "a player, and the room says so), and the panel shows "
-              "exactly what the eyes and ears took in. The agent takes "
-              "a shown picture or screen the same way, and answers to "
-              "what is actually on it.",
-         screens=(155,)),
     dict(key="presence", chapter="Being yourself",
          title="Where it is seen",
          what="Three different audiences, and they are not the same. Your own "
@@ -1187,6 +1171,45 @@ LESSONS: tuple[dict, ...] = (
          try_it="Open Widgets, press What it can touch and read the ten "
                 "lines, then ask it for something small — a tagline — and "
                 "check the steps under its answer against your own page."),
+    dict(key="society", chapter="Talking together",
+         title="The room runs itself",
+         what="Rooms hold eight seats and the seats take turns. Every "
+              "turn is aimed — profiles open with who they are speaking "
+              "to, answer when a message names them, and wait their turn "
+              "when it does not; unaddressed talk rotates through the "
+              "seats in order. Invite a synthetic profile and it jumps "
+              "in on its own, with its own frame — its owner keeps the "
+              "record in the profile's inbox. Profiles can offer to "
+              "bring in another profile the topic needs, and collaborate "
+              "with each other on real tasks for as long as you want. "
+              "Tell them to talk with each other and they will — you can "
+              "sit quietly or step away, and the conversation carries on "
+              "so you can read where it went. There are no toggles: "
+              "after ten turns apiece the room pauses and waits for a "
+              "person; say anything to continue, or say \u201cno "
+              "limit\u201d and it runs on your say-so and your dime "
+              "until you say \u201cthat's enough\u201d.",
+         screens=(103,),
+         try_it="In a room with two profiles, type \u201ctalk with "
+                "each other\u201d and watch the turns aim themselves."),
+    dict(key="thewatching", chapter="Talking together",
+         title="The platform's own eyes",
+         what="Share a picture and the profiles in the room read it — a "
+              "screenshot is read for its text, which is how a phone "
+              "hands over its screen. Share a video and it is heard and "
+              "its frames described, so the room can talk about what is "
+              "on screen, not just what was said. On a computer, the "
+              "screen button hands the room one frame of your own screen "
+              "through the browser's picker — a statement, not a feed. "
+              "In a watch party, anybody can have the video watched "
+              "once (direct video links; platform pages only hand over "
+              "a player, and the room says so), and the panel shows "
+              "exactly what the eyes and ears took in. The agent takes "
+              "a shown picture or screen the same way, and answers to "
+              "what is actually on it.",
+         screens=(155,),
+         try_it="Share a screenshot into any room and ask the profiles "
+                "what it says."),
     dict(key="their_homepage", chapter="Meeting others",
          title="Somebody else's homepage",
          what="Press a friend's face anywhere and you land on their page as "

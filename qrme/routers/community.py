@@ -23,8 +23,8 @@ from datetime import date
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import (auth, db, engagement, identity, inbox, llm, marketplace,
-                moderation, persona, referral, roommic, storage, tiers,
-                watermark)
+                moderation, persona, referral, roommic, society, storage,
+                tiers, watermark)
 from ..common import (age_of, clipped, interactor_or_404, profile_or_404,
                       require_interactor, require_owner_or_interactor,
                       source_items)
@@ -93,9 +93,13 @@ def _room_or_404(room_id: str) -> dict:
 
 
 def _participants(room_id: str) -> list[dict]:
+    # ORDER BY rowid: the order people took their seats IS the seat
+    # priority — "we will do it by priority of seats one through eight
+    # for rotation." Unordered, the rotation reshuffled whenever SQLite
+    # felt like it, which is a rotation in name only.
     rows = db.connect().execute(
-        "SELECT kind, ref_id FROM room_participants WHERE room_id=?",
-        (room_id,)).fetchall()
+        "SELECT kind, ref_id FROM room_participants WHERE room_id=?"
+        " ORDER BY rowid", (room_id,)).fetchall()
     return [dict(r) for r in rows]
 
 
@@ -281,7 +285,7 @@ def _read_link(message: str, on_behalf_of: str | None) -> tuple[str, str, str]:
 def _store_room_message(room_id, sender_kind, sender_id, content,
                         approved, reason, media_id=None,
                         media_text="", media_digest="", media_why="",
-                        media_full=0) -> dict:
+                        media_full=0, aimed_at=None) -> dict:
     conn = db.connect()
     message_id = db.new_id("rmg")
     # A profile's room turn is an AI render facing the whole room: stamped.
@@ -290,18 +294,20 @@ def _store_room_message(room_id, sender_kind, sender_id, content,
     conn.execute(
         "INSERT INTO room_messages (id, room_id, sender_kind, sender_id,"
         " content, status, flag_reason, watermark_id, media_id, media_text,"
-        " media_digest, media_why, media_full, created_at)"
-        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        " media_digest, media_why, media_full, aimed_at, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (message_id, room_id, sender_kind, sender_id, content,
          "approved" if approved else "blocked", reason,
          credential["watermark_id"] if credential else None,
          media_id, media_text or None, media_digest or None,
-         media_why or None, media_full or None, db.utcnow()),
+         media_why or None, media_full or None, aimed_at or None,
+         db.utcnow()),
     )
     conn.commit()
     return {"id": message_id, "sender_kind": sender_kind,
             "from": _display(sender_kind, sender_id),
             "content": content if approved else None,
+            "aimed_at": aimed_at or None,
             "watermark": credential,
             "media": (_media_brief(media_id, bool(media_digest), media_why,
                                    media_full, len(media_text or ""))
@@ -309,14 +315,23 @@ def _store_room_message(room_id, sender_kind, sender_id, content,
             "status": "approved" if approved else "blocked"}
 
 
-def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dict]:
-    """Every profile participant takes one moderated turn."""
+def _profile_turns(room: dict, participants: list[dict], pdi, cloud,
+                   only: set[str] | None = None) -> list[dict]:
+    """The named profile participants each take one moderated turn.
+
+    ``only`` is the society's turn selection (qrme/society.py) — the one
+    seat a message was aimed at, or the next seat in rotation. None keeps
+    the old everybody-speaks behavior for the callers that genuinely mean
+    it (a summoned profile's arrival, a test exercising the room).
+    """
     from .. import briefcase
     maturity = _room_maturity(participants)
     conn = db.connect()
     produced = []
     for participant in participants:
         if participant["kind"] != "profile":
+            continue
+        if only is not None and participant["ref_id"] not in only:
             continue
         profile = profile_or_404(participant["ref_id"])
         if profile["status"] == "departed":
@@ -451,6 +466,14 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
         system += (f"\n\nYou are in a group {room['channel']} room about: "
                    f"{room['topic']} ({_CHANNEL_NOTES[room['channel']]}). "
                    "Reply with one short, in-character turn.")
+        # The society's standing rules — aim your turn, offer a summons
+        # when relevance calls for one, collaborate for as long as the
+        # people here want. One sentence block, written in qrme/society.py
+        # so the mechanics and the telling cannot drift apart.
+        system += "\n\n" + society.cast_note(
+            [{"ref_id": q["ref_id"],
+              "display": _display("profile", q["ref_id"])}
+             for q in participants if q["kind"] == "profile"])
         # The cast used to be appended here as a flat list of names. It now
         # rides `among` above, because naming somebody and saying how you
         # know them is one sentence rather than two, and the second one was
@@ -520,6 +543,12 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
         # Dial moves ride the same channel in a room — anybody seated can
         # ask, the owner's lock is the veto (qrme/selfsteer.py).
         content, dial_moves = selfsteer.split(content)
+        # The society's markers, stripped before moderation so the review
+        # reads the words a person will read: the aim ("[to: Ada]") names
+        # who this turn is for, and the summons ("[invite: Ada]") asks
+        # the room to bring somebody relevant in.
+        content, aimed_display = society.split_aim(content)
+        content, summoned = society.split_summons(content)
         if composed and not content:
             content = i18n.tr_public(
                 "Here it is.", i18n.effective_language(profile["id"]))
@@ -553,11 +582,77 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
                                                    composed["title"])
                 except Exception:               # pragma: no cover
                     doc_digest = doc_words[:600]
+        if summoned and verdict.approved:
+            _summon(room, participants, profile["id"], summoned)
         produced.append(_store_room_message(
             room["id"], "profile", profile["id"], content,
             verdict.approved, verdict.reason, media_id=document_id,
-            media_text=doc_words, media_digest=doc_digest))
+            media_text=doc_words, media_digest=doc_digest,
+            aimed_at=aimed_display))
     return produced
+
+
+def _summon(room: dict, participants: list[dict], asker_id: str,
+            names: list[str]) -> list[str]:
+    """A profile's summons, made real — "offer to or be prompted to
+    invite other synthetic profiles of relevance to need or topic."
+
+    Each name is matched against active profiles by display name; a match
+    that is not already seated takes a seat while the room has one (the
+    same eight the invite route holds), agentic-join style: the seat is
+    the acceptance, and the owner's inbox carries the record. Unknown
+    names are simply not seated — the summoning turn already said the
+    offer out loud, and the room's answer is visible in who arrives.
+    """
+    conn = db.connect()
+    seated: list[str] = []
+    present = {q["ref_id"] for q in participants}
+    room_count = len(participants)
+    for name in names:
+        if room_count >= 8:
+            break
+        row = conn.execute(
+            "SELECT id FROM profiles WHERE lower(display_name)=lower(?)"
+            "  AND status='active' LIMIT 1", (name.strip(),)).fetchone()
+        if row is None or row["id"] in present:
+            continue
+        conn.execute(
+            "INSERT OR IGNORE INTO room_participants (room_id, kind, ref_id)"
+            " VALUES (?,'profile',?)", (room["id"], row["id"]))
+        inbox.note(row["id"], "room_joined", asker_id, ref=room["id"])
+        conn.commit()
+        present.add(row["id"])
+        seated.append(row["id"])
+        room_count += 1
+    return seated
+
+
+def _approved_history(room_id: str) -> list[dict]:
+    """The transcript as the society reads it, oldest first."""
+    rows = db.connect().execute(
+        "SELECT sender_kind, sender_id, aimed_at FROM room_messages"
+        " WHERE room_id=? AND status='approved'"
+        " ORDER BY created_at, rowid", (room_id,)).fetchall()
+    return [dict(r) for r in rows]
+
+
+def _spoken_counts(history: list[dict]) -> dict[str, int]:
+    """Unprompted turns per profile since a person last spoke — the
+    governor's ledger. A user turn resets everybody: "then pauses and
+    waits for user's response to either continue or remains paused." """
+    counts: dict[str, int] = {}
+    for row in history:
+        if row["sender_kind"] == "user":
+            counts = {}
+        else:
+            counts[row["sender_id"]] = counts.get(row["sender_id"], 0) + 1
+    return counts
+
+
+def _room_cast(participants: list[dict]) -> list[dict]:
+    return [{"ref_id": q["ref_id"],
+             "display": _display("profile", q["ref_id"])}
+            for q in participants if q["kind"] == "profile"]
 
 
 @router.post("/rooms", status_code=201)
@@ -810,32 +905,42 @@ def invite_to_room(room_id: str, body: RoomInvite, request: Request) -> dict:
             "SELECT owner_id FROM profiles WHERE id=?",
             (who["subject_id"],)).fetchone()
         caller_account = row["owner_id"] if row else None
-    if caller_account and guest["owner_id"] == caller_account:
-        conn.execute(
-            "INSERT OR IGNORE INTO room_participants (room_id, kind, ref_id)"
-            " VALUES (?,'profile',?)", (room_id, body.profile_id))
-        # A standing invitation is answered by the seat, not left behind.
-        conn.execute(
-            "DELETE FROM inbox_events WHERE profile_id=? AND"
-            " kind='room_invite' AND ref=?", (body.profile_id, room_id))
-        conn.commit()
-        return {"room_id": room_id, "profile_id": body.profile_id,
-                "invited": True, "asked_by": asker,
-                "already_invited": False, "seated": True}
-
-    already = conn.execute(
-        "SELECT 1 FROM inbox_events WHERE profile_id=? AND kind='room_invite'"
-        " AND ref=?", (body.profile_id, room_id)).fetchone()
-    if already is None:
-        inbox.note(body.profile_id, "room_invite", asker, ref=room_id)
+    # The agentic join. The owner's field report, verbatim: "invites are
+    # just sent — no responses and nobody joins... They are agentic, and
+    # they should respond and jump in on their own with their own frame
+    # into the room, up to eight frames." So EVERY invited profile seats
+    # itself — the invitation is answered by the seat, immediately — and
+    # the profile takes an arrival turn so the room hears it come in.
+    # Only humans keep an inbox: "I understand if it went to a user
+    # direct, they can respond out of their own inbox."
+    #
+    # The record still lands: when the press was not the owner's own, the
+    # profile's inbox carries `room_joined` so the owner can see where
+    # their profile has been seated — and the owner's standing remedies
+    # hold (leave the room, wind the profile down). The ten-turn governor
+    # (qrme/society.py) bounds what a seat can spend.
+    own_press = bool(caller_account
+                     and guest["owner_id"] == caller_account)
+    conn.execute(
+        "INSERT OR IGNORE INTO room_participants (room_id, kind, ref_id)"
+        " VALUES (?,'profile',?)", (room_id, body.profile_id))
+    # A standing invitation is answered by the seat, not left behind.
+    conn.execute(
+        "DELETE FROM inbox_events WHERE profile_id=? AND"
+        " kind='room_invite' AND ref=?", (body.profile_id, room_id))
+    conn.commit()
+    if not own_press:
+        inbox.note(body.profile_id, "room_joined", asker, ref=room_id)
+    # The arrival: the seat speaks its own first turn, so an invitation
+    # visibly becomes a person in the room rather than a silent row.
+    arrival = _profile_turns(room, _participants(room_id),
+                             request.app.state.pdi,
+                             request.app.state.cloud,
+                             only={body.profile_id})
     return {"room_id": room_id, "profile_id": body.profile_id,
             "invited": True, "asked_by": asker,
-            # Said plainly rather than implied by a 200: a repeated press is
-            # a no-op and the caller should be able to tell.
-            "already_invited": already is not None,
-            # And whether the press itself seated them — true only for the
-            # caller's own profile, where the consent is complete.
-            "seated": False}
+            "already_invited": False, "seated": True,
+            "arrival": arrival}
 
 
 @router.post("/rooms/{room_id}/invites/accept", status_code=201)
@@ -1390,15 +1495,37 @@ def room_message(room_id: str, body: RoomMessage, request: Request) -> dict:
     lwords, ldigest, lwhy = ("", "", "")
     if verdict.approved:
         lwords, ldigest, lwhy = _read_link(body.message, speaker)
+    # The words-only controls — the sentences that replaced the toggle
+    # button: a release phrase lifts the ten-turn governor "on the user's
+    # choice and dime", a pause phrase puts it back, and any ordinary
+    # message already resets the governor's count by being a user turn.
+    conn = db.connect()
+    if society.said_release(body.message):
+        conn.execute("UPDATE rooms SET free_run=1 WHERE id=?", (room_id,))
+        conn.commit()
+    elif society.said_pause(body.message):
+        conn.execute("UPDATE rooms SET free_run=0 WHERE id=?", (room_id,))
+        conn.commit()
+    cast = _room_cast(participants)
+    aim = society.aim_of(body.message, cast)
     sent = _store_room_message(room_id, "user", speaker, body.message,
                                verdict.approved, verdict.reason,
                                media_text=lwords, media_digest=ldigest,
-                               media_why=lwhy)
+                               media_why=lwhy,
+                               aimed_at=(aim or {}).get("display"))
+    # One seat answers, not eight at once: the seat the message was aimed
+    # at, or the next in rotation. "They announce who the statement is
+    # directed towards, and if an inbound message doesn't contain anything
+    # to do with their own profile, they will wait their turn."
     replies = []
-    if verdict.approved:
-        replies = _profile_turns(room, participants,
-                                 request.app.state.pdi,
-                                 request.app.state.cloud)
+    if verdict.approved and cast:
+        speaker_seat = society.next_speaker(
+            cast, _approved_history(room_id), {}, True)
+        if speaker_seat is not None:
+            replies = _profile_turns(room, participants,
+                                     request.app.state.pdi,
+                                     request.app.state.cloud,
+                                     only={speaker_seat["ref_id"]})
     return {"message": sent, "replies": replies}
 
 
@@ -1417,9 +1544,24 @@ def room_advance(room_id: str, request: Request) -> dict:
     participants = _participants(room_id)
     if not any(p["kind"] == "profile" for p in participants):
         raise HTTPException(422, "no synthetic profiles in this room")
+    # One seat per advance, chosen by the society: the newest turn's aim,
+    # or rotation past the person's silent seat — "rotation will continue,
+    # even though user isn't taking his turn, and will instigate a
+    # back-and-forth anyways." The governor holds the other line: ten
+    # unprompted turns apiece and the room pauses for a person, unless
+    # the person lifted it in words.
+    cast = _room_cast(participants)
+    history = _approved_history(room_id)
+    speaker_seat = society.next_speaker(cast, history,
+                                        _spoken_counts(history),
+                                        bool(room.get("free_run")))
+    if speaker_seat is None:
+        return {"replies": [], "paused": True}
     return {"replies": _profile_turns(room, participants,
                                       request.app.state.pdi,
-                                      request.app.state.cloud)}
+                                      request.app.state.cloud,
+                                      only={speaker_seat["ref_id"]}),
+            "paused": False}
 
 
 @router.get("/rooms/{room_id}/messages")
@@ -1447,6 +1589,9 @@ def room_transcript(room_id: str, request: Request) -> list[dict]:
              "sender_id": r["sender_id"],
              "from": _display(r["sender_kind"], r["sender_id"]),
              "content": r["content"],
+             # The announced aim, worn on the turn — who it was for.
+             "aimed_at": (r["aimed_at"]
+                          if "aimed_at" in r.keys() else None),
              "watermark": watermark.brief(r["watermark_id"]),
              "media": _media_brief(
                  r["media_id"] if "media_id" in r.keys() else None,

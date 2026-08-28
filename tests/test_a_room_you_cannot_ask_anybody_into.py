@@ -59,6 +59,12 @@ def _room(client, uid, head, pid, channel="chat"):
 # --- the round trip ---------------------------------------------------------
 
 def test_a_person_in_the_room_can_ask_a_profile_in(client):
+    """The agentic join. The owner's field report, verbatim: "invites are
+    just sent — no responses and nobody joins... They are agentic, and
+    they should respond and jump in on their own with their own frame."
+    So the ask IS the arrival: the profile seats itself, speaks an
+    arrival turn, and the record lands in its owner's inbox — humans
+    keep an inbox; profiles answer for themselves."""
     uid, ada = _person(client, "Ada")
     host, _own = _profile(client, "acct_host")
     rid = _room(client, uid, ada, host)
@@ -68,23 +74,23 @@ def test_a_person_in_the_room_can_ask_a_profile_in(client):
                         json={"profile_id": guest})
     assert asked.status_code == 201, asked.text
     assert asked.json()["invited"] is True
-    assert asked.json()["already_invited"] is False
+    assert asked.json()["seated"] is True
+    # The frame jumped in: an arrival turn from the invited profile.
+    arrival = asked.json()["arrival"]
+    assert arrival and arrival[0]["sender_kind"] == "profile"
 
-    # It arrives as news, in the guest's own inbox, naming who asked.
+    from qrme import db
+    seats = db.connect().execute(
+        "SELECT ref_id FROM room_participants WHERE room_id=? AND"
+        " kind='profile'", (rid,)).fetchall()
+    assert any(row["ref_id"] == guest for row in seats)
+
+    # The owner's record: their profile answered an invitation itself.
     box = client.get(f"/profiles/{guest}/inbox", headers=guest_own)
     assert box.status_code == 200, box.text
-    invites = [e for e in box.json()["events"] if e["kind"] == "room_invite"]
-    assert len(invites) == 1, box.json()
-    assert invites[0]["ref"] == rid
-    # The actor is a *person*, not a profile — the inbox join has to reach
-    # the interactors table or this reads as a bare id.
-    assert invites[0]["actor_name"] == "Ada", invites[0]
-
-    seated = client.post(f"/rooms/{rid}/invites/accept", headers=guest_own,
-                         json={"profile_id": guest})
-    assert seated.status_code == 201, seated.text
-    assert any(p["kind"] == "profile" and p["id"] == guest
-               for p in seated.json()["participants"]), seated.json()
+    joins = [e for e in box.json()["events"] if e["kind"] == "room_joined"]
+    assert len(joins) == 1 and joins[0]["ref"] == rid, box.json()
+    assert joins[0]["actor_name"] == "Ada", joins[0]
 
 
 def test_a_profiles_owner_in_the_room_can_ask_somebody_in(client):
@@ -162,8 +168,9 @@ def test_accepting_without_being_asked_is_refused(client):
 # --- what a second press does -----------------------------------------------
 
 def test_asking_twice_does_not_send_the_news_twice(client):
-    """A button that can be pressed repeatedly into somebody's inbox is a
-    button for filling somebody's inbox."""
+    """Under the agentic join the first press already seated them, so a
+    second press is the already-in-this-room refusal — and the owner's
+    inbox still carries exactly one record of the joining."""
     uid, ada = _person(client, "Ada")
     host, _own = _profile(client, "acct_h7")
     rid = _room(client, uid, ada, host)
@@ -171,13 +178,13 @@ def test_asking_twice_does_not_send_the_news_twice(client):
 
     first = client.post(f"/rooms/{rid}/invite", headers=ada,
                         json={"profile_id": guest})
+    assert first.status_code == 201 and first.json()["seated"] is True
     again = client.post(f"/rooms/{rid}/invite", headers=ada,
                         json={"profile_id": guest})
-    assert first.json()["already_invited"] is False
-    assert again.json()["already_invited"] is True
+    assert again.status_code == 409, again.text
 
     box = client.get(f"/profiles/{guest}/inbox", headers=guest_own).json()
-    assert len([e for e in box["events"] if e["kind"] == "room_invite"]) == 1
+    assert len([e for e in box["events"] if e["kind"] == "room_joined"]) == 1
 
 
 def test_asking_somebody_already_in_the_room_is_refused(client):
@@ -191,7 +198,11 @@ def test_asking_somebody_already_in_the_room_is_refused(client):
     assert "already in this room" in r.json()["detail"]
 
 
-def test_accepting_twice_is_being_there_once(client):
+def test_the_seat_holds_exactly_once(client):
+    """However many roads lead to the seat — the agentic join, a stale
+    accept from an older client — the room holds one seat per profile,
+    and an accept after the join is answered honestly rather than
+    doubling the frame."""
     uid, ada = _person(client, "Ada")
     host, _own = _profile(client, "acct_h9")
     rid = _room(client, uid, ada, host)
@@ -199,14 +210,17 @@ def test_accepting_twice_is_being_there_once(client):
     client.post(f"/rooms/{rid}/invite", headers=ada,
                 json={"profile_id": guest})
 
-    client.post(f"/rooms/{rid}/invites/accept", headers=guest_own,
-                json={"profile_id": guest})
-    again = client.post(f"/rooms/{rid}/invites/accept", headers=guest_own,
-                        json={"profile_id": guest})
-    assert again.status_code == 201, again.text
-    seated = [p for p in again.json()["participants"]
-              if p["kind"] == "profile" and p["id"] == guest]
-    assert len(seated) == 1, again.json()
+    # The join already answered the invitation, so a late accept finds
+    # nothing left to accept.
+    late = client.post(f"/rooms/{rid}/invites/accept", headers=guest_own,
+                       json={"profile_id": guest})
+    assert late.status_code == 403, late.text
+
+    from qrme import db
+    seats = db.connect().execute(
+        "SELECT ref_id FROM room_participants WHERE room_id=? AND"
+        " kind='profile' AND ref_id=?", (rid, guest)).fetchall()
+    assert len(seats) == 1
 
 
 # --- the room's own state ---------------------------------------------------
@@ -276,27 +290,33 @@ def test_your_own_profile_is_seated_by_the_press(client):
         "the press said seated and the room does not hold the seat")
 
 
-def test_somebody_elses_profile_still_keeps_its_owners_choice(client):
-    """The seat-on-press is ownership, never hosting: a guest from another
-    account is invited exactly as before, and only their own owner token
-    takes it up."""
+def test_somebody_elses_profile_answers_the_invitation_itself(client):
+    """The deliberate reversal of the old consent dance, on the owner's
+    word: "they should respond and jump in on their own." A profile from
+    another account seats itself the moment it is asked; what its owner
+    keeps is the RECORD — `room_joined` in the profile's inbox, naming
+    who asked — and the standing remedies: leave the room, wind the
+    profile down. The ten-turn governor bounds what any seat can spend."""
     from .conftest import enrol
 
     uid, mine = _person(client, "David")
     enrol(uid)
     host, _own = _profile(client, "acct_other_h", "Host")
     rid = _room(client, uid, mine, host)
-    guest, _g = _profile(client, "acct_other_g", "Wren")
+    guest, guest_own = _profile(client, "acct_other_g", "Wren")
 
     r = client.post(f"/rooms/{rid}/invite", headers=mine,
                     json={"profile_id": guest})
     assert r.status_code == 201, r.text
-    assert r.json()["seated"] is False
+    assert r.json()["seated"] is True
     from qrme import db
 
     seats = db.connect().execute(
         "SELECT ref_id FROM room_participants WHERE room_id=? AND"
         " kind='profile'", (rid,)).fetchall()
-    assert not any(row["ref_id"] == guest for row in seats), (
-        "a stranger's profile was seated from the host's own screen — "
-        "'invite' has become a word for something that is not one")
+    assert any(row["ref_id"] == guest for row in seats)
+    box = client.get(f"/profiles/{guest}/inbox", headers=guest_own).json()
+    assert any(e["kind"] == "room_joined" and e["ref"] == rid
+               for e in box["events"]), (
+        "the owner was left without the record of where their profile "
+        "has been seated")

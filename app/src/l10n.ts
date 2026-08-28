@@ -8658,6 +8658,9 @@ const CHROME: Table = {
   "ins.screen": {
     en: "Show the room your screen — one frame, read by the profiles here", es: "Muestra tu pantalla a la sala — un solo fotograma, leído por los perfiles de aquí", fr: "Montrez votre écran à la salle — une seule image, lue par les profils présents", de: "Zeig dem Raum deinen Bildschirm — ein Einzelbild, gelesen von den Profilen hier", pt: "Mostre o seu ecrã à sala — um único quadro, lido pelos perfis daqui", it: "Mostra il tuo schermo alla stanza — un solo fotogramma, letto dai profili qui", ja: "画面をルームに見せる — 1コマだけ、ここのプロフィールが読み取ります", zh: "把你的屏幕给房间看——只取一帧，由这里的形象读取", hi: "कमरे को अपनी स्क्रीन दिखाएँ — एक ही फ़्रेम, यहाँ की प्रोफ़ाइलें पढ़ेंगी", ar: "أرِ الغرفة شاشتك — إطار واحد تقرؤه الملفات هنا",
   },
+  "ins.tenpieces": {
+    en: "They've each said their ten pieces — say anything to carry on, or tell them \u201cno limit\u201d and it's on your dime.", es: "Cada uno ya dijo sus diez turnos — di cualquier cosa para continuar, o diles \u201csin límite\u201d y corre por tu cuenta.", fr: "Chacun a dit ses dix tours — dites n'importe quoi pour continuer, ou dites-leur \u201csans limite\u201d et c'est à vos frais.", de: "Jeder hat seine zehn Züge gesagt — sag irgendetwas, um fortzufahren, oder sag ihnen \u201eohne Limit\u201c, auf deine Rechnung.", pt: "Cada um já disse as suas dez vezes — diga qualquer coisa para continuar, ou diga-lhes \u201csem limite\u201d e fica por sua conta.", it: "Ognuno ha detto i suoi dieci turni — di' qualsiasi cosa per continuare, o di' loro \u201csenza limite\u201d ed è a tue spese.", ja: "それぞれ10回ずつ話し終えました — 何か言えば続きます。「制限なし」と言えばあなたの負担で続行します。", zh: "他们各自说完了十轮——说点什么就能继续，或告诉他们\u201c不设上限\u201d，费用由你承担。", hi: "हरेक ने अपनी दस बारी कह ली — जारी रखने के लिए कुछ भी कहें, या उन्हें \u201cकोई सीमा नहीं\u201d कहें और खर्च आपका।", ar: "قال كلٌّ منهم أدواره العشرة — قل أي شيء للمتابعة، أو قل لهم \u201cبلا حد\u201d وعلى نفقتك.",
+  },
   "ins.share": {
     en: "Share a picture, video or file", es: "Comparte una imagen, video o archivo", fr: "Partagez une image, une vidéo ou un fichier", de: "Bild, Video oder Datei teilen", pt: "Partilhe uma imagem, vídeo ou ficheiro", it: "Condividi un'immagine, un video o un file", ja: "画像・動画・ファイルを共有", zh: "分享图片、视频或文件", hi: "चित्र, वीडियो या फ़ाइल साझा करें", ar: "شارك صورة أو فيديو أو ملفًا",
   },
@@ -8978,9 +8981,6 @@ const CHROME: Table = {
   },
   "ins.sayit": {
     en: "Say it", es: "Decirlo", fr: "Le dire", de: "Sagen", pt: "Dizer", it: "Dillo", ja: "言う", zh: "说出来", hi: "कह दीजिए", ar: "قُلها",
-  },
-  "ins.letthemtalk": {
-    en: "Let it talk first", es: "Deja que hable primero", fr: "Laissez-le parler d'abord", de: "Lass es zuerst reden", pt: "Deixe-o falar primeiro", it: "Lascialo parlare prima", ja: "先に話させる", zh: "让它先说", hi: "पहले इसे बोलने दें", ar: "دعه يتكلّم أولًا",
   },
   "ins.file.reading": {
     en: "Reading {name} ({n} of {m}) — a scanned file takes a while, the eyes are working", es: "Leyendo {name} ({n} de {m}): un archivo escaneado tarda un poco, los ojos están trabajando", fr: "Lecture de {name} ({n} sur {m}) — un fichier scanné prend un moment, les yeux travaillent", de: "Lese {name} ({n} von {m}) — eine gescannte Datei dauert etwas, die Augen arbeiten", pt: "A ler {name} ({n} de {m}) — um ficheiro digitalizado demora um pouco, os olhos estão a trabalhar", it: "Lettura di {name} ({n} di {m}) — un file scansionato richiede un po', gli occhi stanno lavorando", ja: "{name} を読んでいます（{m} 件中 {n} 件目）— スキャンされたファイルは少し時間がかかります", zh: "正在读取 {name}（第 {n} 个，共 {m} 个）——扫描件需要一点时间，眼睛正在工作", hi: "{name} पढ़ा जा रहा है ({m} में से {n}) — स्कैन की गई फ़ाइल में समय लगता है, आँखें काम कर रही हैं", ar: "جارٍ قراءة {name} ({n} من {m}) — الملف الممسوح يستغرق وقتًا، العيون تعمل",

@@ -771,6 +771,36 @@ export function Inside({ onPlans, start = "", onLeave }: {
     return () => window.clearInterval(tick);
   }, [open, token]);
 
+  // The society's chain — the words-only replacement for the toggle that
+  // was removed on the field order: "users can just tell them to talk
+  // with each other." When a profile's turn is aimed at another seat,
+  // the conversation is asking to continue, so the room advances itself
+  // one turn at a time — "rotation will continue, even though user isn't
+  // taking his turn, and will instigate a back-and-forth anyways." The
+  // server's governor is the floor: ten unprompted turns apiece, then
+  // {paused} comes back and the room waits for a person. Leaving the
+  // screen clears the timer — on the web, presence in the background is
+  // the seat (kept server-side), not the chatter; browsers throttle
+  // hidden tabs anyway, and pretending otherwise would be a lie.
+  const [socPaused, setSocPaused] = useState(false);
+  const chained = useRef<string | null>(null);
+  useEffect(() => {
+    if (!open || !token || socPaused || transcript.length === 0) return;
+    const newest = transcript[transcript.length - 1];
+    if (newest.sender_kind !== "profile" || !newest.aimed_at) return;
+    if (chained.current === newest.id) return;
+    chained.current = newest.id;
+    const t = window.setTimeout(() => {
+      api.advanceRoom(open, token).then((r) => {
+        if (r.paused) { setSocPaused(true); return; }
+        api.roomMessages(open, token).then(setTranscript)
+          .catch(() => { /* the poll carries it */ });
+      }).catch(() => { /* the poll, or the next action, will say */ });
+    }, 2500);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transcript, open, token, socPaused]);
+
   useEffect(() => {
     api.overlayCatalogue().then((c) => setMasks(c.kinds)).catch(() => setMasks([]));
   }, []);
@@ -1604,6 +1634,10 @@ export function Inside({ onPlans, start = "", onLeave }: {
   async function sendText(text: string) {
     if (!text.trim() || !token || busy) return;
     personTakesTheTurn();
+    // Speaking is the resume: the governor resets server-side on any
+    // user turn, so the paused note comes down with the same word that
+    // lifts the pause.
+    setSocPaused(false);
     const cut = cutOff.current;
     cutOff.current = null;
     await act(async () => {
@@ -1770,7 +1804,13 @@ export function Inside({ onPlans, start = "", onLeave }: {
       <div className="rs-chatlog" ref={chatLog} onScroll={watchScroll}>
         {transcript.slice(-30).map((m) => (
           <p key={m.id} className="rs-chatline">
-            <strong>{m.from}</strong> {m.content}
+            <strong>{m.from}</strong>
+            {m.aimed_at && (
+              /* Who the turn was for — the announced aim, worn on the
+                 line the way the speaker said it. */
+              <span className="rs-aim muted">{" → "}{m.aimed_at}</span>
+            )}{" "}
+            {m.content}
             {/* The real attachment, not a filename in an emoji. The strip
                 printed `📎 name` as text, so in a full-screen room a
                 shared picture was a word and a shared document was a word
@@ -1778,6 +1818,13 @@ export function Inside({ onPlans, start = "", onLeave }: {
             {attachment(m)}
           </p>
         ))}
+        {socPaused && (
+          /* The governor's floor, said in the room's own voice: ten
+             pieces apiece, then the room waits for a person. */
+          <p className="rs-chatline muted">
+            <em>{tr("ins.tenpieces", lang)}</em>
+          </p>
+        )}
       </div>
       {dictating ? (
         /* The phone's own shape for a take in progress: cancel, a level
@@ -2841,13 +2888,13 @@ export function Inside({ onPlans, start = "", onLeave }: {
                       {lentByMe ? tr("ins.takeback", lang)
                                 : tr("ins.lendmic", lang)}
                     </button>
-                    <button className="rs-round rs-worded talkers"
-                            disabled={busy || !token || !open}
-                            aria-label={tr("ins.letthemtalk", lang)}
-                            title={tr("ins.letthemtalk", lang)}
-                            onClick={act(async () => {
-                              await api.advanceRoom(open, token);
-                            })}>{tr("ins.letthemtalk", lang)}</button>
+                    {/* The let-them-talk button is gone from every
+                        platform, on the field order: "users can just tell
+                        them to talk with each other if they need to, or
+                        just quietly sit out." The words are the control
+                        now — a talk phrase in the chat starts the
+                        back-and-forth, the aims keep it going, and the
+                        ten-turn governor pauses it (qrme/society.py). */}
                     {/* The masks. Two records, not one: taking a mask off and
                         turning a camera off are different actions, so this
                         sits beside the three above rather than among them. */}

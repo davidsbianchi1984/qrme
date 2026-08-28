@@ -624,12 +624,20 @@ def test_the_bottom_card_left_the_room():
 def test_the_room_can_still_be_renamed_behind_the_gear():
     """Moved, not deleted: renaming is a capability with one door, and
     that door lives in your own seat's reveal now — beside the microphone
-    lend and let-them-talk, which rode along off the retired card."""
+    lend. The let-them-talk button is gone from every platform on the
+    field order ("users can just tell them to talk with each other...");
+    the WORDS are the control now, and the society's chain answers them
+    (the socPaused effect, over api.advanceRoom)."""
     block = INSIDE[INSIDE.index("{isMe && reveal && ("):]
     assert 'tr("ins.roomname.save"' in block
     assert "api.renameRoom(" in INSIDE, "the Save button saves nothing"
     assert 'tr("ins.lendmic"' in block
-    assert 'tr("ins.letthemtalk"' in block
+    assert 'tr("ins.letthemtalk"' not in INSIDE, (
+        "the toggle button is back — the order was to remove it "
+        "on all platforms")
+    assert "socPaused" in INSIDE, "the words-driven chain is gone"
+    assert 'tr("ins.tenpieces"' in INSIDE, (
+        "the governor's pause has no sentence on the screen")
 
 
 def test_the_name_box_shows_the_name_it_will_replace():

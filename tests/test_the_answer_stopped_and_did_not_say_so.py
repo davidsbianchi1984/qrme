@@ -79,10 +79,18 @@ def test_every_provider_asks_for_the_same_room():
     asks = [line.strip() for line in inspect.getsource(llm).splitlines()
             if sets.search(line) and not line.lstrip().startswith("#")]
     assert asks, "nothing in llm.py asks for a token budget any more"
-    stray = [a for a in asks if "MAX_REPLY_TOKENS" not in a]
+    # The one deliberate second wall: the seeing door (`look`). An account
+    # of what pictures show is read by a model, never spoken to a person,
+    # so the CONTINUES contract this test protects does not apply to it —
+    # and letting it borrow MAX_REPLY_TOKENS would tie a viewing's depth
+    # to how long a chat turn is allowed to speak.
+    stray = [a for a in asks if "MAX_REPLY_TOKENS" not in a
+             and "MAX_ACCOUNT_TOKENS" not in a]
     assert not stray, (
         "a provider carries its own number, which is a provider with its own "
         "wall:\n    " + "\n    ".join(stray))
+    assert any("MAX_ACCOUNT_TOKENS" in a for a in asks), (
+        "the seeing door lost its own bounded room")
 
 
 # --- the marker ------------------------------------------------------------

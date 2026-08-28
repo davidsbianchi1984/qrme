@@ -114,6 +114,11 @@ CREATE TABLE IF NOT EXISTS rooms (
     topic      TEXT,
     channel    TEXT NOT NULL DEFAULT 'chat',  -- chat | voice | video | ar | vr
     status     TEXT NOT NULL DEFAULT 'active',
+    -- The governor's release. 0 is the standing default: ten unprompted
+    -- turns apiece, then the room waits for a person. 1 only after the
+    -- person said so in words ("no limit", "run in the background") —
+    -- "on the user's choice and dime" — and any pause word puts it back.
+    free_run   INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL
 );
 
@@ -150,6 +155,13 @@ CREATE TABLE IF NOT EXISTS room_messages (
     -- mid-sentence. NULL is the ordinary case: it played out, or nobody was
     -- listening to it aloud at all.
     heard       TEXT,
+    -- Who this turn was aimed at — a seat's display name, parsed from the
+    -- speaker's own words (a profile's `[to: Ada]` marker, or a person
+    -- naming a seat). NULL is a turn for the whole room. The rotation in
+    -- qrme/society.py reads it to hand the next turn to the seat it was
+    -- for, which is what makes eight seats a conversation instead of
+    -- eight simultaneous answers.
+    aimed_at    TEXT,
     created_at  TEXT NOT NULL
 );
 
@@ -2884,6 +2896,10 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # is closing the wardrobe, not opening it — matching the fresh-schema
     # default above so an upgraded database behaves like a new one.
     ("profiles", "guest_styling", "INTEGER NOT NULL DEFAULT 1"),
+    # The room society (qrme/society.py): who a turn was for, and whether
+    # the person lifted the ten-turn governor in words.
+    ("room_messages", "aimed_at", "TEXT"),
+    ("rooms", "free_run", "INTEGER NOT NULL DEFAULT 0"),
 )
 
 

@@ -2111,6 +2111,10 @@ export type RoomMsg = {
                                 // to reach the spoken-voice route
   from: string;
   content: string | null;
+  /** Who this turn was aimed at — a seat's display name, or absent for
+   *  the whole room. The society's chain reads it: a profile aiming at a
+   *  profile is a conversation asking to continue. */
+  aimed_at?: string | null;
   watermark: { display?: { line?: string } } | null;
   // A shared picture, video or file riding the turn. `url` is relative to
   // the API base, the way every media url in this product is. `read` says
@@ -4142,7 +4146,10 @@ export const api = {
                                cut_off_heard: cutOff.heard } : {}) },
         token }),
   advanceRoom: (roomId: string, token: string) =>
-    req<{ replies: RoomMsg[] }>(`/rooms/${roomId}/advance`,
+    req<{ replies: RoomMsg[];
+          /** True when every seat has said its ten pieces and the room
+           *  is waiting for a person — the governor's floor. */
+          paused?: boolean }>(`/rooms/${roomId}/advance`,
       { method: "POST", token }),
   listDesks: () =>
     req<{ id: string; display_name: string; trade: string; location?: string;

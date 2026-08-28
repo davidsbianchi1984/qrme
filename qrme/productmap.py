@@ -142,19 +142,29 @@ DOORS: tuple[Door, ...] = (
          "shared places — flat, AR and VR rooms",
          ("room", "meet in", "shared space", "vr", "ar")),
     Door("Inside", "the Room screen",
-         "inside a room — the camera, the microphone, and what is shared "
-         "between the people in it",
-         ("inside a room", "share my screen", "share a file",
-          "in the room")),
+         "inside a room — the camera, the microphone, what is shared "
+         "between the people in it (pictures and screenshots are read by "
+         "the platform's eyes, videos heard and described), and the "
+         "room's own conversation: aimed turns, seat rotation, agentic "
+         "joins and summons, the ten-turn governor — steered by words, "
+         "never a toggle",
+         ("inside a room", "share my screen", "show my screen",
+          "share a file", "in the room", "let them talk",
+          "talk with each other", "keep talking", "whose turn",
+          "no limit", "invite a specialist",
+          "they joined on their own", "read this screenshot")),
     Door("Live", "Live Now tab",
          "what is live in a shared place — a camera being shared, a "
          "microphone lent",
          ("live", "going live", "broadcast", "streaming now")),
     Door("WatchParty", "Watch Party tab",
-         "watching a posted video together, with synthetic profiles in the "
-         "room",
+         "watching a posted video together, with synthetic profiles in "
+         "the room — and, for a direct video link, having it actually "
+         "watched by the platform's own eyes and ears so the profiles "
+         "can talk about what is on screen",
          ("watch party", "watch together", "watch it with me",
-          "watch this", "watch a video", "video with you")),
+          "watch this", "watch a video", "video with you",
+          "watch the video", "the eyes", "can it see")),
     Door("Solitude", "My Attention tab",
          "who may reach you, and when",
          ("do not disturb", "my attention", "leave me alone", "quiet hours",
@@ -181,14 +191,6 @@ DOORS: tuple[Door, ...] = (
          "door",
          ("full screen avatar", "wardrobe", "restyle", "change outfit",
           "dress the avatar", "physique", "render my avatar")),
-    Door("TheWatching", "the platform's eyes",
-         "the platform's own eyes and ears: shared pictures and "
-         "screenshots read, shared videos heard and their frames "
-         "described, a watch party's video actually watched, and a "
-         "screen shown to a room or the agent one frame at a time",
-         ("watch the video", "see my screen", "show my screen",
-          "read this screenshot", "look at this picture",
-          "what is on screen", "screen share", "the eyes")),
     Door("InWords", "Language & Name tab",
          "the words a profile uses, and the name it answers to",
          ("language", "my name", "what to call", "rename",

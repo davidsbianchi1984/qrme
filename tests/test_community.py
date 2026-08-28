@@ -25,12 +25,17 @@ def test_mixed_room_users_and_profiles(client):
     assert r.status_code == 201
     body = r.json()
     assert body["message"]["status"] == "approved"
-    assert len(body["replies"]) == 2                 # both profiles answered
+    # ONE seat answers, not both at once — the society's turn rule, in
+    # the owner's words: "they announce who the statement is directed
+    # towards, and if an inbound message doesn't contain anything to do
+    # with their own profile, they will wait their turn." The message
+    # named nobody, so rotation hands it to one seat and the other waits.
+    assert len(body["replies"]) == 1
     assert all(reply["status"] == "approved" for reply in body["replies"])
 
     transcript = client.get(f"/rooms/{room['id']}/messages",
                             headers=mine).json()
-    assert [m["sender_kind"] for m in transcript] == ["user", "profile", "profile"]
+    assert [m["sender_kind"] for m in transcript] == ["user", "profile"]
     # Only participants may speak — and it is the *token* that says who is
     # asking. Sending a participant's id from outside used to be enough.
     outsider = make_interactor(client, "Nosy")
@@ -56,13 +61,16 @@ def test_profile_to_profile_room_advance(client):
     # the advance and the read both go out as a profile's owner — which is
     # exactly the case `_require_in_room` accepts an owner token for.
     head = {"authorization": f"Bearer {dana['owner_token']}"}
+    # One seat per advance — rotation, so two presses hear both voices
+    # in seat order rather than everybody at once.
     for _ in range(2):
         r = client.post(f"/rooms/{room['id']}/advance", headers=head)
         assert r.status_code == 201
-        assert len(r.json()["replies"]) == 2
+        assert len(r.json()["replies"]) == 1
+        assert r.json()["paused"] is False
     transcript = client.get(f"/rooms/{room['id']}/messages",
                             headers=head).json()
-    assert len(transcript) == 4
+    assert len(transcript) == 2
     assert {m["from"] for m in transcript} == {"Dana", "Echo"}
 
 
