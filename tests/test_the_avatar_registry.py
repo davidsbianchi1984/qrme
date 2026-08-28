@@ -239,7 +239,7 @@ def test_the_market_names_many_companies_and_the_default_leads():
     from qrme import avatars
     keys = [m["key"] for m in avatars.MARKET]
     assert keys[0] == "elevenlabs", "the owner's provider no longer leads"
-    for expected in ("ready_player_me", "roblox", "vroid_hub", "dicebear",
+    for expected in ("roblox", "vroid_hub", "dicebear",
                      "gravatar", "heygen", "avaturn"):
         assert expected in keys, f"{expected} fell off the market"
     for m in avatars.MARKET:

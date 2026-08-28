@@ -3,7 +3,7 @@ market avatar the person already owns.
 
 The starter collection covers profiles that want an invented face. This
 covers everyone else: the owner's own photos, the selfie capture's frames,
-and the avatar systems people already live in (Ready Player Me, Bitmoji,
+and the avatar systems people already live in (Bitmoji,
 Meta, Memoji and the rest) — as *imports*, because that is the honest verb.
 The person exports the avatar on the provider's own surface and hands QRME
 the image; nothing here calls a provider API or holds a provider credential,
@@ -26,8 +26,12 @@ def test_the_market_shelf_names_its_sources_and_their_exports(client):
     assert r.status_code == 200
     sources = r.json()["skin_sources"]
     keys = {s["key"] for s in sources}
-    assert {"ready_player_me", "bitmoji", "meta_avatar",
-            "apple_memoji", "other"} <= keys
+    assert {"bitmoji", "meta_avatar", "apple_memoji", "other"} <= keys
+    # And the shelf does not offer a service that has been shut down.
+    # Ready Player Me led this list until Netflix bought the company and
+    # closed the platform on 31 January 2026 — a row that sends somebody
+    # to a dead door is worse than one row fewer.
+    assert "ready_player_me" not in keys
     # Every shelf entry says how the export works — the door is only honest
     # if the person can actually walk through it.
     assert all(s["how"] for s in sources)
@@ -37,19 +41,19 @@ def test_the_market_shelf_names_its_sources_and_their_exports(client):
 def test_an_imported_avatar_becomes_the_portrait_with_provenance(client,
                                                                  profile_id):
     r = client.post(f"/profiles/{profile_id}/avatar/import", json={
-        "source": "ready_player_me",
-        "asset": "https://models.readyplayer.me/abc123.png",
+        "source": "bitmoji",
+        "asset": "https://example.test/avatar/abc123.png",
     })
     assert r.status_code == 201, r.text
     out = r.json()
-    assert out["asset"] == "https://models.readyplayer.me/abc123.png"
+    assert out["asset"] == "https://example.test/avatar/abc123.png"
     # The render pipeline is unchanged: badge and likeness ride on it.
     assert out["watermark"]["disclosure"]
     assert "likeness" in out
 
     sources = client.get(f"/profiles/{profile_id}/sources").json()
     item = next(s for s in sources
-                if s["title"] == "avatar import — ready_player_me")
+                if s["title"] == "avatar import — bitmoji")
     assert item["kind"] == "photo"
 
 
@@ -71,13 +75,13 @@ def test_the_torso_stands_beside_the_face(client, profile_id):
     that has no avatar yet — an imported avatar can bring its torso along,
     and every surface reads it from the same render the badge rides on."""
     r = client.post(f"/profiles/{profile_id}/avatar/import", json={
-        "source": "ready_player_me",
-        "asset": "https://models.readyplayer.me/abc.png",
-        "torso": "https://models.readyplayer.me/abc-halfbody.png",
+        "source": "vroid_hub",
+        "asset": "https://example.test/avatar/abc.png",
+        "torso": "https://example.test/avatar/abc-halfbody.png",
     })
     assert r.status_code == 201, r.text
     out = client.get(f"/profiles/{profile_id}/avatar").json()
-    assert out["torso"] == "https://models.readyplayer.me/abc-halfbody.png"
+    assert out["torso"] == "https://example.test/avatar/abc-halfbody.png"
 
 
 def test_the_bubble_is_the_form_of_the_avatarless(client, profile_id):

@@ -5,7 +5,7 @@
 // `GET /avatars/market` names eight systems a person may already have a face
 // in, each with how to export from it. It had one door, on Identity, as a
 // dropdown next to a URL box — which is a form, not a picker. A person who
-// wants their Ready Player Me figure standing in their own conversation had
+// wants a figure they made elsewhere standing in their own conversation had
 // to know that screen existed and that the box wanted a link.
 //
 //     asked     can an owner bring a face from somewhere else
@@ -25,16 +25,11 @@ export interface SkinSource {
   how: string;
 }
 
+// Ready Player Me's mark stood at the head of this table and has been
+// struck with its row: Netflix bought the company and shut the platform
+// down on 31 January 2026. A glyph for a shelf entry that no longer
+// exists is a drawing nothing can ever render.
 const MARKS: Record<string, { color: string; glyph: JSX.Element }> = {
-  ready_player_me: {
-    color: "#7c5cff",
-    glyph: (
-      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden>
-        <path d="M12 3.4a4.3 4.3 0 1 1 0 8.6 4.3 4.3 0 0 1 0-8.6Zm0 10.1c4 0 7.2 2 7.2 4.4v2.1H4.8v-2.1c0-2.4 3.2-4.4 7.2-4.4Z"
-              fill="currentColor" />
-      </svg>
-    ),
-  },
   bitmoji: {
     color: "#fffc00",
     glyph: (

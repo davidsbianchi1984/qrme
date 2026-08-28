@@ -1,7 +1,7 @@
 """Eight systems on the shelf, and three clients filing every face as "other".
 
 `GET /avatars/market` has named eight places a person may already have a face
-— Ready Player Me, Bitmoji, Meta, Memoji, Xbox, Zepeto, Mii, and the catch-all
+— Bitmoji, Meta, Memoji, Xbox, Zepeto, Mii, and the catch-all
 — since the avatar deck was written. Each row carries the provider's own export
 route in that provider's words, which is the half somebody actually needs.
 
@@ -99,7 +99,7 @@ def test_no_client_hard_codes_the_source_it_imports_under():
         # than a variable. Deliberately narrow: the *declaration* of a default
         # in state is fine and every client has one, because a picker has to
         # open on something.
-        for hit in re.finditer(r'["\'](other|ready_player_me|bitmoji)["\']\s*,',
+        for hit in re.finditer(r'["\'](other|bitmoji|meta_avatar)["\']\s*,',
                                text):
             line = text[:hit.start()].count("\n") + 1
             guilty.setdefault(name, []).append(f"{path.name}:{line}")

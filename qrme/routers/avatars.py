@@ -153,7 +153,7 @@ def forge_face(profile_id: str, body: ForgeFace, request: Request) -> dict:
     model = media.save(profile_id, made["model"], name="head.glb",
                        alt="a head built from a photograph")
     row = avatarreg.mint(
-        asset=portrait["url"], source="photos", provider="forge",
+        asset=portrait["url"], source="uploaded", provider="forge",
         label=None, owner_account_id=None, likeness="self",
         basis="built from the owner's own photograph in this deployment's "
               "forge")

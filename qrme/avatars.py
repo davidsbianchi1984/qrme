@@ -488,6 +488,29 @@ def torso_of(profile_id: str) -> str | None:
     return row["asset"] if row else None
 
 
+def model_of(profile_id: str) -> str | None:
+    """The `.glb` of this profile's face, when its registry row carries
+    one — the forge's own output, read through `avatar_ref` so the model
+    and the portrait are one face rather than two records that could
+    disagree. None whenever the profile wears a face nobody forged,
+    which is most of them and is not a failure."""
+    from . import avatarreg
+    row = db.connect().execute(
+        "SELECT avatar_ref FROM profiles WHERE id=?",
+        (profile_id,)).fetchone()
+    if row is None or not row["avatar_ref"]:
+        return None
+    try:
+        got = avatarreg.row(row["avatar_ref"])
+    except KeyError:
+        return None
+    # A retired face keeps its record and stops being shown — the model
+    # follows the portrait out rather than outliving the takedown.
+    if got["status"] != "active":
+        return None
+    return got["render_variants"].get("model")
+
+
 def set_avatar(profile_id: str, asset: str) -> dict:
     """Attach a rendered portrait to a profile."""
     conn = db.connect()
@@ -631,6 +654,13 @@ def render(profile_id: str) -> dict:
         # anonymous profile for the same reason the face is: a torso is a
         # picture of somebody too.
         "torso": None if anonymous else torso_of(profile_id),
+        # The 3-D form of this same face, when the forge built one — the
+        # `.glb` a seat draws in three dimensions and whose mouth the
+        # room's own audio moves. Withheld from an anonymous profile for
+        # exactly the reason the torso is: a head is a picture of
+        # somebody too, and hiding the face while shipping the model
+        # would be the flag leaking past itself a third time.
+        "model": None if anonymous else model_of(profile_id),
         "watermark": watermark.design(profile_id),
         "likeness": likeness(profile_id),
         # The moving image: how the portrait moves, derived from the

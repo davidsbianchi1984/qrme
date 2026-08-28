@@ -578,6 +578,36 @@ const CHROME: Table = {
   "raise.begin.go": {
     en: "Begin the life", es: "Comenzar la vida", fr: "Commencer la vie", de: "Das Leben beginnen", pt: "Começar a vida", it: "Comincia la vita", ja: "命を始める", zh: "开始这段生命", hi: "जीवन शुरू करें", ar: "ابدأ الحياة",
   },
+  "idn.forge": {
+    en: "Build a face from a photo", es: "Crea un rostro a partir de una foto", fr: "Créez un visage à partir d'une photo", de: "Ein Gesicht aus einem Foto bauen", pt: "Crie um rosto a partir de uma foto", it: "Crea un volto da una foto", ja: "写真から顔をつくる", zh: "用一张照片造一张脸", hi: "एक फ़ोटो से चेहरा बनाइए", ar: "ابنِ وجهًا من صورة",
+  },
+  "idn.forge.sub": {
+    en: "Made here, on this deployment's own machine — a 3-D head whose mouth moves when it speaks. No provider account, nothing to subscribe to.", es: "Hecho aquí, en la máquina de esta instalación: una cabeza 3-D cuya boca se mueve al hablar. Sin cuenta de proveedor, sin suscripción.", fr: "Fait ici, sur la machine de ce déploiement — une tête 3-D dont la bouche bouge quand elle parle. Aucun compte fournisseur, rien à souscrire.", de: "Hier gebaut, auf der Maschine dieser Installation — ein 3-D-Kopf, dessen Mund sich beim Sprechen bewegt. Kein Anbieterkonto, kein Abo.", pt: "Feito aqui, na máquina desta instalação — uma cabeça 3-D cuja boca se mexe ao falar. Sem conta de fornecedor, sem subscrição.", it: "Fatto qui, sulla macchina di questa installazione — una testa 3-D la cui bocca si muove quando parla. Nessun account fornitore, nessun abbonamento.", ja: "この配備自身のマシンで作ります — 話すと口が動く3Dの頭。プロバイダのアカウントも定期購入も不要です。", zh: "在本部署自己的机器上制作——一个说话时嘴会动的 3D 头像。无需服务商账号，无需订阅。", hi: "यहीं बनता है, इसी परिनियोजन की अपनी मशीन पर — एक 3-D सिर जिसका मुँह बोलते समय हिलता है। न प्रदाता खाता, न सदस्यता।", ar: "يُصنع هنا، على جهاز هذا النشر نفسه — رأس ثلاثي الأبعاد يتحرك فمه عند الكلام. بلا حساب مزوّد وبلا اشتراك.",
+  },
+  "idn.forge.shot": {
+    en: "How the photo is framed", es: "Cómo está encuadrada la foto", fr: "Le cadrage de la photo", de: "Wie das Foto gerahmt ist", pt: "Como a foto está enquadrada", it: "Come è inquadrata la foto", ja: "写真の写り方", zh: "照片的取景", hi: "फ़ोटो का फ़्रेम", ar: "كيف أُطِّرت الصورة",
+  },
+  "idn.forge.face": {
+    en: "Just the face", es: "Solo el rostro", fr: "Le visage seul", de: "Nur das Gesicht", pt: "Só o rosto", it: "Solo il volto", ja: "顔だけ", zh: "只有脸", hi: "सिर्फ़ चेहरा", ar: "الوجه فقط",
+  },
+  "idn.forge.upper": {
+    en: "Upper torso", es: "Torso superior", fr: "Buste", de: "Oberkörper", pt: "Tronco superior", it: "Busto", ja: "上半身", zh: "上半身", hi: "ऊपरी धड़", ar: "الجذع العلوي",
+  },
+  "idn.forge.full": {
+    en: "Full body", es: "Cuerpo entero", fr: "Corps entier", de: "Ganzkörper", pt: "Corpo inteiro", it: "Corpo intero", ja: "全身", zh: "全身", hi: "पूरा शरीर", ar: "الجسم كامل",
+  },
+  "idn.forge.pick": {
+    en: "Choose the photograph", es: "Elige la fotografía", fr: "Choisissez la photographie", de: "Das Foto wählen", pt: "Escolha a fotografia", it: "Scegli la fotografia", ja: "写真を選ぶ", zh: "选择照片", hi: "फ़ोटो चुनिए", ar: "اختر الصورة",
+  },
+  "idn.forge.working": {
+    en: "Building the head — this takes a moment.", es: "Construyendo la cabeza: tarda un momento.", fr: "Construction de la tête — cela prend un instant.", de: "Der Kopf wird gebaut — das dauert einen Moment.", pt: "A construir a cabeça — demora um momento.", it: "Sto costruendo la testa — ci vuole un momento.", ja: "頭をつくっています — 少しかかります。", zh: "正在构建头部——需要一点时间。", hi: "सिर बनाया जा रहा है — इसमें एक क्षण लगता है।", ar: "يجري بناء الرأس — يستغرق لحظة.",
+  },
+  "idn.forge.where": {
+    en: "The photograph is used to build the face and is not kept — what is stored is the head it became.", es: "La fotografía se usa para construir el rostro y no se conserva: lo que se guarda es la cabeza en que se convirtió.", fr: "La photographie sert à construire le visage et n'est pas conservée — ce qui est stocké, c'est la tête qu'elle est devenue.", de: "Das Foto dient dem Bau des Gesichts und wird nicht aufbewahrt — gespeichert wird der Kopf, der daraus wurde.", pt: "A fotografia serve para construir o rosto e não é guardada — o que fica é a cabeça em que se tornou.", it: "La fotografia serve a costruire il volto e non viene conservata — resta la testa in cui si è trasformata.", ja: "写真は顔をつくるために使われ、保存されません。残るのは、そこから生まれた頭です。", zh: "照片只用于构建这张脸，不会保留——保存的是它变成的那个头。", hi: "फ़ोटो चेहरा बनाने के लिए इस्तेमाल होती है और रखी नहीं जाती — जो सहेजा जाता है वह बना हुआ सिर है।", ar: "تُستخدم الصورة لبناء الوجه ولا تُحفظ — ما يُخزَّن هو الرأس الذي صارت إليه.",
+  },
+  "idn.forge.done": {
+    en: "The face is built and worn.", es: "El rostro está construido y puesto.", fr: "Le visage est construit et porté.", de: "Das Gesicht ist gebaut und getragen.", pt: "O rosto está construído e vestido.", it: "Il volto è costruito e indossato.", ja: "顔ができ、身につけました。", zh: "这张脸已构建并戴上。", hi: "चेहरा बन गया और पहन लिया गया।", ar: "بُني الوجه ولُبس.",
+  },
   "ins.pair.avatar": {
     en: "avatar", es: "avatar", fr: "avatar", de: "Avatar", pt: "avatar", it: "avatar", ja: "アバター", zh: "头像", hi: "अवतार", ar: "الأفاتار",
   },

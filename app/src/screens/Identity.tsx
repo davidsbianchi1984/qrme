@@ -58,7 +58,17 @@ export function Identity({ onPlans, onPassing }: {
   // media door as any photo, then imported as the portrait).
   const [market, setMarket] = useState<{ key: string; name: string;
                                          how: string }[]>([]);
-  const [marketKey, setMarketKey] = useState("ready_player_me");
+  // The first live row of the market list. It used to be a hard-coded
+  // "ready_player_me", which is how a picker came to open on a service
+  // Netflix had shut down — a default naming one row is a default that
+  // rots when that row goes. The server's own list decides now.
+  const [marketKey, setMarketKey] = useState("");
+  // The forge: what this deployment can build from a photograph, and the
+  // framing of the picture being handed to it.
+  const [forge, setForge] = useState<
+    { provider: string; configured: boolean; shots: string[] } | null>(null);
+  const [shot, setShot] = useState("face");
+  const [forging, setForging] = useState(false);
   const [marketUrl, setMarketUrl] = useState("");
   const [marketTorso, setMarketTorso] = useState("");
   // The provider's own id for an imported avatar (an ElevenLabs avatar
@@ -161,6 +171,28 @@ export function Identity({ onPlans, onPassing }: {
       setNote(tr("idn.deck.done", lang));
       reloadAvatar();
     } catch (e) { fail(e); }
+  }
+
+  /** A photograph becomes a face, built here rather than bought.
+   *
+   *  The bytes go up as base64 rather than through the media door,
+   *  because the photograph is the INPUT and not the keepsake: what is
+   *  stored afterwards is the head it became. */
+  async function forgeFrom(file: File | undefined) {
+    if (!file) return;
+    setError(null); setNote(null); setForging(true);
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      let binary = "";
+      // Chunked: one apply() over a multi-megabyte photograph blows the
+      // argument limit on every browser that matters.
+      for (let at = 0; at < bytes.length; at += 0x8000) {
+        binary += String.fromCharCode(...bytes.subarray(at, at + 0x8000));
+      }
+      await api.forgeFace(me, btoa(binary), shot, token);
+      setNote(tr("idn.forge.done", lang));
+      reloadAvatar();
+    } catch (e) { fail(e); } finally { setForging(false); }
   }
 
   async function importMarket() {
@@ -294,7 +326,14 @@ export function Identity({ onPlans, onPassing }: {
     }).catch(fail);
     api.emblems().then((r) => setEmblems(r.emblems)).catch(() => undefined);
     api.avatarBriefs().then((r) => setBriefs(r.briefs)).catch(() => undefined);
-    api.avatarMarket().then((r) => setMarket(r.skin_sources)).catch(() => undefined);
+    api.avatarMarket().then((r) => {
+      setMarket(r.skin_sources);
+      // Open on whatever the server actually offers first, so a row
+      // being struck from the list can never leave the picker pointing
+      // at it.
+      setMarketKey((k) => k || r.skin_sources[0]?.key || "");
+    }).catch(() => undefined);
+    api.forgeDoors().then(setForge).catch(() => setForge(null));
     api.avatarShelf().then((r) => setShelfRows(r.shelf))
       .catch(() => setShelfRows([]));
   }, []);
@@ -680,6 +719,34 @@ export function Identity({ onPlans, onPassing }: {
               </button>
             ))}
           </div>
+        )}
+
+        {/* The forge, above the import list on purpose: this is the road
+            that MAKES a face, and the list below is for a face somebody
+            already has somewhere else. It draws only where a forge is
+            actually configured — a button that fails is worse than an
+            absence, and worst of all at the moment somebody has just
+            chosen a photograph of themselves. */}
+        {forge?.configured && (
+          <>
+            <h4>{tr("idn.forge", lang)}</h4>
+            <p className="muted small">{tr("idn.forge.sub", lang)}</p>
+            <div className="row">
+              <select value={shot} aria-label={tr("idn.forge.shot", lang)}
+                      onChange={(e) => setShot(e.target.value)}>
+                <option value="face">{tr("idn.forge.face", lang)}</option>
+                <option value="upper">{tr("idn.forge.upper", lang)}</option>
+                <option value="full">{tr("idn.forge.full", lang)}</option>
+              </select>
+              <input type="file" accept="image/*" disabled={forging}
+                     aria-label={tr("idn.forge.pick", lang)}
+                     onChange={(e) => void forgeFrom(e.target.files?.[0])} />
+            </div>
+            <p className="muted small">
+              {forging ? tr("idn.forge.working", lang)
+                       : tr("idn.forge.where", lang)}
+            </p>
+          </>
         )}
 
         <h4>{tr("idn.deck.market", lang)}</h4>

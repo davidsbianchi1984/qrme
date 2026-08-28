@@ -33,7 +33,11 @@ struct AvatarSection: View {
     /// held: eight systems is a picker, and re-fetching per tap is what the
     /// old block did with the answer it then threw away.
     @State private var shelf: [ApiClient.MarketSource] = []
-    @State private var chosenSource = "ready_player_me"
+    /// Empty rather than a named row: this was hard-coded to
+    /// "ready_player_me" and that service was shut down, which is how a
+    /// picker comes to open on a door nobody can walk through. The
+    /// shelf's own first row decides once it arrives.
+    @State private var chosenSource = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {

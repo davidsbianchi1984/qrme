@@ -1836,6 +1836,11 @@ export type Avatar = {
   /** The upper-torso form — the figure that stands in a live feed or an
    *  AR scene at 1:1; the circular bubble is only the avatar-less form. */
   torso?: string | null;
+  /** The 3-D form of the same face, when the forge built one from a
+   *  photograph: a `.glb` whose morph targets carry ARKit's names, so
+   *  the seats can draw it and the room's own audio can move its
+   *  mouth. Null on every face nobody forged, which is most of them. */
+  model?: string | null;
   /** Always displayed, by the product's own rule. */
   watermark: { mark: string; label: string; line: string; custom: boolean;
                always_displayed: boolean; disclosure: string };
@@ -4938,6 +4943,21 @@ export const api = {
   // it under a grant that can be withdrawn.
   avatar: (profileId: string, token: string) =>
     req<Avatar>(`/profiles/${profileId}/avatar`, { token }),
+  /** What the forge offers here, asked before anybody picks a photo:
+   *  a deployment with no forge says so instead of drawing a button
+   *  that fails at the worst possible moment. */
+  forgeDoors: () =>
+    req<{ provider: string; configured: boolean; shots: string[];
+          blendshapes: string[] }>("/avatars/forge"),
+  /** A photograph becomes this profile's face — geometry, skin and a
+   *  mouth — built on the deployment's own hardware. `shot` says how
+   *  the picture is framed: face, upper (torso) or full (body). */
+  forgeFace: (profileId: string, photo: string, shot: string,
+              token: string) =>
+    req<{ registry_id: string; portrait: string; model: string;
+          blendshapes: string[]; avatar: Avatar }>(
+      `/profiles/${profileId}/avatar/forge`,
+      { method: "POST", body: { photo, shot }, token }),
   // Takes `asset`, not a brief — the brief is the prompt you would hand a
   // generator, and generating is not this endpoint's job.
   setAvatar: (profileId: string, asset: string, token: string,
