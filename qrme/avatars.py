@@ -418,6 +418,7 @@ IMPORT_SOURCES = {m["key"] for m in MARKET} | {"photos", "capture"}
 
 def import_avatar(profile_id: str, *, source: str, asset: str,
                   extra: list[str] | None = None, torso: str | None = None,
+                  provider_asset_id: str | None = None,
                   pdi=None) -> dict:
     """Attach an avatar that arrived from outside the starter collection.
 
@@ -436,7 +437,8 @@ def import_avatar(profile_id: str, *, source: str, asset: str,
     conn = db.connect()
     item_id = db.new_id("src")
     provenance = {"avatar_import": source, "asset": asset,
-                  "extra_frames": extra or [], "torso": torso}
+                  "extra_frames": extra or [], "torso": torso,
+                  "provider_asset_id": provider_asset_id}
     import json as _json
     content, pdi_key = _json.dumps(provenance), None
     if pdi is not None:

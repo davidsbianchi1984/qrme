@@ -8400,6 +8400,72 @@ const CHROME: Table = {
     hi: "इस ब्राउज़र में वाक् पहचान नहीं है, इसलिए यहाँ कमरे में बोलने का विकल्प नहीं है — टाइप कीजिए, कमरा फिर भी बोलकर उत्तर देगा।",
     ar: "هذا المتصفح لا يملك التعرّف على الكلام، لذا لا يُعرض التحدّث في هذه الغرفة هنا — اكتب بدلًا من ذلك، وستظل الغرفة تجيب بصوت مسموع.",
   },
+  "stage.title": {
+    en: "Your avatar, full screen", es: "Tu avatar, a pantalla completa", fr: "Ton avatar, en plein écran", de: "Dein Avatar, bildschirmfüllend", pt: "Seu avatar, em tela cheia", it: "Il tuo avatar, a schermo intero", ja: "アバターを全画面で", zh: "你的头像，全屏显示", hi: "आपका अवतार, पूरी स्क्रीन पर", ar: "صورتك الرمزية بملء الشاشة",
+  },
+  "stage.open": {
+    en: "Open the avatar full screen", es: "Abrir el avatar a pantalla completa", fr: "Ouvrir l’avatar en plein écran", de: "Den Avatar bildschirmfüllend öffnen", pt: "Abrir o avatar em tela cheia", it: "Apri l’avatar a schermo intero", ja: "アバターを全画面で開く", zh: "全屏打开头像", hi: "अवतार को पूरी स्क्रीन पर खोलें", ar: "افتح الصورة الرمزية بملء الشاشة",
+  },
+  "stage.close": {
+    en: "Close", es: "Cerrar", fr: "Fermer", de: "Schließen", pt: "Fechar", it: "Chiudi", ja: "閉じる", zh: "关闭", hi: "बंद करें", ar: "إغلاق",
+  },
+  "stage.wheel": {
+    en: "Wardrobe & looks", es: "Vestuario y estilos", fr: "Garde-robe et styles", de: "Garderobe & Looks", pt: "Guarda-roupa e visuais", it: "Guardaroba e look", ja: "ワードローブとルック", zh: "衣橱与造型", hi: "अलमारी और लुक", ar: "الخزانة والإطلالات",
+  },
+  "stage.none": {
+    en: "No avatar yet — bring one below, or paint one.", es: "Aún no hay avatar: trae uno abajo o pinta uno.", fr: "Pas encore d’avatar — apporte-en un ci-dessous, ou peins-en un.", de: "Noch kein Avatar — bring unten einen mit oder mal einen.", pt: "Ainda sem avatar — traga um abaixo ou pinte um.", it: "Ancora nessun avatar — portane uno qui sotto o dipingine uno.", ja: "まだアバターがありません。下から持ち込むか、描いてみましょう。", zh: "还没有头像——在下方带一个进来，或画一个。", hi: "अभी कोई अवतार नहीं — नीचे से एक लाएँ या एक बनाएँ।", ar: "لا صورة رمزية بعد — أحضر واحدة أدناه أو ارسم واحدة.",
+  },
+  "ward.title": {
+    en: "Say what changes — or tap a start", es: "Di qué cambia, o toca un comienzo", fr: "Dis ce qui change — ou touche un départ", de: "Sag, was sich ändert — oder tippe einen Anfang an", pt: "Diga o que muda — ou toque em um começo", it: "Di’ cosa cambia — o tocca un inizio", ja: "変えたいことを伝えるか、候補をタップ", zh: "说出想改什么——或点一个起点", hi: "बताएँ क्या बदलना है — या कोई शुरुआत चुनें", ar: "قل ما الذي يتغير — أو المس بداية",
+  },
+  "ward.ph": {
+    en: "Describe the change — outfit, hair, build, anything…", es: "Describe el cambio: ropa, pelo, complexión, lo que sea…", fr: "Décris le changement — tenue, cheveux, silhouette, tout…", de: "Beschreib die Änderung — Outfit, Haar, Statur, alles…", pt: "Descreva a mudança — roupa, cabelo, porte, qualquer coisa…", it: "Descrivi il cambiamento — abito, capelli, corporatura, qualsiasi cosa…", ja: "変えたいことを説明 — 服装、髪、体型、なんでも…", zh: "描述改变——服装、发型、体格，什么都行…", hi: "बदलाव बताएँ — पोशाक, बाल, कद-काठी, कुछ भी…", ar: "صف التغيير — الملابس، الشعر، البنية، أي شيء…",
+  },
+  "ward.paint": {
+    en: "Paint it", es: "Píntalo", fr: "Peins-le", de: "Mal es", pt: "Pinte", it: "Dipingilo", ja: "描く", zh: "画出来", hi: "बनाएँ", ar: "ارسمه",
+  },
+  "ward.painting": {
+    en: "Painting…", es: "Pintando…", fr: "Peinture en cours…", de: "Wird gemalt…", pt: "Pintando…", it: "Dipingendo…", ja: "描いています…", zh: "正在绘制…", hi: "बन रहा है…", ar: "يُرسم الآن…",
+  },
+  "ward.age": {
+    en: "Every look renders at this profile’s own age, with the AI mark burned in.", es: "Cada estilo se pinta a la edad real de este perfil, con la marca de IA grabada.", fr: "Chaque look est rendu à l’âge réel de ce profil, avec la marque IA gravée.", de: "Jeder Look wird im echten Alter dieses Profils gemalt, mit eingebranntem KI-Zeichen.", pt: "Cada visual é pintado na idade real deste perfil, com a marca de IA gravada.", it: "Ogni look è reso all’età reale di questo profilo, con il segno IA impresso.", ja: "どのルックもこのプロフィールの実年齢で描かれ、AIマークが焼き込まれます。", zh: "每个造型都按此档案的真实年龄渲染，并烙有AI标记。", hi: "हर लुक इस प्रोफ़ाइल की असली उम्र पर बनता है, AI चिह्न के साथ।", ar: "كل إطلالة تُرسم بعمر هذا الملف الحقيقي، مع علامة الذكاء الاصطناعي محفورة.",
+  },
+  "ward.real": {
+    en: "A real person’s face is never painted from words — that line protects you. Your avatar arrives from your own photos or your provider’s export, through the import below, under your recorded grant.", es: "El rostro de una persona real nunca se pinta con palabras: esa línea te protege. Tu avatar llega desde tus propias fotos o la exportación de tu proveedor, por la importación de abajo, bajo tu consentimiento registrado.", fr: "Le visage d’une personne réelle n’est jamais peint à partir de mots — cette ligne te protège. Ton avatar arrive de tes propres photos ou de l’export de ton fournisseur, via l’import ci-dessous, sous ton accord enregistré.", de: "Das Gesicht einer echten Person wird nie aus Worten gemalt — diese Linie schützt dich. Dein Avatar kommt aus deinen eigenen Fotos oder dem Export deines Anbieters, über den Import unten, unter deiner aufgezeichneten Einwilligung.", pt: "O rosto de uma pessoa real nunca é pintado a partir de palavras — essa linha protege você. Seu avatar chega das suas próprias fotos ou da exportação do seu provedor, pela importação abaixo, sob seu consentimento registrado.", it: "Il volto di una persona reale non viene mai dipinto dalle parole — quella linea ti protegge. Il tuo avatar arriva dalle tue foto o dall’export del tuo provider, tramite l’importazione qui sotto, con il tuo consenso registrato.", ja: "実在の人の顔は言葉から描かれることはありません — その一線があなたを守ります。アバターは自分の写真かプロバイダのエクスポートから、下のインポートを通じて、記録された同意のもとで届きます。", zh: "真实人物的脸永远不会用文字来画——这条线保护的正是你。你的头像来自你自己的照片或服务商的导出，经由下方导入，在你已记录的授权之下。", hi: "किसी असली व्यक्ति का चेहरा कभी शब्दों से नहीं बनाया जाता — यह रेखा आपकी रक्षा करती है। आपका अवतार आपकी अपनी तस्वीरों या प्रदाता के निर्यात से, नीचे के आयात के ज़रिए, आपकी दर्ज सहमति के तहत आता है।", ar: "وجه شخص حقيقي لا يُرسم أبدًا من الكلمات — هذا الخط يحميك. تصل صورتك الرمزية من صورك الخاصة أو من تصدير مزوّدك، عبر الاستيراد أدناه، بموجب موافقتك المسجلة.",
+  },
+  "ward.apparel": {
+    en: "Leather jacket", es: "Chaqueta de cuero", fr: "Veste en cuir", de: "Lederjacke", pt: "Jaqueta de couro", it: "Giacca di pelle", ja: "レザージャケット", zh: "皮夹克", hi: "लेदर जैकेट", ar: "سترة جلدية",
+  },
+  "ward.apparel2": {
+    en: "Formal wear", es: "Ropa formal", fr: "Tenue de soirée", de: "Abendgarderobe", pt: "Traje formal", it: "Abito formale", ja: "フォーマル", zh: "正装", hi: "औपचारिक पोशाक", ar: "ملابس رسمية",
+  },
+  "ward.hair": {
+    en: "New hairstyle", es: "Peinado nuevo", fr: "Nouvelle coiffure", de: "Neue Frisur", pt: "Penteado novo", it: "Nuova pettinatura", ja: "新しい髪型", zh: "新发型", hi: "नया हेयरस्टाइल", ar: "تسريحة جديدة",
+  },
+  "ward.hair2": {
+    en: "Shorter hair", es: "Pelo más corto", fr: "Cheveux plus courts", de: "Kürzeres Haar", pt: "Cabelo mais curto", it: "Capelli più corti", ja: "短めの髪", zh: "更短的头发", hi: "छोटे बाल", ar: "شعر أقصر",
+  },
+  "ward.physique": {
+    en: "Broader build", es: "Complexión más fuerte", fr: "Carrure plus large", de: "Kräftigere Statur", pt: "Porte mais forte", it: "Corporatura più robusta", ja: "がっしりした体型", zh: "更壮的体格", hi: "मज़बूत कद-काठी", ar: "بنية أعرض",
+  },
+  "ward.physique2": {
+    en: "Leaner build", es: "Complexión más esbelta", fr: "Silhouette plus fine", de: "Schlankere Statur", pt: "Porte mais esguio", it: "Corporatura più snella", ja: "細身の体型", zh: "更瘦的体格", hi: "दुबली कद-काठी", ar: "بنية أنحف",
+  },
+  "ward.gender": {
+    en: "More feminine", es: "Más femenino", fr: "Plus féminin", de: "Femininer", pt: "Mais feminino", it: "Più femminile", ja: "よりフェミニンに", zh: "更女性化", hi: "अधिक स्त्रीोचित", ar: "أكثر أنوثة",
+  },
+  "ward.gender2": {
+    en: "More masculine", es: "Más masculino", fr: "Plus masculin", de: "Maskuliner", pt: "Mais masculino", it: "Più maschile", ja: "よりマスキュリンに", zh: "更男性化", hi: "अधिक पुरुषोचित", ar: "أكثر ذكورية",
+  },
+  "ward.jewelry": {
+    en: "Chain & rings", es: "Cadena y anillos", fr: "Chaîne et bagues", de: "Kette & Ringe", pt: "Corrente e anéis", it: "Catena e anelli", ja: "チェーンと指輪", zh: "项链与戒指", hi: "चेन और अंगूठियाँ", ar: "سلسلة وخواتم",
+  },
+  "ward.backdrop": {
+    en: "Sunset backdrop", es: "Fondo de atardecer", fr: "Fond coucher de soleil", de: "Sonnenuntergangs-Hintergrund", pt: "Fundo de pôr do sol", it: "Sfondo al tramonto", ja: "夕暮れの背景", zh: "日落背景", hi: "सूर्यास्त की पृष्ठभूमि", ar: "خلفية غروب",
+  },
+  "idn.deck.pid.ph": {
+    en: "Provider’s avatar id (optional)", es: "ID del avatar del proveedor (opcional)", fr: "ID de l’avatar chez le fournisseur (facultatif)", de: "Avatar-ID des Anbieters (optional)", pt: "ID do avatar no provedor (opcional)", it: "ID avatar del provider (facoltativo)", ja: "プロバイダのアバターID（任意）", zh: "服务商的头像ID（可选）", hi: "प्रदाता की अवतार आईडी (वैकल्पिक)", ar: "معرّف الصورة الرمزية لدى المزوّد (اختياري)",
+  },
   "rail.ask": {
     en: "These two are the owner’s — but you can just ask. Say what you’d like changed and they’ll take it from there.", es: "Estos dos son del propietario, pero puedes pedirlo sin más. Di qué te gustaría cambiar y ellos se encargan.", fr: "Ces deux-là appartiennent au propriétaire — mais tu peux simplement demander. Dis ce que tu voudrais changer et ils s’en chargent.", de: "Diese beiden gehören dem Eigentümer — aber du kannst einfach fragen. Sag, was du dir anders wünschst, und sie kümmern sich darum.", pt: "Estes dois são do proprietário — mas você pode simplesmente pedir. Diga o que gostaria de mudar e eles cuidam do resto.", it: "Questi due sono del proprietario — ma puoi semplicemente chiedere. Di’ cosa vorresti cambiare e ci penseranno loro.", ja: "この2つはオーナーのものですが、頼むだけで大丈夫。変えてほしいことを伝えれば、あとは任せられます。", zh: "这两个属于所有者——但你可以直接开口。说出你想改变什么，他们会处理。", hi: "ये दोनों मालिक के हैं — लेकिन आप बस कह सकते हैं। बताइए क्या बदलना है और वे संभाल लेंगे।", ar: "هذان للمالك — لكن يمكنك أن تطلب ببساطة. قل ما تودّ تغييره وسيتولون الأمر.",
   },

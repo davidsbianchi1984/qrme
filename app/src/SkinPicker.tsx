@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, getBase, type Avatar } from "./api";
+import { AvatarStage } from "./AvatarStage";
 import { fill, t as tr, visitorLang } from "./l10n";
 import { SkinTiles, type SkinSource } from "./SkinTiles";
 
@@ -33,6 +34,8 @@ export function SkinPicker({ profileId, token, onError, onChanged }: {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
   const [worn, setWorn] = useState<Avatar | null>(null);
+  const [providerId, setProviderId] = useState("");
+  const [staged, setStaged] = useState(false);
 
   useEffect(() => {
     api.avatarMarket().then((r) => setSources(r.skin_sources)).catch(() => setSources([]));
@@ -54,8 +57,10 @@ export function SkinPicker({ profileId, token, onError, onChanged }: {
       await api.importAvatar(profileId, {
         source: chosen, asset: url.trim(),
         ...(torso.trim() ? { torso: torso.trim() } : {}),
+        ...(providerId.trim()
+          ? { provider_asset_id: providerId.trim() } : {}),
       }, token);
-      setUrl(""); setTorso("");
+      setUrl(""); setTorso(""); setProviderId("");
       setNote(tr("idn.deck.done", lang));
       await reload();
     } catch (e) { onError(e); }
@@ -97,6 +102,10 @@ export function SkinPicker({ profileId, token, onError, onChanged }: {
                placeholder={tr("idn.deck.torso.ph", lang)}
                aria-label={tr("idn.deck.torso.ph", lang)}
                onChange={(e) => setTorso(e.target.value)} />
+        <input type="text" value={providerId} disabled={busy}
+               placeholder={tr("idn.deck.pid.ph", lang)}
+               aria-label={tr("idn.deck.pid.ph", lang)}
+               onChange={(e) => setProviderId(e.target.value)} />
         <button disabled={busy || !url.trim()} onClick={bring}>
           {tr("idn.deck.import", lang)}
         </button>
@@ -122,10 +131,22 @@ export function SkinPicker({ profileId, token, onError, onChanged }: {
           )}
         </p>
       )}
+      {/* The avatar ring: the worn face, tappable — tap it and the
+        * render takes the screen, wheel and wardrobe with it. */}
       {worn?.asset && CONSOLE_RENDERS.includes(kind) && (
-        <img className="skin-preview" alt=""
-             src={worn.asset.startsWith("http") ? worn.asset
-                                                : getBase() + worn.asset} />
+        <button className="skin-ring" aria-label={tr("stage.open", lang)}
+                title={tr("stage.open", lang)}
+                onClick={() => setStaged(true)}>
+          <img className="skin-preview" alt=""
+               src={worn.asset.startsWith("http") ? worn.asset
+                                                  : getBase() + worn.asset} />
+        </button>
+      )}
+      {staged && worn && (
+        <AvatarStage profileId={profileId} token={token} avatar={worn}
+                     onClose={() => setStaged(false)}
+                     onChanged={(a) => { setWorn(a); onChanged?.(a); }}
+                     onError={onError} />
       )}
     </div>
   );

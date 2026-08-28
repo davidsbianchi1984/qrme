@@ -2096,3 +2096,41 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 }
 .rail-ask-row { display: flex; gap: 8px; margin-top: 8px; }
 .rail-ask-row input { flex: 1; min-width: 0; }
+
+/* The full-screen face: the background-photo takeover, worn by an avatar. */
+.avatar-stage {
+  position: fixed; inset: 0; z-index: 60; background: #05070f;
+  display: flex; align-items: center; justify-content: center;
+}
+.stage-face { width: 100%; height: 100%; object-fit: cover; }
+.stage-empty { color: var(--muted, #8b90a8); padding: 24px; }
+.stage-mark {
+  position: absolute; top: 14px; left: 14px; z-index: 62;
+  background: rgba(5,7,15,0.65); color: #fff; border-radius: 999px;
+  padding: 4px 10px; font-size: 0.8rem;
+}
+.stage-close {
+  position: absolute; top: 12px; right: 12px; z-index: 62;
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid var(--line); background: rgba(5,7,15,0.65); color: #fff;
+}
+.stage-wheel {
+  position: absolute; bottom: 18px; right: 16px; z-index: 62;
+  width: 46px; height: 46px; border-radius: 50%;
+  border: 1px solid var(--line); background: rgba(5,7,15,0.65);
+  font-size: 1.2rem;
+}
+/* The wardrobe card: sized like a card, scrolls inside itself, never
+   hands the wheel to the face behind it. */
+.wardrobe {
+  position: absolute; bottom: 76px; right: 16px; z-index: 62;
+  width: min(400px, calc(100vw - 32px)); max-height: 55vh;
+  overflow-y: auto; overscroll-behavior: contain;
+}
+.ward-prompt { display: flex; gap: 8px; margin: 8px 0; }
+.ward-prompt input { flex: 1; min-width: 0; }
+.ward-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.skin-ring {
+  border: none; background: none; padding: 0; cursor: pointer;
+  border-radius: 12px; display: block;
+}

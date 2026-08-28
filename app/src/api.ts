@@ -4877,7 +4877,8 @@ export const api = {
       "/avatars/market"),
   importAvatar: (profileId: string, body: { source: string; asset: string;
                                             extra?: string[];
-                                            torso?: string },
+                                            torso?: string;
+                                            provider_asset_id?: string },
                  token: string) =>
     req<Avatar>(`/profiles/${profileId}/avatar/import`,
       { method: "POST", body, token }),

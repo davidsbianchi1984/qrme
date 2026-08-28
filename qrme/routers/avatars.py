@@ -79,6 +79,12 @@ class AvatarImport(BaseModel):
                               description="The upper-torso form of the same"
                                           " avatar — the figure that stands"
                                           " in a live feed or AR at 1:1.")
+    provider_asset_id: str | None = Field(
+        default=None, max_length=120,
+        description="The provider's own id for this avatar — an owner"
+                    " linking their ElevenLabs avatar records it here, so"
+                    " the face's provenance names the exact record it"
+                    " came from.")
 
 
 @router.get("/avatars/market")
@@ -106,6 +112,7 @@ def import_avatar(profile_id: str, body: AvatarImport,
         return avatars.import_avatar(
             profile_id, source=body.source, asset=body.asset,
             extra=body.extra, torso=body.torso,
+            provider_asset_id=body.provider_asset_id,
             pdi=request.app.state.pdi)
     except ValueError as e:
         raise HTTPException(422, i18n.raised(e))
