@@ -198,6 +198,12 @@ DOORS: tuple[Door, ...] = (
          "door",
          ("full screen avatar", "wardrobe", "restyle", "change outfit",
           "dress the avatar", "physique", "render my avatar")),
+    Door("Avatar3D", "the avatar full screen",
+         "the face in three dimensions — the head the forge built from a "
+         "photograph, drawn on the stage and on a room's seats, its mouth "
+         "moving with the voice being spoken",
+         ("3d avatar", "moving face", "talking head", "my face in 3d",
+          "make my avatar talk", "lip sync", "animated avatar")),
     Door("InWords", "Language & Name tab",
          "the words a profile uses, and the name it answers to",
          ("language", "my name", "what to call", "rename",

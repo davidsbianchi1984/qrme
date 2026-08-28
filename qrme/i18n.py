@@ -3099,6 +3099,87 @@ _PUBLIC.update(_PRIVILEGE_SENTENCES)
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    # The forge's refusals (qrme/avatarforge.py) and the sit-out's one.
+    # Every road out of the forge answers in words a person can act on —
+    # a photograph with no face is theirs to fix by sending a clearer
+    # one — so the words have to exist in the language they read.
+    "this deployment has no avatar forge configured — the door exists, the machinery does not": {
+        'es': "esta instalación no tiene forja de avatares configurada — la puerta existe, la maquinaria no",
+        'fr': "ce déploiement n'a pas de forge d'avatars configurée — la porte existe, la machinerie non",
+        'de': "diese Installation hat keine Avatar-Schmiede konfiguriert — die Tür gibt es, die Maschinerie nicht",
+        'pt': "esta instalação não tem forja de avatares configurada — a porta existe, a maquinaria não",
+        'it': "questa installazione non ha una fucina di avatar configurata — la porta esiste, il macchinario no",
+        'ja': "この配備にはアバターの鍛冶場が設定されていません。扉はあり、機械はありません",
+        'zh': "此部署未配置头像锻造——门在，机器不在",
+        'hi': "इस परिनियोजन में अवतार-भट्ठी विन्यस्त नहीं है — द्वार है, मशीनरी नहीं",
+        'ar': "لا توجد مسبكة أفاتار مهيأة في هذا النشر — الباب موجود والآلة لا",
+    },
+    "say how the photo is framed — just the face, the upper torso, or the full body": {
+        'es': "di cómo está encuadrada la foto — solo el rostro, el torso superior o el cuerpo entero",
+        'fr': "dites comment la photo est cadrée — le visage seul, le buste ou le corps entier",
+        'de': "sag, wie das Foto gerahmt ist — nur das Gesicht, der Oberkörper oder der ganze Körper",
+        'pt': "diga como a foto está enquadrada — só o rosto, o tronco superior ou o corpo inteiro",
+        'it': "di' come è inquadrata la foto — solo il volto, il busto o il corpo intero",
+        'ja': "写真の写り方を教えてください — 顔だけ、上半身、全身のいずれか",
+        'zh': "说明照片的取景——只有脸、上半身，还是全身",
+        'hi': "बताइए फ़ोटो का फ़्रेम क्या है — सिर्फ़ चेहरा, ऊपरी धड़, या पूरा शरीर",
+        'ar': "قل كيف أُطِّرت الصورة — الوجه فقط أم الجذع العلوي أم الجسم كامل",
+    },
+    "that photograph is larger than the forge takes — twelve megabytes is the ceiling": {
+        'es': "esa fotografía es mayor de lo que acepta la forja — doce megabytes es el techo",
+        'fr': "cette photographie dépasse ce que la forge accepte — douze mégaoctets est le plafond",
+        'de': "dieses Foto ist größer, als die Schmiede annimmt — zwölf Megabyte sind die Grenze",
+        'pt': "essa fotografia é maior do que a forja aceita — doze megabytes é o tecto",
+        'it': "quella fotografia è più grande di quanto la fucina accetti — dodici megabyte è il tetto",
+        'ja': "その写真は鍛冶場が受け取れる大きさを超えています — 上限は12メガバイトです",
+        'zh': "这张照片超过锻造能接受的大小——上限是十二兆字节",
+        'hi': "वह फ़ोटो भट्ठी की सीमा से बड़ी है — बारह मेगाबाइट अधिकतम है",
+        'ar': "تلك الصورة أكبر مما تقبله المسبكة — اثنا عشر ميغابايت هي السقف",
+    },
+    "the forge could not be reached from here": {
+        'es': "no se pudo contactar con la forja desde aquí",
+        'fr': "la forge n'a pas pu être jointe d'ici",
+        'de': "die Schmiede war von hier aus nicht erreichbar",
+        'pt': "não foi possível contactar a forja a partir daqui",
+        'it': "la fucina non è raggiungibile da qui",
+        'ja': "ここから鍛冶場に届きませんでした",
+        'zh': "从这里联系不到锻造",
+        'hi': "यहाँ से भट्ठी तक नहीं पहुँचा जा सका",
+        'ar': "تعذّر الوصول إلى المسبكة من هنا",
+    },
+    "the forge answered with something this end cannot read": {
+        'es': "la forja respondió con algo que este extremo no puede leer",
+        'fr': "la forge a répondu quelque chose que ce côté ne peut pas lire",
+        'de': "die Schmiede antwortete mit etwas, das diese Seite nicht lesen kann",
+        'pt': "a forja respondeu com algo que este lado não consegue ler",
+        'it': "la fucina ha risposto con qualcosa che questo lato non sa leggere",
+        'ja': "鍛冶場は、こちらでは読めないもので返してきました",
+        'zh': "锻造返回了这一端读不懂的内容",
+        'hi': "भट्ठी ने ऐसा कुछ लौटाया जिसे यह छोर पढ़ नहीं सकता",
+        'ar': "ردّت المسبكة بشيء لا يستطيع هذا الطرف قراءته",
+    },
+    "the forge answered with an empty face": {
+        'es': "la forja respondió con un rostro vacío",
+        'fr': "la forge a répondu par un visage vide",
+        'de': "die Schmiede antwortete mit einem leeren Gesicht",
+        'pt': "a forja respondeu com um rosto vazio",
+        'it': "la fucina ha risposto con un volto vuoto",
+        'ja': "鍛冶場は空の顔を返してきました",
+        'zh': "锻造返回了一张空的脸",
+        'hi': "भट्ठी ने खाली चेहरा लौटाया",
+        'ar': "ردّت المسبكة بوجه فارغ",
+    },
+    "only a person's own seat can sit out of a room": {
+        'es': "solo el asiento de una persona puede quedarse fuera de una sala",
+        'fr': "seul le siège d'une personne peut se mettre en retrait d'un salon",
+        'de': "nur der Sitz einer Person kann in einem Raum aussetzen",
+        'pt': "só o lugar de uma pessoa pode ficar de fora de uma sala",
+        'it': "solo il posto di una persona può restare fuori da una stanza",
+        'ja': "部屋の順番待ちから外れられるのは、人の席だけです",
+        'zh': "只有人的座位可以退出房间的等待",
+        'hi': "कमरे से बाहर केवल किसी व्यक्ति की अपनी सीट बैठ सकती है",
+        'ar': "لا يمكن أن يجلس جانبًا إلا مقعد الشخص نفسه",
+    },
     "only elevenlabs is wired for pulling": {
         'es': "solo elevenlabs está conectado para el llenado automático",
         'fr': "seul elevenlabs est branché pour le remplissage automatique",
@@ -8047,6 +8128,10 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     # `days` matches the siblings' shared vocabulary verbatim — the
     # cross-product guard holds one label per field name, and JIM's
     # forms already taught this one.
+    # The forge's two form fields and the sit-out's one.
+    "photo": {"en": "The photograph", "es": "La fotografía", "fr": "La photographie", "de": "Das Foto", "pt": "A fotografia", "it": "La fotografia", "ja": "写真", "zh": "照片", "hi": "फ़ोटो", "ar": "الصورة"},
+    "shot": {"en": "How the photo is framed", "es": "Cómo está encuadrada la foto", "fr": "Le cadrage de la photo", "de": "Wie das Foto gerahmt ist", "pt": "Como a foto está enquadrada", "it": "Come è inquadrata la foto", "ja": "写真の写り方", "zh": "照片的取景", "hi": "फ़ोटो का फ़्रेम", "ar": "كيف أُطِّرت الصورة"},
+    "out": {"en": "Sitting out", "es": "Quedarse fuera", "fr": "En retrait", "de": "Aussetzen", "pt": "Ficar de fora", "it": "Restare fuori", "ja": "抜けている", "zh": "暂时退出", "hi": "बाहर बैठे हैं", "ar": "جالس جانبًا"},
     "days": {"en": "Days", "es": "Días", "fr": "Jours", "de": "Tage", "pt": "Dias", "it": "Giorni", "ja": "日数", "zh": "天数", "hi": "दिन", "ar": "الأيام"},
     "temperament": {"en": "The temperament seed the raising drifts", "es": "La semilla de temperamento que la crianza va moviendo", "fr": "La graine de tempérament que l'éducation fait dériver", "de": "Der Temperament-Keim, den das Aufziehen verschiebt", "pt": "A semente de temperamento que a criação vai movendo", "it": "Il seme del temperamento che la crescita sposta", "ja": "育てるうちに変わっていく気質の種", "zh": "养育会带动漂移的性情种子", "hi": "स्वभाव-बीज जिसे परवरिश बदलती है", "ar": "بذرة الطبع التي تحرّكها التربية"},
     "teaching": {"en": "What kind of teaching this is", "es": "Qué tipo de enseñanza es", "fr": "Quel type d'enseignement c'est", "de": "Welche Art Unterweisung das ist", "pt": "Que tipo de ensino é", "it": "Che tipo di insegnamento è", "ja": "どの種類の教えか", "zh": "这是哪种教导", "hi": "यह किस प्रकार की शिक्षा है", "ar": "أي نوع من التعليم هذا"},

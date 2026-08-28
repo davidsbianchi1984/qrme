@@ -608,6 +608,18 @@ const CHROME: Table = {
   "idn.forge.done": {
     en: "The face is built and worn.", es: "El rostro está construido y puesto.", fr: "Le visage est construit et porté.", de: "Das Gesicht ist gebaut und getragen.", pt: "O rosto está construído e vestido.", it: "Il volto è costruito e indossato.", ja: "顔ができ、身につけました。", zh: "这张脸已构建并戴上。", hi: "चेहरा बन गया और पहन लिया गया।", ar: "بُني الوجه ولُبس.",
   },
+  "ins.sitout": {
+    en: "Sit out", es: "Quedarse fuera", fr: "Se mettre en retrait", de: "Aussetzen", pt: "Ficar de fora", it: "Restare fuori", ja: "抜ける", zh: "暂时退出", hi: "बाहर बैठें", ar: "اجلس جانبًا",
+  },
+  "ins.sitout.hint": {
+    en: "Step out of the room's waiting — the others keep talking, and you still read every turn.", es: "Sal de la espera de la sala: los demás siguen hablando y tú sigues leyendo cada turno.", fr: "Sortez de l'attente du salon — les autres continuent de parler, et vous lisez toujours chaque tour.", de: "Tritt aus dem Warten des Raums heraus — die anderen reden weiter, und du liest weiterhin jeden Zug.", pt: "Saia da espera da sala — os outros continuam a falar e você continua a ler cada vez.", it: "Esci dall'attesa della stanza — gli altri continuano a parlare e tu leggi ancora ogni turno.", ja: "部屋の順番待ちから外れます。ほかの人たちは話し続け、あなたはすべての発言を読めます。", zh: "退出房间的等待——其他人继续交谈，你依然能读到每一轮。", hi: "कमरे की प्रतीक्षा से हट जाइए — बाक़ी बातें करते रहेंगे, और आप हर बारी पढ़ते रहेंगे।", ar: "اخرج من انتظار الغرفة — يواصل الآخرون الحديث، وتظل تقرأ كل دور.",
+  },
+  "ins.sitin": {
+    en: "Sit back in", es: "Volver a entrar", fr: "Revenir dans le tour", de: "Wieder mitmachen", pt: "Voltar a entrar", it: "Rientra nel giro", ja: "戻る", zh: "重新加入", hi: "वापस बैठें", ar: "عُد إلى الدور",
+  },
+  "ins.sitin.hint": {
+    en: "Take your place back — the room waits for you again.", es: "Recupera tu lugar: la sala vuelve a esperarte.", fr: "Reprenez votre place — le salon vous attend de nouveau.", de: "Nimm deinen Platz wieder ein — der Raum wartet wieder auf dich.", pt: "Retome o seu lugar — a sala volta a esperar por si.", it: "Riprendi il tuo posto — la stanza ti aspetta di nuovo.", ja: "席に戻ります。部屋はまたあなたを待ちます。", zh: "回到你的位置——房间会重新等你。", hi: "अपनी जगह वापस लीजिए — कमरा फिर आपकी प्रतीक्षा करेगा।", ar: "استعد مكانك — تنتظرك الغرفة من جديد.",
+  },
   "ins.pair.avatar": {
     en: "avatar", es: "avatar", fr: "avatar", de: "Avatar", pt: "avatar", it: "avatar", ja: "アバター", zh: "头像", hi: "अवतार", ar: "الأفاتار",
   },

@@ -111,7 +111,8 @@ def doors() -> dict:
                             "eyeBlinkRight"]}
 
 
-def from_photo(photo: bytes, *, shot: str = "face") -> dict:
+def from_photo(photo: bytes, *, shot: str = "face",
+               on_behalf_of: str | None = None) -> dict:
     """One photograph into one speakable head.
 
     Answers ``{"portrait": bytes, "model": bytes, "blendshapes": [...]}``
@@ -132,6 +133,18 @@ def from_photo(photo: bytes, *, shot: str = "face") -> dict:
         raise ForgeError(
             "this deployment has no avatar forge configured — the door "
             "exists, the machinery does not")
+
+    # Offline mode's own rule, and the forge passes it the way the ears
+    # do: the check is on the HOST, not a blanket refusal. A stack-
+    # internal sidecar is on this side of the wire, so an offline
+    # deployment still builds faces — what it refuses is a forge somebody
+    # pointed at the open web, which would carry a photograph off the
+    # machine. `nothing leaves the host` has to be true of this door too.
+    from . import offline
+    # Named on somebody's behalf, like every other errand that leaves
+    # this process: a face is built FOR a profile, and an outbound path
+    # that cannot say whose it is cannot be accounted for afterwards.
+    offline.allow(forge_url(), "the forge's photograph", on_behalf_of)
 
     body = json.dumps({
         "photo": base64.b64encode(photo).decode("ascii"),

@@ -140,7 +140,8 @@ def forge_face(profile_id: str, body: ForgeFace, request: Request) -> dict:
         raise HTTPException(422, i18n.tr_public(
             "the photograph is not valid base64", i18n.DEFAULT)) from None
     try:
-        made = avatarforge.from_photo(photo, shot=body.shot)
+        made = avatarforge.from_photo(photo, shot=body.shot,
+                                      on_behalf_of=profile_id)
     except avatarforge.ForgeError as exc:
         raise HTTPException(422, i18n.raised(exc)) from None
 

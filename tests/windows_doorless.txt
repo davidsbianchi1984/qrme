@@ -75,6 +75,22 @@ GET /raise/{profile_id}
 GET /raise/{profile_id}/album
 POST /raise/{profile_id}/teach
 PATCH /raise/{profile_id}/switches
+
+# The forge (docker/forge, qrme/avatarforge.py): a photograph becomes a
+# 3-D face on this deployment's own hardware. The web console holds the
+# door on Identity — pick a framing, choose a picture, wear the head it
+# builds. This shell has no forge surface yet, and a binding with no
+# screen to live on is the exact failure unused_native_bindings.txt was
+# written to catch. The rows leave this backlog when the shell grows the
+# upload and a renderer that can draw a `.glb`.
+GET /avatars/forge
+POST /profiles/{profile_id}/avatar/forge
+
+# The sit-out: a person's seat steps out of the room's waiting so the
+# profiles keep their own rotation. The console draws it on the person's
+# own frame in a room; these shells do not carry the room's seat frames
+# yet, so there is nothing for the button to sit on.
+POST /rooms/{room_id}/sit-out
 POST /raise/{profile_id}/visit
 POST /raise/{profile_id}/forward
 POST /raise/{profile_id}/branch
