@@ -88,16 +88,40 @@ def _decode(photo: str) -> bytes:
 def health() -> dict:
     """Whether the forge can actually work, said before it is asked.
 
-    A container whose model failed to load answers honestly here rather
-    than failing on somebody's photograph — the same posture the ears
-    keep. `ready` false with a reason is a working answer.
+    This used to import `mediapipe` and call that a yes. It is not one:
+    MediaPipe 1.0 loads its native bindings through ctypes at FIRST USE,
+    so a container missing `libEGL.so.1` imports the module happily and
+    throws the moment a photograph arrives — which is how this door
+    answered "ready": true while every upload came back "could not build
+    a head". A check that passes when the thing is broken is worse than
+    no check, because it sends somebody looking at their own photograph
+    for the fault.
+
+    So it builds a landmarker over a tiny synthetic image — the whole
+    road, in miniature — and reports what actually happened.
     """
     try:
-        import mediapipe  # noqa: F401
+        import numpy as np
+        import mediapipe as mp
+        from mediapipe.tasks import python as mp_python
+        from mediapipe.tasks.python import vision
+
+        frame = mp.Image(image_format=mp.ImageFormat.SRGB,
+                         data=np.zeros((32, 32, 3), dtype=np.uint8))
+        options = vision.FaceLandmarkerOptions(
+            base_options=mp_python.BaseOptions(
+                model_asset_path=os.environ.get(
+                    "FORGE_MODEL", "/srv/face_landmarker.task")),
+            num_faces=1)
+        with vision.FaceLandmarker.create_from_options(options) as looker:
+            looker.detect(frame)          # no face in it, and that is fine
+        # The maker's own imports too — a forge that can see and cannot
+        # build is still a forge that cannot work.
+        from facebuild import build_head  # noqa: F401
         return {"status": "ok", "ready": True, "shots": list(SHOTS)}
     except Exception as exc:
         return {"status": "ok", "ready": False,
-                "why": f"the landmarker is not loaded: {exc}"}
+                "why": f"{type(exc).__name__}: {exc}"}
 
 
 @app.post("/forge")

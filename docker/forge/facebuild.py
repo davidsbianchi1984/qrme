@@ -117,29 +117,40 @@ def _geometry(points: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     return positions.astype(np.float32), uvs.astype(np.float32)
 
 
-def _triangles() -> np.ndarray:
-    """The canonical topology — the same triangles on every face."""
-    from mediapipe.python.solutions import face_mesh_connections as links
+def _triangles(uvs: np.ndarray) -> np.ndarray:
+    """The face's surface, triangulated from the points themselves.
 
-    edges = links.FACEMESH_TESSELATION
-    # The tessellation ships as edges; the faces are recovered from it
-    # once and cached in the module, because the topology is a constant
-    # of the model rather than anything about a particular person.
-    global _FACES
-    if _FACES is None:
-        neighbours: dict[int, set[int]] = {}
-        for a, b in edges:
-            neighbours.setdefault(a, set()).add(b)
-            neighbours.setdefault(b, set()).add(a)
-        faces = set()
-        for a, b in edges:
-            for c in neighbours.get(a, set()) & neighbours.get(b, set()):
-                faces.add(tuple(sorted((a, b, c))))
-        _FACES = np.array(sorted(faces), dtype=np.uint32)
-    return _FACES
+    This asked MediaPipe for its own topology once —
+    ``mediapipe.python.solutions.face_mesh_connections`` — and that is
+    how the forge shipped broken: MediaPipe 1.0 removed the whole legacy
+    Solutions API, so the import raised before any photograph was ever
+    looked at, and every upload came back "could not build a head".
 
+        asked     what are the triangles
+        mattered  who has to still ship that constant next year
 
-_FACES: np.ndarray | None = None
+    The same lesson the vendor slot taught, one layer down: a library's
+    internals are somebody else's to delete. The points are ours. A
+    Delaunay triangulation over the landmarks as they sit IN THE
+    PHOTOGRAPH is the surface seen from the camera, which is exactly the
+    surface this head has — and it cannot be removed in a minor release.
+
+    Spans across a concavity — the mouth's opening, the gap beyond the
+    jaw — come with any hull triangulation, so the long ones are dropped
+    against the mesh's own median edge rather than a number picked here:
+    a face measured close up and a face measured far away have different
+    absolute scales and the same proportions.
+    """
+    from scipy.spatial import Delaunay
+
+    cells = Delaunay(uvs).simplices.astype(np.uint32)
+    sides = np.stack([
+        np.linalg.norm(uvs[cells[:, 0]] - uvs[cells[:, 1]], axis=1),
+        np.linalg.norm(uvs[cells[:, 1]] - uvs[cells[:, 2]], axis=1),
+        np.linalg.norm(uvs[cells[:, 2]] - uvs[cells[:, 0]], axis=1)])
+    longest = sides.max(axis=0)
+    keep = longest <= float(np.median(longest)) * 4.0
+    return cells[keep]
 
 
 def _morphs(positions: np.ndarray) -> dict[str, np.ndarray]:
@@ -331,7 +342,7 @@ def build_head(photo: bytes, *, shot: str = "face") -> dict:
 
     points, _ = _landmarks(photo)
     positions, uvs = _geometry(points)
-    faces = _triangles()
+    faces = _triangles(uvs)
     morphs = _morphs(positions)
     portrait = _portrait(photo, uvs)
     return {"glb": _glb(positions, uvs, faces, morphs, photo),
