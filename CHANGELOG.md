@@ -6,6 +6,27 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.3.1] - 2026-08-28
+
+### Fixed
+
+- **The head the forge builds is actually drawn.** `Avatar3D` shipped in
+  2.3.0 written, given a census row, given a door on the product map —
+  and imported by nothing. Every guard it passed asked whether it was
+  catalogued; none asked whether any screen drew it, so the `.glb` was
+  built, stored and served for a release while the console kept showing
+  the still. The head now stands on the avatar stage and in a room seat's
+  second circle, its jaw moving with the voice already in the air rather
+  than a second fetch of the same speech.
+- **The avatar market is a picker again.** `SkinTiles` was written to
+  replace the dropdown-beside-a-URL-box — its own note calls that shape
+  "a form, not a picker" — and was never mounted either, so the form is
+  what shipped. The tiles are on the Identity deck now.
+- A guard on the shape of both: a component in `app/src` that nothing
+  imports fails the suite, because a drawing nothing calls is a drawing
+  nobody sees. Leaves that are deliberate go in a named list with the
+  reason.
+
 ## [2.3.0] - 2026-08-28
 
 ### Added
@@ -16144,7 +16165,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.3.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.3.1...HEAD
+[2.3.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.3.0...app-v2.3.1
 [2.3.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.2.0...app-v2.3.0
 [2.2.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.1.0...app-v2.2.0
 [2.1.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.0.1...app-v2.1.0

@@ -2229,3 +2229,8 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   position: absolute; top: 3px; left: 4px; font-size: 0.65rem;
   color: #fff; text-shadow: 0 0 4px rgba(0,0,0,0.8);
 }
+
+/* The 3-D head standing in a seat's second circle. It is a canvas rather
+   than an image, so it needs the circle's shape said explicitly — an
+   <img> got that from `.rs-photo` alone. */
+.rs-head { border-radius: 50%; overflow: hidden; aspect-ratio: 1 / 1; }

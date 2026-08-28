@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Avatar3D } from "./Avatar3D";
+import { nowPlaying } from "./spoken";
 import { api, getBase, type Avatar } from "./api";
 import { t as tr, visitorLang } from "./l10n";
 
@@ -123,7 +125,20 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
   return (
     <div className={"avatar-stage" + (clear ? " clear" : "")} role="dialog"
          aria-label={tr("stage.title", lang)}>
-      {src
+      {/* The head the forge built, when there is one: the same face in
+          three dimensions, its mouth moving with whatever voice is in
+          the air. The still is what a face without a model shows, and
+          what shows while the model is still loading — a component that
+          nothing mounted is the failure this replaces (the `.glb` was
+          built, stored and served for a release before any screen drew
+          it), so the drawing lives here rather than in a file the
+          census merely knew about. */}
+      {face?.model
+        ? <Avatar3D src={face.model.startsWith("http")
+                          ? face.model : getBase() + face.model}
+                    speaking={nowPlaying()}
+                    className="stage-face" />
+        : src
         ? <img className={"stage-face" + (face?.torso ? " standing" : "")}
                src={src} alt="" />
         : <div className="stage-empty">{tr("stage.none", lang)}</div>}

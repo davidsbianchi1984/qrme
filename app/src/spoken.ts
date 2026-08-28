@@ -74,6 +74,18 @@ const SILENCE =
 /** The one element every piece plays through, once a press has opened it. */
 let ear: HTMLAudioElement | null = null;
 
+/** The element a voice is playing through right now, or null.
+ *
+ *  Exposed for the face: a 3-D head's mouth is driven from the sound
+ *  already in the air (`Avatar3D`), which means the renderer needs the
+ *  element itself rather than a copy of the audio. One element, shared —
+ *  a second fetch of the same speech to animate a jaw would be a second
+ *  bill for a sound the room already has.
+ */
+export function nowPlaying(): HTMLAudioElement | null {
+  return ear && !ear.paused ? ear : null;
+}
+
 // ------------------------------------------------------------------------
 // Loudness: full blast by default, dialled DOWN by the person.
 //

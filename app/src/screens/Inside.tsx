@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Avatar3D } from "../Avatar3D";
 import { isEcho, RECENT_TURNS } from "../echo";
 import { AvatarStage } from "../AvatarStage";
 import { TalkRail } from "../TalkRail";
@@ -6,7 +7,8 @@ import { accountApi, api, getBase, type Avatar, type MicsHere, type RoomFaces,
          type RoomMsg } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
-import { plainVoice, speakInPieces, type Speaking } from "../spoken";
+import { nowPlaying, plainVoice, speakInPieces,
+         type Speaking } from "../spoken";
 import { useSession } from "../store";
 import { putAway, whenPutAway } from "../away";
 import { startWalking } from "../walk";
@@ -2681,13 +2683,30 @@ export function Inside({ onPlans, start = "", onLeave }: {
                             title={tr("stage.open", lang)}
                             onClick={(e) => { e.stopPropagation();
                                               setStaged(s.id); }}>
-                      <img className="rs-photo rs-avatar2" alt=""
-                           src={(() => {
-                             const art = aiFaces[s.id].torso
-                               || aiFaces[s.id].asset as string;
-                             return art.startsWith("http")
-                               ? art : getBase() + art;
-                           })()} />
+                      {/* The head, live, when the forge built one for
+                          this seat — the same face in three dimensions,
+                          its jaw moving with the voice being read aloud
+                          right now. A seat whose face has no model keeps
+                          the still, which is most of them. */}
+                      {aiFaces[s.id].model ? (
+                        <Avatar3D
+                          className="rs-photo rs-avatar2 rs-head"
+                          src={(aiFaces[s.id].model as string)
+                                 .startsWith("http")
+                                 ? aiFaces[s.id].model as string
+                                 : getBase() + aiFaces[s.id].model}
+                          speaking={voicing?.kind === "profile"
+                                    && voicing.id === s.id
+                                      ? nowPlaying() : null} />
+                      ) : (
+                        <img className="rs-photo rs-avatar2" alt=""
+                             src={(() => {
+                               const art = aiFaces[s.id].torso
+                                 || aiFaces[s.id].asset as string;
+                               return art.startsWith("http")
+                                 ? art : getBase() + art;
+                             })()} />
+                      )}
                       {/* The word under the second circle — the field
                           call: "it must say avatar under the photo",
                           so the pair never reads as a double

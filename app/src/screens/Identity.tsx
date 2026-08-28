@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { SkinTiles } from "../SkinTiles";
 import { api, getBase, getSignupKey, type Anonymity, type Avatar,
          type AvatarBrief, type Deleted,
          type Emblem, type IdentityVocabulary, type Memorial,
@@ -751,13 +752,15 @@ export function Identity({ onPlans, onPassing }: {
 
         <h4>{tr("idn.deck.market", lang)}</h4>
         <p className="muted small">{tr("idn.deck.market.sub", lang)}</p>
+        {/* Tiles, not a dropdown. This component was written for exactly
+            this spot — its own note says the old shape was "a dropdown
+            next to a URL box — which is a form, not a picker" — and then
+            nothing mounted it, so the form is what shipped. A person
+            choosing where their face comes from should see the places,
+            not read a list. */}
+        <SkinTiles sources={market} chosen={marketKey}
+                   onPick={setMarketKey} />
         <div className="row">
-          <select value={marketKey}
-                  onChange={(e) => setMarketKey(e.target.value)}>
-            {market.map((m) => (
-              <option key={m.key} value={m.key}>{m.name}</option>
-            ))}
-          </select>
           <input value={marketUrl} placeholder={tr("idn.deck.url.ph", lang)}
                  onChange={(e) => setMarketUrl(e.target.value)}
                  style={{ flex: 1 }} />
