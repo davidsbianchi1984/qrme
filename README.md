@@ -103,8 +103,8 @@ and the complete tour of all 206 is in [docs/gallery.md](docs/gallery.md).
   <tr>
     <td align="center" width="25%"><a href="docs/screens/83-chat.svg"><img src="docs/screens/83-chat.svg" width="165" alt="Chat"></a><br><sub><b>83</b> · Chat<br>type or talk; it hears, answers and remembers</sub></td>
     <td align="center" width="25%"><a href="docs/screens/198-beside-the-face.svg"><img src="docs/screens/198-beside-the-face.svg" width="165" alt="The talk face"></a><br><sub><b>198</b> · The talk face<br>hands-free voice, with the four panels beside it</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/175-inside-a-room.svg"><img src="docs/screens/175-inside-a-room.svg" width="165" alt="Inside a room"></a><br><sub><b>175</b> · Inside a room<br>you and up to eight, files and links read aloud</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/200-agent.svg"><img src="docs/screens/200-agent.svg" width="165" alt="Agent"></a><br><sub><b>200</b> · Agent<br>builds your page and widgets on your word</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/175-inside.png"><img src="docs/screens/175-inside.png" width="165" alt="Inside a room"></a><br><sub><b>175</b> · Inside a room<br>you and up to eight, files and links read aloud</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/200-agent.png"><img src="docs/screens/200-agent.png" width="165" alt="Agent"></a><br><sub><b>200</b> · Agent<br>builds your page and widgets on your word</sub></td>
   </tr>
 </table>
 
@@ -112,9 +112,9 @@ and the complete tour of all 206 is in [docs/gallery.md](docs/gallery.md).
 
 <table>
   <tr>
-    <td align="center" width="25%"><a href="docs/screens/185-discover.svg"><img src="docs/screens/185-discover.svg" width="165" alt="Discover"></a><br><sub><b>185</b> · Discover<br>everybody here, described, with an offer</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/185-discover.png"><img src="docs/screens/185-discover.png" width="165" alt="Discover"></a><br><sub><b>185</b> · Discover<br>everybody here, described, with an offer</sub></td>
     <td align="center" width="25%"><a href="docs/screens/204-your-circle.svg"><img src="docs/screens/204-your-circle.svg" width="165" alt="Your circle"></a><br><sub><b>204</b> · Your circle<br>only your friends, and what they do</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/84-friends.svg"><img src="docs/screens/84-friends.svg" width="165" alt="Friends"></a><br><sub><b>84</b> · Friends<br>the workbench: search, add, remove</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/84-friends.png"><img src="docs/screens/84-friends.png" width="165" alt="Friends"></a><br><sub><b>84</b> · Friends<br>the workbench: search, add, remove</sub></td>
     <td align="center" width="25%"><a href="docs/screens/197-their-homepage.svg"><img src="docs/screens/197-their-homepage.svg" width="165" alt="Their homepage"></a><br><sub><b>197</b> · Their homepage<br>a face pressed anywhere lands here</sub></td>
   </tr>
 </table>
@@ -135,7 +135,7 @@ and the complete tour of all 206 is in [docs/gallery.md](docs/gallery.md).
 <table>
   <tr>
     <td align="center" width="25%"><a href="docs/screens/07-memory-vault.svg"><img src="docs/screens/07-memory-vault.svg" width="165" alt="Memory vault"></a><br><sub><b>07</b> · Memory vault<br>what it holds about you, erasable by conversation</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/147-your-own-voice.svg"><img src="docs/screens/147-your-own-voice.svg" width="165" alt="Your own voice"></a><br><sub><b>147</b> · Your own voice<br>cloned by consent, watermarked every utterance</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/147-voice.png"><img src="docs/screens/147-voice.png" width="165" alt="Your own voice"></a><br><sub><b>147</b> · Your own voice<br>cloned by consent, watermarked every utterance</sub></td>
     <td align="center" width="25%"><a href="docs/screens/44-avatar-studio.svg"><img src="docs/screens/44-avatar-studio.svg" width="165" alt="Avatar studio"></a><br><sub><b>44</b> · Avatar studio<br>the face, aged and dressed as you choose</sub></td>
     <td align="center" width="25%"><a href="docs/screens/85-my-page.svg"><img src="docs/screens/85-my-page.svg" width="165" alt="My page"></a><br><sub><b>85</b> · My page<br>your public corner, in real HTML</sub></td>
   </tr>
@@ -145,10 +145,10 @@ and the complete tour of all 206 is in [docs/gallery.md](docs/gallery.md).
 
 <table>
   <tr>
-    <td align="center" width="25%"><a href="docs/screens/152-marketplace.svg"><img src="docs/screens/152-marketplace.svg" width="165" alt="Marketplace"></a><br><sub><b>152</b> · Marketplace<br>profiles listed, licensed and hired</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/152-market.png"><img src="docs/screens/152-market.png" width="165" alt="Marketplace"></a><br><sub><b>152</b> · Marketplace<br>profiles listed, licensed and hired</sub></td>
     <td align="center" width="25%"><a href="docs/screens/130-choose-a-plan.svg"><img src="docs/screens/130-choose-a-plan.svg" width="165" alt="Choose a plan"></a><br><sub><b>130</b> · Choose a plan<br>what each tier adds, priced plainly</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/168-who-follows-and-what-they-pay.svg"><img src="docs/screens/168-who-follows-and-what-they-pay.svg" width="165" alt="Audience"></a><br><sub><b>168</b> · Audience<br>who follows a profile, and what they pay</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/145-where-the-money-goes.svg"><img src="docs/screens/145-where-the-money-goes.svg" width="165" alt="Where the money goes"></a><br><sub><b>145</b> · Where the money goes<br>every split, on the record</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/168-audience.png"><img src="docs/screens/168-audience.png" width="165" alt="Audience"></a><br><sub><b>168</b> · Audience<br>who follows a profile, and what they pay</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/145-campaigns.png"><img src="docs/screens/145-campaigns.png" width="165" alt="Where the money goes"></a><br><sub><b>145</b> · Where the money goes<br>every split, on the record</sub></td>
   </tr>
 </table>
 
