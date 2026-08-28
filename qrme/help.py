@@ -503,6 +503,12 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     # tick, and somebody wanting out. Both belong here.
     # People arrive here from three directions — decorating a page, putting
     # a profile on a physical screen, and asking what a wall can show.
+    # The full-screen avatar and its wardrobe: people arrive wanting the
+    # render, the outfit, or the guest switch — three words for one stage.
+    "avatarstage": ("wardrobe", "full screen avatar", "avatar full screen",
+                    "restyle", "change outfit", "dress my avatar",
+                    "avatar ring", "physique", "render my avatar",
+                    "default faces", "let visitors restyle"),
     "presence": ("my page", "customise", "customize", "theme", "layout",
                  "html", "tagline", "front page", "what people see",
                  "wall panel", "kiosk", "screen", "display", "shop window",

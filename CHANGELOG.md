@@ -6,7 +6,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [1.10.0] - 2026-08-28
+## [2.0.0] - 2026-08-28
 
 ### Added
 
@@ -16011,8 +16011,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.10.0...HEAD
-[1.10.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.9.0...app-v1.10.0
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.0.0...HEAD
+[2.0.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.9.0...app-v2.0.0
 [1.9.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.9...app-v1.9.0
 [1.8.9]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.8...app-v1.8.9
 [1.8.8]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.7...app-v1.8.8
