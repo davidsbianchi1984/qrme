@@ -34,6 +34,34 @@ export interface Recording {
   done: Promise<string>;
 }
 
+/** The stream a room-entry tap opened, waiting for the room to want it.
+ *
+ *  iOS opens no microphone a gesture didn't carry — and the tap that
+ *  ENTERS a room is a gesture. `primeMic` runs inside that tap, asks for
+ *  the stream there, and parks it here; the first recording the room
+ *  opens takes the parked stream instead of asking again outside any
+ *  gesture. The field requirement, verbatim: "I shouldn't have to press
+ *  anything — joining the room alone is enough." */
+let primed: MediaStream | null = null;
+
+export function primeMic(): void {
+  if (primed || !canRecord()) return;
+  navigator.mediaDevices.getUserMedia({
+    audio: { echoCancellation: true, noiseSuppression: true,
+             autoGainControl: true },
+  }).then((s) => {
+    // A parked stream nobody claims within a minute goes back — an open
+    // microphone with no room around it is not a state to hold.
+    primed = s;
+    window.setTimeout(() => {
+      if (primed === s) {
+        s.getTracks().forEach((t) => t.stop());
+        primed = null;
+      }
+    }, 60_000);
+  }).catch(() => { /* the room's own fallback chip takes it from here */ });
+}
+
 /** True where this console can record at all. Separate from whether it
  *  *should*: a browser with a working recogniser uses that instead. */
 export function canRecord(): boolean {
@@ -109,12 +137,19 @@ async function open(
   quietEndsMs?: number,
   onBarge?: () => void,
 ): Promise<Recording> {
-  const stream = await navigator.mediaDevices.getUserMedia({
-    // Asked for by name rather than hoped for. This is the one echo
-    // defence that works on sound instead of on words or on clocks.
-    audio: { echoCancellation: true, noiseSuppression: true,
-             autoGainControl: true },
-  });
+  let stream: MediaStream;
+  if (primed && primed.getAudioTracks().some((t) => t.readyState === "live")) {
+    // The stream the entry tap already opened — the grant rode the gesture.
+    stream = primed;
+    primed = null;
+  } else {
+    stream = await navigator.mediaDevices.getUserMedia({
+      // Asked for by name rather than hoped for. This is the one echo
+      // defence that works on sound instead of on words or on clocks.
+      audio: { echoCancellation: true, noiseSuppression: true,
+               autoGainControl: true },
+    });
+  }
 
   const chunks: BlobPart[] = [];
   const rec = new MediaRecorder(stream);

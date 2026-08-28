@@ -32,6 +32,7 @@ import { Beacons } from "./screens/Beacons";
 import { Leaving } from "./screens/Leaving";
 import { Selling } from "./screens/Selling";
 import { Inside } from "./screens/Inside";
+import { primeMic } from "./roomear";
 import { Signing } from "./screens/Signing";
 import { Visiting } from "./screens/Visiting";
 import { Allowed } from "./screens/Allowed";
@@ -354,11 +355,11 @@ export function App() {
       <main className="content" ref={contentRef}>
         <ProblemNotice />
         {tab === "home" && <Home go={setTab} onVisit={visitProfile}
-                 onInside={(id) => { setInsideRoom(id); setTab("inside"); }} />}
+                 onInside={(id) => { primeMic(); setInsideRoom(id); setTab("inside"); }} />}
         {tab === "profile" && (
           <Profile profileId={visitingId} onBack={leaveProfile}
                    onPlans={toPlans} onVisit={visitProfile}
-                   onInside={(id) => { setInsideRoom(id); setTab("inside"); }} />
+                   onInside={(id) => { primeMic(); setInsideRoom(id); setTab("inside"); }} />
         )}
         {tab === "chat" && <Chat onPlans={toPlans} />}
         {tab === "discover" && <Discover onPlans={toPlans} onVisit={visitProfile} />}
@@ -374,7 +375,7 @@ export function App() {
         {tab === "feed" && <Feed onPlans={() => setTab("plans")}
           onParty={(id) => { setOpenParty(id); setTab("party"); }} />}
         {tab === "friends" && <Friends onPlans={toPlans} onVisit={visitProfile} />}
-        {tab === "rooms" && <Rooms onPlans={toPlans} onInside={(id) => { setInsideRoom(id); setTab("inside"); }} />}
+        {tab === "rooms" && <Rooms onPlans={toPlans} onInside={(id) => { primeMic(); setInsideRoom(id); setTab("inside"); }} />}
         {tab === "blend" && <Blend onPlans={toPlans} />}
         {tab === "solitude" && <Solitude />}
         {tab === "simulate" && <Simulate onPlans={toPlans} />}

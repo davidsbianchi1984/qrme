@@ -1369,7 +1369,14 @@ export function Inside({ onPlans, start = "", onLeave }: {
     let fatal = false;
     rec.onerror = (e: { error?: string }) => {
       const code = e.error || "";
-      if (code === "not-allowed") {
+      if (code === "not-allowed" && canRecord()) {
+        // iOS's third mask: a start no gesture carried. The recorded ear
+        // holds the stream the room-entry tap parked (primeMic), so the
+        // fork is the zero-tap way in; if that stream never got parked,
+        // the fork's own refusal raises the tap-anywhere chip below.
+        recorderOnly.current = true;
+        fatal = true;
+      } else if (code === "not-allowed") {
         fatal = true;
         if (byHand.current) setEarFault(tr("ins.ear.blocked", lang));
         else setEarWaiting(true);
