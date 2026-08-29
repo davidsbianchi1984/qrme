@@ -477,12 +477,32 @@ def _decision_prompt(reach: dict, allowed: list[str], seen: str | None,
         "Aim in plain words — the visible label of the thing you mean, as "
         "a person would say it. For `type` the argument is the text; for "
         "`key` it is the key's name; for `scroll` it is `up` or `down`; "
-        "for `wait` it is seconds. Use `ask` when you need a person, and "
-        "`done` when the errand is finished. Never explain, never "
-        "apologise, never answer with more than one line.\n\n"
+        "for `wait` it is seconds.\n"
+        # The screen is read afresh before every one of these questions,
+        # so `look` returns what is already below. The first person to
+        # run this spent step 1 on `look` and learnt nothing, then asked.
+        "You are shown the screen as it is right now, every time you are "
+        "asked. `look` therefore tells you nothing you are not already "
+        "being told — spend a move on it only when you have just changed "
+        "the screen and need to see the result.\n"
+        # "when you need a person" was broad enough to cover "I am not
+        # certain", which is most turns. A hand that asks on every turn
+        # is not cautious, it is useless.
+        "Use `ask` only when the errand cannot go forward without "
+        "something a person knows and the screen does not show — not "
+        "because you are unsure. If the screen shows what you need, act "
+        "on it. Use `done` when the errand is finished.\n"
+        "Never explain, never apologise, never answer with more than one "
+        "line.\n\n"
         + SCREEN_IS_DATA)
     question = (
         f"The errand: {reach['errand']}\n"
+        # The platform was picked on the screen that opened this reach
+        # and then never travelled any further than the check for whether
+        # the machine can be driven at all. A hand reasoning about a Mac
+        # menu bar on somebody's Windows laptop is aiming at furniture
+        # that is not there.
+        f"The machine: {reach['platform']}\n"
         f"Steps so far:\n{steps}\n\n"
         f"{quote(seen) or 'The screen could not be read.'}\n\n"
         "The one next move:")
@@ -533,14 +553,23 @@ def decide(reach_id: str, frame_b64: str | None = None,
     from . import llm
     system, question = _decision_prompt(reach, allowed, seen, ledger(reach_id))
     trouble = None
-    try:
-        said = llm.get_provider().generate(
-            system, [{"role": "user", "content": question}])
-    except Exception as exc:  # the reason is the entire point of catching
-        said = None
-        trouble = type(exc).__name__
-        logger.warning("the deciding model failed on %s: %s: %s",
-                       reach_id, trouble, exc)
+    said = None
+    # Twice, because a model that answers with nothing is a hiccup and
+    # not a question for anybody. The first person to run this watched
+    # one empty answer end the whole errand — `ask` closes a reach, so a
+    # blank round cost him a new grant, a new reach and a new command
+    # line. Once more costs a second or two.
+    for attempt in (1, 2):
+        try:
+            said = llm.get_provider().generate(
+                system, [{"role": "user", "content": question}])
+        except Exception as exc:  # the reason is the point of catching
+            said = None
+            trouble = type(exc).__name__
+            logger.warning("the deciding model failed on %s (try %d): %s: %s",
+                           reach_id, attempt, trouble, exc)
+        if said:
+            break
     if not said:
         # No eyes, no model, no answer: it asks rather than guessing. A
         # hand that moves on a frame it could not read is the whole thing

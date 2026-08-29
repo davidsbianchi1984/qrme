@@ -353,3 +353,61 @@ def test_a_model_that_failed_is_not_reported_as_a_screen(client, profile_id,
                               errand="type yellow", platform="windows")
     blind = hands.decide(reach2["id"])
     assert blind["target"] == "it could not read the screen"
+
+
+def test_the_machine_is_in_the_question(profile_id):
+    """The platform is picked on the screen that opens a reach and was then
+    used only to decide whether the machine could be driven at all. The
+    deciding half was never told which machine it was working, so it
+    reasoned about generic furniture — a Mac menu bar on a Windows laptop.
+    """
+    granted = _grant(profile_id)
+    reach = hands.open_reach(profile_id, granted["id"],
+                             errand="type yellow", platform="windows")
+    _, question = hands._decision_prompt(
+        hands.read_reach(reach["id"]), ["press", "type"], "a notepad", [])
+    assert "windows" in question
+
+
+def test_looking_is_not_offered_as_a_free_first_move(profile_id):
+    """The screen is read afresh before every decision, so `look` returns
+    what the question already carries. The first person to run the motor
+    spent step 1 on `look`, learnt nothing, and asked on step 2.
+
+    asked     why does it burn a move seeing what it was just shown
+    mattered  a step budget is the owner's, and the first one bought air
+    """
+    granted = _grant(profile_id)
+    reach = hands.open_reach(profile_id, granted["id"],
+                             errand="type yellow", platform="windows")
+    system, _ = hands._decision_prompt(
+        hands.read_reach(reach["id"]), ["look", "press", "type"], "x", [])
+    assert "tells you nothing you are not already" in system
+    # And `ask` is for what a person knows, not for being unsure.
+    assert "not because you are unsure" in system
+
+
+def test_an_empty_answer_is_asked_for_twice(client, profile_id, monkeypatch):
+    """`ask` closes a reach. One blank answer therefore ended an errand and
+    cost its owner a new grant, a new reach and a new command line — for a
+    hiccup that was nobody's question."""
+    granted = _grant(profile_id)
+    reach = hands.open_reach(profile_id, granted["id"], errand="type yellow",
+                             platform="windows")
+
+    class _Hiccups:
+        def __init__(self):
+            self.asked = 0
+
+        def generate(self, system, messages):
+            self.asked += 1
+            return "" if self.asked == 1 else "type | the page | yellow"
+
+    twice = _Hiccups()
+    monkeypatch.setattr(hands, "read_screen", lambda *a, **k: "a notepad")
+    from qrme import llm
+    monkeypatch.setattr(llm, "get_provider", lambda *a, **k: twice)
+    step = hands.decide(reach["id"])
+    assert twice.asked == 2
+    assert step["verb"] == "type"
+    assert hands.read_reach(reach["id"])["state"] == "open"
