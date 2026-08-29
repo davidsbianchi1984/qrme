@@ -58,7 +58,9 @@ export function WatchLights() {
       <button className="wl-dot wl-dot-off"
               onClick={load}
               aria-label={tr("lights.unreachable", visitorLang())}
-              title={tr("lights.unreachable", visitorLang())} />
+              title={tr("lights.unreachable", visitorLang())}>
+        <span className="wl-dot-face" />
+      </button>
     );
   }
   const tone = worst(face);
@@ -71,9 +73,11 @@ export function WatchLights() {
 
   if (min) {
     return (
-      <button className="wl-dot" style={{ background: COLORS[tone] }}
+      <button className="wl-dot"
               onClick={() => setMinimized(false)}
-              aria-label="Show agent lights" title="Agent lights" />
+              aria-label="Show agent lights" title="Agent lights">
+        <span className="wl-dot-face" style={{ background: COLORS[tone] }} />
+      </button>
     );
   }
 

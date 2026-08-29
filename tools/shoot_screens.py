@@ -26,6 +26,21 @@ It does not invent. A surface that will not render — because it needs a
 device, a camera, a second person in a room — is left alone rather than
 mocked up. An empty state photographed honestly is worth more than a
 populated one that never existed.
+## The build is a step, not a sentence
+
+It builds the console first, and that is not a convenience. The build used
+to be a requirement written in prose — *run `npm run build` first* — and the
+harness served whatever was already in `app/dist` without ever looking at
+how old it was. So a gallery could be re-shot to show a stylesheet fix, and
+photograph a bundle from days earlier, and every capture would look exactly
+as convincing as one that showed the fix. It happened, in the round that
+replaced drawings with photographs precisely *because* a photograph looks
+like evidence.
+
+    asked     is the console built
+    mattered  is the console built from what is on disk now
+
+A prose requirement is a requirement somebody skips.
 """
 
 from __future__ import annotations
@@ -93,6 +108,24 @@ def seed(db_path: str) -> dict:
             "accountEmail": email,
             "profileId": profile_id,
             "ownerToken": auth.issue("owner", profile_id)}
+
+
+def build_console() -> None:
+    """`npm run build`, every run, before anything is photographed.
+
+    Not conditional on a timestamp comparison: a source file can be older
+    than the bundle and still not be in it — a dependency bump, an aborted
+    build, a file restored from git. The build is a few seconds and the
+    thing it protects is whether these pictures mean anything.
+    """
+    app = REPO / "app"
+    print("building the console…", flush=True)
+    done = subprocess.run(["npm", "run", "build"], cwd=app,
+                          capture_output=True, text=True)
+    if done.returncode != 0:
+        raise SystemExit(
+            "the console did not build, so there is nothing honest to "
+            f"photograph:\n{done.stdout[-2000:]}\n{done.stderr[-2000:]}")
 
 
 def start_backend() -> subprocess.Popen:
@@ -231,6 +264,7 @@ def main(shots: list[tuple[str, str, str]]) -> None:
     """``shots`` is (screen number, tab id, filename stem)."""
     from playwright.sync_api import sync_playwright
 
+    build_console()
     proc = start_backend()
     try:
         session = seed("/tmp/shots.db")
@@ -254,7 +288,12 @@ def main(shots: list[tuple[str, str, str]]) -> None:
             #
             #     asked     is the session set
             #     mattered  is the console showing the session
-            page.goto(CONSOLE, wait_until="networkidle")
+            # `BASE + "/"`, not a CONSOLE constant: this product serves its
+            # console at the root, where its siblings serve theirs at
+            # `/app/`. The reload was carried across from one of them
+            # with the sibling's name for the address still in it, and
+            # this harness has raised NameError on every run since.
+            page.goto(BASE + "/", wait_until="networkidle")
             page.wait_for_timeout(1500)
             # The problem-reporting consent card opens over everything on a
             # browser that has never answered it — which is every fresh
