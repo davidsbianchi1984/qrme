@@ -436,7 +436,7 @@ def test_every_hands_door_is_owner_gated(client):
 
 def test_the_wire_walks_the_whole_errand(client, profile_id):
     told = client.post(f"/profiles/{profile_id}/hands/told", json={
-        "said": "you can click and type in my calendar for the next hour"})
+        "in_words": "you can click and type in my calendar for the next hour"})
     assert told.status_code == 200, told.text
     grant_id = told.json()["id"]
 

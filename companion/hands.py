@@ -220,9 +220,18 @@ def main() -> None:
             time.sleep(1)
         print("    watching now.   ")
 
+    # What became of the step handed out last round. It rides the next
+    # `/next` rather than a door of its own, because the stack writes a
+    # step where it is *permitted* and cannot see a cursor — so `done`
+    # over there has only ever meant chosen and allowed. This end is the
+    # only one that knows whether it landed, and a machine that has
+    # stopped calling has stopped reporting: a step nobody comes back
+    # about stays unlanded, which is the honest state for it.
+    report: dict = {}
+
     for round_number in range(ROUNDS):
         step = _post(said.base, where + "/next", said.token,
-                     {"frame": _frame()})
+                     {"frame": _frame(), **report})
         verb = step.get("verb")
         outcome = step.get("outcome")
         note = step.get("note") or ""
@@ -243,6 +252,10 @@ def main() -> None:
         why = _perform(step, said.live)
         if why:
             print(f"    {why}")
+        report = {"about_step": step.get("n"),
+                  "landed": ("missed" if why else
+                             "landed" if said.live else "rehearsed"),
+                  "landed_note": why}
         time.sleep(max(0.2, said.beat))
 
     print(f"stopped after {ROUNDS} rounds without finishing.")

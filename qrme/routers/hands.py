@@ -39,7 +39,7 @@ class GrantIn(BaseModel):
 
 
 class ToldIn(BaseModel):
-    said: str = Field(description="what the owner said or typed")
+    in_words: str = Field(description="what the owner said or typed")
     surface: str = "computer"
     watched: bool = True
 
@@ -69,6 +69,19 @@ class NextIn(BaseModel):
         default=None,
         description="What the screen shows, in words, when the caller has "
                     "read it already — so the eyes are not paid for twice.")
+    about_step: int | None = Field(
+        default=None,
+        description="The step number this caller was handed last time. Sent "
+                    "back with `landed` so the ledger records what became "
+                    "of it; omitted on the first call of a reach.")
+    landed: str | None = Field(
+        default=None,
+        description="What became of step `did`: landed, missed, or "
+                    "rehearsed (a dry run, which performs nothing).")
+    landed_note: str | None = Field(
+        default=None,
+        description="Why, when it missed. The machine's words, not the "
+                    "stack's — it is the only end that saw.")
 
 
 class HandOverIn(BaseModel):
@@ -155,7 +168,7 @@ def told_grant(profile_id: str, body: ToldIn, request: Request) -> dict:
     """
     require_owner(profile_id, request)
     try:
-        return hands.grant_from_words(profile_id, profile_id, body.said,
+        return hands.grant_from_words(profile_id, profile_id, body.in_words,
                                       surface=body.surface,
                                       watched=body.watched)
     except hands.HandError as exc:
@@ -248,6 +261,14 @@ def next_move(profile_id: str, reach_id: str, body: NextIn,
         reach = hands.read_reach(reach_id)
         if reach["profile_id"] != profile_id:
             raise hands.HandError(404, "no such reach")
+        # What became of the last step, before deciding the next. It
+        # rides this call rather than a door of its own because it is
+        # the same conversation: a machine that has stopped calling has
+        # stopped reporting, and a step nobody came back about should
+        # stay unlanded rather than acquire an ending nobody witnessed.
+        if body.about_step is not None and body.landed:
+            hands.land(reach_id, body.about_step, body.landed,
+                       body.landed_note)
         return hands.decide(reach_id, frame_b64=body.frame, seen=body.saw)
     except hands.HandError as exc:
         raise _fail(exc) from None

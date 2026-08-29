@@ -2881,6 +2881,27 @@ CREATE TABLE IF NOT EXISTS hand_actions (
     UNIQUE (reach_id, n)
 );
 
+-- What the machine reported back about a step it was handed.
+--
+-- `hand_actions.outcome` is written where the move is *permitted*, which is
+-- the server, and the server cannot see a cursor. So `done` there has only
+-- ever meant "chosen and allowed" — a dry run and a live one left identical
+-- records, and a click that missed left one saying it landed. A permission
+-- trail that cannot tell a rehearsal from the real thing is not a trail.
+--
+-- Its own table because `hand_actions` is append-only and stays that way:
+-- the machine's report is a second fact about a step, arriving later from
+-- somewhere else, not a correction to the first.
+CREATE TABLE IF NOT EXISTS hand_landings (
+    id       TEXT PRIMARY KEY,
+    reach_id TEXT NOT NULL REFERENCES reaches(id),
+    n        INTEGER NOT NULL,      -- the step in hand_actions this is about
+    landed   TEXT NOT NULL,         -- landed | missed | rehearsed
+    note     TEXT,
+    at       TEXT NOT NULL,
+    UNIQUE (reach_id, n)
+);
+
 -- A thing it can do again: learned by watching somebody do it (`shown`) or
 -- by being told the steps in words (`told`). One table for both, because a
 -- routine dictated over the phone and a routine demonstrated on screen are
@@ -2897,6 +2918,7 @@ CREATE TABLE IF NOT EXISTS routines (
     created_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_actions_reach ON hand_actions (reach_id, n);
+CREATE INDEX IF NOT EXISTS idx_landings_reach ON hand_landings (reach_id, n);
 CREATE INDEX IF NOT EXISTS idx_reaches_profile ON reaches (profile_id);
 """
 

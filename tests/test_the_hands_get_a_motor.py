@@ -59,7 +59,24 @@ def test_a_decision_goes_through_the_same_door_as_a_move(client):
     body = source.split("def decide(")[1].split("\ndef ")[0]
     assert "_write(" not in body, (
         "deciding writes to the ledger directly, around every bound")
-    assert body.count("act(reach_id") >= 3
+
+    # Counting the calls was a stand-in for the property, and a number in
+    # an assertion is a number nothing compares against what it measures.
+    # The property is that `decide` has no way out except through `act`.
+    tree = ast.parse(source)
+    decide = next(n for n in ast.walk(tree)
+                  if isinstance(n, ast.FunctionDef) and n.name == "decide")
+    returns = [n for n in ast.walk(decide) if isinstance(n, ast.Return)]
+    assert returns, "decide returns nothing at all"
+    for node in returns:
+        call = node.value
+        assert isinstance(call, ast.Call), (
+            f"decide returns something that is not a call, line {node.lineno}")
+        name = getattr(call.func, "id", getattr(call.func, "attr", ""))
+        assert name == "act", (
+            f"decide returns {name}() rather than act(), "
+            f"line {node.lineno} — that is a path into the ledger "
+            "that no bound is standing in front of")
 
 
 def test_it_asks_rather_than_guessing_when_it_cannot_see(client, profile_id,
@@ -633,3 +650,62 @@ def test_there_is_time_to_bring_the_app_forward():
     assert "start_in" in setup and "time.sleep(1)" in setup
     # It counts down out loud rather than appearing to hang.
     assert "first picture in" in setup
+
+
+def test_the_ledger_learns_whether_the_move_landed(client, profile_id,
+                                                   monkeypatch):
+    """`hand_actions.outcome` is written where the move is permitted, and
+    that is the server, which cannot see a cursor. `done` there has only
+    ever meant chosen and allowed — so a dry run and a live one left
+    identical records, and a click that missed left one saying it landed.
+
+    asked     was the move permitted
+    mattered  did the move happen
+
+    The report is its own row because the ledger is append-only: the two
+    are different facts about one step, arriving at different times from
+    different ends, and neither corrects the other.
+    """
+    granted = _grant(profile_id)
+    reach = hands.open_reach(profile_id, granted["id"], errand="type yellow",
+                             platform="windows")
+
+    class _Types:
+        def generate(self, system, messages):
+            return "type | the page | yellow"
+
+    from qrme import llm
+    monkeypatch.setattr(hands, "read_screen", lambda *a, **k: "a notepad")
+    monkeypatch.setattr(llm, "provider_for_profile", lambda *a, **k: _Types())
+    step = hands.decide(reach["id"])
+    assert step["outcome"] == "done"
+
+    # Before anybody reports, the honest answer is that nobody knows.
+    assert hands.ledger(reach["id"])[0]["landed"] is None
+
+    hands.land(reach["id"], step["n"], "rehearsed")
+    written = hands.ledger(reach["id"])[0]
+    assert written["outcome"] == "done" and written["landed"] == "rehearsed"
+
+    # Append-only holds: a second report does not overwrite the first.
+    hands.land(reach["id"], step["n"], "landed")
+    assert hands.ledger(reach["id"])[0]["landed"] == "rehearsed"
+
+    # And nonsense is refused rather than stored.
+    with pytest.raises(hands.HandError):
+        hands.land(reach["id"], step["n"], "probably")
+
+
+def test_the_motor_says_what_became_of_the_last_step():
+    """The report rides the `/next` the motor already makes. A machine that
+    has stopped calling has stopped reporting, and a step nobody came back
+    about stays unlanded — which is a third state and not a quiet no."""
+    motor = (REPO / "companion" / "hands.py").read_text(encoding="utf-8")
+    loop = motor.split("for round_number in range(ROUNDS):")[1]
+    assert '{"frame": _frame(), **report}' in loop
+    assert '"landed": ("missed" if why else' in loop
+    assert '"landed" if said.live else "rehearsed")' in loop
+
+    route = (REPO / "qrme" / "routers" / "hands.py").read_text(
+        encoding="utf-8")
+    assert "hands.land(reach_id, body.about_step, body.landed," in route

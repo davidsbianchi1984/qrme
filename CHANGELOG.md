@@ -6,6 +6,92 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-08-29
+
+### Added
+
+- **The hands get a motor.** 2.4.0 shipped the hands with their
+  authority, their ledger and their screen, and nothing that could move
+  a cursor. The loop was written down as see → decide → act → record and
+  two of the four were missing. `hands.decide` reads one frame, asks for
+  one move, and routes that answer straight into `hands.act`, so a
+  chosen move and a permitted move cannot drift apart. `companion/hands.py`
+  is the other half and runs on the person's own machine: no daemon, no
+  autostart, no credential on disk, no local copy of the permission, and
+  a dry run as the default. The stop is the mouse — a corner of the
+  screen, deliberately a physical gesture rather than a key combination.
+- **The ledger learns whether the move landed.** `hand_actions.outcome`
+  is written where a move is *permitted*, which is the server, and the
+  server cannot see a cursor — so `done` there only ever meant chosen
+  and allowed. A dry run and a live one left identical records, and a
+  click that missed left one saying it landed. A new `hand_landings`
+  table carries what the far end reports: `landed`, `missed`, or
+  `rehearsed`. Its own table because `hand_actions` is append-only and
+  stays that way — the report is a second fact about a step, arriving
+  later from somewhere else, not a correction to the first. A step
+  nobody came back about stays unlanded, which reads as "nobody said"
+  rather than as a quiet yes.
+- **`qrme.will_it_decide`**, which asks every configured provider the
+  question the hands ask and sorts the answers four ways. Whether a
+  model will choose a move on somebody's screen is its vendor's policy,
+  it differs between them and it changes; finding out used to cost a
+  grant, a reach, a hand-edited command line and a rebuild per
+  candidate.
+
+### Changed
+
+- The deciding half is told **which machine** it is working. The
+  platform was picked on the screen that opens a reach and travelled no
+  further than the check for whether the machine could be driven at all.
+- `look` is no longer offered as a free first move. The screen is read
+  afresh before every decision, so looking returns what the question
+  already carries, and it costs a step out of the owner's budget.
+- `ask` is for what a person knows and the screen does not show — not
+  for being unsure, which was most turns.
+- An empty answer is asked for a second time. `ask` closes a reach, so
+  one blank round used to end an errand and cost its owner a new grant,
+  a new reach and a new command line.
+- The decision goes to the model **the profile chose**, not the house
+  default, so an owner whose provider declines this class of work can
+  send that one job elsewhere from a screen they already have.
+- The motor's command line is one line with a button beside it. It was
+  printed the way a shell script reads, and the first person to run it
+  was on PowerShell, where a trailing backslash is an argument rather
+  than a continuation.
+
+### Fixed
+
+- **The eyes stop writing down what they should not read.** The
+  description they produce is stored in the ledger's `saw` column and
+  handed to the deciding model on every turn after, so a terminal left
+  open put a live owner token into the database and into a provider's
+  inbox. `SECRET_FIELDS` guarded *typing* a secret and always had;
+  reading one was a door with no lock on it. The eyes are now told to
+  say where a credential is and never what it says, and
+  `without_secrets` takes card shapes and long opaque runs back out of
+  whatever comes back.
+- **The token leaves the command line.** `--token` put it in the shell's
+  history, the process list, the scrollback, and — because this is the
+  one program whose job is to photograph the screen it runs on — every
+  frame it sent. Clearing the terminal could not help: the line you
+  paste is echoed. The motor asks for it at a silent prompt or reads
+  `QRME_OWNER_TOKEN`, the console prints the command without it, and a
+  **Copy my token** button puts it on the clipboard without drawing it.
+- A model that failed is no longer reported as a screen that could not
+  be read. Three different failures arrived wearing one sentence, and it
+  sent the first person to use it looking at his own monitor.
+- `look`, `ask` and `done` are drawn as what they are — always on, and
+  not the owner's to turn off. Drawn empty and disabled, they read as
+  refused.
+- The platform picker opens on the machine reading the screen instead of
+  macOS for everybody.
+- `--start-in` waits before the first frame so the person can bring the
+  app they named to the front. The motor is started from a terminal, so
+  a terminal was the first thing it photographed.
+- `mss.mss` is deprecated on release 10, and its warning printed above
+  the motor's own first line looked like a fault in the library the
+  person had just installed.
+
 ## [2.5.0] - 2026-08-29
 
 ### Added
@@ -16328,7 +16414,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.5.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.6.0...HEAD
+[2.6.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.5.0...app-v2.6.0
 [2.5.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.4.0...app-v2.5.0
 [2.4.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.3.1...app-v2.4.0
 [2.3.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.3.0...app-v2.3.1

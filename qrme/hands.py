@@ -877,14 +877,60 @@ def stop(reach_id: str, why: str = "stopped by the person") -> dict:
     return read_reach(reach_id)
 
 
+#: What a machine may report about a step it was handed. `rehearsed` is
+#: the dry run saying so out loud, which is the whole point of a dry run
+#: and was previously indistinguishable from having done the thing.
+LANDINGS = ("landed", "missed", "rehearsed")
+
+
+def land(reach_id: str, n: int, landed: str, note: str | None = None) -> dict:
+    """Record what the machine says became of step `n`.
+
+    `hand_actions.outcome` is written where the move is permitted, and
+    that is the server, which cannot see a cursor. `done` there has only
+    ever meant chosen and allowed. Whether it landed is known on the
+    other end and nowhere else, so it arrives later and separately —
+    never as an edit, because the ledger is append-only and the two are
+    different facts about the same step.
+
+        asked     was the move permitted
+        mattered  did the move happen
+
+    Silence is not a report. A step nobody came back about stays
+    unlanded, which reads as "we do not know" rather than either yes or
+    no, and that is the honest state.
+    """
+    if landed not in LANDINGS:
+        raise HandError(422, f"no such landing: {landed!r}")
+    row = db.connect().execute(
+        "SELECT * FROM hand_actions WHERE reach_id=? AND n=?",
+        (reach_id, n)).fetchone()
+    if row is None:
+        raise HandError(404, "no such step on this reach")
+    conn = db.connect()
+    conn.execute(
+        "INSERT OR IGNORE INTO hand_landings (id, reach_id, n, landed,"
+        " note, at) VALUES (?,?,?,?,?,?)",
+        (db.new_id("hln"), reach_id, n, landed,
+         (note or "").strip()[:200] or None, db.utcnow()))
+    conn.commit()
+    return {"reach_id": reach_id, "n": n, "landed": landed}
+
+
 def ledger(reach_id: str) -> list[dict]:
     """Every move of one reach, in order, including the refused ones."""
-    rows = db.connect().execute(
+    conn = db.connect()
+    rows = conn.execute(
         "SELECT * FROM hand_actions WHERE reach_id=? ORDER BY n",
         (reach_id,)).fetchall()
+    said = {r["n"]: r for r in conn.execute(
+        "SELECT * FROM hand_landings WHERE reach_id=?", (reach_id,)).fetchall()}
     return [{"n": r["n"], "profile_id": r["profile_id"], "verb": r["verb"],
              "target": r["target"], "detail": json.loads(r["detail"]),
              "saw": r["saw"], "outcome": r["outcome"], "note": r["note"],
+             # None when no machine ever came back about it.
+             "landed": said[r["n"]]["landed"] if r["n"] in said else None,
+             "landed_note": said[r["n"]]["note"] if r["n"] in said else None,
              "at": r["at"]} for r in rows]
 
 

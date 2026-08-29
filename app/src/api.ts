@@ -2206,7 +2206,13 @@ export type Reach = {
 export type HandAction = {
   n: number; profile_id: string; verb: string;
   target: string | null; detail: Record<string, unknown>;
-  saw: string | null; outcome: string; note: string | null; at: string;
+  saw: string | null; outcome: string; note: string | null;
+  // `outcome` is what the stack permitted; `landed` is what the machine
+  // came back and said became of it. null means nobody ever did — which
+  // is a third state, not a quiet no.
+  landed: "landed" | "missed" | "rehearsed" | null;
+  landed_note: string | null;
+  at: string;
 };
 
 export type HandStep = {
@@ -5763,7 +5769,7 @@ export const api = {
   // picking it. Strict about what the words named — words that name no
   // place are refused rather than read generously.
   tellHands: (profileId: string, token: string, body: {
-    said: string; surface?: string; watched?: boolean;
+    in_words: string; surface?: string; watched?: boolean;
   }) => req<HandGrant>(`/profiles/${profileId}/hands/told`,
                        { method: "POST", token, body }),
   takeHandsBack: (profileId: string, token: string, grantId: string) =>

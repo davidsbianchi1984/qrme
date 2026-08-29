@@ -58,6 +58,11 @@ function _thisMachine(): string {
   return "macos";
 }
 
+/** The one line that puts the motor on somebody's machine. A constant
+ *  rather than a translated string: what the reader types has to match
+ *  what pip expects, in every language. */
+const INSTALL = "pip install pyautogui mss pillow";
+
 export function Hands() {
   const { session } = useSession();
   const lang = visitorLang();
@@ -162,6 +167,14 @@ export function Hands() {
     }
   }
 
+  async function copyInstall() {
+    setNote(null);
+    try {
+      await navigator.clipboard.writeText(INSTALL);
+      setNote(tr("hnd.motor.installed", lang));
+    } catch { setNote(tr("hnd.motor.select", lang)); }
+  }
+
   async function copyMotor(reachId: string) {
     setNote(null);
     try {
@@ -197,7 +210,7 @@ export function Hands() {
     setError(null); setNote(null);
     try {
       const written = await api.tellHands(me, token,
-                                          { said, surface, watched });
+                                          { in_words: said, surface, watched });
       setNote(fill(tr("hnd.heard", lang), {
         places: written.places.join(", "),
         verbs: written.verbs.join(", "),
@@ -487,6 +500,17 @@ export function Hands() {
               <strong>{step.n}. {step.verb}</strong>
               {step.target ? ` — ${step.target}` : ""}
               {step.outcome !== "done" && ` · ${step.outcome}`}
+              {/* Permitted and performed are two different facts, and a
+                  step nobody reported on is a third. Saying nothing where
+                  the report is missing would read as "it happened". */}
+              {step.outcome === "done" && (
+                <span className="muted">
+                  {" · "}{tr(`hnd.landed.${step.landed || "unknown"}`, lang)}
+                </span>
+              )}
+              {step.landed_note && (
+                <span className="muted"> {step.landed_note}</span>
+              )}
               {step.note && <span className="muted"> {step.note}</span>}
               {step.saw && <span className="muted small"> · {step.saw}</span>}
             </p>
@@ -507,6 +531,20 @@ export function Hands() {
             <div className="hnd-motor">
               <p className="small">{tr("hnd.motor", lang)}</p>
               <p className="muted small">{tr("hnd.motor.sub", lang)}</p>
+              {/* A shell command is the same in every language, so it is
+                  neither prose to translate nor prose to leave in English:
+                  it is a line to copy, and it goes in a box like the other
+                  one. Inside the caption it made two of the ten languages
+                  read as half-finished English; drawn as loose text it was
+                  an English string on a translated screen. Both readings
+                  were right about the same mistake. */}
+              <textarea readOnly rows={1} className="hnd-cmd"
+                        value={INSTALL} />
+              <div className="row">
+                <button onClick={copyInstall}>
+                  {tr("hnd.motor.install", lang)}
+                </button>
+              </div>
               <textarea readOnly rows={3} className="hnd-cmd"
                         value={motorCommand(reach.id)} />
               <div className="row">
