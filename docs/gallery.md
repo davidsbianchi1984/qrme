@@ -304,7 +304,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 <td align="center" width="25%"><a href="screens/154-grants.png"><img src="screens/154-grants.png" width="210" alt="Lent Skills"></a><br><sub><b>154</b> · Lent Skills</sub></td>
 </tr>
 <tr>
-<td align="center" width="25%"><a href="screens/155-watch-together.svg"><img src="screens/155-watch-together.svg" width="210" alt="Watch Together"></a><br><sub><b>155</b> · Watch Together</sub></td>
+<td align="center" width="25%"><a href="screens/155-party.png"><img src="screens/155-party.png" width="210" alt="Watch Together"></a><br><sub><b>155</b> · Watch Together</sub></td>
 <td align="center" width="25%"><a href="screens/156-identity.png"><img src="screens/156-identity.png" width="210" alt="Who This Is"></a><br><sub><b>156</b> · Who This Is</sub></td>
 <td align="center" width="25%"><a href="screens/157-presence.png"><img src="screens/157-presence.png" width="210" alt="Where It Is Seen"></a><br><sub><b>157</b> · Where It Is Seen</sub></td>
 <td align="center" width="25%"><a href="screens/158-live.png"><img src="screens/158-live.png" width="210" alt="What Is Live"></a><br><sub><b>158</b> · What Is Live</sub></td>
@@ -352,7 +352,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 <td align="center" width="25%"><a href="screens/186-wall.png"><img src="screens/186-wall.png" width="210" alt="Wall"></a><br><sub><b>186</b> · Wall</sub></td>
 </tr>
 <tr>
-<td align="center" width="25%"><a href="screens/187-shops.svg"><img src="screens/187-shops.svg" width="210" alt="Shops"></a><br><sub><b>187</b> · Shops</sub></td>
+<td align="center" width="25%"><a href="screens/187-shop.png"><img src="screens/187-shop.png" width="210" alt="Shops"></a><br><sub><b>187</b> · Shops</sub></td>
 <td align="center" width="25%"><a href="screens/188-corner.png"><img src="screens/188-corner.png" width="210" alt="Your Corner"></a><br><sub><b>188</b> · Your Corner</sub></td>
 <td align="center" width="25%"><a href="screens/189-feed.png"><img src="screens/189-feed.png" width="210" alt="Feed"></a><br><sub><b>189</b> · Feed</sub></td>
 <td align="center" width="25%"><a href="screens/190-what-plays.svg"><img src="screens/190-what-plays.svg" width="210" alt="What Plays"></a><br><sub><b>190</b> · What Plays</sub></td>
@@ -603,7 +603,7 @@ is exactly how the old card came to be showing yours in place of theirs.
   </tr>
   <tr>
     <td align="center" width="25%"><a href="screens/205-avatar-stage.svg"><img src="screens/205-avatar-stage.svg" width="210" alt="Avatar stage"></a><br><sub><b>205</b> · Avatar stage · the avatar takes the screen, wardrobe on the rail</sub></td>
-    <td align="center" width="25%"><a href="screens/206-raise.svg"><img src="screens/206-raise.svg" width="210" alt="Raise"></a><br><sub><b>206</b> · Raise · grow your own — stages earned, the Album written and never edited</sub></td>
+    <td align="center" width="25%"><a href="screens/206-raise.png"><img src="screens/206-raise.png" width="210" alt="Raise"></a><br><sub><b>206</b> · Raise · grow your own — stages earned, the Album written and never edited</sub></td>
     <td align="center" width="25%"><a href="screens/first-question.png"><img src="screens/first-question.png" width="210" alt="The first question"></a><br><sub><b>·</b> · The first question · the problem-reporting card, before anything else is shown</sub></td>
     <td align="center" width="25%"><a href="screens/207-hands.png"><img src="screens/207-hands.png" width="210" alt="Hands"></a><br><sub><b>207</b> · Hands · what it may work, for how long, and what it will never type</sub></td>
   </tr>

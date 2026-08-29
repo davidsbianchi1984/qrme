@@ -165,6 +165,68 @@ def open_tab(page, tab: str) -> bool:
                 and active.get_attribute("data-tab") == tab)
 
 
+
+def census() -> dict[str, int]:
+    """Which screen number each console surface is, per `tests/ui_screens.txt`.
+
+    This function is the fix for a defect in this file's own first version.
+    The docstring below `TABS` said "the numbers are the census's, so a
+    capture replaces the drawing that stood for the same surface" — and the
+    code numbered the captures 1, 2, 3 in the order the tabs happen to be
+    listed. So `home`, which the census calls screen 5, was written as
+    `1-home.png`, claiming to be screen 1, which is Welcome.
+
+        asked     photograph every surface
+        mattered  file each photograph under the surface it is of
+
+    A comment that describes what the author meant while the code does
+    something else is worse than no comment: the next reader trusts it. The
+    census is now read rather than described.
+    """
+    rows: dict[str, int] = {}
+    for line in (REPO / "tests" / "ui_screens.txt").read_text(
+            encoding="utf-8").splitlines():
+        line = line.split("#", 1)[0].strip()
+        if not line:
+            continue
+        parts = line.split()
+        if len(parts) < 2:
+            continue
+        first = parts[1].split(",")[0]
+        if first.isdigit():
+            rows[parts[0]] = int(first)
+    return rows
+
+
+#: The console component each tab renders, read off `App.tsx` rather than
+#: written down here — a second list would drift from the first.
+def components() -> dict[str, str]:
+    import re
+    source = (REPO / "app" / "src" / "App.tsx").read_text(encoding="utf-8")
+    return {tab: name for tab, name in
+            re.findall(r'tab === "([a-z]+)" && <([A-Z][A-Za-z]*)', source)}
+
+
+def numbered(tabs: list[str]) -> list[tuple[str, str, str]]:
+    """(census number, tab, stem) for every tab the census knows.
+
+    A tab whose component is not in the census is skipped loudly rather
+    than given a number nobody agreed on.
+    """
+    seen, by_tab = census(), components()
+    out, orphans = [], []
+    for tab in tabs:
+        component = by_tab.get(tab)
+        number = seen.get(component or "")
+        if number is None:
+            orphans.append(f"{tab} ({component or 'no component'})")
+            continue
+        out.append((f"{number:02d}", tab, tab))
+    for orphan in orphans:
+        print(f"  ? {orphan}: not in the census — no number to file it under")
+    return out
+
+
 def main(shots: list[tuple[str, str, str]]) -> None:
     """``shots`` is (screen number, tab id, filename stem)."""
     from playwright.sync_api import sync_playwright
@@ -207,6 +269,16 @@ def main(shots: list[tuple[str, str, str]]) -> None:
                 page.screenshot(path=str(OUT / "0-first-question.png"))
                 asked.click()
                 page.wait_for_timeout(400)
+            # The status bubble floats over the bottom-left of every
+            # screen, and at phone width it sits on top of the content the
+            # gallery is about. It carries its own minimise control, which
+            # is what a person does with it, so this presses that rather
+            # than hiding the element: what is photographed stays a state
+            # the product can actually be in.
+            minimise = page.query_selector(".wl-min")
+            if minimise:
+                minimise.evaluate("el => el.click()")
+                page.wait_for_timeout(200)
             for number, tab, stem in shots:
                 if not open_tab(page, tab):
                     print(f"  ! {tab}: never reached — nothing written")
@@ -237,4 +309,4 @@ if __name__ == "__main__":
         "assist", "referrals", "lobby", "audience", "beacons", "reaching",
         "leaving", "selling", "inside", "raise",
     ]
-    main([(str(i + 1), tab, tab) for i, tab in enumerate(TABS)])
+    main(numbered(TABS))
