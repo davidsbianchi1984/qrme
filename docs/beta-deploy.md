@@ -532,13 +532,35 @@ procedure, and the procedure looked like the four lines below it. So the
 ```bash
 ssh root@your-host
 
-cd /srv/qrme     && git pull --ff-only
-cd /srv/jim-mini && git pull --ff-only
-cd /srv/pdi      && git pull --ff-only
+cd /srv/qrme     && git checkout main && git pull --ff-only
+cd /srv/jim-mini && git checkout main && git pull --ff-only
+cd /srv/pdi      && git checkout main && git pull --ff-only
 
 cd /srv/qrme
 docker compose -f docker/beta-compose.yml --env-file .env up -d --build
 ```
+
+The `git checkout main` is the fifth repair of the same kind, and it cost
+two releases on the live beta before anybody saw it. `/srv/qrme` was on a
+local branch called `test-motor`, left there after a session on the box.
+`git pull --ff-only` on a checkout that is not on `main` does not fail — it
+fast-forwards the branch it *is* on, prints `Already up to date`, and looks
+exactly like a clean pull. The build then rebuilds the code that is there,
+the container comes up healthy, and the deploy reads as a success from
+beginning to end.
+
+    asked     did the pull succeed
+    mattered  did it pull the thing you are releasing
+
+It surfaced two releases later, in step 5: `sntheticprofiles.com` answering
+`"version":"2.5.0"` while the other two answered `2.7.0`. That check is the
+only thing on this page that could have caught it, and it caught it two
+releases late because nothing between the pull and the health object ever
+mentions a branch.
+
+`git checkout main` is idempotent — on a checkout already on `main` it
+prints one line and changes nothing — so it costs nothing to carry, and it
+lives inside the block for the same reason the `ssh` above it does.
 
 All three, every time, even for a release that changed only one of them —
 the version guard in each console compares itself against the backend
