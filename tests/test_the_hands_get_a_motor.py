@@ -318,3 +318,38 @@ def test_the_platform_starts_at_the_machine_reading_the_screen():
     for named in ("windows", "macos", "linux", "android", "ios"):
         assert named in guess
         assert named in hands.PLATFORMS
+
+
+def test_a_model_that_failed_is_not_reported_as_a_screen(client, profile_id,
+                                                         monkeypatch):
+    """`decide` caught every exception from the deciding model, threw the
+    reason away, and asked with "it could not read the screen". The eyes
+    had worked — the first person to run the motor watched it describe his
+    taskbar, then his Notepad window, and then tell him twice that it
+    could not read the screen. He went looking at his monitor.
+
+    asked     which half failed
+    mattered  a refusal that names the wrong half sends the reader to the
+              wrong place, and this one is read by the owner of the screen
+    """
+    granted = _grant(profile_id)
+    reach = hands.open_reach(profile_id, granted["id"], errand="type yellow",
+                             platform="windows")
+
+    class _Broken:
+        def generate(self, system, messages):
+            raise RuntimeError("nope")
+
+    monkeypatch.setattr(hands, "read_screen", lambda *a, **k: "a notepad")
+    from qrme import llm
+    monkeypatch.setattr(llm, "get_provider", lambda *a, **k: _Broken())
+    step = hands.decide(reach["id"])
+    assert step["verb"] == "ask"
+    assert "could not read the screen" not in step["target"]
+    assert "RuntimeError" in step["target"]
+    # The eyes' own failure keeps the sentence that belongs to it.
+    monkeypatch.setattr(hands, "read_screen", lambda *a, **k: None)
+    reach2 = hands.open_reach(profile_id, granted["id"],
+                              errand="type yellow", platform="windows")
+    blind = hands.decide(reach2["id"])
+    assert blind["target"] == "it could not read the screen"

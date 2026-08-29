@@ -103,10 +103,13 @@ decision would.
 from __future__ import annotations
 
 import json
+import logging
 import re
 from datetime import datetime, timedelta, timezone
 
 from . import db
+
+logger = logging.getLogger("qrme.hands")
 
 #: Where a hand can reach. `here` is our own console — the safest of the
 #: three and the only one that needs no companion on another machine.
@@ -529,17 +532,35 @@ def decide(reach_id: str, frame_b64: str | None = None,
 
     from . import llm
     system, question = _decision_prompt(reach, allowed, seen, ledger(reach_id))
+    trouble = None
     try:
         said = llm.get_provider().generate(
             system, [{"role": "user", "content": question}])
-    except Exception:
+    except Exception as exc:  # the reason is the entire point of catching
         said = None
+        trouble = type(exc).__name__
+        logger.warning("the deciding model failed on %s: %s: %s",
+                       reach_id, trouble, exc)
     if not said:
         # No eyes, no model, no answer: it asks rather than guessing. A
         # hand that moves on a frame it could not read is the whole thing
         # this module exists to prevent.
-        return act(reach_id, "ask", target="it could not read the screen",
-                   saw=seen)
+        #
+        # Three different failures used to arrive here wearing one
+        # sentence. The eyes had worked and the deciding model had not,
+        # and the ledger said "it could not read the screen" — which sent
+        # the first person to use it looking at their own monitor. The
+        # exception's name goes on the line because a person reading a
+        # refusal about their own machine deserves to know it was not
+        # their machine; its text goes to the log rather than the ledger,
+        # which is read by people who are not the operator.
+        if not seen:
+            why = "it could not read the screen"
+        elif trouble:
+            why = f"the deciding model failed ({trouble})"
+        else:
+            why = "the deciding model answered with nothing"
+        return act(reach_id, "ask", target=why, saw=seen)
 
     match = _CHOICE.match(said.strip().splitlines()[0])
     verb = (match.group(1) if match else "").strip().lower()
