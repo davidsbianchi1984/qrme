@@ -5784,6 +5784,15 @@ export const api = {
   }) => req<HandStep>(
     `/profiles/${profileId}/hands/reaches/${reachId}/act`,
     { method: "POST", token, body }),
+  // One frame in, one bounded move out. What comes back has already
+  // been through every bound the grant carries and is already written in
+  // the ledger — a refusal arrives the same way, 200 with the refusal in
+  // the row. A caller performs only what carries `outcome: "done"`.
+  nextMove: (profileId: string, token: string, reachId: string, body: {
+    frame?: string | null; saw?: string | null;
+  }) => req<HandStep>(
+    `/profiles/${profileId}/hands/reaches/${reachId}/next`,
+    { method: "POST", token, body }),
   handOver: (profileId: string, token: string, reachId: string, body: {
     to_profile_id: string; places?: string[]; verbs?: string[];
   }) => req<Reach>(

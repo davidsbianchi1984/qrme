@@ -4943,6 +4943,15 @@ const CHROME: Table = {
   "ward.building": {
     en: "Building the head…", es: "Construyendo la cabeza…", fr: "Construction de la tête…", de: "Der Kopf wird gebaut…", pt: "A construir a cabeça…", it: "Sto costruendo la testa…", ja: "頭を組み立てています…", zh: "正在构建头部…", hi: "सिर बनाया जा रहा है…", ar: "يجري بناء الرأس…",
   },
+  "hnd.choose": {
+    en: "Let it choose the next move", es: "Deja que elija el siguiente movimiento", fr: "Laissez-le choisir le geste suivant", de: "Lass es die nächste Bewegung wählen", pt: "Deixa-o escolher o próximo movimento", it: "Lascia che scelga la mossa successiva", ja: "次の一手を選ばせる", zh: "让它选择下一步", hi: "इसे अगली चाल चुनने दें", ar: "دعه يختار الحركة التالية",
+  },
+  "hnd.choose.ph": {
+    en: "what is on the screen, in your words", es: "qué hay en la pantalla, con tus palabras", fr: "ce qu'il y a à l'écran, avec vos mots", de: "was auf dem Bildschirm ist, in deinen Worten", pt: "o que está no ecrã, nas tuas palavras", it: "cosa c'è sullo schermo, con parole tue", ja: "画面に何があるか、あなたの言葉で", zh: "屏幕上有什么，用你的话说", hi: "स्क्रीन पर क्या है, आपके शब्दों में", ar: "ما على الشاشة، بكلماتك",
+  },
+  "hnd.choose.go": {
+    en: "Choose", es: "Elegir", fr: "Choisir", de: "Wählen", pt: "Escolher", it: "Scegli", ja: "選ぶ", zh: "选择", hi: "चुनें", ar: "اختر",
+  },
   "hnd.again": {
     en: "Things it can do again", es: "Cosas que puede repetir", fr: "Ce qu'il peut refaire", de: "Was es wiederholen kann", pt: "Coisas que pode repetir", it: "Cose che può rifare", ja: "またできること", zh: "它能重复做的事", hi: "जो यह दोबारा कर सकता है", ar: "أشياء يمكنه تكرارها",
   },

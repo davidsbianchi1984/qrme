@@ -73,6 +73,7 @@ export function Hands() {
   const [moveText, setMoveText] = useState("");
   const [handTo, setHandTo] = useState("");
   const [dictated, setDictated] = useState("");
+  const [onScreen, setOnScreen] = useState("");
 
   const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<ReactNode>(null);
@@ -185,6 +186,25 @@ export function Hands() {
       // where it belongs, and the ledger is what refreshes.
       if (step.outcome !== "done") setNote(step.note || step.outcome || null);
       setMoveText("");
+      refresh(reach.id);
+    } catch (e) { fail(e); }
+  }
+
+  /** Let it choose, rather than being told the move.
+   *
+   * The console cannot photograph another machine's screen — that is the
+   * companion's job, and the companion posts a frame to this same door.
+   * What this end can do is describe the screen in words, which is the
+   * honest thing a person watching can offer, and is exactly what the
+   * eyes would have produced from a picture.
+   */
+  async function letItChoose() {
+    if (!reach) return;
+    setError(null); setNote(null);
+    try {
+      const step = await api.nextMove(me, token, reach.id,
+                                      { saw: onScreen.trim() || null });
+      if (step.outcome !== "done") setNote(step.note || step.outcome || null);
       refresh(reach.id);
     } catch (e) { fail(e); }
   }
@@ -421,6 +441,15 @@ export function Hands() {
                            : tr("hnd.move.text", lang)} />
                 )}
                 <button onClick={makeMove}>{tr("hnd.move.go", lang)}</button>
+              </div>
+              <p className="small">{tr("hnd.choose", lang)}</p>
+              <div className="row">
+                <input value={onScreen}
+                       onChange={(e) => setOnScreen(e.target.value)}
+                       placeholder={tr("hnd.choose.ph", lang)} />
+                <button onClick={letItChoose}>
+                  {tr("hnd.choose.go", lang)}
+                </button>
               </div>
               <div className="row">
                 <input value={handTo}

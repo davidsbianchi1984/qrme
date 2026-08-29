@@ -60,6 +60,17 @@ class ActIn(BaseModel):
                             description="what the eyes read on the screen")
 
 
+class NextIn(BaseModel):
+    frame: str | None = Field(
+        default=None,
+        description="One picture of the surface, base64 PNG. Omitted when "
+                    "the caller has already described it.")
+    saw: str | None = Field(
+        default=None,
+        description="What the screen shows, in words, when the caller has "
+                    "read it already — so the eyes are not paid for twice.")
+
+
 class HandOverIn(BaseModel):
     to_profile_id: str
     places: list[str] | None = None
@@ -209,6 +220,35 @@ def act(profile_id: str, reach_id: str, body: ActIn,
             raise hands.HandError(404, "no such reach")
         return hands.act(reach_id, body.verb, target=body.target,
                          detail=body.detail, saw=body.saw)
+    except hands.HandError as exc:
+        raise _fail(exc) from None
+
+
+@router.post("/profiles/{profile_id}/hands/reaches/{reach_id}/next")
+def next_move(profile_id: str, reach_id: str, body: NextIn,
+              request: Request) -> dict:
+    """One frame in, one bounded move out.
+
+    The door a companion holds open: it sends a picture of the surface, and
+    what comes back is a single move that has already been through every
+    bound the grant carries and is already written in the ledger.
+
+    A refusal comes back the same way, 200 with the refusal in the row.
+    The companion performs only what carries ``outcome == "done"``;
+    anything else is finished business — recorded, explained, and nothing
+    for a hand to do.
+
+    Deciding and permitting are one call on purpose. A decision that is
+    not immediately bounded is a decision somebody has to remember to
+    bound, and the whole point of `hands.act` is that nobody has to
+    remember.
+    """
+    require_owner(profile_id, request)
+    try:
+        reach = hands.read_reach(reach_id)
+        if reach["profile_id"] != profile_id:
+            raise hands.HandError(404, "no such reach")
+        return hands.decide(reach_id, frame_b64=body.frame, seen=body.saw)
     except hands.HandError as exc:
         raise _fail(exc) from None
 

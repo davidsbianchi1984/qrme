@@ -448,6 +448,123 @@ def grant_from_words(profile_id: str, granted_by: str, said: str, *,
 
 
 # --------------------------------------------------------------------------
+# Deciding
+
+
+#: What a decision may come back as. The model answers one line and the
+#: line is parsed strictly — a reply this cannot read is a reply that
+#: moves nothing, which is the right failure for a hand.
+_CHOICE = re.compile(
+    r"^\s*(\w+)\s*(?:\|\s*([^|]*?))?\s*(?:\|\s*(.*?))?\s*$")
+
+
+def _decision_prompt(reach: dict, allowed: list[str], seen: str | None,
+                     done: list[dict]) -> tuple[str, str]:
+    """The system sentence and the question, kept together so the shape of
+    the answer is written beside the shape that is parsed."""
+    steps = "\n".join(
+        f"{a['n']}. {a['verb']} {a['target'] or ''}"
+        f"{'' if a['outcome'] == 'done' else ' — REFUSED: ' + (a['note'] or '')}"
+        for a in done[-8:]) or "nothing yet"
+    system = (
+        "You are working somebody's screen on their behalf, one move at a "
+        "time. Answer with exactly one line and nothing else:\n"
+        "  VERB | what you are aiming at | argument\n"
+        f"VERB is one of: {', '.join(allowed)}.\n"
+        "Aim in plain words — the visible label of the thing you mean, as "
+        "a person would say it. For `type` the argument is the text; for "
+        "`key` it is the key's name; for `scroll` it is `up` or `down`; "
+        "for `wait` it is seconds. Use `ask` when you need a person, and "
+        "`done` when the errand is finished. Never explain, never "
+        "apologise, never answer with more than one line.\n\n"
+        + SCREEN_IS_DATA)
+    question = (
+        f"The errand: {reach['errand']}\n"
+        f"Steps so far:\n{steps}\n\n"
+        f"{quote(seen) or 'The screen could not be read.'}\n\n"
+        "The one next move:")
+    return system, question
+
+
+def decide(reach_id: str, frame_b64: str | None = None,
+           seen: str | None = None) -> dict:
+    """See, choose one move, and put it through the same door every other
+    move goes through.
+
+    ## Why the deciding and the acting are one call
+
+    A decision that is not immediately bounded is a decision somebody has
+    to remember to bound. `act` holds the grant's life, its verb list, its
+    step budget and the refusal to type a secret; routing the model's
+    choice straight into it means a chosen move and a permitted move
+    cannot drift apart, and a refusal is recorded in the same ledger as
+    everything else rather than being a thing that happened in a client.
+
+        asked     what should it do next
+        mattered  what is it allowed to do next
+
+    The caller executes only what comes back with ``outcome == "done"``.
+    Anything else is already written down, already explained, and already
+    finished — there is nothing for a hand to perform.
+
+    `seen` is accepted alongside `frame_b64` so a caller that has already
+    described the screen does not pay for the eyes twice; the frame is
+    read here when it has not.
+    """
+    reach = read_reach(reach_id)
+    if reach["state"] not in ("open",):
+        raise HandError(409, "that reach is not open")
+    grant_row = db.connect().execute(
+        "SELECT * FROM hand_grants WHERE id=?",
+        (reach["grant_id"],)).fetchone()
+    if grant_row is None or not _live(grant_row):
+        _close(reach_id, "stopped", "the permission ran out or was taken back")
+        raise HandError(403, "the permission for these hands is gone")
+
+    allowed = json.loads(grant_row["verbs"])
+    if reach["mode"] == "watching":
+        allowed = [v for v in allowed if v in EYES_ONLY]
+    if seen is None:
+        seen = read_screen(frame_b64, reach["errand"])
+
+    from . import llm
+    system, question = _decision_prompt(reach, allowed, seen, ledger(reach_id))
+    try:
+        said = llm.get_provider().generate(
+            system, [{"role": "user", "content": question}])
+    except Exception:
+        said = None
+    if not said:
+        # No eyes, no model, no answer: it asks rather than guessing. A
+        # hand that moves on a frame it could not read is the whole thing
+        # this module exists to prevent.
+        return act(reach_id, "ask", target="it could not read the screen",
+                   saw=seen)
+
+    match = _CHOICE.match(said.strip().splitlines()[0])
+    verb = (match.group(1) if match else "").strip().lower()
+    if verb not in VERBS:
+        return act(reach_id, "ask",
+                   target="it did not answer with a move it has",
+                   saw=seen)
+    target = (match.group(2) or "").strip() or None
+    argument = (match.group(3) or "").strip()
+    detail: dict = {}
+    if verb == "type":
+        detail = {"text": argument, "field": target}
+    elif verb == "key":
+        detail = {"key": argument.lower()}
+    elif verb == "scroll":
+        detail = {"dy": -600 if argument.lower().startswith("up") else 600}
+    elif verb == "wait":
+        try:
+            detail = {"seconds": float(argument or 1)}
+        except ValueError:
+            detail = {"seconds": 1.0}
+    return act(reach_id, verb, target=target, detail=detail, saw=seen)
+
+
+# --------------------------------------------------------------------------
 # The reach
 
 

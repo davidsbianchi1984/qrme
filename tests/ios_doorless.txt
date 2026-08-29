@@ -146,3 +146,11 @@ POST /profiles/{profile_id}/hands/told
 # measurement shows, so nothing here is missing — it simply does not
 # move yet.
 POST /profiles/{profile_id}/avatar/speaking
+
+# POST /profiles/{profile_id}/hands/reaches/{reach_id}/next — one frame
+# in, one bounded move out. On the same row as the thirteen hand routes
+# above and for the same reason: a hand needs a motor, and none of these
+# three shells has one. The web console reaches it by describing the
+# screen in words; the machine that can photograph a screen and then act
+# on it is `companion/hands.py`, which runs on the person's own desk.
+POST /profiles/{profile_id}/hands/reaches/{reach_id}/next
