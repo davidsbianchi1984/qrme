@@ -613,3 +613,23 @@ def test_the_owner_can_still_get_at_their_own_token():
     # The command itself still carries no token.
     built = screen.split("function motorCommand(")[1].split("\n  }")[0]
     assert "${token}" not in built
+
+
+def test_there_is_time_to_bring_the_app_forward():
+    """The motor is started from a terminal, so a terminal is the first
+    thing it photographs: a shell filling the display, and an errand about
+    an app that is not in the picture. The first person to run it watched
+    it look, look again, and give up — every one of those a correct
+    reading of the screen it was actually shown.
+
+    asked     what is on the screen when the first picture is taken
+    mattered  whatever the person was starting this from, not what they
+              meant it to work
+    """
+    motor = (REPO / "companion" / "hands.py").read_text(encoding="utf-8")
+    assert '"--start-in"' in motor
+    body = motor.split("def main(")[1]
+    setup = body.split("for round_number")[0]
+    assert "start_in" in setup and "time.sleep(1)" in setup
+    # It counts down out loud rather than appearing to hang.
+    assert "first picture in" in setup

@@ -185,6 +185,9 @@ def main() -> None:
     ask.add_argument("--live", action="store_true",
                      help="actually touch this machine (default: print only)")
     ask.add_argument("--beat", type=float, default=BEAT)
+    ask.add_argument("--start-in", type=float, default=5.0, metavar="SECONDS",
+                     help="wait this long before the first picture, so you "
+                          "can bring the app you named to the front")
     said = ask.parse_args()
 
     # The command line is copied off a screen, and a half-copied one used
@@ -203,6 +206,19 @@ def main() -> None:
           f"{'LIVE' if said.live else 'dry run'}")
     if said.live:
         print("  the stop is your mouse: throw the pointer into a corner.")
+    # You start this from a terminal, so a terminal is the first thing it
+    # photographs — a shell filling the display and an errand about an
+    # app that is not in the picture. The first person to run it watched
+    # it look, look again, and give up, all of which was the correct
+    # reading of the screen it was shown. Give them the seconds it takes
+    # to click the window they actually meant.
+    if said.start_in > 0:
+        print("  bring the app you named to the front — "
+              f"first picture in {said.start_in:.0f}s")
+        for left in range(int(said.start_in), 0, -1):
+            print(f"    {left}...", end="\r", flush=True)
+            time.sleep(1)
+        print("    watching now.   ")
 
     for round_number in range(ROUNDS):
         step = _post(said.base, where + "/next", said.token,
