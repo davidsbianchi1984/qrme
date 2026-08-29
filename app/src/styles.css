@@ -2238,12 +2238,36 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 /* The portrait taken to the screen — the photo big and nothing else,
    under the stage (z-59 beneath its 60) so opening the avatar from a
    seat never fights the lightbox for the front. */
+/* The portrait, filling the frame.
+ *
+ * It was a boxed picture at 92vw/92vh on a 0.92 scrim, so the room stayed
+ * visible around and behind it — the field's words: "I don't want it to
+ * bring up that whole background that's in the back behind the photo."
+ * Opaque ground, and the picture covers the frame the way a background
+ * image does, centred and cropped rather than letterboxed. */
 .face-light {
-  position: fixed; inset: 0; z-index: 59; background: rgba(5,7,15,0.92);
+  position: fixed; inset: 0; z-index: 59; background: #05070f;
   display: flex; align-items: center; justify-content: center;
 }
 .face-light img {
-  max-width: 92vw; max-height: 92vh; border-radius: 12px;
+  width: 100%; height: 100%; object-fit: cover; object-position: center;
+  border-radius: 0;
+}
+/* Both doors, on the picture. A full-screen portrait with no way across
+   to the avatar is a dead end, which is the one thing a pair of circles
+   exists to avoid. */
+.face-light-rail {
+  position: absolute; bottom: 22px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 8px; z-index: 2;
+}
+.face-light-rail button {
+  padding: 8px 16px; border-radius: 999px;
+  border: 1px solid var(--line); background: rgba(5,7,15,0.72);
+  color: var(--text, #e8eaf6); font-size: 13px; cursor: pointer;
+}
+.face-light-rail button.lit {
+  border-color: var(--accent, #7b7bff); opacity: 1; cursor: default;
 }
 /* The wardrobe card: sized like a card, scrolls inside itself, never
    hands the wheel to the face behind it. */

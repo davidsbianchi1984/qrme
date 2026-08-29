@@ -303,7 +303,11 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // The portrait taken to the screen — the OTHER circle of the pair.
   // "You click to just see the profile photo": no rail, no wardrobe,
   // just the picture big, and a tap anywhere puts it back.
-  const [shown, setShown] = useState<string | null>(null);
+  // The portrait, full screen. It keeps the seat as well as the picture:
+  // without the seat there is no way back to that face's avatar, and the
+  // field's ask was for both doors to stay reachable from the big view.
+  const [shown, setShown] =
+    useState<{ src: string; seat: string } | null>(null);
   // Which of the device's cameras. "user" is the selfie side; flipping asks
   // for the other and the effect below re-acquires the stream.
   const [facing, setFacing] = useState<"user" | "environment">("user");
@@ -2702,10 +2706,13 @@ export function Inside({ onPlans, start = "", onLeave }: {
                     <button className="rs-circle-btn" type="button"
                             aria-label={s.display}
                             onClick={(e) => { e.stopPropagation();
-                              setShown((aiFaces[s.id].asset as string)
-                                .startsWith("http")
-                                ? (aiFaces[s.id].asset as string)
-                                : getBase() + aiFaces[s.id].asset); }}>
+                              setShown({
+                                seat: s.id,
+                                src: (aiFaces[s.id].asset as string)
+                                  .startsWith("http")
+                                  ? (aiFaces[s.id].asset as string)
+                                  : getBase() + aiFaces[s.id].asset,
+                              }); }}>
                       <img className="rs-photo" alt={s.display}
                            src={(aiFaces[s.id].asset as string)
                                   .startsWith("http")
@@ -3380,17 +3387,38 @@ export function Inside({ onPlans, start = "", onLeave }: {
           }}
           onError={setError} />
       )}
-      {/* The portrait, big. The first circle of the pair opens this —
-          the photo and nothing else, closed by a tap anywhere on it. */}
+      {/* The portrait, the whole screen.
+       *
+       * It used to be a boxed picture on a translucent scrim, with the
+       * room showing through around it — "I don't want it to bring up
+       * that whole background that's in the back behind the photo. I
+       * just wanted to fill the screen with their image centered in the
+       * frame like a background image." So it fills, centred and
+       * cropped to the frame, on solid ground.
+       *
+       * And the two doors stay on it. A full-screen picture with no way
+       * across to the avatar would make this a dead end, which is the
+       * one thing the pair of circles exists to avoid. */}
       {shown && (
         <div className="face-light" role="dialog" aria-modal="true"
              onClick={() => setShown(null)}>
-          <img src={shown} alt="" />
+          <img src={shown.src} alt="" />
           <button className="stage-close" type="button"
                   aria-label={tr("stage.close", lang)}
                   onClick={() => setShown(null)}>
             ✕
           </button>
+          <div className="face-light-rail"
+               onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="lit" disabled>
+              {tr("ins.pair.photo", lang)}
+            </button>
+            <button type="button"
+                    onClick={() => { const seat = shown.seat;
+                                     setShown(null); setStaged(seat); }}>
+              {tr("ins.pair.avatar", lang)}
+            </button>
+          </div>
         </div>
       )}
     </div>

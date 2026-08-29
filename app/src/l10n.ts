@@ -638,6 +638,9 @@ const CHROME: Table = {
   "ins.pair.avatar": {
     en: "Avatar", es: "Avatar", fr: "Avatar", de: "Avatar", pt: "Avatar", it: "Avatar", ja: "アバター", zh: "头像", hi: "अवतार", ar: "الأفاتار",
   },
+  "ins.pair.photo": {
+    en: "Photo", es: "Foto", fr: "Photo", de: "Foto", pt: "Foto", it: "Foto", ja: "写真", zh: "照片", hi: "फ़ोटो", ar: "صورة",
+  },
   "ins.pair.audio": {
     en: "Audio", es: "Audio", fr: "Audio", de: "Audio", pt: "Áudio", it: "Audio", ja: "音声", zh: "语音", hi: "ऑडियो", ar: "الصوت",
   },
