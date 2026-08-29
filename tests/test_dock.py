@@ -46,7 +46,9 @@ def test_every_face_has_a_route_to_a_screen_that_exists(client):
     """A read-only pane whose faces went nowhere would be a dead end. Every
     face carries a way out, and the screen it names has to be drawn."""
     root = pathlib.Path(__file__).resolve().parent.parent / "docs" / "screens"
-    drawn = {int(p.name.split("-", 1)[0]) for p in root.glob("*.svg")
+    drawn = {int(p.name.split("-", 1)[0])
+             for pattern in ("*.svg", "*.png")
+             for p in root.glob(pattern)
              if p.name.split("-", 1)[0].isdigit()}
     for face in dock.FACES:
         route = dock.route(face)

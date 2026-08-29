@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v2.3.1** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v2.4.0** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -93,7 +93,7 @@ and the complete tour of all 207 is in [docs/gallery.md](docs/gallery.md).
     <td align="center" width="25%"><a href="docs/screens/01-welcome.svg"><img src="docs/screens/01-welcome.svg" width="165" alt="Welcome"></a><br><sub><b>01</b> · Welcome<br>the first door, no account needed to look</sub></td>
     <td align="center" width="25%"><a href="docs/screens/02-create-profile.svg"><img src="docs/screens/02-create-profile.svg" width="165" alt="Create a profile"></a><br><sub><b>02</b> · Create a profile<br>a synthetic person, made from your answers</sub></td>
     <td align="center" width="25%"><a href="docs/screens/39-sign-in.svg"><img src="docs/screens/39-sign-in.svg" width="165" alt="Sign in"></a><br><sub><b>39</b> · Sign in<br>your account, your held profiles</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/05-profile-home.svg"><img src="docs/screens/05-profile-home.svg" width="165" alt="Profile home"></a><br><sub><b>05</b> · Profile home<br>memory, engagement and moderation at a glance</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/05-home.png"><img src="docs/screens/05-home.png" width="165" alt="Profile home"></a><br><sub><b>05</b> · Profile home<br>memory, engagement and moderation at a glance</sub></td>
   </tr>
 </table>
 
@@ -134,7 +134,7 @@ and the complete tour of all 207 is in [docs/gallery.md](docs/gallery.md).
 
 <table>
   <tr>
-    <td align="center" width="25%"><a href="docs/screens/07-memory-vault.svg"><img src="docs/screens/07-memory-vault.svg" width="165" alt="Memory vault"></a><br><sub><b>07</b> · Memory vault<br>what it holds about you, erasable by conversation</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/07-memory.png"><img src="docs/screens/07-memory.png" width="165" alt="Memory vault"></a><br><sub><b>07</b> · Memory vault<br>what it holds about you, erasable by conversation</sub></td>
     <td align="center" width="25%"><a href="docs/screens/147-voice.png"><img src="docs/screens/147-voice.png" width="165" alt="Your own voice"></a><br><sub><b>147</b> · Your own voice<br>cloned by consent, watermarked every utterance</sub></td>
     <td align="center" width="25%"><a href="docs/screens/44-avatar-studio.svg"><img src="docs/screens/44-avatar-studio.svg" width="165" alt="Avatar studio"></a><br><sub><b>44</b> · Avatar studio<br>the face, aged and dressed as you choose</sub></td>
     <td align="center" width="25%"><a href="docs/screens/85-my-page.svg"><img src="docs/screens/85-my-page.svg" width="165" alt="My page"></a><br><sub><b>85</b> · My page<br>your public corner, in real HTML</sub></td>
@@ -158,7 +158,7 @@ and the complete tour of all 207 is in [docs/gallery.md](docs/gallery.md).
   <tr>
     <td align="center" width="25%"><a href="docs/screens/205-avatar-stage.svg"><img src="docs/screens/205-avatar-stage.svg" width="165" alt="Avatar stage"></a><br><sub><b>205</b> · Avatar stage<br>the avatar full screen, wardrobe rail down the edge</sub></td>
     <td align="center" width="25%"><a href="docs/screens/155-watch-together.svg"><img src="docs/screens/155-watch-together.svg" width="165" alt="Watch party"></a><br><sub><b>155</b> · Watch party<br>watched together — and watchable by the platform's own eyes</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/156-who-this-is.svg"><img src="docs/screens/156-who-this-is.svg" width="165" alt="Identity"></a><br><sub><b>156</b> · Identity<br>who a profile is — and the avatar deck it dresses from</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/156-identity.png"><img src="docs/screens/156-identity.png" width="165" alt="Identity"></a><br><sub><b>156</b> · Identity<br>who a profile is — and the avatar deck it dresses from</sub></td>
     <td align="center" width="25%"><a href="docs/screens/194-the-vastscape.svg"><img src="docs/screens/194-the-vastscape.svg" width="165" alt="A party you can find"></a><br><sub><b>194</b> · The vastscape<br>the wide view of everything running</sub></td>
   </tr>
 </table>
@@ -288,6 +288,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **2.4.0** | The hands — a profile can work a screen under a grant that names its apps, its moves, its minutes and its steps, given by menu or by word; it will not type a password, cannot widen itself from anything written on a screen, and says out loud that no iPhone can be driven. Plus the Wall crash that blanked the whole console, and the capture harness that had photographed the same screen thirty-nine times |
 | **2.3.1** | The head the forge builds is actually drawn — `Avatar3D` shipped catalogued but mounted by nothing, and now stands on the avatar stage and in a room seat with its jaw moving to the voice; the avatar market becomes a tile picker; and a guard fails the suite for any component nothing imports |
 | **2.3.0** | **The forge** — a photograph becomes a 3-D face on the deployment's own hardware (MediaPipe sidecar, ARKit-named blendshapes, no vendor and no monthly bill) and the head's mouth moves with the voice the room already plays; the sit-out button lets a person's seat step out of the rotation's waiting; Ready Player Me struck from the shelf after its January shutdown; aimed turns survive a mid-paragraph marker and a mistyped name; the room's ear re-opens when it falls quiet |
 | **2.2.0** | **The timeline gets hands** — Raise's three time controls: every Album entry on a day of the life's own calendar; visits that rewind the voice read-only to a lived day; branches that copy the record into a second life raised differently (the original never overwritten); fast-forward days lived from the record alone with saved questions waiting — plus the avatar screen made a true takeover with its red close, and the word “avatar” under the seat pair's second circle |

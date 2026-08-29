@@ -6,6 +6,73 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-08-29
+
+### Added
+
+- **The hands.** A profile could see and speak; now one can work a
+  screen. `qrme/hands.py` runs a four-step loop — read one frame, decide
+  **one** move against it, act, write it down — and everything else in
+  the module bounds that. A plan made against one frame is a set of
+  assertions about the next frame nobody checked, which is how an agent
+  presses *Delete* because *Cancel* used to be there.
+- **A grant that names what it covers, or is refused.** Every authority
+  names its apps or sites, its moves, its minutes and its steps; `"*"` is
+  refused at write time, where the owner is standing to read it. Two
+  doors reach the same row: the owner picks it from the list, or says it
+  — "you can click and type in my calendar for the next hour" — and the
+  spoken door is strict, because words that name no place must grant
+  nothing rather than be read generously.
+- **Refusals that are published, not only enforced.** It does not type
+  passwords, PINs, one-time codes, card numbers or recovery phrases,
+  caught both by what the field is called and by the shape of the text —
+  and the refusal is a recorded step, with what it declined to type kept
+  out of the ledger. Text read off a screen is data and can never widen
+  a grant, whatever that text claims. There is no shell, no install and
+  no download: a cursor and a keyboard is the whole instrument.
+- **Nothing drives an iPhone, and the product says so.** No third-party
+  process may operate another app's interface on iOS — no API, no
+  entitlement, no build that survives review — so `hands.DRIVABLE` omits
+  it and the reach is refused with the reason rather than accepted and
+  failed one screen later. On iOS the profile watches and says where to
+  press.
+- **An errand can be handed to a second profile**, who can only ever
+  hold less: the same places or fewer, the same moves or fewer, the
+  steps that remain and never a fresh budget. Otherwise a handover is
+  the cheapest way to widen a permission.
+- **Routines** — a thing it can do again, learned by watching somebody
+  work or by being told the steps, in one table because those are the
+  same object. Replaying one opens an ordinary reach and puts every step
+  through the same door a fresh decision goes through, so a routine
+  recorded under a generous grant does nothing under a narrow one.
+- Screen 207 draws the grant rather than the errand: the question a
+  person actually has is what they just handed over, and how to take it
+  back.
+
+### Fixed
+
+- **The Wall took the whole console down.** `api.feed` was declared as
+  answering `{ posts }`; the route has only ever answered
+  `{ feed_posts }`, so the screen put `undefined` in state and rendered
+  `posts.length`. With no error boundary anywhere in the tree, React
+  unmounted the entire application — pressing *Wall* gave a white page
+  with no menu to leave by. The type checker was clean on every line,
+  because a wrong hand-written type is a lie it enforces.
+- **A crash now costs one card, not the session.** `Boundary` catches a
+  failing screen, says the rest still works, offers to try again, and
+  posts the failure to the problem log instead of leaving it as
+  somebody's memory of a white page.
+- **The screens in 2.3.1's gallery were all the same screen.** The
+  capture harness navigated by `#tab` and this console has no hash
+  router, so every one of the thirty-nine photographs was Home, filed
+  under thirty-nine names. It now presses the tabs in the drawer the way
+  a person does and refuses to write a file unless the console marks the
+  tab it asked for as active. All thirty-nine are re-shot — and the
+  first honest run is what found the Wall.
+- A guard comparing the shapes `app/src/api.ts` declares against what the
+  routes actually answer, which is what would have caught the white page
+  before a tester did.
+
 ## [2.3.1] - 2026-08-28
 
 ### Fixed
@@ -16165,7 +16232,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.3.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.4.0...HEAD
+[2.4.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.3.1...app-v2.4.0
 [2.3.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.3.0...app-v2.3.1
 [2.3.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.2.0...app-v2.3.0
 [2.2.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.1.0...app-v2.2.0

@@ -980,6 +980,29 @@ LESSONS: tuple[dict, ...] = (
          screens=(163, 176),
          try_it="Open the full list of bodies and find one you cannot buy "
                 "yet."),
+    dict(key="hands", chapter="Working", title="Hands",
+         what="Letting a profile work a screen for you — a cursor, a "
+              "keyboard, and nothing else. It reads one frame, decides "
+              "one move against that frame, makes it, and writes the move "
+              "down beside what it saw; there is no plan running ahead of "
+              "what is on screen. What it may do is a permission you "
+              "write, and every part of it is a limit: which apps or "
+              "sites, which moves, how many minutes, how many steps. "
+              "Naming everything is refused outright. You can pick the "
+              "permission from the list or simply say it — \"you can "
+              "click and type in my calendar for the next hour\" — and "
+              "words that name no app or site grant nothing rather than "
+              "being read generously. It will not type a password, a PIN, "
+              "a one-time code or a card number, and it says so instead "
+              "of trying. Anything written on a screen is read as words "
+              "on a screen and can never widen what it is allowed to do. "
+              "On an iPhone it can watch and tell you where to press but "
+              "cannot press for you, because nothing may operate another "
+              "app's interface there. Take it back in one press: whatever "
+              "is running stops at its next move.",
+         screens=(207,),
+         try_it="Open Hands, say what it may do in one sentence, and read "
+                "back what those words were understood to mean."),
     dict(key="identity", chapter="Being yourself", title="Who this profile is",
          what="You may hold as many profiles as you like, and any of them may "
               "be anonymous. At most one may be verified — because the badge "

@@ -68,6 +68,11 @@ export function Hands() {
   const [reach, setReach] = useState<Reach | null>(null);
   const [ledger, setLedger] = useState<HandAction[]>([]);
   const [routineName, setRoutineName] = useState("");
+  const [moveVerb, setMoveVerb] = useState("press");
+  const [moveTarget, setMoveTarget] = useState("");
+  const [moveText, setMoveText] = useState("");
+  const [handTo, setHandTo] = useState("");
+  const [dictated, setDictated] = useState("");
 
   const [error, setError] = useState<unknown>(null);
   const [note, setNote] = useState<ReactNode>(null);
@@ -156,6 +161,62 @@ export function Hands() {
     try {
       const ended = await api.stopReach(me, token, reach.id);
       setReach(ended);
+    } catch (e) { fail(e); }
+  }
+
+  /** One move, by hand.
+   *
+   * With no companion driving a real cursor yet, this is the only way to
+   * exercise a reach — and it stays useful after there is one, because
+   * the person watching is the one who should be able to take a single
+   * step themselves without handing over the whole errand.
+   */
+  async function makeMove() {
+    if (!reach) return;
+    setError(null); setNote(null);
+    try {
+      const detail: Record<string, unknown> = {};
+      if (moveVerb === "type") { detail.text = moveText; detail.field = moveTarget; }
+      if (moveVerb === "key") detail.key = moveText;
+      const step = await api.handAct(me, token, reach.id, {
+        verb: moveVerb, target: moveTarget || null, detail,
+      });
+      // A refusal comes back as a step, not as an error — the ledger is
+      // where it belongs, and the ledger is what refreshes.
+      if (step.outcome !== "done") setNote(step.note || step.outcome || null);
+      setMoveText("");
+      refresh(reach.id);
+    } catch (e) { fail(e); }
+  }
+
+  async function passItOn() {
+    if (!reach) return;
+    setError(null); setNote(null);
+    try {
+      const passed = await api.handOver(me, token, reach.id,
+                                        { to_profile_id: handTo });
+      setReach(passed); setHandTo("");
+      refresh(passed.id);
+    } catch (e) { fail(e); }
+  }
+
+  /** A routine somebody dictates rather than demonstrates. One line per
+   *  step, `verb: what it aims at` — the same rows `learn_from_reach`
+   *  writes, arriving through the other door. */
+  async function dictate() {
+    setError(null); setNote(null);
+    const steps = dictated.split("\n").map((line) => {
+      const [verb, ...rest] = line.split(":");
+      return { verb: verb.trim().toLowerCase(),
+               target: rest.join(":").trim() || null,
+               detail: {} };
+    }).filter((step) => step.verb);
+    try {
+      await api.writeRoutine(me, token, {
+        name: routineName, surface, learned: "told", steps,
+      });
+      setNote(tr("hnd.wrotedown", lang));
+      setDictated(""); setRoutineName(""); load();
     } catch (e) { fail(e); }
   }
 
@@ -339,6 +400,39 @@ export function Hands() {
               {step.saw && <span className="muted small"> · {step.saw}</span>}
             </p>
           ))}
+          {reach.state === "open" && (
+            <>
+              <p className="small">{tr("hnd.move", lang)}</p>
+              <div className="row">
+                <select value={moveVerb}
+                        onChange={(e) => setMoveVerb(e.target.value)}>
+                  {(vocab?.verbs || []).map((v) => (
+                    <option key={v} value={v}>{v}</option>
+                  ))}
+                </select>
+                <input value={moveTarget}
+                       onChange={(e) => setMoveTarget(e.target.value)}
+                       placeholder={tr("hnd.move.at", lang)} />
+                {(moveVerb === "type" || moveVerb === "key") && (
+                  <input value={moveText}
+                         onChange={(e) => setMoveText(e.target.value)}
+                         placeholder={moveVerb === "key"
+                           ? tr("hnd.move.key", lang)
+                           : tr("hnd.move.text", lang)} />
+                )}
+                <button onClick={makeMove}>{tr("hnd.move.go", lang)}</button>
+              </div>
+              <div className="row">
+                <input value={handTo}
+                       onChange={(e) => setHandTo(e.target.value)}
+                       placeholder={tr("hnd.pass.who", lang)} />
+                <button disabled={!handTo.trim()} onClick={passItOn}>
+                  {tr("hnd.pass.go", lang)}
+                </button>
+              </div>
+              <p className="muted small">{tr("hnd.pass.note", lang)}</p>
+            </>
+          )}
           <div className="row">
             <input value={routineName}
                    onChange={(e) => setRoutineName(e.target.value)}
@@ -352,6 +446,18 @@ export function Hands() {
       <div className="card">
         <h3>{tr("hnd.again", lang)}</h3>
         <p className="muted small">{tr("hnd.again.pitch", lang)}</p>
+        <div className="row">
+          <input value={routineName}
+                 onChange={(e) => setRoutineName(e.target.value)}
+                 placeholder={tr("hnd.name", lang)} />
+        </div>
+        <textarea value={dictated} rows={3}
+                  onChange={(e) => setDictated(e.target.value)}
+                  placeholder={tr("hnd.dictate.ph", lang)} />
+        <div className="row">
+          <button disabled={!routineName.trim() || !dictated.trim()}
+                  onClick={dictate}>{tr("hnd.dictate.go", lang)}</button>
+        </div>
         {!routines.length && <p className="muted small">{tr("hnd.noroutines", lang)}</p>}
         {routines.map((r) => (
           <div key={r.id} className="row">

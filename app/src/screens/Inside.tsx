@@ -3,7 +3,7 @@ import { Avatar3D } from "../Avatar3D";
 import { isEcho, RECENT_TURNS } from "../echo";
 import { AvatarStage } from "../AvatarStage";
 import { TalkRail } from "../TalkRail";
-import { accountApi, api, getBase, type Avatar, type MicsHere, type RoomFaces,
+import { accountApi, api, getBase, type Avatar, type RoomFaces,
          type RoomMsg } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
@@ -194,7 +194,6 @@ export function Inside({ onPlans, start = "", onLeave }: {
 
   const [roomId, setRoomId] = useState(start);
   const [transcript, setTranscript] = useState<RoomMsg[]>([]);
-  const [mics, setMics] = useState<MicsHere | null>(null);
   const [seats, setSeats] = useState<
     { kind: string; id: string; display: string }[]>([]);
   // Profiles asked in whose owners have not yet said yes — drawn as
@@ -656,6 +655,19 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // Sharing into the room: whatever is typed in the box rides along as
   // the caption, so "look at this" and the picture arrive as one turn.
   const sharePick = useRef<HTMLInputElement>(null);
+  // The paperclip used to jump straight to the operating system's file
+  // dialog. On a phone that is the wrong first question: somebody
+  // attaching a photo in a room means the camera roll or the camera, and
+  // being dropped into a folder tree is a detour through the one place a
+  // picture is hardest to find. So the clip asks first, and each answer
+  // is its own input — `accept` and `capture` are read when the picker
+  // opens, so one input reconfigured on the way to `.click()` gets the
+  // dialog it had a moment ago, which is how a camera button ends up
+  // showing a folder.
+  const photoPick = useRef<HTMLInputElement>(null);
+  const cameraPick = useRef<HTMLInputElement>(null);
+  const videoPick = useRef<HTMLInputElement>(null);
+  const [attaching, setAttaching] = useState(false);
 
   const open = roomId.trim();
   // Whether a room is open, and therefore whether this screen is a PLACE
@@ -693,17 +705,9 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // to be the only reader. Declared with `inRoom` for that reason —
   // this is the third dead-zone crash on this screen from a const
   // sitting below its first use.
-  const lentByMe = mics?.microphones_lent.some((m) => m.interactor_id === me);
-  // The room's name, read off the join answer and editable in place.
+  // The room's name, read off the join answer. Renaming lives on the
+  // Rooms screen now — see the note where the box used to be.
   const [roomName, setRoomName] = useState("");
-  async function saveName() {
-    const want = roomName.trim();
-    if (!want || !token || busy) return;
-    await act(async () => {
-      await api.renameRoom(open, me, want, token);
-      setNote(tr("ins.roomname.saved", lang));
-    })();
-  }
 
   // A voice room is a voice room. Field report, holding a `voice` room up
   // against what it drew: "this is supposed to be audio chat only — we
@@ -720,7 +724,6 @@ export function Inside({ onPlans, start = "", onLeave }: {
   function load() {
     if (!open || !token) return;
     api.roomMessages(open, token).then(setTranscript).catch(setError);
-    api.micsInRoom(open, token).then(setMics).catch(() => setMics(null));
     // The seats. Joining twice is being there once, so the join door
     // doubles as the who-is-here read — and going in renders a scene
     // rather than leaving you on the same form, which a field report
@@ -1897,11 +1900,41 @@ export function Inside({ onPlans, start = "", onLeave }: {
                   onClick={() => dictation.current?.stop()}>⏹</button>
         </div>
       ) : (
+      <>
+      {/* What the clip asks before anything opens. Four answers, and each
+          is the shortest road to the thing it names: the camera roll, the
+          camera itself, video, and — last, because it is the general case
+          rather than the common one — everything else. */}
+      {attaching && (
+        <div className="rs-attach" role="menu">
+          <button role="menuitem" onClick={() => {
+            setAttaching(false); photoPick.current?.click(); }}>
+            🖼 {tr("ins.attach.photos", lang)}
+          </button>
+          <button role="menuitem" onClick={() => {
+            setAttaching(false); cameraPick.current?.click(); }}>
+            📷 {tr("ins.attach.camera", lang)}
+          </button>
+          <button role="menuitem" onClick={() => {
+            setAttaching(false); videoPick.current?.click(); }}>
+            🎞 {tr("ins.attach.video", lang)}
+          </button>
+          <button role="menuitem" onClick={() => {
+            setAttaching(false); sharePick.current?.click(); }}>
+            📁 {tr("ins.attach.files", lang)}
+          </button>
+          <button className="rs-attach-x"
+                  onClick={() => setAttaching(false)}>
+            {tr("ins.attach.cancel", lang)}
+          </button>
+        </div>
+      )}
       <div className="rs-chatpill">
         <button className="rs-chatbtn" disabled={busy || !token}
                 aria-label={tr("ins.share", lang)}
                 title={tr("ins.share", lang)}
-                onClick={() => sharePick.current?.click()}>📎</button>
+                aria-expanded={attaching}
+                onClick={() => setAttaching((v) => !v)}>📎</button>
         {canGrabScreen && (
           <button className="rs-chatbtn" disabled={busy || !token}
                   aria-label={tr("ins.screen", lang)}
@@ -1921,6 +1954,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 aria-label={tr("ins.sayit", lang)}
                 onClick={() => void sendDraft()}>➤</button>
       </div>
+      </>
       )}
       {/* The round controls screen 103 draws along the bottom.
        *
@@ -2677,6 +2711,14 @@ export function Inside({ onPlans, start = "", onLeave }: {
                                   .startsWith("http")
                                   ? (aiFaces[s.id].asset as string)
                                   : getBase() + aiFaces[s.id].asset} />
+                      {/* The word under the first circle. The pair
+                          carried a caption on one side only, which reads
+                          as a label for the pair rather than for the
+                          circle it sits under. Both are named now, and
+                          named for what pressing them does. */}
+                      <span className="rs-cap">
+                        {tr("ins.pair.audio", lang)}
+                      </span>
                     </button>
                     <button className="rs-circle-btn" type="button"
                             aria-label={tr("stage.open", lang)}
@@ -2938,42 +2980,16 @@ export function Inside({ onPlans, start = "", onLeave }: {
                         {tr("ins.face.hereoff", lang)}
                       </button>
                     )}
-                    {/* The room's own controls, behind the same gear as
-                        your seat's — the bottom card they lived on left
-                        the room ("you just could've set that up before
-                        they joined"), and each of these is still a
-                        capability's one door: the name, the microphone
-                        lend, and letting the profiles talk first. */}
-                    <input value={roomName} disabled={busy}
-                           onChange={(e) => setRoomName(e.target.value)}
-                           onKeyDown={(e) => {
-                             if (e.key === "Enter") void saveName();
-                           }}
-                           aria-label={tr("ins.roomname", lang)}
-                           placeholder={tr("ins.roomname.ph", lang)} />
-                    <button className="chip"
-                            disabled={busy || !token || !roomName.trim()}
-                            onClick={() => void saveName()}>
-                      {tr("ins.roomname.save", lang)}
-                    </button>
-                    <button className={"rs-round rs-worded lend"
-                                       + (lentByMe ? " live" : "")}
-                            disabled={busy || !token || !me || !open}
-                            aria-pressed={lentByMe}
-                            aria-label={lentByMe ? tr("ins.takeback", lang)
-                                                 : tr("ins.lendmic", lang)}
-                            title={tr("ins.micpitch", lang)}
-                            onClick={act(async () => {
-                              if (lentByMe) {
-                                await api.takeBackMicInRoom(open, me, token);
-                              } else {
-                                await api.lendMicInRoom(open, me, token);
-                              }
-                            }, lentByMe ? tr("ins.takenback", lang)
-                                        : tr("ins.lent", lang))}>
-                      {lentByMe ? tr("ins.takeback", lang)
-                                : tr("ins.lendmic", lang)}
-                    </button>
+                    {/* The room's name and the microphone lend are not
+                        here any more. Both are things you set *before*
+                        anybody is in the room with you, and both had been
+                        put behind a seat's gear where you can only reach
+                        them once the room is already running — a text box
+                        and a lend button wedged between "Camera on" and
+                        "Background", which is where the field found them
+                        and asked for them out. They are on the Rooms
+                        screen now, on the room's own row, which is the
+                        one place you stand before you walk in. */}
                     {/* The let-them-talk button is gone from every
                         platform, on the field order: "users can just tell
                         them to talk with each other if they need to, or
@@ -3258,6 +3274,31 @@ export function Inside({ onPlans, start = "", onLeave }: {
              * record is for reading. */}
             {/* The file picker stays: the strip's own attach button
                 clicks it, so it is this row's one surviving job. */}
+            {/* One input per answer, for the reason written where these
+                refs are declared. `capture` opens the camera on a phone
+                and is ignored on a desktop, where the file dialog is the
+                honest fallback rather than a broken button. */}
+            <input ref={photoPick} type="file" multiple accept="image/*"
+                   style={{ display: "none" }}
+                   onChange={(e) => {
+                     const picked = Array.from(e.target.files ?? []);
+                     e.target.value = "";
+                     if (picked.length) void shareFiles(picked);
+                   }} />
+            <input ref={cameraPick} type="file" accept="image/*"
+                   capture="environment" style={{ display: "none" }}
+                   onChange={(e) => {
+                     const picked = Array.from(e.target.files ?? []);
+                     e.target.value = "";
+                     if (picked.length) void shareFiles(picked);
+                   }} />
+            <input ref={videoPick} type="file" multiple accept="video/*"
+                   style={{ display: "none" }}
+                   onChange={(e) => {
+                     const picked = Array.from(e.target.files ?? []);
+                     e.target.value = "";
+                     if (picked.length) void shareFiles(picked);
+                   }} />
             <input ref={sharePick} type="file" multiple
                    style={{ display: "none" }}
                    accept="image/*,video/*,.pdf,.docx,.xlsx,.pptx,.zip,.txt"

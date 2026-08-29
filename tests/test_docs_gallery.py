@@ -60,13 +60,15 @@ def _referenced(src: str) -> list[str]:
     each is preserved.
     """
     seen: dict[str, None] = {}
-    for name in re.findall(r"(?:docs/)?screens/([\w\-.]+\.svg)", src):
+    for name in re.findall(r"(?:docs/)?screens/([\w\-.]+\.(?:svg|png))",
+                           src):
         seen.setdefault(name, None)
     return list(seen)
 
 
 def _on_disk() -> set[str]:
-    return {f for f in os.listdir(SCREENS) if f.endswith(".svg")}
+    return {f for f in os.listdir(SCREENS)
+            if f.endswith(".svg") or f.endswith(".png")}
 
 
 def test_every_referenced_screen_exists():
@@ -99,7 +101,7 @@ def test_no_screen_is_named_something_a_url_cannot_carry():
     a file on disk that the README cannot address.
     """
     bad = sorted(f for f in _on_disk()
-                 if not re.fullmatch(r"[0-9a-z][0-9a-z\-.]*\.svg", f))
+                 if not re.fullmatch(r"[0-9a-z][0-9a-z\-.]*\.(?:svg|png)", f))
     assert not bad, ("screen files whose names are unsafe in a URL:\n  "
                      + "\n  ".join(bad))
 

@@ -620,8 +620,26 @@ const CHROME: Table = {
   "ins.sitin.hint": {
     en: "Take your place back — the room waits for you again.", es: "Recupera tu lugar: la sala vuelve a esperarte.", fr: "Reprenez votre place — le salon vous attend de nouveau.", de: "Nimm deinen Platz wieder ein — der Raum wartet wieder auf dich.", pt: "Retome o seu lugar — a sala volta a esperar por si.", it: "Riprendi il tuo posto — la stanza ti aspetta di nuovo.", ja: "席に戻ります。部屋はまたあなたを待ちます。", zh: "回到你的位置——房间会重新等你。", hi: "अपनी जगह वापस लीजिए — कमरा फिर आपकी प्रतीक्षा करेगा।", ar: "استعد مكانك — تنتظرك الغرفة من جديد.",
   },
+  "ins.attach.photos": {
+    en: "Photos", es: "Fotos", fr: "Photos", de: "Fotos", pt: "Fotos", it: "Foto", ja: "写真", zh: "照片", hi: "फ़ोटो", ar: "الصور",
+  },
+  "ins.attach.camera": {
+    en: "Camera", es: "Cámara", fr: "Appareil photo", de: "Kamera", pt: "Câmara", it: "Fotocamera", ja: "カメラ", zh: "相机", hi: "कैमरा", ar: "الكاميرا",
+  },
+  "ins.attach.video": {
+    en: "Video", es: "Vídeo", fr: "Vidéo", de: "Video", pt: "Vídeo", it: "Video", ja: "動画", zh: "视频", hi: "वीडियो", ar: "فيديو",
+  },
+  "ins.attach.files": {
+    en: "Files", es: "Archivos", fr: "Fichiers", de: "Dateien", pt: "Ficheiros", it: "File", ja: "ファイル", zh: "文件", hi: "फ़ाइलें", ar: "الملفات",
+  },
+  "ins.attach.cancel": {
+    en: "Cancel", es: "Cancelar", fr: "Annuler", de: "Abbrechen", pt: "Cancelar", it: "Annulla", ja: "キャンセル", zh: "取消", hi: "रद्द करें", ar: "إلغاء",
+  },
   "ins.pair.avatar": {
-    en: "avatar", es: "avatar", fr: "avatar", de: "Avatar", pt: "avatar", it: "avatar", ja: "アバター", zh: "头像", hi: "अवतार", ar: "الأفاتار",
+    en: "Avatar", es: "Avatar", fr: "Avatar", de: "Avatar", pt: "Avatar", it: "Avatar", ja: "アバター", zh: "头像", hi: "अवतार", ar: "الأفاتار",
+  },
+  "ins.pair.audio": {
+    en: "Audio", es: "Audio", fr: "Audio", de: "Audio", pt: "Áudio", it: "Audio", ja: "音声", zh: "语音", hi: "ऑडियो", ar: "الصوت",
   },
   "raise.time": {
     en: "The three time controls", es: "Los tres controles del tiempo", fr: "Les trois contrôles du temps", de: "Die drei Zeitregler", pt: "Os três controlos do tempo", it: "I tre controlli del tempo", ja: "3つの時間コントロール", zh: "三个时间控制", hi: "समय के तीन नियंत्रण", ar: "ضوابط الزمن الثلاثة",
@@ -4758,7 +4776,7 @@ const CHROME: Table = {
     en: "Give it hands", es: "Darle manos", fr: "Lui donner des mains", de: "Ihm Hände geben", pt: "Dar-lhe mãos", it: "Dargli le mani", ja: "手を与える", zh: "给它双手", hi: "इसे हाथ दें", ar: "امنحه يدين",
   },
   "hnd.give.pitch": {
-    en: "Name the apps or sites, the moves, the minutes and the steps. All four are limits, and all four are enforced where the move happens rather than on this screen.", es: "Nombra las aplicaciones o sitios, los movimientos, los minutos y los pasos. Los cuatro son límites, y los cuatro se aplican donde ocurre el movimiento, no en esta pantalla.", fr: "Nommez les applications ou sites, les gestes, les minutes et les étapes. Ces quatre éléments sont des limites, appliquées là où le geste se produit et non sur cet écran.", de: "Nennen Sie die Apps oder Seiten, die Bewegungen, die Minuten und die Schritte. Alle vier sind Grenzen, und alle vier gelten dort, wo die Bewegung geschieht, nicht auf diesem Bildschirm.", pt: "Nomeie as aplicações ou sites, os movimentos, os minutos e os passos. Os quatro são limites, e os quatro são impostos onde o movimento acontece, não neste ecrã.", it: "Indica le app o i siti, le mosse, i minuti e i passi. Tutti e quattro sono limiti, imposti dove avviene la mossa e non su questo schermo.", ja: "アプリまたはサイト、動作、分数、手数を指定します。四つとも上限であり、この画面ではなく動作が起きる場所で守られます。", zh: "写明应用或网站、动作、分钟数与步数。这四项都是上限，都在动作发生之处生效，而不是在这个屏幕上。", hi: "ऐप या साइट, चालें, मिनट और चरण बताएँ। चारों सीमाएँ हैं, और चारों वहीं लागू होती हैं जहाँ चाल चलती है, इस स्क्रीन पर नहीं।", ar: "سمِّ التطبيقات أو المواقع والحركات والدقائق والخطوات. الأربعة حدود، وتُطبَّق جميعها حيث تقع الحركة لا على هذه الشاشة.",
+    en: "Name the apps or sites, the moves, the minutes and the steps. All four are limits, and all four are enforced where the move happens rather than on this screen.", es: "Nombra las aplicaciones o sitios, los movimientos, los minutos y los pasos. Los cuatro son límites, y los cuatro se aplican donde ocurre el movimiento, no en esta pantalla.", fr: "Nommez les applications ou sites, les gestes, les minutes et les étapes. Ces quatre éléments sont des limites, appliquées là où le geste se produit et non sur cet écran.", de: "Nenn die Apps oder Seiten, die Bewegungen, die Minuten und die Schritte. Alle vier sind Grenzen, und alle vier gelten dort, wo die Bewegung geschieht, nicht auf diesem Bildschirm.", pt: "Nomeie as aplicações ou sites, os movimentos, os minutos e os passos. Os quatro são limites, e os quatro são impostos onde o movimento acontece, não neste ecrã.", it: "Indica le app o i siti, le mosse, i minuti e i passi. Tutti e quattro sono limiti, imposti dove avviene la mossa e non su questo schermo.", ja: "アプリまたはサイト、動作、分数、手数を指定します。四つとも上限であり、この画面ではなく動作が起きる場所で守られます。", zh: "写明应用或网站、动作、分钟数与步数。这四项都是上限，都在动作发生之处生效，而不是在这个屏幕上。", hi: "ऐप या साइट, चालें, मिनट और चरण बताएँ। चारों सीमाएँ हैं, और चारों वहीं लागू होती हैं जहाँ चाल चलती है, इस स्क्रीन पर नहीं।", ar: "سمِّ التطبيقات أو المواقع والحركات والدقائق والخطوات. الأربعة حدود، وتُطبَّق جميعها حيث تقع الحركة لا على هذه الشاشة.",
   },
   "hnd.surface": {
     en: "Where", es: "Dónde", fr: "Où", de: "Wo", pt: "Onde", it: "Dove", ja: "場所", zh: "何处", hi: "कहाँ", ar: "أين",
@@ -4791,10 +4809,10 @@ const CHROME: Table = {
     en: "Hands given for {places}.", es: "Manos dadas para {places}.", fr: "Mains données pour {places}.", de: "Hände gegeben für {places}.", pt: "Mãos dadas para {places}.", it: "Mani date per {places}.", ja: "{places} に手を与えました。", zh: "已为 {places} 给出双手。", hi: "{places} के लिए हाथ दिए गए।", ar: "مُنحت اليدان لـ {places}.",
   },
   "hnd.told": {
-    en: "Or just say it", es: "O simplemente dilo", fr: "Ou dites-le simplement", de: "Oder sagen Sie es einfach", pt: "Ou basta dizê-lo", it: "Oppure dillo e basta", ja: "または、言うだけ", zh: "或者直接说出来", hi: "या बस कह दीजिए", ar: "أو قُلها فحسب",
+    en: "Or just say it", es: "O simplemente dilo", fr: "Ou dites-le simplement", de: "Oder sag es einfach", pt: "Ou basta dizê-lo", it: "Oppure dillo e basta", ja: "または、言うだけ", zh: "或者直接说出来", hi: "या बस कह दीजिए", ar: "أو قُلها فحسب",
   },
   "hnd.told.pitch": {
-    en: "The same permission, said instead of picked. Words that name no app or site grant nothing — the refusal quotes back what was heard so you can say it better.", es: "El mismo permiso, dicho en vez de elegido. Palabras que no nombran ninguna aplicación o sitio no conceden nada — el rechazo repite lo que se oyó para que puedas decirlo mejor.", fr: "La même permission, dite au lieu d'être choisie. Des mots qui ne nomment aucune application ni aucun site n'accordent rien — le refus cite ce qui a été entendu pour que vous puissiez mieux le dire.", de: "Dieselbe Erlaubnis, gesagt statt ausgewählt. Worte, die keine App und keine Seite nennen, gewähren nichts — die Ablehnung zitiert das Gehörte zurück, damit Sie es besser sagen können.", pt: "A mesma permissão, dita em vez de escolhida. Palavras que não nomeiam nenhuma aplicação ou site não concedem nada — a recusa cita o que foi ouvido para que possa dizê-lo melhor.", it: "Lo stesso permesso, detto invece che scelto. Parole che non nominano alcuna app o sito non concedono nulla — il rifiuto ripete ciò che ha sentito perché tu possa dirlo meglio.", ja: "同じ許可を、選ぶ代わりに言葉で。アプリやサイトを挙げない言葉は何も許可しません — 拒否は聞き取った内容をそのまま返すので、言い直せます。", zh: "同一个许可，用说的而不是选的。没有点名应用或网站的话什么也不授予 — 拒绝会把听到的原话回给你，好让你说得更清楚。", hi: "वही अनुमति, चुनने के बजाय कही गई। जो शब्द किसी ऐप या साइट का नाम नहीं लेते वे कुछ नहीं देते — इनकार सुनी हुई बात दोहरा देता है ताकि आप बेहतर कह सकें।", ar: "الإذن نفسه، مقولًا بدل أن يكون مختارًا. الكلمات التي لا تسمّي تطبيقًا أو موقعًا لا تمنح شيئًا — والرفض يقتبس ما سُمع كي تقولها على نحو أوضح.",
+    en: "The same permission, said instead of picked. Words that name no app or site grant nothing — the refusal quotes back what was heard so you can say it better.", es: "El mismo permiso, dicho en vez de elegido. Palabras que no nombran ninguna aplicación o sitio no conceden nada — el rechazo repite lo que se oyó para que puedas decirlo mejor.", fr: "La même permission, dite au lieu d'être choisie. Des mots qui ne nomment aucune application ni aucun site n'accordent rien — le refus cite ce qui a été entendu pour que vous puissiez mieux le dire.", de: "Dieselbe Erlaubnis, gesagt statt ausgewählt. Worte, die keine App und keine Seite nennen, gewähren nichts — die Ablehnung zitiert das Gehörte zurück, damit du es besser sagen kannst.", pt: "A mesma permissão, dita em vez de escolhida. Palavras que não nomeiam nenhuma aplicação ou site não concedem nada — a recusa cita o que foi ouvido para que possa dizê-lo melhor.", it: "Lo stesso permesso, detto invece che scelto. Parole che non nominano alcuna app o sito non concedono nulla — il rifiuto ripete ciò che ha sentito perché tu possa dirlo meglio.", ja: "同じ許可を、選ぶ代わりに言葉で。アプリやサイトを挙げない言葉は何も許可しません — 拒否は聞き取った内容をそのまま返すので、言い直せます。", zh: "同一个许可，用说的而不是选的。没有点名应用或网站的话什么也不授予 — 拒绝会把听到的原话回给你，好让你说得更清楚。", hi: "वही अनुमति, चुनने के बजाय कही गई। जो शब्द किसी ऐप या साइट का नाम नहीं लेते वे कुछ नहीं देते — इनकार सुनी हुई बात दोहरा देता है ताकि आप बेहतर कह सकें।", ar: "الإذن نفسه، مقولًا بدل أن يكون مختارًا. الكلمات التي لا تسمّي تطبيقًا أو موقعًا لا تمنح شيئًا — والرفض يقتبس ما سُمع كي تقولها على نحو أوضح.",
   },
   "hnd.told.hint": {
     en: "you can click and type in my calendar for the next hour", es: "puedes hacer clic y escribir en mi calendario durante la próxima hora", fr: "tu peux cliquer et écrire dans mon agenda pendant la prochaine heure", de: "du darfst in der nächsten Stunde in meinem Kalender klicken und tippen", pt: "podes clicar e escrever no meu calendário durante a próxima hora", it: "puoi cliccare e scrivere nel mio calendario per la prossima ora", ja: "これから一時間、私のカレンダーでクリックと入力をしていい", zh: "接下来一小时你可以在我的日历里点击和输入", hi: "अगले एक घंटे तक तुम मेरे कैलेंडर में क्लिक और टाइप कर सकते हो", ar: "يمكنك النقر والكتابة في تقويمي خلال الساعة القادمة",
@@ -4809,7 +4827,7 @@ const CHROME: Table = {
     en: "What it may do now", es: "Lo que puede hacer ahora", fr: "Ce qu'il peut faire maintenant", de: "Was es jetzt darf", pt: "O que pode fazer agora", it: "Cosa può fare adesso", ja: "いま許されていること", zh: "它现在可以做什么", hi: "अभी यह क्या कर सकता है", ar: "ما يُسمح له الآن",
   },
   "hnd.none": {
-    en: "Nothing. It has no hands until you give it some.", es: "Nada. No tiene manos hasta que se las des.", fr: "Rien. Il n'a pas de mains tant que vous ne lui en donnez pas.", de: "Nichts. Es hat keine Hände, bis Sie ihm welche geben.", pt: "Nada. Não tem mãos até que lhas dê.", it: "Niente. Non ha mani finché non gliene dai.", ja: "何もありません。手を与えるまで、手はありません。", zh: "没有。在你给它之前，它没有手。", hi: "कुछ नहीं। जब तक आप न दें, इसके हाथ नहीं हैं।", ar: "لا شيء. لا يدين له حتى تمنحه إياهما.",
+    en: "Nothing. It has no hands until you give it some.", es: "Nada. No tiene manos hasta que se las des.", fr: "Rien. Il n'a pas de mains tant que vous ne lui en donnez pas.", de: "Nichts. Es hat keine Hände, bis du ihm welche gibst.", pt: "Nada. Não tem mãos até que lhas dê.", it: "Niente. Non ha mani finché non gliene dai.", ja: "何もありません。手を与えるまで、手はありません。", zh: "没有。在你给它之前，它没有手。", hi: "कुछ नहीं। जब तक आप न दें, इसके हाथ नहीं हैं।", ar: "لا شيء. لا يدين له حتى تمنحه إياهما.",
   },
   "hnd.over": {
     en: "over", es: "terminado", fr: "terminé", de: "abgelaufen", pt: "terminado", it: "scaduto", ja: "終了", zh: "已结束", hi: "समाप्त", ar: "منتهٍ",
@@ -4839,7 +4857,7 @@ const CHROME: Table = {
     en: "Begin", es: "Comenzar", fr: "Commencer", de: "Beginnen", pt: "Começar", it: "Inizia", ja: "開始", zh: "开始", hi: "शुरू करें", ar: "ابدأ",
   },
   "hnd.undrivable": {
-    en: "Nothing can operate another app's interface on an iPhone — Apple provides no way, so there is no permission to ask for. It can still watch this screen and tell you where to press.", es: "Nada puede manejar la interfaz de otra aplicación en un iPhone — Apple no ofrece ninguna vía, así que no hay permiso que pedir. Aún puede mirar esta pantalla y decirte dónde pulsar.", fr: "Rien ne peut manœuvrer l'interface d'une autre application sur un iPhone — Apple n'offre aucun moyen, il n'y a donc aucune permission à demander. Il peut toujours regarder cet écran et vous dire où appuyer.", de: "Auf einem iPhone kann nichts die Oberfläche einer anderen App bedienen — Apple bietet keinen Weg, also gibt es keine Erlaubnis zu erfragen. Zusehen und Ihnen sagen, wo Sie drücken sollen, kann es weiterhin.", pt: "Nada consegue operar a interface de outra aplicação num iPhone — a Apple não oferece qualquer via, por isso não há permissão a pedir. Ainda pode observar este ecrã e dizer-lhe onde carregar.", it: "Su un iPhone nulla può usare l'interfaccia di un'altra app — Apple non offre alcuna via, quindi non c'è alcun permesso da chiedere. Può comunque guardare questo schermo e dirti dove premere.", ja: "iPhone では、他アプリの画面を操作できるものはありません — Apple がその手段を用意していないため、求めるべき許可自体が存在しません。画面を見て、どこを押せばよいか伝えることはできます。", zh: "在 iPhone 上，任何程序都无法操作另一个应用的界面 — 苹果没有提供途径，因此根本没有可申请的权限。它仍然可以看这块屏幕并告诉你按哪里。", hi: "iPhone पर कोई भी दूसरे ऐप का इंटरफ़ेस नहीं चला सकता — Apple कोई रास्ता नहीं देता, इसलिए माँगने को कोई अनुमति ही नहीं है। यह फिर भी यह स्क्रीन देख सकता है और बता सकता है कि कहाँ दबाना है।", ar: "لا شيء يستطيع تشغيل واجهة تطبيق آخر على الآيفون — لا توفّر آبل أي سبيل لذلك، فلا وجود لإذن يُطلب. ويظل بوسعه مشاهدة هذه الشاشة وإخبارك أين تضغط.",
+    en: "Nothing can operate another app's interface on an iPhone — Apple provides no way, so there is no permission to ask for. It can still watch this screen and tell you where to press.", es: "Nada puede manejar la interfaz de otra aplicación en un iPhone — Apple no ofrece ninguna vía, así que no hay permiso que pedir. Aún puede mirar esta pantalla y decirte dónde pulsar.", fr: "Rien ne peut manœuvrer l'interface d'une autre application sur un iPhone — Apple n'offre aucun moyen, il n'y a donc aucune permission à demander. Il peut toujours regarder cet écran et vous dire où appuyer.", de: "Auf einem iPhone kann nichts die Oberfläche einer anderen App bedienen — Apple bietet keinen Weg, also gibt es keine Erlaubnis zu erfragen. Zusehen und dir sagen, wo du drücken sollst, kann es weiterhin.", pt: "Nada consegue operar a interface de outra aplicação num iPhone — a Apple não oferece qualquer via, por isso não há permissão a pedir. Ainda pode observar este ecrã e dizer-lhe onde carregar.", it: "Su un iPhone nulla può usare l'interfaccia di un'altra app — Apple non offre alcuna via, quindi non c'è alcun permesso da chiedere. Può comunque guardare questo schermo e dirti dove premere.", ja: "iPhone では、他アプリの画面を操作できるものはありません — Apple がその手段を用意していないため、求めるべき許可自体が存在しません。画面を見て、どこを押せばよいか伝えることはできます。", zh: "在 iPhone 上，任何程序都无法操作另一个应用的界面 — 苹果没有提供途径，因此根本没有可申请的权限。它仍然可以看这块屏幕并告诉你按哪里。", hi: "iPhone पर कोई भी दूसरे ऐप का इंटरफ़ेस नहीं चला सकता — Apple कोई रास्ता नहीं देता, इसलिए माँगने को कोई अनुमति ही नहीं है। यह फिर भी यह स्क्रीन देख सकता है और बता सकता है कि कहाँ दबाना है।", ar: "لا شيء يستطيع تشغيل واجهة تطبيق آخر على الآيفون — لا توفّر آبل أي سبيل لذلك، فلا وجود لإذن يُطلب. ويظل بوسعه مشاهدة هذه الشاشة وإخبارك أين تضغط.",
   },
   "hnd.reach.line": {
     en: "{state} · {left} steps left · {where}", es: "{state} · quedan {left} pasos · {where}", fr: "{state} · {left} étapes restantes · {where}", de: "{state} · noch {left} Schritte · {where}", pt: "{state} · restam {left} passos · {where}", it: "{state} · {left} passi rimasti · {where}", ja: "{state} · 残り{left}手 · {where}", zh: "{state} · 剩余 {left} 步 · {where}", hi: "{state} · {left} चरण शेष · {where}", ar: "{state} · بقيت {left} خطوة · {where}",
@@ -4851,13 +4869,64 @@ const CHROME: Table = {
     en: "Take the screen back", es: "Recuperar la pantalla", fr: "Reprendre l'écran", de: "Bildschirm zurücknehmen", pt: "Recuperar o ecrã", it: "Riprendi lo schermo", ja: "画面を取り戻す", zh: "收回屏幕", hi: "स्क्रीन वापस लें", ar: "استرجع الشاشة",
   },
   "hnd.name": {
-    en: "call this something", es: "llámalo de algún modo", fr: "donnez-lui un nom", de: "geben Sie dem einen Namen", pt: "dê-lhe um nome", it: "dagli un nome", ja: "名前をつける", zh: "给它起个名字", hi: "इसे कोई नाम दें", ar: "سمِّ هذا",
+    en: "call this something", es: "llámalo de algún modo", fr: "donnez-lui un nom", de: "gib dem einen Namen", pt: "dê-lhe um nome", it: "dagli un nome", ja: "名前をつける", zh: "给它起个名字", hi: "इसे कोई नाम दें", ar: "سمِّ هذا",
   },
   "hnd.write": {
     en: "Write it down", es: "Anotarlo", fr: "Le noter", de: "Aufschreiben", pt: "Anotar", it: "Annotalo", ja: "書き留める", zh: "记下来", hi: "लिख लें", ar: "دوّنه",
   },
   "hnd.wrotedown": {
     en: "Written down. It can do that again.", es: "Anotado. Puede hacerlo de nuevo.", fr: "Noté. Il peut le refaire.", de: "Aufgeschrieben. Es kann das wieder tun.", pt: "Anotado. Pode fazê-lo outra vez.", it: "Annotato. Può rifarlo.", ja: "書き留めました。同じことをまたできます。", zh: "已记下。它可以再做一次。", hi: "लिख लिया गया। यह इसे फिर कर सकता है।", ar: "دُوّن. يستطيع فعل ذلك مجددًا.",
+  },
+  "hnd.move": {
+    en: "Make a move yourself", es: "Haz un movimiento tú", fr: "Faites un geste vous-même", de: "Mach selbst eine Bewegung", pt: "Faz tu um movimento", it: "Fai tu una mossa", ja: "自分で動かす", zh: "自己动一下", hi: "खुद एक चाल चलें", ar: "حرّك أنت",
+  },
+  "hnd.move.at": {
+    en: "what it is aiming at", es: "a qué apunta", fr: "ce qu'il vise", de: "worauf es zielt", pt: "a que aponta", it: "a cosa mira", ja: "何を狙うか", zh: "瞄准什么", hi: "किस पर निशाना", ar: "ما يستهدفه",
+  },
+  "hnd.move.text": {
+    en: "what to type", es: "qué escribir", fr: "quoi écrire", de: "was getippt wird", pt: "o que escrever", it: "cosa scrivere", ja: "入力する内容", zh: "要输入什么", hi: "क्या टाइप करना है", ar: "ما يُكتب",
+  },
+  "hnd.move.key": {
+    en: "which key", es: "qué tecla", fr: "quelle touche", de: "welche Taste", pt: "que tecla", it: "quale tasto", ja: "どのキー", zh: "哪个键", hi: "कौन-सी कुंजी", ar: "أي مفتاح",
+  },
+  "hnd.move.go": {
+    en: "Move", es: "Mover", fr: "Faire", de: "Bewegen", pt: "Mover", it: "Muovi", ja: "動かす", zh: "执行", hi: "चलें", ar: "نفّذ",
+  },
+  "hnd.pass.who": {
+    en: "hand it to which profile", es: "a qué perfil se lo pasas", fr: "à quel profil le confier", de: "an welches Profil übergeben", pt: "a que perfil o passas", it: "a quale profilo passarlo", ja: "どのプロフィールに渡すか", zh: "交给哪个资料", hi: "किस प्रोफ़ाइल को सौंपें", ar: "إلى أي ملف تُسلّمه",
+  },
+  "hnd.pass.go": {
+    en: "Hand it over", es: "Pasarlo", fr: "Le confier", de: "Übergeben", pt: "Passar", it: "Passalo", ja: "渡す", zh: "交出去", hi: "सौंपें", ar: "سلّمه",
+  },
+  "hnd.pass.note": {
+    en: "The second profile can only ever hold less — the same apps or fewer, the same moves or fewer, and the steps that are left rather than a fresh budget.", es: "El segundo perfil solo puede tener menos: las mismas aplicaciones o menos, los mismos movimientos o menos, y los pasos que quedan en vez de un presupuesto nuevo.", fr: "Le second profil ne peut jamais détenir que moins : les mêmes applications ou moins, les mêmes gestes ou moins, et les étapes restantes plutôt qu'un nouveau budget.", de: "Das zweite Profil kann immer nur weniger halten — dieselben Apps oder weniger, dieselben Bewegungen oder weniger, und die verbleibenden Schritte statt eines neuen Budgets.", pt: "O segundo perfil só pode ter menos — as mesmas aplicações ou menos, os mesmos movimentos ou menos, e os passos que restam em vez de um orçamento novo.", it: "Il secondo profilo può solo avere meno — le stesse app o meno, le stesse mosse o meno, e i passi rimasti invece di un budget nuovo.", ja: "二つ目のプロフィールが持てるのは、常により少ないものだけです — 同じか少ないアプリ、同じか少ない動作、そして新しい持ち分ではなく残りの手数。", zh: "第二个资料只能拿到更少 — 同样或更少的应用、同样或更少的动作，以及剩下的步数，而不是重新一份额度。", hi: "दूसरा प्रोफ़ाइल हमेशा कम ही रख सकता है — वही या कम ऐप, वही या कम चालें, और बचे हुए चरण, नया बजट नहीं।", ar: "لا يمكن للملف الثاني أن يحمل إلا أقل — التطبيقات ذاتها أو أقل، والحركات ذاتها أو أقل، والخطوات المتبقية لا حصة جديدة.",
+  },
+  "hnd.dictate.ph": {
+    en: "one step a line — press: New event", es: "un paso por línea — press: Nuevo evento", fr: "une étape par ligne — press: Nouvel événement", de: "ein Schritt pro Zeile — press: Neuer Termin", pt: "um passo por linha — press: Novo evento", it: "un passo per riga — press: Nuovo evento", ja: "1行に1手 — 「press」: 新しい予定", zh: "每行一步 — 「press」：新建事件", hi: "हर पंक्ति में एक चरण — press: नया इवेंट", ar: "خطوة في كل سطر — press: حدث جديد",
+  },
+  "hnd.dictate.go": {
+    en: "Write it down", es: "Anotarlo", fr: "Le noter", de: "Aufschreiben", pt: "Anotar", it: "Annotalo", ja: "書き留める", zh: "记下来", hi: "लिख लें", ar: "دوّنه",
+  },
+  "ward.shot": {
+    en: "How the photo is framed", es: "Cómo está encuadrada la foto", fr: "Le cadrage de la photo", de: "Wie das Foto gerahmt ist", pt: "Como a foto está enquadrada", it: "Come è inquadrata la foto", ja: "写真の写り方", zh: "照片的取景", hi: "फ़ोटो का फ़्रेम", ar: "كيف أُطِّرت الصورة",
+  },
+  "ward.shot.face": {
+    en: "just the face", es: "solo la cara", fr: "le visage seul", de: "nur das Gesicht", pt: "só o rosto", it: "solo il volto", ja: "顔だけ", zh: "只有脸", hi: "केवल चेहरा", ar: "الوجه فقط",
+  },
+  "ward.shot.upper": {
+    en: "upper body", es: "medio cuerpo", fr: "buste", de: "Oberkörper", pt: "meio corpo", it: "mezzo busto", ja: "上半身", zh: "上半身", hi: "ऊपरी शरीर", ar: "الجزء العلوي",
+  },
+  "ward.shot.full": {
+    en: "full body", es: "cuerpo entero", fr: "corps entier", de: "ganzer Körper", pt: "corpo inteiro", it: "corpo intero", ja: "全身", zh: "全身", hi: "पूरा शरीर", ar: "الجسم كامل",
+  },
+  "ward.photo": {
+    en: "A photograph", es: "Una fotografía", fr: "Une photographie", de: "Ein Foto", pt: "Uma fotografia", it: "Una fotografia", ja: "写真", zh: "一张照片", hi: "एक फ़ोटो", ar: "صورة",
+  },
+  "ward.photo.note": {
+    en: "Your own photograph, built into a head here on this deployment — no vendor, no account anywhere else. The picture is the input; what is kept is the head it became.", es: "Tu propia fotografía, convertida en una cabeza aquí mismo — sin proveedor y sin cuenta en ningún otro sitio. La foto es la entrada; lo que se guarda es la cabeza en que se convirtió.", fr: "Votre propre photographie, transformée en tête ici même — sans fournisseur ni compte ailleurs. La photo est l'entrée ; ce qui est conservé est la tête obtenue.", de: "Dein eigenes Foto, hier auf dieser Installation zu einem Kopf gebaut — kein Anbieter, kein Konto anderswo. Das Bild ist die Eingabe; behalten wird der Kopf, der daraus wurde.", pt: "A tua própria fotografia, transformada numa cabeça aqui mesmo — sem fornecedor e sem conta em mais lado nenhum. A foto é a entrada; o que fica é a cabeça em que se tornou.", it: "La tua fotografia, trasformata in una testa qui su questa installazione — nessun fornitore, nessun account altrove. La foto è l'ingresso; ciò che resta è la testa che ne è venuta.", ja: "あなた自身の写真を、この環境の中で頭に組み上げます — 業者も、よその アカウントもいりません。写真は入力であり、残るのはそこからできた頭です。", zh: "你自己的照片，就在这套部署里做成一个头 — 没有供应商，也不需要别处的账号。照片是输入，留下的是由它做成的头。", hi: "आपकी अपनी फ़ोटो, यहीं इसी तैनाती में एक सिर में बनाई जाती है — न कोई विक्रेता, न कहीं और कोई खाता। तस्वीर इनपुट है; जो रखा जाता है वह उससे बना सिर है।", ar: "صورتك أنت، تُبنى رأسًا هنا على هذا التنصيب — بلا مورّد وبلا حساب في أي مكان آخر. الصورة هي المُدخل، والمحفوظ هو الرأس الذي صار منها.",
+  },
+  "ward.building": {
+    en: "Building the head…", es: "Construyendo la cabeza…", fr: "Construction de la tête…", de: "Der Kopf wird gebaut…", pt: "A construir a cabeça…", it: "Sto costruendo la testa…", ja: "頭を組み立てています…", zh: "正在构建头部…", hi: "सिर बनाया जा रहा है…", ar: "يجري بناء الرأس…",
   },
   "hnd.again": {
     en: "Things it can do again", es: "Cosas que puede repetir", fr: "Ce qu'il peut refaire", de: "Was es wiederholen kann", pt: "Coisas que pode repetir", it: "Cose che può rifare", ja: "またできること", zh: "它能重复做的事", hi: "जो यह दोबारा कर सकता है", ar: "أشياء يمكنه تكرارها",

@@ -144,6 +144,14 @@ def _terminate(profile_id: str, request: Request) -> None:
             "UPDATE voice_consents SET revoked_at=? WHERE profile_id=?"
             " AND revoked_at IS NULL",
             "UPDATE wearables      SET revoked_at=? WHERE profile_id=?"
+            " AND revoked_at IS NULL",
+            # And its hands. A terminated profile that kept a live grant
+            # could still move a cursor on somebody's machine — the widest
+            # capability in the product outliving the profile it was given
+            # to. The check that stops it is in `hands.act`, which reads
+            # this column on every step, so revoking here stops a reach
+            # already in flight at its next move rather than at the end.
+            "UPDATE hand_grants   SET revoked_at=? WHERE profile_id=?"
             " AND revoked_at IS NULL"):
         conn.execute(sql, (db.utcnow(), profile_id))
     # The standing offer goes with them: leaving it is leaving the shop window

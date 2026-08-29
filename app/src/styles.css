@@ -1178,8 +1178,16 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
    phone media rule that lays the overlay's rail flat, so the column
    holds at every width; the opened panel swings out to the left of the
    column rather than into it. */
+/* Centred on the right edge and NOT scrollable.
+ *
+ * It was pinned below the dial (`top: 50% + 84px`) with an internal
+ * `overflow-y: auto`, which meant the column had only the lower half of
+ * the screen to sit in and scrolled inside itself when it did not fit —
+ * so the buttons moved under the finger. Centring gives the column the
+ * whole height to use, and five buttons at this size fit every phone
+ * without a scrollbar. */
 .chat-rail-dock .talk-rail { position: fixed; right: 6px;
-                             top: calc(50% + 84px); transform: none;
+                             top: 50%; transform: translateY(-50%);
                              flex-direction: column; z-index: 84; }
 /* Compact in the dock — the field report circled four boxes and could
    not see all four: at the overlay's size the column's tail slid under
@@ -1189,10 +1197,10 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .chat-rail-dock .talk-rail-btn { min-width: 52px; padding: 5px 4px;
                                  font-size: 15px; border-radius: 11px; }
 .chat-rail-dock .talk-rail-label { font-size: 8.5px; max-width: 50px; }
-.chat-rail-dock .talk-rail { max-height: calc(50vh - 100px);
-                             overflow-y: auto; }
+.chat-rail-dock .talk-rail { max-height: calc(100vh - 120px);
+                             overflow: visible; }
 .chat-rail-dock .talk-panel { position: fixed; right: 76px; top: 50%;
-                              transform: translateY(-50%); z-index: 86;
+                              transform: translateY(-50%); z-index: 94;
                               width: min(86vw, 560px); }
 .chat-head-face { width: 52px; height: 52px; border-radius: 50%;
                   object-fit: cover; border: 2px solid var(--line);
@@ -2030,9 +2038,17 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
    panel (86) so the panel itself stays tappable. The red close is the
    exit a person can see, top corner of the panel, red because the field
    asked for "a little red at the top". */
-.talk-panel-scrim { position: fixed; inset: 0; z-index: 85;
+/* Above the room's chrome.
+ *
+ * 85/86 put the panel under the corner counter (90) and under the
+ * full-screen ask (88), so a menu opened from the rail came up with a
+ * layer across it — visible, unreadable, and untappable at the overlap.
+ * A panel somebody deliberately opened outranks passive chrome; the
+ * version guard (100) still outranks everything, which is the one thing
+ * that should. */
+.talk-panel-scrim { position: fixed; inset: 0; z-index: 93;
                     background: transparent; }
-.talk-panel { position: relative; z-index: 86; }
+.talk-panel { position: relative; z-index: 94; }
 .talk-panel-close { position: absolute; top: 8px; right: 8px;
                     width: 26px; height: 26px; border-radius: 50%;
                     border: 0; cursor: pointer; line-height: 1;
@@ -2094,6 +2110,11 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   position: sticky; bottom: 8px; align-self: flex-end;
   max-height: 70vh; overflow: visible;
 }
+/* Name the room and lend it your microphone, on the room's own row —
+   the two things you set before walking in. */
+.rms-before { display: inline-flex; gap: 6px; align-items: center;
+              min-width: 0; }
+.rms-before input { min-width: 0; width: min(220px, 45vw); }
 .rail-ask-row { display: flex; gap: 8px; margin-top: 8px; }
 .rail-ask-row input { flex: 1; min-width: 0; }
 
@@ -2180,13 +2201,34 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 /* The word under the second circle — "it must say avatar under the
    photo". Tops aligned above so the first circle stays put while its
    neighbor wears the caption. */
+/* Full width of the circle it sits under, and centred there. It had
+   `text-align: center` and no width, so it centred whatever box the text
+   happened to make rather than the circle above it — which on the phone
+   put the word visibly off to one side. */
 .rs-cap {
-  display: block; margin-top: 2px; font-size: 10px; line-height: 1.2;
-  color: var(--muted, #8b90a8); text-align: center;
+  display: block; width: 100%; margin-top: 2px; font-size: 10px;
+  line-height: 1.2; color: var(--muted, #8b90a8); text-align: center;
 }
+/* What the paperclip asks first. A short column above the composer,
+   because the answer is one press and a list that has to be scrolled is
+   a worse question than the file dialog it replaced. */
+.rs-attach {
+  display: flex; flex-direction: column; gap: 4px;
+  margin: 0 8px 6px; padding: 6px;
+  background: var(--card, #171a2b); border: 1px solid var(--line, #2a2f45);
+  border-radius: 12px;
+}
+.rs-attach button {
+  text-align: left; padding: 10px 12px; font-size: 14px;
+  background: none; border: none; border-radius: 8px;
+  color: var(--text, #e8eaf6); cursor: pointer;
+}
+.rs-attach button:hover { background: var(--line, #2a2f45); }
+.rs-attach .rs-attach-x { text-align: center; color: var(--muted, #8b90a8); }
 .rs-circle-btn {
   background: none; border: none; padding: 0; cursor: pointer;
   border-radius: 50%; display: block; flex: 0 1 72px; min-width: 0;
+  text-align: center;
 }
 /* The tile floor is 128px and two full 72px circles want 154px, so on the
    narrowest phones both shrink together — still whole circles, never one
@@ -2210,6 +2252,10 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   width: min(400px, calc(100vw - 32px)); max-height: 55vh;
   overflow-y: auto; overscroll-behavior: contain;
 }
+/* The road that is open when the prompt bar is not: a photograph, the
+   only way a real likeness has ever been allowed to arrive. */
+.ward-import { display: flex; flex-direction: column; gap: 8px;
+               margin-top: 10px; }
 .ward-prompt { display: flex; gap: 8px; margin: 8px 0; }
 .ward-prompt input { flex: 1; min-width: 0; }
 .ward-chips { display: flex; flex-wrap: wrap; gap: 6px; }

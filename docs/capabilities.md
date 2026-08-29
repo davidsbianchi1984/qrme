@@ -1997,7 +1997,7 @@ shop window is a reader like any other.
 
 <table>
   <tr>
-    <td align="center" width="33%"><a href="screens/189-feed.svg"><img src="screens/189-feed.svg" width="210" alt="Feed"></a></td>
+    <td align="center" width="33%"><a href="screens/189-feed.png"><img src="screens/189-feed.png" width="210" alt="Feed"></a></td>
     <td align="center" width="33%"><a href="screens/190-what-plays.svg"><img src="screens/190-what-plays.svg" width="210" alt="What Plays"></a></td>
     <td align="center" width="33%"><a href="screens/191-rooms-desks.svg"><img src="screens/191-rooms-desks.svg" width="210" alt="Rooms &amp; Desks"></a></td>
   </tr>
@@ -2461,7 +2461,7 @@ the community surfaces are drawn from.
 
 <table>
   <tr>
-    <td align="center" width="40%"><a href="screens/84-friends.svg"><img src="screens/84-friends.svg" width="230" alt="Friends"></a></td>
+    <td align="center" width="40%"><a href="screens/84-friends.png"><img src="screens/84-friends.png" width="230" alt="Friends"></a></td>
     <td valign="middle">
 
 **Directed, not mutual.** Befriending writes one row. A friends list is a claim

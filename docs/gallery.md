@@ -58,10 +58,10 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 <td align="center" width="25%"><a href="screens/04-personality.svg"><img src="screens/04-personality.svg" width="210" alt="Personality"></a><br><sub><b>04</b> · Personality</sub></td>
 </tr>
 <tr>
-<td align="center" width="25%"><a href="screens/05-profile-home.svg"><img src="screens/05-profile-home.svg" width="210" alt="Profile Home"></a><br><sub><b>05</b> · Profile Home</sub></td>
-<td align="center" width="25%"><a href="screens/06-chat.svg"><img src="screens/06-chat.svg" width="210" alt="Chat"></a><br><sub><b>06</b> · Chat</sub></td>
-<td align="center" width="25%"><a href="screens/07-memory-vault.svg"><img src="screens/07-memory-vault.svg" width="210" alt="Memory Vault"></a><br><sub><b>07</b> · Memory Vault</sub></td>
-<td align="center" width="25%"><a href="screens/08-relationships.svg"><img src="screens/08-relationships.svg" width="210" alt="Relationships"></a><br><sub><b>08</b> · Relationships</sub></td>
+<td align="center" width="25%"><a href="screens/05-home.png"><img src="screens/05-home.png" width="210" alt="Profile Home"></a><br><sub><b>05</b> · Profile Home</sub></td>
+<td align="center" width="25%"><a href="screens/06-chat.png"><img src="screens/06-chat.png" width="210" alt="Chat"></a><br><sub><b>06</b> · Chat</sub></td>
+<td align="center" width="25%"><a href="screens/07-memory.png"><img src="screens/07-memory.png" width="210" alt="Memory Vault"></a><br><sub><b>07</b> · Memory Vault</sub></td>
+<td align="center" width="25%"><a href="screens/08-relationships.png"><img src="screens/08-relationships.png" width="210" alt="Relationships"></a><br><sub><b>08</b> · Relationships</sub></td>
 </tr>
 <tr>
 <td align="center" width="25%"><a href="screens/09-add-relationship.svg"><img src="screens/09-add-relationship.svg" width="210" alt="Add Relationship"></a><br><sub><b>09</b> · Add Relationship</sub></td>
@@ -87,7 +87,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 </tr>
 <tr>
 <td align="center" width="25%"><a href="screens/20-connections.svg"><img src="screens/20-connections.svg" width="210" alt="Connections"></a><br><sub><b>20</b> · Connections</sub></td>
-<td align="center" width="25%"><a href="screens/21-rooms.svg"><img src="screens/21-rooms.svg" width="210" alt="Rooms"></a><br><sub><b>21</b> · Rooms</sub></td>
+<td align="center" width="25%"><a href="screens/21-rooms.png"><img src="screens/21-rooms.png" width="210" alt="Rooms"></a><br><sub><b>21</b> · Rooms</sub></td>
 <td align="center" width="25%"><a href="screens/22-providers.svg"><img src="screens/22-providers.svg" width="210" alt="Providers"></a><br><sub><b>22</b> · Providers</sub></td>
 </tr>
 </table>
@@ -208,7 +208,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 
 <table>
 <tr>
-<td align="center" width="25%"><a href="screens/69-live-desks.svg"><img src="screens/69-live-desks.svg" width="210" alt="Live Desks"></a><br><sub><b>69</b> · Live Desks</sub></td>
+<td align="center" width="25%"><a href="screens/69-desk.png"><img src="screens/69-desk.png" width="210" alt="Live Desks"></a><br><sub><b>69</b> · Live Desks</sub></td>
 <td align="center" width="25%"><a href="screens/70-desk-beacons.svg"><img src="screens/70-desk-beacons.svg" width="210" alt="Desk Beacons"></a><br><sub><b>70</b> · Desk Beacons</sub></td>
 <td align="center" width="25%"><a href="screens/71-audience.svg"><img src="screens/71-audience.svg" width="210" alt="Audience"></a><br><sub><b>71</b> · Audience</sub></td>
 <td align="center" width="25%"><a href="screens/72-gifts-purchases.svg"><img src="screens/72-gifts-purchases.svg" width="210" alt="Gifts &amp; Purchases"></a><br><sub><b>72</b> · Gifts &amp; Purchases</sub></td>
@@ -229,7 +229,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 <td align="center" width="25%"><a href="screens/81-lend-a-microphone.svg"><img src="screens/81-lend-a-microphone.svg" width="210" alt="Lend a Microphone"></a><br><sub><b>81</b> · Lend a Microphone</sub></td>
 <td align="center" width="25%"><a href="screens/82-agents.svg"><img src="screens/82-agents.svg" width="210" alt="Agents"></a><br><sub><b>82</b> · Agents</sub></td>
 <td align="center" width="25%"><a href="screens/83-chat.svg"><img src="screens/83-chat.svg" width="210" alt="Chat with the agent overlay"></a><br><sub><b>83</b> · Chat · overlay</sub></td>
-<td align="center" width="25%"><a href="screens/84-friends.svg"><img src="screens/84-friends.svg" width="210" alt="Friends"></a><br><sub><b>84</b> · Friends</sub></td>
+<td align="center" width="25%"><a href="screens/84-friends.png"><img src="screens/84-friends.png" width="210" alt="Friends"></a><br><sub><b>84</b> · Friends</sub></td>
 </tr>
 <tr>
 <td align="center" width="25%"><a href="screens/85-my-page.svg"><img src="screens/85-my-page.svg" width="210" alt="My Page"></a><br><sub><b>85</b> · My Page</sub></td>
@@ -283,60 +283,60 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 <td align="center" width="25%"><a href="screens/139-where-it-lives.svg"><img src="screens/139-where-it-lives.svg" width="210" alt="Where It Lives"></a><br><sub><b>139</b> · Where It Lives</sub></td>
 <td align="center" width="25%"><a href="screens/140-not-on-free.svg"><img src="screens/140-not-on-free.svg" width="210" alt="Not On Free"></a><br><sub><b>140</b> · Not On Free</sub></td>
 <td align="center" width="25%"><a href="screens/141-which-model-answers.svg"><img src="screens/141-which-model-answers.svg" width="210" alt="Which Model Answers"></a><br><sub><b>141</b> · Which Model Answers</sub></td>
-<td align="center" width="25%"><a href="screens/142-blend-a-profile.svg"><img src="screens/142-blend-a-profile.svg" width="210" alt="Blend a Profile"></a><br><sub><b>142</b> · Blend a Profile</sub></td>
+<td align="center" width="25%"><a href="screens/142-blend.png"><img src="screens/142-blend.png" width="210" alt="Blend a Profile"></a><br><sub><b>142</b> · Blend a Profile</sub></td>
 </tr>
 <tr>
-<td align="center" width="25%"><a href="screens/143-what-would-they-do.svg"><img src="screens/143-what-would-they-do.svg" width="210" alt="What Would They Do"></a><br><sub><b>143</b> · What Would They Do</sub></td>
+<td align="center" width="25%"><a href="screens/143-simulate.png"><img src="screens/143-simulate.png" width="210" alt="What Would They Do"></a><br><sub><b>143</b> · What Would They Do</sub></td>
 <td align="center" width="25%"><a href="screens/144-where-you-are.svg"><img src="screens/144-where-you-are.svg" width="210" alt="Where You Are"></a><br><sub><b>144</b> · Where You Are</sub></td>
-<td align="center" width="25%"><a href="screens/145-where-the-money-goes.svg"><img src="screens/145-where-the-money-goes.svg" width="210" alt="Where the Money Goes"></a><br><sub><b>145</b> · Where the Money Goes</sub></td>
-<td align="center" width="25%"><a href="screens/146-the-ecosystem.svg"><img src="screens/146-the-ecosystem.svg" width="210" alt="The Ecosystem"></a><br><sub><b>146</b> · The Ecosystem</sub></td>
+<td align="center" width="25%"><a href="screens/145-campaigns.png"><img src="screens/145-campaigns.png" width="210" alt="Where the Money Goes"></a><br><sub><b>145</b> · Where the Money Goes</sub></td>
+<td align="center" width="25%"><a href="screens/146-org.png"><img src="screens/146-org.png" width="210" alt="The Ecosystem"></a><br><sub><b>146</b> · The Ecosystem</sub></td>
 </tr>
 <tr>
-<td align="center" width="25%"><a href="screens/147-your-own-voice.svg"><img src="screens/147-your-own-voice.svg" width="210" alt="Your Own Voice"></a><br><sub><b>147</b> · Your Own Voice</sub></td>
+<td align="center" width="25%"><a href="screens/147-voice.png"><img src="screens/147-voice.png" width="210" alt="Your Own Voice"></a><br><sub><b>147</b> · Your Own Voice</sub></td>
 <td align="center" width="25%"><a href="screens/148-who-wrote-this.svg"><img src="screens/148-who-wrote-this.svg" width="210" alt="Who Wrote This?"></a><br><sub><b>148</b> · Who Wrote This?</sub></td>
 <td align="center" width="25%"><a href="screens/149-how-should-they-work.svg"><img src="screens/149-how-should-they-work.svg" width="210" alt="How Should They Work?"></a><br><sub><b>149</b> · How Should They Work?</sub></td>
 <td align="center" width="25%"><a href="screens/150-what-went-wrong.svg"><img src="screens/150-what-went-wrong.svg" width="210" alt="What Went Wrong"></a><br><sub><b>150</b> · What Went Wrong</sub></td>
 </tr>
 <tr>
 <td align="center" width="25%"><a href="screens/151-before-anything-is-sent.svg"><img src="screens/151-before-anything-is-sent.svg" width="210" alt="Before Anything Is Sent"></a><br><sub><b>151</b> · Before Anything Is Sent</sub></td>
-<td align="center" width="25%"><a href="screens/152-marketplace.svg"><img src="screens/152-marketplace.svg" width="210" alt="Marketplace"></a><br><sub><b>152</b> · Marketplace</sub></td>
-<td align="center" width="25%"><a href="screens/153-exchanges.svg"><img src="screens/153-exchanges.svg" width="210" alt="Exchanges"></a><br><sub><b>153</b> · Exchanges</sub></td>
-<td align="center" width="25%"><a href="screens/154-lent-skills.svg"><img src="screens/154-lent-skills.svg" width="210" alt="Lent Skills"></a><br><sub><b>154</b> · Lent Skills</sub></td>
+<td align="center" width="25%"><a href="screens/152-market.png"><img src="screens/152-market.png" width="210" alt="Marketplace"></a><br><sub><b>152</b> · Marketplace</sub></td>
+<td align="center" width="25%"><a href="screens/153-exchanges.png"><img src="screens/153-exchanges.png" width="210" alt="Exchanges"></a><br><sub><b>153</b> · Exchanges</sub></td>
+<td align="center" width="25%"><a href="screens/154-grants.png"><img src="screens/154-grants.png" width="210" alt="Lent Skills"></a><br><sub><b>154</b> · Lent Skills</sub></td>
 </tr>
 <tr>
 <td align="center" width="25%"><a href="screens/155-watch-together.svg"><img src="screens/155-watch-together.svg" width="210" alt="Watch Together"></a><br><sub><b>155</b> · Watch Together</sub></td>
-<td align="center" width="25%"><a href="screens/156-who-this-is.svg"><img src="screens/156-who-this-is.svg" width="210" alt="Who This Is"></a><br><sub><b>156</b> · Who This Is</sub></td>
-<td align="center" width="25%"><a href="screens/157-where-it-is-seen.svg"><img src="screens/157-where-it-is-seen.svg" width="210" alt="Where It Is Seen"></a><br><sub><b>157</b> · Where It Is Seen</sub></td>
-<td align="center" width="25%"><a href="screens/158-what-is-live.svg"><img src="screens/158-what-is-live.svg" width="210" alt="What Is Live"></a><br><sub><b>158</b> · What Is Live</sub></td>
+<td align="center" width="25%"><a href="screens/156-identity.png"><img src="screens/156-identity.png" width="210" alt="Who This Is"></a><br><sub><b>156</b> · Who This Is</sub></td>
+<td align="center" width="25%"><a href="screens/157-presence.png"><img src="screens/157-presence.png" width="210" alt="Where It Is Seen"></a><br><sub><b>157</b> · Where It Is Seen</sub></td>
+<td align="center" width="25%"><a href="screens/158-live.png"><img src="screens/158-live.png" width="210" alt="What Is Live"></a><br><sub><b>158</b> · What Is Live</sub></td>
 </tr>
 <tr>
-<td align="center" width="25%"><a href="screens/159-contest-a-profile.svg"><img src="screens/159-contest-a-profile.svg" width="210" alt="Contest A Profile"></a><br><sub><b>159</b> · Contest A Profile</sub></td>
-<td align="center" width="25%"><a href="screens/160-show-me-around.svg"><img src="screens/160-show-me-around.svg" width="210" alt="Show Me Around"></a><br><sub><b>160</b> · Show Me Around</sub></td>
+<td align="center" width="25%"><a href="screens/159-contest.png"><img src="screens/159-contest.png" width="210" alt="Contest A Profile"></a><br><sub><b>159</b> · Contest A Profile</sub></td>
+<td align="center" width="25%"><a href="screens/160-guide.png"><img src="screens/160-guide.png" width="210" alt="Show Me Around"></a><br><sub><b>160</b> · Show Me Around</sub></td>
 <td align="center" width="25%"><a href="screens/161-not-on-this-plan.svg"><img src="screens/161-not-on-this-plan.svg" width="210" alt="Not On This Plan"></a><br><sub><b>161</b> · Not On This Plan</sub></td>
 <td align="center" width="25%"><a href="screens/162-where-it-is-marketed.svg"><img src="screens/162-where-it-is-marketed.svg" width="210" alt="Where It Is Marketed"></a><br><sub><b>162</b> · Where It Is Marketed</sub></td>
 </tr>
 <tr>
 <td align="center" width="25%"><a href="screens/163-a-body-to-speak-through.svg"><img src="screens/163-a-body-to-speak-through.svg" width="210" alt="A Body To Speak Through"></a><br><sub><b>163</b> · A Body To Speak Through</sub></td>
-<td align="center" width="25%"><a href="screens/164-what-it-is-made-of.svg"><img src="screens/164-what-it-is-made-of.svg" width="210" alt="What It Is Made Of"></a><br><sub><b>164</b> · What It Is Made Of</sub></td>
-<td align="center" width="25%"><a href="screens/165-what-it-can-do-for-you.svg"><img src="screens/165-what-it-can-do-for-you.svg" width="210" alt="What It Can Do For You"></a><br><sub><b>165</b> · What It Can Do For You</sub></td>
-<td align="center" width="25%"><a href="screens/166-somebody-qualified.svg"><img src="screens/166-somebody-qualified.svg" width="210" alt="Somebody Qualified"></a><br><sub><b>166</b> · Somebody Qualified</sub></td>
+<td align="center" width="25%"><a href="screens/164-workshop.png"><img src="screens/164-workshop.png" width="210" alt="What It Is Made Of"></a><br><sub><b>164</b> · What It Is Made Of</sub></td>
+<td align="center" width="25%"><a href="screens/165-assist.png"><img src="screens/165-assist.png" width="210" alt="What It Can Do For You"></a><br><sub><b>165</b> · What It Can Do For You</sub></td>
+<td align="center" width="25%"><a href="screens/166-referrals.png"><img src="screens/166-referrals.png" width="210" alt="Somebody Qualified"></a><br><sub><b>166</b> · Somebody Qualified</sub></td>
 </tr>
 <tr>
-<td align="center" width="25%"><a href="screens/167-in-the-game-with-you.svg"><img src="screens/167-in-the-game-with-you.svg" width="210" alt="In The Game With You"></a><br><sub><b>167</b> · In The Game With You</sub></td>
-<td align="center" width="25%"><a href="screens/168-who-follows-and-what-they-pay.svg"><img src="screens/168-who-follows-and-what-they-pay.svg" width="210" alt="Who Follows, And What They Pay"></a><br><sub><b>168</b> · Who Follows, And What They Pay</sub></td>
-<td align="center" width="25%"><a href="screens/169-where-people-find-you.svg"><img src="screens/169-where-people-find-you.svg" width="210" alt="Where People Find You"></a><br><sub><b>169</b> · Where People Find You</sub></td>
-<td align="center" width="25%"><a href="screens/170-reaching-out-and-what-stops-it.svg"><img src="screens/170-reaching-out-and-what-stops-it.svg" width="210" alt="Reaching Out, And What Stops It"></a><br><sub><b>170</b> · Reaching Out, And What Stops It</sub></td>
+<td align="center" width="25%"><a href="screens/167-lobby.png"><img src="screens/167-lobby.png" width="210" alt="In The Game With You"></a><br><sub><b>167</b> · In The Game With You</sub></td>
+<td align="center" width="25%"><a href="screens/168-audience.png"><img src="screens/168-audience.png" width="210" alt="Who Follows, And What They Pay"></a><br><sub><b>168</b> · Who Follows, And What They Pay</sub></td>
+<td align="center" width="25%"><a href="screens/169-beacons.png"><img src="screens/169-beacons.png" width="210" alt="Where People Find You"></a><br><sub><b>169</b> · Where People Find You</sub></td>
+<td align="center" width="25%"><a href="screens/170-reaching.png"><img src="screens/170-reaching.png" width="210" alt="Reaching Out, And What Stops It"></a><br><sub><b>170</b> · Reaching Out, And What Stops It</sub></td>
 </tr>
 <tr>
-<td align="center" width="25%"><a href="screens/171-what-leaves-and-on-what-terms.svg"><img src="screens/171-what-leaves-and-on-what-terms.svg" width="210" alt="What Leaves, And On What Terms"></a><br><sub><b>171</b> · What Leaves, And On What Terms</sub></td>
+<td align="center" width="25%"><a href="screens/171-leaving.png"><img src="screens/171-leaving.png" width="210" alt="What Leaves, And On What Terms"></a><br><sub><b>171</b> · What Leaves, And On What Terms</sub></td>
 <td align="center" width="25%"><a href="screens/172-one-thing-named.svg"><img src="screens/172-one-thing-named.svg" width="210" alt="One Thing, Named"></a><br><sub><b>172</b> · One Thing, Named</sub></td>
 <td align="center" width="25%"><a href="screens/173-beginning-and-passing-on.svg"><img src="screens/173-beginning-and-passing-on.svg" width="210" alt="Beginning, And Passing On"></a><br><sub><b>173</b> · Beginning, And Passing On</sub></td>
-<td align="center" width="25%"><a href="screens/174-what-you-are-owed.svg"><img src="screens/174-what-you-are-owed.svg" width="210" alt="What You Are Owed"></a><br><sub><b>174</b> · What You Are Owed</sub></td>
+<td align="center" width="25%"><a href="screens/174-selling.png"><img src="screens/174-selling.png" width="210" alt="What You Are Owed"></a><br><sub><b>174</b> · What You Are Owed</sub></td>
 </tr>
 <tr>
-<td align="center" width="25%"><a href="screens/175-inside-a-room.svg"><img src="screens/175-inside-a-room.svg" width="210" alt="Inside A Room"></a><br><sub><b>175</b> · Inside A Room</sub></td>
+<td align="center" width="25%"><a href="screens/175-inside.png"><img src="screens/175-inside.png" width="210" alt="Inside A Room"></a><br><sub><b>175</b> · Inside A Room</sub></td>
 <td align="center" width="25%"><a href="screens/176-a-body-and-what-it-learns.svg"><img src="screens/176-a-body-and-what-it-learns.svg" width="210" alt="A Body, And What It Learns"></a><br><sub><b>176</b> · A Body, And What It Learns</sub></td>
-<td align="center" width="25%"><a href="screens/177-work-handed-over.svg"><img src="screens/177-work-handed-over.svg" width="210" alt="Work Handed Over"></a><br><sub><b>177</b> · Work Handed Over</sub></td>
+<td align="center" width="25%"><a href="screens/177-delegate.png"><img src="screens/177-delegate.png" width="210" alt="Work Handed Over"></a><br><sub><b>177</b> · Work Handed Over</sub></td>
 <td align="center" width="25%"><a href="screens/178-signed-and-checked.svg"><img src="screens/178-signed-and-checked.svg" width="210" alt="Signed, And Checked"></a><br><sub><b>178</b> · Signed, And Checked</sub></td>
 </tr>
 <tr>
@@ -348,18 +348,18 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 <tr>
 <td align="center" width="25%"><a href="screens/183-everything-else.svg"><img src="screens/183-everything-else.svg" width="210" alt="Everything Else"></a><br><sub><b>183</b> · Everything Else</sub></td>
 <td align="center" width="25%"><a href="screens/184-without-an-account.svg"><img src="screens/184-without-an-account.svg" width="210" alt="Without An Account"></a><br><sub><b>184</b> · Without An Account</sub></td>
-<td align="center" width="25%"><a href="screens/185-discover.svg"><img src="screens/185-discover.svg" width="210" alt="Discover"></a><br><sub><b>185</b> · Discover</sub></td>
-<td align="center" width="25%"><a href="screens/186-wall.svg"><img src="screens/186-wall.svg" width="210" alt="Wall"></a><br><sub><b>186</b> · Wall</sub></td>
+<td align="center" width="25%"><a href="screens/185-discover.png"><img src="screens/185-discover.png" width="210" alt="Discover"></a><br><sub><b>185</b> · Discover</sub></td>
+<td align="center" width="25%"><a href="screens/186-wall.png"><img src="screens/186-wall.png" width="210" alt="Wall"></a><br><sub><b>186</b> · Wall</sub></td>
 </tr>
 <tr>
 <td align="center" width="25%"><a href="screens/187-shops.svg"><img src="screens/187-shops.svg" width="210" alt="Shops"></a><br><sub><b>187</b> · Shops</sub></td>
-<td align="center" width="25%"><a href="screens/188-your-corner.svg"><img src="screens/188-your-corner.svg" width="210" alt="Your Corner"></a><br><sub><b>188</b> · Your Corner</sub></td>
-<td align="center" width="25%"><a href="screens/189-feed.svg"><img src="screens/189-feed.svg" width="210" alt="Feed"></a><br><sub><b>189</b> · Feed</sub></td>
+<td align="center" width="25%"><a href="screens/188-corner.png"><img src="screens/188-corner.png" width="210" alt="Your Corner"></a><br><sub><b>188</b> · Your Corner</sub></td>
+<td align="center" width="25%"><a href="screens/189-feed.png"><img src="screens/189-feed.png" width="210" alt="Feed"></a><br><sub><b>189</b> · Feed</sub></td>
 <td align="center" width="25%"><a href="screens/190-what-plays.svg"><img src="screens/190-what-plays.svg" width="210" alt="What Plays"></a><br><sub><b>190</b> · What Plays</sub></td>
 </tr>
 <tr>
 <td align="center" width="25%"><a href="screens/191-rooms-desks.svg"><img src="screens/191-rooms-desks.svg" width="210" alt="Rooms &amp; Desks"></a><br><sub><b>191</b> · Rooms &amp; Desks</sub></td>
-<td align="center" width="25%"><a href="screens/192-your-side-of-it.svg"><img src="screens/192-your-side-of-it.svg" width="210" alt="Your Side of It"></a><br><sub><b>192</b> · Your Side of It</sub></td>
+<td align="center" width="25%"><a href="screens/192-solitude.png"><img src="screens/192-solitude.png" width="210" alt="Your Side of It"></a><br><sub><b>192</b> · Your Side of It</sub></td>
 <td align="center" width="25%"><a href="screens/193-ability-is-not-a-gate.svg"><img src="screens/193-ability-is-not-a-gate.svg" width="210" alt="Ability Is Not A Gate"></a><br><sub><b>193</b> · Ability Is Not A Gate</sub></td>
 </tr>
 </table>
@@ -570,7 +570,7 @@ believed and the steps are the part you can check.
 
 <table>
   <tr>
-    <td align="center" width="25%"><a href="screens/196-widgets.svg"><img src="screens/196-widgets.svg" width="210" alt="Widgets"></a><br><sub><b>196</b> · Widgets · your own tools, boxed</sub></td>
+    <td align="center" width="25%"><a href="screens/196-studio.png"><img src="screens/196-studio.png" width="210" alt="Widgets"></a><br><sub><b>196</b> · Widgets · your own tools, boxed</sub></td>
   </tr>
 </table>
 
@@ -593,7 +593,7 @@ is exactly how the old card came to be showing yours in place of theirs.
     <td align="center" width="25%"><a href="screens/197-their-homepage.svg"><img src="screens/197-their-homepage.svg" width="210" alt="Their homepage"></a><br><sub><b>197</b> · Their homepage · a face is a door</sub></td>
     <td align="center" width="25%"><a href="screens/198-beside-the-face.svg"><img src="screens/198-beside-the-face.svg" width="210" alt="Beside the face"></a><br><sub><b>198</b> · Beside the face · four panels, only what you can open</sub></td>
     <td align="center" width="25%"><a href="screens/199-what-it-is-doing.svg"><img src="screens/199-what-it-is-doing.svg" width="210" alt="What it is doing"></a><br><sub><b>199</b> · What it is doing · bars that mean it</sub></td>
-    <td align="center" width="25%"><a href="screens/200-agent.svg"><img src="screens/200-agent.svg" width="210" alt="Agent"></a><br><sub><b>200</b> · Agent · say what you want changed</sub></td>
+    <td align="center" width="25%"><a href="screens/200-agent.png"><img src="screens/200-agent.png" width="210" alt="Agent"></a><br><sub><b>200</b> · Agent · say what you want changed</sub></td>
   </tr>
   <tr>
     <td align="center" width="25%"><a href="screens/201-plug-ins.svg"><img src="screens/201-plug-ins.svg" width="210" alt="Plug-ins"></a><br><sub><b>201</b> · Plug-ins · what it can reach, and what it needs first</sub></td>
@@ -604,6 +604,7 @@ is exactly how the old card came to be showing yours in place of theirs.
   <tr>
     <td align="center" width="25%"><a href="screens/205-avatar-stage.svg"><img src="screens/205-avatar-stage.svg" width="210" alt="Avatar stage"></a><br><sub><b>205</b> · Avatar stage · the avatar takes the screen, wardrobe on the rail</sub></td>
     <td align="center" width="25%"><a href="screens/206-raise.svg"><img src="screens/206-raise.svg" width="210" alt="Raise"></a><br><sub><b>206</b> · Raise · grow your own — stages earned, the Album written and never edited</sub></td>
+    <td align="center" width="25%"><a href="screens/first-question.png"><img src="screens/first-question.png" width="210" alt="The first question"></a><br><sub><b>·</b> · The first question · the problem-reporting card, before anything else is shown</sub></td>
     <td align="center" width="25%"><a href="screens/207-hands.png"><img src="screens/207-hands.png" width="210" alt="Hands"></a><br><sub><b>207</b> · Hands · what it may work, for how long, and what it will never type</sub></td>
   </tr>
 </table>

@@ -54,6 +54,7 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
   const [words, setWords] = useState("");
   const [busy, setBusy] = useState(false);
   const [face, setFace] = useState<Avatar | null>(avatar);
+  const [shot, setShot] = useState("face");
 
   useEffect(() => {
     api.getProfile(profileId).then((p) => {
@@ -79,6 +80,34 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
       setFace(a);
       onChanged(a);
       setWords("");
+    } catch (e) { onError(e); }
+    finally { setBusy(false); }
+  }
+
+  /** The import road the doctrine gate always promised and never drew.
+   *
+   * The rail's three windows all landed on the same sentence — "a real
+   * person's face is never painted from words" — because for a real
+   * likeness there was nothing else on the card. Four buttons, one
+   * refusal, repeated: the field read that as four broken buttons, and
+   * it was right that nothing worked. The sentence stands, and under it
+   * is the thing that does work: a photograph, through the forge, which
+   * is how a real face has always been allowed to arrive.
+   */
+  async function forgeFrom(file: File | undefined) {
+    if (!file || busy) return;
+    setBusy(true);
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      let binary = "";
+      // Chunked — one apply() over a multi-megabyte photograph blows the
+      // argument limit on every browser that matters.
+      for (let at = 0; at < bytes.length; at += 0x8000) {
+        binary += String.fromCharCode(...bytes.subarray(at, at + 0x8000));
+      }
+      const built = await api.forgeFace(profileId, btoa(binary), shot, token);
+      setFace(built.avatar);
+      onChanged(built.avatar);
     } catch (e) { onError(e); }
     finally { setBusy(false); }
   }
@@ -156,7 +185,8 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
             {w.glyph}
           </button>
         ))}
-        <button className={rail === "all" ? "lit" : ""} aria-pressed={!!rail}
+        <button className={rail === "all" ? "lit" : ""}
+                aria-pressed={rail === "all"}
                 aria-label={tr("stage.wheel", lang)}
                 title={tr("stage.wheel", lang)}
                 onClick={() => setRail((r) => r === "all" ? null : "all")}>
@@ -196,9 +226,31 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
             // The wardrobe exists and the owner shut it. Said, not hidden.
             <p className="muted small">{tr("ward.locked", lang)}</p>
           ) : (
-            // The gate, said instead of hidden: real faces arrive by
-            // photograph under a recorded grant, never by prompt.
-            <p className="muted small">{tr("ward.real", lang)}</p>
+            // The gate, said instead of hidden — and then the road that
+            // is open, because a card that only says no is a card the
+            // field reads as a broken button.
+            <>
+              <p className="muted small">{tr("ward.real", lang)}</p>
+              {owned && (
+                <div className="ward-import">
+                  <label>{tr("ward.shot", lang)}
+                    <select value={shot} disabled={busy}
+                            onChange={(e) => setShot(e.target.value)}>
+                      <option value="face">{tr("ward.shot.face", lang)}</option>
+                      <option value="upper">{tr("ward.shot.upper", lang)}</option>
+                      <option value="full">{tr("ward.shot.full", lang)}</option>
+                    </select>
+                  </label>
+                  <input type="file" accept="image/*" disabled={busy}
+                         aria-label={tr("ward.photo", lang)}
+                         onChange={(e) =>
+                           void forgeFrom(e.target.files?.[0] ?? undefined)} />
+                  <p className="muted small">
+                    {busy ? tr("ward.building", lang) : tr("ward.photo.note", lang)}
+                  </p>
+                </div>
+              )}
+            </>
           )}
           {owned && fictional && (
             <label className="ward-switch">

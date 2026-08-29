@@ -26,7 +26,8 @@ def test_every_screen_in_the_gallery_is_covered_by_a_lesson(client):
     """
     root = pathlib.Path(__file__).resolve().parent.parent / "docs" / "screens"
     drawn = set()
-    for path in root.glob("*.svg"):
+    for pattern in ("*.svg", "*.png"):
+      for path in root.glob(pattern):
         head = path.name.split("-", 1)[0]
         if head.isdigit():
             drawn.add(int(head))
@@ -45,7 +46,9 @@ def test_no_lesson_points_at_a_screen_that_is_not_there(client):
     """The other direction. A step telling somebody to look at a screen that
     was renumbered away sends them somewhere blank."""
     root = pathlib.Path(__file__).resolve().parent.parent / "docs" / "screens"
-    drawn = {int(p.name.split("-", 1)[0]) for p in root.glob("*.svg")
+    drawn = {int(p.name.split("-", 1)[0])
+             for pattern in ("*.svg", "*.png")
+             for p in root.glob(pattern)
              if p.name.split("-", 1)[0].isdigit()}
     for lesson in tutorial.LESSONS:
         stale = sorted(set(lesson["screens"]) - drawn)

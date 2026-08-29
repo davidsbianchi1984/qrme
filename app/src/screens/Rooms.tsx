@@ -42,10 +42,34 @@ export function Rooms({ onPlans, onInside }: {
     useState<{ profile_id: string; display_name: string }[]>([]);
   const [asking, setAsking] = useState<Record<string, string>>({});
   const [asked, setAsked] = useState<string | null>(null);
+  // The two things you set *before* anybody is in the room with you.
+  // Both used to live behind a seat's gear inside the room, where you can
+  // only reach them once it is already running — the field asked for them
+  // out of that frame, and this row is where somebody actually stands
+  // before walking in.
+  const [naming, setNaming] = useState<Record<string, string>>({});
+  const [lent, setLent] = useState<Record<string, boolean>>({});
   // The XR shelf: every headset on the market and its road into these
   // rooms. The rooms are pages, so the road is the headset's own browser
   // — the card says which, and marks the futures as futures.
   const [xr, setXr] = useState<XrPlatform[]>([]);
+
+  /** Whether this account's microphone is already lent in each room —
+   *  read rather than remembered, so a reload does not offer to lend a
+   *  microphone that is already lent. */
+  function readMics(ids: string[]) {
+    const token = session.interactorToken;
+    const me = session.interactorId;
+    if (!token || !me) return;
+    ids.forEach((id) => {
+      api.micsInRoom(id, token).then((m) => {
+        setLent((cur) => ({
+          ...cur,
+          [id]: m.microphones_lent.some((row) => row.interactor_id === me),
+        }));
+      }).catch(() => {});
+    });
+  }
 
   function load() {
     api.listRooms().then(setRooms).catch((e) => setError(e));
@@ -185,6 +209,56 @@ export function Rooms({ onPlans, onInside }: {
                     }}>
               {tr("rms.standing.open", lang)}
             </button>
+            {/* Name it, and lend it your microphone — before you walk in.
+                Both were behind a seat's gear inside the room until the
+                field found them wedged between "Camera on" and
+                "Background" and asked for them out of that frame. */}
+            {session.profileId && session.ownerToken && (
+              <span className="rms-before">
+                <input value={naming[r.id] ?? (r.topic || "")}
+                       disabled={busy}
+                       aria-label={tr("ins.roomname", lang)}
+                       placeholder={tr("ins.roomname.ph", lang)}
+                       onChange={(e) => setNaming(
+                         { ...naming, [r.id]: e.target.value })} />
+                <button className="ghost"
+                        disabled={busy || !(naming[r.id] ?? "").trim()}
+                        onClick={async () => {
+                          setBusy(true); setError(null);
+                          try {
+                            await api.renameRoom(r.id, session.profileId!,
+                                                 naming[r.id].trim(),
+                                                 session.ownerToken!);
+                            load();
+                          } catch (e) { setError(e); }
+                          finally { setBusy(false); }
+                        }}>
+                  {tr("ins.roomname.save", lang)}
+                </button>
+              </span>
+            )}
+            {session.interactorId && session.interactorToken && (
+              <button className="ghost" disabled={busy}
+                      aria-pressed={!!lent[r.id]}
+                      title={tr("ins.micpitch", lang)}
+                      onClick={async () => {
+                        setBusy(true); setError(null);
+                        const me = session.interactorId!;
+                        const tok = session.interactorToken!;
+                        try {
+                          if (lent[r.id]) {
+                            await api.takeBackMicInRoom(r.id, me, tok);
+                          } else {
+                            await api.lendMicInRoom(r.id, me, tok);
+                          }
+                          readMics([r.id]);
+                        } catch (e) { setError(e); }
+                        finally { setBusy(false); }
+                      }}>
+                {lent[r.id] ? tr("ins.takeback", lang)
+                            : tr("ins.lendmic", lang)}
+              </button>
+            )}
             {/* Asking somebody in. Rooms could be opened and walked into and
                 nobody could be invited to one: the only ways were to name
                 them in the create body — which needs their id before the
