@@ -36,6 +36,8 @@ from pathlib import Path
 
 import pytest
 
+from . import ratchets
+
 
 def _repo_root() -> Path:
     for d in Path(__file__).resolve().parents:
@@ -193,7 +195,8 @@ def test_the_refusals_are_published_before_anybody_tries(client):
     for kind, why in view["refusal_reasons"].items():
         assert kind not in view["kinds_worn"], (
             f"{kind} is offered and refused at the same time")
-        assert len(why) > 40, f"{kind} is refused without a reason"
+        assert len(why) >= ratchets.floor("refusals.shortest_reason"), (
+            f"{kind} is refused without a reason")
 
 
 def test_unpairing_keeps_the_row(client):

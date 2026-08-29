@@ -1,5 +1,5 @@
-# status: backlog — 7 rows
-# ceiling: 7
+# status: backlog — 0 rows
+# ceiling: 0
 #
 # Every numeric floor in this suite still carrying its own literal: an
 # `assert <something> > <int>` with the number written into the assertion.
@@ -89,6 +89,19 @@
 #   test_steering_hub.py: hub['age']['effective_age'] >= 41
 #   test_the_keys_the_till_and_the_lifeline.py: client.post('/auth/oauth/nobody/start', json={}).status_code >= 400
 #   test_the_strangers_language_on_a_phone.py: n >= 2
+#   test_the_room_reads_what_you_hand_it.py: fn.count('except Exception') >= 2
+#
+# 2.7.1 added one, of the same shape as the four above.
+# `fn.count('except Exception') >= 2` reads one function's source and asks
+# that both of its reads are guarded — the two are the read and the parse,
+# and there is no third to raise it toward.
+#
+# `len(why) > 40` was written here too, on the reasoning that a length is
+# not a size. The count guard refused it, correctly: it is `len(...)`, and
+# it turned out to be decoration of the plainest kind — the shortest reason
+# those routes publish is 220 characters. It is `refusals.shortest_reason`
+# now, floored at 165, where it will notice a sentence cut down to a stub.
+#
 #
 # One candidate was deliberately *not* exempted. `test_seed_backfill.py`'s
 # `out['repaired'] >= 34` counts profiles a repair pass fixed, and that
@@ -122,10 +135,3 @@
 # they stand here as rows instead, each with this paragraph as its
 # reason.
 #
-test_the_keys_the_android_client_reads.py:386: len(driven) >= 80
-test_the_refusal_that_handed_the_body_back.py:161: reached > 100
-test_the_room_reads_what_you_hand_it.py:166: fn.count('except Exception') >= 2
-test_the_shape_the_client_expects.py:310: len(driven) >= 30
-test_the_shape_the_console_expects.py:457: len(driven) >= 60
-test_the_shape_the_swift_client_expects.py:228: len(driven) >= 25
-test_two_questions_a_mark_answers.py:196: len(why) > 40
