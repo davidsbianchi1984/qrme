@@ -63,10 +63,22 @@ export function Avatar3D({ src, speaking, className }: {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     mount.appendChild(renderer.domElement);
-    // Lit softly from the front: a photographed face already carries its
-    // own light, so the scene's job is to not fight it.
-    scene.add(new THREE.AmbientLight(0xffffff, 1.6));
-    const key = new THREE.DirectionalLight(0xffffff, 0.6);
+    // A photographed face already carries its own light, and the scene's
+    // job is to not fight it. It was fighting it: ambient 1.6 plus a 0.6
+    // key over a lit material multiplies the photograph by more than two,
+    // so every pixel above about four-tenths brightness clipped to white
+    // and the head came back as a featureless white blob with a little
+    // facet shading on it — which is exactly what the field reported.
+    //
+    //     asked     is the face lit
+    //     mattered  is the photograph still visible after lighting it
+    //
+    // The skin is swapped to an unlit material below, so these lights
+    // only reach a head that arrived without one. Kept faint for that
+    // case rather than removed, because an unlit material with no map is
+    // a flat silhouette and a lit one at least has a shape.
+    scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+    const key = new THREE.DirectionalLight(0xffffff, 0.35);
     key.position.set(0, 1, 2);
     scene.add(key);
 
@@ -79,6 +91,22 @@ export function Avatar3D({ src, speaking, className }: {
         const mesh = thing as THREE.Mesh;
         if (!head && mesh.isMesh && mesh.morphTargetInfluences) {
           head = mesh;
+          // The photograph, shown as photographed.
+          //
+          // glTF's own material is a lit one, and lighting a face that
+          // was already lit when the shutter opened is how the skin got
+          // washed out of it. An unlit material draws the texture at the
+          // brightness it was taken at — which is the whole point of
+          // building a head out of somebody's own picture — and morph
+          // targets work on it exactly as they do on the lit one, so the
+          // jaw still moves with the voice.
+          const lit = mesh.material as THREE.MeshStandardMaterial;
+          if (lit?.map) {
+            mesh.material = new THREE.MeshBasicMaterial({
+              map: lit.map, side: THREE.DoubleSide,
+            });
+            lit.dispose();
+          }
           // The names ride in the mesh's extras, which is where the forge
           // put them and where every exporter puts them.
           const named = (mesh.morphTargetDictionary

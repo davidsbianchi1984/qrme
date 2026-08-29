@@ -315,6 +315,21 @@ def _glb(positions: np.ndarray, uvs: np.ndarray, faces: np.ndarray,
     return b"".join(model.save_to_bytes())
 
 
+def _as_png(photo: bytes) -> bytes:
+    """The photograph as real PNG bytes, whatever arrived.
+
+    A texture is embedded beside a `mimeType`, and a reader is entitled
+    to believe it. Re-encoding is what makes the two agree — cheaper
+    than the class of bug where a head renders with no skin and nothing
+    anywhere says why.
+    """
+    from PIL import Image
+
+    held = io.BytesIO()
+    Image.open(io.BytesIO(photo)).convert("RGB").save(held, format="PNG")
+    return held.getvalue()
+
+
 def build_head(photo: bytes, *, shot: str = "face") -> dict:
     """The whole road: a photograph in, a speakable head out.
 
@@ -345,6 +360,16 @@ def build_head(photo: bytes, *, shot: str = "face") -> dict:
     faces = _triangles(uvs)
     morphs = _morphs(positions)
     portrait = _portrait(photo, uvs)
-    return {"glb": _glb(positions, uvs, faces, morphs, photo),
+    # The skin, encoded rather than asserted.
+    #
+    # The uploaded bytes went into the file as-is under a declared
+    # `image/png`, and almost every photograph a person uploads is a
+    # JPEG. glTF readers are entitled to believe that declaration; the
+    # ones that do get a decode failure and draw the head with no skin
+    # at all. Encoding here makes the label true by construction instead
+    # of by hope, which is the same reason `qrme/media.py` reads a kind
+    # out of the bytes and never out of the name.
+    skin = _as_png(photo)
+    return {"glb": _glb(positions, uvs, faces, morphs, skin),
             "portrait": portrait,
             "blendshapes": list(BLENDSHAPES)}
