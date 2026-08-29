@@ -6,6 +6,58 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-08-29
+
+### Added
+
+- **The photograph is what speaks.** The forge built a head out of
+  MediaPipe's 478 face landmarks, and a landmark set is a face region —
+  no skull, no hair, no ears, no neck. However well it is textured and
+  lit, the mesh can only ever be a mask. The field looked at one and
+  said it exactly: *"That isn't the photo I uploaded, that just seems
+  like a white moving skeleton frame that goes behind the image."*
+- So nothing is rebuilt any more. A new `/speak` door **measures** the
+  picture — where the face's points sit, how they join up, how a mouth
+  moves in the picture's own plane — and answers without the photograph,
+  which is already on the profile. The console lays that mesh flat over
+  the picture it already has, with the picture as its own texture at the
+  places it was measured, so at rest the mesh is a copy of the picture
+  over the picture and cannot be seen. The only thing that ever moves is
+  a mouth, and everything that is not a mouth is never touched. That is
+  why the person on screen goes on being the person in the photo.
+- No depth, deliberately: a photograph has none, and inventing one is
+  how the mask got built. The plane shapes carry two numbers per point
+  and a guard fails if a third appears. No blink either — a blink drawn
+  by displacing a picture of an open eye is a smear, so it is lips and
+  jaw or it is nothing.
+- The measurement rides the same registry row as the portrait — one
+  record, one likeness, one provenance — and follows it out on a
+  takedown exactly as the model does. An anonymous profile ships
+  neither: where somebody's face sits in their own picture is a picture
+  of somebody.
+
+### Fixed
+
+- **The head's texture was labelled a lie.** The uploaded bytes went
+  into the glTF as-is under a declared `image/png`, and almost every
+  photograph anybody uploads is a JPEG. A reader entitled to believe
+  that declaration gets a decode failure and draws the head with no skin
+  at all — the same failure `qrme/media.py` was written against, one
+  layer out. The photograph is encoded now, so the label is true by
+  construction.
+- **And the lighting ate what survived.** Ambient 1.6 plus a 0.6 key
+  over a lit material multiplies a photograph by more than two, so every
+  pixel above roughly four-tenths brightness clipped to white. The skin
+  moves to an unlit material, drawn at the brightness it was taken at.
+- The 3-D head stays, second on its card and behind a fold that says
+  what it is — no hair, no ears, no back of the head — so anybody who
+  opens it already knows why it will not look like them. It becomes
+  worth showing the day the landmarks are fitted to a mesh that has a
+  skull.
+- A ratchet whose floor had drifted to under half of what it measures:
+  `suite.guard_names` sat at 1900 while the suite grew to 3804, so the
+  tests could have halved without a word.
+
 ## [2.4.0] - 2026-08-29
 
 ### Added
@@ -16276,7 +16328,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.4.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.5.0...HEAD
+[2.5.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.4.0...app-v2.5.0
 [2.4.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.3.1...app-v2.4.0
 [2.3.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.3.0...app-v2.3.1
 [2.3.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.2.0...app-v2.3.0

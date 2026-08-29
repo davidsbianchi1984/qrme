@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v2.4.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v2.5.0** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -288,6 +288,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **2.5.0** | The photograph is what speaks — the forge measures a picture instead of rebuilding it, and the console lays that mesh flat over the photo so the only thing that ever moves is a mouth; the 3-D head's mislabelled texture and blown-out lighting fixed, and the head itself moved behind a fold that says it is a mask |
 | **2.4.0** | The hands — a profile can work a screen under a grant that names its apps, its moves, its minutes and its steps, given by menu or by word; it will not type a password, cannot widen itself from anything written on a screen, and says out loud that no iPhone can be driven. Plus the Wall crash that blanked the whole console, and the capture harness that had photographed the same screen thirty-nine times |
 | **2.3.1** | The head the forge builds is actually drawn — `Avatar3D` shipped catalogued but mounted by nothing, and now stands on the avatar stage and in a room seat with its jaw moving to the voice; the avatar market becomes a tile picker; and a guard fails the suite for any component nothing imports |
 | **2.3.0** | **The forge** — a photograph becomes a 3-D face on the deployment's own hardware (MediaPipe sidecar, ARKit-named blendshapes, no vendor and no monthly bill) and the head's mouth moves with the voice the room already plays; the sit-out button lets a person's seat step out of the rotation's waiting; Ready Player Me struck from the shelf after its January shutdown; aimed turns survive a mid-paragraph marker and a mistyped name; the room's ear re-opens when it falls quiet |
