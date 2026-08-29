@@ -2615,7 +2615,14 @@ export function Inside({ onPlans, start = "", onLeave }: {
                                             void flipSitOut(); }}
                           onDoubleClick={(e) => e.stopPropagation()}
                           onPointerDown={(e) => e.stopPropagation()}>
-                    {sittingOut ? "▶" : "⏸"}
+                    {/* The word, not a transport glyph. ▶/⏸ read as play
+                        and pause over a photograph — the field said so:
+                        "the play and pause button above my profile photo,
+                        it was supposed to be sit in and sit out." The
+                        label is the action about to happen, which is why
+                        it says "Sit out" while you are seated. */}
+                    {sittingOut ? tr("ins.sitin", lang)
+                                : tr("ins.sitout", lang)}
                   </button>
                 )}
                 {/* What is behind the person, drawn first so everything

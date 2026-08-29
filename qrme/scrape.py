@@ -107,11 +107,75 @@ def fetch_transcribed(url: str, on_behalf_of: str | None = None) -> dict | None:
     except Exception:  # noqa: BLE001 — missing ears are the caller's decision
         return None
     text = (out.get("text") or "").strip()
-    if not text:
+    if not text or looped(text):
         return None
     return {"text": text[:_MAX_RENDERED],
             "duration_seconds": out.get("duration_seconds"),
             "language": out.get("language")}
+
+
+#: A transcript can come back as one short thing said over and over —
+#: "Nghei, Nghei, Nghei, …" thirty times, "de typedas" ten times. That is
+#: not somebody speaking. It is what a recogniser does when it is handed
+#: near-silence or a loudspeaker playing back into the microphone: it
+#: locks onto a fragment and repeats it until the audio runs out.
+#:
+#:     asked     did the ears answer
+#:     mattered  did the ears answer with speech
+#:
+#: It matters more here than in most places because these words go into a
+#: room *as that person's own message*. A wall of nonsense under somebody's
+#: name is worse than no message at all, and every client — the console and
+#: the three shells — reaches the ears through this module, so the check
+#: lives here rather than in a screen.
+_LOOP_MIN_WORDS = 8
+_LOOP_SHARE = 0.5
+_LOOP_MIN_PAIRS = 6
+_LOOP_PAIR_SHARE = 0.4
+_LOOP_TOKEN_MAX = 14
+_LOOP_MIN_VOCAB_WORDS = 12
+_LOOP_MIN_PAIR_HITS = 4
+_LOOP_VOCAB = 0.5
+
+
+def looped(text: str) -> bool:
+    """True when a transcript is one fragment repeated rather than speech.
+
+    Two shapes, because the recogniser produces both: a single word
+    hammered (``Nghei, Nghei, Nghei…``) and a short phrase hammered
+    (``de typedas 3 - 7 % de typedas 4 - 7 %…``), which no single-word
+    count would catch.
+
+    The thresholds are half and two-fifths rather than a tenth on
+    purpose. Somebody really does say "no, no, no" and a name really does
+    get repeated in a room; those land well under half. A recogniser
+    stuck on a fragment lands well over it. Tokens longer than
+    :data:`_LOOP_TOKEN_MAX` are exempt, because a word rare enough to be
+    that long is not the shape this describes.
+    """
+    from collections import Counter
+    words = [w for w in re.findall(r"[\w'%-]+", (text or "").lower()) if w]
+    if len(words) >= _LOOP_MIN_WORDS:
+        token, count = Counter(words).most_common(1)[0]
+        if len(token) <= _LOOP_TOKEN_MAX and count / len(words) >= _LOOP_SHARE:
+            return True
+    pairs = [" ".join(words[i:i + 2]) for i in range(len(words) - 1)]
+    if len(pairs) >= _LOOP_MIN_PAIRS:
+        _pair, count = Counter(pairs).most_common(1)[0]
+        if count / len(pairs) >= _LOOP_PAIR_SHARE:
+            return True
+        # The interleaved shape, which neither count above catches: a
+        # phrase repeated with a changing number wedged into it —
+        # "de typedas 3 - 7 % de typedas 4 - 7 % de typedas 5 - 8 %".
+        # The phrase is only a fifth of the pairs because the fillers
+        # dilute it, so the second half of the test is the vocabulary:
+        # real speech of this length does not say the same few words
+        # over and over.
+        if (len(words) >= _LOOP_MIN_VOCAB_WORDS
+                and count >= _LOOP_MIN_PAIR_HITS
+                and len(set(words)) / len(words) < _LOOP_VOCAB):
+            return True
+    return False
 
 
 def transcribe_bytes(data: bytes, on_behalf_of: str | None = None) -> dict | None:
@@ -138,7 +202,7 @@ def transcribe_bytes(data: bytes, on_behalf_of: str | None = None) -> dict | Non
     except Exception:  # noqa: BLE001 — missing ears are the caller's decision
         return None
     text = (out.get("text") or "").strip()
-    if not text:
+    if not text or looped(text):
         return None
     return {"text": text[:_MAX_RENDERED],
             "duration_seconds": out.get("duration_seconds"),

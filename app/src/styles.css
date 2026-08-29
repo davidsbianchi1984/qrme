@@ -611,6 +611,30 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
    audio room has tiles at all. Green, not the brand purple: the screen it is
    drawn from uses #7bc47f, and it is the tile ground, the border and a ring
    round the face together, because one of the three alone is a hint. */
+/* The sit-out, on your own tile's left corner.
+ *
+ * It had no rule at all, so it drew as a bare glyph box in the corner of
+ * a photograph and read as a media control: "the play and pause button
+ * above my profile photo, it was supposed to be sit in and sit out." A
+ * word cannot be mistaken for a transport button, and the word is the
+ * action about to happen — "Sit out" while you are seated, "Sit in"
+ * while you are not.
+ *
+ * `lit` when you are out, because sitting out is the state somebody
+ * needs to be able to see across the room at a glance, not the default. */
+.rs-sitout {
+  position: absolute; top: 8px; left: 8px; z-index: 5;
+  padding: 4px 10px; border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(5,7,15,0.72); color: var(--text, #e8eaf6);
+  font-size: 10.5px; font-weight: 700; line-height: 1.2;
+  letter-spacing: .01em; cursor: pointer; white-space: nowrap;
+}
+.rs-sitout:hover { border-color: rgba(255,255,255,0.35); }
+.rs-sitout.out {
+  background: rgba(123,196,127,0.9); color: #0d1a0f;
+  border-color: rgba(123,196,127,0.95);
+}
 .rs-tile.talking { background: rgba(123,196,127,0.14);
   border: 2px solid rgba(123,196,127,0.85); padding: 11px 7px; }
 .rs-tile.talking .rs-face, .rs-tile.talking .rs-photo,
