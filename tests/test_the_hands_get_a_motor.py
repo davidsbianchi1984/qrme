@@ -525,3 +525,35 @@ def test_the_probe_asks_what_the_hands_ask():
     # flattering it.
     assert verdict in ("UNPARSED", "SILENT", "HEDGED", "ERROR")
     assert detail
+
+
+def test_the_eyes_do_not_write_down_what_they_should_not_read():
+    """The description the eyes write is not a passing thought: it goes
+    into the ledger's `saw` column and out to the deciding model on every
+    turn after. A terminal left open with an owner token in it therefore
+    put that token in the database and in a provider's inbox — and the
+    deciding model refused the errand rather than work a screen with a
+    credential written across it, which was the right call.
+
+    asked     what did the eyes see
+    mattered  what did they write down, and where did that go
+    """
+    seen = ("PowerShell is open behind Notepad. It shows: python hands.py "
+            "--token _-emviLdIVDYeyhz2YGM3dW_5QutpovSwIVbcQJHTXs --reach "
+            "rch_1d5b30d5af28")
+    kept = hands.without_secrets(seen)
+    assert "_5QutpovSwIVbcQJHTXs" not in kept
+    assert hands.UNSAID in kept
+    # The parts a person needs are still there.
+    assert "Notepad" in kept and "hands.py" in kept
+    # Ordinary prose is left alone.
+    plain = "A blank Notepad window with the cursor at Ln 1, Col 1."
+    assert hands.without_secrets(plain) == plain
+    # A card on the glass goes too, and the sentence still reads.
+    carded = hands.without_secrets("the card 4111 1111 1111 1111 is shown")
+    assert "4111" not in carded and "is shown" in carded
+    # And it is the eyes that call it, not something a caller may forget.
+    source = (REPO / "qrme" / "hands.py").read_text(encoding="utf-8")
+    eyes = source.split("def read_screen(")[1].split("\ndef ")[0]
+    assert "without_secrets(llm.look(" in eyes
+    assert "never what it says" in eyes
