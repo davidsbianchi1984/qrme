@@ -49,6 +49,10 @@ export function Rooms({ onPlans, onInside }: {
   // before walking in.
   const [naming, setNaming] = useState<Record<string, string>>({});
   const [lent, setLent] = useState<Record<string, boolean>>({});
+  // What just happened, in the same words the room used to say it in.
+  // These three sentences lost their reader when the controls moved and
+  // would otherwise be ten translations nobody sees.
+  const [note, setNote] = useState<string | null>(null);
   // The XR shelf: every headset on the market and its road into these
   // rooms. The rooms are pages, so the road is the headset's own browser
   // — the card says which, and marks the futures as futures.
@@ -229,6 +233,7 @@ export function Rooms({ onPlans, onInside }: {
                             await api.renameRoom(r.id, session.profileId!,
                                                  naming[r.id].trim(),
                                                  session.ownerToken!);
+                            setNote(tr("ins.roomname.saved", lang));
                             load();
                           } catch (e) { setError(e); }
                           finally { setBusy(false); }
@@ -248,8 +253,10 @@ export function Rooms({ onPlans, onInside }: {
                         try {
                           if (lent[r.id]) {
                             await api.takeBackMicInRoom(r.id, me, tok);
+                            setNote(tr("ins.takenback", lang));
                           } else {
                             await api.lendMicInRoom(r.id, me, tok);
+                            setNote(tr("ins.lent", lang));
                           }
                           readMics([r.id]);
                         } catch (e) { setError(e); }
@@ -352,6 +359,7 @@ export function Rooms({ onPlans, onInside }: {
       )}
 
       <Refusal error={error} onPlans={onPlans} variant="inline" />
+      {note && <p className="small">{note}</p>}
     </div>
   );
 }

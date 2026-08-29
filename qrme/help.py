@@ -457,6 +457,11 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     "bodies": ("robot", "robots", "a body", "humanoid", "android",
                "my robot", "bind a robot", "embodiment", "speak through",
                "task pack", "robot skills"),
+    "hands": ("hands", "use my computer", "use my screen", "work my screen",
+              "click for me", "type for me", "take over", "do it for me on "
+              "screen", "navigate for me", "do that again", "repeat that",
+              "let it use my calendar", "give it my screen",
+              "cursor", "sit at my computer"),
     "placement": ("adult venue", "onlyfans", "fansly", "rated placement",
                   "place my profile", "market my profile", "18+ venue",
                   "adult marketing", "where is it advertised"),

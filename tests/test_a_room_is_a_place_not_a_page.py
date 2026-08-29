@@ -41,6 +41,14 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 APP = (REPO / "app/src/App.tsx").read_text(encoding="utf-8")
 INSIDE = (REPO / "app/src/screens/Inside.tsx").read_text(encoding="utf-8")
+#: The Rooms screen. Two controls moved here from inside the room — the
+#: room's name and the microphone lend — because both are things somebody
+#: sets *before* walking in, and both had been reachable only once the
+#: room was already running. The field found them wedged between "Camera
+#: on" and "Background" and asked for them out of that frame. These tests
+#: hold the capability, not the address, so they read both screens.
+ROOMS = (REPO / "app/src/screens/Rooms.tsx").read_text(encoding="utf-8")
+CONSOLE = INSIDE + ROOMS
 CSS = (REPO / "app/src/styles.css").read_text(encoding="utf-8")
 #: The stylesheet with its comments taken out.
 #:
@@ -341,7 +349,7 @@ def test_every_control_in_the_strip_does_something():
     # rather than pinned to the strip.
     for wired in ("api.lendMicInRoom(", "api.takeBackMicInRoom(",
                   "api.advanceRoom("):
-        assert wired in INSIDE, f"the only door is gone entirely: {wired}"
+        assert wired in CONSOLE, f"the only door is gone entirely: {wired}"
 
 
 def test_the_paperclip_takes_photos_video_and_files():
@@ -621,17 +629,28 @@ def test_the_bottom_card_left_the_room():
     assert 'tr("ins.goin"' in INSIDE, "the way into a room was replaced"
 
 
-def test_the_room_can_still_be_renamed_behind_the_gear():
-    """Moved, not deleted: renaming is a capability with one door, and
-    that door lives in your own seat's reveal now — beside the microphone
-    lend. The let-them-talk button is gone from every platform on the
-    field order ("users can just tell them to talk with each other...");
-    the WORDS are the control now, and the society's chain answers them
+def test_the_room_can_still_be_renamed_and_lent_a_microphone():
+    """Moved twice, deleted never.
+
+    Renaming and lending each have exactly one door. That door was behind
+    your own seat's gear, which put it out of reach until the room was
+    already running — "you just could've set that up before they joined"
+    was the reasoning that put it there, and it is the reasoning that
+    took it out again. Both live on the room's own row on the Rooms
+    screen now, which is where somebody stands before walking in.
+
+    The let-them-talk button is gone from every platform on the field
+    order ("users can just tell them to talk with each other..."); the
+    WORDS are the control now, and the society's chain answers them
     (the socPaused effect, over api.advanceRoom)."""
-    block = INSIDE[INSIDE.index("{isMe && reveal && ("):]
-    assert 'tr("ins.roomname.save"' in block
-    assert "api.renameRoom(" in INSIDE, "the Save button saves nothing"
-    assert 'tr("ins.lendmic"' in block
+    assert 'tr("ins.roomname.save"' in ROOMS
+    assert "api.renameRoom(" in ROOMS, "the Save button saves nothing"
+    assert 'tr("ins.lendmic"' in ROOMS
+    # And gone from the frame it was pulled out of, not merely copied.
+    assert 'tr("ins.roomname.ph"' not in INSIDE, (
+        "the name box is back in the seat's gear")
+    assert 'tr("ins.lendmic"' not in INSIDE, (
+        "the lend button is back in the seat's gear")
     assert 'tr("ins.letthemtalk"' not in INSIDE, (
         "the toggle button is back — the order was to remove it "
         "on all platforms")
@@ -666,7 +685,11 @@ def test_no_control_is_offered_twice():
     # The doors themselves must survive the cards being removed.
     for door in ("api.inviteToRoom(", "api.lendMicInRoom(",
                  "api.takeBackMicInRoom("):
-        assert door in INSIDE, f"{door} left with the card that held it"
+        assert door in CONSOLE, f"{door} left with the card that held it"
+    # And exactly once across the console: a control offered on two
+    # screens is the same defect this test is named for, one screen wider.
+    for once in ("api.lendMicInRoom(", "api.renameRoom("):
+        assert CONSOLE.count(once) == 1, f"{once} is offered twice"
 
 
 def test_lending_says_which_way_it_points():
@@ -677,13 +700,19 @@ def test_lending_says_which_way_it_points():
     # words — the glyph read as "a person in a doorway" on a Windows
     # handheld, the third strip control in two rounds whose meaning
     # lived in a tooltip no phone shows.
-    block = INSIDE[INSIDE.index('className={"rs-round rs-worded lend"'):]
-    block = block[:block.index("</button>")]
+    block = ROOMS[ROOMS.index("api.lendMicInRoom("):]
+    block = block[:block.index("</button>") + 9]
+    # The aria and the class sit above the call; take the whole control.
+    head = ROOMS[:ROOMS.index("api.lendMicInRoom(")]
+    block = head[head.rindex("<button"):] + block
     assert 'tr("ins.takeback"' in block and 'tr("ins.lendmic"' in block
-    assert "aria-pressed={lentByMe}" in block
-    # The label IS the state: both sentences are rendered as the button's
-    # text, not only as aria strings.
-    assert block.count('tr("ins.lendmic"') >= 2 or "lentByMe ? tr(" in block
+    # Which way it points, said out loud rather than left to a tooltip no
+    # phone shows — and read from the room rather than remembered, so a
+    # reload does not offer to lend a microphone that is already lent.
+    assert "aria-pressed={!!lent[r.id]}" in block
+    assert "lent[r.id] ? tr(" in block
+    assert "api.micsInRoom(" in ROOMS, (
+        "the lend state is guessed rather than read")
 
 
 def test_a_lent_microphone_is_visible_across_the_room():

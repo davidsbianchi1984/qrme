@@ -228,11 +228,22 @@ def _markup(rel: str) -> str:
 
 
 def test_the_screen_exists_and_calls_all_six():
-    src = (REPO / "app/src/screens/Inside.tsx").read_text(encoding="utf-8")
+    """All six, across the two screens a room is worked from.
+
+    Three of them moved. The microphone lend — and the read of who has
+    already lent one — sat behind a seat's gear *inside* the room, which
+    put them out of reach until the room was already running. They are on
+    the Rooms screen now, on the room's own row, because lending a
+    microphone is something somebody decides before walking in. This test
+    is about the doors existing and carrying the interactor's token, not
+    about which screen holds them.
+    """
+    console = ((REPO / "app/src/screens/Inside.tsx").read_text(encoding="utf-8")
+               + (REPO / "app/src/screens/Rooms.tsx").read_text(encoding="utf-8"))
     for binding in ("api.roomMessages(", "api.sayInRoom(", "api.advanceRoom(",
                     "api.micsInRoom(", "api.lendMicInRoom(",
                     "api.takeBackMicInRoom("):
-        assert binding in src, f"{binding} is not called by the screen"
+        assert binding in console, f"{binding} is not called by the console"
 
 
 def test_the_screen_sends_the_interactor_token_not_the_owners():
@@ -274,7 +285,8 @@ def test_the_screen_says_the_microphone_is_seen_by_everyone():
     has dropped renders `ins.micpitch`, and a table that keeps the sentence
     no screen reads is a translation nobody sees.
     """
-    assert 'tr("ins.micpitch", lang)' in _markup("app/src/screens/Inside.tsx")
+    # On the Rooms screen, which is where the lend control lives now.
+    assert 'tr("ins.micpitch", lang)' in _markup("app/src/screens/Rooms.tsx")
     l10n = _markup("app/src/l10n.ts")
     assert "a microphone the others cannot see" in l10n
     assert "Everybody here is shown that you lent it" in l10n
