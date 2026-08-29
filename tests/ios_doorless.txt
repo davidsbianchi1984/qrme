@@ -136,3 +136,13 @@ POST /profiles/{profile_id}/hands/routines
 POST /profiles/{profile_id}/hands/routines/from-reach
 POST /profiles/{profile_id}/hands/routines/{routine_id}/replay
 POST /profiles/{profile_id}/hands/told
+
+# POST /profiles/{profile_id}/avatar/speaking — the photograph, measured
+# so its mouth can move. The web console builds and draws it; these three
+# do not, for the same reason they do not reach `/avatar/forge` above:
+# the drawing takes a mesh laid over the picture with the picture as its
+# own texture, and none of these shells has that renderer. The still
+# portrait they already draw is exactly what a face without a
+# measurement shows, so nothing here is missing — it simply does not
+# move yet.
+POST /profiles/{profile_id}/avatar/speaking

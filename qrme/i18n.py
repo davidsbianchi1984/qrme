@@ -4159,6 +4159,17 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'hi': 'ऐसा कोई गेम सत्र नहीं है',
         'ar': 'لا توجد جلسة اللعب هذه',
     },
+    'the forge answered with nothing to move': {
+        'es': 'la fragua respondió sin nada que mover',
+        'fr': "la forge a répondu sans rien à faire bouger",
+        'de': 'die Schmiede antwortete ohne etwas Bewegliches',
+        'pt': 'a forja respondeu sem nada para mover',
+        'it': 'la fucina ha risposto senza nulla da muovere',
+        'ja': '動かせるものが何も返ってきませんでした',
+        'zh': '锻造返回的内容里没有可以动的东西',
+        'hi': 'फोर्ज ने ऐसा कुछ नहीं लौटाया जिसे हिलाया जा सके',
+        'ar': 'ردّت المسبكة بلا شيء يمكن تحريكه',
+    },
     'no such reach': {
         'es': 'no existe esa sesión de control',
         'fr': "cette prise en main n'existe pas",

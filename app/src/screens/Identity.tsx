@@ -179,7 +179,22 @@ export function Identity({ onPlans, onPassing }: {
    *  The bytes go up as base64 rather than through the media door,
    *  because the photograph is the INPUT and not the keepsake: what is
    *  stored afterwards is the head it became. */
-  async function forgeFrom(file: File | undefined) {
+  /** The 3-D head, for anybody who wants one.
+   *
+   * It is second on the card and says what it is, because a head built
+   * from 478 face landmarks has no skull, no hair and no ears — it is a
+   * mask, and the field said so looking at one. It stays reachable
+   * because it is real and it works, and because deleting the only door
+   * to a capability is a different act from taking it off the front of a
+   * screen. Sharing `forgeFrom`'s reading and encoding rather than
+   * copying them: one road in, two things it can build.
+   */
+  async function headFrom(file: File | undefined) {
+    await forgeFrom(file, "head");
+  }
+
+  async function forgeFrom(file: File | undefined,
+                           makes: "speaking" | "head" = "speaking") {
     if (!file) return;
     setError(null); setNote(null); setForging(true);
     try {
@@ -190,7 +205,11 @@ export function Identity({ onPlans, onPassing }: {
       for (let at = 0; at < bytes.length; at += 0x8000) {
         binary += String.fromCharCode(...bytes.subarray(at, at + 0x8000));
       }
-      await api.speakingFace(me, btoa(binary), shot, token);
+      if (makes === "head") {
+        await api.forgeFace(me, btoa(binary), shot, token);
+      } else {
+        await api.speakingFace(me, btoa(binary), shot, token);
+      }
       setNote(tr("idn.forge.done", lang));
       reloadAvatar();
     } catch (e) { fail(e); } finally { setForging(false); }
@@ -747,6 +766,14 @@ export function Identity({ onPlans, onPassing }: {
               {forging ? tr("idn.forge.working", lang)
                        : tr("idn.forge.where", lang)}
             </p>
+            {/* The head, second and labelled. See `headFrom`. */}
+            <details className="idn-head">
+              <summary>{tr("idn.head", lang)}</summary>
+              <p className="muted small">{tr("idn.head.sub", lang)}</p>
+              <input type="file" accept="image/*" disabled={forging}
+                     aria-label={tr("idn.head.pick", lang)}
+                     onChange={(e) => void headFrom(e.target.files?.[0])} />
+            </details>
           </>
         )}
 

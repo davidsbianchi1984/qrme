@@ -1094,7 +1094,12 @@ RATCHETS: tuple[Ratchet, ...] = (
             "routes whose answer is decisively a list or an object"),
     Ratchet("markup.strings_scanned", 16, _markup_strings,
             "f-strings in this package that build markup"),
-    Ratchet("suite.guard_names", 1900, _guard_names,
+    # 3040 against 3804 — four-fifths, which is what the floor guard next
+    # door asks of every ratchet here. It sat at 1900 while the suite
+    # doubled past it, so half the tests could have disappeared without
+    # a word. A floor that cannot notice its own subject leaving is
+    # decoration.
+    Ratchet("suite.guard_names", 3040, _guard_names,
             "test functions this suite declares"),
     Ratchet("sweep.files_parsed", 280, _files_swept,
             "test files the bare-floor sweep can read"),

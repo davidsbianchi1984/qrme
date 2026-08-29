@@ -161,10 +161,39 @@ def test_the_photograph_is_preferred_over_the_head(client):
 
 
 def test_the_photo_door_builds_the_speaking_face(client):
-    """Both doors exist; only one is put in front of a person."""
+    """Both doors exist. The photograph is what the card offers; the head
+    is behind a fold, and says what it is.
+
+    This test first asserted the head was *gone* from the screen, which
+    was the wrong property and the suite said so: this repo does not
+    allow a client binding no screen calls, on the reasoning that a door
+    nobody can reach is a capability nobody can audit. It is right. What
+    matters is not that the head is absent but that it is **second** —
+    so that is what is checked.
+    """
     assert "api.speakingFace(" in IDENTITY
-    assert "api.forgeFace(" not in IDENTITY, (
-        "the head build is back on the screen people meet")
+    assert "api.forgeFace(" in IDENTITY, "the head lost its only door"
+    # Order is read off the MARKUP, not off the branch that dispatches
+    # them — the two calls sit inside one `if` and their source order
+    # says nothing about which control a person meets first.
+    assert IDENTITY.index('tr("idn.forge.pick"') < IDENTITY.index(
+        '<details className="idn-head">'), (
+        "the head is being offered ahead of the person")
+    fold = IDENTITY[IDENTITY.index("<details className=\"idn-head\">"):]
+    assert 'tr("idn.head"' in fold[:400]
+    assert "headFrom" in fold
+
+
+def test_the_head_says_what_it_is(client):
+    """A control offering a mask has to say it is a mask. Somebody who
+    picks it should already know why it will not look like them."""
+    l10n = (REPO / "app" / "src" / "l10n.ts").read_text(encoding="utf-8")
+    line = next(ln for ln in l10n.splitlines() if "idn.head.sub" in ln
+                or (ln.strip().startswith("en:") and "no ears" in ln))
+    said = l10n.split('"idn.head.sub"')[1].split("},")[0]
+    assert "no hair" in said and "no ears" in said
+    assert "mask" in said
+    del line
 
 
 def test_the_renderer_lets_go_of_the_gpu(client):
