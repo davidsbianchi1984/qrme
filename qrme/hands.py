@@ -111,9 +111,44 @@ from . import db
 
 logger = logging.getLogger("qrme.hands")
 
-#: Where a hand can reach. `here` is our own console — the safest of the
-#: three and the only one that needs no companion on another machine.
-SURFACES = ("computer", "phone", "here")
+#: Where a hand can reach. `here` is our own console — the safest of them
+#: and the only one that needs no companion on another machine. `body` is
+#: a robot from :mod:`qrme.robotics`, and it is on this list so that the
+#: refusal below has somewhere to live: a surface a product silently does
+#: not support is indistinguishable from one it forgot.
+SURFACES = ("computer", "phone", "here", "body")
+
+#: What a body would need before anything may move on one, and what it
+#: does not yet have. Each of these is a screen bound that does not
+#: transfer, and the difference is that a mis-click is undone with a
+#: keystroke and an arm in the wrong place is not.
+#:
+#: 1. **A place, not an app list.** `places` on a screen names software.
+#:    On a body it has to name where the body may *be* — a room, a floor,
+#:    a envelope — and "anywhere in the house" is the `"*"` of the
+#:    physical world.
+#: 2. **A force and a speed ceiling.** A step budget bounds how many
+#:    things happen. It says nothing about how hard any one of them is.
+#: 3. **A stop somebody can reach.** On a screen the failsafe is a
+#:    gesture made on the machine being driven. A person standing beside
+#:    a robot is not holding its mouse, and "there was a button on the
+#:    web page" is not a stop.
+#: 4. **A landing from a sensor.** `land` takes the far end's word for
+#:    it, which is adequate for a motor that knows whether PyAutoGUI
+#:    raised. A body reporting that it moved because it *sent* a move is
+#:    not evidence; it is the request, restated.
+#:
+#: Until those are decided by the person who owns the body, `open_reach`
+#: refuses `acting` on one and says all four out loud. Watching is
+#: allowed: seeing through a robot and saying what is there carries none
+#: of this.
+BODY_UNDECIDED = (
+    "where the body may be, which is not a list of app names",
+    "a ceiling on force and speed, which a step budget does not give",
+    "a stop within reach of the person standing next to it",
+    "a landing reported by a sensor rather than by the thing that was "
+    "asked to move",
+)
 
 #: What the surface is running. Recorded because the honest answer to "can
 #: you do this" differs by platform and the person deserves the real one.
@@ -702,6 +737,17 @@ def open_reach(profile_id: str, grant_id: str, *, errand: str,
         raise HandError(404, "no such grant on this profile")
     if not _live(row):
         raise HandError(403, "that permission has run out or been taken back")
+    # A body is a surface this product can watch through and cannot yet
+    # move, and the refusal names every reason rather than one. A person
+    # told "not supported" learns nothing; a person told what is missing
+    # can decide whether they want to supply it.
+    if mode == "acting" and row["surface"] == "body":
+        raise HandError(
+            403, "nothing may move a body yet. Four things a screen never "
+                 "needed have to be decided first, by whoever owns it: "
+                 + "; ".join(BODY_UNDECIDED)
+                 + ". It can watch through this body today and tell you "
+                   "what it sees.")
     if mode == "acting" and platform not in DRIVABLE:
         raise HandError(
             403, "nothing may operate another app's interface on an iPhone — "
