@@ -29,7 +29,11 @@ go stale.
 
     pip install pyautogui mss
     python companion/hands.py --base https://your-deployment \\
-        --profile prf_... --token OWNER_TOKEN --reach rch_...
+        --profile prf_... --reach rch_...
+
+It asks for the owner token rather than taking it on the command line,
+because this program photographs the screen it is running on and a
+token typed into that window is in every picture it takes.
 
 `--dry-run` is the default: it prints each move instead of performing it,
 so the first thing anybody sees is what it *would* do. Pass `--live` to
@@ -45,8 +49,10 @@ from __future__ import annotations
 
 import argparse
 import base64
+import getpass
 import io
 import json
+import os
 import sys
 import time
 import urllib.error
@@ -138,11 +144,43 @@ def _perform(step: dict, live: bool) -> str | None:
     return None
 
 
+def _token(given: str | None) -> str:
+    """The owner token, from anywhere but the command line if possible.
+
+    It began as `--token`, and that put a live credential in four places
+    at once: the shell's history, the process list, the terminal's
+    scrollback, and — because this program photographs the screen it is
+    running on — every frame it sends. The first errand run this way was
+    refused by the deciding model for exactly that reason, which was the
+    correct reading of a screen with a token written across it.
+
+        asked     how does this program learn the token
+        mattered  who else learns it on the way
+
+    So: the environment first, then a silent prompt. `--token` still
+    works for a script that has nowhere to type, and says what it costs.
+    """
+    if given:
+        print("  --token leaves your token in this window, and so in\n"
+              "  every picture this program takes of it.\n"
+              "  Leave it off and you will be asked instead.")
+        return given
+    from_env = os.environ.get("QRME_OWNER_TOKEN")
+    if from_env:
+        return from_env
+    got = getpass.getpass("owner token (not shown): ").strip()
+    if not got:
+        raise SystemExit("no token, so there is nothing to ask on your "
+                         "behalf. Copy it from the Hands screen.")
+    return got
+
+
 def main() -> None:
     ask = argparse.ArgumentParser(description=__doc__)
     ask.add_argument("--base", required=True, help="the deployment's URL")
     ask.add_argument("--profile", required=True)
-    ask.add_argument("--token", required=True, help="the profile's owner token")
+    ask.add_argument("--token", default=None,
+                     help="the owner token; better left off — see _token")
     ask.add_argument("--reach", required=True, help="an open reach")
     ask.add_argument("--live", action="store_true",
                      help="actually touch this machine (default: print only)")
@@ -157,6 +195,8 @@ def main() -> None:
             f"--base must be the deployment's URL, starting http:// or "
             f"https:// — got {said.base!r}. Copy the whole command from "
             f"the Hands screen; it comes with your own values in it.")
+
+    said.token = _token(said.token)
 
     where = (f"/profiles/{said.profile}/hands/reaches/{said.reach}")
     print(f"watching {said.base} · {said.reach} · "

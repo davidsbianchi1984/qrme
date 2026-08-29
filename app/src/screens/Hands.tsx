@@ -135,8 +135,15 @@ export function Hands() {
    *  only works on the machine the author happened to use is not a line
    *  to print on a screen anybody opens. */
   function motorCommand(reachId: string): string {
+    // No token. It used to be here, and this screen said so plainly —
+    // "the token below is yours, on your own machine". That was true and
+    // still wrong: the motor photographs the screen it runs on, so a
+    // token typed into that window is in the shell's history, the
+    // process list, the scrollback and every frame the eyes send. The
+    // deciding model refused an errand over exactly that, correctly. The
+    // program asks for it instead, and nothing types it in public.
     return `python hands.py --base ${getBase()} --profile ${me}`
-      + ` --token ${token} --reach ${reachId}`;
+      + ` --reach ${reachId}`;
   }
 
   async function copyMotor(reachId: string) {

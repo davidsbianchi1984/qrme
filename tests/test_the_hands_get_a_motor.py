@@ -300,7 +300,7 @@ def test_the_command_is_one_line_and_copyable():
         encoding="utf-8")
     built = screen.split("function motorCommand(")[1].split("\n  }")[0]
     assert "\\\\\\n" not in built and "\\n" not in built
-    for flag in ("--base", "--profile", "--token", "--reach"):
+    for flag in ("--base", "--profile", "--reach"):
         assert flag in built
     # And there is a button, not just a box to select by hand.
     assert 'tr("hnd.motor.copy"' in screen
@@ -557,3 +557,32 @@ def test_the_eyes_do_not_write_down_what_they_should_not_read():
     eyes = source.split("def read_screen(")[1].split("\ndef ")[0]
     assert "without_secrets(llm.look(" in eyes
     assert "never what it says" in eyes
+
+
+def test_the_token_is_not_on_the_screen_the_eyes_photograph():
+    """`--token` put a live credential in four places at once: the shell's
+    history, the process list, the terminal's scrollback, and — because
+    this program photographs the screen it is running on — every frame it
+    sends. Clearing the window did not help: the line you type is echoed,
+    so the token is back in the first row of the next picture.
+
+    asked     how does the motor learn the token
+    mattered  who else learns it, and the eyes were one of them
+
+    The deciding model refused an errand over exactly this, which was the
+    right reading of a screen with a token written across it.
+    """
+    motor = (REPO / "companion" / "hands.py").read_text(encoding="utf-8")
+    assert 'ask.add_argument("--token", default=None' in motor
+    assert "getpass.getpass(" in motor
+    assert "QRME_OWNER_TOKEN" in motor
+    # `--token` still exists for a script with nowhere to type, and says
+    # what it costs rather than passing silently.
+    resolve = motor.split("def _token(")[1].split("\ndef ")[0]
+    assert "every picture" in resolve
+
+    # And the console stops printing it.
+    screen = (REPO / "app" / "src" / "screens" / "Hands.tsx").read_text(
+        encoding="utf-8")
+    built = screen.split("function motorCommand(")[1].split("\n  }")[0]
+    assert "token" not in built.replace("// ", "").split("return")[1]
