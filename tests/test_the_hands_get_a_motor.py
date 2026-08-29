@@ -411,3 +411,37 @@ def test_an_empty_answer_is_asked_for_twice(client, profile_id, monkeypatch):
     assert twice.asked == 2
     assert step["verb"] == "type"
     assert hands.read_reach(reach["id"])["state"] == "open"
+
+
+def test_the_prompt_says_whose_screen_it_is(profile_id):
+    """Every claim in the opening of the system prompt is one this module
+    enforces elsewhere, and it is there because leaving it out changed the
+    answers: the model chose `look`, then said nothing at all once looking
+    was discouraged and pressing was the only thing left.
+
+    asked     whose machine is this and who is standing at it
+    mattered  a hand asked to drive nobody's computer should decline; the
+              refusal was right and the question was wrong
+    """
+    granted = _grant(profile_id)
+    reach = hands.open_reach(profile_id, granted["id"],
+                             errand="type yellow", platform="windows")
+    system, _ = hands._decision_prompt(
+        hands.read_reach(reach["id"]), ["press", "type"], "a notepad", [])
+    assert "owner's own" in system
+    assert "ledger" in system
+    assert "corner" in system
+    # And each claim is true of the code, not decoration.
+    assert hands.read_grant(granted["id"])["places"]        # named apps
+    assert hands.read_grant(granted["id"])["steps"]         # a step budget
+    assert hands.ledger(reach["id"]) == []                  # a real ledger
+
+
+def test_a_silent_answer_names_its_stop_reason():
+    """The Anthropic response keeps only text blocks. When there are none,
+    `stop_reason` is the only thing that says whether the model declined or
+    spent its budget thinking — and it was dropped, so every caller saw an
+    empty string and reported it as having nothing to say."""
+    source = (REPO / "qrme" / "llm.py").read_text(encoding="utf-8")
+    body = source.split("class AnthropicProvider")[1].split("\nclass ")[0]
+    assert "stop_reason=%s blocks=%s" in body

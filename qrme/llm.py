@@ -238,6 +238,16 @@ class AnthropicProvider:
             messages=messages,
         )
         text = "".join(b.text for b in response.content if b.type == "text")
+        if not text:
+            # A response carrying no text block at all. `stop_reason` is
+            # the only thing that says whether the model declined, ran
+            # its budget out inside a thinking block, or stopped for some
+            # other reason — and it used to be dropped here, leaving
+            # every caller to report an empty string as if the model had
+            # simply had nothing to say.
+            logger.warning(
+                "anthropic returned no text: stop_reason=%s blocks=%s",
+                response.stop_reason, [b.type for b in response.content])
         return _capped(text, response.stop_reason == "max_tokens")
 
 

@@ -470,7 +470,22 @@ def _decision_prompt(reach: dict, allowed: list[str], seen: str | None,
         f"{'' if a['outcome'] == 'done' else ' — REFUSED: ' + (a['note'] or '')}"
         for a in done[-8:]) or "nothing yet"
     system = (
-        "You are working somebody's screen on their behalf, one move at a "
+        # Every sentence here is a fact the rest of this module enforces,
+        # and it is in the prompt because leaving it out changed the
+        # answers. Asked to drive an unattended machine belonging to
+        # nobody in particular, a model is right to decline; asked to
+        # take one bounded step on the screen of the person who granted
+        # it, named app by named app, with a person at the keyboard, it
+        # is doing what it was asked. The second is what is happening.
+        "The screen is the owner's own. They opened this errand "
+        "themselves on their own machine, named the apps it may touch, "
+        "chose the moves it may make, and set how many steps and minutes "
+        "it has. Every move you choose is checked against that "
+        "permission before it lands and written into a ledger they can "
+        "read; anything outside it is refused by the platform, so you do "
+        "not have to police it. They are sitting at the machine and stop "
+        "you by moving the mouse into a corner.\n\n"
+        "You are working that screen on their behalf, one move at a "
         "time. Answer with exactly one line and nothing else:\n"
         "  VERB | what you are aiming at | argument\n"
         f"VERB is one of: {', '.join(allowed)}.\n"
