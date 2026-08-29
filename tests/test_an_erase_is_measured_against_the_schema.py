@@ -83,7 +83,16 @@ def _plant(conn, table: str, subject: str) -> bool:
             values.append(subject)
         elif name == "id":
             names.append(name)
-            values.append(f"erase-probe-{table}")
+            # The SUBJECT is in the key, not just the table.
+            #
+            # It was `erase-probe-{table}`, which is the same primary key
+            # whoever plants it — so the second planter in a database
+            # collides with the first, every insert fails, and `plantable`
+            # reports three tables instead of forty. That is
+            # indistinguishable from a schema with nothing in it, which is
+            # the exact failure this function's own docstring warns about,
+            # and it made the count depend on which test ran first.
+            values.append(f"erase-probe-{subject}-{table}")
         elif notnull and default is None and not pk:
             names.append(name)
             values.append(_filler(kind))
