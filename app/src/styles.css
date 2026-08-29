@@ -2146,6 +2146,15 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 11px; line-height: 1.5; resize: vertical;
 }
+/* The token, when somebody deliberately unfolds it. `code` has none of
+   the textarea's box, and a credential run together with the prose
+   around it is a credential half-copied. */
+.hnd-token { margin-top: 8px; }
+.hnd-token code.hnd-cmd {
+  display: block; margin-top: 4px; padding: 6px 8px;
+  border: 1px solid var(--line); border-radius: 6px;
+  word-break: break-all; user-select: all;
+}
 .rail-ask-row { display: flex; gap: 8px; margin-top: 8px; }
 .rail-ask-row input { flex: 1; min-width: 0; }
 

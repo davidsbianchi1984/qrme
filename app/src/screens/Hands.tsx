@@ -146,6 +146,22 @@ export function Hands() {
       + ` --reach ${reachId}`;
   }
 
+  /** The token, onto the clipboard, without ever drawing it. Taking it
+   *  out of the printed command was right and left nowhere to get it
+   *  from — the first person to try typed something else and the stack
+   *  answered "authentication required", which was true and unhelpful.
+   *  Copied is not shown: the fold below is there for a browser that
+   *  will not reach the clipboard, and it costs a deliberate press. */
+  async function copyToken() {
+    setNote(null);
+    try {
+      await navigator.clipboard.writeText(token);
+      setNote(tr("hnd.motor.token.copied", lang));
+    } catch {
+      setNote(tr("hnd.motor.token.stuck", lang));
+    }
+  }
+
   async function copyMotor(reachId: string) {
     setNote(null);
     try {
@@ -497,7 +513,19 @@ export function Hands() {
                 <button onClick={() => copyMotor(reach.id)}>
                   {tr("hnd.motor.copy", lang)}
                 </button>
+                <button onClick={copyToken}>
+                  {tr("hnd.motor.token", lang)}
+                </button>
               </div>
+              <details className="hnd-token">
+                <summary className="small">
+                  {tr("hnd.motor.token.show", lang)}
+                </summary>
+                <p className="muted small">
+                  {tr("hnd.motor.token.warn", lang)}
+                </p>
+                <code className="hnd-cmd">{token}</code>
+              </details>
               <p className="muted small">{tr("hnd.motor.dry", lang)}</p>
             </div>
           )}

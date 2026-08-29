@@ -586,3 +586,30 @@ def test_the_token_is_not_on_the_screen_the_eyes_photograph():
         encoding="utf-8")
     built = screen.split("function motorCommand(")[1].split("\n  }")[0]
     assert "token" not in built.replace("// ", "").split("return")[1]
+
+
+def test_the_owner_can_still_get_at_their_own_token():
+    """Taking the token out of the printed command was right and left
+    nowhere to get it from — the console showed it in exactly one place
+    and that place was the command. The first person to try typed
+    something else and the stack said "authentication required", which
+    was true and no help at all.
+
+    asked     where does the owner get their token now
+    mattered  a secret nobody can reach is not safer, it is broken
+    """
+    screen = (REPO / "app" / "src" / "screens" / "Hands.tsx").read_text(
+        encoding="utf-8")
+    # Copied, never drawn.
+    assert "navigator.clipboard.writeText(token)" in screen
+    assert 'tr("hnd.motor.token"' in screen
+    # And a fold for a browser that cannot reach the clipboard, which
+    # costs a deliberate press and says what it costs.
+    assert 'tr("hnd.motor.token.show"' in screen
+    assert 'tr("hnd.motor.token.warn"' in screen
+    fold = screen.split('<details className="hnd-token">')[1].split(
+        "</details>")[0]
+    assert "{token}" in fold
+    # The command itself still carries no token.
+    built = screen.split("function motorCommand(")[1].split("\n  }")[0]
+    assert "${token}" not in built
