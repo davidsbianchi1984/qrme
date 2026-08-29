@@ -576,7 +576,16 @@ def decide(reach_id: str, frame_b64: str | None = None,
     # line. Once more costs a second or two.
     for attempt in (1, 2):
         try:
-            said = llm.get_provider().generate(
+            # The owner's own choice, not the house default. Deciding a
+            # move on somebody's screen is the one call in this platform
+            # a provider may decline as a class — one did, with a plain
+            # refusal and no content at all — and the answer to that is
+            # the owner pointing this at a model that will take the work,
+            # on the settings screen they already have. The eyes are left
+            # on the default deliberately: describing a picture is a
+            # different question, it was never refused, and the two
+            # halves are better off able to sit on different models.
+            said = llm.provider_for_profile(reach["profile_id"]).generate(
                 system, [{"role": "user", "content": question}])
         except Exception as exc:  # the reason is the point of catching
             said = None
@@ -603,7 +612,14 @@ def decide(reach_id: str, frame_b64: str | None = None,
         elif trouble:
             why = f"the deciding model failed ({trouble})"
         else:
-            why = "the deciding model answered with nothing"
+            # An empty answer from a reachable model is, in practice, a
+            # provider declining this class of work — one returned a
+            # plain refusal with no content at all. That is the
+            # provider's call to make and not something to be worded
+            # around, so the sentence points at the thing the owner can
+            # actually do: send this half somewhere else.
+            why = ("the deciding model would not answer — choose another "
+                   "on the Settings screen")
         return act(reach_id, "ask", target=why, saw=seen)
 
     match = _CHOICE.match(said.strip().splitlines()[0])

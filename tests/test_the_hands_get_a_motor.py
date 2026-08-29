@@ -445,3 +445,57 @@ def test_a_silent_answer_names_its_stop_reason():
     source = (REPO / "qrme" / "llm.py").read_text(encoding="utf-8")
     body = source.split("class AnthropicProvider")[1].split("\nclass ")[0]
     assert "stop_reason=%s blocks=%s" in body
+
+
+def test_the_decision_follows_the_owners_chosen_model(client, profile_id,
+                                                      monkeypatch):
+    """Deciding a move on somebody's screen is the one call here a provider
+    may decline as a class, and one did — `stop_reason=refusal`, no content
+    at all. The remedy is the owner's, and they already have the screen for
+    it, so `decide` asks the provider that profile chose rather than the
+    house default.
+
+    asked     which model is being asked to move somebody's cursor
+    mattered  the owner picked one; a refusal they cannot route around is
+              a dead end, and this one is theirs to route
+    """
+    granted = _grant(profile_id)
+    reach = hands.open_reach(profile_id, granted["id"], errand="type yellow",
+                             platform="windows")
+    asked_for = {}
+
+    class _Says:
+        def generate(self, system, messages):
+            return "type | the page | yellow"
+
+    from qrme import llm
+
+    def _for_profile(pid, cloud=None):
+        asked_for["profile"] = pid
+        return _Says()
+
+    monkeypatch.setattr(hands, "read_screen", lambda *a, **k: "a notepad")
+    monkeypatch.setattr(llm, "provider_for_profile", _for_profile)
+    step = hands.decide(reach["id"])
+    assert asked_for["profile"] == profile_id
+    assert step["verb"] == "type"
+
+
+def test_a_model_that_will_not_answer_points_at_the_remedy(client, profile_id,
+                                                           monkeypatch):
+    """"answered with nothing" is true and useless. The owner can change
+    which model decides, on a screen that already exists."""
+    granted = _grant(profile_id)
+    reach = hands.open_reach(profile_id, granted["id"], errand="type yellow",
+                             platform="windows")
+
+    class _Mute:
+        def generate(self, system, messages):
+            return ""
+
+    from qrme import llm
+    monkeypatch.setattr(hands, "read_screen", lambda *a, **k: "a notepad")
+    monkeypatch.setattr(llm, "provider_for_profile", lambda *a, **k: _Mute())
+    step = hands.decide(reach["id"])
+    assert step["verb"] == "ask"
+    assert "Settings" in step["target"]
