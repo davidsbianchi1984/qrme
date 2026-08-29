@@ -56,6 +56,7 @@ Briefcase       6,197
 AvatarStage     205
 Avatar3D        205,175
 Raise           206
+Hands           207
 SkinTiles       44
 TalkRail        198
 Waveform        199

@@ -114,6 +114,57 @@ def start_backend() -> subprocess.Popen:
     raise SystemExit("the backend never came up")
 
 
+def open_tab(page, tab: str) -> bool:
+    """Reach a tab the way a person does, and refuse to lie about it.
+
+    ## Why this is not `goto("#tab")`
+
+    It was, and every capture it took was the Home screen. This console
+    has no hash router — `App.tsx` holds the tab in `useState` and the
+    only thing that moves it is a press on the drawer. So `#market`
+    loaded the app, changed nothing, and the harness photographed Home
+    and filed it as the marketplace. Thirty-nine times.
+
+        asked     photograph the screens
+        mattered  photograph the screen you say you did
+
+    A harness that navigates by a mechanism the product does not have
+    fails silently and produces confident, wrong output — which is worse
+    than the drawings it replaced, because a drawing is obviously a
+    drawing and this looked like evidence.
+
+    So it drives the actual drawer, and then **checks**: the tab the
+    console marks `active` has to be the one that was asked for, or this
+    returns False and the caller writes no file. A missing screen is a
+    gap somebody notices. A wrong screen is a gap nobody notices.
+    """
+    # Reload between shots. Some surfaces put something over the drawer or
+    # navigate away from the shell entirely, and one of them used to take
+    # every capture after it down with it — a run that photographed
+    # twenty-five screens and then failed the last fourteen in a row.
+    page.goto(BASE + "/", wait_until="networkidle")
+    page.wait_for_timeout(700)
+    page.evaluate("window.scrollTo(0, 0)")
+    fab = page.query_selector(".menu-fab")
+    if fab and page.get_attribute(".menu-fab", "aria-expanded") != "true":
+        fab.click()
+        page.wait_for_timeout(300)
+    # The drawer stacks its tabs under collapsible group heads; open all
+    # of them rather than guessing which group a tab lives in.
+    for head in page.query_selector_all(".nav-group-head"):
+        if "open" not in (head.get_attribute("class") or ""):
+            head.click()
+            page.wait_for_timeout(80)
+    target = page.query_selector(f'.nav-item[data-tab="{tab}"]')
+    if target is None:
+        return False
+    target.click()
+    page.wait_for_timeout(1200)
+    active = page.query_selector(".nav-item.active")
+    return bool(active
+                and active.get_attribute("data-tab") == tab)
+
+
 def main(shots: list[tuple[str, str, str]]) -> None:
     """``shots`` is (screen number, tab id, filename stem)."""
     from playwright.sync_api import sync_playwright
@@ -157,8 +208,9 @@ def main(shots: list[tuple[str, str, str]]) -> None:
                 asked.click()
                 page.wait_for_timeout(400)
             for number, tab, stem in shots:
-                page.goto(f"{BASE}/#{tab}", wait_until="networkidle")
-                page.wait_for_timeout(1200)
+                if not open_tab(page, tab):
+                    print(f"  ! {tab}: never reached — nothing written")
+                    continue
                 # Scroll to the top so every capture starts where the
                 # screen starts rather than wherever the last one left
                 # the viewport.

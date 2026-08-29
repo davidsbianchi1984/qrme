@@ -2814,6 +2814,90 @@ CREATE TABLE IF NOT EXISTS inbox_events (
     created_at  TEXT NOT NULL,
     seen_at     TEXT
 );
+
+-- ===================================================================
+-- The hands (qrme/hands.py). A profile could already see and speak; these
+-- four tables are what it takes for one to ACT on a screen — and three of
+-- the four exist to bound that rather than to enable it.
+--
+-- The authority a hand moves under. Never implicit, never inherited from a
+-- conversation, never widened by anything read off a screen. `places` is a
+-- JSON list of NAMED apps or hosts and the module refuses "*" outright,
+-- because a grant that names everything is the absence of a grant wearing
+-- its clothes.
+CREATE TABLE IF NOT EXISTS hand_grants (
+    id          TEXT PRIMARY KEY,
+    profile_id  TEXT NOT NULL REFERENCES profiles(id),
+    granted_by  TEXT NOT NULL,        -- the account that said yes
+    surface     TEXT NOT NULL,        -- hands.SURFACES
+    places      TEXT NOT NULL,        -- JSON list of named places, never "*"
+    verbs       TEXT NOT NULL,        -- JSON subset of hands.VERBS
+    steps       INTEGER NOT NULL,     -- step budget for the whole grant
+    watched     INTEGER NOT NULL DEFAULT 1,   -- 1 = only while somebody watches
+    door        TEXT NOT NULL,        -- picked | told — how it was granted
+    said        TEXT,                 -- the words themselves, when `told`
+    expires_at  TEXT NOT NULL,
+    revoked_at  TEXT,
+    created_at  TEXT NOT NULL
+);
+
+-- One session of a profile having hands on a surface. `mode` is the whole
+-- difference between watching somebody work and doing the work: `watching`
+-- is eyes only and cannot spend a step, `acting` moves.
+CREATE TABLE IF NOT EXISTS reaches (
+    id          TEXT PRIMARY KEY,
+    profile_id  TEXT NOT NULL REFERENCES profiles(id),
+    grant_id    TEXT NOT NULL REFERENCES hand_grants(id),
+    surface     TEXT NOT NULL,
+    platform    TEXT NOT NULL,        -- hands.PLATFORMS
+    errand      TEXT NOT NULL,        -- what it was asked to do, in words
+    mode        TEXT NOT NULL,        -- watching | acting
+    state       TEXT NOT NULL,        -- open | asking | done | stopped
+    why         TEXT,                 -- why it stopped, in plain words
+    handed_to   TEXT REFERENCES profiles(id),  -- who holds it now, if handed
+    routine_id  TEXT,                 -- the routine being learned or replayed
+    steps_used  INTEGER NOT NULL DEFAULT 0,
+    opened_at   TEXT NOT NULL,
+    closed_at   TEXT
+);
+
+-- Append-only. Nothing in the package updates or deletes a row here, and
+-- `n` is unique per reach so a step cannot be quietly rewritten by a second
+-- insert. `saw` keeps what the eyes reported at the moment the hand decided,
+-- which is the only way a person reading this afterwards can tell whether
+-- the move was reasonable on the evidence it actually had.
+CREATE TABLE IF NOT EXISTS hand_actions (
+    id         TEXT PRIMARY KEY,
+    reach_id   TEXT NOT NULL REFERENCES reaches(id),
+    profile_id TEXT NOT NULL REFERENCES profiles(id),  -- who moved
+    n          INTEGER NOT NULL,      -- step number within the reach
+    verb       TEXT NOT NULL,
+    target     TEXT,                  -- what it aimed at, in words
+    detail     TEXT,                  -- JSON argument, secrets never in it
+    saw        TEXT,                  -- what the eyes reported before deciding
+    outcome    TEXT NOT NULL,         -- done | refused | failed
+    note       TEXT,
+    at         TEXT NOT NULL,
+    UNIQUE (reach_id, n)
+);
+
+-- A thing it can do again: learned by watching somebody do it (`shown`) or
+-- by being told the steps in words (`told`). One table for both, because a
+-- routine dictated over the phone and a routine demonstrated on screen are
+-- the same object and the product should not have two of them.
+CREATE TABLE IF NOT EXISTS routines (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    name       TEXT NOT NULL,
+    surface    TEXT NOT NULL,
+    learned    TEXT NOT NULL,         -- shown | told
+    steps      TEXT NOT NULL,         -- JSON list of {verb, target, detail}
+    runs       INTEGER NOT NULL DEFAULT 0,
+    last_run   TEXT,
+    created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_actions_reach ON hand_actions (reach_id, n);
+CREATE INDEX IF NOT EXISTS idx_reaches_profile ON reaches (profile_id);
 """
 
 _local = threading.local()

@@ -56,6 +56,7 @@ from .routers import (accounts as account_routes,
                       summon, tiers as tier_routes, tutorial,
                       visits as visit_routes,
                       viewfinder as viewfinder_routes, wall,
+                      hands as hands_routes,
                       watch, watchparty, watermarks,
                       xr as xr_routes)
 
@@ -173,6 +174,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(dock.router)
     app.include_router(tier_routes.router)
     app.include_router(viewfinder_routes.router)
+    app.include_router(hands_routes.router)
     app.include_router(pages.router)
     app.include_router(studio.router)
     app.include_router(wall.router)

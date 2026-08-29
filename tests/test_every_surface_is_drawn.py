@@ -81,6 +81,16 @@ NOT_A_SURFACE = {
     # Voice.tsx it was covered by screen 147; moving files did not make it
     # a destination.
     "LoudnessRail",
+    # The crash boundary. It draws a card, and the card is a failure
+    # notice — the same category as the version guard above, and for the
+    # same reason it is not `undrawn`: a drawing of it would be a picture
+    # of something going wrong, which is not a place anybody navigates to
+    # and not a thing the tour is for. What it is held to instead lives in
+    # `test_a_screen_that_falls_over_does_not_take_the_app.py`: the rest
+    # of the console keeps working, the notice says so, and the failure is
+    # posted to the problem log rather than left as somebody's memory of a
+    # white page.
+    "Boundary",
 }
 
 

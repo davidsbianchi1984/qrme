@@ -22,6 +22,8 @@ import { Contest } from "./screens/Contest";
 import { Guide } from "./screens/Guide";
 import { Placements } from "./screens/Placements";
 import { Plans } from "./screens/Plans";
+import { Boundary } from "./Boundary";
+import { Hands } from "./screens/Hands";
 import { Robots } from "./screens/Robots";
 import { Workshop } from "./screens/Workshop";
 import { Assist } from "./screens/Assist";
@@ -76,7 +78,7 @@ import { WatchLights } from "./WatchLights";
 // `profile` is deliberately not in NAV: somebody else's homepage is a place
 // you are taken to by pressing their face, not a standing destination — the
 // same reason `passing` is reachable and unlisted.
-type Tab = "profile" | "home" | "circle" | "agent" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "raise" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "allowed" | "stranger" | "themark" | "inwords" | "remainder" | "plugins" | "named" | "passing" | "robots" | "placements" | "plans" | "access" | "matters" | "settings";
+type Tab = "profile" | "home" | "circle" | "agent" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "raise" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "allowed" | "stranger" | "themark" | "inwords" | "remainder" | "plugins" | "named" | "passing" | "robots" | "hands" | "placements" | "plans" | "access" | "matters" | "settings";
 
 // `art` is the one tab whose mark is a picture rather than a glyph. Kept as a
 // second, optional field rather than widening `icon` to a node: the nav guards
@@ -135,6 +137,7 @@ const NAV: { id: Tab; label: string; icon: string; art?: string;
   { id: "plugins", label: "Plug-ins", icon: "🔌", group: "system" },
   { id: "named", label: "Lookup", icon: "🔎", group: "create" },
   { id: "robots", label: "Robots & Devices", icon: "🤖", group: "business" },
+  { id: "hands", label: "Hands", icon: "🖐", group: "trust" },
   { id: "placements", label: "Ad Placements", icon: "📌", group: "business" },
   { id: "plans", label: "Plans & Billing", icon: "🎟", group: "system" },
   { id: "access", label: "Accessibility", icon: "♿", group: "trust" },
@@ -311,6 +314,7 @@ export function App() {
             <button
               key={n.id}
               className={"nav-item" + (tab === n.id ? " active" : "")}
+              data-tab={n.id}
               onClick={() => { setTab(n.id); setMenuOpen(false); }}
             >
               <span className={"nav-icon" + (n.art ? " nav-art" : "")}>
@@ -335,6 +339,7 @@ export function App() {
                   <button
                     key={n.id}
                     className={"nav-item" + (tab === n.id ? " active" : "")}
+                    data-tab={n.id}
                     onClick={() => { setTab(n.id); setMenuOpen(false); }}
                   >
                     <span className={"nav-icon" + (n.art ? " nav-art" : "")}>
@@ -356,6 +361,10 @@ export function App() {
       <WalkAlong />
       <main className="content" ref={contentRef}>
         <ProblemNotice />
+        {/* Keyed by tab so each screen gets a fresh
+            boundary rather than inheriting the last
+            one's failure. */}
+        <Boundary where={tab} key={tab}>
         {tab === "home" && <Home go={setTab} onVisit={visitProfile}
                  onInside={(id) => { primeMic(); setInsideRoom(id); setTab("inside"); }} />}
         {tab === "profile" && (
@@ -425,11 +434,13 @@ export function App() {
         {tab === "named" && <Named onPlans={toPlans} />}
         {tab === "passing" && <Passing onPlans={toPlans} />}
         {tab === "robots" && <Robots onPlans={toPlans} />}
+        {tab === "hands" && <Hands />}
         {tab === "placements" && <Placements onPlans={toPlans} />}
         {tab === "plans" && <Plans />}
         {tab === "access" && <Access />}
         {tab === "matters" && <Matters />}
         {tab === "settings" && <Settings onPlans={toPlans} />}
+        </Boundary>
       </main>
 
       {/* Outside the tab switch on purpose: it is part of the shell, so every

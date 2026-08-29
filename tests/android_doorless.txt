@@ -93,3 +93,47 @@ POST /rooms/{room_id}/sit-out
 POST /raise/{profile_id}/visit
 POST /raise/{profile_id}/forward
 POST /raise/{profile_id}/branch
+
+# --- the hands (0.98.0 / qrme/hands.py) -------------------------------------
+#
+# Fourteen routes, and this shell reaches none of them. The reason is one
+# thing, and it is not scheduling.
+#
+# A hand needs a motor: something that can actually move a cursor, press a
+# control and type into a field on the surface in front of it. None of these
+# three shells has one, and what it would take differs per platform in a way
+# that matters:
+#
+#   iOS      there is no motor to build. No third-party process may operate
+#            another app's interface — no public API, no entitlement to
+#            request, no build that survives review. `hands.DRIVABLE` omits
+#            `ios` for this reason and `open_reach` refuses `acting` there
+#            with the reason written out. On an iPhone the profile watches
+#            and says where to press, which is a real feature and a smaller
+#            one, and this backlog is where that is admitted rather than
+#            being discovered by somebody whose phone did nothing.
+#   Android  an AccessibilityService — a separate app component, with its own
+#            Play policy review for exactly this class of use.
+#   Windows  a desktop automation service running beside the shell.
+#
+#     asked     can this client reach the route
+#     mattered  can this client do the thing the route records
+#
+# Binding the fourteen calls now would take them off this list and build
+# nothing — the precise failure `unused_native_bindings.txt` exists to catch,
+# and the same reasoning as the `/rooms/{room_id}/heard` row above. The web
+# console has the whole surface today; these rows stand until a motor does.
+DELETE /profiles/{profile_id}/hands/grants/{grant_id}
+GET /hands/vocabulary
+GET /profiles/{profile_id}/hands/grants
+GET /profiles/{profile_id}/hands/reaches/{reach_id}
+GET /profiles/{profile_id}/hands/routines
+POST /profiles/{profile_id}/hands/grants
+POST /profiles/{profile_id}/hands/reaches
+POST /profiles/{profile_id}/hands/reaches/{reach_id}/act
+POST /profiles/{profile_id}/hands/reaches/{reach_id}/hand-over
+POST /profiles/{profile_id}/hands/reaches/{reach_id}/stop
+POST /profiles/{profile_id}/hands/routines
+POST /profiles/{profile_id}/hands/routines/from-reach
+POST /profiles/{profile_id}/hands/routines/{routine_id}/replay
+POST /profiles/{profile_id}/hands/told

@@ -1295,6 +1295,9 @@ const CHROME: Table = {
     ja: "はじまりと引き継ぎ", zh: "开始与传承",
     hi: "आरंभ और उत्तराधिकार", ar: "البداية والانتقال",
   },
+  "nav.hands": {
+    en: "Hands", es: "Manos", fr: "Mains", de: "Hände", pt: "Mãos", it: "Mani", ja: "手", zh: "双手", hi: "हाथ", ar: "اليدان",
+  },
   "nav.robots": {
     en: "Robots & Devices", es: "Robots y dispositivos", fr: "Robots et appareils", de: "Roboter & Geräte", pt: "Robôs e dispositivos", it: "Robot e dispositivi", ja: "ロボットとデバイス", zh: "机器人与设备", hi: "रोबोट और डिवाइस", ar: "الروبوتات والأجهزة",
   },
@@ -4741,6 +4744,132 @@ const CHROME: Table = {
   },
   "rbt.invariant": {
     en: "Invariant across {across}.", es: "Invariante en {across}.", fr: "Invariant sur {across}.", de: "Invariant über {across}.", pt: "Invariante em {across}.", it: "Invariante su {across}.", ja: "{across}をまたいで不変。", zh: "在{across}间保持不变。", hi: "{across} में अपरिवर्तित।", ar: "ثابت عبر {across}.",
+  },
+  "hnd.title": {
+    en: "Hands", es: "Manos", fr: "Mains", de: "Hände", pt: "Mãos", it: "Mani", ja: "手", zh: "双手", hi: "हाथ", ar: "اليدان",
+  },
+  "hnd.pitch": {
+    en: "It can already see and speak. This is where it is given permission to work a screen — and taken back in one press.", es: "Ya puede ver y hablar. Aquí se le da permiso para manejar una pantalla — y se le retira con una sola pulsación.", fr: "Il voit et parle déjà. Ici, on lui donne la permission de manœuvrer un écran — et on la reprend d'une seule pression.", de: "Sehen und sprechen kann es schon. Hier bekommt es die Erlaubnis, einen Bildschirm zu bedienen — und mit einem Druck ist sie wieder weg.", pt: "Já consegue ver e falar. Aqui dá-se-lhe permissão para trabalhar um ecrã — e retira-se num só toque.", it: "Vedere e parlare sa già farlo. Qui gli si dà il permesso di usare uno schermo — e lo si ritira con una sola pressione.", ja: "見ることも話すこともすでにできます。ここでは画面を操作する許可を与えます — そして一度の操作で取り戻せます。", zh: "它已经能看、能说。在这里给它操作屏幕的许可 — 也能一按收回。", hi: "यह पहले ही देख और बोल सकता है। यहाँ इसे स्क्रीन चलाने की अनुमति दी जाती है — और एक ही दबाव में वापस ले ली जाती है।", ar: "هو يرى ويتكلم بالفعل. هنا يُمنح إذن تشغيل شاشة — ويُسترد بضغطة واحدة.",
+  },
+  "hnd.never": {
+    en: "What it will never do", es: "Lo que nunca hará", fr: "Ce qu'il ne fera jamais", de: "Was es nie tun wird", pt: "O que nunca fará", it: "Cosa non farà mai", ja: "決してしないこと", zh: "它绝不会做的事", hi: "यह क्या कभी नहीं करेगा", ar: "ما لن يفعله أبدًا",
+  },
+  "hnd.give": {
+    en: "Give it hands", es: "Darle manos", fr: "Lui donner des mains", de: "Ihm Hände geben", pt: "Dar-lhe mãos", it: "Dargli le mani", ja: "手を与える", zh: "给它双手", hi: "इसे हाथ दें", ar: "امنحه يدين",
+  },
+  "hnd.give.pitch": {
+    en: "Name the apps or sites, the moves, the minutes and the steps. All four are limits, and all four are enforced where the move happens rather than on this screen.", es: "Nombra las aplicaciones o sitios, los movimientos, los minutos y los pasos. Los cuatro son límites, y los cuatro se aplican donde ocurre el movimiento, no en esta pantalla.", fr: "Nommez les applications ou sites, les gestes, les minutes et les étapes. Ces quatre éléments sont des limites, appliquées là où le geste se produit et non sur cet écran.", de: "Nennen Sie die Apps oder Seiten, die Bewegungen, die Minuten und die Schritte. Alle vier sind Grenzen, und alle vier gelten dort, wo die Bewegung geschieht, nicht auf diesem Bildschirm.", pt: "Nomeie as aplicações ou sites, os movimentos, os minutos e os passos. Os quatro são limites, e os quatro são impostos onde o movimento acontece, não neste ecrã.", it: "Indica le app o i siti, le mosse, i minuti e i passi. Tutti e quattro sono limiti, imposti dove avviene la mossa e non su questo schermo.", ja: "アプリまたはサイト、動作、分数、手数を指定します。四つとも上限であり、この画面ではなく動作が起きる場所で守られます。", zh: "写明应用或网站、动作、分钟数与步数。这四项都是上限，都在动作发生之处生效，而不是在这个屏幕上。", hi: "ऐप या साइट, चालें, मिनट और चरण बताएँ। चारों सीमाएँ हैं, और चारों वहीं लागू होती हैं जहाँ चाल चलती है, इस स्क्रीन पर नहीं।", ar: "سمِّ التطبيقات أو المواقع والحركات والدقائق والخطوات. الأربعة حدود، وتُطبَّق جميعها حيث تقع الحركة لا على هذه الشاشة.",
+  },
+  "hnd.surface": {
+    en: "Where", es: "Dónde", fr: "Où", de: "Wo", pt: "Onde", it: "Dove", ja: "場所", zh: "何处", hi: "कहाँ", ar: "أين",
+  },
+  "hnd.places": {
+    en: "Apps or sites", es: "Aplicaciones o sitios", fr: "Applications ou sites", de: "Apps oder Seiten", pt: "Aplicações ou sites", it: "App o siti", ja: "アプリまたはサイト", zh: "应用或网站", hi: "ऐप या साइट", ar: "تطبيقات أو مواقع",
+  },
+  "hnd.places.hint": {
+    en: "calendar, mail — separated by commas", es: "calendario, correo — separados por comas", fr: "agenda, courrier — séparés par des virgules", de: "Kalender, Mail — durch Kommas getrennt", pt: "calendário, correio — separados por vírgulas", it: "calendario, posta — separati da virgole", ja: "カレンダー、メール — カンマ区切り", zh: "日历、邮件 — 用逗号分隔", hi: "कैलेंडर, मेल — अल्पविराम से अलग", ar: "التقويم، البريد — مفصولة بفواصل",
+  },
+  "hnd.moves": {
+    en: "The moves it may make", es: "Los movimientos que puede hacer", fr: "Les gestes qu'il peut faire", de: "Die Bewegungen, die es machen darf", pt: "Os movimentos que pode fazer", it: "Le mosse che può fare", ja: "許される動作", zh: "它可以做的动作", hi: "जो चालें यह चल सकता है", ar: "الحركات المسموح بها",
+  },
+  "hnd.minutes": {
+    en: "Minutes", es: "Minutos", fr: "Minutes", de: "Minuten", pt: "Minutos", it: "Minuti", ja: "分", zh: "分钟", hi: "मिनट", ar: "دقائق",
+  },
+  "hnd.steps": {
+    en: "Steps", es: "Pasos", fr: "Étapes", de: "Schritte", pt: "Passos", it: "Passi", ja: "手数", zh: "步数", hi: "चरण", ar: "خطوات",
+  },
+  "hnd.stepsword": {
+    en: "steps", es: "pasos", fr: "étapes", de: "Schritte", pt: "passos", it: "passi", ja: "手", zh: "步", hi: "चरण", ar: "خطوات",
+  },
+  "hnd.watched": {
+    en: "only while somebody is watching", es: "solo mientras alguien mira", fr: "seulement pendant que quelqu'un regarde", de: "nur solange jemand zusieht", pt: "apenas enquanto alguém observa", it: "solo mentre qualcuno guarda", ja: "誰かが見ている間だけ", zh: "仅在有人看着时", hi: "केवल जब कोई देख रहा हो", ar: "فقط بينما يراقب أحد",
+  },
+  "hnd.give.go": {
+    en: "Give", es: "Dar", fr: "Donner", de: "Geben", pt: "Dar", it: "Dai", ja: "与える", zh: "给予", hi: "दें", ar: "امنح",
+  },
+  "hnd.gave": {
+    en: "Hands given for {places}.", es: "Manos dadas para {places}.", fr: "Mains données pour {places}.", de: "Hände gegeben für {places}.", pt: "Mãos dadas para {places}.", it: "Mani date per {places}.", ja: "{places} に手を与えました。", zh: "已为 {places} 给出双手。", hi: "{places} के लिए हाथ दिए गए।", ar: "مُنحت اليدان لـ {places}.",
+  },
+  "hnd.told": {
+    en: "Or just say it", es: "O simplemente dilo", fr: "Ou dites-le simplement", de: "Oder sagen Sie es einfach", pt: "Ou basta dizê-lo", it: "Oppure dillo e basta", ja: "または、言うだけ", zh: "或者直接说出来", hi: "या बस कह दीजिए", ar: "أو قُلها فحسب",
+  },
+  "hnd.told.pitch": {
+    en: "The same permission, said instead of picked. Words that name no app or site grant nothing — the refusal quotes back what was heard so you can say it better.", es: "El mismo permiso, dicho en vez de elegido. Palabras que no nombran ninguna aplicación o sitio no conceden nada — el rechazo repite lo que se oyó para que puedas decirlo mejor.", fr: "La même permission, dite au lieu d'être choisie. Des mots qui ne nomment aucune application ni aucun site n'accordent rien — le refus cite ce qui a été entendu pour que vous puissiez mieux le dire.", de: "Dieselbe Erlaubnis, gesagt statt ausgewählt. Worte, die keine App und keine Seite nennen, gewähren nichts — die Ablehnung zitiert das Gehörte zurück, damit Sie es besser sagen können.", pt: "A mesma permissão, dita em vez de escolhida. Palavras que não nomeiam nenhuma aplicação ou site não concedem nada — a recusa cita o que foi ouvido para que possa dizê-lo melhor.", it: "Lo stesso permesso, detto invece che scelto. Parole che non nominano alcuna app o sito non concedono nulla — il rifiuto ripete ciò che ha sentito perché tu possa dirlo meglio.", ja: "同じ許可を、選ぶ代わりに言葉で。アプリやサイトを挙げない言葉は何も許可しません — 拒否は聞き取った内容をそのまま返すので、言い直せます。", zh: "同一个许可，用说的而不是选的。没有点名应用或网站的话什么也不授予 — 拒绝会把听到的原话回给你，好让你说得更清楚。", hi: "वही अनुमति, चुनने के बजाय कही गई। जो शब्द किसी ऐप या साइट का नाम नहीं लेते वे कुछ नहीं देते — इनकार सुनी हुई बात दोहरा देता है ताकि आप बेहतर कह सकें।", ar: "الإذن نفسه، مقولًا بدل أن يكون مختارًا. الكلمات التي لا تسمّي تطبيقًا أو موقعًا لا تمنح شيئًا — والرفض يقتبس ما سُمع كي تقولها على نحو أوضح.",
+  },
+  "hnd.told.hint": {
+    en: "you can click and type in my calendar for the next hour", es: "puedes hacer clic y escribir en mi calendario durante la próxima hora", fr: "tu peux cliquer et écrire dans mon agenda pendant la prochaine heure", de: "du darfst in der nächsten Stunde in meinem Kalender klicken und tippen", pt: "podes clicar e escrever no meu calendário durante a próxima hora", it: "puoi cliccare e scrivere nel mio calendario per la prossima ora", ja: "これから一時間、私のカレンダーでクリックと入力をしていい", zh: "接下来一小时你可以在我的日历里点击和输入", hi: "अगले एक घंटे तक तुम मेरे कैलेंडर में क्लिक और टाइप कर सकते हो", ar: "يمكنك النقر والكتابة في تقويمي خلال الساعة القادمة",
+  },
+  "hnd.told.go": {
+    en: "Say it", es: "Decirlo", fr: "Le dire", de: "Sagen", pt: "Dizer", it: "Dillo", ja: "伝える", zh: "说出来", hi: "कहें", ar: "قُلها",
+  },
+  "hnd.heard": {
+    en: "Heard: {places} · {verbs}", es: "Oído: {places} · {verbs}", fr: "Entendu : {places} · {verbs}", de: "Gehört: {places} · {verbs}", pt: "Ouvido: {places} · {verbs}", it: "Sentito: {places} · {verbs}", ja: "聞き取り: {places} · {verbs}", zh: "听到：{places} · {verbs}", hi: "सुना: {places} · {verbs}", ar: "المسموع: {places} · {verbs}",
+  },
+  "hnd.now": {
+    en: "What it may do now", es: "Lo que puede hacer ahora", fr: "Ce qu'il peut faire maintenant", de: "Was es jetzt darf", pt: "O que pode fazer agora", it: "Cosa può fare adesso", ja: "いま許されていること", zh: "它现在可以做什么", hi: "अभी यह क्या कर सकता है", ar: "ما يُسمح له الآن",
+  },
+  "hnd.none": {
+    en: "Nothing. It has no hands until you give it some.", es: "Nada. No tiene manos hasta que se las des.", fr: "Rien. Il n'a pas de mains tant que vous ne lui en donnez pas.", de: "Nichts. Es hat keine Hände, bis Sie ihm welche geben.", pt: "Nada. Não tem mãos até que lhas dê.", it: "Niente. Non ha mani finché non gliene dai.", ja: "何もありません。手を与えるまで、手はありません。", zh: "没有。在你给它之前，它没有手。", hi: "कुछ नहीं। जब तक आप न दें, इसके हाथ नहीं हैं।", ar: "لا شيء. لا يدين له حتى تمنحه إياهما.",
+  },
+  "hnd.over": {
+    en: "over", es: "terminado", fr: "terminé", de: "abgelaufen", pt: "terminado", it: "scaduto", ja: "終了", zh: "已结束", hi: "समाप्त", ar: "منتهٍ",
+  },
+  "hnd.takeback": {
+    en: "Take back", es: "Retirar", fr: "Reprendre", de: "Zurücknehmen", pt: "Retirar", it: "Ritira", ja: "取り消す", zh: "收回", hi: "वापस लें", ar: "استرداد",
+  },
+  "hnd.tookback": {
+    en: "Taken back. Anything running stops at its next step.", es: "Retirado. Lo que esté en marcha se detiene en su próximo paso.", fr: "Repris. Ce qui est en cours s'arrête à l'étape suivante.", de: "Zurückgenommen. Was läuft, hält beim nächsten Schritt an.", pt: "Retirado. O que estiver a decorrer para no passo seguinte.", it: "Ritirato. Ciò che è in corso si ferma al passo successivo.", ja: "取り消しました。実行中のものは次の一手で止まります。", zh: "已收回。正在进行的会在下一步停下。", hi: "वापस ले लिया। जो चल रहा है वह अगले चरण पर रुक जाएगा।", ar: "تم الاسترداد. ما يجري يتوقف عند خطوته التالية.",
+  },
+  "hnd.put": {
+    en: "Put its hands on something", es: "Poner sus manos en algo", fr: "Poser ses mains sur quelque chose", de: "Ihm etwas in die Hände geben", pt: "Pôr as mãos em algo", it: "Mettergli le mani su qualcosa", ja: "何かに手をかける", zh: "让它上手做事", hi: "इसे किसी काम पर लगाएँ", ar: "ضع يديه على شيء",
+  },
+  "hnd.pickgrant": {
+    en: "Which permission", es: "Qué permiso", fr: "Quelle permission", de: "Welche Erlaubnis", pt: "Que permissão", it: "Quale permesso", ja: "どの許可", zh: "用哪个许可", hi: "कौन-सी अनुमति", ar: "أي إذن",
+  },
+  "hnd.mode.act": {
+    en: "do the work", es: "hacer el trabajo", fr: "faire le travail", de: "die Arbeit tun", pt: "fazer o trabalho", it: "fare il lavoro", ja: "作業する", zh: "动手做", hi: "काम करे", ar: "يؤدي العمل",
+  },
+  "hnd.mode.watch": {
+    en: "watch only", es: "solo mirar", fr: "regarder seulement", de: "nur zusehen", pt: "apenas observar", it: "solo guardare", ja: "見るだけ", zh: "只观看", hi: "केवल देखे", ar: "المشاهدة فقط",
+  },
+  "hnd.errand": {
+    en: "what it should do", es: "qué debe hacer", fr: "ce qu'il doit faire", de: "was es tun soll", pt: "o que deve fazer", it: "cosa deve fare", ja: "してほしいこと", zh: "它该做什么", hi: "इसे क्या करना है", ar: "ما ينبغي أن يفعله",
+  },
+  "hnd.put.go": {
+    en: "Begin", es: "Comenzar", fr: "Commencer", de: "Beginnen", pt: "Começar", it: "Inizia", ja: "開始", zh: "开始", hi: "शुरू करें", ar: "ابدأ",
+  },
+  "hnd.undrivable": {
+    en: "Nothing can operate another app's interface on an iPhone — Apple provides no way, so there is no permission to ask for. It can still watch this screen and tell you where to press.", es: "Nada puede manejar la interfaz de otra aplicación en un iPhone — Apple no ofrece ninguna vía, así que no hay permiso que pedir. Aún puede mirar esta pantalla y decirte dónde pulsar.", fr: "Rien ne peut manœuvrer l'interface d'une autre application sur un iPhone — Apple n'offre aucun moyen, il n'y a donc aucune permission à demander. Il peut toujours regarder cet écran et vous dire où appuyer.", de: "Auf einem iPhone kann nichts die Oberfläche einer anderen App bedienen — Apple bietet keinen Weg, also gibt es keine Erlaubnis zu erfragen. Zusehen und Ihnen sagen, wo Sie drücken sollen, kann es weiterhin.", pt: "Nada consegue operar a interface de outra aplicação num iPhone — a Apple não oferece qualquer via, por isso não há permissão a pedir. Ainda pode observar este ecrã e dizer-lhe onde carregar.", it: "Su un iPhone nulla può usare l'interfaccia di un'altra app — Apple non offre alcuna via, quindi non c'è alcun permesso da chiedere. Può comunque guardare questo schermo e dirti dove premere.", ja: "iPhone では、他アプリの画面を操作できるものはありません — Apple がその手段を用意していないため、求めるべき許可自体が存在しません。画面を見て、どこを押せばよいか伝えることはできます。", zh: "在 iPhone 上，任何程序都无法操作另一个应用的界面 — 苹果没有提供途径，因此根本没有可申请的权限。它仍然可以看这块屏幕并告诉你按哪里。", hi: "iPhone पर कोई भी दूसरे ऐप का इंटरफ़ेस नहीं चला सकता — Apple कोई रास्ता नहीं देता, इसलिए माँगने को कोई अनुमति ही नहीं है। यह फिर भी यह स्क्रीन देख सकता है और बता सकता है कि कहाँ दबाना है।", ar: "لا شيء يستطيع تشغيل واجهة تطبيق آخر على الآيفون — لا توفّر آبل أي سبيل لذلك، فلا وجود لإذن يُطلب. ويظل بوسعه مشاهدة هذه الشاشة وإخبارك أين تضغط.",
+  },
+  "hnd.reach.line": {
+    en: "{state} · {left} steps left · {where}", es: "{state} · quedan {left} pasos · {where}", fr: "{state} · {left} étapes restantes · {where}", de: "{state} · noch {left} Schritte · {where}", pt: "{state} · restam {left} passos · {where}", it: "{state} · {left} passi rimasti · {where}", ja: "{state} · 残り{left}手 · {where}", zh: "{state} · 剩余 {left} 步 · {where}", hi: "{state} · {left} चरण शेष · {where}", ar: "{state} · بقيت {left} خطوة · {where}",
+  },
+  "hnd.refresh": {
+    en: "Refresh", es: "Actualizar", fr: "Actualiser", de: "Aktualisieren", pt: "Atualizar", it: "Aggiorna", ja: "更新", zh: "刷新", hi: "ताज़ा करें", ar: "تحديث",
+  },
+  "hnd.stop": {
+    en: "Take the screen back", es: "Recuperar la pantalla", fr: "Reprendre l'écran", de: "Bildschirm zurücknehmen", pt: "Recuperar o ecrã", it: "Riprendi lo schermo", ja: "画面を取り戻す", zh: "收回屏幕", hi: "स्क्रीन वापस लें", ar: "استرجع الشاشة",
+  },
+  "hnd.name": {
+    en: "call this something", es: "llámalo de algún modo", fr: "donnez-lui un nom", de: "geben Sie dem einen Namen", pt: "dê-lhe um nome", it: "dagli un nome", ja: "名前をつける", zh: "给它起个名字", hi: "इसे कोई नाम दें", ar: "سمِّ هذا",
+  },
+  "hnd.write": {
+    en: "Write it down", es: "Anotarlo", fr: "Le noter", de: "Aufschreiben", pt: "Anotar", it: "Annotalo", ja: "書き留める", zh: "记下来", hi: "लिख लें", ar: "دوّنه",
+  },
+  "hnd.wrotedown": {
+    en: "Written down. It can do that again.", es: "Anotado. Puede hacerlo de nuevo.", fr: "Noté. Il peut le refaire.", de: "Aufgeschrieben. Es kann das wieder tun.", pt: "Anotado. Pode fazê-lo outra vez.", it: "Annotato. Può rifarlo.", ja: "書き留めました。同じことをまたできます。", zh: "已记下。它可以再做一次。", hi: "लिख लिया गया। यह इसे फिर कर सकता है।", ar: "دُوّن. يستطيع فعل ذلك مجددًا.",
+  },
+  "hnd.again": {
+    en: "Things it can do again", es: "Cosas que puede repetir", fr: "Ce qu'il peut refaire", de: "Was es wiederholen kann", pt: "Coisas que pode repetir", it: "Cose che può rifare", ja: "またできること", zh: "它能重复做的事", hi: "जो यह दोबारा कर सकता है", ar: "أشياء يمكنه تكرارها",
+  },
+  "hnd.again.pitch": {
+    en: "Learned by watching you, or dictated in words. Either way it is a memory of moves and never a stored permission — doing it again goes through a live grant like any fresh decision.", es: "Aprendido mirándote, o dictado con palabras. En ambos casos es un recuerdo de movimientos y nunca un permiso guardado — repetirlo pasa por un permiso vigente como cualquier decisión nueva.", fr: "Appris en vous regardant, ou dicté avec des mots. Dans les deux cas c'est un souvenir de gestes et jamais une permission stockée — le refaire passe par une permission en cours comme toute décision nouvelle.", de: "Durch Zusehen gelernt oder in Worten diktiert. So oder so ist es eine Erinnerung an Bewegungen und nie eine gespeicherte Erlaubnis — die Wiederholung geht durch eine gültige Erlaubnis wie jede neue Entscheidung.", pt: "Aprendido a observá-lo, ou ditado por palavras. Em qualquer dos casos é uma memória de movimentos e nunca uma permissão guardada — repeti-lo passa por uma permissão em vigor como qualquer decisão nova.", it: "Imparato guardandoti, o dettato a parole. In ogni caso è un ricordo di mosse e mai un permesso conservato — rifarlo passa da un permesso valido come ogni decisione nuova.", ja: "あなたを見て覚えたか、言葉で伝えられたもの。どちらも動作の記憶であって、保存された許可ではありません — 繰り返すときも、新しい判断と同じく有効な許可を通ります。", zh: "看你做而学会的，或是用话口述的。无论哪种，它都只是动作的记忆，绝不是存下来的许可 — 再做一次同样要经过一份有效的许可，和任何新决定一样。", hi: "आपको देखकर सीखा, या शब्दों में बताया गया। दोनों ही हाल में यह चालों की स्मृति है, कोई सहेजी हुई अनुमति नहीं — दोबारा करना भी किसी नए निर्णय की तरह एक जीवित अनुमति से होकर जाता है।", ar: "تعلّمه بمشاهدتك، أو أُملي عليه بالكلمات. في الحالتين هو ذاكرة حركات لا إذن مخزَّن — وتكراره يمرّ عبر إذن سارٍ كأي قرار جديد.",
+  },
+  "hnd.noroutines": {
+    en: "Nothing yet.", es: "Nada todavía.", fr: "Rien encore.", de: "Noch nichts.", pt: "Ainda nada.", it: "Ancora niente.", ja: "まだありません。", zh: "还没有。", hi: "अभी कुछ नहीं।", ar: "لا شيء بعد.",
+  },
+  "hnd.again.go": {
+    en: "Do it again", es: "Repetir", fr: "Refaire", de: "Wiederholen", pt: "Repetir", it: "Rifallo", ja: "もう一度", zh: "再做一次", hi: "फिर करें", ar: "كرّره",
   },
   "rbt.market": {
     en: "The market", es: "El mercado", fr: "Le marché", de: "Der Markt", pt: "O mercado", it: "Il mercato", ja: "市場", zh: "市场", hi: "बाज़ार", ar: "السوق",

@@ -2169,6 +2169,63 @@ export type RoomMsg = {
   created_at?: string;
 };
 
+/** The hands (qrme/hands.py). A permission before it is a capability:
+ *  every field here is a bound, and the console draws them as bounds. */
+export type HandGrant = {
+  id: string; profile_id: string; surface: string;
+  places: string[]; verbs: string[];
+  steps: number; watched: boolean;
+  /** `picked` from the list, or `told` in words. Both write this row. */
+  door: string;
+  /** The words themselves, when the door was `told` — kept so the owner can
+   *  read back exactly what their sentence was understood to mean. */
+  said: string | null;
+  expires_at: string; revoked_at: string | null;
+  live: boolean; created_at: string;
+};
+
+/** One session of having hands on a surface. `mode` is the whole
+ *  difference between watching somebody work and doing the work. */
+export type Reach = {
+  id: string; profile_id: string; grant_id: string;
+  surface: string; platform: string; errand: string;
+  mode: string; state: string; why: string | null;
+  handed_to: string | null; routine_id: string | null;
+  steps_used: number; steps_left: number; hands_on: boolean;
+  opened_at: string; closed_at: string | null;
+};
+
+/** One move, including the refused ones — a ledger that only kept the
+ *  moves that worked would be a story about the errand, not a record. */
+export type HandAction = {
+  n: number; profile_id: string; verb: string;
+  target: string | null; detail: Record<string, unknown>;
+  saw: string | null; outcome: string; note: string | null; at: string;
+};
+
+export type HandStep = {
+  id?: string; reach_id?: string; profile_id?: string; n?: number;
+  verb: string; target: string | null;
+  detail: Record<string, unknown>;
+  outcome?: string; note?: string | null;
+};
+
+/** A thing it can do again — watched (`shown`) or dictated (`told`). */
+export type Routine = {
+  id: string; profile_id: string; name: string; surface: string;
+  learned: string; steps: HandStep[]; runs: number;
+  last_run: string | null; created_at: string;
+};
+
+export type HandsVocabulary = {
+  surfaces: string[]; platforms: string[]; drivable: string[];
+  verbs: string[]; eyes_only: string[]; keys: string[]; doors: string[];
+  caps: { steps: number; minutes: number; wait_seconds: number };
+  /** Published, not merely enforced. A client that knew only what was
+   *  allowed would draw the iPhone case as a missing feature. */
+  never: string[];
+};
+
 export type RobotCatalogue = {
   robots: RobotModel[];
   by_maker: Record<string, RobotModel[]>;
@@ -3830,8 +3887,14 @@ export const api = {
   inboxSeen: (profileId: string, token: string) =>
     req<{ marked_seen: number }>(`/profiles/${profileId}/inbox/seen`,
       { method: "POST", token }),
+  // `feed_posts`, and the name is load-bearing. This was declared as
+  // `posts` — a hand-written shape that the route has never sent — so the
+  // console read `undefined`, put it in state, and `posts.length` took the
+  // whole application down to a blank page the moment anybody opened the
+  // Wall. TypeScript agreed with every line of it, because a lie in a
+  // type declaration is a lie the type checker enforces.
   feed: (profileId: string, adult = false) =>
-    req<{ posts: WallPost[]; ranked_on: string[] }>(
+    req<{ feed_posts: WallPost[]; ranked_on: string[] }>(
       `/profiles/${profileId}/feed${adult ? "?adult=true" : ""}`),
   myWall: (profileId: string) =>
     req<{ posts: WallPost[] }>(`/profiles/${profileId}/wall`),
@@ -5664,6 +5727,72 @@ export const api = {
   // with a 409 that names the status — a 404 would be a lie about a machine
   // its maker has publicly shown.
   robotCatalogue: () => req<RobotCatalogue>("/robotics/catalog"),
+
+  // ---- the hands ------------------------------------------------------
+  // Every door that writes authority is owner-gated. The vocabulary is not:
+  // it publishes the refusals by name, including the one this product
+  // cannot engineer its way around (an iPhone's interface is not drivable
+  // by anything, so on iOS the profile watches and says where to press).
+  handsVocabulary: () => req<HandsVocabulary>("/hands/vocabulary"),
+  handGrants: (profileId: string, token: string, live = false) =>
+    req<{ grants: HandGrant[] }>(
+      `/profiles/${profileId}/hands/grants${live ? "?live=true" : ""}`,
+      { token }),
+  grantHands: (profileId: string, token: string, body: {
+    surface: string; places: string[]; verbs: string[];
+    minutes?: number; steps?: number; watched?: boolean;
+  }) => req<HandGrant>(`/profiles/${profileId}/hands/grants`,
+                       { method: "POST", token, body }),
+  // The second door onto the same row: the owner says it instead of
+  // picking it. Strict about what the words named — words that name no
+  // place are refused rather than read generously.
+  tellHands: (profileId: string, token: string, body: {
+    said: string; surface?: string; watched?: boolean;
+  }) => req<HandGrant>(`/profiles/${profileId}/hands/told`,
+                       { method: "POST", token, body }),
+  takeHandsBack: (profileId: string, token: string, grantId: string) =>
+    req<HandGrant>(`/profiles/${profileId}/hands/grants/${grantId}`,
+                   { method: "DELETE", token }),
+  openReach: (profileId: string, token: string, body: {
+    grant_id: string; errand: string; platform: string; mode?: string;
+  }) => req<Reach>(`/profiles/${profileId}/hands/reaches`,
+                   { method: "POST", token, body }),
+  readReach: (profileId: string, token: string, reachId: string) =>
+    req<{ reach: Reach; ledger: HandAction[] }>(
+      `/profiles/${profileId}/hands/reaches/${reachId}`, { token }),
+  // A refusal comes back 200 with the refusal in the row: a hand declining
+  // to type a password is the system working, not the request failing.
+  handAct: (profileId: string, token: string, reachId: string, body: {
+    verb: string; target?: string | null;
+    detail?: Record<string, unknown>; saw?: string | null;
+  }) => req<HandStep>(
+    `/profiles/${profileId}/hands/reaches/${reachId}/act`,
+    { method: "POST", token, body }),
+  handOver: (profileId: string, token: string, reachId: string, body: {
+    to_profile_id: string; places?: string[]; verbs?: string[];
+  }) => req<Reach>(
+    `/profiles/${profileId}/hands/reaches/${reachId}/hand-over`,
+    { method: "POST", token, body }),
+  stopReach: (profileId: string, token: string, reachId: string,
+              why?: string) =>
+    req<Reach>(`/profiles/${profileId}/hands/reaches/${reachId}/stop`,
+               { method: "POST", token, body: { why: why || undefined } }),
+  routines: (profileId: string, token: string) =>
+    req<{ routines: Routine[] }>(`/profiles/${profileId}/hands/routines`,
+                                 { token }),
+  writeRoutine: (profileId: string, token: string, body: {
+    name: string; surface: string; learned: string; steps: HandStep[];
+  }) => req<Routine>(`/profiles/${profileId}/hands/routines`,
+                     { method: "POST", token, body }),
+  routineFromReach: (profileId: string, token: string, body: {
+    reach_id: string; name: string;
+  }) => req<Routine>(`/profiles/${profileId}/hands/routines/from-reach`,
+                     { method: "POST", token, body }),
+  replayRoutine: (profileId: string, token: string, routineId: string,
+                  body: { grant_id: string; platform: string }) =>
+    req<{ reach: Reach; steps: HandStep[] }>(
+      `/profiles/${profileId}/hands/routines/${routineId}/replay`,
+      { method: "POST", token, body }),
 
   // The connections bracket: what a body is taught, and what it is plugged
   // into. A task pack installed on a robot turns each of its tasks into a

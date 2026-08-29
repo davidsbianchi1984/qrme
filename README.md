@@ -84,7 +84,7 @@ The majority of what a person actually encounters, with what each screen
 does — drawn at phone scale, and the same screens serve the web console
 on a computer and the installed app. The Android tellings live beside
 these in `docs/screens/android/`, the watch has its own gallery below,
-and the complete tour of all 206 is in [docs/gallery.md](docs/gallery.md).
+and the complete tour of all 207 is in [docs/gallery.md](docs/gallery.md).
 
 **Getting in**
 

@@ -263,6 +263,11 @@ DOORS: tuple[Door, ...] = (
     Door("Robots", "Robots & Devices tab",
          "a body to speak through",
          ("robot", "device", "speak through", "hardware")),
+    Door("Hands", "Hands tab",
+         "let it work a screen for you — what it may touch, for how long, "
+         "and what it will never type",
+         ("hands", "use my computer", "do it on my screen", "click for me",
+          "take over", "navigate for me", "do that again")),
     Door("Plugins", "Plug-ins tab",
          "the plug-in storefront, and what each row can reach",
          ("plug-in", "plugin", "integration", "connect an app")),
