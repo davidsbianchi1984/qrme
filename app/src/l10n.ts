@@ -638,6 +638,9 @@ const CHROME: Table = {
   "ins.pair.avatar": {
     en: "Avatar", es: "Avatar", fr: "Avatar", de: "Avatar", pt: "Avatar", it: "Avatar", ja: "アバター", zh: "头像", hi: "अवतार", ar: "الأفاتار",
   },
+  "ins.ear.speaking": {
+    en: "Someone is speaking. The microphone will not open over them — it would record the speaker, not you. It comes back the moment they finish; headphones settle it for good.", es: "Alguien está hablando. El micrófono no se abre encima — grabaría el altavoz, no a ti. Vuelve en cuanto terminen; con auriculares se resuelve del todo.", fr: "Quelqu'un parle. Le micro ne s'ouvre pas par-dessus — il enregistrerait le haut-parleur, pas vous. Il revient dès qu'on a fini ; un casque règle la question.", de: "Es spricht gerade jemand. Das Mikrofon geht nicht darüber auf — es würde den Lautsprecher aufnehmen, nicht dich. Es kommt zurück, sobald sie fertig sind; mit Kopfhörern erledigt sich das ganz.", pt: "Alguém está a falar. O microfone não abre por cima — gravaria o altifalante, não a ti. Volta assim que terminarem; com auscultadores fica resolvido.", it: "Qualcuno sta parlando. Il microfono non si apre sopra — registrerebbe l'altoparlante, non te. Torna appena hanno finito; con le cuffie la questione si chiude.", ja: "いま誰かが話しています。その上からマイクは開きません — 録れるのはあなたではなくスピーカーだからです。話し終えればすぐ戻ります。イヤホンを使えばこの問題自体がなくなります。", zh: "现在有人在说话。麦克风不会盖在上面打开 — 那样录到的是扬声器，不是你。等他们说完就会恢复；戴耳机可以彻底解决。", hi: "अभी कोई बोल रहा है। माइक उसके ऊपर नहीं खुलेगा — वह आपको नहीं, स्पीकर को रिकॉर्ड करेगा। उनके ख़त्म होते ही यह लौट आता है; हेडफ़ोन से यह बात हमेशा के लिए सुलझ जाती है।", ar: "هناك من يتكلم الآن. لن يُفتح الميكروفون فوق ذلك — إذ سيسجّل السمّاعة لا صوتك. يعود فور انتهائهم، وسمّاعة الرأس تُنهي المسألة تمامًا.",
+  },
   "ins.pair.photo": {
     en: "Photo", es: "Foto", fr: "Photo", de: "Foto", pt: "Foto", it: "Foto", ja: "写真", zh: "照片", hi: "फ़ोटो", ar: "صورة",
   },

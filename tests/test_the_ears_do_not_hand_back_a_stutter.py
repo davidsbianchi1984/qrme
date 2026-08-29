@@ -109,3 +109,38 @@ def test_a_stutter_becomes_no_words_at_all(monkeypatch):
     monkeypatch.setattr(scrape.urllib.request, "urlopen",
                         lambda *a, **k: _Answer())
     assert scrape.transcribe_bytes(b"pretend-audio") is None
+
+
+# --------------------------------------------------------------------------
+# The other end of it: not recording the loudspeaker in the first place
+
+
+def test_the_microphone_does_not_open_over_a_speaking_voice():
+    """The cause, not only the symptom.
+
+    A room plays a profile's answer out of the same device the microphone
+    is on. A take opened into that records the loudspeaker, and `looped`
+    above is what the transcript of a loudspeaker looks like. So the
+    console refuses the take while a voice is playing, and says why.
+    """
+    import pathlib as _p
+    root = _p.Path(__file__).resolve().parent.parent
+    src = (root / "app" / "src" / "screens" / "Inside.tsx").read_text()
+    body = src.split("async function dictRecorded()")[1].split("\n  }")[0]
+    assert "if (voicing)" in body, (
+        "the take opens whatever is coming out of the speaker")
+    assert "ins.ear.speaking" in body, (
+        "a refusal with no sentence is a button that did nothing")
+
+
+def test_the_refusal_clears_itself():
+    """`voicing` is null the moment the answer finishes playing, so the
+    control comes back with no further press. A refusal somebody has to
+    dismiss is a worse refusal than one that ends on its own."""
+    import pathlib as _p
+    root = _p.Path(__file__).resolve().parent.parent
+    src = (root / "app" / "src" / "screens" / "Inside.tsx").read_text()
+    assert "disabled={busy || !!voicing}" in src
+    # And the disabled control carries the reason, because a dead button
+    # with no explanation is the thing the field reports as broken.
+    assert 'title={voicing ? tr("ins.ear.speaking", lang)' in src

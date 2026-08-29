@@ -72,6 +72,50 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - A guard comparing the shapes `app/src/api.ts` declares against what the
   routes actually answer, which is what would have caught the white page
   before a tester did.
+- **A stutter is not speech.** Two voice memos came back from the ears as
+  one fragment repeated — `Nghei, Nghei, Nghei…` thirty times, and
+  `de typedas` ten times with a changing number wedged in — and were
+  posted into a room under the speaker's own name. That is what a
+  transcriber does with near-silence or with a loudspeaker playing back
+  into the microphone. Both ears doors now refuse a looped transcript,
+  answering with no words rather than with nonsense somebody has to
+  disown. Tested in both directions: "no, no, no", a name called twice
+  and a repeated shopping list all pass through untouched, because a
+  guard that ate a real sentence would be the worse failure.
+- **And the cause, not only the symptom:** the room's microphone will not
+  open while a profile is mid-sentence, since a take opened into a
+  playing voice records the loudspeaker. The refusal says so, and ends
+  itself the moment the answer finishes.
+- **The sit-out was a play button.** It had no style rule at all, so it
+  drew as a bare ▶/⏸ glyph over a photograph and read as a transport
+  control. It is a worded pill now — *Sit out* while you are seated,
+  *Sit in* while you are not — lit while you are out.
+- **The paperclip opened a folder tree.** In a room it went straight to
+  the operating system's file dialog; it asks first now — photos,
+  camera, video, files — and each answer is its own input, because
+  `accept` and `capture` are read when the picker opens.
+- **The portrait fills the frame.** Pressing a seat's photograph showed a
+  boxed picture with the room still visible around it. It covers the
+  screen now, on solid ground, and keeps a rail across to that same
+  seat's avatar so the big view is not a dead end.
+- **Four buttons, one refusal.** On the full-screen stage the prompt,
+  wardrobe and body windows all landed on the same sentence for a real
+  likeness — *a real person's face is never painted from words*. The
+  sentence stands; under it is now the road the module's own note had
+  always promised and never drawn: a photograph, framed as face, upper
+  body or full body, built into a head on this deployment.
+- **The room's rail scrolled and its menus came up underneath.** The
+  column was pinned below the dial with an internal scroll, so it had
+  half a screen and moved under the finger; it is centred now with the
+  whole height. Its panel sat under the corner counter and the
+  full-screen ask — a menu somebody deliberately opened, with passive
+  chrome across it.
+- **Two controls left the seat's gear.** The room's name and the
+  microphone lend were reachable only once the room was already running.
+  They are on the Rooms screen now, on the room's own row.
+- **Terminating a profile takes its hands.** A terminated profile kept
+  any live grant, which would have left the widest capability in the
+  product outliving the profile it was given to.
 
 ## [2.3.1] - 2026-08-28
 

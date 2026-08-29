@@ -1562,6 +1562,24 @@ export function Inside({ onPlans, start = "", onLeave }: {
    *  no sentence, on the same screen whose talk ear already forked. */
   async function dictRecorded() {
     if (!token || dictation.current) return;
+    // Not over a voice that is already speaking.
+    //
+    // The room plays a profile's answer out of the same device the
+    // microphone is on. Open a take into that and the recording is the
+    // loudspeaker, and the transcriber does what a transcriber does with
+    // a loudspeaker: it locks onto a fragment and repeats it — "Nghei,
+    // Nghei, Nghei…" — which then lands in the room as this person's own
+    // message. `qrme/scrape.looped` catches the nonsense on the way back
+    // in; this stops it being recorded in the first place.
+    //
+    //     asked     did the microphone open
+    //     mattered  did it open onto the person or onto the speaker
+    //
+    // It clears itself: `voicing` is null the moment the answer finishes
+    // playing, and the button beside this is live again with no further
+    // press. Headphones make the whole question moot, which is why the
+    // sentence says so.
+    if (voicing) { setEarFault(tr("ins.ear.speaking", lang)); return; }
     // One capture at a time — iOS mutes the elder stream when a second
     // opens, the lesson the barge-in meter already paid for. Rooms open
     // the standing ear on entry now, so the ear that is already holding
@@ -1946,9 +1964,11 @@ export function Inside({ onPlans, start = "", onLeave }: {
                   onClick={() => void grabScreen()}>🖥️</button>
         )}
         {canDictate && (
-          <button className="rs-chatbtn" disabled={busy}
+          <button className="rs-chatbtn" disabled={busy || !!voicing}
                   aria-pressed={dictating}
                   aria-label={tr("ins.dictate", lang)}
+                  title={voicing ? tr("ins.ear.speaking", lang)
+                                 : tr("ins.dictate", lang)}
                   onClick={flipDictation}>🎤</button>
         )}
         <input value={draft} placeholder={tr("ins.type.ph", lang)}
