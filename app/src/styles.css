@@ -2139,6 +2139,13 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .rms-before { display: inline-flex; gap: 6px; align-items: center;
               min-width: 0; }
 .rms-before input { min-width: 0; width: min(220px, 45vw); }
+/* The motor's command line, ready to copy. Monospaced and selectable —
+   it is meant to leave this screen and land in a terminal. */
+.hnd-motor { margin-top: 10px; }
+.hnd-cmd {
+  width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px; line-height: 1.5; resize: vertical;
+}
 .rail-ask-row { display: flex; gap: 8px; margin-top: 8px; }
 .rail-ask-row input { flex: 1; min-width: 0; }
 

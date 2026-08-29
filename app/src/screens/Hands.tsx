@@ -3,6 +3,7 @@ import { api, type HandAction, type HandGrant, type HandsVocabulary,
          type Reach, type Routine } from "../api";
 import { Refusal } from "../Refusal";
 import { fill, t as tr, visitorLang } from "../l10n";
+import { getBase } from "../api";
 import { useSession } from "../store";
 
 /**
@@ -420,6 +421,31 @@ export function Hands() {
               {step.saw && <span className="muted small"> · {step.saw}</span>}
             </p>
           ))}
+          {/* The motor's command line, already filled in.
+           *
+           * The stack cannot move a cursor — `companion/hands.py` does,
+           * and it runs on the machine whose screen is being worked. It
+           * needs four things this screen already knows, and the
+           * alternative was telling somebody to dig an owner token out
+           * of browser storage, which is not a thing to ask of anybody.
+           *
+           * The token is on screen because it is the reader's own, on
+           * their own machine, and the line is useless without it. It is
+           * said out loud rather than hidden, so nobody pastes it
+           * somewhere it should not go by not knowing what it was. */}
+          {reach.state === "open" && reach.surface !== "here" && (
+            <div className="hnd-motor">
+              <p className="small">{tr("hnd.motor", lang)}</p>
+              <p className="muted small">{tr("hnd.motor.sub", lang)}</p>
+              <textarea readOnly rows={4} className="hnd-cmd"
+                        value={`python hands.py \\\n`
+                          + `  --base ${getBase()} \\\n`
+                          + `  --profile ${me} \\\n`
+                          + `  --token ${token} \\\n`
+                          + `  --reach ${reach.id}`} />
+              <p className="muted small">{tr("hnd.motor.dry", lang)}</p>
+            </div>
+          )}
           {reach.state === "open" && (
             <>
               <p className="small">{tr("hnd.move", lang)}</p>
