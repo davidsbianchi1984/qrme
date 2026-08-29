@@ -6,6 +6,33 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-08-29
+
+### Added
+
+- **A body is a surface, and moving one is refused with its reasons.**
+  `qrme/robotics.py` has carried a catalogue of bodies for several
+  releases and none of it was ever attached to a grant, a reach, a ledger
+  or a refusal. `body` now joins the hands' surfaces — because a surface a
+  product silently does not support is indistinguishable from one it
+  forgot — and watching through one is allowed, since seeing and saying
+  what is there carries none of the risk. Acting on one is refused, and
+  the refusal names all four bounds a screen never needed: where the body
+  may be (which is not a list of app names), a ceiling on force and speed
+  (which a step budget does not give), a stop within reach of the person
+  standing next to it, and a landing reported by a sensor rather than by
+  the thing that was asked to move. A person told "not supported" learns
+  nothing; a person told what is missing can decide whether to supply it.
+
+### Changed
+
+- **The trio is back on one number.** Each product's README promises that
+  one version names one tested combination of all three, and three hands
+  rounds here alone drifted that apart — QRME at 2.6.0, JIM-mini and PDI
+  at 2.3.1. This cut takes all three to 2.7.0 rather than each to its own
+  next number, because a promise the numbers do not keep is worse than a
+  gap in the sequence.
+
 ## [2.6.0] - 2026-08-29
 
 ### Added
@@ -16414,7 +16441,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.6.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.7.0...HEAD
+[2.7.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.6.0...app-v2.7.0
 [2.6.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.5.0...app-v2.6.0
 [2.5.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.4.0...app-v2.5.0
 [2.4.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.3.1...app-v2.4.0
