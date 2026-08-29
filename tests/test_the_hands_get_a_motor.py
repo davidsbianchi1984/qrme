@@ -231,3 +231,56 @@ def test_it_installs_nothing_and_survives_nothing():
     for never in ("systemd", "LaunchAgent", "autostart", "winreg",
                   'open("token', "keyring"):
         assert never not in code, never
+
+
+def test_the_always_on_moves_are_drawn_as_on(client, profile_id):
+    """`look`, `ask` and `done` are in every grant whether or not they were
+    ticked — `_verbs` forces them in. The screen drew them empty and
+    disabled, which reads as "refused" rather than "always", and the first
+    person to use it reported that it would not let him tick `look`.
+
+    asked     why can the owner not grant the move that lets it see
+    mattered  a box the owner cannot tick and cannot read is a lie either
+              way; drawn on, it says what the backend already does
+    """
+    granted = hands.grant(
+        profile_id, profile_id, surface="computer", places=["notepad"],
+        verbs=["press", "type"])
+    # Untouched by the owner, and in anyway.
+    assert {"look", "ask", "done"} <= set(granted["verbs"])
+
+    screen = (REPO / "app" / "src" / "screens" / "Hands.tsx").read_text(
+        encoding="utf-8")
+    block = screen.split('tr("hnd.moves"')[1].split("</div>")[0]
+    assert "checked={verbs.includes(v) || always.includes(v)}" in block
+    assert "disabled={always.includes(v)}" in block
+    # And the reason is on the screen, not only in this file.
+    assert 'tr("hnd.always"' in screen
+
+
+def test_a_half_copied_command_line_says_so():
+    """The command is copied off a screen, and the first person to run it
+    copied the placeholders instead of the values. urllib answered with
+    `unknown url type: '.../profiles/...'`, which names neither the flag
+    that is wrong nor the screen the right one is on.
+
+    asked     what does the motor say when --base is not a URL
+    mattered  the person holding the terminal is the owner, not an
+              operator; a traceback is not an answer to them
+    """
+    source = (REPO / "companion" / "hands.py").read_text(encoding="utf-8")
+    body = source.split("def main(")[1]
+    guard = body.split("where = ")[0]
+    assert 'startswith(("http://", "https://"))' in guard
+    assert "SystemExit" in guard
+    # And it points at the place the real one is written out.
+    assert "Hands screen" in guard
+
+
+def test_the_grab_uses_the_name_mss_is_keeping():
+    """`mss.mss` warns on release 10 and is going away. The motor prints
+    that warning above its own first line, which reads like a fault in the
+    thing the person just installed."""
+    source = (REPO / "companion" / "hands.py").read_text(encoding="utf-8")
+    assert 'getattr(mss, "MSS", None)' in source
+    assert "with mss.mss()" not in source

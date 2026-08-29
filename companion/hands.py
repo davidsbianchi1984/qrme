@@ -86,7 +86,10 @@ def _frame() -> str:
     import mss
     from PIL import Image
 
-    with mss.mss() as grab:
+    # `mss.mss` is the old spelling and warns on newer releases; `MSS` is
+    # the same object under the name it will keep.
+    screens = getattr(mss, "MSS", None) or mss.mss
+    with screens() as grab:
         shot = grab.grab(grab.monitors[1])
     picture = Image.frombytes("RGB", shot.size, shot.rgb)
     # Sent small. The eyes read a layout, not a font: a full 4K frame
@@ -145,6 +148,15 @@ def main() -> None:
                      help="actually touch this machine (default: print only)")
     ask.add_argument("--beat", type=float, default=BEAT)
     said = ask.parse_args()
+
+    # The command line is copied off a screen, and a half-copied one used
+    # to end in a urllib traceback about an "unknown url type" — which
+    # says nothing about the thing that is actually wrong.
+    if not said.base.startswith(("http://", "https://")):
+        raise SystemExit(
+            f"--base must be the deployment's URL, starting http:// or "
+            f"https:// — got {said.base!r}. Copy the whole command from "
+            f"the Hands screen; it comes with your own values in it.")
 
     where = (f"/profiles/{said.profile}/hands/reaches/{said.reach}")
     print(f"watching {said.base} · {said.reach} · "

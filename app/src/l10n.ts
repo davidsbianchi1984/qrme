@@ -4805,6 +4805,9 @@ const CHROME: Table = {
   "hnd.moves": {
     en: "The moves it may make", es: "Los movimientos que puede hacer", fr: "Les gestes qu'il peut faire", de: "Die Bewegungen, die es machen darf", pt: "Os movimentos que pode fazer", it: "Le mosse che può fare", ja: "許される動作", zh: "它可以做的动作", hi: "जो चालें यह चल सकता है", ar: "الحركات المسموح بها",
   },
+  "hnd.always": {
+    en: "Looking, asking and stopping are always included — a hand that cannot see, ask or stop is a worse hand, not a safer one.", es: "Mirar, preguntar y detenerse van siempre incluidos: una mano que no puede ver, preguntar ni detenerse es una mano peor, no más segura.", fr: "Regarder, demander et s'arrêter sont toujours inclus : une main qui ne peut ni voir, ni demander, ni s'arrêter est une moins bonne main, pas une main plus sûre.", de: "Sehen, Fragen und Aufhören sind immer dabei — eine Hand, die nicht sehen, fragen oder aufhören kann, ist eine schlechtere Hand, keine sicherere.", pt: "Olhar, perguntar e parar estão sempre incluídos — uma mão que não pode ver, perguntar ou parar é uma mão pior, não mais segura.", it: "Guardare, chiedere e fermarsi sono sempre inclusi: una mano che non può vedere, chiedere o fermarsi è una mano peggiore, non più sicura.", ja: "見ること、尋ねること、やめることは常に含まれます — 見ることも尋ねることもやめることもできない手は、より安全な手ではなく、より悪い手です。", zh: "查看、询问和停止始终包含在内 — 一只不能看、不能问、不能停的手是更差的手，而不是更安全的手。", hi: "देखना, पूछना और रुकना हमेशा शामिल हैं — जो हाथ देख, पूछ या रुक नहीं सकता वह बेहतर नहीं, बदतर हाथ है।", ar: "النظر والسؤال والتوقّف مشمولة دائمًا — فاليد التي لا تستطيع أن ترى أو تسأل أو تتوقّف يد أسوأ لا أكثر أمانًا.",
+  },
   "hnd.minutes": {
     en: "Minutes", es: "Minutos", fr: "Minutes", de: "Minuten", pt: "Minutos", it: "Minuti", ja: "分", zh: "分钟", hi: "मिनट", ar: "دقائق",
   },

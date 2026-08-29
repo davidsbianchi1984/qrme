@@ -106,6 +106,13 @@ export function Hands() {
   const undrivable = !!vocab && mode === "acting"
     && !vocab.drivable.includes(platform);
 
+  // `look`, `ask` and `done` are added to every grant by `_verbs()` on the
+  // other side, ticked or not — a hand that cannot see, ask or stop is a
+  // worse hand rather than a safer one. Drawing them empty and disabled
+  // said "refused" when it meant "always", so they are drawn as what they
+  // are: on, and not yours to turn off.
+  const always = ["look", "ask", "done"];
+
   function toggleVerb(v: string) {
     setVerbs((prev) => prev.includes(v)
       ? prev.filter((x) => x !== v) : [...prev, v]);
@@ -304,12 +311,14 @@ export function Hands() {
         <div className="row">
           {(vocab?.verbs || []).map((v) => (
             <label key={v} className="small">
-              <input type="checkbox" checked={verbs.includes(v)}
-                     disabled={["look", "ask", "done"].includes(v)}
+              <input type="checkbox"
+                     checked={verbs.includes(v) || always.includes(v)}
+                     disabled={always.includes(v)}
                      onChange={() => toggleVerb(v)} /> {v}
             </label>
           ))}
         </div>
+        <p className="muted small">{tr("hnd.always", lang)}</p>
 
         <div className="row">
           <label>{tr("hnd.minutes", lang)}
