@@ -8,6 +8,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [2.7.0] - 2026-08-29
 
+### Changed
+
+- **The front-page gallery is photographs of the running console**, not
+  drawings of it — shot against a real backend, a real build and a real
+  enrolment, by a harness that refuses to file a capture it cannot prove
+  it reached.
+
 ### Added
 
 - **A body is a surface, and moving one is refused with its reasons.**
