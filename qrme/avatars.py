@@ -511,6 +511,27 @@ def model_of(profile_id: str) -> str | None:
     return got["render_variants"].get("model")
 
 
+def speaking_of(profile_id: str) -> str | None:
+    """Where this face's points sit, when it was measured so its mouth
+    could move — read through `avatar_ref` for the same reason `model_of`
+    is, and gone the moment the face is retired. None on a face nobody
+    measured, which is most of them and is not a failure: a still is a
+    perfectly good portrait and always was."""
+    from . import avatarreg
+    row = db.connect().execute(
+        "SELECT avatar_ref FROM profiles WHERE id=?",
+        (profile_id,)).fetchone()
+    if row is None or not row["avatar_ref"]:
+        return None
+    try:
+        got = avatarreg.row(row["avatar_ref"])
+    except KeyError:
+        return None
+    if got["status"] != "active":
+        return None
+    return got["render_variants"].get("speaking")
+
+
 def set_avatar(profile_id: str, asset: str) -> dict:
     """Attach a rendered portrait to a profile."""
     conn = db.connect()
@@ -661,6 +682,11 @@ def render(profile_id: str) -> dict:
         # somebody too, and hiding the face while shipping the model
         # would be the flag leaking past itself a third time.
         "model": None if anonymous else model_of(profile_id),
+        # And the measurements that let the photograph itself speak.
+        # Withheld from an anonymous profile for exactly the same reason
+        # the model is: this is where somebody's face sits in their own
+        # picture, which is a picture of somebody.
+        "speaking": None if anonymous else speaking_of(profile_id),
         "watermark": watermark.design(profile_id),
         "likeness": likeness(profile_id),
         # The moving image: how the portrait moves, derived from the

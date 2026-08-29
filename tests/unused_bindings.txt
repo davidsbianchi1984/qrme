@@ -1,0 +1,31 @@
+# Client bindings no screen calls, with the reason. See
+# test_a_binding_is_not_a_door.py — a binding here still counts its route
+# as doored, so a row is a claim that the door exists and is deliberately
+# not on a screen.
+#
+# ## api.forgeFace — the head, kept but not shown
+#
+# `POST /profiles/{id}/avatar/forge` builds a 3-D head from a photograph
+# out of MediaPipe's 478 face landmarks. A landmark set is a face region:
+# no skull, no hair, no ears, no neck. So the mesh is a shield-shaped
+# patch, and however well it is textured and lit it can only ever be a
+# mask. The field looked at one and said it exactly — "that isn't the
+# photo I uploaded, that just seems like a white moving skeleton frame
+# that goes behind the image" — which is a correct description of a
+# landmark mesh, not a rendering bug. Two real bugs underneath it were
+# fixed in the same round (a JPEG labelled `image/png`, and lighting that
+# multiplied the skin past white) and it was still a mask.
+#
+#     asked     let the avatar speak
+#     mattered  let it still be them while it does
+#
+# `api.speakingFace` is what a person is shown now: the forge measures
+# the photograph, the console lays that mesh flat over the picture it
+# already has, and the only thing that ever moves is a mouth. Nothing is
+# rebuilt, so nothing stops looking like them.
+#
+# The head door stays because it is real, it works, and it becomes worth
+# showing the day a full head model sits behind it — the landmarks fitted
+# to a mesh that HAS a skull. Deleting the only door to a capability is a
+# different act from taking it off a screen, and this is the second one.
+api.forgeFace

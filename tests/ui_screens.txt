@@ -1,4 +1,4 @@
-# status: floor — 72 rows
+# status: floor — 73 rows
 #
 # Which console surface each screen drawing depicts.
 #
@@ -55,6 +55,7 @@ Blend           142
 Briefcase       6,197
 AvatarStage     205
 Avatar3D        205,175
+SpeakingPortrait 205,175
 Raise           206
 Hands           207
 SkinTiles       44

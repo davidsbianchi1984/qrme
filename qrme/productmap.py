@@ -198,6 +198,11 @@ DOORS: tuple[Door, ...] = (
          "door",
          ("full screen avatar", "wardrobe", "restyle", "change outfit",
           "dress the avatar", "physique", "render my avatar")),
+    Door("SpeakingPortrait", "the avatar full screen",
+         "your own photograph with a mouth that moves when it speaks — "
+         "nothing is redrawn, so it goes on looking exactly like you",
+         ("make my photo speak", "talking photo", "moving mouth",
+          "speaking portrait", "my picture talks", "animate my photo")),
     Door("Avatar3D", "the avatar full screen",
          "the face in three dimensions — the head the forge built from a "
          "photograph, drawn on the stage and on a room's seats, its mouth "

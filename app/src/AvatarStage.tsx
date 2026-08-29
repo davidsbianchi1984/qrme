@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Avatar3D } from "./Avatar3D";
+import { SpeakingPortrait } from "./SpeakingPortrait";
 import { nowPlaying } from "./spoken";
 import { api, getBase, type Avatar } from "./api";
 import { t as tr, visitorLang } from "./l10n";
@@ -55,6 +56,23 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
   const [busy, setBusy] = useState(false);
   const [face, setFace] = useState<Avatar | null>(avatar);
   const [shot, setShot] = useState("face");
+  // Where this face's points sit, fetched once when the profile carries
+  // a measurement. A small JSON beside the picture, not a model.
+  const [speech, setSpeech] = useState<Parameters<
+    typeof SpeakingPortrait>[0]["map"] | null>(null);
+
+  useEffect(() => {
+    const where = face?.speaking;
+    if (!where) { setSpeech(null); return; }
+    let stop = false;
+    fetch(where.startsWith("http") ? where : getBase() + where)
+      .then((r) => r.json())
+      .then((m) => { if (!stop) setSpeech(m); })
+      // A measurement that will not load leaves the still standing,
+      // which is a perfectly good portrait and always was.
+      .catch(() => { if (!stop) setSpeech(null); });
+    return () => { stop = true; };
+  }, [face?.speaking]);
 
   useEffect(() => {
     api.getProfile(profileId).then((p) => {
@@ -105,7 +123,8 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
       for (let at = 0; at < bytes.length; at += 0x8000) {
         binary += String.fromCharCode(...bytes.subarray(at, at + 0x8000));
       }
-      const built = await api.forgeFace(profileId, btoa(binary), shot, token);
+      const built = await api.speakingFace(profileId, btoa(binary),
+                                          shot, token);
       setFace(built.avatar);
       onChanged(built.avatar);
     } catch (e) { onError(e); }
@@ -162,7 +181,15 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
           built, stored and served for a release before any screen drew
           it), so the drawing lives here rather than in a file the
           census merely knew about. */}
-      {face?.model
+      {/* The photograph, moving — preferred over the head whenever this
+          face has been measured, because it goes on looking like the
+          person and a landmark head cannot. The head is still drawn for
+          a face that only has one. */}
+      {speech && src
+        ? <SpeakingPortrait src={src} map={speech}
+                            speaking={nowPlaying()}
+                            className="stage-face" />
+        : face?.model
         ? <Avatar3D src={face.model.startsWith("http")
                           ? face.model : getBase() + face.model}
                     speaking={nowPlaying()}

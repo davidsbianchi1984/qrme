@@ -190,7 +190,7 @@ export function Identity({ onPlans, onPassing }: {
       for (let at = 0; at < bytes.length; at += 0x8000) {
         binary += String.fromCharCode(...bytes.subarray(at, at + 0x8000));
       }
-      await api.forgeFace(me, btoa(binary), shot, token);
+      await api.speakingFace(me, btoa(binary), shot, token);
       setNote(tr("idn.forge.done", lang));
       reloadAvatar();
     } catch (e) { fail(e); } finally { setForging(false); }

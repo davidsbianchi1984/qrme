@@ -8,6 +8,8 @@ show the picture without also having been handed the disclosure.
 
 from __future__ import annotations
 
+import json
+
 import os
 
 from pydantic import BaseModel, Field
@@ -163,6 +165,69 @@ def forge_face(profile_id: str, body: ForgeFace, request: Request) -> dict:
     return {"registry_id": row["id"], "portrait": portrait["url"],
             "model": model["url"],
             "blendshapes": made["blendshapes"],
+            "avatar": avatars.render(profile_id)}
+
+
+@router.post("/profiles/{profile_id}/avatar/speaking", status_code=201)
+def speaking_face(profile_id: str, body: ForgeFace,
+                  request: Request) -> dict:
+    """The profile's own photograph, given a mouth that moves.
+
+    ## Why this is the door and the head is not
+
+    `/avatar/forge` builds a head, and a head from 478 face points has no
+    skull, no hair and no ears. Textured and lit perfectly it is still a
+    mask — the field looked at one and said *"that isn't the photo I
+    uploaded, that's a white moving skeleton frame"*, which is an exact
+    description of a landmark mesh.
+
+        asked     let the avatar speak
+        mattered  let it still be them while it does
+
+    So nothing is rebuilt here. The forge measures the picture and hands
+    back where the face's points sit, how they join up, and how a mouth
+    moves in the picture's own plane. The console lays that over the
+    photograph it already has and drives it with the voice already in the
+    ear: at rest the mesh is a copy of the picture over the picture and
+    cannot be seen, and the only thing that ever moves is a mouth.
+
+    The measurements are stored as a variant on the same registry row the
+    portrait rides, so a speaking face is the same face — one record, one
+    likeness, one provenance — rather than a second identity for the same
+    person.
+    """
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    import base64 as _b64
+    try:
+        photo = _b64.b64decode(body.photo, validate=True)
+    except Exception:
+        raise HTTPException(422, i18n.tr_public(
+            "the photograph is not valid base64", i18n.DEFAULT)) from None
+    try:
+        made = avatarforge.speech_map(photo, shot=body.shot,
+                                      on_behalf_of=profile_id)
+    except avatarforge.ForgeError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
+
+    # The photograph itself becomes the portrait, because it IS the
+    # portrait — the whole point of this road is that nothing is redrawn.
+    portrait = media.save(profile_id, photo, name="portrait.png",
+                          alt="the owner's own photograph")
+    measured = media.save(
+        profile_id, json.dumps(made).encode("utf-8"),
+        name="speaking.txt",
+        alt="where this face's points sit, so its mouth can move")
+    row = avatarreg.mint(
+        asset=portrait["url"], source="uploaded", provider="forge",
+        label=None, owner_account_id=None, likeness="self",
+        basis="the owner's own photograph, measured in this deployment's "
+              "forge so its mouth can move")
+    avatarreg.set_variant(row["id"], "speaking", measured["url"])
+    avatarreg.claim(row["id"], profile_id)
+    return {"registry_id": row["id"], "portrait": portrait["url"],
+            "speaking": measured["url"],
+            "mouth_shapes": sorted(made.get("shapes") or {}),
             "avatar": avatars.render(profile_id)}
 
 

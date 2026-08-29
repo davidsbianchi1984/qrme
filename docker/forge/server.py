@@ -164,3 +164,50 @@ def forge(body: ForgeIn) -> dict:
         "blendshapes": made["blendshapes"],
         "shot": body.shot,
     }
+
+
+@app.post("/speak")
+def speak(body: ForgeIn) -> dict:
+    """The photograph's own measurements, so it can be made to speak.
+
+    Answers ``{points, triangles, shapes, mouth, width, height}`` — where
+    the face's points sit in the picture, how they join up, and how the
+    mouth moves in the picture's own plane. No model, no texture, no copy
+    of the photograph: the console already has the picture, and this is
+    the small amount of arithmetic that lets it move.
+
+    ## Why this door exists beside /forge
+
+    `/forge` builds a head, and a head from 478 face points has no skull,
+    no hair and no ears — it can only ever be a mask, and a mask is not
+    the person. Laid flat over the photograph the same measurements stop
+    being a mask and become the photograph: at rest the mesh is a copy of
+    the picture over the picture, and the only thing that ever moves is a
+    mouth.
+
+        asked     let the avatar speak
+        mattered  let it still be them while it does
+
+    Both doors stay. This one is what a person is shown.
+    """
+    if body.shot not in SHOTS:
+        raise HTTPException(
+            422, "say how the photo is framed — just the face, the upper "
+                 "torso, or the full body")
+    photo = _decode(body.photo)
+
+    try:
+        from facebuild import build_speaking       # the forge's own maker
+    except Exception as exc:                        # pragma: no cover
+        raise HTTPException(
+            503, f"the forge's maker is not loaded: {exc}") from None
+
+    try:
+        return build_speaking(photo, shot=body.shot)
+    except LookupError:
+        raise HTTPException(
+            422, "no face was found in that photograph — a clearer, "
+                 "front-facing picture is what this needs") from None
+    except Exception:
+        raise HTTPException(
+            500, "the forge could not measure that photograph") from None

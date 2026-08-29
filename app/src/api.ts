@@ -1841,6 +1841,12 @@ export type Avatar = {
    *  the seats can draw it and the room's own audio can move its
    *  mouth. Null on every face nobody forged, which is most of them. */
   model?: string | null;
+  /** Where this face's points sit in its own photograph, when it was
+   *  measured so its mouth could move — a small JSON, not a model. The
+   *  console lays that mesh over the picture it already has, so what
+   *  speaks is the photograph rather than a head built to replace it.
+   *  Null on every face nobody measured, which is most of them. */
+  speaking?: string | null;
   /** Always displayed, by the product's own rule. */
   watermark: { mark: string; label: string; line: string; custom: boolean;
                always_displayed: boolean; disclosure: string };
@@ -5015,6 +5021,16 @@ export const api = {
   /** A photograph becomes this profile's face — geometry, skin and a
    *  mouth — built on the deployment's own hardware. `shot` says how
    *  the picture is framed: face, upper (torso) or full (body). */
+  // The photograph, measured so its mouth can move. This is the door a
+  // person is shown; `forgeFace` below builds a head, and a head from
+  // face landmarks has no skull, no hair and no ears — it can only be a
+  // mask. Both stay; only one is put in front of anybody.
+  speakingFace: (profileId: string, photo: string, shot: string,
+                 token: string) =>
+    req<{ registry_id: string; portrait: string; speaking: string;
+          mouth_shapes: string[]; avatar: Avatar }>(
+      `/profiles/${profileId}/avatar/speaking`,
+      { method: "POST", body: { photo, shot }, token }),
   forgeFace: (profileId: string, photo: string, shot: string,
               token: string) =>
     req<{ registry_id: string; portrait: string; model: string;

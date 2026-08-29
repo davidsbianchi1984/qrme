@@ -90,8 +90,17 @@ def _unused() -> list[str]:
 
 
 def _recorded() -> list[str]:
+    """The rows, without the reasons.
+
+    `#` lines are skipped, the way every other ledger beside this one
+    reads. A row here is a claim that a door exists and is deliberately
+    off the screens, and a claim that cannot carry its reason is a list
+    of names nobody can audit — which is the thing this file exists to
+    prevent one layer down.
+    """
     return [line.strip() for line in
-            SNAPSHOT.read_text(encoding="utf-8").splitlines() if line.strip()]
+            SNAPSHOT.read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.lstrip().startswith("#")]
 
 
 def test_the_unused_bindings_match_the_record():

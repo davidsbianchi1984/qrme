@@ -315,6 +315,92 @@ def _glb(positions: np.ndarray, uvs: np.ndarray, faces: np.ndarray,
     return b"".join(model.save_to_bytes())
 
 
+#: The mouth's own points, as one list. The speaking portrait moves these
+#: and nothing else — which is the whole reason it keeps looking like the
+#: person, because everything that is not a mouth is never touched.
+_MOUTH = _UPPER_LIP + _LOWER_LIP
+
+
+def _plane_shapes(points: np.ndarray) -> dict[str, list]:
+    """The mouth's movement, in the picture's own plane.
+
+    ## Why this is not `_morphs`
+
+    `_morphs` moves a head in a scene: y counts upward, z is depth, and
+    the deltas are written for a surface standing in space. Here there is
+    no space. The mesh lies flat on the photograph, at the exact places
+    the landmarker measured, and the photograph is its own texture — so
+    at rest the mesh is invisible, because it is a copy of the picture
+    laid over the picture.
+
+        asked     build a face that can speak
+        mattered  keep it looking like the person while it does
+
+    A head built from 478 face points has no skull, no hair and no ears,
+    so it can only ever be a mask. Laid flat over the photograph it stops
+    being a mask and becomes the photograph — and the only thing that has
+    to be right is the mouth.
+
+    Picture space counts y **downward**, so a jaw that opens is a
+    positive delta here and a negative one over there. Sparse — `(index,
+    dx, dy)` — because two shapes over 478 points is mostly zeros, and a
+    console downloads this.
+    """
+    height = float(points[:, 1].max() - points[:, 1].min()) or 1.0
+    width = float(points[:, 0].max() - points[:, 0].min()) or 1.0
+    shapes: dict[str, list] = {}
+
+    # A jaw opens: the lower lip and the jawline travel down the picture.
+    jaw: list = []
+    for index in _LOWER_LIP:
+        jaw.append([int(index), 0.0, round(height * 0.10, 6)])
+    for index in _JAW:
+        jaw.append([int(index), 0.0, round(height * 0.13, 6)])
+    shapes["jawOpen"] = jaw
+
+    # Lips purse: the ring draws in toward its own centre. No forward
+    # push — there is no forward in a plane, and inventing one would be
+    # the mask coming back.
+    centre = points[np.array(_MOUTH, dtype=int)].mean(axis=0)
+    pucker: list = []
+    for index in _MOUTH:
+        toward = centre - points[index]
+        pucker.append([int(index), round(float(toward[0]) * 0.45, 6),
+                       round(float(toward[1]) * 0.20, 6)])
+    shapes["mouthPucker"] = pucker
+    del width                                  # kept for symmetry of read
+    return shapes
+
+
+def build_speaking(photo: bytes, *, shot: str = "face") -> dict:
+    """The photograph, with a mouth that can move.
+
+    Answers the measurements rather than a model: where the face's points
+    sit in the picture, how they join up, and how the mouth moves. The
+    console lays that mesh over the photograph it already has and drives
+    it with the voice already in the ear — so nothing is rebuilt, nothing
+    is textured, and the person on screen is the person in the photo.
+
+    The photograph itself does not come back. It is already on the
+    profile; sending it again would be a second copy of somebody's face
+    travelling for no reason.
+    """
+    from PIL import Image
+
+    picture = Image.open(io.BytesIO(photo)).convert("RGB")
+    width, height = picture.size
+    points, _ = _landmarks(photo)
+    flat = points[:, :2].astype(np.float32)
+    return {
+        "points": [[round(float(x), 6), round(float(y), 6)] for x, y in flat],
+        "triangles": [[int(a), int(b), int(c)]
+                      for a, b, c in _triangles(flat)],
+        "shapes": _plane_shapes(flat),
+        "mouth": [int(i) for i in _MOUTH],
+        "width": int(width), "height": int(height),
+    }
+
+
 def _as_png(photo: bytes) -> bytes:
     """The photograph as real PNG bytes, whatever arrived.
 

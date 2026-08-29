@@ -185,3 +185,79 @@ def from_photo(photo: bytes, *, shot: str = "face",
         raise ForgeError("the forge answered with an empty face")
     return {"portrait": portrait, "model": model,
             "blendshapes": made.get("blendshapes") or []}
+
+
+def speech_map(photo: bytes, *, shot: str = "face",
+               on_behalf_of: str | None = None) -> dict:
+    """The photograph's own measurements, so the console can make it speak.
+
+    Answers ``{points, triangles, shapes, mouth, width, height}``: where
+    the face's points sit in the picture, how they join up, and how the
+    mouth moves in the picture's own plane.
+
+    ## Why this is the door a person is shown, and `from_photo` is not
+
+    `from_photo` builds a head, and a head from 478 face points has no
+    skull, no hair and no ears. However well it is textured and lit, it
+    is a mask — the field looked at one and said "that isn't the photo I
+    uploaded, that's a white moving skeleton frame", which is exactly
+    right about what a landmark mesh is.
+
+        asked     let the avatar speak
+        mattered  let it still be them while it does
+
+    Laid flat over the photograph the same measurements stop being a mask
+    and become the photograph: the mesh is a copy of the picture, at the
+    places it was measured, over the picture. At rest it cannot be seen.
+    The only thing that ever moves is a mouth, and everything that is not
+    a mouth is never touched — which is why the person on screen goes on
+    being the person in the photo.
+
+    No picture comes back. It is already on the profile, and a second
+    copy of somebody's face travelling for no reason is a cost with no
+    benefit attached.
+    """
+    if shot not in SHOTS:
+        raise ForgeError(
+            "say how the photo is framed — just the face, the upper "
+            "torso, or the full body")
+    if not photo:
+        raise ForgeError("the upload arrived empty")
+    if len(photo) > MAX_PHOTO_BYTES:
+        raise ForgeError(
+            "that photograph is larger than the forge takes — twelve "
+            "megabytes is the ceiling")
+    if not configured():
+        raise ForgeError(
+            "this deployment has no avatar forge configured — the door "
+            "exists, the machinery does not")
+
+    from . import offline
+    offline.allow(forge_url(), "the forge's photograph", on_behalf_of)
+
+    body = json.dumps({
+        "photo": base64.b64encode(photo).decode("ascii"),
+        "shot": shot,
+    }).encode("utf-8")
+    request = urllib.request.Request(
+        f"{forge_url()}/speak", data=body, method="POST",
+        headers={"content-type": "application/json"})
+    try:
+        # Measuring is much cheaper than building — no mesh is written,
+        # no texture encoded — so the ceiling is a fraction of the head's.
+        with urllib.request.urlopen(request, timeout=45) as answer:
+            made = json.loads(answer.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        try:
+            said = json.loads(exc.read().decode("utf-8")).get("detail")
+        except Exception:
+            said = None
+        raise ForgeError(
+            said or "the forge refused that photograph") from None
+    except Exception:
+        raise ForgeError(
+            "the forge could not be reached from here") from None
+
+    if not made.get("points") or not made.get("triangles"):
+        raise ForgeError("the forge answered with nothing to move")
+    return made
