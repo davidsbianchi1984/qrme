@@ -43,6 +43,21 @@ import { useSession } from "../store";
  * already running stops at its next step, because the check lives in the
  * backend's `act`, not in this button.
  */
+/** Which machine is reading this screen. The picker used to open on
+ *  macOS for everybody, so the first Windows reader opened a reach that
+ *  told the deciding half it was working a Mac — the errand was right and
+ *  the menus it reasoned about were somebody else's. A guess the reader
+ *  can correct beats a constant nobody notices. */
+function _thisMachine(): string {
+  const said = (navigator.userAgent || "").toLowerCase();
+  if (said.includes("android")) return "android";
+  if (/iphone|ipad|ipod/.test(said)) return "ios";
+  if (said.includes("win")) return "windows";
+  if (said.includes("mac")) return "macos";
+  if (said.includes("linux")) return "linux";
+  return "macos";
+}
+
 export function Hands() {
   const { session } = useSession();
   const lang = visitorLang();
@@ -63,7 +78,7 @@ export function Hands() {
 
   const [useGrant, setUseGrant] = useState("");
   const [errand, setErrand] = useState("");
-  const [platform, setPlatform] = useState("macos");
+  const [platform, setPlatform] = useState(_thisMachine());
   const [mode, setMode] = useState("acting");
 
   const [reach, setReach] = useState<Reach | null>(null);
@@ -112,6 +127,29 @@ export function Hands() {
   // said "refused" when it meant "always", so they are drawn as what they
   // are: on, and not yours to turn off.
   const always = ["look", "ask", "done"];
+
+  /** The motor's command line, on ONE line. It used to be printed the
+   *  way a shell script reads — four lines ending in backslashes — and
+   *  the first person to run it was on PowerShell, where a trailing
+   *  backslash is an argument rather than a continuation. A line that
+   *  only works on the machine the author happened to use is not a line
+   *  to print on a screen anybody opens. */
+  function motorCommand(reachId: string): string {
+    return `python hands.py --base ${getBase()} --profile ${me}`
+      + ` --token ${token} --reach ${reachId}`;
+  }
+
+  async function copyMotor(reachId: string) {
+    setNote(null);
+    try {
+      await navigator.clipboard.writeText(motorCommand(reachId));
+      setNote(tr("hnd.motor.copied", lang));
+    } catch {
+      // A browser that will not reach the clipboard is not a failure
+      // worth a refusal — the line is on screen and can be selected.
+      setNote(tr("hnd.motor.select", lang));
+    }
+  }
 
   function toggleVerb(v: string) {
     setVerbs((prev) => prev.includes(v)
@@ -446,12 +484,13 @@ export function Hands() {
             <div className="hnd-motor">
               <p className="small">{tr("hnd.motor", lang)}</p>
               <p className="muted small">{tr("hnd.motor.sub", lang)}</p>
-              <textarea readOnly rows={4} className="hnd-cmd"
-                        value={`python hands.py \\\n`
-                          + `  --base ${getBase()} \\\n`
-                          + `  --profile ${me} \\\n`
-                          + `  --token ${token} \\\n`
-                          + `  --reach ${reach.id}`} />
+              <textarea readOnly rows={3} className="hnd-cmd"
+                        value={motorCommand(reach.id)} />
+              <div className="row">
+                <button onClick={() => copyMotor(reach.id)}>
+                  {tr("hnd.motor.copy", lang)}
+                </button>
+              </div>
               <p className="muted small">{tr("hnd.motor.dry", lang)}</p>
             </div>
           )}

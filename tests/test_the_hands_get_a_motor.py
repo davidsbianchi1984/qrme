@@ -284,3 +284,37 @@ def test_the_grab_uses_the_name_mss_is_keeping():
     source = (REPO / "companion" / "hands.py").read_text(encoding="utf-8")
     assert 'getattr(mss, "MSS", None)' in source
     assert "with mss.mss()" not in source
+
+
+def test_the_command_is_one_line_and_copyable():
+    """The motor's command line was printed the way a shell script reads —
+    four lines ending in backslashes. The first person to run it was on
+    PowerShell, where a trailing backslash is an argument rather than a
+    continuation, so the line could not be pasted at all.
+
+    asked     can the reader get this command onto their own terminal
+    mattered  it carries a token; a line you must retype off a screen is
+              a line that gets retyped wrong, or photographed
+    """
+    screen = (REPO / "app" / "src" / "screens" / "Hands.tsx").read_text(
+        encoding="utf-8")
+    built = screen.split("function motorCommand(")[1].split("\n  }")[0]
+    assert "\\\\\\n" not in built and "\\n" not in built
+    for flag in ("--base", "--profile", "--token", "--reach"):
+        assert flag in built
+    # And there is a button, not just a box to select by hand.
+    assert 'tr("hnd.motor.copy"' in screen
+    assert "navigator.clipboard.writeText(motorCommand(" in screen
+
+
+def test_the_platform_starts_at_the_machine_reading_the_screen():
+    """The picker opened on macOS for everybody. A Windows reader opened a
+    reach that told the deciding half it was working a Mac, so the errand
+    was right and the menus it reasoned about were somebody else's."""
+    screen = (REPO / "app" / "src" / "screens" / "Hands.tsx").read_text(
+        encoding="utf-8")
+    assert 'useState(_thisMachine())' in screen
+    guess = screen.split("function _thisMachine(")[1].split("\n}")[0]
+    for named in ("windows", "macos", "linux", "android", "ios"):
+        assert named in guess
+        assert named in hands.PLATFORMS
