@@ -94,6 +94,18 @@ ANTHROPIC_API_KEY=
 # voice and the say route refuses, naming this variable.
 ELEVENLABS_API_KEY=
 
+# --- optional: somewhere else to point the hands ------------------------
+# The hands decide their next move with the model the profile chose on
+# the Settings screen, and a provider may decline to work a screen at
+# all — one returns a plain refusal with no content. That is its call to
+# make, and the answer is to point that one job somewhere else. A key
+# here puts its tile on the Settings screen; empty leaves the tile there
+# and unconfigured. None of these are needed for anything but choice.
+OPENAI_API_KEY=
+GEMINI_API_KEY=
+XAI_API_KEY=
+DEEPSEEK_API_KEY=
+
 # --- optional: the vault's real voice (section 8) ------------------------
 # Empty means PDI's resident answers with its honest stub and QRME's
 # offline provider points at loopback. Section 8 measures the box, picks

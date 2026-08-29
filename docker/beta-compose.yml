@@ -220,6 +220,12 @@ services:
       # answer on a box testers are using, so both are set together.
       QRME_LLM: anthropic
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?set ANTHROPIC_API_KEY in .env}
+      # Optional, and only so the owner has somewhere else to send
+      # the deciding half when a provider declines to work a screen.
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      XAI_API_KEY: ${XAI_API_KEY:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
     volumes:
       - shared:/shared
       - qrme-data:/data

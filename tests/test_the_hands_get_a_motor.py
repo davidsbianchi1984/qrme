@@ -499,3 +499,29 @@ def test_a_model_that_will_not_answer_points_at_the_remedy(client, profile_id,
     step = hands.decide(reach["id"])
     assert step["verb"] == "ask"
     assert "Settings" in step["target"]
+
+
+def test_the_probe_asks_what_the_hands_ask():
+    """Finding out which provider will work a screen used to cost a grant,
+    a reach, a hand-edited command line and a rebuild — per candidate, and
+    the answer is each vendor's policy rather than anything predictable.
+
+    asked     which model will choose a move, before anyone buys a key
+    mattered  a probe that asks an easier question answers a different one
+    """
+    from qrme import will_it_decide
+
+    # It builds the real prompt, not a convenient one.
+    source = (REPO / "qrme" / "will_it_decide.py").read_text(encoding="utf-8")
+    assert "hands._decision_prompt(" in source
+    assert "hands._CHOICE.match" in source
+    # And it ships: `tools/` is not copied into the image, and this has to
+    # run where the keys are.
+    assert (REPO / "qrme" / "will_it_decide.py").exists()
+    assert "COPY qrme/" in (REPO / "Dockerfile").read_text(encoding="utf-8")
+
+    verdict, detail = will_it_decide._one("stub")
+    # The stub is not a deciding model and the probe says so rather than
+    # flattering it.
+    assert verdict in ("UNPARSED", "SILENT", "HEDGED", "ERROR")
+    assert detail
