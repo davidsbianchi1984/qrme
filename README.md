@@ -170,34 +170,53 @@ face here. Frames from the footage, not stills posed for the page.
   </tr>
 </table>
 
-### The room, on a phone and on the desktop
+### One exchange, two turns, four screens
 
-**These two are compositions, not captures.** They are drawn from real
-assets — the portraits this repository ships and frames from the footage
-above — and they show a surface that is built at the module and route
-level and not yet on screen. The distinction is the one
+**These are compositions, not captures.** They are drawn from real assets
+— the portraits this repository ships and frames from the footage above —
+and they show a surface that is built at the module and route level and
+not yet on screen. The distinction is the one
 `tests/superseded_drawings.txt` exists to keep: a drawing standing in for
 a screen is honest until it is quiet about being a drawing.
 
-<img src="docs/scenes/room-phone.png" width="300" align="right" alt="The room on a phone">
+The same consultation, one turn each. The green ring moves with whoever
+the turn belongs to — their seat and their frame, so the eye joins the
+two — and the scene moves with them, because the standing direction
+belongs to the speaker rather than to the room. He asks from a walled
+garden after dark; she answers from a hospital ward at shift change.
+Neither pressed play.
 
-On a phone the seats become a strip across the top and the stage takes
-the full width. A rail of faces down the side would leave the footage too
+**His turn**
+
+<table>
+  <tr>
+    <td align="center" width="62%"><img src="docs/scenes/turn-david-desktop.png" alt="David's turn, desktop"><br><sub>Windows &amp; desktop</sub></td>
+    <td align="center" width="38%"><img src="docs/scenes/turn-david-phone.png" alt="David's turn, phone"><br><sub>Phone</sub></td>
+  </tr>
+</table>
+
+**Her reply**
+
+<table>
+  <tr>
+    <td align="center" width="62%"><img src="docs/scenes/turn-amara-desktop.png" alt="Amara's turn, desktop"><br><sub>Windows &amp; desktop</sub></td>
+    <td align="center" width="38%"><img src="docs/scenes/turn-amara-phone.png" alt="Amara's turn, phone"><br><sub>Phone</sub></td>
+  </tr>
+</table>
+
+On a phone the seats become a strip across the top and the stage takes the
+full width. A rail of faces down the side would leave the footage too
 narrow to read a face in, which defeats the point of rendering one.
 
 Underneath the frame sits the standing direction in the owner's own words,
-and the line that changes it. On roads 1 and 2 that line is not greyed
-out — it is gone, because a control that cannot do anything is worse than
-no control at all.
+and the line that changes it. On roads 1 and 2 that line is not greyed out
+— it is gone, because a control that cannot do anything is worse than no
+control at all.
 
 The AI mark rides every seat and the footage both. On the portraits it is
 burned into the pixels by `tools/mark_portraits.py`, because
 `/portraits/{handle}.webp` is a public URL and a composited badge does not
 travel with a scraped file.
-
-<br clear="all">
-
-<img src="docs/scenes/room-desktop.png" width="620" alt="The room on the desktop">
 
 ### Filling the screen, and leaving it
 
@@ -205,13 +224,24 @@ The frame carries an expand in its bottom-right corner. Not video
 furniture — a still and a 3-D head are both worth filling a screen with,
 so it is on every road.
 
-Full screen, the direction stays legible along the bottom and the mark
-stays in the corner: the two things a viewer needs are what they are
-looking at and that it was made. Leaving is a red X, top right, and it is
-the only red control on the surface because it is the only one that ends
-something rather than changing it.
+Full screen the direction stays legible along the bottom **and so does the
+line that changes it**: this is where somebody is actually looking at the
+scene, so it is the likeliest place they will want to say "not like that",
+and leaving the prompt behind on the small frame would mean shrinking the
+thing in order to fix it. Whatever they ask here is the same standing
+direction the windowed frame reads — there are not two of them to keep in
+step — and `scene_direction_log` records which view it was asked from.
 
-<img src="docs/scenes/room-fullscreen.png" width="620" alt="A rendered scene, full screen">
+Leaving is a red X, top right, and it is the only red control on the
+surface because it is the only one that ends something rather than
+changing it.
+
+<table>
+  <tr>
+    <td align="center" width="50%"><img src="docs/scenes/full-david.png" alt="David's scene, full screen"><br><sub>His scene, full screen</sub></td>
+    <td align="center" width="50%"><img src="docs/scenes/full-amara.png" alt="Amara's scene, full screen"><br><sub>Hers</sub></td>
+  </tr>
+</table>
 
 ## The screens you'll meet
 
