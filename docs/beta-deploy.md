@@ -615,6 +615,18 @@ person pastes contains no change of machine at all.
 checks for two different machines, and which one you want is decided by what
 you are sitting at rather than by what you just deployed to.
 
+**Which of the two you want is decided by the prompt in front of you, not
+by the laptop under your hands.** Both blocks below say "your own machine",
+and that phrasing has now sent the Windows form to a host: a Windows
+machine SSH'd into Ubuntu is sitting at a Unix prompt, `curl.exe` is not a
+program there, and `curl.exe: command not found` reads like a broken
+deploy rather than a wrong room. If the prompt says `root@ubuntu`, you are
+on the host and you want plain `curl` — whatever the machine you are
+typing on happens to be. `exit` first if you meant to check from outside.
+
+    asked     does the page name the Windows form
+    mattered  does it say when you are not in Windows any more
+
 If your own machine runs a Unix shell:
 
 ```bash

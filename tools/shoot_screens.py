@@ -199,6 +199,216 @@ def open_tab(page, tab: str) -> bool:
 
 
 
+#: Where a recipe starts when there is no session yet — the screens a
+#: person meets before the console has anybody in it.
+SIGNED_OUT = "signed-out"
+
+#: Screens that are a page, but not one a nav tile opens.
+#:
+#: A recipe is: the number, the file stem, where to start, what a person
+#: presses to get there, and a selector that proves it arrived. `proof`
+#: exists on the screen being asked for and nowhere on the way to it, so a
+#: recipe that lands somewhere else writes nothing and says so — a wrong
+#: screen filed under a right number is worse than a gap.
+INSIDE: tuple[tuple[str, str, str, tuple[str, ...], str], ...] = (
+    ("39", "sign-in", SIGNED_OUT, (), ".tabs .tab.active"),
+    ("41", "log-in", SIGNED_OUT, (".tabs .tab:nth-child(2)",),
+     ".tabs .tab:nth-child(2).active"),
+)
+
+
+def open_inside(page, session, start, presses, proof) -> bool:
+    """Reach a screen that is not a tab, and refuse to lie about it."""
+    if start == SIGNED_OUT:
+        page.goto(BASE + "/", wait_until="networkidle")
+        page.evaluate("() => localStorage.clear()")
+        page.goto(BASE + "/", wait_until="networkidle")
+    else:
+        page.evaluate("s => localStorage.setItem('qrme.session', s)",
+                      json.dumps(session))
+        if not open_tab(page, start):
+            print(f"  ? could not open the {start} tab")
+            return False
+        # A signed-out recipe earlier in this run cleared `localStorage`,
+        # so the notice may be asking again and the widgets may have
+        # forgotten they were tucked away.
+        answer_the_notice(page)
+        tuck_the_widgets(page)
+    page.wait_for_timeout(900)
+    for press in presses:
+        target = page.query_selector(press)
+        if target is None:
+            print(f"  ? nothing matched {press}")
+            return False
+        target.evaluate("el => el.click()")
+        page.wait_for_timeout(900)
+    return page.query_selector(proof) is not None
+
+
+def answer_the_notice(page) -> None:
+    """Answer the problem-reporting consent card, if it is asking.
+
+    It opens over everything on a browser that has never answered it, and
+    it is answered once at the start of a run — but a recipe that clears
+    `localStorage` to reach a signed-out screen puts it right back, and
+    every capture after that one carries it. Idempotent: on a browser that
+    has already answered, nothing matches and this does nothing.
+    """
+    for label in ("That's fine", "No thanks", "Yes, send them"):
+        button = page.query_selector(f"text={label}")
+        if button:
+            button.click()
+            page.wait_for_timeout(400)
+            return
+
+
+def tuck_the_widgets(page) -> None:
+    """Minimise the floating widgets, the way a person does.
+
+    The second half of the same repair: the minimise is remembered per
+    browser and `localStorage.clear()` forgets it. Pressed, not hidden —
+    the widget carries its own control, so what is photographed stays a
+    state the product can actually be in.
+    """
+    for control in (".wl-min", ".vl-min", ".uw-min"):
+        minimise = page.query_selector(control)
+        if minimise:
+            minimise.evaluate("el => el.click()")
+            page.wait_for_timeout(200)
+
+
+#: Screens that are a card on a screen, not a screen of their own.
+#:
+#: The census lets one component own several numbers, because a component
+#: draws more than one thing a person meets. The tab captures the whole
+#: page; these are the parts of it the gallery numbers separately, and
+#: until now every one was a drawing for the same reason: the camera could
+#: photograph a page and nothing smaller.
+#:
+#:     asked     can the camera reach every page
+#:     mattered  can it reach everything the gallery numbers
+#:
+#: The element is found by `data-screen="<number>"` on the element that
+#: owns it — the same shape as the `data-tab` the nav carries, and for the
+#: same reason: a marker in the markup is a thing the camera and the
+#: reader can both check, where a selector guessed from outside silently
+#: starts matching the wrong card.
+ELEMENTS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
+    ("150", "what-went-wrong", "settings", ()),
+    ("22", "providers", "settings", ()),
+    ("44", "avatar-studio", "identity", ()),
+    ("198", "beside-the-face", "chat", ()),
+    ("199", "what-it-is-doing", "chat", ()),
+)
+
+
+#: What the shell floats over every screen, hidden while a card sits for
+#: its portrait. An element screenshot is a crop of the rendered page, not
+#: a render of the element alone, so anything painted over that rectangle
+#: lands in the picture — and all of this is `position: fixed`. Hiding it
+#: here hides nothing from the gallery: each is photographed on every page
+#: capture, which is where a reader meets them.
+FURNITURE = (".help-fab", ".help-panel", ".watch-lights", ".wl-dot",
+             ".underway", ".uw-dot", ".vault-light", ".vl-dot",
+             ".footsteps")
+
+
+def hide_furniture(page) -> None:
+    page.evaluate(
+        """(sel) => {
+          const style = document.createElement('style');
+          style.id = 'qrme-camera-hide';
+          style.textContent = sel.join(',') + '{visibility:hidden!important}';
+          document.head.appendChild(style);
+        }""", list(FURNITURE))
+
+
+def show_furniture(page) -> None:
+    page.evaluate(
+        """() => {
+          const style = document.getElementById('qrme-camera-hide');
+          if (style) style.remove();
+        }""")
+
+
+def shoot_element(page, session, number, start, presses) -> bool:
+    """Photograph one card, and refuse to photograph the wrong one."""
+    page.evaluate("s => localStorage.setItem('qrme.session', s)",
+                  json.dumps(session))
+    if not open_tab(page, start):
+        print(f"  ? could not open the {start} tab")
+        return False
+    answer_the_notice(page)
+    tuck_the_widgets(page)
+    for press in presses:
+        target = page.query_selector(press)
+        if target is None:
+            print(f"  ? nothing matched {press}")
+            return False
+        target.evaluate("el => el.click()")
+        page.wait_for_timeout(700)
+    page.wait_for_timeout(600)
+    return page.query_selector(f'[data-screen="{number}"]') is not None
+
+
+#: Things that are painted past the right edge on purpose.
+#:
+#: `past_the_edge` exists to catch content clipped away by accident, and
+#: two shipped designs park themselves off-edge deliberately. Reported
+#: every run against every screen, they would bury the one row that
+#: mattered — which is how a check with a false positive per capture stops
+#: being read at all.
+#:
+#:     asked     is anything drawn past the edge
+#:     mattered  is anything drawn past it that did not mean to be
+#:
+#: Each row names the reason, so a rule that stops being deliberate stops
+#: being exempt. The element and everything inside it is skipped.
+EDGE_EXEMPT = (
+    (".agent-rail",
+     "`flex-wrap: nowrap; overflow-x: auto` with `scroll-snap` on the "
+     "chips: a rail of starters meant to be swiped, where the chips past "
+     "the edge are the ones a thumb scrolls to."),
+    (".loudness-rail",
+     "asleep it is `translateX(72%)` — a faint sliver tucked into the "
+     "edge, on the owner's instruction ('let's hide the volume button'), "
+     "and it slides back on pointer enter. The vertical range input rides "
+     "with it."),
+)
+
+def past_the_edge(page) -> list[str]:
+    """Everything this viewport draws to the right of its own right edge.
+
+    A page overflows horizontally in two unrelated ways and only one is
+    visible to `document.scrollWidth`. When an element with its own
+    `overflow` holds the too-wide content, the scroll container absorbs
+    it: the document stays exactly as wide as the window, the number says
+    the page fits, and the right-hand end of whatever is inside is clipped
+    away.
+
+        asked     is the document wider than the window
+        mattered  is anything drawn past the window's edge
+    """
+    return page.evaluate("""(skip) => {
+      const edge = document.documentElement.clientWidth;
+      const over = [];
+      for (const el of document.querySelectorAll('body *')) {
+        const style = getComputedStyle(el);
+        if (style.visibility === 'hidden' || style.display === 'none') continue;
+        const box = el.getBoundingClientRect();
+        if (box.width === 0 || box.height === 0) continue;
+        if (box.right <= edge + 1) continue;
+        if (skip.some((sel) => el.closest(sel))) continue;
+        const name = el.tagName.toLowerCase()
+          + (el.id ? '#' + el.id : '')
+          + (el.className && typeof el.className === 'string'
+             ? '.' + el.className.trim().split(/\\s+/).join('.') : '');
+        over.push(name + ' +' + Math.round(box.right - edge) + 'px');
+      }
+      return over.slice(0, 6);
+    }""", [s for s, _why in EDGE_EXEMPT])
+
+
 def census() -> dict[str, int]:
     """Which screen number each console surface is, per `tests/ui_screens.txt`.
 
@@ -354,6 +564,37 @@ def main(shots: list[tuple[str, str, str]]) -> None:
                 target = OUT / f"{number}-{stem}.png"
                 page.screenshot(path=str(target), full_page=True)
                 print(f"  {target.name}")
+                for offender in past_the_edge(page):
+                    print(f"      past the right edge: {offender}")
+
+            # The pages that are not tabs. Same refusal.
+            for number, stem, start, presses, proof in INSIDE:
+                if not open_inside(page, session, start, presses, proof):
+                    print(f"  ! {number}-{stem}: never reached — "
+                          "nothing written")
+                    continue
+                page.evaluate("window.scrollTo(0, 0)")
+                page.wait_for_timeout(250)
+                target = OUT / f"{number}-{stem}.png"
+                page.screenshot(path=str(target), full_page=True)
+                print(f"  {target.name}")
+
+            # The cards. Same refusal as the pages: a recipe whose element
+            # is not on the page writes nothing and says so.
+            for number, stem, start, presses in ELEMENTS:
+                if not shoot_element(page, session, number, start, presses):
+                    print(f"  ! {number}-{stem}: never reached — "
+                          "nothing written")
+                    continue
+                el = page.query_selector(f'[data-screen="{number}"]')
+                el.scroll_into_view_if_needed()
+                page.wait_for_timeout(250)
+                target = OUT / f"{number}-{stem}.png"
+                hide_furniture(page)
+                el.screenshot(path=str(target))
+                show_furniture(page)
+                print(f"  {target.name}")
+
             browser.close()
     finally:
         proc.terminate()
@@ -371,5 +612,14 @@ if __name__ == "__main__":
         "contest", "exchanges", "grants", "party", "voice", "workshop",
         "assist", "referrals", "lobby", "audience", "beacons", "reaching",
         "leaving", "selling", "inside", "raise", "capabilities",
+        # Sixteen tabs the nav has opened for releases and this list had
+        # never named. Not a decision — an omission: the list was typed
+        # once and every tab added since went in the nav and not here, so
+        # each of those screens stayed a drawing while the console it was
+        # drawn from shipped. `numbered()` skips loudly rather than
+        # guessing, so the ones without a census row say so by name.
+        "signing", "visiting", "allowed", "stranger", "themark", "inwords",
+        "remainder", "plugins", "named", "robots", "hands", "placements",
+        "plans", "access", "matters", "settings",
     ]
     main(numbered(TABS))

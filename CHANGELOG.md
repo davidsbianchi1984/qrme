@@ -6,6 +6,51 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Sixteen nav tabs the camera had never been pointed at.** `Signing`,
+  `Visiting`, `Permissions`, `Guest Access`, `Watermark`, `Language & Name`,
+  `More Tools`, `Plug-ins`, `Lookup`, `Robots & Devices`, `Hands`,
+  `Ad Placements`, `Plans & Billing`, `Accessibility`, `Support` and
+  `Settings` are all reachable from the nav and have been for releases.
+  None was in `tools/shoot_screens.py`'s tab list.
+
+  That is not a decision, it is an omission with a shape: the list was
+  typed once, and every tab added since went into the nav and not into it.
+  Fifteen gallery drawings were standing in for screens the console had
+  been shipping all along.
+
+      asked     can the camera reach every tab
+      mattered  is every tab on the list it reads
+
+- **The camera can photograph a card, and a page no tile opens.** Carried
+  from the sibling: a state is found by `data-screen="<number>"` on the
+  element that owns it, a page that no tab opens by a recipe naming the
+  press that gets there. Six more are photographs — the provider tiles
+  (22), the avatar studio (44), what went wrong (150), the rail beside the
+  face (198), and the two front doors (39, 41).
+
+### Fixed
+
+- **The Home screen's tiles drew 41px past the right edge of a phone.**
+  `.tiles` was `repeat(4, 1fr)`, and `1fr` is `minmax(auto, 1fr)`: the
+  `auto` floor is the track's own content, so a track never shrinks below
+  the widest thing in it and four of them plus the gaps came to more than
+  a 430px screen. The same defect that drew the sibling's sign-in card
+  wider than the phone it was on, found the same way — by measuring what
+  was painted rather than reading what was declared.
+
+  `minmax(0, 1fr)` lets the columns share the width, and below 560px there
+  are two of them: four numbers across a phone is four too many.
+
+- **The right-edge check stopped crying wolf.** It reported 114 rows a run
+  — two per capture — and both were designs that park themselves off-edge
+  on purpose: the loudness rail tucks into the edge asleep and slides back
+  on hover, and the agent rail is a swipeable strip of starters. A check
+  with a false positive per capture is a check nobody reads, so both are
+  exempt by name with the reason written beside them. The remaining ten
+  rows were the tiles, and after the fix there are none.
+
 ## [2.8.0] - 2026-08-30
 
 ### Fixed

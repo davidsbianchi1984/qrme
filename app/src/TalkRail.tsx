@@ -58,7 +58,7 @@ export function TalkRail({
 
   return (
     <>
-      <div className="talk-rail" role="group"
+      <div className="talk-rail" data-screen="198" role="group"
            aria-label={tr("rail.group", lang)}>
         {panels.map((p) => (
           <button key={p}

@@ -132,7 +132,7 @@ and the complete tour of all 207 is in [docs/gallery.md](docs/gallery.md).
   <tr>
     <td align="center" width="25%"><a href="docs/screens/01-welcome.svg"><img src="docs/screens/01-welcome.svg" width="165" alt="Welcome"></a><br><sub><b>01</b> · Welcome<br>the first door, no account needed to look</sub></td>
     <td align="center" width="25%"><a href="docs/screens/02-create-profile.svg"><img src="docs/screens/02-create-profile.svg" width="165" alt="Create a profile"></a><br><sub><b>02</b> · Create a profile<br>a synthetic person, made from your answers</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/39-sign-in.svg"><img src="docs/screens/39-sign-in.svg" width="165" alt="Sign in"></a><br><sub><b>39</b> · Sign in<br>your account, your held profiles</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/39-sign-in.png"><img src="docs/screens/39-sign-in.png" width="165" alt="Sign in"></a><br><sub><b>39</b> · Sign in<br>your account, your held profiles</sub></td>
     <td align="center" width="25%"><a href="docs/screens/05-home.png"><img src="docs/screens/05-home.png" width="165" alt="Profile home"></a><br><sub><b>05</b> · Profile home<br>memory, engagement and moderation at a glance</sub></td>
   </tr>
 </table>
@@ -142,7 +142,7 @@ and the complete tour of all 207 is in [docs/gallery.md](docs/gallery.md).
 <table>
   <tr>
     <td align="center" width="25%"><a href="docs/screens/83-chat.svg"><img src="docs/screens/83-chat.svg" width="165" alt="Chat"></a><br><sub><b>83</b> · Chat<br>type or talk; it hears, answers and remembers</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/198-beside-the-face.svg"><img src="docs/screens/198-beside-the-face.svg" width="165" alt="The talk face"></a><br><sub><b>198</b> · The talk face<br>hands-free voice, with the four panels beside it</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/198-beside-the-face.png"><img src="docs/screens/198-beside-the-face.png" width="165" alt="The talk face"></a><br><sub><b>198</b> · The talk face<br>hands-free voice, with the four panels beside it</sub></td>
     <td align="center" width="25%"><a href="docs/screens/175-inside.png"><img src="docs/screens/175-inside.png" width="165" alt="Inside a room"></a><br><sub><b>175</b> · Inside a room<br>you and up to eight, files and links read aloud</sub></td>
     <td align="center" width="25%"><a href="docs/screens/200-agent.png"><img src="docs/screens/200-agent.png" width="165" alt="Agent"></a><br><sub><b>200</b> · Agent<br>builds your page and widgets on your word</sub></td>
   </tr>
@@ -176,7 +176,7 @@ and the complete tour of all 207 is in [docs/gallery.md](docs/gallery.md).
   <tr>
     <td align="center" width="25%"><a href="docs/screens/07-memory.png"><img src="docs/screens/07-memory.png" width="165" alt="Memory vault"></a><br><sub><b>07</b> · Memory vault<br>what it holds about you, erasable by conversation</sub></td>
     <td align="center" width="25%"><a href="docs/screens/147-voice.png"><img src="docs/screens/147-voice.png" width="165" alt="Your own voice"></a><br><sub><b>147</b> · Your own voice<br>cloned by consent, watermarked every utterance</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/44-avatar-studio.svg"><img src="docs/screens/44-avatar-studio.svg" width="165" alt="Avatar studio"></a><br><sub><b>44</b> · Avatar studio<br>the face, aged and dressed as you choose</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/44-avatar-studio.png"><img src="docs/screens/44-avatar-studio.png" width="165" alt="Avatar studio"></a><br><sub><b>44</b> · Avatar studio<br>the face, aged and dressed as you choose</sub></td>
     <td align="center" width="25%"><a href="docs/screens/85-my-page.svg"><img src="docs/screens/85-my-page.svg" width="165" alt="My page"></a><br><sub><b>85</b> · My page<br>your public corner, in real HTML</sub></td>
   </tr>
 </table>
@@ -186,7 +186,7 @@ and the complete tour of all 207 is in [docs/gallery.md](docs/gallery.md).
 <table>
   <tr>
     <td align="center" width="25%"><a href="docs/screens/152-market.png"><img src="docs/screens/152-market.png" width="165" alt="Marketplace"></a><br><sub><b>152</b> · Marketplace<br>profiles listed, licensed and hired</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/130-choose-a-plan.svg"><img src="docs/screens/130-choose-a-plan.svg" width="165" alt="Choose a plan"></a><br><sub><b>130</b> · Choose a plan<br>what each tier adds, priced plainly</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/130-plans.png"><img src="docs/screens/130-plans.png" width="165" alt="Choose a plan"></a><br><sub><b>130</b> · Choose a plan<br>what each tier adds, priced plainly</sub></td>
     <td align="center" width="25%"><a href="docs/screens/168-audience.png"><img src="docs/screens/168-audience.png" width="165" alt="Audience"></a><br><sub><b>168</b> · Audience<br>who follows a profile, and what they pay</sub></td>
     <td align="center" width="25%"><a href="docs/screens/145-campaigns.png"><img src="docs/screens/145-campaigns.png" width="165" alt="Where the money goes"></a><br><sub><b>145</b> · Where the money goes<br>every split, on the record</sub></td>
   </tr>
@@ -209,8 +209,8 @@ and the complete tour of all 207 is in [docs/gallery.md](docs/gallery.md).
   <tr>
     <td align="center" width="25%"><a href="docs/screens/148-who-wrote-this.svg"><img src="docs/screens/148-who-wrote-this.svg" width="165" alt="Who wrote this"></a><br><sub><b>148</b> · Who wrote this<br>the watermark answers, even reworded</sub></td>
     <td align="center" width="25%"><a href="docs/screens/32-moderation.svg"><img src="docs/screens/32-moderation.svg" width="165" alt="Moderation"></a><br><sub><b>32</b> · Moderation<br>review before a doubtful turn ships</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/202-what-it-may-do.svg"><img src="docs/screens/202-what-it-may-do.svg" width="165" alt="What it may do"></a><br><sub><b>202</b> · What it may do<br>every power off until somebody says yes</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/203-get-help.svg"><img src="docs/screens/203-get-help.svg" width="165" alt="Get help"></a><br><sub><b>203</b> · Get help<br>a person settles it, signed in or not</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/202-allowed.png"><img src="docs/screens/202-allowed.png" width="165" alt="What it may do"></a><br><sub><b>202</b> · What it may do<br>every power off until somebody says yes</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/203-matters.png"><img src="docs/screens/203-matters.png" width="165" alt="Get help"></a><br><sub><b>203</b> · Get help<br>a person settles it, signed in or not</sub></td>
   </tr>
 </table>
 

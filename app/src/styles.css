@@ -133,7 +133,25 @@ button.linkish { background: none; border: 0; color: var(--brand); font-weight: 
 /* The profile's actual portrait, same footprint as the orb it replaces. */
 .hero-face { width: 76px; height: 76px; border-radius: 50%; object-fit: cover;
   border: 1px solid var(--line); flex-shrink: 0; }
-.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+/* `minmax(0, 1fr)`, not `1fr`, and two columns on a phone.
+
+   `1fr` is `minmax(auto, 1fr)`: the `auto` floor is the track's own
+   content, so a track never shrinks below the widest thing in it and four
+   of them plus the gaps came to more than a 430px screen. The Home
+   screen's tiles drew 41px past the right edge — the same defect that
+   drew the sign-in card wider than the phone it was on, in the same
+   product family, found the same way.
+
+       asked     are the columns allowed to share the width
+       mattered  are they allowed to be narrower than their contents
+
+   Four numbers across a phone is also just four numbers too many; two
+   rows of two is the same information, readable. */
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+         gap: 12px; }
+@media (max-width: 560px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 .tile, .card, .persona-card {
   background: linear-gradient(160deg, var(--card), var(--card2));
   border: 1px solid var(--line); border-radius: 14px; padding: 16px;

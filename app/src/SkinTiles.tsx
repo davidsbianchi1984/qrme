@@ -105,7 +105,7 @@ export function SkinTiles(props: {
   busy?: boolean;
 }) {
   return (
-    <div className="provider-tiles">
+    <div className="provider-tiles" data-screen="44">
       {props.sources.map((s) => {
         const mark = MARKS[s.key] || MARKS.other;
         const active = props.chosen === s.key;
