@@ -380,9 +380,33 @@ def catalog() -> list[dict]:
 #: the honest verb is *import*, and the provider's own license keeps
 #: governing what the person may do with their avatar.
 MARKET: tuple[dict, ...] = (
-    # First on purpose — the owner runs his voices and avatars on this
-    # platform's surface and asked for it to lead the list. The pattern is
-    # the market's own: made there, exported as an image, referenced here.
+    # First on purpose, and the only row on this shelf that hands over a
+    # model rather than a picture. It is where the starter faces are being
+    # built, and the shelf's first row is what the picker opens on — which
+    # is the whole of what "default provider" can honestly mean here.
+    #
+    # It is NOT `avatarforge.PROVIDERS`, and the distinction is the point.
+    # That tuple names roads this deployment can *make* a face on, and the
+    # only one that exists is our own sidecar: Avatar SDK's generation API
+    # is their Enterprise tier, so there is no key an operator could set
+    # that would make `QRME_AVATAR_PROVIDER=avatarsdk` do anything but turn
+    # face-making off. A shelf row costs nobody a subscription and is true
+    # today; a provider slot naming a road we cannot drive would be a
+    # button that fails.
+    #
+    # The export is FBX on the credit tier and the console loads `.glb`,
+    # so the conversion is named in the instructions rather than left for
+    # somebody to discover at the import box.
+    {"key": "metaperson", "name": "MetaPerson (Avatar SDK)",
+     "how": "At metaperson.avatarsdk.com, build your avatar from a "
+            "photograph and export it. A .glb can be pasted or uploaded "
+            "here as it is; an FBX export needs converting to .glb first "
+            "(Blender: File \u2192 Import \u2192 FBX, then File \u2192 "
+            "Export \u2192 glTF 2.0, leaving Shape Keys checked so the "
+            "mouth survives)."},
+    # The owner runs his voices and avatars on this platform's surface and
+    # asked for it to lead the list. The pattern is the market's own: made
+    # there, exported as an image, referenced here.
     {"key": "elevenlabs", "name": "ElevenLabs",
      "how": "In ElevenLabs, open My Avatars, save your avatar's portrait "
             "image, then upload or paste it here."},
@@ -442,6 +466,11 @@ MARKET: tuple[dict, ...] = (
 )
 
 IMPORT_SOURCES = {m["key"] for m in MARKET} | {"photos", "capture"}
+
+#: Which row the picker opens on. Stated here rather than left implicit in
+#: the tuple's order, so that reordering `MARKET` without meaning to change
+#: the default is caught by the guard next door instead of shipping.
+DEFAULT_MARKET_SOURCE = "metaperson"
 
 
 def import_avatar(profile_id: str, *, source: str, asset: str,

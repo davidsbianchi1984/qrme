@@ -235,12 +235,20 @@ def test_a_face_carries_its_name(client, monkeypatch):
 
 def test_the_market_names_many_companies_and_the_default_leads():
     """The same format the model keys took: many options, and the
-    deployment's own — ElevenLabs — first on the owner's word."""
+    deployment's chosen one first.
+
+    Which one that is has changed once already and will change again, so
+    the check is against the *stated* default rather than a name written
+    twice. Reordering the shelf without moving the default is the bug
+    this catches; picking a different default is a one-line edit.
+    """
     from qrme import avatars
     keys = [m["key"] for m in avatars.MARKET]
-    assert keys[0] == "elevenlabs", "the owner's provider no longer leads"
-    for expected in ("roblox", "vroid_hub", "dicebear",
-                     "gravatar", "heygen", "avaturn"):
+    assert keys[0] == avatars.DEFAULT_MARKET_SOURCE, (
+        f"the shelf opens on {keys[0]} but the stated default is "
+        f"{avatars.DEFAULT_MARKET_SOURCE}")
+    for expected in ("roblox", "vroid_hub", "dicebear", "gravatar",
+                     "heygen", "avaturn", "elevenlabs", "metaperson"):
         assert expected in keys, f"{expected} fell off the market"
     for m in avatars.MARKET:
         assert m["key"] and m["name"] and m["how"], (
