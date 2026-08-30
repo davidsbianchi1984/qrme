@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { Liveliness, Motion } from "./avatarMotion";
 
 /**
  * The face, in three dimensions, with a mouth that moves when it speaks.
@@ -34,10 +35,13 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
  * this does not pretend otherwise.
  */
 
-export function Avatar3D({ src, speaking, className }: {
+export function Avatar3D({ src, speaking, motion, className }: {
   src: string;
   /** The audio in the air right now, if any. Its loudness moves the jaw. */
   speaking?: HTMLAudioElement | null;
+  /** How this face carries itself, as `avatars.motion_of` derived it from
+   *  the profile's own history. Absent means breathe at the default pace. */
+  motion?: Motion | null;
   className?: string;
 }) {
   const holder = useRef<HTMLDivElement | null>(null);
@@ -52,6 +56,10 @@ export function Avatar3D({ src, speaking, className }: {
     if (!mount) return;
     let stop = false;
     let frame = 0;
+    // Asked of the machine, not of the profile. Somebody who told their
+    // system to stop animating things did not mean "except faces".
+    const calm = window.matchMedia
+      && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
@@ -82,15 +90,25 @@ export function Avatar3D({ src, speaking, className }: {
     key.position.set(0, 1, 2);
     scene.add(key);
 
-    let head: THREE.Mesh | null = null;
-    let targets: Record<string, number> = {};
+    // Every mesh that carries shapes, not the first one found.
+    //
+    // This bound to the first mesh with morph targets, and on a vendor
+    // model that is the eyelashes — which carry the eye shapes and no
+    // `jawOpen` at all, so the mouth was being driven on a mesh that has
+    // no mouth. The head and the lower teeth both carry `jawOpen` and are
+    // both supposed to move on it; that is what the teeth mesh's own
+    // nineteen shapes are for.
+    //
+    //     asked     which mesh is the face
+    //     mattered  which meshes carry the shape being driven
+    const shaped: { mesh: THREE.Mesh; at: Record<string, number> }[] = [];
+    let live: Liveliness | null = null;
 
     new GLTFLoader().load(src, (loaded) => {
       if (stop) return;
       loaded.scene.traverse((thing) => {
         const mesh = thing as THREE.Mesh;
-        if (!head && mesh.isMesh && mesh.morphTargetInfluences) {
-          head = mesh;
+        if (mesh.isMesh && mesh.morphTargetInfluences) {
           // The photograph, shown as photographed.
           //
           // glTF's own material is a lit one, and lighting a face that
@@ -115,9 +133,12 @@ export function Avatar3D({ src, speaking, className }: {
                     (mesh.userData.targetNames as string[])
                       .map((n, i) => [n, i]))
                 : {})) as Record<string, number>;
-          targets = named;
+          shaped.push({ mesh, at: named });
         }
       });
+      // The skeleton, if this model brought one. A head with no rig still
+      // speaks and blinks; it simply does not breathe.
+      live = new Liveliness(loaded.scene, motion, calm);
       // Framed on the head: the model is built around its own centre, so
       // the camera only has to look at the middle of what arrived.
       const box = new THREE.Box3().setFromObject(loaded.scene);
@@ -158,25 +179,36 @@ export function Avatar3D({ src, speaking, className }: {
       return Math.min(1, (sum / bins.length) / 24);
     }
 
+    // One named shape, set on every mesh that has it. See `shaped`.
+    const set = (name: string, value: number) => {
+      for (const { mesh, at } of shaped) {
+        const index = at[name];
+        if (index !== undefined && mesh.morphTargetInfluences) {
+          mesh.morphTargetInfluences[index] = value;
+        }
+      }
+    };
+
     let openness = 0;
+    let last = performance.now();
+    const began = last;
     function draw() {
       if (stop) return;
       frame = requestAnimationFrame(draw);
+      const now = performance.now();
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
       const want = loudness();
       // Eased rather than snapped: a jaw that tracks every sample reads
       // as a rattle, and a mouth is a hinge with mass on it.
       openness += (want - openness) * (want > openness ? 0.5 : 0.2);
-      const mesh = head as THREE.Mesh | null;
-      if (mesh?.morphTargetInfluences) {
-        const set = (name: string, value: number) => {
-          const at = targets[name];
-          if (at !== undefined) mesh.morphTargetInfluences![at] = value;
-        };
-        set("jawOpen", openness);
-        // A little rounding rides with the opening so the shape reads as
-        // speech rather than a yawn.
-        set("mouthPucker", openness * 0.25);
-      }
+      set("jawOpen", openness);
+      // A little rounding rides with the opening so the shape reads as
+      // speech rather than a yawn.
+      set("mouthPucker", openness * 0.25);
+      // Breath, weight, a glance and a blink. Driven after the mouth so a
+      // blink is never overwritten by the frame's mouth shapes.
+      live?.update((now - began) / 1000, dt, openness, set);
       renderer.render(scene, camera);
     }
     draw();
@@ -200,7 +232,7 @@ export function Avatar3D({ src, speaking, className }: {
       renderer.forceContextLoss();
       mount.removeChild(renderer.domElement);
     };
-  }, [src, speaking]);
+  }, [src, speaking, motion]);
 
   return <div ref={holder} className={className || "avatar3d"} />;
 }

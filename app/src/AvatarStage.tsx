@@ -194,6 +194,7 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
         ? <Avatar3D src={face.model.startsWith("http")
                           ? face.model : getBase() + face.model}
                     speaking={nowPlaying()}
+                    motion={face.motion}
                     className="stage-face" />
         : src
         ? <img className={"stage-face" + (face?.torso ? " standing" : "")}
