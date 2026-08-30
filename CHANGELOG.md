@@ -6,6 +6,61 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **All four rail buttons opened half a window, and the rule meant to fix
+  that had never once run.** The field report was exact: on a handheld held
+  sideways every panel the talk rail opens came up capped at a little over
+  half the screen. Measured on the viewport from the report — 932×430 — the
+  panel drew 258px of 430, which is 60vh to the pixel.
+
+  `.talk-panel` had its `max-height: 60vh` written twice, nine hundred lines
+  apart, with the `@media (max-height: 600px)` override that sets
+  `max-height: none` sitting between them. A media query adds no
+  specificity: all three rules are `(0, 1, 0)`, so the later plain rule won
+  on source order and the short-screen override never applied.
+
+      asked     is there a rule that gives the panel the room
+      mattered  is it the rule the browser uses
+
+  The duplicate is folded into the base rule, which now sits above the media
+  block. Same viewport, after: 406px of 430 docked, 390px in the overlay.
+
+  The override also needed splitting. `max-height: none` is right for the
+  overlay's panel, which is a flex child that can be told to take the room;
+  the docked panel is `position: fixed` and centred, where `none` means "as
+  tall as the content" and runs off both ends of the screen at once. That
+  one gets the viewport as its bound.
+
+- **Seven more declarations that had never run, found by the guard written
+  for the first one.** `.waveform` on a short screen, and `.rs-strip` and
+  `.rs-round` in the room strip: the same defect, in two media blocks that
+  were each declared next to the thing they were about rather than after
+  it. Both blocks moved below the base rules they override.
+
+### Added
+
+- **`test_a_media_query_adds_no_specificity.py`, carried by all three
+  products.** This defect has now shipped four times in this estate —
+  `.help-fab` in JIM-mini, `.vault-light` in PDI, `.talk-panel` and
+  `.waveform` here — and no test said a word about any of them. Each time
+  somebody wrote the override, read it back, and had every reason to
+  believe it worked.
+
+  The check compares only *textually identical* selectors, so a hit is never
+  a specificity judgement call: identical selector text is identical
+  specificity by construction, and the loser is always losing on source
+  order alone. `.dock .thing` beating `.thing` is the cascade working and is
+  not reported — a checker that guessed at specificity across differing
+  selectors would be switched off inside a week.
+
+  Three of its four tests are about the checker rather than the sheet: one
+  proves it fails on a sample that has the defect, one proves the same
+  sample passes once reordered, and one proves a more specific later
+  selector is left alone. Two of this estate's proof tests once passed
+  vacuously, so a checker whose only evidence is a green run is not
+  evidence.
+
 ### Added
 
 - **The capability register: nine faculties, on one page, each beside the

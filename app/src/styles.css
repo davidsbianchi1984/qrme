@@ -1184,21 +1184,31 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .talk-rail-label { font-size: 10px; font-weight: 600; max-width: 60px;
                    text-align: center; overflow: hidden;
                    text-overflow: ellipsis; white-space: nowrap; }
+/* Everything the bare `.talk-panel` gets, in one place and before the
+   `@media (max-height: 600px)` block below.
+   
+   These four lines used to live two rules apart: `max-height: 60vh` here,
+   and a second `.talk-panel { max-height: 60vh; max-width: 420px; ... }`
+   nine hundred lines further down. Same selector, same specificity, and a
+   media query adds none — so the *later* base rule won, and the short-screen
+   override between them never once applied. On a handheld held sideways the
+   panel stayed capped at 60vh of a 400px viewport, which is why all four
+   rail buttons opened something that looked like half a window.
+   
+       asked     is there a rule that gives the panel the room
+       mattered  is it the rule the browser uses
+   
+   A card, not a wall: it caps well under the viewport, scrolls inside
+   itself, and — the field report's exact words — never "grabs the
+   background of the chat room", which is what the containment is for. */
 .talk-panel { max-height: 60vh; min-height: 180px; flex: none;
-              overflow-y: auto; width: min(96vw, 720px);
+              overflow-y: auto; overscroll-behavior: contain;
+              width: min(96vw, 720px); max-width: 420px;
               text-align: left; }
 /* A short landscape screen — the handheld — gets the panel by taking the
    room from the face, which the owner offered by name: "you can make the
    photo a lot smaller if you need room". One line of dials is not a
    panel. */
-@media (max-height: 600px) {
-  .talk-overlay { gap: 8px; padding: 12px 24px; }
-  .talk-face { width: min(20vh, 100px); height: min(20vh, 100px); }
-  .talk-torso { max-height: 22vh; }
-  .talk-name { font-size: 15px; }
-  .waveform { height: 22px; margin: 0; }
-  .talk-panel { max-height: none; flex: 1 1 auto; min-height: 140px; }
-}
 /* Why the robot voice is standing in — the server's refusal sentence,
    small and dismissible, beside the conversation it explains. */
 .voice-note { display: flex; align-items: center; gap: 8px;
@@ -1290,6 +1300,36 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
    and would animate on a dead microphone. */
 .waveform { display: flex; align-items: center; justify-content: center;
             gap: 3px; height: 34px; margin: 2px 0 4px; }
+
+/* Declared here, below every base rule it overrides, and not beside the
+   thing it is about.
+
+   A media query adds no specificity: this block and the plain rules it
+   narrows are all `(0, 1, 0)`, so between them the browser takes the one
+   written later. Placed next to `.talk-overlay` — where a reader would
+   look for it — it sat above `.waveform` and above the panel's own base
+   rule, and the two declarations that mattered most on a short screen were
+   the two that never ran.
+
+       asked     is the override written
+       mattered  is the override reachable
+
+   `test_a_media_query_adds_no_specificity.py` now fails on any block put
+   back where it reads better and works worse. */
+@media (max-height: 600px) {
+  .talk-overlay { gap: 8px; padding: 12px 24px; }
+  .talk-face { width: min(20vh, 100px); height: min(20vh, 100px); }
+  .talk-torso { max-height: 22vh; }
+  .talk-name { font-size: 15px; }
+  .waveform { height: 22px; margin: 0; }
+  .talk-panel { max-height: none; flex: 1 1 auto; min-height: 140px; }
+  /* The overlay's panel is a flex child and can be told to take the room.
+     The docked one is `position: fixed` and centred on the viewport, where
+     `max-height: none` is not "as tall as there is room for" but "as tall
+     as the content", running off both ends at once. It gets the viewport
+     as its bound instead, and keeps scrolling inside itself. */
+  .chat-rail-dock .talk-panel { max-height: calc(100vh - 24px); }
+}
 .wf-bar { width: 3px; height: 100%; border-radius: 2px;
           background: var(--accent); transform: scaleY(0.08);
           transform-origin: center;
@@ -1741,12 +1781,6 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
  * height rather than width on purpose: it is the shortness that makes a
  * column wrong, and a short window on a computer wants the same thing.
  */
-@media (max-height: 560px) {
-  .room-out { top: 8px; right: 10px; width: 28px; height: 28px;
-    font-size: 13px; }
-  .rs-strip { padding: 2px 0 0; gap: 6px; }
-  .rs-round { width: 30px; height: 30px; font-size: 13px; }
-}
 
 /* ---- press and hold ------------------------------------------------------
  *
@@ -1836,6 +1870,28 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 }
 .rs-round:hover:not(:disabled) { transform: translateY(-1px); }
 .rs-round:disabled { opacity: .45; cursor: default; }
+
+/* Declared here, below every base rule it overrides, and not beside the
+   thing it is about.
+
+   A media query adds no specificity: this block and the plain rules it
+   narrows are all `(0, 1, 0)`, so between them the browser takes the one
+   written later. Placed next to `.talk-overlay` — where a reader would
+   look for it — it sat above `.waveform` and above the panel's own base
+   rule, and the two declarations that mattered most on a short screen were
+   the two that never ran.
+
+       asked     is the override written
+       mattered  is the override reachable
+
+   `test_a_media_query_adds_no_specificity.py` now fails on any block put
+   back where it reads better and works worse. */
+@media (max-height: 560px) {
+  .room-out { top: 8px; right: 10px; width: 28px; height: 28px;
+    font-size: 13px; }
+  .rs-strip { padding: 2px 0 0; gap: 6px; }
+  .rs-round { width: 30px; height: 30px; font-size: 13px; }
+}
 /* A strip button that says its job in words — for the one whose glyph
    nobody could read. Same height and rim as its round neighbours, wide
    enough for its sentence. */
@@ -2141,14 +2197,6 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 }
 .dict-stop { font-size: 1.05rem; }
 
-/* The panel behaves: a card, not a wall. It caps well under the viewport,
-   scrolls inside itself, and — the field report's exact words — never
-   "grabs the background of the chat room": overscroll containment ends
-   the wheel at the panel's own edge. */
-.talk-panel {
-  max-height: 60vh; max-width: 420px;
-  overflow-y: auto; overscroll-behavior: contain;
-}
 /* All four buttons in frame: the dock pins to the chat's visible corner
    and never flows below the fold. */
 .chat-rail-dock {
