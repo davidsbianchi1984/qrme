@@ -1003,6 +1003,26 @@ LESSONS: tuple[dict, ...] = (
          screens=(207,),
          try_it="Open Hands, say what it may do in one sentence, and read "
                 "back what those words were understood to mean."),
+    dict(key="capabilities", chapter="Being yourself",
+         title="Everything a profile can be given, on one page",
+         what="Nine faculties can be given to a profile, and none is on "
+              "when you arrive: a live view through your camera, a "
+              "wearable microphone lent to the profiles in a place, a "
+              "voice built from your own samples, a face carrying its "
+              "watermark, a robot to stand in, the movements that robot "
+              "will accept, reading a screen, working a screen, and the "
+              "dials it may turn on its own when you ask. This page names "
+              "all nine in one place, says what each one is doing right "
+              "now, names the permission it rests on, and takes you to "
+              "the screen that withdraws it. It reads the same routes "
+              "those screens read, so it cannot tell you one thing while "
+              "the product does another — and it grants nothing itself, "
+              "so nothing here can be switched on by accident. Where a "
+              "faculty shows as absent, that is because no permission for "
+              "it exists, not because the page is hiding it.",
+         screens=(208,),
+         try_it="Open Capabilities and read the middle line of each card — "
+                "that is what this profile can actually do today."),
     dict(key="identity", chapter="Being yourself", title="Who this profile is",
          what="You may hold as many profiles as you like, and any of them may "
               "be anonymous. At most one may be verified — because the badge "

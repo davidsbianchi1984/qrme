@@ -370,6 +370,6 @@ if __name__ == "__main__":
         "studio", "delegate", "desk", "identity", "presence", "live",
         "contest", "exchanges", "grants", "party", "voice", "workshop",
         "assist", "referrals", "lobby", "audience", "beacons", "reaching",
-        "leaving", "selling", "inside", "raise",
+        "leaving", "selling", "inside", "raise", "capabilities",
     ]
     main(numbered(TABS))

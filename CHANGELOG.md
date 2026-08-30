@@ -6,6 +6,40 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The capability register: nine faculties, on one page, each beside the
+  permission it rests on.** Every one of these already had a door —
+  `console_doorless.txt` has stood at zero for many rounds — and not one of
+  them had a place that named the set. Channel 3 lived inside Live Now,
+  Channel 2 inside a room, the look permit as a checkbox on Hands. Somebody
+  wanting to answer *what can a profile actually do* had to already know
+  where to look, which meant the only people who could answer it were the
+  people who built it.
+
+      asked     can each capability be reached
+      mattered  can the whole set be read at once
+
+  The new **Capabilities** screen (208) carries four columns for each of the
+  nine — what it is, where it stands, what it rests on, where it is
+  withdrawn — and the third is read live from the same routes the owning
+  screens read, so the register cannot drift into a brochure. Nothing on it
+  grants, opens, commands or revokes: it reads, and it routes. `README.md`
+  carries the same four columns as a table, for a reader who never opens the
+  app.
+
+  The nine are named for what they do, not for the body part they resemble.
+  *Eyes* claims a faculty, where *a live view through the holder's own
+  camera, opened by the holder, minuted, and disclosed to everybody present*
+  states a behaviour that can be checked against the code and found true or
+  false.
+
+  JIM-mini gained a register of the same shape in the same round and it is
+  deliberately not the same nine rows. This product lends a profile an ear
+  and an eye *into a place*; the sibling attaches them to a monitor on one
+  person. Copying the sibling's wording would have produced a register that
+  described the wrong product accurately.
+
 ## [2.7.1] - 2026-08-30
 
 ### Fixed

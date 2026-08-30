@@ -78,6 +78,46 @@ whole loop: your words become tracked work.
 | **Privacy** | Room pixels never cross clients; disclosures are recorded, not footage; microphones pair without listening. `QRME_OFFLINE=1` keeps everything on the host, enforced at every socket. |
 | **Tandem** | Runs beside JIM-mini and on top of the PDI vault, one version number across the three. |
 
+## Capabilities, and what each one rests on
+
+Nine faculties can be given to a profile. None is on by default, each
+requires a permission that is recorded before the faculty exists, and
+each is withdrawn on one screen — the same screen the console reads to
+say whether it is on at all.
+
+The console carries this table as a live screen (**Capabilities**,
+screen 208): the same four columns, with the third read from the running
+deployment rather than written here. A register that could disagree with
+the product would be a brochure, so it is built to read the same routes
+the owning screens read.
+
+| Faculty | What it does | What it rests on | Withdrawn on |
+|---|---|---|---|
+| **Live visual channel** | Channel 3: a live view through the holder's own camera, so that somebody on the other side can see the thing rather than hear it described. | A session the holder opened on a named surface, with a stated subject and a bystander notice shown to the people in view. Closing it ends the view; nothing continues after. | Live Now |
+| **Lent audio channel** | Channel 2: a wearable microphone lent to the profiles in a place, so that what is said aloud reaches them without anybody stopping to type it. | A surface whose other occupants have a member list and somewhere to be shown the disclosure. Rooms are excluded and lend through their own route. | Rooms |
+| **Synthesised speech** | A voice built from recorded samples in FIG. 800's order: permission first, collection second, and a print that can be retired. | Permission recorded before a single sample is collected, and the disclosure that a synthetic voice is speaking. Withdrawing permission retires the print. | Voice |
+| **Presented likeness** | The face a profile shows — the bubble, and the upper-torso form that stands in a live feed or an AR scene — carrying a watermark that is always displayed. | An asset chosen for the profile. Where a real person's likeness stands behind it, a grant from that person that can be withdrawn. | Presence |
+| **Physical embodiment** | A robot bound to the profile as a body to speak through — the same persona, through the same model, wherever it is embodied. | An explicit binding to a named platform from the published catalogue. Only platforms shipping or open for preorder can be bound; an announced one is refused by name. | Robots & Devices |
+| **Locomotion directives** | The movement a bound body may be told to make, checked against that platform's own allowlist before anything reaches the robot. A vacuum cannot be told to fetch. | A bound body whose own list includes the move. Not a separate switch: with nothing bound there is nothing that could be told to move. | Robots & Devices |
+| **Screen observation** | Reading a screen without acting on it. Text found on a screen is treated as data and can never widen what is allowed, whatever that text claims. | A look permit naming its applications, its minutes and its steps. A wildcard is refused. | Hands |
+| **Interface operation** | Working a screen — moving a pointer, pressing a control, typing into a field — under a grant bounded in applications, moves, minutes and steps. | A grant naming all four limits, enforced where the move happens rather than on the screen that requested it. It never types passwords, PINs, one-time codes, card numbers or recovery phrases, and says so instead of trying. | Hands |
+| **Self-adjustment** | The profile turns its own dials when the person talking asks it to — warmer, briefer — instead of the change waiting on the owner being around. | The dials the owner exposed, within the bounds the owner set. A lock the owner places is refused from inside the conversation, not negotiated. | Agent |
+
+**On the naming.** These are named for what they do, not for the body
+part they resemble. The engineering shorthand behind them is anatomical
+— the eyes, the ears, the hands — and that shorthand is exactly wrong in
+front of a regulator or an attorney: *eyes* claims a faculty, where *a
+live view through the holder's own camera, opened by the holder, minuted,
+and disclosed to everybody present* states a behaviour that can be
+checked against the code and found true or false.
+
+**Why these nine are not JIM-mini's nine.** The sibling product carries a
+register of the same shape and it is deliberately not the same rows.
+QRME lends a profile an ear and an eye *into a place*, where JIM-mini
+attaches them to a monitor on one person; copying the sibling's wording
+would have produced a register that described the wrong product
+accurately.
+
 ## The screens you'll meet
 
 The majority of what a person actually encounters, with what each screen

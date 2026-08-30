@@ -607,6 +607,9 @@ is exactly how the old card came to be showing yours in place of theirs.
     <td align="center" width="25%"><a href="screens/first-question.png"><img src="screens/first-question.png" width="210" alt="The first question"></a><br><sub><b>·</b> · The first question · the problem-reporting card, before anything else is shown</sub></td>
     <td align="center" width="25%"><a href="screens/207-hands.png"><img src="screens/207-hands.png" width="210" alt="Hands"></a><br><sub><b>207</b> · Hands · what it may work, for how long, and what it will never type</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="25%"><a href="screens/208-capabilities.png"><img src="screens/208-capabilities.png" width="210" alt="Capabilities"></a><br><sub><b>208</b> · Capabilities · every faculty a profile can be given, what it rests on, and where it is withdrawn</sub></td>
+  </tr>
 </table>
 
 The strip changes with the room and only with the room. An audio room has no

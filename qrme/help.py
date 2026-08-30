@@ -457,6 +457,13 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     "bodies": ("robot", "robots", "a body", "humanoid", "android",
                "my robot", "bind a robot", "embodiment", "speak through",
                "task pack", "robot skills"),
+    "capabilities": ("capabilities", "what can it do", "what can you do",
+                     "what is it allowed to do", "what is it able to do",
+                     "permissions", "what did i agree to", "what can it see",
+                     "what can it hear", "can it move", "can it see me",
+                     "can it hear me", "what is switched on",
+                     "what is turned on", "how do i turn it off",
+                     "what am i allowing", "everything it can do"),
     "hands": ("hands", "use my computer", "use my screen", "work my screen",
               "click for me", "type for me", "take over", "do it for me on "
               "screen", "navigate for me", "do that again", "repeat that",

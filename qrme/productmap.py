@@ -273,6 +273,15 @@ DOORS: tuple[Door, ...] = (
          "and what it will never type",
          ("hands", "use my computer", "do it on my screen", "click for me",
           "take over", "navigate for me", "do that again")),
+    Door("Capabilities", "Capabilities tab",
+         "the register of every faculty a profile can be given — what each "
+         "one currently is, the permission it rests on, and the screen "
+         "that withdraws it; it reads and routes, and grants nothing "
+         "itself",
+         ("capabilities", "what can it do", "what can you do",
+          "what is it allowed to do", "permissions",
+          "what did i agree to", "what can it see", "what can it hear",
+          "can it move", "what is switched on", "how do i turn it off")),
     Door("Plugins", "Plug-ins tab",
          "the plug-in storefront, and what each row can reach",
          ("plug-in", "plugin", "integration", "connect an app")),
