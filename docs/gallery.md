@@ -330,7 +330,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 <tr>
 <td align="center" width="25%"><a href="screens/171-leaving.png"><img src="screens/171-leaving.png" width="210" alt="What Leaves, And On What Terms"></a><br><sub><b>171</b> · What Leaves, And On What Terms</sub></td>
 <td align="center" width="25%"><a href="screens/172-named.png"><img src="screens/172-named.png" width="210" alt="One Thing, Named"></a><br><sub><b>172</b> · One Thing, Named</sub></td>
-<td align="center" width="25%"><a href="screens/173-beginning-and-passing-on.svg"><img src="screens/173-beginning-and-passing-on.svg" width="210" alt="Beginning, And Passing On"></a><br><sub><b>173</b> · Beginning, And Passing On</sub></td>
+<td align="center" width="25%"><a href="screens/173-beginning-and-passing-on.png"><img src="screens/173-beginning-and-passing-on.png" width="210" alt="Beginning, And Passing On"></a><br><sub><b>173</b> · Beginning, And Passing On</sub></td>
 <td align="center" width="25%"><a href="screens/174-selling.png"><img src="screens/174-selling.png" width="210" alt="What You Are Owed"></a><br><sub><b>174</b> · What You Are Owed</sub></td>
 </tr>
 <tr>

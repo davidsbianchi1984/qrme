@@ -123,7 +123,7 @@ export function Home({ go, onVisit, onInside }: {
                     onClick={() => go("friends")}>
               {tr("hom.friends", lang)}
             </button>
-            <button className="tile-label linkish"
+            <button className="tile-label linkish" data-go="circle"
                     onClick={() => go("circle")}>
               {tr("hom.seeall", lang)}
             </button>

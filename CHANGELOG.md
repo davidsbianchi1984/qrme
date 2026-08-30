@@ -30,6 +30,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   (22), the avatar studio (44), what went wrong (150), the rail beside the
   face (198), and the two front doors (39, 41).
 
+- **A page reached by a press, and the press named in the markup.**
+  `Passing` (173) is in the `Tab` union and not in the nav — a person
+  reaches it from a chip on Identity. That chip, and the "see all" on
+  Home that opens `Circle`, now carry `data-go` naming their destination,
+  the way the nav's tiles have always carried `data-tab`: a camera can
+  press *that* control rather than the nth child of a list that reorders.
+  173 is a photograph; 204 is not, and the reason is recorded rather than
+  guessed at — the seeded account holds no friends, so the tile carrying
+  its button does not draw.
+
 ### Fixed
 
 - **The Home screen's tiles drew 41px past the right edge of a phone.**

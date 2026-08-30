@@ -1,4 +1,4 @@
-# status: backlog — 18 rows
+# status: backlog — 17 rows
 #
 # Gallery screens the camera cannot yet photograph, and why each one.
 #
@@ -48,10 +48,13 @@
 
 # --- pages that are not tabs, with no recipe yet ------------------------
 204  Circle · your circle
-173  Passing · beginning and passing on
-     Both are in the `Tab` union and not in the nav: reached from a press
-     inside another screen. They want an `INSIDE` recipe naming that press,
-     the way 39 and 41 now have one.
+     In the `Tab` union and not in the nav, reached from a press on Home —
+     `[data-go="circle"]`, the "see all" beside the friends tile. The
+     recipe exists and the button is not on the page for the harness's
+     seeded account, which holds no friends, so the tile that carries it
+     does not draw. Reaching it means seeding a friend first. (Its sibling
+     173 came off this list the same day: the press that opens it is on
+     Identity, which needs nothing seeded.)
 184  Public · without an account
      The page a stranger lands on with no session at all. A signed-out
      recipe, but not the onboarding one — it is a different route.

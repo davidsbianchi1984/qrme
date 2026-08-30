@@ -214,6 +214,12 @@ INSIDE: tuple[tuple[str, str, str, tuple[str, ...], str], ...] = (
     ("39", "sign-in", SIGNED_OUT, (), ".tabs .tab.active"),
     ("41", "log-in", SIGNED_OUT, (".tabs .tab:nth-child(2)",),
      ".tabs .tab:nth-child(2).active"),
+    # Two pages the nav does not open, reached the way a person reaches
+    # them: the press that goes there, named in the markup.
+    ("204", "your-circle", "home", ('[data-go="circle"]',),
+     '[data-screen="204"]'),
+    ("173", "beginning-and-passing-on", "identity",
+     ('[data-go="passing"]',), '[data-screen="173"]'),
 )
 
 

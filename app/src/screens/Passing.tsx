@@ -80,7 +80,7 @@ export function Passing({ onPlans }: { onPlans: () => void }) {
   };
 
   return (
-    <div className="screen">
+    <div className="screen" data-screen="173">
       <h2>{tr("pas.title", lang)}</h2>
       <p className="muted small">{tr("pas.lead", lang)}</p>
 

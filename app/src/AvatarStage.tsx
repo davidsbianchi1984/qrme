@@ -171,7 +171,8 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
   ];
 
   return (
-    <div className={"avatar-stage" + (clear ? " clear" : "")} role="dialog"
+    <div className={"avatar-stage" + (clear ? " clear" : "")}
+         data-screen="205" role="dialog"
          aria-label={tr("stage.title", lang)}>
       {/* The head the forge built, when there is one: the same face in
           three dimensions, its mouth moving with whatever voice is in

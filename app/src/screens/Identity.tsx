@@ -398,7 +398,7 @@ export function Identity({ onPlans, onPassing }: {
         {/* Beginning and passing on left the sidebar: pre-building an
             account, recovery, and how it ends are options taken from the
             identity they concern. */}
-        <button className="chip" onClick={onPassing}>
+        <button className="chip" data-go="passing" onClick={onPassing}>
           {tr("idn.passing", lang)}
         </button>
       </header>

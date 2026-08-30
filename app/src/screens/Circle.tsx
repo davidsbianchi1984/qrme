@@ -75,7 +75,7 @@ export function Circle({ onVisit, onMeet }: {
   }, [session.profileId]);
 
   return (
-    <div className="screen">
+    <div className="screen" data-screen="204">
       <header className="screen-head">
         <h2>{tr("crc.title", lang)}</h2>
         <span className="muted small">{tr("crc.pitch", lang)}</span>
