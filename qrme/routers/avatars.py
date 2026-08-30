@@ -122,6 +122,65 @@ def video_doors() -> dict:
     return filming.doors()
 
 
+class Road(BaseModel):
+    road: str = Field(description="photo, avatar or video — which road this "
+                                  "profile's presence takes.")
+    daily_seconds: int | None = Field(default=None, ge=0, le=3600,
+                                      description="Seconds of finished "
+                                                  "footage per day. What "
+                                                  "makes choosing video "
+                                                  "safe.")
+
+
+@router.get("/video/road/{profile_id}")
+def video_road(profile_id: str) -> dict:
+    """Which road this profile takes, its ceiling, and what is left today."""
+    return {**filming.road_of(profile_id), **filming.budget(profile_id),
+            "roads": list(filming.ROADS)}
+
+
+@router.post("/video/road/{profile_id}")
+def video_set_road(profile_id: str, body: Road) -> dict:
+    try:
+        filming.set_road(profile_id, body.road, body.daily_seconds)
+    except filming.FilmingError as exc:
+        raise HTTPException(status_code=400,
+                            detail=i18n.raised(exc)) from None
+    return {**filming.road_of(profile_id), **filming.budget(profile_id),
+            "roads": list(filming.ROADS)}
+
+
+@router.get("/video/latest/{profile_id}")
+def video_latest(profile_id: str) -> dict:
+    """The most recent render for this profile, however it ended.
+
+    What a screen asks on opening, and the reason it has to exist: a
+    render outlives the page that started it. The console tells somebody
+    "it keeps going without this page open, and appears here when you
+    come back" — and coming back only works if there is something to ask.
+    Without this the sentence is a promise nothing keeps.
+
+    Answers `{"scene": null}` rather than a 404 when there has never been
+    one: no footage is the ordinary case on every road but video, and a
+    screen should not have to catch an error to learn it.
+    """
+    return {"scene": filming.latest(profile_id)}
+
+
+@router.get("/video/render/{render_id}")
+def video_follow(render_id: str) -> dict:
+    """Whether a render started by a turn has finished.
+
+    What a screen polls. A settled render is returned as it stands rather
+    than asked about again — the service bills per call on some plans,
+    and a finished job does not become unfinished.
+    """
+    got = filming.follow(render_id)
+    if got is None:
+        raise HTTPException(status_code=404, detail="no such render")
+    return got
+
+
 class Direction(BaseModel):
     surface: str | None = Field(default=None,
                                 description="window or fullscreen — where "
@@ -155,7 +214,8 @@ def video_direct(profile_id: str, body: Direction) -> dict:
     try:
         return filming.amend(profile_id, body.asked, body.surface)
     except filming.FilmingError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from None
+        raise HTTPException(status_code=400,
+                            detail=i18n.raised(exc)) from None
 
 
 @router.get("/video/direction/{profile_id}/log")
@@ -214,7 +274,8 @@ def video_render(body: Scene) -> dict:
                               shape=body.shape, wait=body.wait,
                               directed_for=body.profile_id)
     except filming.FilmingError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from None
+        raise HTTPException(status_code=400,
+                            detail=i18n.raised(exc)) from None
 
 
 

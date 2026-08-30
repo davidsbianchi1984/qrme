@@ -1023,6 +1023,29 @@ LESSONS: tuple[dict, ...] = (
          screens=(208,),
          try_it="Open Capabilities and read the middle line of each card — "
                 "that is what this profile can actually do today."),
+    dict(key="scenefilm", chapter="Being yourself",
+         title="The reply, rendered as footage",
+         what="A profile can take one of three roads out: a still photo, a "
+              "speaking avatar, or video. On the video road every approved "
+              "reply is rendered as it arrives — the turn starts the job "
+              "and moves on, because a render is minutes and a reply is "
+              "not, so the words are readable the whole time the footage "
+              "is being made and nobody presses play. Length is not a "
+              "setting: it is worked out from how long the passage takes "
+              "to say, because a dial would make the video fit the "
+              "setting instead of the content. Above the picker sits the "
+              "one number that matters — seconds of video a day — and it "
+              "counts renders already started, not only finished ones, so "
+              "two quick replies cannot both slip under a limit neither "
+              "had spent. A reply past the ceiling arrives as text saying "
+              "so, and a render that fails never takes the answer with "
+              "it. What comes back is stored marked as AI, and there is "
+              "no setting that turns that off.",
+         screens=(209,),
+         try_it="Set the daily ceiling low, say something, and watch the "
+                "line under the reply: it tells you the footage is being "
+                "made, and then tells you when the day's seconds are "
+                "gone."),
     dict(key="identity", chapter="Being yourself", title="Who this profile is",
          what="You may hold as many profiles as you like, and any of them may "
               "be anonymous. At most one may be verified — because the badge "

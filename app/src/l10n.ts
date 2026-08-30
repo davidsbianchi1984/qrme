@@ -641,6 +641,21 @@ const CHROME: Table = {
   "idn.road.video.sub": {
     en: "The reply, rendered as footage.", es: "La respuesta, representada como metraje.", fr: "La réponse, rendue en images.", de: "Die Antwort, als Filmmaterial gerendert.", pt: "A resposta, representada como imagens.", it: "La risposta, resa come filmato.", ja: "返答を映像として描き出します。", zh: "把回复渲染成影像。", hi: "उत्तर को फ़ुटेज के रूप में रेंडर किया गया।", ar: "الرد، مُصاغًا كلقطات.",
   },
+  "idn.road.cap": {
+    en: "Seconds of video a day", es: "Segundos de vídeo al día", fr: "Secondes de vidéo par jour", de: "Sekunden Video pro Tag", pt: "Segundos de vídeo por dia", it: "Secondi di video al giorno", ja: "1 日あたりの動画の秒数", zh: "每天的视频秒数", hi: "प्रतिदिन वीडियो के सेकंड", ar: "ثوانٍ من الفيديو في اليوم",
+  },
+  "idn.road.cap.sub": {
+    en: "Every reply is rendered, so this is the ceiling that makes picking video safe to pick. Replies past it arrive as text and say so.", es: "Cada respuesta se representa, así que este es el techo que hace seguro elegir vídeo. Las respuestas que lo superen llegan como texto y lo indican.", fr: "Chaque réponse est rendue : c'est donc le plafond qui rend le choix de la vidéo sans danger. Au-delà, les réponses arrivent en texte et le disent.", de: "Jede Antwort wird gerendert, also ist das die Obergrenze, die die Wahl von Video ungefährlich macht. Antworten darüber kommen als Text und sagen das.", pt: "Cada resposta é representada, por isso este é o tecto que torna seguro escolher vídeo. As respostas para além dele chegam como texto e dizem-no.", it: "Ogni risposta viene resa, quindi questo è il tetto che rende sicuro scegliere il video. Le risposte oltre arrivano come testo e lo dicono.", ja: "返答はすべて描き出されるので、これが動画を選んでも安心でいられる上限です。上限を超えた返答はテキストで届き、その旨を伝えます。", zh: "每条回复都会被渲染，所以这是让你放心选择视频的上限。超出后的回复以文字送达，并会说明原因。", hi: "हर उत्तर रेंडर होता है, इसलिए यही वह सीमा है जो वीडियो चुनना सुरक्षित बनाती है। इससे आगे के उत्तर पाठ के रूप में आते हैं और यह बता देते हैं।", ar: "كل رد يُصيَّر، لذا فهذا هو السقف الذي يجعل اختيار الفيديو آمنًا. الردود بعده تصل نصًا وتقول ذلك.",
+  },
+  "idn.road.cap.set": {
+    en: "Set the ceiling", es: "Fijar el techo", fr: "Définir le plafond", de: "Obergrenze festlegen", pt: "Definir o tecto", it: "Imposta il tetto", ja: "上限を設定", zh: "设定上限", hi: "सीमा तय करें", ar: "تعيين السقف",
+  },
+  "idn.road.left": {
+    en: "{left} of {cap} seconds left today.", es: "Quedan {left} de {cap} segundos hoy.", fr: "Il reste {left} secondes sur {cap} aujourd'hui.", de: "Heute noch {left} von {cap} Sekunden.", pt: "Restam {left} de {cap} segundos hoje.", it: "Restano {left} secondi su {cap} oggi.", ja: "本日は {cap} 秒のうち {left} 秒が残っています。", zh: "今天还剩 {left} 秒，共 {cap} 秒。", hi: "आज {cap} में से {left} सेकंड शेष हैं।", ar: "بقي {left} من {cap} ثانية اليوم.",
+  },
+  "idn.road.spent": {
+    en: "The ceiling counts renders already started, not only finished ones — two quick replies cannot both slip under a limit neither had spent.", es: "El techo cuenta las representaciones ya iniciadas, no solo las terminadas: dos respuestas seguidas no pueden colarse ambas bajo un límite que ninguna había gastado.", fr: "Le plafond compte les rendus déjà lancés, pas seulement ceux terminés — deux réponses rapprochées ne peuvent pas passer toutes deux sous une limite qu'aucune n'avait entamée.", de: "Die Obergrenze zählt bereits gestartete Renderings, nicht nur fertige — zwei schnelle Antworten können nicht beide unter einem Limit durchrutschen, das keine verbraucht hatte.", pt: "O tecto conta as representações já iniciadas, não só as terminadas — duas respostas seguidas não podem passar ambas por baixo de um limite que nenhuma tinha gasto.", it: "Il tetto conta i rendering già avviati, non solo quelli finiti — due risposte ravvicinate non possono passare entrambe sotto un limite che nessuna aveva speso.", ja: "上限は完了したものだけでなく、開始済みの描き出しも数えます — 立て続けの 2 つの返答が、どちらも使っていない上限をすり抜けることはありません。", zh: "上限会把已开始的渲染也算进去，而不只是已完成的 — 两条紧接着的回复不会双双溜过一个谁都还没花掉的额度。", hi: "सीमा केवल पूर्ण हुए नहीं, आरंभ हो चुके रेंडर भी गिनती है — दो त्वरित उत्तर दोनों उस सीमा के नीचे नहीं खिसक सकते जिसे किसी ने खर्च नहीं किया था।", ar: "يحتسب السقف عمليات التصيير التي بدأت فعلًا، لا المكتملة وحدها — لا يمكن لردَّين متتاليين أن يمرّا معًا تحت حدٍّ لم ينفقه أيٌّ منهما.",
+  },
   "idn.video.service": {
     en: "Rendering service", es: "Servicio de representación", fr: "Service de rendu", de: "Renderdienst", pt: "Serviço de representação", it: "Servizio di rendering", ja: "レンダリングサービス", zh: "渲染服务", hi: "रेंडरिंग सेवा", ar: "خدمة التصيير",
   },
@@ -1679,6 +1694,21 @@ const CHROME: Table = {
     zh: "由本机内置的后备模型写成，而不是",
     hi: "इस मशीन के अंतर्निहित फ़ॉलबैक द्वारा लिखा गया, न कि",
     ar: "كتبه البديل المدمج في هذا الجهاز، لا",
+  },
+  "chat.scene.making": {
+    en: "Rendering this reply as {seconds} seconds of footage.", es: "Representando esta respuesta como {seconds} segundos de metraje.", fr: "Rendu de cette réponse en {seconds} secondes d'images.", de: "Diese Antwort wird als {seconds} Sekunden Filmmaterial gerendert.", pt: "A representar esta resposta como {seconds} segundos de imagens.", it: "Sto rendendo questa risposta come {seconds} secondi di filmato.", ja: "この返答を {seconds} 秒の映像として描き出しています。", zh: "正在把这条回复渲染成 {seconds} 秒影像。", hi: "इस उत्तर को {seconds} सेकंड के फ़ुटेज के रूप में रेंडर किया जा रहा है।", ar: "يجري تصيير هذا الرد كـ {seconds} ثانية من اللقطات.",
+  },
+  "chat.scene.ai": {
+    en: "AI-generated video", es: "Vídeo generado por IA", fr: "Vidéo générée par IA", de: "KI-erzeugtes Video", pt: "Vídeo gerado por IA", it: "Video generato dall'IA", ja: "AI が生成した動画", zh: "AI 生成的视频", hi: "AI द्वारा बनाया गया वीडियो", ar: "فيديو من إنشاء الذكاء الاصطناعي",
+  },
+  "chat.scene.failed": {
+    en: "This reply was not rendered. The words above are the whole answer.", es: "Esta respuesta no se representó. Las palabras de arriba son la respuesta completa.", fr: "Cette réponse n'a pas été rendue. Les mots ci-dessus sont la réponse entière.", de: "Diese Antwort wurde nicht gerendert. Die Worte oben sind die ganze Antwort.", pt: "Esta resposta não foi representada. As palavras acima são a resposta completa.", it: "Questa risposta non è stata resa. Le parole qui sopra sono tutta la risposta.", ja: "この返答は描き出されませんでした。上の文章がすべての答えです。", zh: "这条回复没有被渲染。上面的文字就是完整答复。", hi: "यह उत्तर रेंडर नहीं हुआ। ऊपर के शब्द ही पूरा उत्तर हैं।", ar: "لم يُصيَّر هذا الرد. الكلمات أعلاه هي الجواب كاملًا.",
+  },
+  "chat.scene.capped": {
+    en: "Today's video ceiling is reached — {left} of {cap} seconds left — so this reply arrived as text.", es: "Se alcanzó el techo de vídeo de hoy — quedan {left} de {cap} segundos — así que esta respuesta llegó como texto.", fr: "Le plafond vidéo du jour est atteint — il reste {left} secondes sur {cap} — cette réponse est donc arrivée en texte.", de: "Die heutige Video-Obergrenze ist erreicht — {left} von {cap} Sekunden übrig — daher kam diese Antwort als Text.", pt: "O tecto de vídeo de hoje foi atingido — restam {left} de {cap} segundos — por isso esta resposta chegou como texto.", it: "Il tetto video di oggi è stato raggiunto — restano {left} secondi su {cap} — perciò questa risposta è arrivata come testo.", ja: "本日の動画の上限に達しました — {cap} 秒のうち残り {left} 秒 — このため返答はテキストで届きました。", zh: "今天的视频额度已用完 — 共 {cap} 秒，还剩 {left} 秒 — 所以这条回复以文字送达。", hi: "आज की वीडियो सीमा पूरी हो गई — {cap} में से {left} सेकंड शेष — इसलिए यह उत्तर पाठ के रूप में आया।", ar: "بلغت سقف الفيديو لليوم — بقي {left} من {cap} ثانية — لذلك وصل هذا الرد نصًا.",
+  },
+  "chat.scene.gaveup": {
+    en: "Still rendering. It keeps going without this page open, and appears here when you come back.", es: "Sigue representándose. Continúa sin esta página abierta y aparecerá aquí cuando vuelvas.", fr: "Le rendu continue. Il se poursuit sans cette page ouverte et apparaîtra ici à votre retour.", de: "Wird noch gerendert. Es läuft ohne diese Seite weiter und erscheint hier, wenn du zurückkommst.", pt: "Ainda a representar. Continua sem esta página aberta e aparece aqui quando voltares.", it: "Rendering ancora in corso. Prosegue senza questa pagina aperta e comparirà qui al tuo ritorno.", ja: "まだ描き出し中です。このページを開いていなくても進み、戻ってきたときにここに表示されます。", zh: "仍在渲染。不必开着此页，它会继续，等你回来时显示在这里。", hi: "अभी भी रेंडर हो रहा है। यह पेज खुला न रहने पर भी चलता रहेगा और लौटने पर यहाँ दिखेगा।", ar: "ما زال التصيير جاريًا. يتابع دون إبقاء هذه الصفحة مفتوحة، ويظهر هنا عند عودتك.",
   },
   "chat.degraded.tail": {
     en: "— that model could not be reached. Check the key in Settings → Model.",

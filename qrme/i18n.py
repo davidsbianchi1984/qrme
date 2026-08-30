@@ -3111,6 +3111,33 @@ _REFUSALS: dict[str, dict[str, str]] = {
     # "the scene is unchanged rather than blank" — because the thing a
     # person fears when a correction fails is that they have lost the
     # five they made before it.
+    # The road's own two. A ceiling is a number somebody typed, so the
+    # refusal has to reach them in the language they typed it in; a
+    # render that is not there is the answer to a poll, and a poller
+    # reading English on a Japanese console cannot tell a missing row
+    # from a broken screen.
+    "a ceiling below zero is not a ceiling": {
+        'es': "un techo por debajo de cero no es un techo",
+        'fr': "un plafond en dessous de zéro n'est pas un plafond",
+        'de': "eine Obergrenze unter null ist keine Obergrenze",
+        'pt': "um tecto abaixo de zero não é um tecto",
+        'it': "un tetto sotto lo zero non è un tetto",
+        'ja': "ゼロを下回る上限は上限ではありません",
+        'zh': "低于零的上限不是上限",
+        'hi': "शून्य से कम की सीमा कोई सीमा नहीं है",
+        'ar': "سقف دون الصفر ليس سقفًا",
+    },
+    "no such render": {
+        'es': "no existe esa representación",
+        'fr': "ce rendu n'existe pas",
+        'de': "dieses Rendering gibt es nicht",
+        'pt': "não existe essa representação",
+        'it': "questo rendering non esiste",
+        'ja': "その描き出しはありません",
+        'zh': "没有这个渲染",
+        'hi': "ऐसा कोई रेंडर नहीं है",
+        'ar': "لا يوجد هذا التصيير",
+    },
     "say how the scene should look, or clear it": {
         'es': "di cómo debe verse la escena, o bórrala",
         'fr': "dites de quoi la scène doit avoir l'air, ou effacez-la",
@@ -8249,6 +8276,15 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     # `days` matches the siblings' shared vocabulary verbatim — the
     # cross-product guard holds one label per field name, and JIM's
     # forms already taught this one.
+    # The video road's five form fields (qrme/routers/avatars.py), worded
+    # exactly as Identity asks them — the console's own `idn.road`,
+    # `idn.road.cap`, `idn.video.passage`, `idn.video.shape` and the
+    # "Change it" box, so the refusal and the form agree by construction.
+    "road": {"en": "How this renders", "es": "Cómo se representa", "fr": "Comment ceci s'affiche", "de": "Wie das dargestellt wird", "pt": "Como isto é representado", "it": "Come viene reso", "ja": "どう表示するか", "zh": "如何呈现", "hi": "यह कैसे प्रस्तुत होता है", "ar": "كيف يُعرض هذا"},
+    "daily_seconds": {"en": "Seconds of video a day", "es": "Segundos de vídeo al día", "fr": "Secondes de vidéo par jour", "de": "Sekunden Video pro Tag", "pt": "Segundos de vídeo por dia", "it": "Secondi di video al giorno", "ja": "1 日あたりの動画の秒数", "zh": "每天的视频秒数", "hi": "प्रतिदिन वीडियो के सेकंड", "ar": "ثوانٍ من الفيديو في اليوم"},
+    "prompt": {"en": "What is being rendered", "es": "Qué se va a representar", "fr": "Ce qui est rendu", "de": "Was gerendert wird", "pt": "O que vai ser representado", "it": "Che cosa viene reso", "ja": "何を描き出すか", "zh": "要渲染的内容", "hi": "क्या रेंडर किया जा रहा है", "ar": "ما الذي يجري تصييره"},
+    "shape": {"en": "Shape", "es": "Formato", "fr": "Format", "de": "Format", "pt": "Formato", "it": "Formato", "ja": "画面の形", "zh": "画面比例", "hi": "आकार", "ar": "الشكل"},
+    "asked": {"en": "What you want changed", "es": "Qué quieres cambiar", "fr": "Ce que vous voulez changer", "de": "Was du geändert haben willst", "pt": "O que queres mudar", "it": "Che cosa vuoi cambiare", "ja": "変えてほしいこと", "zh": "你想改什么", "hi": "आप क्या बदलवाना चाहते हैं", "ar": "ما تريد تغييره"},
     # The forge's two form fields and the sit-out's one.
     "photo": {"en": "The photograph", "es": "La fotografía", "fr": "La photographie", "de": "Das Foto", "pt": "A fotografia", "it": "La fotografia", "ja": "写真", "zh": "照片", "hi": "फ़ोटो", "ar": "الصورة"},
     "shot": {"en": "How the photo is framed", "es": "Cómo está encuadrada la foto", "fr": "Le cadrage de la photo", "de": "Wie das Foto gerahmt ist", "pt": "Como a foto está enquadrada", "it": "Come è inquadrata la foto", "ja": "写真の写り方", "zh": "照片的取景", "hi": "फ़ोटो का फ़्रेम", "ar": "كيف أُطِّرت الصورة"},

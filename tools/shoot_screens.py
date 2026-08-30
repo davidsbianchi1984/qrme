@@ -103,6 +103,25 @@ def seed(db_path: str) -> dict:
          "true to draw.", "{}", "[]", 0, 0, "public", "auto", 0,
          "balanced", 0, terms.TERMS_VERSION, db.utcnow(), db.utcnow()))
     conn.commit()
+    # The video road, and one render on it.
+    #
+    # Seeded rather than started, because starting one needs a service and
+    # every one of them is behind a key this machine does not have. What is
+    # photographed is still a state the product reaches on its own: the
+    # road is stored the way `filming.set_road` stores it, the row is the
+    # row `auto_render` inserts, and the console draws it by polling the
+    # real route. Nothing here is drawn — only reached from a shorter
+    # distance than a person reaches it.
+    from qrme import filming
+    filming.set_road(profile_id, "video", 60)
+    conn.execute(
+        "INSERT INTO scene_render (id, profile_id, passage, seconds, status,"
+        " created_at) VALUES (?,?,?,?,'pending',?)",
+        (db.new_id("ren"), profile_id,
+         "Usually on the discharging team, and usually it is a gap rather "
+         "than a decision.", 8, db.utcnow()))
+    conn.commit()
+
     return {"accountId": account,
             "accountToken": auth.issue("account", account),
             "accountEmail": email,
@@ -305,6 +324,11 @@ ELEMENTS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
     ("44", "avatar-studio", "identity", ()),
     ("198", "beside-the-face", "chat", ()),
     ("199", "what-it-is-doing", "chat", ()),
+    # The reply as footage. It draws on the chat screen because that is
+    # where a reply is read, and it is photographed as a card because the
+    # four states it has are the whole surface — three of them have no
+    # video in them, and those are the ones worth showing.
+    ("209", "the-reply-as-footage", "chat", ()),
 )
 
 

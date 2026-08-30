@@ -1,4 +1,4 @@
-# status: floor — 74 rows
+# status: floor — 76 rows
 #
 # Which console surface each screen drawing depicts.
 #
@@ -91,6 +91,11 @@ Identity        156
 # Draws inside Identity rather than on a screen of its own: it is the
 # derived length and the quoted wait, shown where the passage is written.
 VideoQuote      156
+# Draws inside Chat, where a reply is read, rather than on a screen of
+# its own. 209 is the card: the turn being rendered, which is the state a
+# person on the video road meets most — the other three states it has are
+# a finished video, a ceiling reached, and a render that failed.
+SceneFilm       209
 Presence        157
 Live            158
 Contest         159

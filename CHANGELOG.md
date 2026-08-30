@@ -8,6 +8,62 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **Every reply becomes footage, and nobody presses play.** A profile on
+  the video road renders each approved turn as it happens. The turn starts
+  the job and moves on — a render is minutes and a reply is not — so what
+  the chat response carries is a row, and the screen polls it.
+
+  Three things make that safe to switch on. The road is stored on the
+  server, not held in a component: `auto_render` runs on a turn nobody is
+  looking at a screen for, and a choice living in the picker is a choice
+  `/profiles/{id}/chat` cannot see. A daily ceiling in seconds sits above
+  the picker rather than on a settings page found afterwards, and it
+  counts renders already started, so two quick replies cannot both slip
+  under a limit neither had spent. And a reply past the ceiling arrives as
+  text saying so — an owner who set a limit and then stopped seeing video
+  is owed the reason, because "you reached the limit you set" is a
+  different sentence from "it broke".
+
+  A failed render never fails the turn. The reply already happened and the
+  person is reading it; a video that did not get made is a smaller thing
+  than an answer that did not arrive.
+
+      asked     should this reply become footage
+      mattered  can it, today, without spending what nobody agreed to
+
+- **A render outlives the page that started it.** `GET /video/latest/{id}`
+  is what a conversation asks on opening. The bubble tells somebody the
+  render "keeps going without this page open, and appears here when you
+  come back" — and coming back only worked if something asked. Nothing
+  did: the scene arrived on the chat response and lived in component
+  state, so closing the tab lost a job that carried on being paid for.
+
+- **Offline mode reached starting a render and not polling one.** The gate
+  sat in `filming.render`, one level above the socket, so an offline host
+  refused to *begin* a video and would happily go on asking the service
+  whether one had finished. A poll carries a job id rather than somebody's
+  words, but it still opens a connection to a machine that is by
+  definition not this one, and "nothing leaves the host" has to be true of
+  every way out or it is not a property of the code. The check moved into
+  `_ask`, which is the only way out of that module.
+
+      asked     does the render consult offline mode
+      mattered  does everything that reaches the service consult it
+
+- **Five refusals were passing on `str(exc)`.** `str()` on a `Templated`
+  returns a plain `str`, so a refusal built from a template arrived at the
+  handler having forgotten how it was built — English, silently, and
+  indistinguishable from a sentence nobody has translated. All five now
+  use `i18n.raised`.
+
+- **Screen 209, and it is a photograph.** `SceneFilm` draws four states
+  and three of them have no video in them — being rendered, the ceiling
+  reached, and a render that failed. Those are the ones worth showing, and
+  the one in the gallery is the state a person on this road meets most.
+  The harness seeds the road and the row the way the product writes them
+  and photographs the real component polling the real route; nothing is
+  drawn, only reached from a shorter distance than a person reaches it.
+
 - **Sixteen nav tabs the camera had never been pointed at.** `Signing`,
   `Visiting`, `Permissions`, `Guest Access`, `Watermark`, `Language & Name`,
   `More Tools`, `Plug-ins`, `Lookup`, `Robots & Devices`, `Hands`,

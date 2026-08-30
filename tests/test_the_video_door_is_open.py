@@ -551,3 +551,208 @@ def test_one_profile_s_log_is_not_another_s(seeded):
     from qrme import filming
     filming.set_direction("p1", "A beach.")
     assert filming.direction_log("p2") == []
+
+
+# --- rendering without being asked --------------------------------------
+
+def test_a_profile_starts_on_the_photo_road(seeded):
+    """What a profile has before anybody chooses, and what every other
+    road falls back to."""
+    from qrme import filming
+    assert filming.road_of("p1")["road"] == "photo"
+
+
+def test_the_road_is_one_of_three(seeded):
+    from qrme import filming
+    for road in filming.ROADS:
+        assert filming.set_road("p1", road)["road"] == road
+    with pytest.raises(filming.FilmingError):
+        filming.set_road("p1", "hologram")
+
+
+def test_choosing_video_carries_a_ceiling(seeded):
+    """A room left on this road with no cap spends until the card
+    declines, and the person who set it was choosing a look."""
+    from qrme import filming
+    assert filming.set_road("p1", "video")["daily_seconds"] > 0
+    assert filming.set_road("p1", "video", 30)["daily_seconds"] == 30
+    with pytest.raises(filming.FilmingError):
+        filming.set_road("p1", "video", -1)
+
+
+def test_a_turn_on_the_photo_road_renders_nothing(seeded, wired):
+    from qrme import filming
+    assert filming.auto_render("p1", "Yes, that helps.") is None
+
+
+def test_an_unconfigured_deployment_renders_nothing_automatically(seeded):
+    """Never raises. The reply already happened and the person is reading
+    it; a video that did not get made is smaller than an answer that did
+    not arrive."""
+    from qrme import filming
+    filming.set_road("p1", "video")
+    assert filming.auto_render("p1", "Yes, that helps.") is None
+
+
+def test_a_turn_on_the_video_road_starts_a_render(seeded, monkeypatch, wired):
+    from qrme import filming
+    filming.set_road("p1", "video", 300)
+    speaks = _speaks(lambda url, body: {"id": "job-1"})
+    monkeypatch.setattr("urllib.request.urlopen", speaks)
+    got = filming.auto_render("p1", " ".join(["word"] * 30))
+    assert got["status"] == "pending"
+    assert got["job"] == "job-1"
+    assert filming.latest("p1")["id"] == got["id"]
+
+
+def test_the_turn_does_not_wait_for_the_render(seeded, monkeypatch, wired):
+    """A render is minutes and a reply is not."""
+    from qrme import filming
+    filming.set_road("p1", "video", 300)
+    calls = []
+
+    def urlopen(request, timeout=None):
+        calls.append(request.full_url)
+        import io as _io, json as _json
+        class R(_io.BytesIO):
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+        return R(_json.dumps({"id": "job-1"}).encode())
+
+    monkeypatch.setattr("urllib.request.urlopen", urlopen)
+    filming.auto_render("p1", "Yes.")
+    # One call: the submit. No polling happened inside the turn.
+    assert len(calls) == 1
+
+
+def test_the_ceiling_stops_the_next_render_and_says_so(seeded, monkeypatch,
+                                                       wired):
+    """"You reached the limit you set" is a different sentence from "it
+    broke", and an owner who stopped seeing video is owed the first."""
+    from qrme import filming
+    filming.set_road("p1", "video", 6)
+    monkeypatch.setattr("urllib.request.urlopen",
+                        _speaks(lambda url, body: {"id": "job-1"}))
+    filming.auto_render("p1", " ".join(["word"] * 20))   # 8s, over 6
+    capped = filming.auto_render("p1", " ".join(["word"] * 20))
+    assert capped["status"] == "capped"
+    assert capped["daily_seconds"] == 6
+
+
+def test_what_is_in_flight_counts_against_the_ceiling(seeded, monkeypatch,
+                                                      wired):
+    """Two turns in quick succession would otherwise both pass a cap
+    neither had spent yet — the money is committed when the job starts."""
+    from qrme import filming
+    filming.set_road("p1", "video", 12)
+    monkeypatch.setattr("urllib.request.urlopen",
+                        _speaks(lambda url, body: {"id": "job-1"}))
+    first = filming.auto_render("p1", " ".join(["word"] * 25))
+    assert first["status"] == "pending"          # nothing has finished
+    assert filming.spent_today("p1") == first["seconds"]
+    assert filming.budget("p1")["left"] < 12
+
+
+def test_a_failed_render_does_not_spend_the_ceiling(seeded, monkeypatch,
+                                                    wired):
+    from qrme import filming
+    filming.set_road("p1", "video", 300)
+
+    def dies(request, timeout=None):
+        raise OSError("no route")
+
+    monkeypatch.setattr("urllib.request.urlopen", dies)
+    got = filming.auto_render("p1", " ".join(["word"] * 30))
+    assert got["status"] == "failed"
+    assert filming.spent_today("p1") == 0
+
+
+def test_following_a_render_settles_it(seeded, monkeypatch, wired):
+    from qrme import filming
+    filming.set_road("p1", "video", 300)
+    stage = {"done": False}
+
+    def script(url, body):
+        if body is not None:
+            return {"id": "job-1"}
+        return ({"status": "done", "video_url": "https://cdn/x.mp4"}
+                if stage["done"] else {"status": "pending"})
+
+    monkeypatch.setattr("urllib.request.urlopen", _speaks(script))
+    started = filming.auto_render("p1", "Yes.")
+    assert filming.follow(started["id"])["status"] == "pending"
+    stage["done"] = True
+    settled = filming.follow(started["id"])
+    assert settled["status"] == "done"
+    assert settled["video_url"] == "https://cdn/x.mp4"
+
+
+def test_a_settled_render_is_not_asked_about_again(seeded, monkeypatch,
+                                                    wired):
+    """The service bills per call on some plans, and a finished job does
+    not become unfinished."""
+    from qrme import filming
+    filming.set_road("p1", "video", 300)
+    speaks = _speaks(lambda url, body: {"video_url": "https://cdn/x.mp4"})
+    monkeypatch.setattr("urllib.request.urlopen", speaks)
+    started = filming.auto_render("p1", "Yes.")
+    before = len(speaks.calls)
+    filming.follow(started["id"])
+    assert len(speaks.calls) == before
+
+
+def test_a_poll_that_cannot_reach_the_service_is_not_a_failed_render(
+        seeded, monkeypatch, wired):
+    """Saying it failed would throw away a video somebody has paid for."""
+    from qrme import filming
+    filming.set_road("p1", "video", 300)
+    monkeypatch.setattr("urllib.request.urlopen",
+                        _speaks(lambda url, body: {"id": "job-1"}))
+    started = filming.auto_render("p1", "Yes.")
+
+    def dies(request, timeout=None):
+        raise OSError("no route")
+
+    monkeypatch.setattr("urllib.request.urlopen", dies)
+    assert filming.follow(started["id"])["status"] == "pending"
+
+
+# --- the render outlives the page ----------------------------------------
+
+def test_the_newest_render_is_what_latest_answers(seeded, monkeypatch, wired):
+    """What a screen asks on opening.
+
+    A render outlives the page that started it — that is the whole reason
+    a turn starts one and moves on. The bubble tells somebody it "appears
+    here when you come back", and coming back only works if there is
+    something to ask. Without this the sentence is a promise nothing
+    keeps: the row existed and no door reached it.
+    """
+    from qrme import filming
+    filming.set_road("p1", "video", 300)
+    monkeypatch.setattr("urllib.request.urlopen",
+                        _speaks(lambda url, body: {"id": "job-1"}))
+    first = filming.auto_render("p1", "Yes.")
+    second = filming.auto_render("p1", "And also this.")
+    assert filming.latest("p1")["id"] == second["id"]
+    assert first["id"] != second["id"]
+
+
+def test_a_profile_with_no_footage_has_no_latest(seeded):
+    """None, not an error. No footage is the ordinary case on every road
+    but video, and a screen should not have to catch an exception to
+    learn that nothing has happened."""
+    from qrme import filming
+    assert filming.latest("p1") is None
+
+
+def test_latest_belongs_to_the_profile_that_asked(seeded, monkeypatch, wired):
+    """A conversation opening must not be handed somebody else's render."""
+    from qrme import filming
+    filming.set_road("p1", "video", 300)
+    filming.set_road("p2", "video", 300)
+    monkeypatch.setattr("urllib.request.urlopen",
+                        _speaks(lambda url, body: {"id": "job-1"}))
+    mine = filming.auto_render("p1", "Yes.")
+    filming.auto_render("p2", "Not yours.")
+    assert filming.latest("p1")["id"] == mine["id"]

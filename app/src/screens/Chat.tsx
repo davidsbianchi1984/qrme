@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { api, getBase, type Avatar, type Briefing, type DialerPosture,
-         type Escalated, type MyPerson } from "../api";
+         type Escalated, type MyPerson, type SceneRender } from "../api";
 import { AvatarStage } from "../AvatarStage";
 import { Briefcase } from "../Briefcase";
 import { Refusal } from "../Refusal";
+import { SceneFilm } from "../SceneFilm";
 import { micClosed, openTheEar, plainVoice, speakInPieces } from "../spoken";
 import { TalkRail } from "../TalkRail";
 import { Waveform } from "../Waveform";
@@ -28,7 +29,10 @@ interface Msg { who: "you" | "assistant"; text: string; note?: string;
                 doc?: Doc | null;
                 /** Set when the model the owner chose did not answer and
                  *  the local fallback wrote this instead. */
-                degradedFrom?: string | null }
+                degradedFrom?: string | null;
+                /** The turn's own footage, when this profile's road is
+                 *  video. A row, not a video: `SceneFilm` polls it. */
+                scene?: SceneRender | null }
 
 /** The designation, over the face it is the designation of.
  *
@@ -272,6 +276,31 @@ export function Chat({ onPlans }: {
         (d) => d.profile_id === session.profileId && d.open)))
       .catch(() => undefined);
   }, [session.interactorId, session.interactorToken, session.profileId]);
+  /** The render this conversation left behind, if it left one.
+   *
+   * A render outlives the page that started it — that is the point of
+   * starting it and moving on — so the bubble tells somebody it "appears
+   * here when you come back". Coming back only works if something asks,
+   * and nothing did: the scene arrived on the chat response and lived in
+   * component state, so closing the tab lost it while the job carried on
+   * being paid for. This is the asking.
+   *
+   *     asked     is a render finished
+   *     mattered  is there one at all, after a reload
+   *
+   * It stands on its own line rather than in a bubble: the turn it
+   * belongs to is above in the transcript, and pinning it to a message
+   * that may not have been re-fetched would put it under the wrong one.
+   */
+  const [standing, setStanding] = useState<SceneRender | null>(null);
+  useEffect(() => {
+    if (!session.profileId) return;
+    let live = true;
+    api.videoLatest(session.profileId)
+      .then((r) => { if (live) setStanding(r.scene); })
+      .catch(() => undefined);
+    return () => { live = false; };
+  }, [session.profileId]);
   // The composer's +. Five tools lived as full-size buttons in the bar and
   // the text box paid for it — the field report could not even see it. The
   // mic, the box and Send stay; everything else folds here.
@@ -956,8 +985,11 @@ export function Chat({ onPlans }: {
       const degradedFrom = reply.provenance?.degraded_from ?? null;
       // What the turn handed over, if it handed anything over.
       const doc = (pm as { document?: Doc | null }).document ?? null;
+      // Only on an approved reply, and the server already decided that:
+      // footage of something moderation held back would be the held
+      // thing, in a more persuasive form.
       setMsgs((m) => [...m, { who: "assistant", text, note, degradedFrom,
-                              doc }]);
+                              doc, scene: reply.scene ?? null }]);
       if ((speakOn || talking) && pm.status === "approved") speakAloud(text);
     } catch (e) {
       setError(e);
@@ -1038,6 +1070,11 @@ export function Chat({ onPlans }: {
                 )}
               </a>
             )}
+            {/* The reply as footage, when that is this profile's road.
+                Under the words rather than instead of them: a video that
+                is still rendering, or that failed, must not take the
+                answer away from somebody who can already read it. */}
+            {m.scene && <SceneFilm scene={m.scene} lang={lang} />}
             {m.note && <div className="bubble-note">{m.note}</div>}
             {m.degradedFrom && (
               <div className="degraded">
@@ -1047,6 +1084,13 @@ export function Chat({ onPlans }: {
             )}
           </div>
         ))}
+        {/* The render left over from a previous visit. Drawn once, under
+            everything, and only when this session has not already got a
+            scene of its own on a message — otherwise a reload would show
+            the same footage twice. */}
+        {standing && !msgs.some((m) => m.scene) && (
+          <SceneFilm scene={standing} lang={lang} />
+        )}
         {busy && <div className="bubble assistant thinking">…</div>}
       </div>
 

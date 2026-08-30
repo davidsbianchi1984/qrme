@@ -67,10 +67,20 @@ export function Identity({ onPlans, onPassing }: {
   const [marketKey, setMarketKey] = useState("");
   // The forge: what this deployment can build from a photograph, and the
   // framing of the picture being handed to it.
-  // Which of the three roads this profile's presence takes. Not stored
-  // on the profile: it is a per-render choice, because a profile pinned
-  // to video would cost four dollars and four minutes for every reply.
+  // Which of the three roads this profile's presence takes.
+  //
+  // Stored on the server, not held here. It used to be component state,
+  // and that was fine while the only thing it did was decide which block
+  // this screen drew — but auto-render reads the road on a turn nobody
+  // is looking at this screen for, and a choice living in a component is
+  // a choice `/profiles/{id}/chat` cannot see. `budget` is the other
+  // half: every reply renders, so the ceiling is what makes video safe
+  // to pick, and it is shown next to the road rather than on a settings
+  // page somebody finds after the bill.
   const [road, setRoad] = useState<"photo" | "avatar" | "video">("photo");
+  const [budget, setBudget] = useState<
+    { daily_seconds: number; spent: number; left: number } | null>(null);
+  const [capDraft, setCapDraft] = useState("");
   const [film, setFilm] = useState<
     Awaited<ReturnType<typeof api.videoDoors>> | null>(null);
   const [passage, setPassage] = useState("");
@@ -378,6 +388,13 @@ export function Identity({ onPlans, onPassing }: {
     // the worst moment to find out.
     api.videoDoors().then(setFilm).catch(() => setFilm(null));
     if (me) {
+      // The stored road, so the picker opens on what the chat endpoint
+      // will actually do rather than on this component's default.
+      api.videoRoad(me).then((r) => {
+        setRoad(r.road as "photo" | "avatar" | "video");
+        setBudget(r);
+        setCapDraft(String(r.daily_seconds));
+      }).catch(() => setBudget(null));
       api.videoDirection(me).then((r) => setDirection(r.direction))
         .catch(() => setDirection(""));
       api.videoDirectionLog(me).then((r) => setSceneLog(r.log))
@@ -386,6 +403,48 @@ export function Identity({ onPlans, onPassing }: {
     api.avatarShelf().then((r) => setShelfRows(r.shelf))
       .catch(() => setShelfRows([]));
   }, []);
+
+  /** Take the road, and keep it.
+   *
+   * The picker moves first and the request follows, because the block
+   * below it is the whole reason somebody pressed: making them wait on a
+   * round trip to see the video options would be a spinner in place of a
+   * fold. If the write fails the server's answer wins — a picker showing
+   * "video" over a profile still stored as "photo" is the one state that
+   * would have somebody wondering why no footage ever arrives.
+   */
+  async function chooseRoad(key: "photo" | "avatar" | "video") {
+    setRoad(key);
+    if (!me) return;
+    try {
+      const got = await api.videoSetRoad(me, key);
+      setRoad(got.road as "photo" | "avatar" | "video");
+      setBudget(got);
+      setCapDraft(String(got.daily_seconds));
+    } catch (e) {
+      fail(e);
+      api.videoRoad(me).then((r) => {
+        setRoad(r.road as "photo" | "avatar" | "video");
+        setBudget(r);
+      }).catch(() => undefined);
+    }
+  }
+
+  /** Move the ceiling. Sent with the road it belongs to, since that is
+   *  the pair the server stores — and a ceiling is only ever raised or
+   *  lowered by the person who has to live under it. */
+  async function setCeiling() {
+    if (!me) return;
+    const seconds = Number(capDraft);
+    if (!Number.isFinite(seconds) || seconds < 0) return;
+    try {
+      const got = await api.videoSetRoad(me, road, Math.round(seconds));
+      setBudget(got);
+      setCapDraft(String(got.daily_seconds));
+    } catch (e) {
+      fail(e);
+    }
+  }
 
   /** Send the passage to be rendered. Length is never passed: the
    *  backend derives it from the words, which is the whole reason there
@@ -837,7 +896,7 @@ export function Identity({ onPlans, onPassing }: {
             <button key={key} type="button"
                     className={"road" + (road === key ? " lit" : "")}
                     aria-pressed={road === key}
-                    onClick={() => setRoad(key)}>
+                    onClick={() => void chooseRoad(key)}>
               <span className="road-name">{name}</span>
               <span className="road-note">{note}</span>
             </button>
@@ -851,6 +910,31 @@ export function Identity({ onPlans, onPassing }: {
             decision. */}
         {road === "video" && (
           <>
+            {/* The ceiling, first — above the service and above the
+                passage, because it is the sentence that makes the rest of
+                this block a safe thing to have pressed. Every reply is
+                rendered once this road is taken; a limit offered after
+                that is a limit offered after the bill. */}
+            <h4>{tr("idn.road.cap", lang)}</h4>
+            <p className="muted small">{tr("idn.road.cap.sub", lang)}</p>
+            <div className="row">
+              <input type="number" min={0} max={3600} value={capDraft}
+                     aria-label={tr("idn.road.cap", lang)}
+                     onChange={(e) => setCapDraft(e.target.value)} />
+              <button className="chip" onClick={() => void setCeiling()}>
+                {tr("idn.road.cap.set", lang)}
+              </button>
+            </div>
+            {budget && (
+              <p className="muted small">
+                {fill(tr("idn.road.left", lang), {
+                  left: String(budget.left),
+                  cap: String(budget.daily_seconds),
+                })}
+              </p>
+            )}
+            <p className="muted small">{tr("idn.road.spent", lang)}</p>
+
             <h4>{tr("idn.video.service", lang)}</h4>
             <SkinTiles
               sources={(film?.providers || [])

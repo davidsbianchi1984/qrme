@@ -609,6 +609,7 @@ is exactly how the old card came to be showing yours in place of theirs.
   </tr>
   <tr>
     <td align="center" width="25%"><a href="screens/208-capabilities.png"><img src="screens/208-capabilities.png" width="210" alt="Capabilities"></a><br><sub><b>208</b> · Capabilities · every faculty a profile can be given, what it rests on, and where it is withdrawn</sub></td>
+    <td align="center" width="25%"><a href="screens/209-the-reply-as-footage.png"><img src="screens/209-the-reply-as-footage.png" width="210" alt="The reply as footage"></a><br><sub><b>209</b> · The reply as footage · a turn on the video road, being rendered — no one pressed play</sub></td>
   </tr>
 </table>
 

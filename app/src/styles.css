@@ -2492,3 +2492,35 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .scene-log li { font-size: 12px; line-height: 1.55; color: var(--t2);
   margin-bottom: 4px; }
 .scene-log li em { font-style: normal; font-size: 10.5px; }
+
+/* The reply as footage, inside the bubble it belongs to.
+ *
+ * Four states and only one of them is a video, so the other three are
+ * lines of type rather than an empty frame — a blank space cannot tell a
+ * render in progress from one that failed, or from a ceiling the owner
+ * set themselves. The accent says which: green while it is being made,
+ * amber for the ceiling, muted for a failure, because a failed render is
+ * not an error in the answer above it. */
+.bubble-scene {
+  margin-top: 9px; padding: 8px 11px; border-radius: 10px;
+  font-size: 11.5px; line-height: 1.5; color: var(--t2);
+  background: var(--card2); border: 1px solid var(--line);
+}
+.bubble-scene.making {
+  border-color: rgba(123,196,127,.34); background: rgba(123,196,127,.08);
+}
+.bubble-scene.capped {
+  border-color: rgba(255,184,77,.34); background: rgba(255,184,77,.09);
+}
+.bubble-scene.done { padding: 0; overflow: hidden; position: relative;
+  background: #000; }
+.bubble-scene.done video { width: 100%; display: block; }
+/* Marked on the surface as well as in the file. `asset_is_marked` decides
+   by path and the stored file carries the badge, but somebody watching a
+   video in a chat bubble reads the caption under it, not the URL. */
+.bubble-scene-ai {
+  position: absolute; left: 8px; bottom: 8px; font-size: 8.5px;
+  font-weight: 800; letter-spacing: .06em; color: #9fd8e8;
+  background: rgba(8,6,16,.72); border-radius: 6px; padding: 2px 7px;
+}
+.bubble-scene em { font-style: normal; }

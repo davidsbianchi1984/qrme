@@ -209,6 +209,21 @@ DOORS: tuple[Door, ...] = (
          "moving with the voice being spoken",
          ("3d avatar", "moving face", "talking head", "my face in 3d",
           "make my avatar talk", "lip sync", "animated avatar")),
+    Door("VideoQuote", "Identity tab",
+         "how long a scene will run and how long it takes to make — "
+         "worked out from the passage, stated and never offered as a "
+         "dial, because a dial makes the video fit the setting instead "
+         "of the content",
+         ("how long will the video be", "video length", "how long to "
+          "render", "why is my video that long", "make the video longer")),
+    Door("SceneFilm", "the conversation",
+         "the reply rendered as footage, playing under the words it is a "
+         "video of — started by the turn itself, so nobody presses play, "
+         "and saying which of the four things is happening when there is "
+         "no video yet",
+         ("where is my video", "render my replies", "video of the answer",
+          "why did no video appear", "reply as video",
+          "daily video limit")),
     Door("InWords", "Language & Name tab",
          "the words a profile uses, and the name it answers to",
          ("language", "my name", "what to call", "rename",

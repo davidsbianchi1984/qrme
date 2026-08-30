@@ -155,3 +155,33 @@ POST /profiles/{profile_id}/avatar/speaking
 # screen in words; the machine that can photograph a screen and then act
 # on it is `companion/hands.py`, which runs on the person's own desk.
 POST /profiles/{profile_id}/hands/reaches/{reach_id}/next
+
+# The video road (qrme/filming.py) — ten doors the console has and these
+# three shells do not.
+#
+# Recorded rather than built, and the reason is that a door here would be
+# a button that spends money on a surface with nothing to show the result
+# on. The road is not one route: it is a picker, a daily ceiling in
+# seconds, a standing direction written in prose, a poller that has to
+# survive the app going to the background, and a video player. Binding
+# the ten routes without those is the failure
+# unused_native_bindings.txt exists to catch — a shell that can START a
+# render it cannot show, cap, or cancel.
+#
+#     asked     can this client reach the route
+#     mattered  can this client do the thing the route is for
+#
+# The console carries all ten today. When a shell grows the player and
+# the poller, these ten come off together — not one at a time, because a
+# render started on a phone that cannot display it is worse than one
+# nobody could start.
+GET /video/doors
+POST /video/render
+GET /video/render/{render_id}
+GET /video/latest/{profile_id}
+GET /video/road/{profile_id}
+POST /video/road/{profile_id}
+GET /video/direction/{profile_id}
+POST /video/direction/{profile_id}
+DELETE /video/direction/{profile_id}
+GET /video/direction/{profile_id}/log

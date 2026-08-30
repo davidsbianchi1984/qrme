@@ -1142,6 +1142,48 @@ CREATE TABLE IF NOT EXISTS scene_direction (
     updated_at TEXT NOT NULL
 );
 
+-- Which road this profile's presence takes, and what it has spent today.
+--
+-- Stored rather than asked per turn, because auto-render has to know
+-- without being told: a reply arrives and something must decide, before
+-- anybody looks at a screen, whether that reply becomes footage.
+--
+--     asked     does this person want video
+--     mattered  do they want it for EVERY reply, at a few dollars each
+--
+-- `daily_seconds` is the ceiling that makes the answer safe to be yes. A
+-- room left on the video road with no cap spends until the card declines,
+-- and the person who set it was choosing a look rather than a budget.
+CREATE TABLE IF NOT EXISTS presence_road (
+    profile_id    TEXT PRIMARY KEY REFERENCES profiles(id),
+    road          TEXT NOT NULL,      -- photo | avatar | video
+    daily_seconds INTEGER NOT NULL,   -- of finished footage, per day
+    updated_at    TEXT NOT NULL
+);
+
+-- One render, from the moment it was asked for to the moment it arrived.
+--
+-- Auto-render cannot hold a request open for four minutes, so the turn
+-- starts a render and moves on; this is what a screen polls. `seconds` is
+-- the finished length, written when the job STARTS rather than when it
+-- finishes, because the ceiling has to count what is in flight — two
+-- turns in quick succession would otherwise both pass a cap that neither
+-- had spent yet.
+CREATE TABLE IF NOT EXISTS scene_render (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    passage    TEXT NOT NULL,
+    seconds    INTEGER NOT NULL,
+    job        TEXT,               -- the service's own id, while pending
+    video_url  TEXT,
+    status     TEXT NOT NULL,      -- pending | done | failed
+    detail     TEXT,               -- why, when failed
+    created_at TEXT NOT NULL,
+    settled_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_scene_render_profile
+    ON scene_render(profile_id, created_at DESC);
+
 -- Every change asked of the scene direction, and what it did.
 --
 -- The direction itself is one row that gets overwritten, which is right for

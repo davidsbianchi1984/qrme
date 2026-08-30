@@ -958,6 +958,11 @@ class ChatResponse(BaseModel):
     # across every embodiment/modality, so a client can prove personality
     # continuity when a relationship moves from voice → text → hologram.
     persona_signature: str | None = None
+    # The turn as footage, when this profile takes the video road. Started
+    # here and NOT waited for — a render is minutes and a reply is not —
+    # so what rides back is a row to poll rather than a video. None on the
+    # photo and avatar roads, and when no service is configured.
+    scene: dict | None = None
     embodiment: str | None = None      # the embodiment this turn came through
     # Echo of the environmental context the reply adapted to (spec clause 1);
     # None when the request carried none.

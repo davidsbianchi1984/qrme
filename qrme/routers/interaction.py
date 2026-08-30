@@ -10,9 +10,9 @@ from datetime import date
 from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
-from .. import (adaptation, auth, briefcase, companion, contacts, db, opendoor,
-                engagement, i18n,
-                llm, moderation, offline, persona, referral, remembrance,
+from .. import (adaptation, auth, briefcase, companion, contacts, db,
+                engagement, filming, i18n, llm, moderation, offline,
+                opendoor, persona, referral, remembrance,
                 roles, scrape, voiceprint, watermark)
 from ..common import (require_may_publish, 
     age_of, anonymized_exchange, biometric_domain, biometrics_recovered,
@@ -770,7 +770,20 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     chat_provenance = content_provenance(speaking_profile, sources, status,
                                          flag_reason)
     chat_provenance["grounded_in_vault"] = grounded
+    # The turn as footage, when that is the road this profile takes.
+    #
+    # Started after the reply is settled and never waited for: a render is
+    # minutes, a reply is not, and the person is already reading. Only an
+    # approved reply is rendered — footage of something moderation held
+    # back would be the held thing, in a more persuasive form.
+    #
+    #     asked     should this reply become video
+    #     mattered  should THIS reply become video
+    scene = (filming.auto_render(profile_id, reply)
+             if status == "approved" else None)
+
     return ChatResponse(
+        scene=scene,
         provenance=chat_provenance,
         interactor_message=message_out(rows[interactor_msg_id]),
         profile_message=message_out(rows[profile_msg_id]),

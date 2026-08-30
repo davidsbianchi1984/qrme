@@ -1229,6 +1229,24 @@ export interface ChatMessage {
   status: string;        // "approved" | "held" | "rejected"
   flag_reason?: string | null;
 }
+/** A reply being rendered as footage — the row `auto_render` starts and
+ *  `videoFollow` polls.
+ *
+ *  `status` is "pending", "done", "failed" or "capped". "capped" is the
+ *  only one with no row behind it: it is the ceiling answering, and it
+ *  carries `left` instead of an id, because an owner who set a limit and
+ *  then stopped seeing video is owed the reason. */
+export interface SceneRender {
+  id?: string;
+  profile_id?: string;
+  job?: string | null;
+  status: string;
+  video_url?: string | null;
+  seconds?: number;
+  detail?: string | null;
+  left?: number;
+  daily_seconds?: number;
+}
 export interface ChatReply {
   interactor_message: ChatMessage;
   profile_message: ChatMessage;
@@ -1249,6 +1267,11 @@ export interface ChatReply {
     generated_by?: string;
     degraded_from?: string | null;
   } | null;
+  /** Set only when this profile's road is video and there was room
+   *  under today's ceiling. Never an error: a video that did not get
+   *  made is a smaller thing than an answer that did not arrive, so the
+   *  turn returns null rather than failing. */
+  scene?: SceneRender | null;
 }
 export interface CompositionRow {
   source_profile_id: string;
@@ -5062,6 +5085,41 @@ export const api = {
   videoUndirect: (profileId: string) =>
     req<{ direction: string }>(`/video/direction/${profileId}`,
                                { method: "DELETE" }),
+  /** Which road this profile's presence takes, its daily ceiling, and
+   *  what is left of it today. The road is stored server-side because
+   *  auto-render reads it on a turn nobody is looking at a screen for:
+   *  a choice held in a component is a choice the chat endpoint cannot
+   *  see. `left` is the number that makes picking video safe to pick. */
+  videoRoad: (profileId: string) =>
+    req<{ road: string; daily_seconds: number; set: boolean;
+          spent: number; left: number; roads: string[] }>(
+      `/video/road/${profileId}`),
+  /** Choose the road, and the ceiling that goes with it. The ceiling is
+   *  sent with the road rather than on its own screen: somebody turning
+   *  video on is exactly the person who needs to see what it will cost
+   *  them per day, and a limit set later is a limit set after the bill. */
+  videoSetRoad: (profileId: string, road: string,
+                 dailySeconds?: number) =>
+    req<{ road: string; daily_seconds: number; set: boolean;
+          spent: number; left: number; roads: string[] }>(
+      `/video/road/${profileId}`,
+      { method: "POST",
+        body: JSON.stringify({ road, daily_seconds: dailySeconds }) }),
+  /** The most recent render for this profile, however it ended.
+   *
+   *  Asked on opening a conversation, because a render outlives the page
+   *  that started it. The bubble says "it keeps going without this page
+   *  open, and appears here when you come back" — and coming back only
+   *  works if there is something to ask. `scene` is null when there has
+   *  never been one, which is the ordinary case on every road but video. */
+  videoLatest: (profileId: string) =>
+    req<{ scene: SceneRender | null }>(`/video/latest/${profileId}`),
+  /** Whether a render started by a turn has finished. What a screen
+   *  polls after a reply comes back carrying a pending `scene`. A
+   *  settled render answers from the row rather than the service, so
+   *  polling a finished job costs nothing. */
+  videoFollow: (renderId: string) =>
+    req<SceneRender>(`/video/render/${renderId}`),
   videoRender: (prompt: string, shape: string, profileId: string | null = null,
                 wait = false) =>
     req<{ video_url?: string; id?: string; pending?: boolean;

@@ -273,13 +273,31 @@ def check(scene: str, *, seconds: int = 5, shape: str = "landscape") -> None:
                                      seconds=seconds, max=MAX_SECONDS))
 
 
-def _ask(url: str, body: dict | None = None) -> dict:
+def _ask(url: str, body: dict | None = None,
+         on_behalf_of: str | None = None) -> dict:
     """One call to the service, with its refusals passed through.
 
     A vendor's own wording is better than ours — "the prompt was rejected
     by our safety filter" is something a person can act on, and
     "the render failed" is not.
+
+    Offline mode is checked here rather than in `render`, and that is the
+    correction: the gate sat one level up, so starting a render refused
+    on an offline host and *polling* one did not. A poll carries a job id
+    rather than somebody's words, but it still opens a socket to a
+    service that is by definition not on this machine, and "nothing
+    leaves the host" has to be true of every way out or it is not a
+    property of the code.
+
+        asked     does the render consult offline mode
+        mattered  does everything that reaches the service consult it
+
+    This is the only way out of this module, so gating it gates all of
+    them.
     """
+    from . import offline
+    offline.allow(url, "the video service", on_behalf_of)
+
     key = os.environ.get("QRME_FILM_KEY", "").strip()
     headers = {"authorization": f"Bearer {key}"}
     data = None
@@ -323,14 +341,6 @@ def render(scene: str, *, seconds: int | None = None,
     if not configured():
         raise FilmingError(why_not() or "this deployment renders no video")
 
-    # Offline mode's own rule, applied the way the forge applies it: the
-    # check is on the HOST. A prompt describing a scene is somebody's
-    # words, and a render service is by definition not on this machine,
-    # so an offline deployment refuses here rather than discovering it
-    # mid-upload.
-    from . import offline
-    offline.allow(endpoint(), "the video service's prompt", on_behalf_of)
-
     # The standing direction rides in front of the passage. Length was
     # derived from the passage alone, above, and stays that way: the
     # direction says how it looks, not how long it runs, and letting it
@@ -339,7 +349,8 @@ def render(scene: str, *, seconds: int | None = None,
 
     began = time.monotonic()
     started = _ask(endpoint(), {"provider": provider(), "prompt": prompt,
-                                "seconds": seconds, "shape": shape})
+                                "seconds": seconds, "shape": shape},
+                   on_behalf_of=on_behalf_of)
     if started.get("video_url"):
         return {"video_url": started["video_url"], "provider": provider(),
                 "seconds": seconds, "waited": 0}
@@ -355,7 +366,7 @@ def render(scene: str, *, seconds: int | None = None,
 
     while time.monotonic() - began < GIVE_UP_AFTER:
         time.sleep(POLL_EVERY)
-        state = _ask(f"{endpoint()}/{job}")
+        state = _ask(f"{endpoint()}/{job}", on_behalf_of=on_behalf_of)
         status = (state.get("status") or "").lower()
         if status == "done" and state.get("video_url"):
             return {"video_url": state["video_url"], "provider": provider(),
@@ -549,3 +560,200 @@ def compose(profile_id: str, passage: str) -> str:
     setting as an afterthought.
     """
     return f"{direction_of(profile_id)}\n\n{(passage or '').strip()}"
+
+
+# --------------------------------------------------------------------------- #
+# The road, the ceiling, and rendering without being asked
+# --------------------------------------------------------------------------- #
+
+#: The three roads a presence takes. `photo` leads because it is what a
+#: profile has before anybody chooses, and what every other road falls
+#: back to when it is not ready.
+ROADS = ("photo", "avatar", "video")
+DEFAULT_ROAD = "photo"
+
+#: How many seconds of finished footage one profile may render in a day
+#: unless its owner says otherwise. At the going rate this is a few
+#: dollars — enough to see the feature work, small enough that a room
+#: left running overnight is an annoyance rather than an incident.
+DEFAULT_DAILY_SECONDS = 60
+
+
+def road_of(profile_id: str) -> dict:
+    """Which road this profile's presence takes, and its daily ceiling."""
+    from . import db
+    row = db.connect().execute(
+        "SELECT road, daily_seconds FROM presence_road WHERE profile_id=?",
+        (profile_id,)).fetchone()
+    if row is None:
+        return {"road": DEFAULT_ROAD, "daily_seconds": DEFAULT_DAILY_SECONDS,
+                "set": False}
+    return {"road": row["road"], "daily_seconds": row["daily_seconds"],
+            "set": True}
+
+
+def set_road(profile_id: str, road: str,
+             daily_seconds: int | None = None) -> dict:
+    """Choose the road, and the ceiling that makes choosing video safe."""
+    from . import db
+    if road not in ROADS:
+        raise FilmingError(
+            "a presence takes one of these roads — " + ", ".join(ROADS))
+    cap = road_of(profile_id)["daily_seconds"] if daily_seconds is None \
+        else int(daily_seconds)
+    if cap < 0:
+        raise FilmingError("a ceiling below zero is not a ceiling")
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO presence_road (profile_id, road, daily_seconds,"
+        " updated_at) VALUES (?,?,?,?) ON CONFLICT (profile_id) DO UPDATE SET"
+        " road=excluded.road, daily_seconds=excluded.daily_seconds,"
+        " updated_at=excluded.updated_at",
+        (profile_id, road, cap, db.utcnow()))
+    conn.commit()
+    return road_of(profile_id)
+
+
+def spent_today(profile_id: str) -> int:
+    """Seconds of footage this profile has ordered today.
+
+    Counts renders that are still PENDING as well as finished ones. Two
+    turns in quick succession would otherwise both pass a ceiling neither
+    had spent yet — the money is committed when the job starts, not when
+    the video arrives.
+    """
+    from . import db
+    row = db.connect().execute(
+        "SELECT COALESCE(SUM(seconds), 0) AS spent FROM scene_render"
+        " WHERE profile_id=? AND status != 'failed'"
+        " AND substr(created_at, 1, 10) = substr(?, 1, 10)",
+        (profile_id, db.utcnow())).fetchone()
+    return int(row["spent"])
+
+
+def budget(profile_id: str) -> dict:
+    """What is left today, said in the terms the ceiling is set in."""
+    settings = road_of(profile_id)
+    spent = spent_today(profile_id)
+    return {"daily_seconds": settings["daily_seconds"], "spent": spent,
+            "left": max(0, settings["daily_seconds"] - spent)}
+
+
+def auto_render(profile_id: str, passage: str,
+                shape: str = "landscape") -> dict | None:
+    """Render this reply as footage, if that is the road and there is room.
+
+    The turn calls this and moves on. Nothing is waited for: a render is
+    minutes and a reply is not, so what comes back is a row a screen can
+    poll rather than a video.
+
+        asked     should this reply become footage
+        mattered  can it, today, without spending what nobody agreed to
+
+    Answers None — never raises — when the road is not video, when the
+    ceiling is reached, or when no service is configured. A turn is not
+    the place to fail: the reply already happened, the person is reading
+    it, and a video that did not get made is a smaller thing than an
+    answer that did not arrive.
+    """
+    from . import db
+
+    settings = road_of(profile_id)
+    if settings["road"] != "video" or not configured():
+        return None
+
+    seconds = length_for(passage)
+    left = budget(profile_id)["left"]
+    if seconds > left:
+        # Recorded rather than silent. An owner who set a ceiling and then
+        # stopped seeing video is owed the reason, and "you reached the
+        # limit you set" is a different sentence from "it broke".
+        return {"status": "capped", "seconds": seconds, "left": left,
+                "daily_seconds": settings["daily_seconds"]}
+
+    row_id = db.new_id("ren")
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO scene_render (id, profile_id, passage, seconds, status,"
+        " created_at) VALUES (?,?,?,?,'pending',?)",
+        (row_id, profile_id, passage.strip()[:2000], seconds, db.utcnow()))
+    conn.commit()
+
+    try:
+        started = render(passage, seconds=seconds, shape=shape,
+                         directed_for=profile_id, on_behalf_of=profile_id,
+                         wait=False)
+    except FilmingError as exc:
+        settle(row_id, status="failed", detail=i18n.raised(exc))
+        return {"id": row_id, "status": "failed",
+                "detail": i18n.raised(exc)}
+
+    if started.get("video_url"):
+        settle(row_id, status="done", video_url=started["video_url"])
+    else:
+        conn.execute("UPDATE scene_render SET job=? WHERE id=?",
+                     (started.get("id"), row_id))
+        conn.commit()
+    return latest(profile_id)
+
+
+def settle(render_id: str, *, status: str, video_url: str | None = None,
+           detail: str | None = None) -> None:
+    """Write how a render ended. Called once; a settled row stays settled.
+
+    Guarded in SQL rather than by reading first: two pollers finishing the
+    same job would otherwise both write, and the second would overwrite a
+    `done` with whatever it saw.
+    """
+    from . import db
+    conn = db.connect()
+    conn.execute(
+        "UPDATE scene_render SET status=?, video_url=?, detail=?,"
+        " settled_at=? WHERE id=? AND status='pending'",
+        (status, video_url, detail, db.utcnow(), render_id))
+    conn.commit()
+
+
+def latest(profile_id: str) -> dict | None:
+    """The most recent render for this profile, however it ended."""
+    from . import db
+    row = db.connect().execute(
+        "SELECT id, seconds, job, video_url, status, detail, created_at"
+        " FROM scene_render WHERE profile_id=?"
+        " ORDER BY created_at DESC, rowid DESC LIMIT 1",
+        (profile_id,)).fetchone()
+    return dict(row) if row else None
+
+
+def follow(render_id: str) -> dict | None:
+    """Ask the service whether a pending render has finished.
+
+    What a screen polls. A render that is already settled is returned as
+    it stands rather than asked about again — the service is billed per
+    call on some plans, and a finished job does not become unfinished.
+    """
+    from . import db
+    row = db.connect().execute(
+        "SELECT id, profile_id, job, status, video_url, seconds, detail"
+        " FROM scene_render WHERE id=?", (render_id,)).fetchone()
+    if row is None:
+        return None
+    if row["status"] != "pending" or not row["job"]:
+        return dict(row)
+    try:
+        state = _ask(f"{endpoint()}/{row['job']}",
+                     on_behalf_of=row["profile_id"])
+    except FilmingError as exc:
+        # A poll that could not reach the service is not a failed render.
+        # The job may well be running; saying it failed would throw away a
+        # video somebody has already paid for.
+        return {**dict(row), "detail": i18n.raised(exc)}
+    status = (state.get("status") or "").lower()
+    if status == "done" and state.get("video_url"):
+        settle(row["id"], status="done", video_url=state["video_url"])
+    elif status == "failed":
+        settle(row["id"], status="failed",
+               detail=state.get("detail") or "the render failed at the service")
+    return dict(db.connect().execute(
+        "SELECT id, profile_id, job, status, video_url, seconds, detail"
+        " FROM scene_render WHERE id=?", (render_id,)).fetchone())

@@ -150,6 +150,30 @@ owner said rather than appending to it, so twenty corrections stay one
 readable paragraph instead of a transcript of complaints that contradict
 each other.
 
+**Nobody presses play.** On the video road every approved reply is
+rendered as it arrives — the turn starts the job and moves on, because a
+render is minutes and a reply is not. What the response carries is a row
+and the screen polls it, so the words are readable the whole time the
+footage is being made.
+
+Two things keep that from being a bill nobody agreed to. The road is
+stored on the server rather than held on the screen that picks it — the
+turn runs where no console is looking, and a choice living in a component
+is one the chat endpoint cannot see. And a ceiling in seconds a day sits
+directly above the picker, counting renders already started so two quick
+replies cannot both slip under a limit neither had spent. A reply past it
+arrives as text that says so: an owner who set a limit and then stopped
+seeing video is owed the reason, because "you reached the limit you set"
+is a different sentence from "it broke".
+
+A render that fails never fails the turn, and a render outlives the page
+that started it — `GET /video/latest/{id}` is what a conversation asks on
+opening, so closing the tab does not lose a job that is still being paid
+for.
+
+    asked     should this reply become footage
+    mattered  can it, today, without spending what nobody agreed to
+
 **No vendor is load-bearing.** Seven services are named and none is
 depended on. Sora is absent on purpose: OpenAI deprecated it on 26 April
 2026 and shuts the API down on 24 September. Ready Player Me closed on

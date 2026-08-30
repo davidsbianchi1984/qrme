@@ -209,6 +209,10 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     "make_one": ("make a profile", "new profile", "create a profile",
                  "add a profile", "genesis", "character card",
                  "import a card", "sillytavern", "chara card"),
+    "scenefilm": ("where is my video", "render my replies", "video of the "
+                  "reply", "reply as video", "why did no video appear",
+                  "video generation", "daily video limit",
+                  "how long is the video"),
     "blend": ("blend", "hybrid", "combine profiles", "mix profiles",
               "both grandparents", "composite", "merge two profiles"),
     "predict": ("what would they do", "what would he do", "what would she do",
