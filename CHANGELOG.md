@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.8.0] - 2026-08-30
+
 ### Fixed
 
 - **All four rail buttons opened half a window, and the rule meant to fix
@@ -16564,7 +16566,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.7.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.8.0...HEAD
+[2.8.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.7.1...app-v2.8.0
 [2.7.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.7.0...app-v2.7.1
 [2.7.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.6.0...app-v2.7.0
 [2.6.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.5.0...app-v2.6.0

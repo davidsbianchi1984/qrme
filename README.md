@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v2.7.1** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v2.8.0** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -328,6 +328,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **2.8.0** | Nine faculties on one page, in this product's own words — Channel 3, Channel 2, the voiceprint, the avatar, self-steering — each beside its live state, the permission it rests on, and the screen that withdraws it. The talk rail's four buttons open a whole window again: the panel was capped at 60vh of a sideways handheld because its override sat between two copies of the rule it was overriding. Seven more dead declarations were found by the guard written for that one. |
 | **2.7.1** | The minimized light is a circle again — a tap-target minimum was beating its declared height and drawing an ellipse. The screenshot harness builds the console before it photographs one, and can run at all: it had been raising NameError on every invocation since the reload round, so this gallery is the first shot since. |
 | **2.7.0** | A body is a surface, and moving one is refused with its reasons: `body` joins the hands' surfaces so the refusal has somewhere to live, watching through a robot is allowed, and acting on one names all four bounds a screen never needed — where the body may be, a ceiling on force and speed, a stop within reach of the person beside it, and a landing reported by a sensor rather than by the thing asked to move. The whole trio returns to one version number |
 | **2.6.0** | The hands get a motor — a small program on the person's own machine performs what the stack decides and permits, holding no authority, no daemon and no credential on disk, with a dry run as the default and a corner of the screen as the stop; the ledger learns whether a move actually landed, because permitting one and performing it are different facts from different ends; and the owner token stops being printed into a command line that the eyes were about to photograph |
