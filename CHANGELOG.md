@@ -6,6 +6,33 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.7.1] - 2026-08-30
+
+### Fixed
+
+- **The minimized light is a circle again.** It rendered 22 wide and 44
+  tall — an ellipse. It is a `<button>`, and the phone block sets
+  `button { min-height: 44px }` so every control is a real tap target;
+  `min-height` beats `height`, and the guard read the declared width and
+  height, saw 22 and 22, and passed. The button is the tap target now and
+  carries no paint; a face inside it is the circle.
+
+- **The screenshot harness runs, and builds first.** It had been raising
+  `NameError` on every invocation since the round that taught it to reload
+  before looking for a signed-in screen: the reload was carried across from
+  a sibling with the sibling's name for the console address, and this
+  product serves its console at the root. Nothing said so until somebody
+  ran it. It also required `app/dist` to be built and said so only in
+  prose, so a gallery could be re-shot to show a fix and photograph a
+  bundle from days earlier. The build is a step now, and this gallery is
+  the first shot here since the reload round.
+
+### Changed
+
+- **Every numeric floor in the suite is registered and audited.** Seven
+  rows left `unregistered_floors.txt`; three of them were decoration,
+  including one that stood at a fifth of what it measured.
+
 ## [2.7.0] - 2026-08-29
 
 ### Changed
@@ -16448,7 +16475,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.7.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.7.1...HEAD
+[2.7.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.7.0...app-v2.7.1
 [2.7.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.6.0...app-v2.7.0
 [2.6.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.5.0...app-v2.6.0
 [2.5.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.4.0...app-v2.5.0
