@@ -16,7 +16,8 @@ from pydantic import BaseModel, Field
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from .. import (auth, avatarforge, avatarreg, avatars, media, portraitist,
+from .. import (auth, avatarforge, avatarreg, avatars, filming, media,
+                portraitist,
                 presentation, skins)
 from ..common import profile_or_404, require_owner
 from .. import i18n
@@ -103,6 +104,22 @@ def forge_doors() -> dict:
     worst possible moment to discover it.
     """
     return avatarforge.doors()
+
+
+@router.get("/video/doors")
+def video_doors() -> dict:
+    """Whether a described scene can become video on this deployment.
+
+    Public and answered before anybody writes a prompt, for the same
+    reason the forge's door is: a console that draws the road on a
+    deployment that has none is a button that fails, and somebody who
+    has just written the scene they wanted is the worst moment to find
+    out.
+
+    It is shut everywhere today, and `why` says so in words rather than
+    leaving a screen to invent an explanation for a false flag.
+    """
+    return filming.doors()
 
 
 class ForgeFace(BaseModel):

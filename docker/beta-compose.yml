@@ -206,6 +206,9 @@ services:
       # recordings — same forwards-only-what-a-block-names reason.
       QRME_EARS_URL: http://ears:8500
       QRME_FORGE_URL: http://forge:8600
+      QRME_FILM_PROVIDER: ${QRME_FILM_PROVIDER:-}
+      QRME_FILM_URL: ${QRME_FILM_URL:-}
+      QRME_FILM_KEY: ${QRME_FILM_KEY:-}
       # Advertised by GET /pair, so the QR a phone scans has to point at the
       # public name rather than the container.
       QRME_PUBLIC_URL: ${QRME_PUBLIC_URL:?set QRME_PUBLIC_URL in .env}

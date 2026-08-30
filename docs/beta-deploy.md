@@ -94,6 +94,26 @@ ANTHROPIC_API_KEY=
 # voice and the say route refuses, naming this variable.
 ELEVENLABS_API_KEY=
 
+# --- optional: rendering a described scene as video ---------------------
+# A scene becomes video at a service that is not this one. All three are
+# needed together: naming a provider without a URL and a key leaves the
+# road built and pointed nowhere, and the console says which one is
+# missing rather than reporting "not configured".
+#
+# PROVIDER is one of: seedance, happyhorse, veo, kling, ltx, luma,
+# runway. URL points at whatever speaks submit-and-poll JSON for it —
+# the aggregators hosting these models already do.
+#
+# It is slow. Thirty seconds of 4K is minutes, not moments, and the
+# console quotes the wait before anybody commits to one; whether to wait
+# is the person's call. It also bills by the second of output, so a
+# deployment that sets these wants a spend limit above them.
+#
+# The key is typed on this box, never pasted into a document.
+QRME_FILM_PROVIDER=
+QRME_FILM_URL=
+QRME_FILM_KEY=
+
 # --- optional: somewhere else to point the hands ------------------------
 # The hands decide their next move with the model the profile chose on
 # the Settings screen, and a provider may decline to work a screen at
