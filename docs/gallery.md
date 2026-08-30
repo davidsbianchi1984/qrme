@@ -298,7 +298,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 <td align="center" width="25%"><a href="screens/150-what-went-wrong.svg"><img src="screens/150-what-went-wrong.svg" width="210" alt="What Went Wrong"></a><br><sub><b>150</b> · What Went Wrong</sub></td>
 </tr>
 <tr>
-<td align="center" width="25%"><a href="screens/151-before-anything-is-sent.svg"><img src="screens/151-before-anything-is-sent.svg" width="210" alt="Before Anything Is Sent"></a><br><sub><b>151</b> · Before Anything Is Sent</sub></td>
+<td align="center" width="25%"><a href="screens/151-before-anything-is-sent.png"><img src="screens/151-before-anything-is-sent.png" width="210" alt="Before Anything Is Sent"></a><br><sub><b>151</b> · Before Anything Is Sent</sub></td>
 <td align="center" width="25%"><a href="screens/152-market.png"><img src="screens/152-market.png" width="210" alt="Marketplace"></a><br><sub><b>152</b> · Marketplace</sub></td>
 <td align="center" width="25%"><a href="screens/153-exchanges.png"><img src="screens/153-exchanges.png" width="210" alt="Exchanges"></a><br><sub><b>153</b> · Exchanges</sub></td>
 <td align="center" width="25%"><a href="screens/154-grants.png"><img src="screens/154-grants.png" width="210" alt="Lent Skills"></a><br><sub><b>154</b> · Lent Skills</sub></td>
