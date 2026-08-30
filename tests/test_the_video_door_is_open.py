@@ -272,3 +272,45 @@ def test_whatever_comes_back_is_marked():
     artifact most likely to be met with no context around it."""
     from qrme import filming
     assert filming.doors()["marked"] is True
+
+
+# --- length is derived, not dialled ------------------------------------
+
+def test_a_passage_is_rendered_for_as_long_as_it_takes_to_say():
+    """The dial this replaces made the video fit the setting instead of
+    the content."""
+    from qrme import filming
+    short = filming.length_for("Yes.")
+    longer = filming.length_for(" ".join(["word"] * 40))
+    assert short < longer
+    assert filming.MIN_SECONDS <= short <= filming.MAX_SECONDS
+    assert filming.MIN_SECONDS <= longer <= filming.MAX_SECONDS
+
+
+def test_nothing_renders_below_the_floor_or_above_the_ceiling():
+    from qrme import filming
+    assert filming.length_for("") == filming.MIN_SECONDS
+    assert filming.length_for(" ".join(["word"] * 5000)) == filming.MAX_SECONDS
+
+
+def test_a_passage_too_long_for_one_scene_is_answered_not_truncated():
+    """A video that quietly drops its last sentence is worse than one
+    that was never made — nobody watching can tell."""
+    from qrme import filming
+    assert filming.too_long(" ".join(["word"] * 500)) is True
+    assert filming.too_long("A courtroom at dusk.") is False
+
+
+def test_the_door_says_the_length_is_not_a_control():
+    """A screen reading this must not draw a slider."""
+    from qrme import filming
+    assert filming.doors()["length_is_derived"] is True
+
+
+def test_a_render_asks_for_the_length_the_passage_needs(monkeypatch, wired):
+    from qrme import filming
+    speaks = _speaks(lambda url, body: {"video_url": "https://cdn/x.mp4"})
+    monkeypatch.setattr("urllib.request.urlopen", speaks)
+    passage = " ".join(["word"] * 30)
+    filming.render(passage)
+    assert speaks.calls[0][1]["seconds"] == filming.length_for(passage)

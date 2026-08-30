@@ -58,6 +58,15 @@ It also costs real money per second of output — ten to fifteen cents a
 second at the going rate, so a half-minute clip is three to four dollars.
 :data:`MAX_SECONDS` is a ceiling on one render rather than a budget; a
 deployment that opens this door wants a spend limit above it.
+
+## Length is derived, not dialled
+
+There is no slider. :func:`length_for` works out how long a passage takes
+to say and renders it for that long, because a dial makes the video fit
+the setting instead of the content — two sentences padded out to thirty
+seconds, or a paragraph hurried into five, footage stretched or clipped
+to hit a number nobody meant. The console shows the number it arrived at;
+it does not offer to change it.
 """
 
 from __future__ import annotations
@@ -67,6 +76,8 @@ import os
 import time
 import urllib.error
 import urllib.request
+
+from . import i18n
 
 #: The roads this module can speak. ``none`` leads because it is what a
 #: deployment gets unless somebody chooses otherwise, and an unknown name
@@ -86,8 +97,15 @@ PROVIDERS = (
 )
 
 #: How long one render may be asked for. Not a budget — a ceiling on a
-#: single call, so a typo in a field cannot order a five-minute film.
+#: single call, so a runaway script cannot order a five-minute film.
 MAX_SECONDS = 30
+
+#: The floor. Below this a clip is a flicker rather than a shot.
+MIN_SECONDS = 2
+
+#: Unhurried speech. Used to work out how long a passage takes to say,
+#: which is how long its video should run.
+WORDS_PER_MINUTE = 150
 
 #: Roughly how long a second of finished video takes to render, used to
 #: quote a wait before anybody commits to one. Deliberately pessimistic:
@@ -162,6 +180,37 @@ def why_not() -> str | None:
             f"reach it with — set QRME_FILM_KEY.")
 
 
+def length_for(text: str) -> int:
+    """How long a passage takes to say, which is how long to render it.
+
+    Length is **not** a control a person is given. A dial makes the video
+    fit the setting instead of the content: two sentences padded out to
+    thirty seconds, or a paragraph hurried into five, and in both cases
+    the footage is stretched or clipped to hit a number nobody meant.
+
+        asked     how long should this video be
+        mattered  how long is the thing it is a video of
+
+    So it is derived and then shown. The ceiling still applies, and
+    :func:`too_long` is how a caller finds out it was hit rather than
+    discovering a sentence went missing.
+    """
+    words = len((text or "").split())
+    spoken = round(words / (WORDS_PER_MINUTE / 60))
+    return max(MIN_SECONDS, min(MAX_SECONDS, spoken))
+
+
+def too_long(text: str) -> bool:
+    """Whether this passage needs more than one scene can hold.
+
+    Answered rather than silently truncated: a video that quietly drops
+    its last sentence is worse than one that was never made, because
+    nobody watching can tell.
+    """
+    words = len((text or "").split())
+    return round(words / (WORDS_PER_MINUTE / 60)) > MAX_SECONDS
+
+
 def estimate(seconds: int) -> dict:
     """What to say before anybody commits to a wait.
 
@@ -189,7 +238,13 @@ def doors() -> dict:
         "configured": configured(),
         "why": why_not(),
         "providers": [p for p in PROVIDERS if p != "none"],
+        # Length is derived from the passage, not chosen — see
+        # `length_for`. These are reported so a screen can SHOW the number
+        # it arrived at, never so it can offer a dial.
         "max_seconds": MAX_SECONDS,
+        "min_seconds": MIN_SECONDS,
+        "words_per_minute": WORDS_PER_MINUTE,
+        "length_is_derived": True,
         "seconds_per_second": SECONDS_PER_SECOND,
         "give_up_after": GIVE_UP_AFTER,
         "shapes": list(SHAPES),
@@ -209,14 +264,13 @@ def check(scene: str, *, seconds: int = 5, shape: str = "landscape") -> None:
     if not (scene or "").strip():
         raise FilmingError("say what the scene is before asking for it")
     if shape not in SHAPES:
-        raise FilmingError(
-            "say how the scene is framed — " + ", ".join(SHAPES))
+        raise FilmingError(i18n.fill(i18n.SCENE_SHAPE,
+                                     choices=", ".join(SHAPES)))
     if seconds < 1:
         raise FilmingError("a scene shorter than a second is a still")
     if seconds > MAX_SECONDS:
-        raise FilmingError(
-            f"{seconds} seconds is longer than this door renders — "
-            f"{MAX_SECONDS} is the ceiling on one scene")
+        raise FilmingError(i18n.fill(i18n.SCENE_TOO_LONG,
+                                     seconds=seconds, max=MAX_SECONDS))
 
 
 def _ask(url: str, body: dict | None = None) -> dict:
@@ -249,7 +303,8 @@ def _ask(url: str, body: dict | None = None) -> dict:
             "the video service could not be reached from here") from None
 
 
-def render(scene: str, *, seconds: int = 5, shape: str = "landscape",
+def render(scene: str, *, seconds: int | None = None,
+           shape: str = "landscape",
            on_behalf_of: str | None = None,
            wait: bool = True) -> dict:
     """One described scene, as video.
@@ -259,6 +314,10 @@ def render(scene: str, *, seconds: int = 5, shape: str = "landscape",
     the caller would rather poll from a screen than hold a request open
     for four minutes.
     """
+    # Derived from the passage unless a caller insists. The console never
+    # insists — there is no control for it — so this is the road every
+    # ordinary render takes.
+    seconds = length_for(scene) if seconds is None else seconds
     check(scene, seconds=seconds, shape=shape)
     if not configured():
         raise FilmingError(why_not() or "this deployment renders no video")
@@ -299,10 +358,9 @@ def render(scene: str, *, seconds: int = 5, shape: str = "landscape",
             raise FilmingError(
                 state.get("detail") or "the render failed at the service")
 
-    raise FilmingError(
-        f"the render did not finish within "
-        f"{GIVE_UP_AFTER // 60} minutes — it may still be running at "
-        f"{provider()}, and the job is {job}")
+    raise FilmingError(i18n.fill(i18n.RENDER_GAVE_UP,
+                                 minutes=GIVE_UP_AFTER // 60,
+                                 provider=provider(), job=job))
 
 
 def save(profile_id: str, data: bytes, *, name: str = "scene.mp4") -> dict:

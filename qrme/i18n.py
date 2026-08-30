@@ -1396,6 +1396,9 @@ APP_NOT_SIGNED_IN = ("{label} is installed and has not been signed in to yet, so
 APP_NEEDS_KEY = ("{label} needs a key this deployment has not been given, so it cannot reach the service. Whoever runs this deployment adds it.")
 MODE_MUST_BE = "mode must be one of {choices}"
 UNKNOWN_LANGUAGE = "unknown language {got}"
+SCENE_SHAPE = "say how the scene is framed — {choices}"
+SCENE_TOO_LONG = ("{seconds} seconds is longer than this door renders — {max} is the ceiling on one scene")
+RENDER_GAVE_UP = ("the render did not finish within {minutes} minutes — it may still be running at {provider}, and the job is {job}")
 NO_SUCH_FACE = "no such face {got}; one of {choices}"
 FACE_NOT_CARRIED = "{got} is not one of the faces this dock carries"
 MAIL_SERVER_REFUSED = "the mail server refused it: {detail}"
@@ -3103,6 +3106,53 @@ _REFUSALS: dict[str, dict[str, str]] = {
     # Every road out of the forge answers in words a person can act on —
     # a photograph with no face is theirs to fix by sending a clearer
     # one — so the words have to exist in the language they read.
+    # The video road's refusals (qrme/filming.py). A person who asked for a
+    # scene and got a wall is owed the reason in their own language, the
+    # same as every other road out of this platform.
+    "say what the scene is before asking for it": {
+        'es': "di cuál es la escena antes de pedirla",
+        'fr': "dites quelle est la scène avant de la demander",
+        'de': "sag, was die Szene ist, bevor du sie anforderst",
+        'pt': "diga qual é a cena antes de a pedir",
+        'it': "di' qual è la scena prima di chiederla",
+        'ja': "シーンを頼む前に、どんなシーンか教えてください",
+        'zh': "先说明是什么场景，再来请求它",
+        'hi': "दृश्य माँगने से पहले बताइए कि दृश्य क्या है",
+        'ar': "قل ما هو المشهد قبل أن تطلبه",
+    },
+    "a scene shorter than a second is a still": {
+        'es': "una escena de menos de un segundo es una imagen fija",
+        'fr': "une scène de moins d'une seconde est une image fixe",
+        'de': "eine Szene unter einer Sekunde ist ein Standbild",
+        'pt': "uma cena com menos de um segundo é uma imagem fixa",
+        'it': "una scena più corta di un secondo è un fermo immagine",
+        'ja': "1 秒に満たないシーンは静止画です",
+        'zh': "短于一秒的场景就是一张静止画",
+        'hi': "एक सेकंड से छोटा दृश्य एक स्थिर चित्र है",
+        'ar': "المشهد الأقصر من ثانية صورة ثابتة",
+    },
+    "the video service could not be reached from here": {
+        'es': "no se pudo contactar con el servicio de vídeo desde aquí",
+        'fr': "le service vidéo n'a pas pu être joint d'ici",
+        'de': "der Videodienst war von hier aus nicht erreichbar",
+        'pt': "não foi possível contactar o serviço de vídeo a partir daqui",
+        'it': "il servizio video non è raggiungibile da qui",
+        'ja': "ここから動画サービスに到達できませんでした",
+        'zh': "从这里联系不上视频服务",
+        'hi': "यहाँ से वीडियो सेवा तक नहीं पहुँचा जा सका",
+        'ar': "تعذّر الوصول إلى خدمة الفيديو من هنا",
+    },
+    "the video service answered without a render or a job to follow — nothing here can be shown or waited for": {
+        'es': "el servicio de vídeo respondió sin una representación ni un trabajo que seguir — aquí no hay nada que mostrar ni que esperar",
+        'fr': "le service vidéo a répondu sans rendu ni tâche à suivre — il n'y a rien ici à montrer ni à attendre",
+        'de': "der Videodienst antwortete ohne Render und ohne Auftrag zum Verfolgen — hier gibt es nichts zu zeigen und nichts zu erwarten",
+        'pt': "o serviço de vídeo respondeu sem uma representação nem um trabalho a seguir — não há aqui nada para mostrar nem para esperar",
+        'it': "il servizio video ha risposto senza un rendering né un lavoro da seguire — qui non c'è nulla da mostrare né da attendere",
+        'ja': "動画サービスは、描き出しも追跡できるジョブも返しませんでした。ここには見せるものも待つものもありません",
+        'zh': "视频服务既没有返回成片，也没有可跟踪的任务——这里没有可显示、也没有可等待的东西",
+        'hi': "वीडियो सेवा ने न कोई रेंडर लौटाया न कोई कार्य जिसका पीछा किया जा सके — यहाँ दिखाने या प्रतीक्षा करने को कुछ नहीं है",
+        'ar': "أجابت خدمة الفيديو بلا تصيير ولا مهمة نتابعها — لا شيء هنا يُعرض ولا يُنتظر",
+    },
     "this deployment has no avatar forge configured — the door exists, the machinery does not": {
         'es': "esta instalación no tiene forja de avatares configurada — la puerta existe, la maquinaria no",
         'fr': "ce déploiement n'a pas de forge d'avatars configurée — la porte existe, la machinerie non",

@@ -122,6 +122,41 @@ def video_doors() -> dict:
     return filming.doors()
 
 
+class Scene(BaseModel):
+    prompt: str = Field(min_length=1, max_length=2000,
+                        description="What the scene is. Sent to the "
+                                    "rendering service as written.")
+    seconds: int = Field(default=5, ge=1, le=filming.MAX_SECONDS,
+                         description="How long the finished clip runs. It "
+                                     "bills by this, and the wait scales "
+                                     "with it.")
+    shape: str = Field(default="landscape",
+                       description="portrait, landscape or square.")
+    wait: bool = Field(default=False,
+                       description="Hold the request open until the render "
+                                   "finishes. False — the default — hands "
+                                   "back a job to follow, because a render "
+                                   "is minutes and a held request is not.")
+
+
+@router.post("/video/render")
+def video_render(body: Scene) -> dict:
+    """Render a described scene as video.
+
+    Defaults to NOT waiting. A render takes minutes, and a console that
+    holds a request open for one has turned a slow feature into a broken
+    one — the job comes back with the quote attached so a screen can say
+    how long and let the person decide whether to stay.
+    """
+    try:
+        return filming.render(body.prompt, seconds=body.seconds,
+                              shape=body.shape, wait=body.wait)
+    except filming.FilmingError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from None
+
+
+
+
 class ForgeFace(BaseModel):
     photo: str = Field(min_length=1,
                        description="The photograph, base64. It is used to "

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { SkinTiles } from "../SkinTiles";
+import { VideoQuote } from "../VideoQuote";
 import { api, getBase, getSignupKey, type Anonymity, type Avatar,
          type AvatarBrief, type Deleted,
          type Emblem, type IdentityVocabulary, type Memorial,
@@ -66,6 +67,16 @@ export function Identity({ onPlans, onPassing }: {
   const [marketKey, setMarketKey] = useState("");
   // The forge: what this deployment can build from a photograph, and the
   // framing of the picture being handed to it.
+  // Which of the three roads this profile's presence takes. Not stored
+  // on the profile: it is a per-render choice, because a profile pinned
+  // to video would cost four dollars and four minutes for every reply.
+  const [road, setRoad] = useState<"photo" | "avatar" | "video">("photo");
+  const [film, setFilm] = useState<
+    Awaited<ReturnType<typeof api.videoDoors>> | null>(null);
+  const [passage, setPassage] = useState("");
+  const [videoShape, setVideoShape] = useState("landscape");
+  const [filming, setFilming] = useState(false);
+
   const [forge, setForge] = useState<
     { provider: string; configured: boolean; shots: string[] } | null>(null);
   const [shot, setShot] = useState("face");
@@ -354,9 +365,33 @@ export function Identity({ onPlans, onPassing }: {
       setMarketKey((k) => k || r.skin_sources[0]?.key || "");
     }).catch(() => undefined);
     api.forgeDoors().then(setForge).catch(() => setForge(null));
+    // The video road's own door, asked before anybody writes anything:
+    // a screen that draws the road on a deployment with none is a button
+    // that fails, and somebody who has just written what they wanted is
+    // the worst moment to find out.
+    api.videoDoors().then(setFilm).catch(() => setFilm(null));
     api.avatarShelf().then((r) => setShelfRows(r.shelf))
       .catch(() => setShelfRows([]));
   }, []);
+
+  /** Send the passage to be rendered. Length is never passed: the
+   *  backend derives it from the words, which is the whole reason there
+   *  is no dial on this screen. */
+  async function renderScene() {
+    setFilming(true);
+    setNote(null);
+    try {
+      const got = await api.videoRender(passage, videoShape);
+      // `fill` answers nodes for the places that render markup; this is a
+      // plain note, so the two strings are plain too.
+      setNote(got.video_url ? tr("idn.video.done", lang)
+                            : tr("idn.video.queued", lang));
+    } catch (e) {
+      fail(e);
+    } finally {
+      setFilming(false);
+    }
+  }
 
   function reload() {
     if (!me || !token) return;
@@ -741,13 +776,94 @@ export function Identity({ onPlans, onPassing }: {
           </div>
         )}
 
+        {/* The three roads, one question above the framing choice.
+            Framing — face, upper torso, full body — is about the
+            photograph going IN. This is about which road the presence
+            takes on the way out, and video is not a fourth way to crop a
+            photo. Each surface already falls back down this list when
+            the one above it is not there, so the picker names something
+            true rather than inventing a hierarchy. */}
+        <h4>{tr("idn.road", lang)}</h4>
+        <p className="muted small">{tr("idn.road.sub", lang)}</p>
+        <div className="roads">
+          {/* Keys written out rather than built from the road name. A
+              lookup assembled with a template literal is invisible to the
+              extractor next door, which then reports six strings
+              translated into ten languages and read by nobody — and it
+              would be right, because it could not prove otherwise. */}
+          {([
+            ["photo", tr("idn.road.photo", lang), tr("idn.road.photo.sub", lang)],
+            ["avatar", tr("idn.road.avatar", lang), tr("idn.road.avatar.sub", lang)],
+            ["video", tr("idn.road.video", lang), tr("idn.road.video.sub", lang)],
+          ] as const).map(([key, name, note]) => (
+            <button key={key} type="button"
+                    className={"road" + (road === key ? " lit" : "")}
+                    aria-pressed={road === key}
+                    onClick={() => setRoad(key)}>
+              <span className="road-name">{name}</span>
+              <span className="road-note">{note}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* The video road. Drawn whatever the deployment has chosen: with
+            nothing configured it says WHICH of the three variables is
+            missing, because "not configured" teaches an operator nothing
+            and is how a door stays shut by accident rather than by
+            decision. */}
+        {road === "video" && (
+          <>
+            <h4>{tr("idn.video.service", lang)}</h4>
+            <SkinTiles
+              sources={(film?.providers || [])
+                .map((k) => ({ key: k, name: k, how: "" }))}
+              chosen={film?.provider || ""}
+              onPick={() => undefined} />
+
+            <h4>{tr("idn.video.passage", lang)}</h4>
+            <p className="muted small">{tr("idn.video.passage.sub", lang)}</p>
+            <textarea rows={4} value={passage}
+                      aria-label={tr("idn.video.passage", lang)}
+                      onChange={(e) => setPassage(e.target.value)} />
+
+            <h4>{tr("idn.video.shape", lang)}</h4>
+            <div className="row">
+              {["portrait", "landscape", "square"].map((shape) => (
+                <button key={shape} type="button"
+                        className={"chip" + (videoShape === shape ? " lit" : "")}
+                        aria-pressed={videoShape === shape}
+                        onClick={() => setVideoShape(shape)}>
+                  {shape === "portrait" ? tr("idn.video.portrait", lang)
+                   : shape === "landscape" ? tr("idn.video.landscape", lang)
+                   : tr("idn.video.square", lang)}
+                </button>
+              ))}
+            </div>
+
+            {/* The number this screen SHOWS and never offers to change. */}
+            {film && passage.trim() !== "" && (
+              <VideoQuote text={passage} film={film} lang={lang} />
+            )}
+
+            {film?.configured
+              ? <button className="primary"
+                        disabled={filming || passage.trim() === ""}
+                        onClick={() => void renderScene()}>
+                  {tr("idn.video.go", lang)}
+                </button>
+              : <p className="muted small">{film?.why}</p>}
+
+            <p className="muted small">{tr("idn.video.marked", lang)}</p>
+          </>
+        )}
+
         {/* The forge, above the import list on purpose: this is the road
             that MAKES a face, and the list below is for a face somebody
             already has somewhere else. It draws only where a forge is
             actually configured — a button that fails is worse than an
             absence, and worst of all at the moment somebody has just
             chosen a photograph of themselves. */}
-        {forge?.configured && (
+        {road === "avatar" && forge?.configured && (
           <>
             <h4>{tr("idn.forge", lang)}</h4>
             <p className="muted small">{tr("idn.forge.sub", lang)}</p>

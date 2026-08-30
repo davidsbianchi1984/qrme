@@ -2431,3 +2431,44 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
    than an image, so it needs the circle's shape said explicitly — an
    <img> got that from `.rs-photo` alone. */
 .rs-head { border-radius: 50%; overflow: hidden; aspect-ratio: 1 / 1; }
+
+/* --- the three roads, and the number that is shown rather than set ----
+   The picker sits one question above the framing choice on Identity:
+   framing is about the photograph going in, this is about which road the
+   presence takes on the way out. Stacked rather than side by side —
+   three roads with a sentence each do not fit across a phone, and the
+   sentence is the part that makes the choice obvious. */
+.roads { display: grid; gap: 8px; margin: 0 0 6px; }
+.road {
+  background: var(--card2); border: 1px solid var(--line);
+  border-radius: 11px; padding: 11px 10px; text-align: left;
+  color: var(--t2); font: inherit;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.road:hover { border-color: var(--t3); }
+.road .road-name { display: block; font-size: 13.5px; font-weight: 600;
+  color: var(--txt); }
+.road .road-note { display: block; font-size: 11px; margin-top: 3px;
+  line-height: 1.35; }
+.road.lit {
+  background: linear-gradient(180deg, #2a2160, #221a4e);
+  border-color: var(--brand); color: var(--brand2);
+}
+.road.lit .road-name { color: #fff; }
+
+/* The quote. Amber because it is a cost being disclosed, not an error and
+   not a success — the person is being told what this will take before
+   they spend it. */
+.video-quote {
+  margin: 11px 0 0; padding: 10px 12px; border-radius: 10px;
+  background: rgba(123,196,127,.08); border: 1px solid rgba(123,196,127,.3);
+  font-size: 12px; line-height: 1.5;
+}
+.video-quote.long {
+  background: rgba(255,184,77,.09); border-color: rgba(255,184,77,.34);
+}
+.video-quote p { margin: 0; }
+.video-quote p + p { margin-top: 4px; }
+/* Over the ceiling. Said in the accent that means "read this", because a
+   passage that needs a second scene is a decision, not a warning. */
+.video-quote-over { color: var(--amber); font-weight: 600; }

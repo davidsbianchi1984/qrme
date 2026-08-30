@@ -5024,6 +5024,27 @@ export const api = {
   forgeDoors: () =>
     req<{ provider: string; configured: boolean; shots: string[];
           blendshapes: string[] }>("/avatars/forge"),
+  /** Whether a described passage can be rendered as video here, which
+   *  service would do it, and — when it cannot — which of the three
+   *  variables is missing. Answered before anybody writes anything, so
+   *  the console draws the road only where there is one. */
+  videoDoors: () =>
+    req<{ provider: string; configured: boolean; why: string | null;
+          providers: string[]; max_seconds: number; min_seconds: number;
+          words_per_minute: number; length_is_derived: boolean;
+          seconds_per_second: number; give_up_after: number;
+          shapes: string[]; marked: boolean }>("/video/doors"),
+  /** Render a passage as video. Length is NOT sent: the backend derives
+   *  it from the passage, because a dial makes the video fit the setting
+   *  instead of the content. Defaults to not waiting — a render is
+   *  minutes, and a held request is not. */
+  videoRender: (prompt: string, shape: string, wait = false) =>
+    req<{ video_url?: string; id?: string; pending?: boolean;
+          provider: string; seconds?: number; waited?: number;
+          wait_seconds?: number }>("/video/render", {
+      method: "POST",
+      body: JSON.stringify({ prompt, shape, wait }),
+    }),
   /** A photograph becomes this profile's face — geometry, skin and a
    *  mouth — built on the deployment's own hardware. `shot` says how
    *  the picture is framed: face, upper (torso) or full (body). */

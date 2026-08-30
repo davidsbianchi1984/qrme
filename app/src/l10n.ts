@@ -587,6 +587,75 @@ const CHROME: Table = {
   "idn.head.pick": {
     en: "A photograph for the head", es: "Una fotografía para la cabeza", fr: "Une photographie pour la tête", de: "Ein Foto für den Kopf", pt: "Uma fotografia para a cabeça", it: "Una fotografia per la testa", ja: "頭にする写真", zh: "用于头像的照片", hi: "सिर के लिए एक फ़ोटो", ar: "صورة للرأس",
   },
+  "idn.video.done": {
+    en: "The scene rendered.", es: "La escena se ha representado.", fr: "La scène est rendue.", de: "Die Szene wurde gerendert.", pt: "A cena foi representada.", it: "La scena è stata resa.", ja: "シーンを描き出しました。", zh: "场景已渲染完成。", hi: "दृश्य रेंडर हो गया।", ar: "تم تصيير المشهد.",
+  },
+  "idn.video.queued": {
+    en: "Started. It keeps rendering whether you stay or not.", es: "Iniciado. Sigue representándose te quedes o no.", fr: "Lancé. Le rendu continue que vous restiez ou non.", de: "Gestartet. Es rendert weiter, ob du bleibst oder nicht.", pt: "Iniciado. Continua a representar quer fiques ou não.", it: "Avviato. Continua a essere reso, che tu resti o no.", ja: "開始しました。留まっても離れても描き出しは続きます。", zh: "已开始。无论你是否留下，都会继续渲染。", hi: "शुरू हो गया। आप रुकें या न रुकें, यह रेंडर होता रहेगा।", ar: "بدأ. سيستمر التصيير سواء بقيت أم لا.",
+  },
+  "idn.road": {
+    en: "How this renders", es: "Cómo se representa", fr: "Comment ceci s'affiche", de: "Wie das dargestellt wird", pt: "Como isto é representado", it: "Come viene reso", ja: "どう表示するか", zh: "如何呈现", hi: "यह कैसे प्रस्तुत होता है", ar: "كيف يُعرض هذا",
+  },
+  "idn.road.sub": {
+    en: "Pick one. Each surface falls back down this list when the one above it is not there yet.", es: "Elige una. Cada superficie desciende por esta lista cuando la de arriba aún no existe.", fr: "Choisissez-en une. Chaque surface redescend cette liste quand celle du dessus n'existe pas encore.", de: "Wähle eine. Jede Oberfläche fällt in dieser Liste zurück, wenn die darüber noch nicht da ist.", pt: "Escolhe uma. Cada superfície desce nesta lista quando a de cima ainda não existe.", it: "Scegline una. Ogni superficie scende in questo elenco quando quella sopra non c'è ancora.", ja: "ひとつ選んでください。上のものがまだ無い面は、この順に下へ戻ります。", zh: "选一个。当上面那项还不存在时，各界面会沿此列表向下回退。", hi: "एक चुनें। जब ऊपर वाला मौजूद न हो, हर सतह इस सूची में नीचे की ओर लौटती है।", ar: "اختر واحدًا. يتراجع كل سطح إلى أسفل هذه القائمة عندما لا يتوفر ما فوقه بعد.",
+  },
+  "idn.road.photo": {
+    en: "Profile photo", es: "Foto de perfil", fr: "Photo de profil", de: "Profilfoto", pt: "Foto de perfil", it: "Foto del profilo", ja: "プロフィール写真", zh: "个人资料照片", hi: "प्रोफ़ाइल फ़ोटो", ar: "صورة الملف",
+  },
+  "idn.road.photo.sub": {
+    en: "A still. Instant, free, always works.", es: "Una imagen fija. Instantánea, gratuita, siempre funciona.", fr: "Une image fixe. Instantanée, gratuite, toujours fonctionnelle.", de: "Ein Standbild. Sofort, kostenlos, funktioniert immer.", pt: "Uma imagem fixa. Instantânea, gratuita, funciona sempre.", it: "Un fermo immagine. Istantaneo, gratuito, funziona sempre.", ja: "静止画。即時、無料、必ず使えます。", zh: "静态图。即时、免费、总能用。", hi: "एक स्थिर चित्र। तुरंत, मुफ़्त, हमेशा काम करता है।", ar: "صورة ثابتة. فورية ومجانية وتعمل دائمًا.",
+  },
+  "idn.road.avatar": {
+    en: "Avatar", es: "Avatar", fr: "Avatar", de: "Avatar", pt: "Avatar", it: "Avatar", ja: "アバター", zh: "虚拟形象", hi: "अवतार", ar: "الأفاتار",
+  },
+  "idn.road.avatar.sub": {
+    en: "A face that speaks. Live, every frame.", es: "Un rostro que habla. En vivo, en cada fotograma.", fr: "Un visage qui parle. En direct, image par image.", de: "Ein Gesicht, das spricht. Live, in jedem Einzelbild.", pt: "Um rosto que fala. Ao vivo, a cada fotograma.", it: "Un volto che parla. Dal vivo, fotogramma per fotogramma.", ja: "話す顔。ライブで、毎フレーム。", zh: "会说话的脸。实时，逐帧。", hi: "बोलता हुआ चेहरा। लाइव, हर फ़्रेम।", ar: "وجه يتكلم. مباشر، في كل إطار.",
+  },
+  "idn.road.video": {
+    en: "Video generation", es: "Generación de vídeo", fr: "Génération vidéo", de: "Videoerzeugung", pt: "Geração de vídeo", it: "Generazione video", ja: "動画生成", zh: "视频生成", hi: "वीडियो जनरेशन", ar: "توليد الفيديو",
+  },
+  "idn.road.video.sub": {
+    en: "The reply, rendered as footage.", es: "La respuesta, representada como metraje.", fr: "La réponse, rendue en images.", de: "Die Antwort, als Filmmaterial gerendert.", pt: "A resposta, representada como imagens.", it: "La risposta, resa come filmato.", ja: "返答を映像として描き出します。", zh: "把回复渲染成影像。", hi: "उत्तर को फ़ुटेज के रूप में रेंडर किया गया।", ar: "الرد، مُصاغًا كلقطات.",
+  },
+  "idn.video.service": {
+    en: "Rendering service", es: "Servicio de representación", fr: "Service de rendu", de: "Renderdienst", pt: "Serviço de representação", it: "Servizio di rendering", ja: "レンダリングサービス", zh: "渲染服务", hi: "रेंडरिंग सेवा", ar: "خدمة التصيير",
+  },
+  "idn.video.passage": {
+    en: "What is being rendered", es: "Qué se va a representar", fr: "Ce qui est rendu", de: "Was gerendert wird", pt: "O que vai ser representado", it: "Che cosa viene reso", ja: "何を描き出すか", zh: "要渲染的内容", hi: "क्या रेंडर किया जा रहा है", ar: "ما الذي يجري تصييره",
+  },
+  "idn.video.passage.sub": {
+    en: "Length is worked out from it. There is no dial, because a dial makes the video fit the setting instead of the content.", es: "La duración se deduce de ello. No hay control deslizante: un control haría que el vídeo se ajustara al ajuste en lugar de al contenido.", fr: "La durée en est déduite. Aucun curseur : un curseur ferait coller la vidéo au réglage plutôt qu'au contenu.", de: "Die Länge ergibt sich daraus. Es gibt keinen Regler — ein Regler würde das Video an die Einstellung anpassen statt an den Inhalt.", pt: "A duração é deduzida daí. Não há cursor: um cursor faria o vídeo ajustar-se à definição em vez do conteúdo.", it: "La durata si ricava da questo. Nessun cursore: un cursore farebbe adattare il video all'impostazione anziché al contenuto.", ja: "長さはここから割り出します。つまみはありません — つまみがあると、動画が内容ではなく設定に合わせられてしまいます。", zh: "时长由它算出。没有滑块 — 滑块会让视频去迁就设置而不是内容。", hi: "अवधि इसी से निकाली जाती है। कोई स्लाइडर नहीं, क्योंकि स्लाइडर वीडियो को सामग्री के बजाय सेटिंग के अनुरूप बना देता है।", ar: "تُشتق المدة منه. لا يوجد مِقبض: المِقبض يجعل الفيديو يوافق الإعداد بدل المحتوى.",
+  },
+  "idn.video.shape": {
+    en: "Shape", es: "Formato", fr: "Format", de: "Format", pt: "Formato", it: "Formato", ja: "画面の形", zh: "画面比例", hi: "आकार", ar: "الشكل",
+  },
+  "idn.video.portrait": {
+    en: "Portrait", es: "Vertical", fr: "Portrait", de: "Hochformat", pt: "Vertical", it: "Verticale", ja: "縦", zh: "竖屏", hi: "पोर्ट्रेट", ar: "طولي",
+  },
+  "idn.video.landscape": {
+    en: "Landscape", es: "Horizontal", fr: "Paysage", de: "Querformat", pt: "Horizontal", it: "Orizzontale", ja: "横", zh: "横屏", hi: "लैंडस्केप", ar: "عرضي",
+  },
+  "idn.video.square": {
+    en: "Square", es: "Cuadrado", fr: "Carré", de: "Quadratisch", pt: "Quadrado", it: "Quadrato", ja: "正方形", zh: "方形", hi: "वर्ग", ar: "مربع",
+  },
+  "idn.video.quote": {
+    en: "{words} words is {seconds} seconds of speech, so that is how long it renders for. About {wait} to make.", es: "{words} palabras son {seconds} segundos de habla, y esa es su duración. Unos {wait} para producirlo.", fr: "{words} mots font {seconds} secondes de parole, c'est donc sa durée. Environ {wait} pour le produire.", de: "{words} Wörter sind {seconds} Sekunden Sprache, so lang wird es. Etwa {wait} zum Erstellen.", pt: "{words} palavras são {seconds} segundos de fala, e é essa a duração. Cerca de {wait} para produzir.", it: "{words} parole sono {seconds} secondi di parlato, e questa è la durata. Circa {wait} per realizzarlo.", ja: "{words} 語は話すと {seconds} 秒なので、その長さで描き出します。制作におよそ {wait}。", zh: "{words} 个词说出来是 {seconds} 秒，就按这个长度渲染。制作约需 {wait}。", hi: "{words} शब्द बोलने में {seconds} सेकंड लगते हैं, इसलिए यही अवधि रहेगी। बनाने में लगभग {wait}।", ar: "{words} كلمة تعادل {seconds} ثانية من الكلام، فهذه هي مدته. نحو {wait} لإنتاجه.",
+  },
+  "idn.video.leave": {
+    en: "Worth leaving the page — it keeps going without you.", es: "Merece la pena salir de la página: sigue sin ti.", fr: "Vous pouvez quitter la page — cela continue sans vous.", de: "Du kannst die Seite verlassen — es läuft ohne dich weiter.", pt: "Vale a pena sair da página — continua sem ti.", it: "Puoi lasciare la pagina — va avanti senza di te.", ja: "このページを離れて大丈夫です — あなたがいなくても進みます。", zh: "可以离开此页 — 它会自行继续。", hi: "पेज छोड़ सकते हैं — यह आपके बिना भी चलता रहेगा।", ar: "يمكنك مغادرة الصفحة — سيتابع من دونك.",
+  },
+  "idn.video.stay": {
+    en: "Short enough to wait here.", es: "Lo bastante corto para esperar aquí.", fr: "Assez court pour attendre ici.", de: "Kurz genug, um hier zu warten.", pt: "Curto o suficiente para esperar aqui.", it: "Abbastanza breve da aspettare qui.", ja: "ここで待てる短さです。", zh: "够短，可以在此等待。", hi: "इतना छोटा कि यहीं प्रतीक्षा कर सकते हैं।", ar: "قصير بما يكفي للانتظار هنا.",
+  },
+  "idn.video.toolong": {
+    en: "Too long for one scene. Over {max} seconds of speech needs more than one, and nothing is trimmed to fit.", es: "Demasiado largo para una sola escena. Más de {max} segundos de habla necesita varias, y nada se recorta para encajar.", fr: "Trop long pour une seule scène. Au-delà de {max} secondes de parole, il en faut plusieurs, et rien n'est coupé pour tenir.", de: "Zu lang für eine Szene. Über {max} Sekunden Sprache braucht mehrere, und nichts wird passend gekürzt.", pt: "Demasiado longo para uma cena. Mais de {max} segundos de fala precisa de várias, e nada é cortado para caber.", it: "Troppo lungo per una scena sola. Oltre {max} secondi di parlato ne servono più d'una, e nulla viene tagliato per farlo entrare.", ja: "1 シーンには長すぎます。話して {max} 秒を超える分は複数必要で、収めるために切り詰めることはしません。", zh: "对一个镜头来说太长了。超过 {max} 秒的话语需要多个镜头，且不会为了塞下而裁剪。", hi: "एक दृश्य के लिए बहुत लंबा। {max} सेकंड से अधिक बोलने के लिए एक से ज़्यादा चाहिए, और फ़िट करने के लिए कुछ नहीं काटा जाता।", ar: "أطول من مشهد واحد. ما يتجاوز {max} ثانية من الكلام يحتاج أكثر من مشهد، ولا يُقتطع شيء ليتّسع.",
+  },
+  "idn.video.go": {
+    en: "Render scene", es: "Representar escena", fr: "Rendre la scène", de: "Szene rendern", pt: "Representar cena", it: "Rendi la scena", ja: "シーンを描き出す", zh: "渲染场景", hi: "दृश्य रेंडर करें", ar: "صيّر المشهد",
+  },
+  "idn.video.marked": {
+    en: "Whatever comes back is stored marked as AI. There is no setting that turns that off.", es: "Todo lo que vuelva se guarda marcado como IA. No hay ajuste que lo desactive.", fr: "Tout ce qui revient est stocké marqué comme IA. Aucun réglage ne le désactive.", de: "Was zurückkommt, wird als KI markiert gespeichert. Es gibt keine Einstellung, die das abschaltet.", pt: "Tudo o que volta é guardado marcado como IA. Não há definição que desligue isso.", it: "Tutto ciò che torna viene salvato contrassegnato come IA. Non esiste un'impostazione che lo disattivi.", ja: "戻ってきたものは AI と印を付けて保存されます。これを解除する設定はありません。", zh: "返回的内容都会带 AI 标记保存。没有任何设置能关闭它。", hi: "जो भी वापस आता है, वह AI चिह्नित करके संग्रहीत होता है। इसे बंद करने वाली कोई सेटिंग नहीं है।", ar: "كل ما يعود يُحفظ موسومًا بأنه ذكاء اصطناعي. لا يوجد إعداد يعطّل ذلك.",
+  },
   "idn.forge": {
     en: "Make your photo speak", es: "Haz que tu foto hable", fr: "Faites parler votre photo", de: "Lass dein Foto sprechen", pt: "Faz a tua foto falar", it: "Fai parlare la tua foto", ja: "写真に話をさせる", zh: "让你的照片开口说话", hi: "अपनी फ़ोटो को बोलने दें", ar: "اجعل صورتك تتكلم",
   },
