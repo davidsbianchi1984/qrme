@@ -306,6 +306,7 @@ def _ask(url: str, body: dict | None = None) -> dict:
 def render(scene: str, *, seconds: int | None = None,
            shape: str = "landscape",
            on_behalf_of: str | None = None,
+           directed_for: str | None = None,
            wait: bool = True) -> dict:
     """One described scene, as video.
 
@@ -330,8 +331,14 @@ def render(scene: str, *, seconds: int | None = None,
     from . import offline
     offline.allow(endpoint(), "the video service's prompt", on_behalf_of)
 
+    # The standing direction rides in front of the passage. Length was
+    # derived from the passage alone, above, and stays that way: the
+    # direction says how it looks, not how long it runs, and letting it
+    # move the clock would make "put us on the beach" cost more money.
+    prompt = compose(directed_for, scene) if directed_for else scene
+
     began = time.monotonic()
-    started = _ask(endpoint(), {"provider": provider(), "prompt": scene,
+    started = _ask(endpoint(), {"provider": provider(), "prompt": prompt,
                                 "seconds": seconds, "shape": shape})
     if started.get("video_url"):
         return {"video_url": started["video_url"], "provider": provider(),
@@ -374,3 +381,171 @@ def save(profile_id: str, data: bytes, *, name: str = "scene.mp4") -> dict:
     from . import media
     return media.save(profile_id, data, name=name,
                       alt="a rendered scene", ai_marked=True)
+
+
+# --------------------------------------------------------------------------- #
+# The standing direction
+# --------------------------------------------------------------------------- #
+
+#: What a scene looks like before anybody has said otherwise. Deliberately
+#: thin: enough that the first render is not a lottery, little enough that
+#: the person's own words replace rather than argue with it.
+DEFAULT_DIRECTION = (
+    "A cinematic wide shot. The speaker is in frame, lit naturally, "
+    "in a setting that suits what they are saying.")
+
+#: How long a direction may run. A ceiling rather than a budget — the
+#: direction rides every prompt, so one that grows without limit starts
+#: crowding out the passage it is supposed to be framing.
+MAX_DIRECTION = 600
+
+
+def direction_of(profile_id: str) -> str:
+    """How this profile's scenes are shot, in the owner's own words.
+
+    The default until somebody says otherwise, and then whatever they
+    said — carried from one render to the next, which is the whole point
+    of it being stored rather than typed each time.
+    """
+    from . import db
+    row = db.connect().execute(
+        "SELECT direction FROM scene_direction WHERE profile_id=?",
+        (profile_id,)).fetchone()
+    return row["direction"] if row else DEFAULT_DIRECTION
+
+
+def set_direction(profile_id: str, direction: str, *,
+                  asked: str | None = None,
+                  surface: str | None = None) -> str:
+    """Write the direction verbatim, and log what it replaced.
+
+    The road :func:`amend` ends on, and the one a caller takes when it
+    already has the words it wants. Every write goes through here, which
+    is why the log cannot fall out of step with the direction: there is
+    no second place that sets one.
+    """
+    from . import db
+    text = (direction or "").strip()[:MAX_DIRECTION]
+    if not text:
+        raise FilmingError("say how the scene should look, or clear it")
+    was = direction_of(profile_id)
+    conn = db.connect()
+    now = db.utcnow()
+    conn.execute(
+        "INSERT INTO scene_direction (profile_id, direction, updated_at)"
+        " VALUES (?,?,?) ON CONFLICT (profile_id) DO UPDATE SET"
+        " direction=excluded.direction, updated_at=excluded.updated_at",
+        (profile_id, text, now))
+    conn.execute(
+        "INSERT INTO scene_direction_log (id, profile_id, asked, was,"
+        " became, surface, created_at) VALUES (?,?,?,?,?,?,?)",
+        (db.new_id("scn"), profile_id, asked, was, text, surface, now))
+    conn.commit()
+    return text
+
+
+def direction_log(profile_id: str, limit: int = 20) -> list[dict]:
+    """What was asked of this scene, newest first.
+
+    The direction is one row that gets overwritten, which is right for a
+    standing setting and useless as an account of one. Somebody who has
+    amended five times cannot otherwise tell which request caused the
+    thing they now dislike, or step back one.
+
+    `surface` says whether it was asked from the frame or from full
+    screen — not because the two behave differently, they read and write
+    the same row, but because "I changed that while it was full screen"
+    is how a person remembers doing it.
+    """
+    from . import db
+    rows = db.connect().execute(
+        "SELECT asked, was, became, surface, created_at"
+        " FROM scene_direction_log WHERE profile_id=?"
+        " ORDER BY created_at DESC, rowid DESC LIMIT ?",
+        (profile_id, max(1, min(200, limit)))).fetchall()
+    return [dict(r) for r in rows]
+
+
+def forget_direction(profile_id: str, surface: str | None = None) -> str:
+    """Back to the default. Every standing thing in this platform has a
+    way out that is one press, and this is not the exception.
+
+    Logged like any other change. Starting over is a thing somebody did,
+    and a log that records five amendments and not the reset reads as
+    though the last amendment is still in force.
+    """
+    from . import db
+    was = direction_of(profile_id)
+    conn = db.connect()
+    conn.execute("DELETE FROM scene_direction WHERE profile_id=?",
+                 (profile_id,))
+    if was != DEFAULT_DIRECTION:
+        conn.execute(
+            "INSERT INTO scene_direction_log (id, profile_id, asked, was,"
+            " became, surface, created_at) VALUES (?,?,?,?,?,?,?)",
+            (db.new_id("scn"), profile_id, None, was, DEFAULT_DIRECTION,
+             surface, db.utcnow()))
+    conn.commit()
+    return DEFAULT_DIRECTION
+
+
+def amend(profile_id: str, asked: str,
+          surface: str | None = None) -> dict:
+    """The person says what they want changed; the direction is rewritten.
+
+    Not appended. Appending is the obvious implementation and it degrades
+    fast: "it's too dark", then "still too dark", then "actually the beach
+    was better" — twenty corrections become a transcript of complaints
+    that contradict each other, and the renderer is handed all of it.
+
+        asked     what did they want changed
+        mattered  what does the scene look like now
+
+    So the model is given the standing direction and the request and asked
+    for the *resulting* direction, which stays one readable paragraph
+    somebody can check. It is the person's own words that are authoritative
+    — the request is applied, not negotiated with.
+    """
+    from . import llm
+    want = (asked or "").strip()
+    if not want:
+        raise FilmingError("say what you would like changed about the scene")
+
+    standing = direction_of(profile_id)
+    system = (
+        "You maintain the standing camera direction for one speaker's "
+        "rendered scenes. You are given the current direction and a change "
+        "the owner asked for. Answer with the COMPLETE new direction and "
+        "nothing else — no preamble, no explanation, no quotation marks.\n"
+        "Rules: apply what they asked rather than debating it. Keep "
+        "everything they did not ask to change. Describe only the setting, "
+        "the framing and the light — never what the speaker says or who "
+        "they are. Stay under 80 words, in plain prose.")
+    messages = [{"role": "user", "content":
+                 f"Current direction:\n{standing}\n\nThey asked for:\n{want}"}]
+    try:
+        written = llm.provider_for_profile(profile_id).generate(system,
+                                                               messages)
+    except Exception:
+        raise FilmingError(
+            "the model that keeps the scene direction could not be "
+            "reached — the direction is unchanged") from None
+
+    written = (written or "").strip().strip('"')
+    if not written:
+        raise FilmingError(
+            "the model answered with an empty direction — the scene is "
+            "unchanged rather than blank")
+    return {"direction": set_direction(profile_id, written, asked=want,
+                                       surface=surface),
+            "was": standing, "asked": want}
+
+
+def compose(profile_id: str, passage: str) -> str:
+    """The prompt actually sent: how it looks, then what is said.
+
+    The direction leads because it is the frame the passage sits inside,
+    and a renderer reading them the other way round tends to treat the
+    setting as an afterthought.
+    """
+    return f"{direction_of(profile_id)}\n\n{(passage or '').strip()}"

@@ -122,6 +122,62 @@ def video_doors() -> dict:
     return filming.doors()
 
 
+class Direction(BaseModel):
+    surface: str | None = Field(default=None,
+                                description="window or fullscreen — where "
+                                            "they were when they asked. "
+                                            "Recorded, never acted on: both "
+                                            "read and write the same row.")
+    asked: str = Field(min_length=1, max_length=500,
+                       description="What the owner wants changed about how "
+                                   "their scenes look, in their own words — "
+                                   "\"it's too dark, let's have this on the "
+                                   "beach\". Applied, not negotiated with.")
+
+
+@router.get("/video/direction/{profile_id}")
+def video_direction(profile_id: str) -> dict:
+    """How this profile's scenes are shot, and what it would be if the
+    owner started over."""
+    return {"direction": filming.direction_of(profile_id),
+            "default": filming.DEFAULT_DIRECTION,
+            "max_length": filming.MAX_DIRECTION}
+
+
+@router.post("/video/direction/{profile_id}")
+def video_direct(profile_id: str, body: Direction) -> dict:
+    """Change how the scenes look, in the owner's own words.
+
+    Rewrites the standing direction rather than appending to it, and the
+    answer carries `was` so a screen can show what it replaced — an
+    amendment nobody can see the effect of is one nobody can undo.
+    """
+    try:
+        return filming.amend(profile_id, body.asked, body.surface)
+    except filming.FilmingError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from None
+
+
+@router.get("/video/direction/{profile_id}/log")
+def video_direction_log(profile_id: str, limit: int = 20) -> dict:
+    """What was asked of this scene, newest first.
+
+    `surface` says whether the change came from the frame or from full
+    screen. Not because the two behave differently — they read and write
+    the same row, which is why leaving full screen loses nothing — but
+    because "I changed that while it was full screen" is how a person
+    remembers doing it.
+    """
+    return {"log": filming.direction_log(profile_id, limit)}
+
+
+@router.delete("/video/direction/{profile_id}")
+def video_undirect(profile_id: str) -> dict:
+    """Back to the default. Every standing thing here has a way out that
+    is one press, and this is not the exception."""
+    return {"direction": filming.forget_direction(profile_id)}
+
+
 class Scene(BaseModel):
     prompt: str = Field(min_length=1, max_length=2000,
                         description="What the scene is. Sent to the "
@@ -132,6 +188,11 @@ class Scene(BaseModel):
                                      "with it.")
     shape: str = Field(default="landscape",
                        description="portrait, landscape or square.")
+    profile_id: str | None = Field(default=None,
+                                   description="Whose standing scene "
+                                               "direction to shoot this "
+                                               "under. Without one the "
+                                               "passage is sent bare.")
     wait: bool = Field(default=False,
                        description="Hold the request open until the render "
                                    "finishes. False — the default — hands "
@@ -150,7 +211,8 @@ def video_render(body: Scene) -> dict:
     """
     try:
         return filming.render(body.prompt, seconds=body.seconds,
-                              shape=body.shape, wait=body.wait)
+                              shape=body.shape, wait=body.wait,
+                              directed_for=body.profile_id)
     except filming.FilmingError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from None
 

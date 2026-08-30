@@ -3106,6 +3106,55 @@ _REFUSALS: dict[str, dict[str, str]] = {
     # Every road out of the forge answers in words a person can act on —
     # a photograph with no face is theirs to fix by sending a clearer
     # one — so the words have to exist in the language they read.
+    # The standing direction's own refusals. The two about the model
+    # both end the same way on purpose — "the direction is unchanged",
+    # "the scene is unchanged rather than blank" — because the thing a
+    # person fears when a correction fails is that they have lost the
+    # five they made before it.
+    "say how the scene should look, or clear it": {
+        'es': "di cómo debe verse la escena, o bórrala",
+        'fr': "dites de quoi la scène doit avoir l'air, ou effacez-la",
+        'de': "sag, wie die Szene aussehen soll, oder lösch sie",
+        'pt': "diga como a cena deve ficar, ou limpe-a",
+        'it': "di' come deve apparire la scena, o cancellala",
+        'ja': "シーンをどう見せたいか言うか、消してください",
+        'zh': "说明场景该是什么样子，或者清空它",
+        'hi': "बताइए दृश्य कैसा दिखना चाहिए, या इसे मिटा दीजिए",
+        'ar': "قل كيف ينبغي أن يبدو المشهد، أو امسحه",
+    },
+    "say what you would like changed about the scene": {
+        'es': "di qué te gustaría cambiar de la escena",
+        'fr': "dites ce que vous aimeriez changer dans la scène",
+        'de': "sag, was du an der Szene ändern möchtest",
+        'pt': "diga o que gostaria de mudar na cena",
+        'it': "di' che cosa vorresti cambiare della scena",
+        'ja': "シーンのどこを変えたいか教えてください",
+        'zh': "说说这个场景你想改什么",
+        'hi': "बताइए दृश्य में आप क्या बदलना चाहेंगे",
+        'ar': "قل ما تودّ تغييره في المشهد",
+    },
+    "the model that keeps the scene direction could not be reached — the direction is unchanged": {
+        'es': "no se pudo contactar con el modelo que mantiene la dirección de escena; la dirección no ha cambiado",
+        'fr': "le modèle qui tient la direction de scène n'a pas pu être joint — la direction est inchangée",
+        'de': "das Modell, das die Szenenanweisung führt, war nicht erreichbar — die Anweisung ist unverändert",
+        'pt': "não foi possível contactar o modelo que mantém a direção de cena — a direção está inalterada",
+        'it': "il modello che tiene la direzione di scena non è raggiungibile — la direzione è invariata",
+        'ja': "シーンの指示を保つモデルに到達できませんでした。指示はそのままです",
+        'zh': "联系不上维护场景指示的模型 — 指示未改动",
+        'hi': "दृश्य-निर्देश रखने वाले मॉडल तक नहीं पहुँचा जा सका — निर्देश अपरिवर्तित है",
+        'ar': "تعذّر الوصول إلى النموذج الذي يحفظ توجيه المشهد — التوجيه دون تغيير",
+    },
+    "the model answered with an empty direction — the scene is unchanged rather than blank": {
+        'es': "el modelo respondió con una dirección vacía; la escena queda sin cambios en lugar de en blanco",
+        'fr': "le modèle a répondu par une direction vide — la scène reste inchangée plutôt que vide",
+        'de': "das Modell antwortete mit einer leeren Anweisung — die Szene bleibt unverändert statt leer",
+        'pt': "o modelo respondeu com uma direção vazia — a cena fica inalterada em vez de em branco",
+        'it': "il modello ha risposto con una direzione vuota — la scena resta invariata anziché vuota",
+        'ja': "モデルが空の指示を返しました。シーンは空白ではなくそのままです",
+        'zh': "模型返回了空的指示 — 场景保持原样，而不是被清空",
+        'hi': "मॉडल ने खाली निर्देश लौटाया — दृश्य खाली होने के बजाय अपरिवर्तित है",
+        'ar': "أجاب النموذج بتوجيه فارغ — يبقى المشهد كما هو بدل أن يُفرَّغ",
+    },
     # The video road's refusals (qrme/filming.py). A person who asked for a
     # scene and got a wall is owed the reason in their own language, the
     # same as every other road out of this platform.

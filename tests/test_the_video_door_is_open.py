@@ -314,3 +314,240 @@ def test_a_render_asks_for_the_length_the_passage_needs(monkeypatch, wired):
     passage = " ".join(["word"] * 30)
     filming.render(passage)
     assert speaks.calls[0][1]["seconds"] == filming.length_for(passage)
+
+
+# --- the standing direction --------------------------------------------
+
+@pytest.fixture()
+def seeded(monkeypatch):
+    import tempfile as _t
+    monkeypatch.setenv("QRME_DB", _t.mkdtemp() + "/scene.db")
+    from qrme import db
+    db.reset()
+    db.connect()
+    yield
+    db.reset()
+
+
+def test_a_profile_that_has_said_nothing_still_has_a_direction(seeded):
+    """The first render must not be a lottery."""
+    from qrme import filming
+    assert filming.direction_of("p1") == filming.DEFAULT_DIRECTION
+
+
+def test_what_they_said_is_carried_to_the_next_render(seeded):
+    """The whole point of storing it: "let's have this on the beach" is
+    not a note about one video."""
+    from qrme import filming
+    filming.set_direction("p1", "A sunlit beach at golden hour.")
+    assert filming.direction_of("p1") == "A sunlit beach at golden hour."
+    assert "beach" in filming.compose("p1", "Yes, that helps.")
+
+
+def test_the_direction_leads_and_the_passage_follows(seeded):
+    """A renderer handed them the other way round treats the setting as
+    an afterthought."""
+    from qrme import filming
+    filming.set_direction("p1", "A beach.")
+    composed = filming.compose("p1", "Yes.")
+    assert composed.index("A beach.") < composed.index("Yes.")
+
+
+def test_there_is_one_press_back_to_the_default(seeded):
+    from qrme import filming
+    filming.set_direction("p1", "A beach.")
+    assert filming.forget_direction("p1") == filming.DEFAULT_DIRECTION
+    assert filming.direction_of("p1") == filming.DEFAULT_DIRECTION
+
+
+def test_one_profile_s_direction_is_not_another_s(seeded):
+    from qrme import filming
+    filming.set_direction("p1", "A beach.")
+    assert filming.direction_of("p2") == filming.DEFAULT_DIRECTION
+
+
+def test_a_direction_cannot_grow_without_limit(seeded):
+    """It rides every prompt, so one that grows unbounded starts crowding
+    out the passage it is supposed to be framing."""
+    from qrme import filming
+    kept = filming.set_direction("p1", "beach " * 500)
+    assert len(kept) <= filming.MAX_DIRECTION
+
+
+def test_an_empty_direction_is_refused_rather_than_stored(seeded):
+    from qrme import filming
+    with pytest.raises(filming.FilmingError):
+        filming.set_direction("p1", "   ")
+
+
+def test_an_amendment_rewrites_rather_than_appends(seeded, monkeypatch):
+    """Appending degrades fast: "too dark", "still too dark", "actually
+    the beach was better" — twenty corrections become a transcript of
+    complaints that contradict each other."""
+    from qrme import filming
+
+    class Model:
+        def generate(self, system, messages):
+            self.saw = messages[0]["content"]
+            return "A sunlit beach at golden hour, wide, salt haze."
+
+    model = Model()
+    monkeypatch.setattr("qrme.llm.provider_for_profile", lambda *a, **k: model)
+    filming.set_direction("p1", "A dark room at night.")
+    got = filming.amend("p1", "it's too dark, let's have this on the beach")
+    assert got["direction"] == "A sunlit beach at golden hour, wide, salt haze."
+    assert "dark room" not in filming.direction_of("p1")
+    # It was shown the standing direction, not asked to invent from nothing.
+    assert "A dark room at night." in model.saw
+
+
+def test_an_amendment_with_nothing_asked_is_refused(seeded):
+    from qrme import filming
+    with pytest.raises(filming.FilmingError):
+        filming.amend("p1", "  ")
+
+
+def test_a_model_that_cannot_be_reached_leaves_the_scene_alone(seeded,
+                                                               monkeypatch):
+    """The failure this prevents is a correction that silently blanks the
+    direction somebody spent five amendments building."""
+    from qrme import filming
+
+    class Dead:
+        def generate(self, system, messages):
+            raise OSError("no route")
+
+    monkeypatch.setattr("qrme.llm.provider_for_profile", lambda *a, **k: Dead())
+    filming.set_direction("p1", "A beach.")
+    with pytest.raises(filming.FilmingError):
+        filming.amend("p1", "make it night")
+    assert filming.direction_of("p1") == "A beach."
+
+
+def test_an_empty_answer_leaves_the_scene_alone(seeded, monkeypatch):
+    from qrme import filming
+
+    class Blank:
+        def generate(self, system, messages):
+            return "   "
+
+    monkeypatch.setattr("qrme.llm.provider_for_profile", lambda *a, **k: Blank())
+    filming.set_direction("p1", "A beach.")
+    with pytest.raises(filming.FilmingError):
+        filming.amend("p1", "make it night")
+    assert filming.direction_of("p1") == "A beach."
+
+
+def test_the_render_sends_the_direction_in_front_of_the_passage(
+        seeded, monkeypatch, wired):
+    from qrme import filming
+    filming.set_direction("p1", "A sunlit beach at golden hour.")
+    speaks = _speaks(lambda url, body: {"video_url": "https://cdn/x.mp4"})
+    monkeypatch.setattr("urllib.request.urlopen", speaks)
+    filming.render("Yes, that helps.", directed_for="p1")
+    sent = speaks.calls[0][1]["prompt"]
+    assert sent.index("beach") < sent.index("Yes, that helps.")
+
+
+def test_the_direction_does_not_move_the_clock(seeded, monkeypatch, wired):
+    """Letting the setting lengthen the render would make "put us on the
+    beach" cost money, which is not what anybody meant by it."""
+    from qrme import filming
+    passage = " ".join(["word"] * 30)
+    filming.set_direction("p1", "A beach. " * 20)
+    speaks = _speaks(lambda url, body: {"video_url": "https://cdn/x.mp4"})
+    monkeypatch.setattr("urllib.request.urlopen", speaks)
+    filming.render(passage, directed_for="p1")
+    assert speaks.calls[0][1]["seconds"] == filming.length_for(passage)
+
+
+# --- the account of what was asked --------------------------------------
+
+def test_every_change_is_logged_with_what_it_replaced(seeded):
+    """The direction is one row that gets overwritten, which is right for
+    a standing setting and useless as an account of one."""
+    from qrme import filming
+    filming.set_direction("p1", "A dark room.")
+    filming.set_direction("p1", "A sunlit beach.")
+    log = filming.direction_log("p1")
+    assert len(log) == 2
+    assert log[0]["became"] == "A sunlit beach."
+    assert log[0]["was"] == "A dark room."
+
+
+def test_the_log_is_newest_first(seeded):
+    from qrme import filming
+    for n in ("one", "two", "three"):
+        filming.set_direction("p1", f"A room, {n}.")
+    assert filming.direction_log("p1")[0]["became"] == "A room, three."
+
+
+def test_a_change_made_full_screen_is_what_the_frame_reads(seeded,
+                                                           monkeypatch):
+    """Progress sticks across the two views because there are not two of
+    them: one row, read by both."""
+    from qrme import filming
+
+    class Model:
+        def generate(self, system, messages):
+            return "A sunlit beach at golden hour."
+
+    monkeypatch.setattr("qrme.llm.provider_for_profile", lambda *a, **k: Model())
+    filming.amend("p1", "let's have this on the beach", surface="fullscreen")
+    # Nothing is carried back. The windowed frame reads the same row.
+    assert filming.direction_of("p1") == "A sunlit beach at golden hour."
+    assert filming.direction_log("p1")[0]["surface"] == "fullscreen"
+
+
+def test_the_log_keeps_their_words_not_just_the_result(seeded, monkeypatch):
+    """Somebody who has amended five times cannot otherwise tell which
+    request caused the thing they now dislike."""
+    from qrme import filming
+
+    class Model:
+        def generate(self, system, messages):
+            return "A sunlit beach at golden hour."
+
+    monkeypatch.setattr("qrme.llm.provider_for_profile", lambda *a, **k: Model())
+    filming.amend("p1", "it's too dark")
+    assert filming.direction_log("p1")[0]["asked"] == "it's too dark"
+
+
+def test_starting_over_is_logged_too(seeded):
+    """A log with five amendments and no reset reads as though the last
+    amendment is still in force."""
+    from qrme import filming
+    filming.set_direction("p1", "A beach.")
+    filming.forget_direction("p1")
+    log = filming.direction_log("p1")
+    assert log[0]["became"] == filming.DEFAULT_DIRECTION
+    assert log[0]["was"] == "A beach."
+
+
+def test_resetting_an_untouched_scene_writes_nothing(seeded):
+    """Pressing start-over on a default is not an event."""
+    from qrme import filming
+    filming.forget_direction("p1")
+    assert filming.direction_log("p1") == []
+
+
+def test_a_failed_amendment_leaves_no_trace(seeded, monkeypatch):
+    """The log is what happened, not what was attempted — an entry whose
+    `became` never became would make the account a lie."""
+    from qrme import filming
+
+    class Dead:
+        def generate(self, system, messages):
+            raise OSError("no route")
+
+    monkeypatch.setattr("qrme.llm.provider_for_profile", lambda *a, **k: Dead())
+    filming.set_direction("p1", "A beach.")
+    with pytest.raises(filming.FilmingError):
+        filming.amend("p1", "make it night")
+    assert len(filming.direction_log("p1")) == 1
+
+
+def test_one_profile_s_log_is_not_another_s(seeded):
+    from qrme import filming
+    filming.set_direction("p1", "A beach.")
+    assert filming.direction_log("p2") == []

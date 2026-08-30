@@ -2472,3 +2472,23 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 /* Over the ceiling. Said in the accent that means "read this", because a
    passage that needs a second scene is a decision, not a warning. */
 .video-quote-over { color: var(--amber); font-weight: 600; }
+
+/* The standing direction, shown as the prose it is. Bordered rather than
+   boxed like a field, because it is not one — it is what the camera was
+   last told, and the control that changes it is the line underneath. */
+.scene-direction {
+  margin: 8px 0 10px; padding: 9px 12px; border-radius: 10px;
+  background: var(--card2); border: 1px solid var(--line);
+  border-left: 3px solid var(--brand); color: var(--t2);
+  font-size: 12.5px; line-height: 1.55; font-style: italic;
+}
+
+/* The account of what was asked. Folded away because it is a record
+   rather than a control, and open it reads as a list of sentences the
+   owner wrote — which is what it is. */
+.scene-log { margin: 0 0 12px; }
+.scene-log summary { font-size: 12px; color: var(--t2); cursor: pointer; }
+.scene-log ul { margin: 8px 0 0; padding-left: 17px; }
+.scene-log li { font-size: 12px; line-height: 1.55; color: var(--t2);
+  margin-bottom: 4px; }
+.scene-log li em { font-style: normal; font-size: 10.5px; }

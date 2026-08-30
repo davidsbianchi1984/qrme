@@ -5038,12 +5038,37 @@ export const api = {
    *  it from the passage, because a dial makes the video fit the setting
    *  instead of the content. Defaults to not waiting — a render is
    *  minutes, and a held request is not. */
-  videoRender: (prompt: string, shape: string, wait = false) =>
+  /** How this profile's scenes are shot, carried from one render to the
+   *  next. The default until somebody says otherwise. */
+  videoDirection: (profileId: string) =>
+    req<{ direction: string; default: string; max_length: number }>(
+      `/video/direction/${profileId}`),
+  /** Change how they look, in the owner's own words. Rewrites the
+   *  standing direction rather than appending, and answers with `was` so
+   *  a screen can show what it replaced. */
+  videoDirect: (profileId: string, asked: string,
+                surface: "window" | "fullscreen" = "window") =>
+    req<{ direction: string; was: string; asked: string }>(
+      `/video/direction/${profileId}`,
+      { method: "POST", body: JSON.stringify({ asked, surface }) }),
+  /** What was asked of this scene, newest first — so somebody who has
+   *  amended five times can see which request caused the thing they now
+   *  dislike, rather than only where they ended up. */
+  videoDirectionLog: (profileId: string) =>
+    req<{ log: { asked: string | null; was: string; became: string;
+                 surface: string | null; created_at: string }[] }>(
+      `/video/direction/${profileId}/log`),
+  /** Back to the default, in one press. */
+  videoUndirect: (profileId: string) =>
+    req<{ direction: string }>(`/video/direction/${profileId}`,
+                               { method: "DELETE" }),
+  videoRender: (prompt: string, shape: string, profileId: string | null = null,
+                wait = false) =>
     req<{ video_url?: string; id?: string; pending?: boolean;
           provider: string; seconds?: number; waited?: number;
           wait_seconds?: number }>("/video/render", {
       method: "POST",
-      body: JSON.stringify({ prompt, shape, wait }),
+      body: JSON.stringify({ prompt, shape, wait, profile_id: profileId }),
     }),
   /** A photograph becomes this profile's face — geometry, skin and a
    *  mouth — built on the deployment's own hardware. `shot` says how

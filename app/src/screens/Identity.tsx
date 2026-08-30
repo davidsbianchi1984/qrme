@@ -76,6 +76,13 @@ export function Identity({ onPlans, onPassing }: {
   const [passage, setPassage] = useState("");
   const [videoShape, setVideoShape] = useState("landscape");
   const [filming, setFilming] = useState(false);
+  // How this profile's scenes are shot, carried from one render to the
+  // next. Amended in the owner's own words rather than typed out again.
+  const [direction, setDirection] = useState("");
+  const [sceneAsk, setSceneAsk] = useState("");
+  const [directing, setDirecting] = useState(false);
+  const [sceneLog, setSceneLog] = useState<
+    Awaited<ReturnType<typeof api.videoDirectionLog>>["log"]>([]);
 
   const [forge, setForge] = useState<
     { provider: string; configured: boolean; shots: string[] } | null>(null);
@@ -370,6 +377,12 @@ export function Identity({ onPlans, onPassing }: {
     // that fails, and somebody who has just written what they wanted is
     // the worst moment to find out.
     api.videoDoors().then(setFilm).catch(() => setFilm(null));
+    if (me) {
+      api.videoDirection(me).then((r) => setDirection(r.direction))
+        .catch(() => setDirection(""));
+      api.videoDirectionLog(me).then((r) => setSceneLog(r.log))
+        .catch(() => setSceneLog([]));
+    }
     api.avatarShelf().then((r) => setShelfRows(r.shelf))
       .catch(() => setShelfRows([]));
   }, []);
@@ -381,7 +394,7 @@ export function Identity({ onPlans, onPassing }: {
     setFilming(true);
     setNote(null);
     try {
-      const got = await api.videoRender(passage, videoShape);
+      const got = await api.videoRender(passage, videoShape, me);
       // `fill` answers nodes for the places that render markup; this is a
       // plain note, so the two strings are plain too.
       setNote(got.video_url ? tr("idn.video.done", lang)
@@ -390,6 +403,31 @@ export function Identity({ onPlans, onPassing }: {
       fail(e);
     } finally {
       setFilming(false);
+    }
+  }
+
+  /** Their words, applied. The direction comes back rewritten rather
+   *  than lengthened — see `filming.amend` for why appending degrades. */
+  async function directScene() {
+    setDirecting(true);
+    try {
+      const got = await api.videoDirect(me, sceneAsk, "window");
+      setDirection(got.direction);
+      setSceneAsk("");
+      setSceneLog((await api.videoDirectionLog(me)).log);
+    } catch (e) {
+      fail(e);
+    } finally {
+      setDirecting(false);
+    }
+  }
+
+  async function undirectScene() {
+    try {
+      setDirection((await api.videoUndirect(me)).direction);
+      setSceneLog((await api.videoDirectionLog(me)).log);
+    } catch (e) {
+      fail(e);
     }
   }
 
@@ -819,6 +857,50 @@ export function Identity({ onPlans, onPassing }: {
                 .map((k) => ({ key: k, name: k, how: "" }))}
               chosen={film?.provider || ""}
               onPick={() => undefined} />
+
+            {/* The standing direction, above the passage because it is
+                the frame the passage sits inside — and because somebody
+                who does not like what they saw looks here first. Shown
+                as prose rather than as fields: the vocabulary of a shot
+                is not a form, and "it's too dark" is not a dropdown. */}
+            <h4>{tr("idn.scene.direction", lang)}</h4>
+            <p className="muted small">
+              {tr("idn.scene.direction.sub", lang)}
+            </p>
+            {direction !== "" && <p className="scene-direction">{direction}</p>}
+            <div className="row">
+              <input value={sceneAsk} style={{ flex: 1 }}
+                     placeholder={tr("idn.scene.ask.ph", lang)}
+                     aria-label={tr("idn.scene.ask", lang)}
+                     onChange={(e) => setSceneAsk(e.target.value)} />
+              <button disabled={directing || sceneAsk.trim() === ""}
+                      onClick={() => void directScene()}>
+                {tr("idn.scene.ask", lang)}
+              </button>
+              <button className="chip" onClick={() => void undirectScene()}>
+                {tr("idn.scene.reset", lang)}
+              </button>
+            </div>
+
+            {/* What was asked, in their own words. Folded away because
+                it is a record rather than a control — but present,
+                because a direction that only says where somebody ended
+                up cannot tell them which request took them there. */}
+            <details className="scene-log">
+              <summary>{tr("idn.scene.log", lang)}</summary>
+              {sceneLog.length === 0
+                ? <p className="muted small">{tr("idn.scene.log.none", lang)}</p>
+                : <ul>
+                    {sceneLog.map((entry, at) => (
+                      <li key={at}>
+                        <span>{entry.asked || tr("idn.scene.log.reset", lang)}</span>
+                        {entry.surface !== null && (
+                          <em className="muted"> · {entry.surface}</em>
+                        )}
+                      </li>
+                    ))}
+                  </ul>}
+            </details>
 
             <h4>{tr("idn.video.passage", lang)}</h4>
             <p className="muted small">{tr("idn.video.passage.sub", lang)}</p>

@@ -101,6 +101,7 @@ the owning screens read.
 | **Locomotion directives** | The movement a bound body may be told to make, checked against that platform's own allowlist before anything reaches the robot. A vacuum cannot be told to fetch. | A bound body whose own list includes the move. Not a separate switch: with nothing bound there is nothing that could be told to move. | Robots & Devices |
 | **Screen observation** | Reading a screen without acting on it. Text found on a screen is treated as data and can never widen what is allowed, whatever that text claims. | A look permit naming its applications, its minutes and its steps. A wildcard is refused. | Hands |
 | **Interface operation** | Working a screen — moving a pointer, pressing a control, typing into a field — under a grant bounded in applications, moves, minutes and steps. | A grant naming all four limits, enforced where the move happens rather than on the screen that requested it. It never types passwords, PINs, one-time codes, card numbers or recovery phrases, and says so instead of trying. | Hands |
+| **Rendered scene** | The turn itself as footage — the reply spoken in a place, rendered by a service that is not this one and played without anybody pressing anything. | A rendering service the deployment named, a key to reach it with, and the standing direction the owner wrote. Everything it returns is stored marked, with no setting that turns the mark off. | Identity |
 | **Self-adjustment** | The profile turns its own dials when the person talking asks it to — warmer, briefer — instead of the change waiting on the owner being around. | The dials the owner exposed, within the bounds the owner set. A lock the owner places is refused from inside the conversation, not negotiated. | Agent |
 
 **On the naming.** These are named for what they do, not for the body
@@ -117,6 +118,100 @@ QRME lends a profile an ear and an eye *into a place*, where JIM-mini
 attaches them to a monitor on one person; copying the sibling's wording
 would have produced a register that described the wrong product
 accurately.
+
+
+## How a profile is seen: three roads
+
+A presence has three roads, and each surface falls down the list when the
+one above it is not there yet. That is why they are three fillings of one
+frame rather than three layouts: the frame does not move, resize, or swap
+for a different panel — it simply gets more alive as each road becomes
+available, and a face is on screen the whole time.
+
+| | What fills the frame | Speed | What it costs |
+|---|---|---|---|
+| **1 · Profile photo** | The still, carrying the AI mark in its own pixels | Instant | Nothing |
+| **2 · Avatar** | The 3-D head, breathing, mouth on the voice | Live, every frame | Nothing, once the model exists |
+| **3 · Video generation** | The reply rendered as footage | Minutes | Ten to fifteen cents a second |
+
+**Length is not a setting.** `filming.length_for` works out how long the
+passage takes to say and renders for exactly that. A dial would make the
+video fit the setting instead of the content — two sentences padded to
+thirty seconds, or a paragraph hurried into five — so the console shows
+the number it arrived at and never offers to change it. Past the ceiling
+it says so rather than trimming: a video that quietly drops its last
+sentence is worse than one that was never made, because nobody watching
+can tell.
+
+**The direction is standing.** "It's too dark, let's have this on the
+beach" is not a note about one video; it is where this profile lives from
+now on. `filming.amend` rewrites the standing direction from what the
+owner said rather than appending to it, so twenty corrections stay one
+readable paragraph instead of a transcript of complaints that contradict
+each other.
+
+**No vendor is load-bearing.** Seven services are named and none is
+depended on. Sora is absent on purpose: OpenAI deprecated it on 26 April
+2026 and shuts the API down on 24 September. Ready Player Me closed on
+31 January 2026 and is why `qrme/avatarforge.py` exists at all. Two
+shutdowns in fifteen months, in the two markets this platform would most
+like to buy from — so a shelf that sends somebody to a service with a
+published end date is worse than a shelf one row shorter.
+
+### Real output
+
+Two scenes this platform rendered, each of a profile that already had a
+face here. Frames from the footage, not stills posed for the page.
+
+<table>
+  <tr>
+    <td align="center" width="50%"><img src="docs/scenes/dr_amara_osei.jpg" alt="Dr Amara Osei, rendered"><br><sub><b>Dr. Amara Osei</b> · healthcare<br>the starter portrait, rendered into a place</sub></td>
+    <td align="center" width="50%"><img src="docs/scenes/david_bianchi_ai.jpg" alt="David Bianchi, rendered"><br><sub><b>David Bianchi</b> · the founder's own persona<br>same face, a different room</sub></td>
+  </tr>
+</table>
+
+### The room, on a phone and on the desktop
+
+**These two are compositions, not captures.** They are drawn from real
+assets — the portraits this repository ships and frames from the footage
+above — and they show a surface that is built at the module and route
+level and not yet on screen. The distinction is the one
+`tests/superseded_drawings.txt` exists to keep: a drawing standing in for
+a screen is honest until it is quiet about being a drawing.
+
+<img src="docs/scenes/room-phone.png" width="300" align="right" alt="The room on a phone">
+
+On a phone the seats become a strip across the top and the stage takes
+the full width. A rail of faces down the side would leave the footage too
+narrow to read a face in, which defeats the point of rendering one.
+
+Underneath the frame sits the standing direction in the owner's own words,
+and the line that changes it. On roads 1 and 2 that line is not greyed
+out — it is gone, because a control that cannot do anything is worse than
+no control at all.
+
+The AI mark rides every seat and the footage both. On the portraits it is
+burned into the pixels by `tools/mark_portraits.py`, because
+`/portraits/{handle}.webp` is a public URL and a composited badge does not
+travel with a scraped file.
+
+<br clear="all">
+
+<img src="docs/scenes/room-desktop.png" width="620" alt="The room on the desktop">
+
+### Filling the screen, and leaving it
+
+The frame carries an expand in its bottom-right corner. Not video
+furniture — a still and a 3-D head are both worth filling a screen with,
+so it is on every road.
+
+Full screen, the direction stays legible along the bottom and the mark
+stays in the corner: the two things a viewer needs are what they are
+looking at and that it was made. Leaving is a red X, top right, and it is
+the only red control on the surface because it is the only one that ends
+something rather than changing it.
+
+<img src="docs/scenes/room-fullscreen.png" width="620" alt="A rendered scene, full screen">
 
 ## The screens you'll meet
 

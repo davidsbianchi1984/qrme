@@ -1120,6 +1120,54 @@ CREATE TABLE IF NOT EXISTS avatar_motion (
     updated_at TEXT NOT NULL
 );
 
+-- The standing direction for this profile's rendered scenes: how they should
+-- look, in the owner's own words, carried from one render to the next.
+--
+-- A scene rendered from the reply alone gets whatever the model imagines,
+-- which is a different room every time and usually a dark one. Somebody who
+-- says "it is too dark, let's have this on the beach" is not asking for one
+-- beach — they are telling the camera where this profile lives, and the next
+-- render has to know it too.
+--
+--     asked     what should this scene look like
+--     mattered  what should every scene after it look like
+--
+-- Free text rather than a set of dials on purpose: the vocabulary of a shot
+-- is not a form. It is amended by the model from what the person said (see
+-- `filming.amend`) rather than appended to, so twenty corrections stay one
+-- readable paragraph instead of becoming a transcript of every complaint.
+CREATE TABLE IF NOT EXISTS scene_direction (
+    profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
+    direction  TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+-- Every change asked of the scene direction, and what it did.
+--
+-- The direction itself is one row that gets overwritten, which is right for
+-- a standing setting and wrong for an account of one. An owner who has
+-- amended five times cannot see what they asked, cannot tell which request
+-- caused the thing they now dislike, and cannot go back one step — the
+-- direction says where they ended up and nothing about how.
+--
+--     asked     what does the scene look like now
+--     mattered  what did they ask for, and what did it do
+--
+-- Append-only by construction: nothing updates a row here. `was` and
+-- `became` are both kept so a reversal is a fact on the row rather than a
+-- diff somebody has to compute against the row above.
+CREATE TABLE IF NOT EXISTS scene_direction_log (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    asked      TEXT,             -- their words; NULL when set outright
+    was        TEXT NOT NULL,
+    became     TEXT NOT NULL,
+    surface    TEXT,             -- window | fullscreen | NULL if unsaid
+    created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_scene_log_profile
+    ON scene_direction_log(profile_id, created_at DESC);
+
 -- What kind of thing the avatar asset is, when the asset itself cannot say.
 -- `presentation.kind_of` reads the kind off the string — a `.glb` is a model,
 -- a `.mp4` is a video — which covers every asset that carries an extension.

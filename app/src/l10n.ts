@@ -593,6 +593,30 @@ const CHROME: Table = {
   "idn.video.queued": {
     en: "Started. It keeps rendering whether you stay or not.", es: "Iniciado. Sigue representándose te quedes o no.", fr: "Lancé. Le rendu continue que vous restiez ou non.", de: "Gestartet. Es rendert weiter, ob du bleibst oder nicht.", pt: "Iniciado. Continua a representar quer fiques ou não.", it: "Avviato. Continua a essere reso, che tu resti o no.", ja: "開始しました。留まっても離れても描き出しは続きます。", zh: "已开始。无论你是否留下，都会继续渲染。", hi: "शुरू हो गया। आप रुकें या न रुकें, यह रेंडर होता रहेगा।", ar: "بدأ. سيستمر التصيير سواء بقيت أم لا.",
   },
+  "idn.scene.direction": {
+    en: "How these scenes look", es: "Cómo se ven estas escenas", fr: "L'allure de ces scènes", de: "Wie diese Szenen aussehen", pt: "Como estas cenas ficam", it: "Come appaiono queste scene", ja: "これらのシーンの見え方", zh: "这些场景的样子", hi: "ये दृश्य कैसे दिखते हैं", ar: "كيف تبدو هذه المشاهد",
+  },
+  "idn.scene.direction.sub": {
+    en: "Carried from one render to the next. Say what you would change and it is rewritten — you do not have to describe the whole thing again.", es: "Se mantiene de una representación a la siguiente. Di qué cambiarías y se reescribe: no hace falta describirlo todo otra vez.", fr: "Conservé d'un rendu à l'autre. Dites ce que vous changeriez et c'est réécrit — inutile de tout redécrire.", de: "Wird von einem Render zum nächsten mitgenommen. Sag, was du ändern würdest, und es wird neu geschrieben — du musst nicht alles noch einmal beschreiben.", pt: "Mantém-se de uma representação para a seguinte. Diz o que mudarias e é reescrito — não precisas de descrever tudo de novo.", it: "Si mantiene da un rendering al successivo. Di' cosa cambieresti e viene riscritto — non devi descrivere tutto da capo.", ja: "描き出しをまたいで引き継がれます。変えたいところを言えば書き直されます — 全部を説明し直す必要はありません。", zh: "会从一次渲染带到下一次。说出你想改什么，它会被重写 — 不必再把整段描述一遍。", hi: "एक रेंडर से अगले तक चलता रहता है। जो बदलना हो वह कहिए, यह फिर से लिखा जाएगा — पूरा दोबारा बताने की ज़रूरत नहीं।", ar: "يُحمل من تصيير إلى الذي يليه. قل ما تريد تغييره فيُعاد كتابته — لا حاجة لوصف كل شيء من جديد.",
+  },
+  "idn.scene.ask.ph": {
+    en: "It's too dark — let's have this on the beach", es: "Está demasiado oscuro: llevemos esto a la playa", fr: "C'est trop sombre — mettons ça sur la plage", de: "Es ist zu dunkel — machen wir das am Strand", pt: "Está demasiado escuro — vamos pôr isto na praia", it: "È troppo buio — spostiamolo sulla spiaggia", ja: "暗すぎます — 浜辺にしましょう", zh: "太暗了 — 咱们换到海滩吧", hi: "बहुत अंधेरा है — चलिए इसे समुद्र तट पर करते हैं", ar: "مظلم أكثر من اللازم — لنجعله على الشاطئ",
+  },
+  "idn.scene.ask": {
+    en: "Change it", es: "Cambiarlo", fr: "Le changer", de: "Ändern", pt: "Mudar", it: "Cambialo", ja: "変更する", zh: "更改", hi: "बदलें", ar: "غيّره",
+  },
+  "idn.scene.reset": {
+    en: "Start over", es: "Empezar de nuevo", fr: "Recommencer", de: "Von vorn", pt: "Começar de novo", it: "Ricomincia", ja: "最初から", zh: "重新开始", hi: "फिर से शुरू करें", ar: "ابدأ من جديد",
+  },
+  "idn.scene.log": {
+    en: "What you have asked for", es: "Lo que has pedido", fr: "Ce que vous avez demandé", de: "Was du verlangt hast", pt: "O que pediste", it: "Che cosa hai chiesto", ja: "これまでに頼んだこと", zh: "你提出过的要求", hi: "आपने क्या माँगा है", ar: "ما طلبته",
+  },
+  "idn.scene.log.none": {
+    en: "Nothing yet — the scene is as it started.", es: "Nada aún: la escena está como empezó.", fr: "Rien pour l'instant — la scène est telle qu'elle a commencé.", de: "Noch nichts — die Szene ist, wie sie begann.", pt: "Ainda nada — a cena está como começou.", it: "Ancora nulla — la scena è come è iniziata.", ja: "まだありません — シーンは最初のままです。", zh: "还没有 — 场景仍是最初的样子。", hi: "अभी कुछ नहीं — दृश्य वैसा ही है जैसा शुरू हुआ था।", ar: "لا شيء بعد — المشهد كما بدأ.",
+  },
+  "idn.scene.log.reset": {
+    en: "Started over", es: "Se empezó de nuevo", fr: "Recommencé", de: "Von vorn begonnen", pt: "Recomeçado", it: "Ricominciato", ja: "最初からやり直し", zh: "已重新开始", hi: "फिर से शुरू किया", ar: "أُعيد من البداية",
+  },
   "idn.road": {
     en: "How this renders", es: "Cómo se representa", fr: "Comment ceci s'affiche", de: "Wie das dargestellt wird", pt: "Como isto é representado", it: "Come viene reso", ja: "どう表示するか", zh: "如何呈现", hi: "यह कैसे प्रस्तुत होता है", ar: "كيف يُعرض هذا",
   },
