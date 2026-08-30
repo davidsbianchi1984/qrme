@@ -350,6 +350,15 @@ def create_app(pdi_client: PDIClient | None = None,
         from fastapi.staticfiles import StaticFiles
         app.mount(avatar_assets.FIGURE_ROUTE,
                   StaticFiles(directory=str(_figures)), name="figures")
+    # The 3-D faces that ship with the collection. A fourth mount for the
+    # same reason as the third: a `.glb` is not a picture, and the surface
+    # that can draw one asks a different question of the asset than the
+    # surface that can only draw a still. `avatars.MODEL_ROUTE`.
+    _models = avatar_assets.models_dir()
+    if _models.is_dir():
+        from fastapi.staticfiles import StaticFiles
+        app.mount(avatar_assets.MODEL_ROUTE,
+                  StaticFiles(directory=str(_models)), name="models")
 
     # User uploads (qrme/media.py): the wall's photos and footage, served
     # read-only from the deployment's own media directory. Created up front

@@ -105,6 +105,12 @@ ADD_PHOTO = f"{FIGURE_ROUTE}/add-photo.svg"
 # would be worse than a slightly dated word.
 SILHOUETTE = ADD_PHOTO
 
+# Where a shipped 3-D face is served from. Its own mount, like the portraits
+# and the figures, and for the reason the figures got one: a `.glb` sitting in
+# a tree that promises pictures is a file smuggled into the wrong directory,
+# and the first surface to read it as an image would be right to.
+MODEL_ROUTE = "/models"
+
 
 def portraits_dir():
     from pathlib import Path
@@ -121,6 +127,11 @@ def photos_dir():
     return Path(__file__).resolve().parent / "assets" / "photos"
 
 
+def models_dir():
+    from pathlib import Path
+    return Path(__file__).resolve().parent / "assets" / "models"
+
+
 def asset_path(handle: str) -> str | None:
     """The served path for a starter's portrait, or None if it has no file."""
     return (f"{ASSET_ROUTE}/{handle}.webp"
@@ -131,6 +142,12 @@ def photo_path(handle: str) -> str | None:
     """The served path for a real photograph, or None if there is no file."""
     return (f"{PHOTO_ROUTE}/{handle}.webp"
             if (photos_dir() / f"{handle}.webp").is_file() else None)
+
+
+def model_path(handle: str) -> str | None:
+    """The served path for a shipped 3-D face, or None if there is no file."""
+    return (f"{MODEL_ROUTE}/{handle}.glb"
+            if (models_dir() / f"{handle}.glb").is_file() else None)
 
 
 def kind_of(asset: str | None) -> str | None:
@@ -488,27 +505,60 @@ def torso_of(profile_id: str) -> str | None:
     return row["asset"] if row else None
 
 
+def _shipped_model(profile_id: str) -> str | None:
+    """The `.glb` that ships with the collection, found by handle.
+
+    A registry row is what a *forged* face gets. A starter has never had
+    one — its portrait is found by handle in the asset tree — so a
+    console asking a starter for its model was told there was none while
+    the file sat on disk beside the picture.
+
+        asked     has somebody forged a face for this profile
+        mattered  does this profile have a face in three dimensions
+
+    A profile can hold more than one handle, so every one it holds is
+    tried rather than only the first the table happens to return.
+    """
+    rows = db.connect().execute(
+        "SELECT handle FROM handles WHERE profile_id=? ORDER BY handle",
+        (profile_id,)).fetchall()
+    for row in rows:
+        found = model_path(row["handle"])
+        if found:
+            return found
+    return None
+
+
 def model_of(profile_id: str) -> str | None:
-    """The `.glb` of this profile's face, when its registry row carries
-    one — the forge's own output, read through `avatar_ref` so the model
-    and the portrait are one face rather than two records that could
-    disagree. None whenever the profile wears a face nobody forged,
-    which is most of them and is not a failure."""
+    """The `.glb` of this profile's face: the forge's own output when the
+    registry carries one, otherwise the model that ships with the
+    collection.
+
+    The registry wins where it answers, because an owner who forged their
+    own face is not overruled by the shipped one. None whenever neither
+    road has a model, which is most profiles and is not a failure.
+    """
     from . import avatarreg
     row = db.connect().execute(
         "SELECT avatar_ref FROM profiles WHERE id=?",
         (profile_id,)).fetchone()
-    if row is None or not row["avatar_ref"]:
+    if row is None:
         return None
-    try:
-        got = avatarreg.row(row["avatar_ref"])
-    except KeyError:
-        return None
-    # A retired face keeps its record and stops being shown — the model
-    # follows the portrait out rather than outliving the takedown.
-    if got["status"] != "active":
-        return None
-    return got["render_variants"].get("model")
+    if row["avatar_ref"]:
+        try:
+            got = avatarreg.row(row["avatar_ref"])
+        except KeyError:
+            got = None
+        if got is not None:
+            # A retired face keeps its record and stops being shown — the
+            # model follows the portrait out rather than outliving the
+            # takedown, and the shipped one does not stand in for it.
+            if got["status"] != "active":
+                return None
+            forged = got["render_variants"].get("model")
+            if forged:
+                return forged
+    return _shipped_model(profile_id)
 
 
 def speaking_of(profile_id: str) -> str | None:
@@ -675,9 +725,9 @@ def render(profile_id: str) -> dict:
         # anonymous profile for the same reason the face is: a torso is a
         # picture of somebody too.
         "torso": None if anonymous else torso_of(profile_id),
-        # The 3-D form of this same face, when the forge built one — the
-        # `.glb` a seat draws in three dimensions and whose mouth the
-        # room's own audio moves. Withheld from an anonymous profile for
+        # The 3-D form of this same face, forged or shipped — the `.glb` a
+        # seat draws in three dimensions and whose mouth the room's own
+        # audio moves. Withheld from an anonymous profile for
         # exactly the reason the torso is: a head is a picture of
         # somebody too, and hiding the face while shipping the model
         # would be the flag leaking past itself a third time.
