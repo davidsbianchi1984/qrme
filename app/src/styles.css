@@ -2676,11 +2676,38 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   /* Everything that is not the rail or the frame runs the full width:
      the switch above, the strip below, the way into the headset. */
   .screen.room-place > .card.room-stage > * { grid-column: 1 / -1; }
+  /* ONE column, not two.
+   *
+   *     asked     how many faces fit across the rail
+   *     mattered  does a whole tile fit across the rail
+   *
+   * Two columns of a 250px rail is a 119px tile, and a 84px face beside
+   * two 28px controls does not fit in 119px — so the roads climbed onto
+   * the portrait. Read off the drawing that settled the tile: the faces
+   * are stacked, each one full rail width, the picture on the left and
+   * its two roads level with it on the right. A rail is a list of who is
+   * here. It was never supposed to be a small grid. */
   .screen.room-place > .card.room-stage > .room-scene {
     grid-column: 1; grid-row: 2;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     align-content: start; overflow-y: auto; min-height: 0;
     margin: 0;
+  }
+  /* And the tile is as tall as what is in it. The 179px floor was set
+     when a tile was a cell in a grid of equal squares; in a rail it just
+     leaves a hole under every name. */
+  .screen.room-place > .card.room-stage > .room-scene > .rs-tile {
+    /* `grid-auto-rows: 1fr` on the scene made every row an equal share of
+       the rail's height, which in a two-row grid is half the rail per
+       tile whatever is in it — hence the acre of empty ground under each
+       name. `auto` lets a tile be as tall as its own contents. */
+    min-height: 0;
+    /* And a lane for the roads. They are out of the flow, so without this
+       the portrait centres under them and the glyphs sit on the picture. */
+    padding-right: 44px;
+  }
+  .screen.room-place > .card.room-stage > .room-scene {
+    grid-auto-rows: auto;
   }
   .screen.room-place > .card.room-stage > .room-focus {
     grid-column: 2; grid-row: 2; min-height: 0;
@@ -2719,3 +2746,80 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   background: transparent; border-color: transparent; box-shadow: none;
 }
 .rs-behind-film > :not(.room-focus) { visibility: hidden; }
+
+/* ---- The rail tile: one face, and the roads beside it -------------------
+ *
+ *     asked     can a seat reach its avatar and its film
+ *     mattered  can it do that in a 250px rail
+ *
+ * The tile drew two equal captioned circles — "Audio" and "Avatar" — side
+ * by side. That was right at full width and fell apart the moment the
+ * seats became a rail: two circles, two captions and a name inside a
+ * quarter of the old width, so the second caption clipped to "Avata" and
+ * the tile read as a mistake. Photographed on a phone and sent back with
+ * four words: "I don't like the way it looks."
+ *
+ * A person is ONE face. The formats are things you can DO with them, and
+ * things you can do belong beside the face rather than competing with it
+ * for the middle of the tile.
+ */
+.rs-circle-btn.rs-solo { flex: 0 0 auto; width: 84px; max-width: 78%; }
+.rs-circle-btn.rs-solo .rs-photo {
+  width: 100%; height: auto; aspect-ratio: 1 / 1;
+  border-radius: 50%; object-fit: cover; display: block;
+}
+
+/* The two roads, BESIDE the face — not under it, not over it.
+ *
+ * Held against the drawing that settled it: the portrait keeps the left
+ * of the tile and the two glyphs stack down its right, level with it.
+ * Name and role run underneath, across the whole tile. Nothing is
+ * captioned, because a glyph that needs a word under it is the wrong
+ * glyph.
+ *
+ * Absolute rather than a grid column: the tile has a dozen conditional
+ * children — badges, hints, camera controls, the sit-out — and turning
+ * it into a grid would scatter every one of them. Taking these two out
+ * of the flow changes nothing else, and a tile with roads and a tile
+ * without them stay the same height, so the rail is a rail and not a
+ * staircase.
+ */
+/* `.rs-tile >` is not decoration. `.rs-tile > *:not(.rs-behind)` further
+   up pins every direct child to `position: relative`, and at (0,2,0) it
+   out-specifies a bare `.rs-side` however far down the file it sits — so
+   the roads stayed in the flow, stacked under the name, and the first
+   render of this looked nothing like the drawing. Matching its
+   specificity and coming later is what actually moves them. */
+.rs-tile > .rs-side {
+  position: absolute; top: 14px; right: 9px; z-index: 3;
+  display: flex; flex-direction: column; gap: 7px;
+}
+/* Bare glyphs. "Not so dark" — so no box, no border, no panel-coloured
+   ground for them to disappear into. The picture IS the button, drawn
+   big enough to press with a thumb and to read at a glance. */
+.rs-tile > .rs-side > .rs-road {
+  width: 28px; height: 28px; padding: 0; border-radius: 9px;
+  display: grid; place-items: center;
+  font-size: 19px; line-height: 1; cursor: pointer;
+  background: none; border: none;
+  transition: transform .12s;
+}
+.rs-tile > .rs-side > .rs-road:hover {
+  transform: translateY(-1px) scale(1.08);
+}
+/* Pressed means "this seat is in the frame, in this format", and it
+   stays lit until pressed again — a control that lights for a moment and
+   goes out has not told you what is on screen. A ring, not a fill: the
+   glyph has to keep its own colours to stay legible. */
+.rs-tile > .rs-side > .rs-road.lit {
+  background: rgba(123,92,255,.22);
+  box-shadow: 0 0 0 2px var(--brand2), 0 3px 12px rgba(123,92,255,.45);
+}
+@media (max-width: 719px) {
+  /* On the phone the rail is a row of narrow tiles, so the roads tuck in
+     and the face keeps the middle. */
+  .rs-tile > .rs-side { top: 6px; right: 5px; gap: 4px; }
+  .rs-tile > .rs-side > .rs-road {
+    width: 23px; height: 23px; font-size: 15px; border-radius: 8px; }
+  .rs-circle-btn.rs-solo { width: 58px; }
+}

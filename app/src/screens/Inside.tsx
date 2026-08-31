@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Avatar3D, type Shot } from "../Avatar3D";
+import { type Shot } from "../Avatar3D";
 import { isEcho, RECENT_TURNS } from "../echo";
 import { AvatarStage } from "../AvatarStage";
 import { TalkRail } from "../TalkRail";
@@ -10,7 +10,7 @@ import { Refusal } from "../Refusal";
 import { SeatFilm } from "../SeatFilm";
 import { roomFormat, setRoomFormat,
          type RoomFormat } from "../roomFormat";
-import { nowPlaying, plainVoice, speakInPieces,
+import { plainVoice, speakInPieces,
          type Speaking } from "../spoken";
 import { useSession } from "../store";
 import { putAway, whenPutAway } from "../away";
@@ -325,6 +325,21 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // room can hide everything behind it — a takeover the room paints
   // through is not a takeover.
   const [filmFull, setFilmFull] = useState(false);
+  /** The seat somebody put in the frame by hand, and it outranks the turn.
+   *
+   *     asked     whose turn is it
+   *     mattered  who did you ASK to look at
+   *
+   * The frame follows whoever spoke last, which is right while you are
+   * listening and wrong the moment you press a face on the rail. Pressing
+   * 🧍 or 🎥 on a seat means "put THEM in the frame", and a stage that
+   * hands it straight back to the last speaker has refused the press.
+   *
+   * Cleared by pressing the same seat again, so the frame goes back to
+   * following the conversation and there is no stuck state with no way
+   * out of it.
+   */
+  const [framed, setFramed] = useState<string | null>(null);
   // The portrait taken to the screen — the OTHER circle of the pair.
   // "You click to just see the profile photo": no rail, no wardrobe,
   // just the picture big, and a tap anywhere puts it back.
@@ -1031,7 +1046,8 @@ export function Inside({ onPlans, start = "", onLeave }: {
    * A room where nobody has said anything falls to the first seat that
    * is not you — you are looking at the room, not at yourself.
    */
-  const onStage = seats.find((x) => isTalking(x))
+  const onStage = seats.find((x) => x.id === framed)
+    || seats.find((x) => isTalking(x))
     || seats.find((x) => !(x.kind === "user" && x.id === me))
     || seats[0] || null;
 
@@ -2885,75 +2901,41 @@ export function Inside({ onPlans, start = "", onLeave }: {
                   </>
                 ) : s.kind !== "user" && aiFaces[s.id]?.asset
                     && !aiFaces[s.id]?.placeholder ? (
-                  // Two whole circles, not a circle and a badge — the
-                  // field correction that shaped this: "an entire profile
-                  // photo circle, but for avatar." The first is the
-                  // portrait and tapping it shows the picture big; the
-                  // second is the avatar's figure and tapping it opens
-                  // the full-screen stage, wardrobe rail and all.
-                  <div className="rs-pair">
-                    <button className="rs-circle-btn" type="button"
-                            aria-label={s.display}
-                            onClick={(e) => { e.stopPropagation();
-                              setShown({
-                                seat: s.id,
-                                src: (aiFaces[s.id].asset as string)
-                                  .startsWith("http")
-                                  ? (aiFaces[s.id].asset as string)
-                                  : getBase() + aiFaces[s.id].asset,
-                              }); }}>
-                      <img className="rs-photo" alt={s.display}
-                           src={(aiFaces[s.id].asset as string)
-                                  .startsWith("http")
-                                  ? (aiFaces[s.id].asset as string)
-                                  : getBase() + aiFaces[s.id].asset} />
-                      {/* The word under the first circle. The pair
-                          carried a caption on one side only, which reads
-                          as a label for the pair rather than for the
-                          circle it sits under. Both are named now, and
-                          named for what pressing them does. */}
-                      <span className="rs-cap">
-                        {tr("ins.pair.audio", lang)}
-                      </span>
-                    </button>
-                    <button className="rs-circle-btn" type="button"
-                            aria-label={tr("stage.open", lang)}
-                            title={tr("stage.open", lang)}
-                            onClick={(e) => { e.stopPropagation();
-                                              setStaged(s.id); }}>
-                      {/* The head, live, when the forge built one for
-                          this seat — the same face in three dimensions,
-                          its jaw moving with the voice being read aloud
-                          right now. A seat whose face has no model keeps
-                          the still, which is most of them. */}
-                      {aiFaces[s.id].model ? (
-                        <Avatar3D
-                          className="rs-photo rs-avatar2 rs-head"
-                          src={(aiFaces[s.id].model as string)
-                                 .startsWith("http")
-                                 ? aiFaces[s.id].model as string
-                                 : getBase() + aiFaces[s.id].model}
-                          speaking={voicing?.kind === "profile"
-                                    && voicing.id === s.id
-                                      ? nowPlaying() : null} />
-                      ) : (
-                        <img className="rs-photo rs-avatar2" alt=""
-                             src={(() => {
-                               const art = aiFaces[s.id].torso
-                                 || aiFaces[s.id].asset as string;
-                               return art.startsWith("http")
-                                 ? art : getBase() + art;
-                             })()} />
-                      )}
-                      {/* The word under the second circle — the field
-                          call: "it must say avatar under the photo",
-                          so the pair never reads as a double
-                          exposure. */}
-                      <span className="rs-cap">
-                        {tr("ins.pair.avatar", lang)}
-                      </span>
-                    </button>
-                  </div>
+                  // ONE circle, and the roads out of it sit beside the
+                  // tile rather than inside it.
+                  //
+                  //     asked     can a seat reach its avatar and its film
+                  //     mattered  can it do that in a 250px rail
+                  //
+                  // This drew two equal captioned circles side by side —
+                  // "Audio" and "Avatar" — which was the right idea at
+                  // full width and fell apart the moment the seats became
+                  // a rail: two circles, two captions and a name inside a
+                  // quarter of the old width, so the second caption
+                  // clipped to "Avata" and the tile read as a mistake.
+                  // Photographed on a phone and sent back with four
+                  // words: "I don't like the way it looks."
+                  //
+                  // A person is ONE face. The formats are things you can
+                  // do with them, and things you can do belong beside the
+                  // face, not competing with it for the middle of the
+                  // tile.
+                  <button className="rs-circle-btn rs-solo" type="button"
+                          aria-label={s.display}
+                          onClick={(e) => { e.stopPropagation();
+                            setShown({
+                              seat: s.id,
+                              src: (aiFaces[s.id].asset as string)
+                                .startsWith("http")
+                                ? (aiFaces[s.id].asset as string)
+                                : getBase() + aiFaces[s.id].asset,
+                            }); }}>
+                    <img className="rs-photo" alt={s.display}
+                         src={(aiFaces[s.id].asset as string)
+                                .startsWith("http")
+                                ? (aiFaces[s.id].asset as string)
+                                : getBase() + aiFaces[s.id].asset} />
+                  </button>
                 ) : behind ? (
                   // A chosen background with nothing standing in front of
                   // it IS the seat's face. The silhouette circle used to
@@ -2975,6 +2957,57 @@ export function Inside({ onPlans, start = "", onLeave }: {
                   </span>
                 )}
                 <span className="rs-name">{s.display}</span>
+                {/* The two roads out of a seat, beside the face rather
+                    than competing with it for the middle of the tile.
+                    Each one puts THIS seat in the frame and sets the
+                    frame's format, so pressing a face is "show me them,
+                    like this" — one press, one outcome. Pressing the
+                    same one again lets go, and the frame goes back to
+                    following whoever is talking. */}
+                {s.kind !== "user" && (
+                  <div className="rs-side">
+                    <button type="button" className={"rs-road"
+                              + (framed === s.id && format === "avatar"
+                                   ? " lit" : "")}
+                            aria-label={tr("ins.format.avatar", lang)}
+                            title={tr("ins.format.avatar", lang)}
+                            aria-pressed={framed === s.id
+                                          && format === "avatar"}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (framed === s.id && format === "avatar") {
+                                setFramed(null);
+                              } else {
+                                setFramed(s.id);
+                                setFormat("avatar"); setRoomFormat("avatar");
+                              }
+                            }}
+                            onDoubleClick={(e) => e.stopPropagation()}
+                            onPointerDown={(e) => e.stopPropagation()}>
+                      {"\u{1F9CD}\u{1F3FD}"}
+                    </button>
+                    <button type="button" className={"rs-road"
+                              + (framed === s.id && format === "video"
+                                   ? " lit" : "")}
+                            aria-label={tr("ins.format.video", lang)}
+                            title={tr("ins.format.video", lang)}
+                            aria-pressed={framed === s.id
+                                          && format === "video"}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (framed === s.id && format === "video") {
+                                setFramed(null);
+                              } else {
+                                setFramed(s.id);
+                                setFormat("video"); setRoomFormat("video");
+                              }
+                            }}
+                            onDoubleClick={(e) => e.stopPropagation()}
+                            onPointerDown={(e) => e.stopPropagation()}>
+                      {"\u{1F3A5}"}
+                    </button>
+                  </div>
+                )}
                 {/* The avatar's door on the seats the pair cannot reach.
                     A profile seat with a portrait draws the twin circles
                     above and needs no badge — "no clear circles... I
