@@ -2795,10 +2795,22 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 @media (max-width: 719px) {
   /* On the phone the rail is a row of narrow tiles, so the roads tuck in
      and the face keeps the middle. */
-  .rs-tile > .rs-side { top: 6px; right: 5px; gap: 4px; }
   .rs-tile > .rs-side > .rs-road {
     width: 23px; height: 23px; font-size: 15px; border-radius: 8px; }
-  .rs-circle-btn.rs-solo { width: 58px; }
+  /* No `width: 58px` on the portrait here.
+   *
+   *     asked     does the phone need smaller faces
+   *     mattered  smaller than WHAT
+   *
+   * It was written when the phone drew a sideways strip of 118px tiles,
+   * where 58px was the whole tile. The strip is gone and the rule
+   * outlived it — so on a phone a profile's face came out a third the
+   * size of the person's own face and of the empty seat's silhouette,
+   * in boxes that are all exactly the same size. Circled in red on a
+   * screenshot, and rightly.
+   *
+   * The box does not change with the width, so the face in it does not
+   * either. */
 }
 
 /* ---- The empty seat, and what a seat says about itself ------------------- */
