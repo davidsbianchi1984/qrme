@@ -1808,7 +1808,22 @@ async def heard(interactor_id: str, request: Request) -> dict:
     words = scrape.transcribe_bytes(data, interactor_id)
     if words is None:
         raise HTTPException(
-            503, "this deployment has no transcription service, so recorded "
-                 "speech cannot be turned into words — set QRME_EARS_URL, or "
-                 "type instead")
+            503, "dictation is off here — a recording cannot be turned "
+                 "into words on this deployment. The voices still speak "
+                 "and you can still hear the room; type your message "
+                 "instead",
+            # The operator's half, out of the guest's way.
+            #
+            #     asked     red error? but the audio is working fine
+            #     mattered  two audiences, one sentence, and it was
+            #               written for the one who was not reading it
+            #
+            # An owner has to learn what to set; a person in a room
+            # cannot act on an environment variable and reads a sentence
+            # naming one as "audio is broken" — which is what happened.
+            # So the body is the person's and this is the operator's, in
+            # the place operator facts belong. It reaches the logs, the
+            # browser's network panel and `curl -i` without being
+            # shouted at a guest.
+            headers={"X-QRME-Fix": "QRME_EARS_URL"})
     return {"text": words["text"]}

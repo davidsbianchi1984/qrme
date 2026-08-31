@@ -4544,32 +4544,54 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'ar': 'لا يوجد صوت',
     },
 
-    'this deployment has no transcription service, so recorded speech cannot '
-    'be turned into words — set QRME_EARS_URL, or type instead': {
-        'es': 'esta instalación no tiene servicio de transcripción, así que el '
-              'audio grabado no puede convertirse en palabras: define '
-              'QRME_EARS_URL, o escribe en su lugar',
-        'fr': "ce déploiement n'a pas de service de transcription, la parole "
-              'enregistrée ne peut donc pas devenir du texte — définissez '
-              'QRME_EARS_URL, ou écrivez à la place',
-        'de': 'diese Installation hat keinen Transkriptionsdienst, aufgenommene '
-              'Sprache kann also nicht zu Worten werden — setze QRME_EARS_URL, '
-              'oder tippe stattdessen',
-        'pt': 'esta instalação não tem serviço de transcrição, por isso a fala '
-              'gravada não pode virar palavras — define QRME_EARS_URL, ou '
-              'escreve em vez disso',
-        'it': 'questa installazione non ha un servizio di trascrizione, quindi '
-              'il parlato registrato non può diventare parole: imposta '
-              'QRME_EARS_URL, oppure scrivi',
-        'ja': 'この導入には文字起こしサービスがないため、録音した音声を言葉に'
-              'できません。QRME_EARS_URL を設定するか、入力してください',
-        'zh': '此部署没有转写服务，因此无法把录音变成文字 — 请设置 '
-              'QRME_EARS_URL，或改为打字',
-        'hi': 'इस परिनियोजन में प्रतिलेखन सेवा नहीं है, इसलिए रिकॉर्ड की गई '
-              'बोली शब्दों में नहीं बदल सकती — QRME_EARS_URL सेट करें, या '
-              'टाइप करें',
-        'ar': 'لا تملك هذه النسخة خدمة تفريغ، لذا لا يمكن تحويل الكلام المسجَّل '
-              'إلى نص — اضبط QRME_EARS_URL، أو اكتب بدلًا من ذلك',
+    # Named for the ONE thing that is off, and it says what still works.
+    #
+    #     asked     red error? but the audio is working fine
+    #     mattered  "no transcription service" reads as "audio is broken"
+    #
+    # It was a sentence about a missing service and an environment
+    # variable, shown in red down the side of a room where the voices were
+    # playing perfectly — so it read as the whole audio path failing, and
+    # the person reporting it was right to read it that way. Dictation and
+    # playback are two different doors, and only one of them is shut.
+    #
+    # The variable name came out. This is shown to somebody in a room who
+    # cannot set an environment variable on a server; the operator learns
+    # what to set from the deployment docs and the logs, which are written
+    # for them. Telling a person to edit a container is not an instruction,
+    # it is a shrug in their direction.
+    'dictation is off here — a recording cannot be turned into words on '
+    'this deployment. The voices still speak and you can still hear the '
+    'room; type your message instead': {
+        'es': 'el dictado está desactivado aquí: en esta instalación una '
+              'grabación no puede convertirse en palabras. Las voces siguen '
+              'hablando y puedes seguir oyendo la sala; escribe tu mensaje '
+              'en su lugar',
+        'fr': "la dictée est désactivée ici : sur ce déploiement, un "
+              'enregistrement ne peut pas devenir du texte. Les voix parlent '
+              'toujours et tu entends toujours la salle ; écris ton message '
+              'à la place',
+        'de': 'das Diktat ist hier aus — auf dieser Installation kann eine '
+              'Aufnahme nicht zu Worten werden. Die Stimmen sprechen weiter '
+              'und du hörst den Raum weiterhin; tippe deine Nachricht '
+              'stattdessen',
+        'pt': 'o ditado está desligado aqui: nesta instalação uma gravação '
+              'não pode virar palavras. As vozes continuam a falar e ainda '
+              'ouves a sala; escreve a tua mensagem em vez disso',
+        'it': "la dettatura è spenta qui: su questa installazione una "
+              'registrazione non può diventare parole. Le voci parlano '
+              'ancora e senti ancora la stanza; scrivi il tuo messaggio',
+        'ja': 'ここでは音声入力が使えません。この配備では録音を言葉に'
+              '変えられません。声はこれまでどおり話し、部屋の音も聞こえます。'
+              '代わりに入力してください',
+        'zh': '此处语音输入已关闭：本部署无法把录音变成文字。声音照常播放，'
+              '你也仍能听到房间；请改为打字',
+        'hi': 'यहाँ श्रुतलेखन बंद है — इस परिनियोजन पर रिकॉर्डिंग शब्दों में '
+              'नहीं बदल सकती। आवाज़ें अब भी बोलती हैं और तुम कमरा सुन सकते '
+              'हो; इसके बजाय टाइप करो',
+        'ar': 'الإملاء الصوتي متوقف هنا — لا يمكن تحويل تسجيل إلى نص على هذا '
+              'النشر. الأصوات ما زالت تتكلم ويمكنك سماع الغرفة؛ اكتب رسالتك '
+              'بدلًا من ذلك',
     },
 
     "a room's name is the words in it": {
