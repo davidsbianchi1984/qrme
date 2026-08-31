@@ -4,7 +4,7 @@ import { isEcho, RECENT_TURNS } from "../echo";
 import { AvatarStage } from "../AvatarStage";
 import { TalkRail } from "../TalkRail";
 import { accountApi, api, getBase, type Avatar, type RoomFaces,
-         type RoomMsg } from "../api";
+         type RoomMsg, type RoomReachProfile } from "../api";
 import { field } from "../fields";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
@@ -372,6 +372,29 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
    * out of it.
    */
   const [framed, setFramed] = useState<string | null>(null);
+
+  /** What the synthetic seats can reach, and what this room allows.
+   *
+   * Kept beside the seats rather than fetched when the window opens:
+   * the panel is below a room that takes the whole screen, so it is
+   * reached by scrolling, and a list that starts loading only once
+   * somebody has scrolled to it is a list they scroll to and find
+   * empty. */
+  const [reach, setReach] = useState<RoomReachProfile[]>([]);
+  const [reachOpen, setReachOpen] = useState(false);
+  /** Which seat's lists are open. One at a time: each seat carries the
+   *  whole catalog — 103 connectors across nine providers — and two of
+   *  those unfolded at once is a wall rather than a decision.
+   *
+   *  `openSeat`, not `shown`: `shown` is already the portrait lightbox
+   *  on this screen, and the fourth name collision in this file would
+   *  have compiled and quietly opened a photograph. */
+  const [openSeat, setOpenSeat] = useState<string | null>(null);
+  /** Seats this session has befriended, so the button can say so. Not
+   *  read back from the server: befriending is the owner's list and the
+   *  room does not hold it, so what this remembers is what happened
+   *  here — which is exactly what the button needs to report. */
+  const [friended, setFriended] = useState<Set<string>>(new Set());
   // The portrait taken to the screen — the OTHER circle of the pair.
   // "You click to just see the profile photo": no rail, no wardrobe,
   // just the picture big, and a tap anywhere puts it back.
@@ -819,12 +842,64 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
     // What is in the seats, and who is wearing what — one call, because a
     // second one would draw a frame with a face and no disclosure on it.
     api.roomFaces(open, token).then(setScene).catch(() => setScene(null));
+    // And what the synthetic seats can reach. A profile whose owner has
+    // connected nothing comes back with empty lists rather than being
+    // left out, so an empty answer here means an empty room, not a
+    // room that failed to say.
+    api.roomReach(open, token)
+       .then((r) => setReach(r.profiles))
+       .catch(() => setReach([]));
   }
   // Loads when you go IN, not when an id appears. The dependency was
   // `[open, token]`, which is exactly the dive this screen was reported
   // for — and it also meant every keystroke in the id box tried to join a
   // half-typed room.
   useEffect(() => { if (entered) load(); }, [entered, open, token]);
+
+  /** Add a seat to your profile's friends, from inside the room.
+   *
+   *     asked     a button for add friend on top of each of the eight
+   *     mattered  somebody may have brought in a profile you have never
+   *               spoken with
+   *
+   * Above the lists rather than on another screen, because the order is
+   * the order somebody actually does it in: meet them here, add them,
+   * then delegate which connections or skills they may use. Your own
+   * profile does the befriending — the door is the owner's, and the
+   * console is signed in as one.
+   */
+  function befriendSeat(profileId: string) {
+    // The owner's door, so the owner's identity — `me` is the
+    // interactor, which is the person in the room and not a list that
+    // can hold anybody.
+    const mine = session.profileId || "";
+    const asOwner = session.ownerToken || "";
+    if (!mine || !asOwner || profileId === mine) return;
+    setBusy(true);
+    api.addFriend(mine, profileId, asOwner)
+       .then(() => setFriended((was) => new Set(was).add(profileId)))
+       .catch(setError)
+       .finally(() => setBusy(false));
+  }
+
+  /** Turn the room's key on one box.
+   *
+   * The answer is re-read rather than assumed: a tick is a permission,
+   * and a checkbox that shows itself ticked because it was pressed —
+   * rather than because the room agreed — is the one control in this
+   * panel that must never lie. The owner may have revoked the thing
+   * underneath it a second ago.
+   */
+  function allowReach(profileId: string, kind: "app" | "cap" | "skill",
+                      key: string, allowed: boolean) {
+    if (!token || !open) return;
+    setBusy(true);
+    api.allowRoomReach(open, profileId, kind, key, allowed, token)
+       .then(() => api.roomReach(open, token))
+       .then((r) => setReach(r.profiles))
+       .catch(setError)
+       .finally(() => setBusy(false));
+  }
 
   // The transcript box follows the newest line, unless you have scrolled
   // up to read — then it stays where you put it, and follows again once
@@ -3544,7 +3619,14 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
         <>
           <div className="card">
             <h3>
-              {tr("ins.whatsaid", lang)}{" "}
+              {/* A window, opened and closed. It sits below a room that
+                  takes the whole screen, so it is reached by scrolling
+                  and its heading is the first thing that arrives — which
+                  makes the heading the right place for the handle. */}
+              <button className="rr-open" onClick={() => setReachOpen(!reachOpen)}
+                      aria-expanded={reachOpen}>
+                {reachOpen ? "\u25BE" : "\u25B8"}{" "}{tr("ins.reach", lang)}
+              </button>{" "}
               <button className={"chip" + (hearAll ? " primary" : "")}
                       onClick={flipHearAll}
                       title={hearAll ? tr("ins.hear.off", lang)
@@ -3561,55 +3643,164 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                         onClick={() => setEarNote(null)}>×</button>
               </div>
             )}
-            {transcript.length === 0 && (
-              <p className="muted small">{tr("ins.nothingyet", lang)}</p>
+            {/* The record card became the room's permission panel.
+             *
+             *     asked     this looks like another identical copy of what
+             *               has been said — make it a window you can close
+             *               and open, of all the synthetic profiles in the
+             *               chat, their connections and skills, with boxes
+             *               to tick and allow
+             *     mattered  which of the two keys this window turns
+             *
+             * The strip riding the room already carries the conversation,
+             * so this card was the same turns a second time in a different
+             * colour. What belongs here instead is the thing there was no
+             * room for anywhere else: what the synthetic people in this
+             * room are able to reach, and which of it they may.
+             *
+             * A profile in a room is very often somebody else's — a starter
+             * outsourced from another account, a specialist invited in by a
+             * person who does not own it. Its owner's grant says what it can
+             * ever do. These boxes say what it may do HERE, for the people
+             * here, and turning one never touches the owner's side. Both
+             * keys, every time, or nothing opens. */}
+            {reachOpen && reach.length === 0 && (
+              <p className="muted small">{tr("ins.reach.none", lang)}</p>
             )}
-            {transcript.map((m) => (
-              <p className="small" key={m.id}>
-                <strong>{m.from}</strong>: {m.content}
-                {attachment(m)}
-                {/* A profile turn can be heard in the voice its owner bound.
-                    A press, never autoplay: the phone's rule and the room's
-                    are the same — sound starts on a gesture. */}
-                {m.sender_kind === "profile" && m.sender_id && (
-                  <button className="chip" disabled={busy}
-                          aria-label={tr("ins.hear", lang)}
-                          onClick={() => {
-                            const id = m.sender_id as string;
-                            // Announced before a note of it plays, and
-                            // through the same door the backlog uses. This
-                            // button put the profile's voice in the room
-                            // with neither echo net watching.
-                            roomSpeaks(m.content || "");
-                            speakInPieces(id, m.content || "", token)
-                              .then((s) => {
-                                nowSaying.current = s;
-                                sayingMsg.current = m.id;
-                                setVoicing({ kind: "profile", id });
-                                return s.done;
-                              })
-                              .then(() => { setVoicing(null); roomFellQuiet(); })
-                              .catch((e) => {
-                                setVoicing(null);
-                                // Quiet again even when the voice failed:
-                                // a flag left standing would deafen the
-                                // room until it was reloaded.
-                                roomFellQuiet();
-                                setError(e);
-                              });
-                          }}>
-                    🔊
+            {reachOpen && reach.map((who) => (
+              <div className="rr-who" key={who.profile_id}>
+                {/* Everybody in the room, listed before anything is
+                    opened — two rows if there are two, eight if there
+                    are eight. One opens at a time: each row carries the
+                    whole catalog under it, and two of those open at once
+                    is a wall rather than a decision. */}
+                <div className="rr-head">
+                  <button className="rr-name"
+                          aria-expanded={openSeat === who.profile_id}
+                          onClick={() => setOpenSeat(
+                            openSeat === who.profile_id ? null : who.profile_id)}>
+                    {openSeat === who.profile_id ? "\u25BE" : "\u25B8"}{" "}
+                    {who.display}
+                    <span className="rr-tally muted small">
+                      {" "}{fill(tr("ins.reach.tally", lang), {
+                        sk: String(who.skills_allowed),
+                        skAll: String(who.skill_count),
+                        cn: String(who.apps_allowed),
+                        cnAll: String(who.app_count),
+                        hd: String(who.hands_allowed),
+                        hdAll: String(who.hands_count) })}
+                    </span>
                   </button>
+                  {/* Somebody may have brought a profile into this room
+                      that you have never spoken with. Adding them is the
+                      thing you do first, and delegating what they may
+                      reach is the thing you do underneath — so the
+                      button sits above the lists rather than on some
+                      other screen. */}
+                  <button className="chip rr-friend" disabled={busy}
+                          onClick={() => befriendSeat(who.profile_id)}>
+                    {friended.has(who.profile_id)
+                      ? tr("ins.reach.friended", lang)
+                      : tr("ins.reach.friend", lang)}
+                  </button>
+                </div>
+                {openSeat === who.profile_id && (
+                  <div className="rr-body">
+                    <div className="rr-kind muted small">
+                      {tr("ins.reach.hands.kind", lang)}
+                    </div>
+                    {who.skills.length === 0 && (
+                      <p className="muted small">
+                        {tr("ins.reach.noskills", lang)}
+                      </p>
+                    )}
+                    {who.skills.map((sk) => (
+                      <label className="rr-box" key={sk.key}>
+                        <input type="checkbox" checked={sk.allowed}
+                               disabled={busy}
+                               onChange={(e) =>
+                                 allowReach(who.profile_id, "skill", sk.key,
+                                            e.target.checked)} />
+                        <span className="rr-label">
+                          {sk.eyes_only ? tr("ins.reach.eyes", lang)
+                                        : tr("ins.reach.hands", lang)}
+                          {" \u00B7 "}{sk.places.join(", ")}
+                        </span>
+                      </label>
+                    ))}
+                    <div className="rr-kind muted small">
+                      {tr("ins.reach.connections", lang)}
+                    </div>
+                    {who.providers.map((group) => (
+                      <div className="rr-group" key={group.provider}>
+                        <div className="rr-provider">{group.label}</div>
+                        {group.apps.map((a) => (
+                          <div className="rr-app" key={a.provider + a.app}>
+                            <label className="rr-box">
+                              <input type="checkbox" checked={a.allowed}
+                                     disabled={busy || !a.connected || !a.ready}
+                                     onChange={(e) => a.key && allowReach(
+                                       who.profile_id, "app", a.key,
+                                       e.target.checked)} />
+                              <span className="rr-label">{a.label}</span>
+                              {/* Three different reasons a box is dark,
+                                  and they are not the same reason. */}
+                              {!a.connected && (
+                                <span className="rr-note muted small">
+                                  {tr("ins.reach.unconnected", lang)}
+                                </span>
+                              )}
+                              {a.connected && !a.ready && (
+                                <span className="rr-note muted small">
+                                  {tr("ins.reach.waiting", lang)}
+                                </span>
+                              )}
+                            </label>
+                            {/* Every skill the connection carries, shown
+                                whether or not it is switched on — "read
+                                the mail" and "send it" are not the same
+                                yes, and a list that hides them until
+                                after the app is allowed is a list that
+                                cannot be read before deciding.
+
+                                180 of them across the catalog. Tickable
+                                only where the owner granted the
+                                capability AND this room allowed the app
+                                it belongs to: a skill of a connector
+                                nobody has connected is not a thing to
+                                agree to. */}
+                            {a.capabilities.length > 0 && (
+                              // Named where they live. The 180 skills of
+                              // this catalog are capabilities OF
+                              // connections — "read the mail" belongs to
+                              // Mail — so a single "Skills" heading at
+                              // the top of the panel put the word
+                              // nowhere near the things it names, and
+                              // the panel read as a list of apps and a
+                              // count nobody could find.
+                              <div className="rr-caps muted small">
+                                {tr("ins.reach.skills", lang)}
+                              </div>
+                            )}
+                            {a.capabilities.map((c) => (
+                              <label className="rr-box rr-cap" key={c.name}>
+                                <input type="checkbox" checked={c.allowed}
+                                       disabled={busy || !a.allowed
+                                                 || !c.granted}
+                                       onChange={(e) => a.key && allowReach(
+                                         who.profile_id, "cap",
+                                         `${a.key}:${c.name}`,
+                                         e.target.checked)} />
+                                <span className="rr-label">{c.name}</span>
+                              </label>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
                 )}
-                {/* A profile's turn is always watermarked and a person's
-                    never is, so the mark is the honest way to tell which
-                    kind of speaker this was — not the name. */}
-                {m.watermark?.display?.line && (
-                  <span className="muted small">
-                    {" "}· {m.watermark.display.line}
-                  </span>
-                )}
-              </p>
+              </div>
             ))}
             {/* The compose row that used to sit here is gone.
              *

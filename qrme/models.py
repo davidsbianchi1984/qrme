@@ -387,6 +387,20 @@ class RoomRename(BaseModel):
     topic: str
 
 
+class RoomAllow(BaseModel):
+    """One box, ticked or unticked, on one synthetic seat.
+
+    `allowed` is required and never inferred from the call. A door where
+    sending the row means yes cannot express no without a second door,
+    and "untick this" is the half of a permission that has to work.
+    """
+
+    profile_id: str
+    kind: str                      # app | skill
+    key: str                       # the connector's id, or the grant's
+    allowed: bool
+
+
 class RoomFace(BaseModel):
     """What your box in the room scene holds.
 

@@ -31,7 +31,8 @@ from ..common import (age_of, clipped, interactor_or_404, profile_or_404,
 from ..models import (
     HandoffCreate, ListingCreate, ListingPlace, MarketAssist, MarketPrefs,
     ProviderCreate, ReferralPrepare, ReferralRelease, ReferralReply,
-    RoomCreate, RoomFace, RoomInvite, RoomMessage, RoomMicLend, RoomRename,
+    RoomAllow, RoomCreate, RoomFace, RoomInvite, RoomMessage, RoomMicLend,
+    RoomRename,
     RoomSitOut,
 )
 from .. import i18n
@@ -1085,6 +1086,68 @@ def accept_room_invite(room_id: str, body: RoomInvite,
             for p in _participants(room_id)
         ],
     }
+
+
+# --- what the room lets the synthetic people in it reach ---------------------
+#
+# Two keys, and both have to be turned. The owner's grant says what a profile
+# can EVER do; the room's tick says what it may do here, for the people in
+# here. See qrme/roomreach.py for why a profile in a room is very often
+# somebody else's and why that makes one key insufficient.
+
+
+@router.get("/rooms/{room_id}/reach")
+def room_reach(room_id: str, request: Request) -> dict:
+    """Every synthetic seat, its connections and its skills, and the ticks.
+
+    In-room only, and wide among the people in it — the same read as
+    `/faces`, for the same reason: a permission that each person sees a
+    different version of is a room where nobody can say what is allowed.
+    Who decided is on the record; what a viewer sees is not private to
+    them.
+    """
+    _room_or_404(room_id)
+    _require_in_room(room_id, request)
+    from .. import roomreach
+
+    seats = [p["ref_id"] for p in _participants(room_id)
+             if p["kind"] == "profile"]
+    people = roomreach.offered(room_id, seats)
+    return {"room_id": room_id,
+            "profiles": [{**row,
+                          "display": _display("profile", row["profile_id"])}
+                         for row in people]}
+
+
+@router.put("/rooms/{room_id}/reach")
+def set_room_reach(room_id: str, body: RoomAllow, request: Request) -> dict:
+    """Tick or untick one box.
+
+    Anybody in the room may turn the room's key, and the row records
+    which of them did. Not the owner's key: this never touches the
+    profile's own connectors or grants, so a person in a room cannot
+    widen what somebody else's profile is able to do — only narrow what
+    it may do in front of them.
+
+    The profile has to actually be seated. Ticking a box for a profile
+    that is not in the room would be a permission attached to nothing,
+    and the room id travels on printed stickers.
+    """
+    room = _room_or_404(room_id)
+    if room["status"] != "active":
+        raise HTTPException(409, "this room has closed")
+    who = _require_in_room(room_id, request)
+    from .. import roomreach
+
+    seated = {p["ref_id"] for p in _participants(room_id)
+              if p["kind"] == "profile"}
+    if body.profile_id not in seated:
+        raise HTTPException(404, "that profile is not in this room")
+    try:
+        return roomreach.allow(room_id, body.profile_id, body.kind,
+                               body.key, body.allowed, who)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc))
 
 
 # --- what your box holds -----------------------------------------------------

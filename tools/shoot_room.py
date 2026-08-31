@@ -257,6 +257,20 @@ def seed(db_path: str) -> dict:
         (db.new_id("ren"), amara, said[-1][2], 8, db.utcnow()))
     conn.commit()
 
+    # What the room's permission window is looking at.
+    #
+    #     asked     a window of all the synthetic profiles in the chat,
+    #               their connections and skills, with boxes to tick
+    #     mattered  a picture of an empty panel proves nothing
+    #
+    # Two connectors and two hand grants, inserted the way the product's
+    # own doors insert them, so the panel is photographed with something
+    # in it. Deliberately mixed: one connector still waiting on its
+    # sign-in, one grant that only looks and one that drives, because
+    # the states this panel exists to tell apart are the states worth
+    # having a picture of.
+    _reachable(conn, amara, others[0], others[1])
+
     base = {
         "accountId": account,
         "accountToken": auth.issue("account", account),
@@ -294,6 +308,39 @@ def speaks(profile_id: str, room_id: str, words: str) -> None:
         "'approved',?)",
         (db.new_id("msg"), room_id, profile_id, words, db.utcnow()))
     conn.commit()
+
+
+def _reachable(conn, amara: str, lena: str, ellen: str) -> None:
+    """Connections and skills on three of the seats."""
+    from qrme import catalog, db, hands
+
+    def app(profile_id: str, provider: str, name: str, ready: bool) -> None:
+        entry = catalog.BY_KEY[(provider, name)]
+        now = db.utcnow()
+        conn.execute(
+            "INSERT INTO app_connectors (id, profile_id, provider, app,"
+            " label, capabilities, directions, status, collected, actions,"
+            " authorized_at, created_at)"
+            " VALUES (?,?,?,?,?,?,?,'active',0,0,?,?)",
+            (db.new_id("app"), profile_id, provider, name, entry["label"],
+             json.dumps(list(entry["capabilities"])),
+             json.dumps(list(entry["directions"])),
+             now if ready else None, now))
+
+    app(amara, "google", "calendar", True)
+    app(amara, "google", "gmail", False)
+    app(lena, "microsoft", "m365", True)
+    conn.commit()
+
+    # Eyes on one, a cursor and a keyboard on another — the difference the
+    # panel names on the box.
+    hands.grant(lena, granted_by="owner", surface="computer",
+                places=["calendar.google.com"],
+                verbs=["look", "wait", "done"], minutes=30, steps=20)
+    hands.grant(ellen, granted_by="owner", surface="computer",
+                places=["mail.google.com"],
+                verbs=["look", "press", "type", "done"],
+                minutes=30, steps=40)
 
 
 def go_in(page, session: dict, room_id: str) -> bool:

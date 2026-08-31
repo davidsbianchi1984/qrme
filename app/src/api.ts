@@ -3658,6 +3658,49 @@ export interface ProfileVoice {
   released: boolean;
 }
 
+/** One synthetic seat's reachable things, and the room's answer to each.
+ *
+ * `ready` on a connection is the owner's side: a connector that has never
+ * been given its credential cannot reach anything yet, and a box ticked
+ * against one would be a yes to something that cannot happen.
+ *
+ * `eyes_only` on a skill is the difference between "you may read my
+ * screen" and "you may drive it" — the two sides of this panel, and
+ * making somebody read four verbs to tell them apart is how the wrong
+ * box gets ticked.
+ */
+export type RoomReachApp = {
+  /** The connector's id, or null where its owner has not connected it.
+   *  Null is what makes the box untickable: the room's key cannot
+   *  conjure the owner's. */
+  key: string | null;
+  provider: string; app: string; label: string;
+  connected: boolean; ready: boolean; allowed: boolean;
+  capabilities: { name: string; granted: boolean; allowed: boolean }[];
+};
+
+export type RoomReachProfile = {
+  profile_id: string;
+  display: string;
+  /** The whole catalog, grouped by its nine providers — not only what
+   *  this profile holds. "What could this reach" and "what has its owner
+   *  wired up" are different questions, and the dark rows are what make
+   *  the lit ones mean something. */
+  providers: { provider: string; label: string; apps: RoomReachApp[] }[];
+  skills: { key: string; surface: string; places: string[]; verbs: string[];
+            steps: number; watched: boolean; expires_at: string;
+            eyes_only: boolean; allowed: boolean }[];
+  connected_count: number;
+  app_count: number;
+  apps_allowed: number;
+  skill_count: number;
+  skills_allowed: number;
+  hands_allowed: number;
+  hands_count: number;
+};
+
+export type RoomReach = { room_id: string; profiles: RoomReachProfile[] };
+
 export const api = {
   // `health` used to sit here: the same route, the body thrown away, a
   // boolean returned. Nothing called it — `healthInfo` below returns the
@@ -5457,6 +5500,28 @@ export const api = {
   takeBackMicInRoom: (roomId: string, interactorId: string, token: string) =>
     req<{ lending: boolean; id: string }>(
       `/rooms/${roomId}/mic/${interactorId}`, { method: "DELETE", token }),
+
+  /** What the room lets the synthetic people in it reach.
+   *
+   * Two keys. The owner's grant says what a profile can ever do; the
+   * room's tick says what it may do here, for the people here — which
+   * matters because a profile in a room is very often somebody else's.
+   * Reading is wide among the people in the room, for the same reason
+   * `/faces` is: a permission each person sees a different version of is
+   * a room where nobody can say what is allowed.
+   */
+  roomReach: (roomId: string, token: string) =>
+    req<RoomReach>(`/rooms/${roomId}/reach`, { token }),
+  allowRoomReach: (roomId: string, profileId: string,
+                   kind: "app" | "cap" | "skill", key: string,
+                   allowed: boolean,
+                   token: string) =>
+    req<{ profile_id: string; kind: string; key: string; allowed: boolean;
+          decided_by: string; decided_at: string }>(
+      `/rooms/${roomId}/reach`, {
+        method: "PUT", token,
+        body: { profile_id: profileId, kind, key, allowed },
+      }),
 
   // What each box in the room scene holds. Three answers and all three are a
   // box — see qrme/roomface.py. `faces` is keyed on the person and is sparse:

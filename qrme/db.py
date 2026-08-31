@@ -128,6 +128,40 @@ CREATE TABLE IF NOT EXISTS rooms (
     created_at TEXT NOT NULL
 );
 
+-- The room's half of a permission.
+--
+-- A profile's owner decides what it can EVER do — its connectors, its hand
+-- grants. That is not enough on its own, because a profile in a room is very
+-- often somebody else's: a starter outsourced from another account, or a
+-- specialist invited in by a person who does not own it. The owner's grant
+-- says *this profile may drive a browser*; it does not say *for you, now, in
+-- here*.
+--
+-- So a reach needs both keys turned: the owner granted it AND this room
+-- allowed it. Each is withdrawable alone, and a reach checks both when it
+-- opens rather than trusting a decision made earlier.
+--
+-- Keyed on the connector id or the grant id rather than on a provider or a
+-- surface, so revoking and remaking the same connection does not inherit the
+-- old yes. Absent means no: a box nobody ticked is a row that does not exist,
+-- which is the honest default for a permission and means a newly connected
+-- app arrives switched off.
+CREATE TABLE IF NOT EXISTS room_allowances (
+    id          TEXT PRIMARY KEY,
+    room_id     TEXT NOT NULL REFERENCES rooms(id),
+    profile_id  TEXT NOT NULL REFERENCES profiles(id),
+    kind        TEXT NOT NULL,   -- app | skill
+    key         TEXT NOT NULL,   -- the connector's id, or the grant's
+    allowed     INTEGER NOT NULL DEFAULT 0,
+    -- Who turned it. "Who let it do that" has to have a name in it.
+    decided_by  TEXT NOT NULL,
+    decided_at  TEXT NOT NULL,
+    UNIQUE (room_id, profile_id, kind, key)
+);
+
+CREATE INDEX IF NOT EXISTS idx_room_allowances_room
+    ON room_allowances (room_id);
+
 CREATE TABLE IF NOT EXISTS room_participants (
     room_id TEXT NOT NULL REFERENCES rooms(id),
     kind    TEXT NOT NULL,   -- user | profile

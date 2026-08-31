@@ -4129,3 +4129,86 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
  * It is a way of moving BETWEEN rooms, which is not something somebody
  * standing in one is doing, and the menu already holds it. */
 .app.in-room .chat-rail-dock { display: none; }
+
+/* ---- The room's permission window --------------------------------------- */
+
+/* A window you open, under a room that fills the screen.
+ *
+ *     asked     the purple box is another copy of what has been said —
+ *               make it a window you can close and open, of all the
+ *               synthetic profiles in the chat, their connections and
+ *               skills, with boxes to tick and allow
+ *     mattered  a permission has to be readable at a glance
+ *
+ * One row per box, the checkbox first, the name of the thing next to it.
+ * Nothing decorative: somebody deciding whether a synthetic person may
+ * drive their keyboard is reading, not browsing. */
+.rr-open {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font: inherit; color: inherit; letter-spacing: inherit;
+}
+.rr-who { margin: 10px 0 0; }
+.rr-name {
+  margin: 0 0 2px; font-size: 13px; font-weight: 800; color: #efecff;
+}
+.rr-kind {
+  margin: 6px 0 2px; text-transform: uppercase;
+  letter-spacing: .07em; font-size: 10px;
+}
+.rr-box {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 0; font-size: 12.5px; color: var(--t2);
+  cursor: pointer;
+}
+.rr-box input {
+  flex: 0 0 auto; width: 16px; height: 16px; cursor: pointer;
+  accent-color: var(--brand2, #7b5cff);
+}
+/* A box that cannot be ticked yet says so by looking like it. */
+.rr-box input:disabled { cursor: not-allowed; opacity: .5; }
+.rr-box input:disabled ~ .rr-label { opacity: .6; }
+/* The label takes only its own width, and the row ends where the words
+   end. `flex: 1 1 auto` pushed the reason a box is greyed out to the far
+   side of a 1200px card, a foot away from the box it explains. */
+.rr-label { flex: 0 1 auto; min-width: 0; }
+.rr-note { flex: 0 1 auto; min-width: 0; }
+
+/* The seat rows, and the catalog under one of them.
+ *
+ *     asked     list all eight upfront — or just the two if there are
+ *               two — and only let me open one at a time, with all the
+ *               connections and all the skills in it
+ *     mattered  103 connectors is a wall unless only one wall is up
+ *
+ * The row is the whole seat: a name you can open, a tally of how much is
+ * wired up, and the add-friend button. Everything else is behind it. */
+.rr-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0 2px; border-top: 1px solid var(--line);
+}
+.rr-who:first-of-type .rr-head { border-top: none; }
+.rr-head .rr-name {
+  flex: 1 1 auto; min-width: 0; text-align: left;
+  background: none; border: none; padding: 0; cursor: pointer;
+  font: inherit; font-size: 13px; font-weight: 800; color: #efecff;
+}
+.rr-tally { font-weight: 500; }
+.rr-friend { flex: 0 0 auto; }
+/* The open seat's own scroll, so the catalog never pushes the seats
+   below it off the bottom of the window. */
+.rr-body { max-height: 420px; overflow-y: auto; padding: 2px 0 8px; }
+.rr-provider {
+  margin: 8px 0 2px; font-size: 11px; font-weight: 700;
+  color: var(--t2); letter-spacing: .03em;
+}
+.rr-app { margin-left: 2px; }
+/* A capability is a narrower yes inside the app's yes — "read the mail"
+   as opposed to "send it" — so it is indented under the box it narrows
+   and only appears once that box is on. */
+.rr-cap { margin-left: 26px; font-size: 11.5px; }
+/* The word "skills" where the skills actually are — under the
+   connection they belong to, not once at the top of the panel. */
+.rr-caps {
+  margin: 2px 0 2px 26px; text-transform: uppercase;
+  letter-spacing: .07em; font-size: 9.5px;
+}

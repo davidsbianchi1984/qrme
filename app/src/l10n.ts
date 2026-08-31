@@ -8980,8 +8980,62 @@ const CHROME: Table = {
   "ins.signinperson": {
     en: "Sign in as a person first — a room turn is spoken by somebody, so a profile's owner token is refused here by name.", es: "Inicia sesión como persona primero — un turno en la sala lo dice alguien, así que el token de propietario de un perfil se rechaza aquí por su nombre.", fr: "Connectez-vous d'abord en tant que personne — un tour de parole dans la salle est prononcé par quelqu'un, donc le jeton de propriétaire d'un profil est ici refusé nommément.", de: "Meld dich zuerst als Person an — ein Redebeitrag im Raum wird von jemandem gesprochen, deshalb wird das Besitzer-Token eines Profils hier ausdrücklich abgelehnt.", pt: "Inicie sessão como pessoa primeiro — um turno na sala é dito por alguém, por isso o token de proprietário de um perfil é aqui recusado pelo nome.", it: "Accedi prima come persona — un turno nella stanza lo pronuncia qualcuno, quindi il token di proprietario di un profilo qui viene rifiutato per nome.", ja: "まず一人の人としてサインインしてください — 部屋での発言は誰かが口にするものなので、プロフィールの所有者トークンはここで名指しで断られます。", zh: "请先以个人身份登录——房间里的发言是由某个人说出口的，所以档案的所有者令牌在这里会被指名拒绝。", hi: "पहले एक व्यक्ति के रूप में साइन इन कीजिए — कमरे में बारी कोई व्यक्ति बोलता है, इसलिए प्रोफ़ाइल-स्वामी का टोकन यहाँ नाम लेकर अस्वीकार किया जाता है।", ar: "سجّل الدخول بصفتك شخصًا أولًا — فالدور في الغرفة ينطق به أحد، ولذلك يُرفض رمز مالك الملف هنا بالاسم.",
   },
-  "ins.whatsaid": {
-    en: "What has been said", es: "Lo que se ha dicho", fr: "Ce qui a été dit", de: "Was gesagt wurde", pt: "O que foi dito", it: "Cosa è stato detto", ja: "これまでの発言", zh: "已经说过的话", hi: "जो कहा जा चुका है", ar: "ما قيل",
+  // The room's permission window. "Reach" rather than "permissions":
+  // what is being agreed to is a synthetic person touching something
+  // real, and the plain word for that is the one on the box.
+  "ins.reach": {
+    en: "What they can reach", es: "Lo que pueden alcanzar", fr: "Ce qu'ils peuvent atteindre", de: "Worauf sie zugreifen können", pt: "O que podem alcançar", it: "Cosa possono raggiungere", ja: "彼らが手を伸ばせるもの", zh: "他们能触及的东西", hi: "वे किस तक पहुँच सकते हैं", ar: "ما يمكنهم الوصول إليه",
+  },
+  "ins.reach.none": {
+    en: "No synthetic profiles in this room yet.", es: "Todavía no hay perfiles sintéticos en esta sala.", fr: "Aucun profil synthétique dans cette salle pour l'instant.", de: "Noch keine synthetischen Profile in diesem Raum.", pt: "Ainda não há perfis sintéticos nesta sala.", it: "Ancora nessun profilo sintetico in questa stanza.", ja: "この部屋にはまだ合成プロフィールがいません。", zh: "这个房间里还没有合成档案。", hi: "इस कमरे में अभी कोई सिंथेटिक प्रोफ़ाइल नहीं है।", ar: "لا توجد ملفات اصطناعية في هذه الغرفة بعد.",
+  },
+  // The row before anything is opened: how much of what is possible is
+  // wired up, and how much of that this room has agreed to.
+  "ins.reach.tally": {
+    en: "Skills {sk} of {skAll} · Connections {cn} of {cnAll} · Eyes and hands {hd} of {hdAll}", es: "Habilidades {sk} de {skAll} · Conexiones {cn} de {cnAll} · Ojos y manos {hd} de {hdAll}", fr: "Compétences {sk} sur {skAll} · Connexions {cn} sur {cnAll} · Yeux et mains {hd} sur {hdAll}", de: "Fähigkeiten {sk} von {skAll} · Verbindungen {cn} von {cnAll} · Augen und Hände {hd} von {hdAll}", pt: "Competências {sk} de {skAll} · Ligações {cn} de {cnAll} · Olhos e mãos {hd} de {hdAll}", it: "Abilità {sk} di {skAll} · Connessioni {cn} di {cnAll} · Occhi e mani {hd} di {hdAll}", ja: "スキル {skAll} 件中 {sk} 件 · 接続 {cnAll} 件中 {cn} 件 · 目と手 {hdAll} 件中 {hd} 件", zh: "技能 {sk}/{skAll} · 连接 {cn}/{cnAll} · 眼睛与双手 {hd}/{hdAll}", hi: "कौशल {skAll} में से {sk} · कनेक्शन {cnAll} में से {cn} · आँखें और हाथ {hdAll} में से {hd}", ar: "المهارات {sk} من {skAll} · الاتصالات {cn} من {cnAll} · العيون واليدان {hd} من {hdAll}",
+  },
+  "ins.reach.friend": {
+    en: "Add friend", es: "Añadir amigo", fr: "Ajouter en ami", de: "Als Freund hinzufügen", pt: "Adicionar amigo", it: "Aggiungi amico", ja: "友だちに追加", zh: "加为好友", hi: "मित्र जोड़ें", ar: "إضافة صديق",
+  },
+  "ins.reach.friended": {
+    en: "Added", es: "Añadido", fr: "Ajouté", de: "Hinzugefügt", pt: "Adicionado", it: "Aggiunto", ja: "追加済み", zh: "已添加", hi: "जोड़ा गया", ar: "تمت الإضافة",
+  },
+  // A profile whose owner has granted it no hands at all. Said, rather
+  // than leaving a heading with nothing under it.
+  "ins.reach.noskills": {
+    en: "No hands granted by its owner.", es: "Su propietario no le ha concedido manos.", fr: "Aucune main accordée par son propriétaire.", de: "Vom Besitzer wurden keine Hände gewährt.", pt: "O proprietário não lhe concedeu mãos.", it: "Il proprietario non gli ha concesso mani.", ja: "所有者から手は与えられていません。", zh: "其所有者未授予任何操作权限。", hi: "इसके स्वामी ने कोई हाथ नहीं दिए हैं।", ar: "لم يمنحه مالكه أي يد.",
+  },
+  // The dark rows: the platform has this connector, this profile does
+  // not hold it. The room's key cannot conjure the owner's.
+  "ins.reach.unconnected": {
+    en: "its owner has not connected this", es: "su propietario no ha conectado esto", fr: "son propriétaire ne l'a pas connecté", de: "der Besitzer hat dies nicht verbunden", pt: "o proprietário não ligou isto", it: "il proprietario non l'ha collegato", ja: "所有者がこれを接続していません", zh: "其所有者尚未连接此项", hi: "इसके स्वामी ने इसे नहीं जोड़ा है", ar: "لم يربط مالكه هذا",
+  },
+  "ins.reach.connections": {
+    en: "Connections", es: "Conexiones", fr: "Connexions", de: "Verbindungen", pt: "Ligações", it: "Connessioni", ja: "接続", zh: "连接", hi: "कनेक्शन", ar: "الاتصالات",
+  },
+  // The hand grants — eyes on a screen, a cursor, a keyboard, a body.
+  // Its own name, because the catalog's capabilities are called skills
+  // too and one heading for both is one heading too few.
+  "ins.reach.hands.kind": {
+    en: "Eyes and hands", es: "Ojos y manos", fr: "Yeux et mains", de: "Augen und Hände", pt: "Olhos e mãos", it: "Occhi e mani", ja: "目と手", zh: "眼睛与双手", hi: "आँखें और हाथ", ar: "العيون واليدان",
+  },
+  "ins.reach.skills": {
+    en: "Skills", es: "Habilidades", fr: "Compétences", de: "Fähigkeiten", pt: "Competências", it: "Abilità", ja: "スキル", zh: "技能", hi: "कौशल", ar: "المهارات",
+  },
+  // The credential the owner has not supplied yet. Said on the box
+  // rather than hiding the row, because "why is this one greyed out" is
+  // a question with a real answer.
+  "ins.reach.waiting": {
+    en: "waiting on its sign-in", es: "esperando su inicio de sesión", fr: "en attente de sa connexion", de: "wartet auf die Anmeldung", pt: "à espera do início de sessão", it: "in attesa del suo accesso", ja: "サインイン待ち", zh: "等待登录", hi: "साइन-इन की प्रतीक्षा में", ar: "بانتظار تسجيل الدخول",
+  },
+  // The two sides of a hand grant, named on the box. Making somebody
+  // read four verbs to tell "read my screen" from "drive it" is how the
+  // wrong box gets ticked.
+  "ins.reach.eyes": {
+    en: "Eyes only", es: "Solo mirar", fr: "Regarder seulement", de: "Nur zusehen", pt: "Apenas observar", it: "Solo guardare", ja: "見るだけ", zh: "只看不动", hi: "केवल देखना", ar: "المشاهدة فقط",
+  },
+  "ins.reach.hands": {
+    en: "Cursor and keyboard", es: "Cursor y teclado", fr: "Curseur et clavier", de: "Zeiger und Tastatur", pt: "Cursor e teclado", it: "Cursore e tastiera", ja: "カーソルとキーボード", zh: "光标与键盘", hi: "कर्सर और कीबोर्ड", ar: "المؤشر ولوحة المفاتيح",
   },
   "ins.scene": {
     en: "In this room", es: "En esta sala", fr: "Dans cette salle", de: "In diesem Raum", pt: "Nesta sala", it: "In questa stanza", ja: "この部屋にいる人", zh: "房间里的人", hi: "इस कमरे में", ar: "في هذه الغرفة",
@@ -8993,9 +9047,6 @@ const CHROME: Table = {
   // different things to the same reader, which is a guard, not a taste.
   "ins.face.cameraon": {
     en: "Camera on", es: "Cámara encendida", fr: "Caméra activée", de: "Kamera an", pt: "Câmara ligada", it: "Fotocamera accesa", ja: "カメラをオン", zh: "开启摄像头", hi: "कैमरा चालू", ar: "تشغيل الكاميرا",
-  },
-  "ins.hear": {
-    en: "Hear it in their voice", es: "Óyelo con su voz", fr: "L'entendre avec sa voix", de: "In ihrer Stimme hören", pt: "Ouvir na voz deles", it: "Ascolta con la sua voce", ja: "その声で聞く", zh: "用它的声音听", hi: "उसकी आवाज़ में सुनें", ar: "اسمعها بصوته",
   },
   "ins.hear.on": {
     en: "hear the room", es: "oír la sala", fr: "entendre la salle", de: "den Raum hören", pt: "ouvir a sala", it: "ascolta la stanza", ja: "部屋の声を聞く", zh: "聆听房间", hi: "कमरे को सुनें", ar: "اسمع الغرفة",
@@ -9615,9 +9666,6 @@ const CHROME: Table = {
   },
   "ins.seat.profile": {
     en: "profile", es: "perfil", fr: "profil", de: "Profil", pt: "perfil", it: "profilo", ja: "プロフィール", zh: "档案", hi: "प्रोफ़ाइल", ar: "ملف",
-  },
-  "ins.nothingyet": {
-    en: "Nothing yet.", es: "Nada todavía.", fr: "Rien pour l'instant.", de: "Noch nichts.", pt: "Nada ainda.", it: "Ancora niente.", ja: "まだ何もありません。", zh: "还没有内容。", hi: "अभी कुछ नहीं।", ar: "لا شيء بعد.",
   },
   "ins.sayit": {
     en: "Say it", es: "Decirlo", fr: "Le dire", de: "Sagen", pt: "Dizer", it: "Dillo", ja: "言う", zh: "说出来", hi: "कह दीजिए", ar: "قُلها",
