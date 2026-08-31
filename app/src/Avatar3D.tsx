@@ -232,23 +232,43 @@ export function Avatar3D({ src, speaking, motion, shot, className }: {
       if (stop) return;
       loaded.scene.traverse((thing) => {
         const mesh = thing as THREE.Mesh;
-        if (mesh.isMesh && mesh.morphTargetInfluences) {
-          // The photograph, shown as photographed.
-          //
-          // glTF's own material is a lit one, and lighting a face that
-          // was already lit when the shutter opened is how the skin got
-          // washed out of it. An unlit material draws the texture at the
-          // brightness it was taken at — which is the whole point of
-          // building a head out of somebody's own picture — and morph
-          // targets work on it exactly as they do on the lit one, so the
-          // jaw still moves with the voice.
-          const lit = mesh.material as THREE.MeshStandardMaterial;
-          if (lit?.map) {
-            mesh.material = new THREE.MeshBasicMaterial({
-              map: lit.map, side: THREE.DoubleSide,
-            });
-            lit.dispose();
-          }
+        if (!mesh.isMesh) return;
+        // The photograph, shown as photographed — on EVERY painted mesh,
+        // not only the ones that carry shapes.
+        //
+        // glTF's own material is a lit one, and lighting a texture that
+        // was already lit when it was baked is how the skin got washed
+        // out of it. An unlit material draws the texture at the
+        // brightness it was made at, and morph targets work on it
+        // exactly as they do on the lit one, so the jaw still moves.
+        //
+        //     asked     is the face lit correctly
+        //     mattered  is the face lit the same as the neck under it
+        //
+        // This test used to be `isMesh && morphTargetInfluences`, so a
+        // vendor model got an unlit HEAD and a lit BODY. The lights are
+        // faint on purpose — they exist only for a head that arrived
+        // with no texture at all — so the body came out near black under
+        // a face at full brightness, and the seam ran straight across
+        // the collar. Reported from a phone, in four words: "the skin
+        // tones don't match."
+        //
+        // Whether a mesh carries shapes says something about whether it
+        // can speak. It says nothing about how its paint should be lit.
+        const lit = mesh.material as THREE.MeshStandardMaterial;
+        if (lit?.map) {
+          mesh.material = new THREE.MeshBasicMaterial({
+            map: lit.map, side: THREE.DoubleSide,
+            // Eyelashes and hair cards are cut out by their alpha, and a
+            // fresh material that forgets that draws them as black
+            // rectangles.
+            transparent: lit.transparent,
+            alphaTest: lit.alphaTest,
+            depthWrite: lit.depthWrite,
+          });
+          lit.dispose();
+        }
+        if (mesh.morphTargetInfluences) {
           // The names ride in the mesh's extras, which is where the forge
           // put them and where every exporter puts them.
           const named = (mesh.morphTargetDictionary
