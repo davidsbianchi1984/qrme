@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v2.9.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v2.9.1** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -480,6 +480,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **2.9.1** | **The camera gets an adapter, and the company is a choice** — video was selected and nothing rendered, whatever was picked. The service picker had no handler at all: it drew every provider, lit the deployment's, and dropped each click. Beneath that, `QRME_FILM_URL` had nothing to point at — `filming.py` speaks one submit-and-poll shape no vendor speaks, and the translator it named in its own docstring was never built. `docker/film` is it, the third sidecar beside the ears and the forge. Pika and Moonvalley join the shelf, Veo becomes the house pick, and a profile now stores the company it renders on. On a phone the seats moved above the figure and came down in size, the figure's frame stopped spilling its controls out of a box that hid its own overflow, and the expand button came out from behind the pencil. |
 | **2.9.0** | **The room holds the second key** — a profile's owner says what it can ever do; the room says what it may do here, for the people here, and nothing opens unless both are turned. The record card became that window: every synthetic seat listed with an Add friend button and a bar reading skills *n* of 180, connections *n* of 103; pressing a name drops one open at a time over all nine providers, all 103 connectors and each connector's own skills. A row its owner has not connected is shown and cannot be ticked — the room's key does not conjure the owner's. The AI and VERIFIED marks left the pixels and became labels on the sphere, because every face here is drawn as a circle and a mark in a square's corner is what a circle crops; the cost, a portrait fetched directly no longer carrying its disclosure, is written down rather than left to be found. |
 | **2.8.0** | Nine faculties on one page, in this product's own words — Channel 3, Channel 2, the voiceprint, the avatar, self-steering — each beside its live state, the permission it rests on, and the screen that withdraws it. The talk rail's four buttons open a whole window again: the panel was capped at 60vh of a sideways handheld because its override sat between two copies of the rule it was overriding. Seven more dead declarations were found by the guard written for that one. |
 | **2.7.1** | The minimized light is a circle again — a tap-target minimum was beating its declared height and drawing an ellipse. The screenshot harness builds the console before it photographs one, and can run at all: it had been raising NameError on every invocation since the reload round, so this gallery is the first shot since. |

@@ -87,14 +87,44 @@ from . import i18n
 #: a short shelf life and is why nothing downstream reads the order.
 PROVIDERS = (
     "none",
+    "veo",          # Google DeepMind. Veo 3.1, audio, ~$0.15/sec fast.
+    "runway",       # Runway, New York. Most studios have a seat already.
+    "luma",         # Luma, Palo Alto. Ray3 was first with native 16-bit HDR.
+    "pika",         # Pika, Palo Alto. Cheap and quick for a short beat.
+    "moonvalley",   # Moonvalley. Marey is trained only on licensed
+                    # footage, which is the one thing on this shelf a
+                    # rights-holder cannot object to.
     "seedance",     # ByteDance. 2.5 does 30s of native 4K with audio.
     "happyhorse",   # Alibaba ATH. Arrived April 2026 near the top.
-    "veo",          # Google DeepMind. Veo 3.1, audio, ~$0.15/sec fast.
     "kling",        # Kuaishou. 3.0 does 4K/60, and a cheaper Turbo.
     "ltx",          # Lightricks. 2.3 is 22B, 4K/50 with stereo.
-    "luma",         # Luma. Ray3 was the first with native 16-bit HDR.
-    "runway",       # Runway. The one most studios already have a seat at.
 )
+
+#: The one this platform picks when an operator has not.
+#:
+#: Veo, on quality and on provenance both: it is the strongest of these
+#: on a plain text prompt, it generates its own audio rather than leaving
+#: a silent clip, and Google is a company that will still be answering
+#: this endpoint next year — which is not a small thing on a shelf that
+#: has already lost Sora and Ready Player Me inside fifteen months.
+#:
+#: An operator who names something else in QRME_FILM_PROVIDER gets it;
+#: an owner who picks on their own Identity screen beats them both. This
+#: is only what happens when nobody has said.
+DEFAULT_PROVIDER = "veo"
+
+#: Not on the shelf, and why — so nobody adds them back by accident.
+#:
+#: **Sora** was deprecated 26 April 2026 and its API shuts 24 September
+#: 2026. A shelf that sends somebody to a service with a published end
+#: date is worse than a shelf one row shorter.
+#:
+#: **Nano Banana** is Google's image model — it makes and edits stills,
+#: and there is no video in it. It gets asked for by name often enough
+#: to be worth writing down: the video road wants a video model, and
+#: Google's is Veo, above. Nano Banana belongs on the image road
+#: (`avatarforge`), which is a different door with a different key.
+NOT_OFFERED = ("sora", "nano_banana")
 
 #: How long one render may be asked for. Not a budget — a ceiling on a
 #: single call, so a runaway script cannot order a five-minute film.
@@ -132,11 +162,21 @@ class FilmingError(RuntimeError):
 
 
 def provider() -> str:
-    """Which service this deployment renders on. ``none`` unless an
-    operator names one, and ``none`` again if they name one this module
-    does not know."""
-    named = os.environ.get("QRME_FILM_PROVIDER", "none").strip().lower()
-    return named if named in PROVIDERS else "none"
+    """Which service this deployment renders on.
+
+    :data:`DEFAULT_PROVIDER` unless an operator names another, and the
+    default again if they name one this module does not know — a typo in
+    an environment variable should not take the video road down, it
+    should render on the house pick and leave the typo visible in
+    :func:`doors`.
+
+    This used to answer ``none`` when unset, which made "nobody chose a
+    model" indistinguishable from "this deployment renders no video" —
+    and the second is what the missing URL and key are for.
+    """
+    named = os.environ.get("QRME_FILM_PROVIDER", "").strip().lower()
+    return named if named in PROVIDERS and named != "none" \
+        else DEFAULT_PROVIDER
 
 
 def endpoint() -> str:
@@ -153,11 +193,12 @@ def configured() -> bool:
     """Whether a scene could actually be rendered here.
 
     False is an answer a screen shows rather than a button that fails,
-    which is the same posture `avatarforge.configured` takes. All three
-    have to be true: a provider chosen, somewhere to send it, and a key
-    to send it with.
+    which is the same posture `avatarforge.configured` takes. Two things
+    have to be true: somewhere to send the scene, and a key to send it
+    with. The model is no longer one of them — there is always one,
+    because there is a default.
     """
-    return provider() != "none" and bool(endpoint()) and keyed()
+    return bool(endpoint()) and keyed()
 
 
 def why_not() -> str | None:
@@ -169,10 +210,6 @@ def why_not() -> str | None:
     """
     if configured():
         return None
-    if provider() == "none":
-        return ("This deployment has not chosen a video service. The road "
-                "is built and nobody has pointed it anywhere — set "
-                "QRME_FILM_PROVIDER, QRME_FILM_URL and QRME_FILM_KEY.")
     if not endpoint():
         return (f"A provider is named ({provider()}) but there is nowhere "
                 f"to send the scene — set QRME_FILM_URL.")

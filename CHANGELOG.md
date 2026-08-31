@@ -6,6 +6,110 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.1] - 2026-08-31
+
+### Added
+
+- **The video road has an adapter, and the company is a choice.** Video
+  was selected on a profile and nothing rendered, whatever service was
+  picked. Two faults, one on top of the other.
+
+  The picker on the Identity screen had no handler — `onPick={() =>
+  undefined}`. It drew all the providers, lit whichever one the
+  deployment's environment named, and dropped every click, so choosing
+  Seedance and choosing nothing were the same act. There was no
+  per-profile provider anywhere either: `filming.render` read the
+  environment variable in five separate places, so a choice could not
+  have been honoured even if one had been stored. `presence_road` now
+  carries a `provider` column, nullable because NULL is a real answer
+  meaning "whatever the deployment named" — which is what every row
+  written before today means. Sending the road alone leaves the company
+  alone; `"none"` hands the choice back.
+
+  Underneath that, `QRME_FILM_URL` had nothing on the box to point at.
+  `filming.py` speaks one submit-and-poll shape and said from the day it
+  was written that it is "one adapter away from any vendor whose own API
+  differs" — and the adapter was never built. `docker/film` is it, the
+  third sidecar on the same pattern as the ears and the forge: one
+  translator with one job, so the product's image stays lean and a
+  vendor swap is one container rather than a change through the
+  codebase. The credential lives on the adapter; the product holds the
+  address of a door, never a video house's key.
+
+- **Five more houses on the shelf, and a house pick.** Pika and
+  Moonvalley join Veo, Runway and Luma — Marey is trained only on
+  licensed footage, which is the one thing here a rights-holder cannot
+  object to — alongside Seedance, Happy Horse, Kling and LTX.
+
+  Veo is the default. Strongest on a plain text prompt, generates its
+  own audio rather than leaving a silent clip, and Google will still be
+  answering that endpoint next year, which is not a small thing on a
+  shelf that has already lost Sora and Ready Player Me inside fifteen
+  months. An operator naming another in `QRME_FILM_PROVIDER` gets it; an
+  owner picking on their own screen beats them both.
+
+  `provider()` used to answer `none` when unset, which made "nobody
+  chose a model" indistinguishable from "this deployment renders no
+  video" — so one wrong letter in a deploy script silently ended video
+  for a whole box. It falls back to the house pick now and the typo
+  stays visible rather than taking the road down.
+
+  Nano Banana is recorded in `NOT_OFFERED` beside Sora, with the reason:
+  it is Google's image model and there is no video in it. It gets asked
+  for by name often enough to be worth writing down.
+
+### Fixed
+
+- **The room's frames stopped overflowing on a phone.** The box reading
+  "This turn, as a figure" showed only half of itself and its expandable
+  button could not be reached. Measured rather than eyeballed: the card
+  is a fixed 860px flex column that *hides* its overflow, and the seats
+  rail took `flex: 1 1 auto` and ate 502 of it, so the bottom of the
+  frame — the framing chips and the lower half of the control rail —
+  fell outside a box with nowhere to scroll. The rail takes a bounded
+  share and scrolls inside itself, the frame takes its own height and is
+  never shrunk, and the card scrolls if the two still do not fit.
+
+- **The expand button came out from behind the pencil.** Both were
+  pinned to the same right edge — `.stage-grow` at `top: 8px`, and a
+  rail anchored to the bottom of that edge which grew upward into it as
+  buttons were added. Not a stacking order to argue with; two things
+  given one address. A ceiling at 44px, so the rail cannot reach it.
+
+- **Who is in the room goes above what one of them is doing.** The frame
+  carried `order: -1`, which put it over the seats. The seats are
+  ordered forward instead, the room's bar stays ahead of both, and the
+  seat boxes come down from 172px to 128 with the face at 84 — "these
+  look way too big of the user frames."
+
+- **The two marks are computed from one number.** The AI and VERIFIED
+  geometry was typed out three times — for the 120px face, the 104px
+  phone face, the 72px rail — while the face's own size lived in a
+  different rule, and they had already drifted: the rail set a 112px
+  face against marks still solving for 104. The tile declares `--face`
+  and where its corner sits; the marks are the measured fractions of it,
+  and every replaced value reproduces exactly.
+
+  Measured against each face's own box afterwards, the AI plate came
+  back three pixels left of the burn on all four seats — the rail's
+  offset had been derived from a padding that changed. Corrected from
+  the live boxes.
+
+  A seat showing a photograph full-bleed has no circle for those
+  fractions to mean anything against, and the gold plate was solving a
+  circle's geometry on a rectangle and landing at .98 of the way across,
+  under the name. It gets its own corner. This does not cover the mark
+  burned into that file and cannot: the burn sits at a fixed fraction of
+  a square image, `object-fit: cover` crops it by an amount only the
+  browser knows, and CSS cannot be told where the crop left it. Both
+  marks are visible on that one tile until there are unburned masters.
+
+- **Joining a standing room raised instead of answering.**
+  `_verified(kind, ref_id, room_id)` was called in the join branch of
+  `open_standing_room`, where `room_id` is not bound until the
+  open-fresh branch below it — a `NameError` on the path that endpoint
+  takes most.
+
 ## [2.9.0] - 2026-08-31
 
 ### Added
@@ -16792,7 +16896,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.1...HEAD
+[2.9.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.0...app-v2.9.1
 [2.9.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.8.0...app-v2.9.0
 [2.8.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.7.1...app-v2.8.0
 [2.7.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.7.0...app-v2.7.1

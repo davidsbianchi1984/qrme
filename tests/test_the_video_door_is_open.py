@@ -72,11 +72,25 @@ def _speaks(script):
 
 # --- the door, before anybody writes a prompt --------------------------
 
-def test_a_deployment_that_chose_nothing_says_what_to_set():
+def test_a_deployment_that_pointed_nowhere_says_what_to_set():
+    """Choosing a model is no longer one of the things that can be missing.
+
+    There is a house pick — `DEFAULT_PROVIDER` — so "nobody named a
+    model" and "this deployment renders no video" stopped being the same
+    answer. What is actually missing is somewhere to send the scene, and
+    that is what the sentence has to name.
+    """
     from qrme import filming
     assert filming.configured() is False
     why = filming.why_not()
-    assert "QRME_FILM_PROVIDER" in why
+    assert "QRME_FILM_URL" in why
+
+
+def test_the_house_pick_is_what_an_unset_deployment_renders_on():
+    from qrme import filming
+    assert filming.provider() == filming.DEFAULT_PROVIDER
+    assert filming.DEFAULT_PROVIDER in filming.PROVIDERS
+    assert filming.DEFAULT_PROVIDER != "none"
 
 
 @pytest.mark.parametrize("missing", ["QRME_FILM_URL", "QRME_FILM_KEY"])
@@ -93,13 +107,41 @@ def test_half_a_configuration_is_not_a_configuration(monkeypatch, missing):
     assert missing in (filming.why_not() or "")
 
 
-def test_a_misspelled_provider_is_not_silently_a_working_one(monkeypatch):
+def test_a_misspelled_provider_falls_back_rather_than_shutting_the_road(
+        monkeypatch):
+    """A typo in an environment variable is not a reason to stop making
+    video.
+
+    It used to take the road down: an unknown name answered "none", and
+    "none" meant unconfigured, so one wrong letter in a deploy script
+    silently ended video for the whole box. The typo still does not get
+    honoured — nothing is rendered on a model this module cannot name —
+    but the house pick carries the render and the misspelling stays
+    visible in `doors()` for an operator to find.
+    """
     from qrme import filming
     monkeypatch.setenv("QRME_FILM_PROVIDER", "seedanse")
     monkeypatch.setenv("QRME_FILM_URL", "https://render.test/v1")
     monkeypatch.setenv("QRME_FILM_KEY", "k")
-    assert filming.provider() == "none"
-    assert filming.configured() is False
+    assert filming.provider() == filming.DEFAULT_PROVIDER
+    assert filming.provider() != "seedanse"
+    assert filming.configured() is True
+
+
+def test_nano_banana_is_not_on_the_video_shelf():
+    """It is an image model, and gets asked for by name often enough to
+    be worth a guard. Google's video model is Veo, which IS on the shelf;
+    stills are the image road's job and a different key."""
+    from qrme import filming
+    assert "nano_banana" not in filming.PROVIDERS
+    assert "nano_banana" in filming.NOT_OFFERED
+    assert "veo" in filming.PROVIDERS
+
+
+def test_the_american_video_houses_are_all_offered():
+    from qrme import filming
+    for house in ("veo", "runway", "luma", "pika", "moonvalley"):
+        assert house in filming.PROVIDERS
 
 
 def test_sora_is_not_on_the_shelf():
