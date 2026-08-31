@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Avatar3D } from "./Avatar3D";
+import { Avatar3D, type Shot } from "./Avatar3D";
 import { SpeakingPortrait } from "./SpeakingPortrait";
 import { nowPlaying } from "./spoken";
 import { api, getBase, type Avatar } from "./api";
@@ -31,6 +31,7 @@ import { t as tr, visitorLang } from "./l10n";
 type Rail = "prompt" | "looks" | "body" | "all";
 
 export function AvatarStage({ profileId, token, avatar, owned, clear,
+                              inline, framing, onFraming, onExpand,
                               onClose, onChanged, onError }: {
   profileId: string;
   token: string;
@@ -44,6 +45,36 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
    *  room's stage — so the avatar stands in the environment instead of
    *  on a black card. Flat surfaces keep the dark takeover. */
   clear?: boolean;
+  /** Run in a frame instead of over the whole screen.
+   *
+   * The owner's correction, and the reason this is one component in two
+   * sizes rather than two components: "the avatars can run inside of
+   * windows like these... but if they don't wanna go full screen, you'll
+   * still have to add those four buttons that allow you to change the
+   * wardrobe or body."
+   *
+   *     asked     where does the avatar go
+   *     mattered  do the four controls come with it
+   *
+   * They do, because it is the same code. A second, smaller avatar
+   * component would have been a second wardrobe to keep in step, and the
+   * one in the frame would have drifted into being the poor relation —
+   * which is how a control ends up existing only in the mode nobody
+   * uses. */
+  inline?: boolean;
+  /** How much of the rendered avatar is in the frame.
+   *
+   *  Deliberately not called `shot`. That word is already taken here by
+   *  the framing of the photograph going IN to the forge, and the two
+   *  are different pictures — somebody can hand over a head-and-
+   *  shoulders photograph and still want the whole body drawn from the
+   *  model built out of it. */
+  framing?: Shot;
+  onFraming?: (s: Shot) => void;
+  /** Take the frame to the whole screen. Drawn in place of the close
+   *  button when inline: filling a window and closing a screen are
+   *  different actions and must not share a glyph. */
+  onExpand?: () => void;
   onClose: () => void;
   onChanged: (a: Avatar) => void;
   onError: (e: unknown) => void;
@@ -171,8 +202,15 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
   ];
 
   return (
-    <div className={"avatar-stage" + (clear ? " clear" : "")}
-         data-screen="205" role="dialog"
+    <div className={"avatar-stage" + (clear ? " clear" : "")
+                    + (inline ? " inline" : "")}
+         data-screen="205"
+         /* A window in a frame is not a dialog: `role="dialog"` on
+            something that has not taken the screen tells a screen reader
+            everything behind it is inert, which is false — the room is
+            still there and still usable. */
+         role={inline ? "group" : "dialog"}
+         aria-modal={inline ? undefined : true}
          aria-label={tr("stage.title", lang)}>
       {/* The head the forge built, when there is one: the same face in
           three dimensions, its mouth moving with whatever voice is in
@@ -195,15 +233,40 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
                           ? face.model : getBase() + face.model}
                     speaking={nowPlaying()}
                     motion={face.motion}
+                    shot={framing}
                     className="stage-face" />
         : src
         ? <img className={"stage-face" + (face?.torso ? " standing" : "")}
                src={src} alt="" />
         : <div className="stage-empty">{tr("stage.none", lang)}</div>}
       <span className="stage-mark" aria-hidden="true">✦ AI</span>
-      <button className="stage-close" aria-label={tr("stage.close", lang)}
-              title={tr("stage.close", lang)}
-              onClick={onClose}>✕</button>
+      {inline
+        ? <button className="stage-grow" aria-label={tr("stage.full", lang)}
+                  title={tr("stage.full", lang)}
+                  onClick={onExpand}>⛶</button>
+        : <button className="stage-close" aria-label={tr("stage.close", lang)}
+                  title={tr("stage.close", lang)}
+                  onClick={onClose}>✕</button>}
+      {/* Face, upper torso, full body — the forge's own three words, so
+          choosing here is choosing what the face was built as. Drawn only
+          where something asked to be told; the takeover inherits whatever
+          the frame was set to. */}
+      {inline && onFraming && (
+        <div className="stage-shots">
+          {/* Written out rather than mapped from a list of keys: a lookup
+              built with a template literal is invisible to the string
+              extractor next door. */}
+          {([["face", tr("idn.forge.face", lang)],
+             ["upper", tr("idn.forge.upper", lang)],
+             ["full", tr("idn.forge.full", lang)]] as const).map(
+            ([key, name]) => (
+              <button key={key} type="button"
+                      className={framing === key ? "lit" : ""}
+                      aria-pressed={framing === key}
+                      onClick={() => onFraming(key)}>{name}</button>
+            ))}
+        </div>
+      )}
       <div className="stage-rail">
         {RAIL.map((w) => (
           <button key={w.key} className={rail === w.key ? "lit" : ""}

@@ -8997,6 +8997,9 @@ const CHROME: Table = {
   "stage.open": {
     en: "Open the avatar full screen", es: "Abrir el avatar a pantalla completa", fr: "Ouvrir l’avatar en plein écran", de: "Den Avatar bildschirmfüllend öffnen", pt: "Abrir o avatar em tela cheia", it: "Apri l’avatar a schermo intero", ja: "アバターを全画面で開く", zh: "全屏打开头像", hi: "अवतार को पूरी स्क्रीन पर खोलें", ar: "افتح الصورة الرمزية بملء الشاشة",
   },
+  "stage.full": {
+    en: "Full screen", es: "Pantalla completa", fr: "Plein écran", de: "Vollbild", pt: "Ecrã inteiro", it: "Schermo intero", ja: "全画面", zh: "全屏", hi: "पूरी स्क्रीन", ar: "ملء الشاشة",
+  },
   "stage.close": {
     en: "Close", es: "Cerrar", fr: "Fermer", de: "Schließen", pt: "Fechar", it: "Chiudi", ja: "閉じる", zh: "关闭", hi: "बंद करें", ar: "إغلاق",
   },

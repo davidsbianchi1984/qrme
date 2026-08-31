@@ -2524,3 +2524,50 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   background: rgba(8,6,16,.72); border-radius: 6px; padding: 2px 7px;
 }
 .bubble-scene em { font-style: normal; }
+
+/* ── The stage, running in a frame ────────────────────────────────────
+ *
+ * The same component at a different size. The owner's ask, twice over:
+ * the avatar runs "inside of windows like these", and "if they don't
+ * wanna go full screen, you'll still have to add those four buttons that
+ * allow you to change the wardrobe or body". So the rail, the wardrobe
+ * and the body controls are not stripped here — they are the reason this
+ * mode exists rather than a smaller second component. */
+.avatar-stage.inline {
+  position: relative; inset: auto; z-index: auto; width: 100%;
+  aspect-ratio: 4 / 3; max-height: 46vh; border-radius: 12px;
+  overflow: hidden; border: 1px solid var(--line); background: #0b0820;
+}
+/* The rail keeps its four, smaller — it is the same rail. */
+.avatar-stage.inline .stage-rail { bottom: 10px; right: 8px; gap: 6px; }
+.avatar-stage.inline .stage-rail button { width: 30px; height: 30px;
+  font-size: 14px; }
+/* The wardrobe opens over the frame rather than beside the screen. */
+.avatar-stage.inline .wardrobe {
+  bottom: 48px; right: 8px; left: 8px; width: auto; max-height: 70%;
+}
+.avatar-stage.inline .stage-mark { top: 8px; left: 8px; font-size: 0.65rem;
+  padding: 2px 7px; }
+/* A window fills the screen; a screen closes. Different actions, so
+   different glyphs and different corners — the expand sits where the
+   video's does, and the red X belongs only to the takeover. */
+.stage-grow {
+  position: absolute; top: 8px; right: 8px; z-index: 62;
+  width: 30px; height: 30px; border-radius: 8px; padding: 0;
+  background: rgba(8,6,16,.72); border: 1px solid rgba(255,255,255,.22);
+  color: #fff; font-size: 14px; line-height: 1; cursor: pointer;
+}
+/* Face, upper torso, full body — the forge's own three words. */
+.stage-shots {
+  position: absolute; left: 8px; bottom: 10px; z-index: 62;
+  display: flex; gap: 5px; flex-wrap: wrap;
+}
+.stage-shots button {
+  background: rgba(8,6,16,.72); border: 1px solid rgba(255,255,255,.22);
+  color: #e7e3f6; border-radius: 999px; padding: 3px 9px; font-size: 10px;
+  cursor: pointer;
+}
+.stage-shots button.lit {
+  border-color: var(--brand); color: #fff;
+  background: linear-gradient(180deg, var(--brand2), var(--brand));
+}
