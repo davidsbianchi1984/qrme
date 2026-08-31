@@ -114,6 +114,9 @@ Named           172
 Passing         173
 Selling         174
 Inside          175
+# The room's video frame: the seat's own footage, or the honest state
+# when there is none. Drawn inside the room, so it is the room's screen.
+SeatFilm        175
 Placements      162
 Public          184
 Onboarding      1,39,41,42,47

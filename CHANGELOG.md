@@ -16792,7 +16792,7 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.8.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.0...HEAD
 [2.9.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.8.0...app-v2.9.0
 [2.8.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.7.1...app-v2.8.0
 [2.7.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.7.0...app-v2.7.1

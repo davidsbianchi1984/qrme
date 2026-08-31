@@ -750,7 +750,7 @@ const CHROME: Table = {
     en: "This turn, as a figure", es: "Este turno, como figura", fr: "Ce tour, en figure", de: "Dieser Zug, als Figur", pt: "Esta vez, como figura", it: "Questo turno, come figura", ja: "この発言を、立体の姿で", zh: "这一轮，以立体形象", hi: "यह बारी, एक आकृति के रूप में", ar: "هذا الدور، بهيئة مجسّمة",
   },
   "ins.turn.avatar.sub": {
-    en: "Their face in three dimensions, mouth on the voice", es: "Su rostro en tres dimensiones, con la boca siguiendo la voz", fr: "Son visage en trois dimensions, la bouche suivant la voix", de: "Ihr Gesicht dreidimensional, der Mund folgt der Stimme", pt: "O rosto em três dimensões, com a boca acompanhando a voz", it: "Il volto in tre dimensioni, la bocca segue la voce", ja: "立体の顔、声に合わせて動く口", zh: "三维的面孔，口型跟随声音", hi: "उनका चेहरा त्रि-आयामी, आवाज़ के साथ चलता मुँह", ar: "وجهه مجسّمًا، والفم يتبع الصوت",
+    en: "Their face in three dimensions, mouth on the voice", es: "Su rostro en tres dimensiones, con la boca siguiendo la voz", fr: "Son visage en trois dimensions, la bouche suivant la voix", de: "Das Gesicht dreidimensional, der Mund folgt der Stimme", pt: "O rosto em três dimensões, com a boca acompanhando a voz", it: "Il volto in tre dimensioni, la bocca segue la voce", ja: "立体の顔、声に合わせて動く口", zh: "三维的面孔，口型跟随声音", hi: "उनका चेहरा त्रि-आयामी, आवाज़ के साथ चलता मुँह", ar: "وجهه مجسّمًا، والفم يتبع الصوت",
   },
   "ins.turn.video": {
     en: "This turn, as footage", es: "Este turno, como imágenes", fr: "Ce tour, en images", de: "Dieser Zug, als Aufnahme", pt: "Esta vez, como imagens", it: "Questo turno, come immagini", ja: "この発言を、映像で", zh: "这一轮，以影像", hi: "यह बारी, फ़ुटेज के रूप में", ar: "هذا الدور، كلقطات",
@@ -8983,6 +8983,11 @@ const CHROME: Table = {
   // The room's permission window. "Reach" rather than "permissions":
   // what is being agreed to is a synthetic person touching something
   // real, and the plain word for that is the one on the box.
+  // The press per turn. Not decoration: it is the fallback for every
+  // time a browser refuses to start sound by itself.
+  "ins.hear": {
+    en: "Hear this", es: "Escuchar esto", fr: "Écouter", de: "Das anhören", pt: "Ouvir isto", it: "Ascolta", ja: "これを聞く", zh: "听这条", hi: "यह सुनिए", ar: "استمع إلى هذا",
+  },
   "ins.reach": {
     en: "What they can reach", es: "Lo que pueden alcanzar", fr: "Ce qu'ils peuvent atteindre", de: "Worauf sie zugreifen können", pt: "O que podem alcançar", it: "Cosa possono raggiungere", ja: "彼らが手を伸ばせるもの", zh: "他们能触及的东西", hi: "वे किस तक पहुँच सकते हैं", ar: "ما يمكنهم الوصول إليه",
   },

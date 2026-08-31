@@ -152,6 +152,19 @@ class ProfileUpdate(BaseModel):
     # on the prompt. Stored since the first migration with no way to set it
     # after creation.
     appearance: str | None = None
+    # What this profile is FOR, under its name — "Healthcare" beside
+    # "Dr. Amara Osei", which is what a room's seats read to say what a
+    # roomful of specialists specialises in.
+    #
+    #     asked     who is in this room
+    #     mattered  what are they for
+    #
+    # It arrived as a seeded column with no door: written once from the
+    # starter's own pack and unchangeable after, which is the same defect
+    # `kind` and `appearance` each had before them. A profile that changes
+    # what it is for has no way to say so, and the seats go on announcing
+    # the old answer.
+    industry: str | None = None
 
 
 class ProfileOut(BaseModel):

@@ -1406,6 +1406,8 @@ UNKNOWN_CONNECTOR = "unknown connector: {provider}/{app}"
 APP_DOES_NOT_OFFER = "{app} does not offer: {capabilities}"
 NO_COLLECT_SUPPORT = "{app} does not support collecting context"
 CANNOT_RUN_ONBOARD_LLM = "{label} cannot run an onboard LLM"
+ROOM_ALLOWS_ONLY = ("a room allows an app, one of its capabilities, or a "
+                    "skill — nothing else")
 
 #: Every template this module offers. Derived from the table below rather than
 #: repeated, so a template with no translations is impossible by construction.
@@ -1449,6 +1451,7 @@ TEMPLATES = (MUST_BE_ONE_OF, SAY_CEILING, ENGINE_REFUSED,
              APP_NOT_SIGNED_IN, APP_NEEDS_KEY, MODE_MUST_BE,
              UNKNOWN_LANGUAGE, NO_SUCH_FACE, FACE_NOT_CARRIED,
              MAIL_SERVER_REFUSED, UNKNOWN_CONNECTOR, APP_DOES_NOT_OFFER,
+             ROOM_ALLOWS_ONLY,
              NO_COLLECT_SUPPORT, CANNOT_RUN_ONBOARD_LLM)
 
 _TEMPLATES: dict[str, dict[str, str]] = {
@@ -2794,6 +2797,17 @@ _TEMPLATES: dict[str, dict[str, str]] = {
         'zh': '{app} 不提供：{capabilities}',
         'hi': '{app} यह प्रदान नहीं करता: {capabilities}',
         'ar': '{app} لا يقدم: {capabilities}',
+    },
+    ROOM_ALLOWS_ONLY: {
+        'es': 'una sala permite una aplicación, una de sus capacidades o una habilidad: nada más',
+        'fr': "une salle autorise une application, l'une de ses capacités ou une compétence — rien d'autre",
+        'de': 'ein Raum erlaubt eine App, eine ihrer Fähigkeiten oder eine Fertigkeit — sonst nichts',
+        'pt': 'uma sala permite uma aplicação, uma das suas capacidades ou uma competência — nada mais',
+        'it': 'una stanza consente un\'app, una delle sue capacità o un\'abilità: nient\'altro',
+        'ja': '部屋が許可できるのはアプリ、その機能のひとつ、またはスキルだけです',
+        'zh': '房间只能允许一个应用、它的某项能力，或一项技能——别无其他',
+        'hi': 'एक कमरा किसी ऐप, उसकी किसी क्षमता, या किसी कौशल की अनुमति देता है — और कुछ नहीं',
+        'ar': 'تسمح الغرفة بتطبيق، أو بإحدى قدراته، أو بمهارة — لا شيء غير ذلك',
     },
     NO_COLLECT_SUPPORT: {
         'es': '{app} no admite recopilar contexto',
@@ -7450,6 +7464,28 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'zh': '你的照片是一张图片——JPEG、PNG、GIF 或 WebP。',
         'hi': 'आपकी तस्वीर एक तस्वीर है — JPEG, PNG, GIF या WebP।',
         'ar': 'صورتك صورة — JPEG أو PNG أو GIF أو WebP.',
+    },
+    'a room allows an app, one of its capabilities, or a skill — nothing else': {
+        'es': 'una sala permite una aplicación, una de sus capacidades o una habilidad: nada más.',
+        'fr': "une salle autorise une application, l'une de ses capacités ou une compétence — rien d'autre.",
+        'de': 'ein Raum erlaubt eine App, eine ihrer Fähigkeiten oder eine Fertigkeit — sonst nichts.',
+        'pt': 'uma sala permite uma aplicação, uma das suas capacidades ou uma competência — nada mais.',
+        'it': "una stanza consente un'app, una delle sue capacità o un'abilità: nient'altro.",
+        'ja': '部屋が許可できるのはアプリ、その機能のひとつ、またはスキルだけです。',
+        'zh': '房间只能允许一个应用、它的某项能力，或一项技能——别无其他。',
+        'hi': 'एक कमरा किसी ऐप, उसकी किसी क्षमता, या किसी कौशल की अनुमति देता है — और कुछ नहीं।',
+        'ar': 'تسمح الغرفة بتطبيق، أو بإحدى قدراته، أو بمهارة — لا شيء غير ذلك.',
+    },
+    'that profile is not in this room': {
+        'es': 'ese perfil no está en esta sala.',
+        'fr': "ce profil n'est pas dans cette salle.",
+        'de': 'dieses Profil ist nicht in diesem Raum.',
+        'pt': 'esse perfil não está nesta sala.',
+        'it': 'quel profilo non è in questa stanza.',
+        'ja': 'そのプロフィールはこの部屋にいません。',
+        'zh': '该档案不在这个房间里。',
+        'hi': 'वह प्रोफ़ाइल इस कमरे में नहीं है।',
+        'ar': 'هذا الملف ليس في هذه الغرفة.',
     },
     'this room has closed': {
         'es': 'esta sala ha cerrado.',

@@ -1143,11 +1143,14 @@ def set_room_reach(room_id: str, body: RoomAllow, request: Request) -> dict:
               if p["kind"] == "profile"}
     if body.profile_id not in seated:
         raise HTTPException(404, "that profile is not in this room")
-    try:
-        return roomreach.allow(room_id, body.profile_id, body.kind,
-                               body.key, body.allowed, who)
-    except ValueError as exc:
-        raise HTTPException(422, str(exc))
+    # The refusal is a constant, not the exception's English. `str(exc)`
+    # would hand the sentence on with its template dropped, which ships
+    # the English in every language — the guard that catches that is why
+    # every refusal in this product lives in `i18n`.
+    if body.kind not in ("app", "cap", "skill"):
+        raise HTTPException(422, i18n.ROOM_ALLOWS_ONLY)
+    return roomreach.allow(room_id, body.profile_id, body.kind,
+                           body.key, body.allowed, who)
 
 
 # --- what your box holds -----------------------------------------------------

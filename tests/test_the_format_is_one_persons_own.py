@@ -92,8 +92,11 @@ def test_reading_the_format_cannot_throw():
     make `localStorage` raise on access rather than return null. A screen
     that cannot remember the choice still has to draw.
     """
+    from tests import ratchets
+
     text = MODULE.read_text(encoding="utf-8")
-    assert text.count("try {") >= 2, (
+    assert text.count("try {") >= ratchets.floor(
+        "console.room_format_guards"), (
         "roomFormat.ts reads or writes storage without catching — a "
         "browser that blocks it would take the room down with it")
 

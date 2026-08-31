@@ -3891,13 +3891,15 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 }
 @media (max-width: 719px) {
   /* Two across instead of four, so the same block is drawn a size down
-     rather than squeezed. */
-  .screen.room-place > .card.room-stage > .room-scene > .rs-tile {
-    padding-right: 54px;
-  }
-  .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-side {
-    left: calc(50% + 31px);
-  }
+     rather than squeezed.
+
+     The lane and the roads' offset are NOT set here. They were, and the
+     later round that widened both — sixteen pixels between the sphere
+     and the glyphs instead of eight — wrote the desktop numbers on the
+     same selectors further down the file. A media query adds no
+     specificity, so those two declarations were overruled on source
+     order alone and the phone quietly drew the desktop lane. They live
+     in that round's own media block now, which comes after it. */
   .screen.room-place > .card.room-stage > .room-scene > .rs-tile
     > .rs-side > .rs-road {
     width: 48px; height: 48px; font-size: 34px;
@@ -4008,9 +4010,21 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
  * has to be pressable whatever is on screen, including the panels each
  * one opens. So they go above everything — the orb one step under the
  * helper, because the helper's own panel opens over the orb. */
-.agent-orb { z-index: 120; }
-.watch-lights, .wl-dot { z-index: 120; }
-.help-fab, .help-panel { z-index: 130; }
+/* Above the cards, and still under the drawer.
+ *
+ * The first pass put these at 120 and 130, which fixed the clipping and
+ * broke the guard that exists because of an earlier field report: "It
+ * seems to be blocking the PDI menus." The navigation is a drawer now,
+ * not a band, so a pinned widget cannot sit beside it — only over it —
+ * and every one of them has to stay below the drawer's 60.
+ *
+ * So the range between a card and the drawer, which is the whole of what
+ * was needed: a card with a layer of its own beat `auto`, and any
+ * positive number beats a card. The orb and the light sit one step under
+ * the helper, because the helper's panel opens over both. */
+.agent-orb { z-index: 48; }
+.watch-lights, .wl-dot { z-index: 48; }
+.help-fab, .help-panel { z-index: 50; }
 
 /* Room to breathe, in both directions.
  *
@@ -4212,3 +4226,12 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   margin: 2px 0 2px 26px; text-transform: uppercase;
   letter-spacing: .07em; font-size: 9.5px;
 }
+/* The press per turn, on the strip's own line. Small and inline: it is
+   one turn's sound, not a control for the room. */
+.rs-hear {
+  background: none; border: none; padding: 0 0 0 6px;
+  font-size: 11px; line-height: 1; cursor: pointer;
+  opacity: .75; vertical-align: baseline;
+}
+.rs-hear:hover { opacity: 1; }
+.rs-hear:disabled { cursor: not-allowed; opacity: .35; }

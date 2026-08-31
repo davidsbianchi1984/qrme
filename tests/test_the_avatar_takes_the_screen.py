@@ -36,22 +36,35 @@ def test_the_deck_is_on_the_screen_people_actually_open():
         assert needle in IDENTITY, f"Identity lost {needle}"
 
 
-def test_the_ring_stands_on_the_seats_and_the_chat_header():
-    # The room: a profile seat with a portrait carries the TWIN circles —
-    # "no clear circles... I meant an entire profile photo circle, but
-    # for avatar" — the portrait opening the picture big, the avatar
-    # opening the stage. The small ring survives only where full-bleed
-    # pixels or an empty seat leave the pair no room.
-    assert "rs-pair" in INSIDE
+def test_the_seat_is_one_face_with_two_roads_beside_it():
+    """The twin circles are gone, and that was the correction.
+
+    A seat used to carry two whole circles — the portrait opening the
+    picture and a second one opening the stage — and the owner's reply to
+    it was four words: "I don't like the way it looks." A person is ONE
+    face. The formats are things you can DO with them, and things you can
+    do belong beside the face rather than competing with it for the
+    middle of the tile.
+
+    So: one portrait, which still opens the picture big, and two road
+    glyphs stacked down its right — the avatar and the film. What this
+    guard protects is that neither road is quietly dropped and that the
+    portrait keeps its lightbox.
+    """
+    assert "rs-circle-btn rs-solo" in INSIDE, (
+        "the seat lost its single portrait circle")
     assert "face-light" in INSIDE, "the portrait circle lost its lightbox"
-    assert "rs-avring" in INSIDE
+    assert "rs-pair" not in INSIDE, (
+        "the twin circles are back — a person is one face")
     assert "AvatarStage" in INSIDE
-    # A pair is two whole 72px circles, not a circle and a 34px badge:
-    # the avatar circle must be drawn in the seat's own face class, and
-    # the badge class must not appear inside the pair block.
-    pair = INSIDE.split('className="rs-pair"')[1].split("</div>")[0]
-    assert "rs-avring" not in pair
-    assert "rs-photo" in pair
+
+    # Both roads, on the seat, each pressing into a format.
+    roads = INSIDE.split('className="rs-side"')[1].split("</div>")[0]
+    assert roads.count('className={"rs-road"') == 2, (
+        "a seat carries two roads: the avatar and the film")
+    for fmt in ('"avatar"', '"video"'):
+        assert fmt in roads, f"the {fmt} road is not on the seat"
+
     # The direct chat's header wears the ring, opening the same stage.
     assert "chat-head-ring" in CHAT
     assert "AvatarStage" in CHAT

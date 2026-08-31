@@ -410,7 +410,12 @@ def test_the_card_says_whether_the_portrait_already_carries_the_mark(client):
                 token=auth.issue("owner", pid))
     card = client.get(f"/b/{b['id']}/card").json()
     assert card["portrait"].endswith("/portraits/otis_marsh.webp")
-    assert card["portrait_marked"] is True
+    # False, and that is the answer rather than a fallback. The mark left
+    # the pixels for the surface that draws the face — a circle crops the
+    # corner of a square, so a burned mark shipped cut in half. The flag
+    # is what tells this card to draw its own, and a stale True here would
+    # be the card politely skipping a badge that is no longer there.
+    assert card["portrait_marked"] is False
 
 
 def test_an_owner_attached_portrait_is_never_claimed_to_be_marked(client):

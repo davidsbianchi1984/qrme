@@ -852,6 +852,24 @@ def _screens_localizer_calls(shell: str):
     return go
 
 
+def _room_format_guards() -> int:
+    """How many storage accesses in `roomFormat.ts` are inside a try.
+
+    Every read and every write of `localStorage` has to be caught: a
+    private window, cleared site data or a browser set to block storage
+    make the access itself raise, and a screen that cannot remember the
+    viewer's chosen format still has to draw the room.
+
+    Counted rather than asserted at a literal 2, because the number is a
+    property of the module — it moves when a third access is added, and a
+    floor that does not move with it stops measuring anything.
+    """
+    from pathlib import Path
+    root = Path(__file__).resolve().parent.parent
+    text = (root / "app" / "src" / "roomFormat.ts").read_text(encoding="utf-8")
+    return text.count("try {")
+
+
 def _problems_recorded(shell: str):
     def go() -> int:
         from .test_native_shells_record_nothing_private import _record_calls
@@ -1244,6 +1262,10 @@ RATCHETS: tuple[Ratchet, ...] = (
     Ratchet("console.nav_tabs", 40, _nav_tabs,
             "tabs the console navigation declares — the floor under the "
             "check that every one of them has a label"),
+    Ratchet("console.room_format_guards", 2, _room_format_guards,
+            "storage accesses in roomFormat.ts wrapped in a try — the floor "
+            "under the check that a browser blocking storage cannot take the "
+            "room down with it"),
     Ratchet("avatars.skin_shelf", 12, _skin_shelf,
             "systems a face can be imported from — the floor under the "
             "check that a source picker is picking between things"),

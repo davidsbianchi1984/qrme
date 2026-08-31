@@ -2051,6 +2051,52 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                 shared picture was a word and a shared document was a word
                 you could not open. Same renderer as the card below. */}
             {attachment(m)}
+            {/* Hear this one turn, in the voice its owner bound.
+             *
+             *     asked     the strip is the record now
+             *     mattered  the press per turn went with the card
+             *
+             * It lived on the transcript card, which was the same turns a
+             * second time and was replaced by the permission window. The
+             * press is not decoration: it is the fallback for every time
+             * the browser refuses autoplay, so deleting the card deleted
+             * the only way to hear a turn on a device that would not
+             * start sound by itself. It belongs on the line, and the line
+             * is here now.
+             *
+             * A press, never autoplay: the phone's rule and the room's are
+             * the same — sound starts on a gesture. */}
+            {m.sender_kind === "profile" && m.sender_id && (
+              <button className="rs-hear" disabled={busy}
+                      aria-label={tr("ins.hear", lang)}
+                      title={tr("ins.hear", lang)}
+                      onClick={() => {
+                        const id = m.sender_id as string;
+                        // Announced before a note of it plays, and through
+                        // the same door the backlog uses. This button once
+                        // put a profile's voice in the room with neither
+                        // echo net watching.
+                        roomSpeaks(m.content || "");
+                        speakInPieces(id, m.content || "", token)
+                          .then((sp) => {
+                            nowSaying.current = sp;
+                            sayingMsg.current = m.id;
+                            setVoicing({ kind: "profile", id });
+                            return sp.done;
+                          })
+                          .then(() => { setVoicing(null); roomFellQuiet(); })
+                          .catch((e) => {
+                            setVoicing(null);
+                            // Quiet again even when the voice failed: a
+                            // flag left standing would deafen the room
+                            // until it was reloaded.
+                            roomFellQuiet();
+                            setError(e);
+                          });
+                      }}>
+                🔊
+              </button>
+            )}
           </p>
         ))}
         {socPaused && (
@@ -2798,15 +2844,20 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                   widest line on the screen saying it twice. */}
               <div className="rf-head">
                 <div>
+                  {/* Two formats, not three. The frame is only drawn for
+                      avatar and video — an audio turn has no second thing
+                      to show, and the box for it was removed. The third
+                      branch outlived its keys: `ins.turn.audio` was
+                      deleted with the box and the ternary went on asking
+                      for it, which is a raw key on the screen the moment
+                      anything reaches that branch again. */}
                   <div className="rf-who">
                     {format === "video" ? tr("ins.turn.video", lang)
-                     : format === "avatar" ? tr("ins.turn.avatar", lang)
-                     : tr("ins.turn.audio", lang)}
+                                        : tr("ins.turn.avatar", lang)}
                   </div>
                   <div className="rf-sub muted small">
                     {format === "video" ? tr("ins.turn.video.sub", lang)
-                     : format === "avatar" ? tr("ins.turn.avatar.sub", lang)
-                     : tr("ins.turn.audio.sub", lang)}
+                                        : tr("ins.turn.avatar.sub", lang)}
                   </div>
                 </div>
                 <span className="rf-ai" title={tr("ins.film.ai", lang)}>

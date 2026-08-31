@@ -63,22 +63,54 @@ L10N = (REPO / "app/src/l10n.ts").read_text(encoding="utf-8")
 # -- the room takes the window ----------------------------------------------
 
 def test_the_shell_knows_when_a_room_is_open():
-    assert 'const inRoom = tab === "inside" && Boolean(insideRoom);' in APP, (
+    """And knows it by both doors, not only the console's own.
+
+    This read `tab === "inside" && Boolean(insideRoom)`, which is the
+    room the console opened. A person can also type a room id on the
+    Inside screen and press Go — the same room, reached by the screen's
+    own door — and the shell knew nothing about it, so the drawer stayed
+    over a room somebody was standing in. `standing` is that second
+    door, reported up by the screen.
+    """
+    assert ('const inRoom = tab === "inside" '
+            '&& (standing || Boolean(insideRoom));') in APP, (
         "nothing in the shell distinguishes standing in a room from any "
         "other tab, so the room cannot be given the window")
+    assert "onInside={setStanding}" in APP, (
+        "the screen's own door into a room is not reported to the shell")
     assert '"app" + (inRoom ? " in-room" : "")' in APP
 
 
 def test_the_navigation_steps_out_of_the_way():
+    """The drawer stands down. The way back into it does not.
+
+    All three were hidden outright — the drawer, the button that opens
+    it and the scrim that closes it — which made a room a place with the
+    rest of the app painted over and no way back to it. The owner's
+    correction was specific: "add the menu button at the very top left
+    that uncovers the big menus to the app."
+
+    So the drawer hides only while it is shut, and the button and the
+    scrim stay: they are how it opens and how it shuts.
+    """
     block = CSS[CSS.index(".app.in-room"):]
     block = block[:block.index(".screen.room-place")]
-    for gone in (".sidebar", ".menu-fab", ".menu-scrim"):
-        assert gone in block, (
-            f"{gone} still occupies the window while somebody is standing "
-            "in a room")
+    assert ".sidebar:not(.open)" in block, (
+        "the drawer still occupies the window while somebody is standing "
+        "in a room")
     assert "grid-template-columns: 1fr" in block, (
         "the sidebar's column is still reserved, so hiding it leaves a "
         "232px hole rather than giving the room the width")
+
+    for kept in (".app.in-room .menu-fab", ".menu-scrim"):
+        assert kept in CSS, (
+            f"{kept} is gone, so a room is a place with no way back to "
+            "the rest of the app")
+    fab = CSS[CSS.index(".app.in-room .menu-fab"):]
+    fab = fab[:fab.index("}")]
+    assert "position: fixed" in fab and "top: 12px" in fab \
+        and "left: 12px" in fab, (
+        "the menu button is not pinned to the top left of the room")
 
 
 def test_the_room_does_not_take_the_window():

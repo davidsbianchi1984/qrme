@@ -71,8 +71,15 @@ def test_the_head_the_forge_builds_is_actually_drawn():
     inside = (SRC / "screens" / "Inside.tsx").read_text(encoding="utf-8")
     assert "<Avatar3D" in stage, (
         "the avatar stage draws a still where the forge built a head")
-    assert "<Avatar3D" in inside, (
+    # The room mounts the head through the stage rather than reaching past
+    # it. It used to render `<Avatar3D>` inline beside a second copy of
+    # the stage's framing controls; one stage, mounted once, is what put
+    # the face and the shots that frame it in the same place.
+    assert "<AvatarStage" in inside, (
         "a room's seats draw a still where the forge built a head")
     # And the mouth is driven by the voice already in the air rather than
-    # a second fetch of the same speech.
-    assert "nowPlaying()" in stage and "nowPlaying()" in inside
+    # a second fetch of the same speech. Once, in the stage: the room
+    # asked for it separately back when it mounted its own `<Avatar3D>`
+    # beside the stage's, and two readers of one playing voice is the
+    # duplication that mounting the stage once removed.
+    assert "nowPlaying()" in stage

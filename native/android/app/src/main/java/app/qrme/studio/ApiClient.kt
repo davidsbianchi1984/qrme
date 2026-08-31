@@ -1364,6 +1364,22 @@ object ApiClient {
 
     suspend fun roomAdvance(roomId: String, token: String) {
         request("/rooms/$roomId/advance", "POST", null, token)
+
+    /** What the room lets the synthetic people in it reach. Two keys: the
+     *  owner's grant says what a profile can ever do, this says what it
+     *  may do here — a profile in a room is very often somebody else's. */
+    fun roomReach(roomId: String, token: String): String =
+        request("/rooms/$roomId/reach", token = token)
+
+    fun allowRoomReach(roomId: String, profileId: String, kind: String,
+                       key: String, allowed: Boolean, token: String): String =
+        request("/rooms/$roomId/reach", "PUT",
+                JSONObject()
+                    .put("profile_id", profileId)
+                    .put("kind", kind)
+                    .put("key", key)
+                    .put("allowed", allowed),
+                token)
     }
 
     suspend fun roomTranscript(roomId: String, token: String): List<RoomMsg> {

@@ -1625,6 +1625,18 @@ public sealed class ApiClient
         res.EnsureSuccessStatusCode();
     }
 
+    // What the room lets the synthetic people in it reach. Two keys: the
+    // owner's grant says what a profile can ever do, this says what it may
+    // do here — a profile in a room is very often somebody else's.
+    public RoomReach RoomReach(string roomId, string token) =>
+        Send<RoomReach>(Get($"/rooms/{roomId}/reach", token));
+
+    public RoomAllowance AllowRoomReach(string roomId, string profileId,
+                                        string kind, string key,
+                                        bool allowed, string token) =>
+        Send<RoomAllowance>(Put($"/rooms/{roomId}/reach",
+            new { profile_id = profileId, kind, key, allowed }, token));
+
     public Task<RoomMsg[]> RoomTranscript(string roomId, string token) =>
         Send<RoomMsg[]>(Get($"/rooms/{roomId}/messages", token));
 
