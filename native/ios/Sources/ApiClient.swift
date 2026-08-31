@@ -1636,24 +1636,6 @@ actor ApiClient {
         try await request("/rooms/\(roomId)/messages", token: token)
     }
 
-    // What the room lets the synthetic people in it reach, and the tick
-    // that says what it may do here. Two keys: the owner's grant decides
-    // what a profile can EVER do, and this decides what it may do for the
-    // people in this room — which matters because a profile in a room is
-    // very often somebody else's.
-    func roomReach(roomId: String, token: String) async throws -> RoomReach {
-        try await request("/rooms/\(roomId)/reach", token: token)
-    }
-
-    func allowRoomReach(roomId: String, profileId: String, kind: String,
-                        key: String, allowed: Bool,
-                        token: String) async throws -> RoomAllowance {
-        try await request("/rooms/\(roomId)/reach", method: "PUT",
-                          body: ["profile_id": profileId, "kind": kind,
-                                 "key": key, "allowed": allowed],
-                          token: token)
-    }
-
     // MARK: Reach — summon (@handle + beacons), marketplace, licensing
 
     // The owner's token. Without it a stranger could replace the name a

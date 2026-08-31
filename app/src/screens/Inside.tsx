@@ -283,6 +283,20 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
   const dockOwner =
     dockedProfile === session.profileId ? session.ownerToken || null
       : (dockedProfile && mintedOwner[dockedProfile]) || null;
+  /** The owner token for the seat currently on the stage, or null.
+   *
+   * Hoisted rather than written inline in the stage's props: spread
+   * across four wrapped lines it could not be quoted, and the guard that
+   * holds this screen to the interactor's token reads lines. A rule
+   * enforced by quoting exact shapes needs the shape to fit on one.
+   *
+   * Same idea as `dockOwner` above and the same bound: the owner's token
+   * only where the session owns the profile, and never on a
+   * room-speaking door — the stage draws a face, it does not take a
+   * turn. */
+  const stageOwner = (framedSeat: string | null) =>
+    framedSeat === session.profileId ? session.ownerToken || null
+      : (framedSeat && framedSeat === dockedProfile && dockOwner) || null;
   const [scene, setScene] = useState<RoomFaces | null>(null);
   // The room's own channel, read off the join answer. `chat`, `voice` and
   // `video` present flat; `ar` and `vr` are the two the homepage sells as
@@ -873,10 +887,15 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
     // interactor, which is the person in the room and not a list that
     // can hold anybody.
     const mine = session.profileId || "";
-    const asOwner = session.ownerToken || "";
-    if (!mine || !asOwner || profileId === mine) return;
+    // The friends door is the owner's own list, so it takes the owner's
+    // token — and this is the third and last place on this screen that
+    // may hold one. It never reaches a room-speaking door: a turn in a
+    // room is spoken by a person, and the guard next door names both by
+    // the exact shape of the line.
+    const befriendAs = session.ownerToken || "";
+    if (!mine || !befriendAs || profileId === mine) return;
     setBusy(true);
-    api.addFriend(mine, profileId, asOwner)
+    api.addFriend(mine, profileId, befriendAs)
        .then(() => setFriended((was) => new Set(was).add(profileId)))
        .catch(setError)
        .finally(() => setBusy(false));
@@ -2879,15 +2898,8 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                   onExpand={() => setStaged(onStage.id)}
                   clear={channel === "ar" || channel === "vr"}
                   profileId={onStage.id}
-                  token={(onStage.id === session.profileId
-                            ? session.ownerToken
-                            : onStage.id === dockedProfile
-                              ? dockOwner : null)
-                         || session.interactorToken || ""}
-                  owned={!!(onStage.id === session.profileId
-                              ? session.ownerToken
-                              : onStage.id === dockedProfile
-                                ? dockOwner : null)}
+                  token={stageOwner(onStage.id) || session.interactorToken || ""}
+                  owned={!!stageOwner(onStage.id)}
                   avatar={(onStage.id === session.profileId ? myFace
                              : aiFaces[onStage.id]) || null}
                   onClose={() => undefined}

@@ -8465,6 +8465,12 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     'plan': {'en': 'Plan', 'es': 'Plan', 'fr': 'Formule', 'de': 'Tarif', 'pt': 'Plano', 'it': 'Piano', 'ja': 'プラン', 'zh': '方案', 'hi': 'योजना', 'ar': 'الخطة'},
     'note': {'en': 'Note', 'es': 'Nota', 'fr': 'Note', 'de': 'Notiz', 'pt': 'Nota', 'it': 'Nota', 'ja': 'メモ', 'zh': '备注', 'hi': 'टिप्पणी', 'ar': 'ملاحظة'},
     'objector_ref': {'en': 'Proof reference', 'es': 'Referencia de prueba', 'fr': 'Référence de preuve', 'de': 'Nachweisreferenz', 'pt': 'Referência de prova', 'it': 'Riferimento di prova', 'ja': '証明の参照番号', 'zh': '证明参考号', 'hi': 'प्रमाण संदर्भ', 'ar': 'مرجع الإثبات'},
+    # The room's permission window: which box, and which way it was
+    # turned. `key` is the connector's id or the grant's, never a
+    # provider's name — so the label says what a person is choosing
+    # rather than repeating the field's spelling.
+    'key': {'en': 'What it may reach', 'es': 'A qué puede acceder', 'fr': 'Ce qu\'il peut atteindre', 'de': 'Worauf es zugreifen darf', 'pt': 'A que pode aceder', 'it': 'A cosa può accedere', 'ja': '手を伸ばせるもの', 'zh': '可触及的内容', 'hi': 'यह किस तक पहुँच सकता है', 'ar': 'ما يمكنه الوصول إليه'},
+    'allowed': {'en': 'Allowed', 'es': 'Permitido', 'fr': 'Autorisé', 'de': 'Erlaubt', 'pt': 'Permitido', 'it': 'Consentito', 'ja': '許可', 'zh': '已允许', 'hi': 'अनुमत', 'ar': 'مسموح'},
     'profile_id': {'en': 'Profile id', 'es': 'Id del perfil', 'fr': 'Identifiant du profil', 'de': 'Profil-ID', 'pt': 'Id do perfil', 'it': 'Id del profilo', 'ja': 'プロフィールID', 'zh': '资料 id', 'hi': 'प्रोफ़ाइल आईडी', 'ar': 'معرّف الملف'},
     'price': {'en': 'Price', 'es': 'Precio', 'fr': 'Prix', 'de': 'Preis', 'pt': 'Preço', 'it': 'Prezzo', 'ja': '価格', 'zh': '价格', 'hi': 'मूल्य', 'ar': 'السعر'},
     'currency': {'en': 'Currency', 'es': 'Moneda', 'fr': 'Devise', 'de': 'Währung', 'pt': 'Moeda', 'it': 'Valuta', 'ja': '通貨', 'zh': '货币', 'hi': 'मुद्रा', 'ar': 'العملة'},

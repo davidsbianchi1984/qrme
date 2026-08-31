@@ -184,3 +184,10 @@ GET /video/direction/{profile_id}
 POST /video/direction/{profile_id}
 DELETE /video/direction/{profile_id}
 GET /video/direction/{profile_id}/log
+
+# The room's permission window. The console draws it — every synthetic seat,
+# its connections and its skills, with a box beside each — and no shell does
+# yet. A binding with no screen behind it would take these two routes off this
+# very backlog while building nothing, which is what this file exists to stop.
+GET /rooms/{room_id}/reach
+PUT /rooms/{room_id}/reach

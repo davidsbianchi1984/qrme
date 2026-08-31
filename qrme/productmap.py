@@ -192,6 +192,12 @@ DOORS: tuple[Door, ...] = (
          "choose from",
          ("avatar", "avatar deck", "change my picture", "pick a face",
           "skin", "avatar tiles", "which faces", "face options")),
+    Door("SeatFilm", "inside a room",
+         "the seat's own footage in the room's frame — the turn a profile "
+         "just spoke, rendered as video, or the honest state when there is "
+         "none yet and why",
+         ("play the video", "watch this turn", "the footage",
+          "see them say it", "is the render done")),
     Door("AvatarStage", "the avatar full screen",
          "the avatar taking the whole screen, with the wardrobe rail — "
          "prompt, apparel, physique and gender — over the one painting "
