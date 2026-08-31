@@ -6,7 +6,52 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.0] - 2026-08-31
+
 ### Added
+
+- **The room holds the second key.** A profile's owner decides what that
+  profile can ever do — which apps it is connected to, which hands it has
+  been granted. That was the only key this product had, and it is not
+  enough, because a profile in a room is very often somebody else's: a
+  starter outsourced from the account that made it, or a specialist
+  invited in by a person who does not own it. The owner's grant says
+  *this profile may drive a browser*. It does not say *for you, now, in
+  here*.
+
+  So the room holds a second key, and nothing opens unless both are
+  turned. Either can be withdrawn alone, and a reach reads both sides
+  every time rather than trusting a decision made earlier — so a person
+  in a room can narrow what somebody else's profile does in front of
+  them, and can never widen what it is able to do at all.
+
+  The window sits under the room and is reached by scrolling. Every
+  synthetic seat is listed before anything is opened — two rows if there
+  are two, eight if there are eight — each with an **Add friend** button,
+  because somebody may bring in a profile you have never spoken with, and
+  adding them is what you do before delegating anything to them. The bar
+  beside each name says what is on in the words for it: skills *n* of
+  180, connections *n* of 103, eyes and hands *n* of however many its
+  owner granted. Pressing a name drops the tab open, one at a time.
+
+  The whole catalog is listed under every seat, not only what a profile
+  holds. "What could this synthetic person reach" and "what has its owner
+  actually wired up" are different questions, and the dark rows are what
+  make the lit ones mean something. A row its owner has not connected
+  says so and cannot be ticked: the room's key does not conjure the
+  owner's, and allowing an app nobody has connected would be a permission
+  for something that cannot happen.
+
+  Absent means no. A box nobody ticked is a row that does not exist, so a
+  newly connected app arrives switched off, and a connection remade after
+  being revoked does not inherit the old yes — the tick is keyed on the
+  connector's id rather than its name. Every row records who turned it,
+  because "who let it do that" has to have a name in it.
+
+      asked     a window of all the synthetic profiles in the chat, their
+                connections and skills, with boxes to tick and allow
+      mattered  which of the two keys that window turns
+
 
 - **Every reply becomes footage, and nobody presses play.** A profile on
   the video road renders each approved turn as it happens. The turn starts
@@ -96,7 +141,76 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   guessed at — the seeded account holds no friends, so the tile carrying
   its button does not draw.
 
+
+### Changed
+
+- **The AI and VERIFIED marks are labels now, not burned pixels.** Both
+  were painted into the images — `AI` top-right on every portrait,
+  `VERIFIED` bottom-right on the one photograph of a real person — so
+  that a hotlinked or saved file would still carry the disclosure. Every
+  surface here draws a face as a **circle**, and a mark in the corner of a
+  square is exactly what a circle crops: both shipped sliced through the
+  middle on every screen they appeared on. A disclosure with its second
+  half missing reads as a rendering fault, which is the opposite of what
+  a disclosure has to do.
+
+  They are drawn by the surface now, in the same two corners, with each
+  pill's centre on the circle's own radius so half of it sits on the
+  photograph and half hangs off the edge. `avatars.asset_is_marked`
+  reports `False` for the whole collection, which is the flag every
+  surface already reads to decide whether to draw its own badge. The gold
+  check comes from a fact and never from a filename: a verification
+  record with a named attestor, the same bar the burning tool refused to
+  run without.
+
+  **What this costs, stated rather than left to be discovered:** a
+  portrait fetched straight from `/portraits/{handle}.webp` no longer
+  carries the disclosure in its bytes. That is the gap the burn existed
+  to close, and it is open again by decision. `docs/media-provenance.md`
+  carries the rule and the cost; the checksum manifest stays, so a
+  shipped face still cannot be swapped for a different one quietly.
+
+  `tools/unmark_faces.py` lifted the marks off, reproducing each marking
+  tool's exact geometry as a mask rather than guessing at it. Two faults
+  in that were caught by looking at the result, not at the code: a
+  straight inpaint spread colour inward from the boundary and left a
+  legible smeared rectangle in the hair of everyone whose hair reached
+  the corner, and the VERIFIED plate is wide enough to overlap its own
+  reflection, which painted "VERI" back into itself reversed.
+
+- **The seats are a table again, divided rather than welded.** They had
+  been pushed onto a shared hairline with no gap — "maybe not share a
+  wall, it looks too sharp; divider is best" — so a small gap and a real
+  corner came back on every box, and the speaking seat now rings its
+  portrait in green as well as its frame. The lit seat changes the colour
+  of its border and never its width, so nothing on the row moves when
+  somebody starts speaking.
+
+- **One face size, by every road it arrives by.** A profile seat draws
+  its portrait inside a button and was caught by a 112px rule; a person's
+  own photo is a direct child of the tile and was caught by a 96px one.
+  Sixteen pixels apart on two boxes side by side, which is why the
+  owner's own face was the smallest one in the room. The two glyphs also
+  came in off the right wall and are placed from the centre now, so the
+  face and the two roads are one block at any column width.
+
+- **The record card is back below the room**, reached by scrolling, with
+  a scrollbar that is actually laid out. Measured twice rather than
+  guessed: `clientWidth` equal to `offsetWidth` is the element saying in
+  numbers that no bar exists, and `scrollbar-gutter` is what reserves the
+  lane when the browser draws overlay scrollbars.
+
+
 ### Fixed
+
+- **The green watch light and the helper button were never on a layer.**
+  `.help-fab` declares `position: fixed` and no `z-index` at all, so every
+  card with a layer of its own painted over it — the "?" arrived cut in
+  half by the record card underneath. The watch light had `z-index: 40`,
+  above the page and below the card. Both go above everything now. The
+  side dock stands down inside a room for the same reason: it was pinned
+  behind the room card's edge, showing about fifty pixels of every label.
+
 
 - **The Home screen's tiles drew 41px past the right edge of a phone.**
   `.tiles` was `repeat(4, 1fr)`, and `1fr` is `minmax(auto, 1fr)`: the
@@ -116,6 +230,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   with a false positive per capture is a check nobody reads, so both are
   exempt by name with the reason written beside them. The remaining ten
   rows were the tiles, and after the fix there are none.
+
 
 ## [2.8.0] - 2026-08-30
 
@@ -16678,6 +16793,7 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   per-OS installer release workflow.
 
 [Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.8.0...HEAD
+[2.9.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.8.0...app-v2.9.0
 [2.8.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.7.1...app-v2.8.0
 [2.7.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.7.0...app-v2.7.1
 [2.7.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.6.0...app-v2.7.0

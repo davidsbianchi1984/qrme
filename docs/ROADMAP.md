@@ -1,6 +1,6 @@
 # Roadmap
 
-Where QRME goes from 2.8.0, and what 3.0.0 has to mean before it is
+Where QRME goes from 2.9.0, and what 3.0.0 has to mean before it is
 allowed to be called 3.0.0.
 
 This document reserves a band, not a schedule. Nine version numbers are
