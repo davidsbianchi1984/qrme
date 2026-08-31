@@ -149,9 +149,17 @@ def seed(db_path: str) -> dict:
     # at eight is the shape worth photographing. All three are in the
     # starter collection with a portrait and a field, so nothing here is
     # drawn that the product could not seat.
-    others = [by_handle(h) for h in ("dr_marcus_adeyemi",
-                                     "cmdr_ellen_park",
-                                     "chef_henri_laurent")]
+    # Three synthetic seats and the person, which leaves an empty chair.
+    #
+    #     asked     three users, or two and one empty frame
+    #     mattered  what a reader should take a room to look like
+    #
+    # It seeded six, which is a room the product can absolutely hold — and
+    # a rail beside an open frame then has to scroll, so every picture of
+    # the avatar and video formats had a scrollbar down its left and five
+    # faces you could not see. The room still seats eight; the pictures
+    # show the shape somebody actually meets.
+    others = [by_handle("dr_marcus_adeyemi")]
     # The account takes both starters.
     #
     #     asked     is there an avatar in the frame
@@ -233,7 +241,7 @@ def seed(db_path: str) -> dict:
         ("profile", lena,
          "And tell her you have done it. The waiting is most of what is "
          "wearing on her, not the appointment."),
-        ("profile", others[1],
+        ("profile", lena,
          "Write the date and the clerk's name down before you dial. Every "
          "checklist I ever wrote existed because somebody trusted their "
          "memory on the phone."),
@@ -269,7 +277,7 @@ def seed(db_path: str) -> dict:
     # sign-in, one grant that only looks and one that drives, because
     # the states this panel exists to tell apart are the states worth
     # having a picture of.
-    _reachable(conn, amara, others[0], others[1])
+    _reachable(conn, amara, lena, others[0])
 
     base = {
         "accountId": account,

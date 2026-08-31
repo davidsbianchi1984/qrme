@@ -1408,6 +1408,8 @@ NO_COLLECT_SUPPORT = "{app} does not support collecting context"
 CANNOT_RUN_ONBOARD_LLM = "{label} cannot run an onboard LLM"
 ROOM_ALLOWS_ONLY = ("a room allows an app, one of its capabilities, or a "
                     "skill — nothing else")
+ROOM_HAS_CLOSED = "this room has closed"
+PROFILE_NOT_IN_ROOM = "that profile is not in this room"
 
 #: Every template this module offers. Derived from the table below rather than
 #: repeated, so a template with no translations is impossible by construction.
@@ -7486,6 +7488,39 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'zh': '该档案不在这个房间里。',
         'hi': 'वह प्रोफ़ाइल इस कमरे में नहीं है।',
         'ar': 'هذا الملف ليس في هذه الغرفة.',
+    },
+    'nothing was said': {
+        'es': 'no se dijo nada.',
+        'fr': "rien n'a été dit.",
+        'de': 'es wurde nichts gesagt.',
+        'pt': 'não foi dito nada.',
+        'it': 'non è stato detto nulla.',
+        'ja': '何も言われていません。',
+        'zh': '什么也没说。',
+        'hi': 'कुछ कहा ही नहीं गया।',
+        'ar': 'لم يُقل شيء.',
+    },
+    'its owner has not given this profile hands — nobody in this room can grant that, and until they do there is nothing here to allow': {
+        'es': 'su propietario no le ha dado manos a este perfil: nadie en esta sala puede concederlo, y hasta que lo haga no hay nada aquí que permitir.',
+        'fr': "son propriétaire n'a pas donné de mains à ce profil — personne dans cette salle ne peut l'accorder, et tant que ce n'est pas fait il n'y a rien à autoriser ici.",
+        'de': 'der Besitzer hat diesem Profil keine Hände gegeben — das kann niemand in diesem Raum gewähren, und bis dahin gibt es hier nichts zu erlauben.',
+        'pt': 'o proprietário não deu mãos a este perfil — ninguém nesta sala pode conceder isso, e até que o faça não há aqui nada para permitir.',
+        'it': 'il proprietario non ha dato mani a questo profilo: nessuno in questa stanza può concederlo, e finché non lo fa qui non c\'è nulla da consentire.',
+        'ja': '所有者はこのプロフィールに手を与えていません。この部屋の誰にもそれは与えられず、与えられるまで許可できるものはありません。',
+        'zh': '它的所有者尚未赋予这个档案双手——这个房间里没有人能授予，在那之前这里没有什么可以允许的。',
+        'hi': 'इसके स्वामी ने इस प्रोफ़ाइल को हाथ नहीं दिए हैं — इस कमरे में कोई भी वह नहीं दे सकता, और तब तक यहाँ अनुमति देने को कुछ नहीं है।',
+        'ar': 'لم يمنح مالكه هذا الملف يدين — لا أحد في هذه الغرفة يستطيع منح ذلك، وحتى يفعل لا يوجد هنا ما يُسمح به.',
+    },
+    'this room has not allowed any of what its owner granted — tick a skill on this seat first, and the box is on this screen': {
+        'es': 'esta sala no ha permitido nada de lo que concedió su propietario: marca primero una habilidad en este asiento, y la casilla está en esta pantalla.',
+        'fr': "cette salle n'a autorisé rien de ce que son propriétaire a accordé — cochez d'abord une compétence sur ce siège, la case est sur cet écran.",
+        'de': 'dieser Raum hat nichts von dem erlaubt, was der Besitzer gewährt hat — hake zuerst eine Fähigkeit auf diesem Platz an, das Kästchen ist auf diesem Bildschirm.',
+        'pt': 'esta sala não permitiu nada do que o proprietário concedeu — marca primeiro uma competência neste lugar, e a caixa está neste ecrã.',
+        'it': 'questa stanza non ha consentito nulla di ciò che il proprietario ha concesso: spunta prima un\'abilità su questo posto, e la casella è su questo schermo.',
+        'ja': 'この部屋は所有者が与えたもののどれも許可していません。まずこの席のスキルにチェックを入れてください。その項目はこの画面にあります。',
+        'zh': '这个房间还没有允许其所有者授予的任何东西——请先在这个座位上勾选一项技能，选项就在这个屏幕上。',
+        'hi': 'इस कमरे ने उसके स्वामी द्वारा दी गई किसी भी चीज़ की अनुमति नहीं दी है — पहले इस सीट पर कोई कौशल टिक कीजिए, वह बॉक्स इसी स्क्रीन पर है।',
+        'ar': 'لم تسمح هذه الغرفة بأيّ ممّا منحه مالكه — ضع علامة على مهارة في هذا المقعد أولًا، والمربّع على هذه الشاشة.',
     },
     'this room has closed': {
         'es': 'esta sala ha cerrado.',

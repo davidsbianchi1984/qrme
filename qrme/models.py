@@ -400,6 +400,20 @@ class RoomRename(BaseModel):
     topic: str
 
 
+class RoomErrand(BaseModel):
+    """Words in a room, sent to one synthetic seat as an errand.
+
+    `platform` is where the hands land — the same vocabulary a reach
+    already takes. It defaults rather than being asked for, because the
+    person saying "check my calendar" is not choosing an operating
+    system.
+    """
+
+    profile_id: str
+    said: str
+    platform: str = "web"
+
+
 class RoomAllow(BaseModel):
     """One box, ticked or unticked, on one synthetic seat.
 

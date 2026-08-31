@@ -25,13 +25,15 @@ from fastapi import APIRouter, HTTPException, Request
 from .. import (auth, db, engagement, identity, inbox, llm, marketplace,
                 moderation, persona, referral, roommic, society, storage,
                 tiers, verification, watermark)
+from .. import hands
 from ..common import (age_of, clipped, interactor_or_404, profile_or_404,
                       require_interactor, require_owner_or_interactor,
                       source_items)
 from ..models import (
     HandoffCreate, ListingCreate, ListingPlace, MarketAssist, MarketPrefs,
     ProviderCreate, ReferralPrepare, ReferralRelease, ReferralReply,
-    RoomAllow, RoomCreate, RoomFace, RoomInvite, RoomMessage, RoomMicLend,
+    RoomAllow, RoomCreate, RoomErrand, RoomFace, RoomInvite, RoomMessage,
+    RoomMicLend,
     RoomRename,
     RoomSitOut,
 )
@@ -173,7 +175,7 @@ def _role(kind: str, ref_id: str) -> str | None:
     return field or None
 
 
-def _verified(kind: str, ref_id: str) -> bool:
+def _verified(kind: str, ref_id: str, room_id: str = "") -> bool:
     """Whether this seat's face is a checked likeness of a real person.
 
         asked     draw the verified mark on the sphere
@@ -186,29 +188,42 @@ def _verified(kind: str, ref_id: str) -> bool:
     to run without. A gold check that a surface draws from nothing is
     worse than no check at all.
 
-    A person's own seat follows the same fact by way of their account.
-    The mark is a claim about a LIKENESS, and the seat of somebody who
-    holds a checked likeness on this platform is the seat that carried
-    it when it was burned into the photograph. So: the account behind
-    the seat owns a profile with a verification record and a named
-    attestor. An interactor with no account, or an account with no
-    checked likeness, gets nothing — which is most of them.
+    A person's seat is marked from the PICTURE it is showing, which is
+    the only checkable fact on that tile.
+
+    The first rule here asked whether the account behind the seat owned a
+    profile with a verification record. That was a guess dressed as a
+    fact — it says something about a person's other profiles rather than
+    about the face on this seat — and it never once fired, which is how
+    guesses usually announce themselves.
+
+    The mark is a claim about a LIKENESS. A seat showing a photograph
+    that belongs to a verified profile is showing a checked likeness, and
+    that is exactly what the gold plate asserted when it was burned into
+    that file. So the question is: is this seat putting up
+    `/photos/<handle>.webp` for a handle whose profile carries a
+    verification record with a named attestor.
     """
     try:
         if kind == "profile":
             record = verification.status(ref_id)
             return bool(record.get("verified") and record.get("attestor"))
-        person = interactor_or_404(ref_id)
-        account = person.get("account_id")
-        if not account:
+        if not room_id:
             return False
-        owned = db.connect().execute(
-            "SELECT id FROM profiles WHERE owner_id=?", (account,)).fetchall()
-        for row in owned:
-            record = verification.status(row["id"])
-            if record.get("verified") and record.get("attestor"):
-                return True
-        return False
+        from .. import avatars, roomface
+
+        shown = roomface.showing_in(room_id).get("faces", {}).get(ref_id)
+        url = (shown or {}).get("media_url") or ""
+        prefix = f"{avatars.PHOTO_ROUTE}/"
+        if not (shown or {}).get("showing") == "photo" or not url.startswith(prefix):
+            return False
+        handle = url[len(prefix):].rsplit(".", 1)[0]
+        row = db.connect().execute(
+            "SELECT profile_id FROM handles WHERE handle=?", (handle,)).fetchone()
+        if row is None:
+            return False
+        record = verification.status(row["profile_id"])
+        return bool(record.get("verified") and record.get("attestor"))
     except Exception:
         return False
 
@@ -761,7 +776,7 @@ def create_room(body: RoomCreate) -> dict:
             {"kind": p.kind, "id": p.id,
              "display": _display(p.kind, p.id),
              "role": _role(p.kind, p.id),
-             "verified": _verified(p.kind, p.id)}
+             "verified": _verified(p.kind, p.id, room_id)}
             for p in body.participants
         ],
     }
@@ -816,7 +831,7 @@ def open_standing_room(key: str, request: Request,
                     {"kind": p["kind"], "id": p["ref_id"],
                      "display": _display(p["kind"], p["ref_id"]),
              "role": _role(p["kind"], p["ref_id"]),
-             "verified": _verified(p["kind"], p["ref_id"])}
+             "verified": _verified(p["kind"], p["ref_id"], room_id)}
                     for p in _participants(row["id"])
                 ],
             }
@@ -846,7 +861,7 @@ def open_standing_room(key: str, request: Request,
             {"kind": p["kind"], "id": p["ref_id"],
              "display": _display(p["kind"], p["ref_id"]),
              "role": _role(p["kind"], p["ref_id"]),
-             "verified": _verified(p["kind"], p["ref_id"])}
+             "verified": _verified(p["kind"], p["ref_id"], room_id)}
             for p in _participants(room_id)
         ],
     }
@@ -894,7 +909,7 @@ def join_room(room_id: str, request: Request) -> dict:
             {"kind": p["kind"], "id": p["ref_id"],
              "display": _display(p["kind"], p["ref_id"]),
              "role": _role(p["kind"], p["ref_id"]),
-             "verified": _verified(p["kind"], p["ref_id"])}
+             "verified": _verified(p["kind"], p["ref_id"], room_id)}
             for p in _participants(room_id)
         ],
         # The invites still standing — so the press that asked somebody in
@@ -1082,7 +1097,7 @@ def accept_room_invite(room_id: str, body: RoomInvite,
             {"kind": p["kind"], "id": p["ref_id"],
              "display": _display(p["kind"], p["ref_id"]),
              "role": _role(p["kind"], p["ref_id"]),
-             "verified": _verified(p["kind"], p["ref_id"])}
+             "verified": _verified(p["kind"], p["ref_id"], room_id)}
             for p in _participants(room_id)
         ],
     }
@@ -1151,6 +1166,42 @@ def set_room_reach(room_id: str, body: RoomAllow, request: Request) -> dict:
         raise HTTPException(422, i18n.ROOM_ALLOWS_ONLY)
     return roomreach.allow(room_id, body.profile_id, body.kind,
                            body.key, body.allowed, who)
+
+
+@router.post("/rooms/{room_id}/errand", status_code=201)
+def room_errand(room_id: str, body: RoomErrand, request: Request) -> dict:
+    """Tell a seat to go and do something, in the room's own words.
+
+    The other half of the two keys. `/reach` decides what a profile in
+    this room MAY do; this spends it — the person asks out loud, and the
+    profile puts its hands on a surface under an authority its owner
+    already wrote and this room already ticked.
+
+    Nothing here grants. A person in a room can ask a profile they do not
+    own to act for them, and cannot thereby obtain anything its owner did
+    not write down: `roomerrand.send` can only pick among grants that
+    pass both keys, and narrows again by what the words name.
+
+    In-room only, and the asker is named on the reach — an errand a
+    profile ran for somebody has to say for whom.
+    """
+    room = _room_or_404(room_id)
+    if room["status"] != "active":
+        raise HTTPException(409, i18n.ROOM_HAS_CLOSED)
+    who = _require_in_room(room_id, request)
+    from .. import roomerrand
+
+    seated = {p["ref_id"] for p in _participants(room_id)
+              if p["kind"] == "profile"}
+    if body.profile_id not in seated:
+        raise HTTPException(404, i18n.PROFILE_NOT_IN_ROOM)
+    try:
+        return roomerrand.send(room_id, body.profile_id, body.said, who,
+                               platform=body.platform)
+    except roomerrand.ErrandError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
+    except hands.HandError as exc:
+        raise HTTPException(exc.status, i18n.raised(exc)) from None
 
 
 # --- what your box holds -----------------------------------------------------

@@ -5510,6 +5510,22 @@ export const api = {
    * `/faces` is: a permission each person sees a different version of is
    * a room where nobody can say what is allowed.
    */
+  /** Tell a seat to go and do something, in the room's own words.
+   *
+   * The other half of the two keys: `/reach` decides what a profile in
+   * this room may do, this spends it. Nothing here grants — the errand
+   * can only pick among grants the owner already wrote and this room
+   * already ticked, and narrows again by what the words name.
+   */
+  roomErrand: (roomId: string, profileId: string, said: string,
+               token: string) =>
+    req<{ id: string; mode: string; grant_id: string; eyes_only: boolean;
+          asked_by: string; room_id: string }>(
+      `/rooms/${roomId}/errand`, {
+        method: "POST", token,
+        body: { profile_id: profileId, said },
+      }),
+
   roomReach: (roomId: string, token: string) =>
     req<RoomReach>(`/rooms/${roomId}/reach`, { token }),
   allowRoomReach: (roomId: string, profileId: string,

@@ -404,6 +404,13 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
    *  on this screen, and the fourth name collision in this file would
    *  have compiled and quietly opened a photograph. */
   const [openSeat, setOpenSeat] = useState<string | null>(null);
+  /** What is typed into each seat's errand box, and what came back.
+   *
+   * Kept per seat rather than one shared field: only one seat is open at
+   * a time, but a half-typed errand should still be there when you open
+   * that seat again rather than having quietly become somebody else's. */
+  const [errand, setErrand] = useState<Record<string, string>>({});
+  const [sent, setSent] = useState<Record<string, string>>({});
   /** Seats this session has befriended, so the button can say so. Not
    *  read back from the server: befriending is the owner's list and the
    *  room does not hold it, so what this remembers is what happened
@@ -898,6 +905,29 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
     api.addFriend(mine, profileId, befriendAs)
        .then(() => setFriended((was) => new Set(was).add(profileId)))
        .catch(setError)
+       .finally(() => setBusy(false));
+  }
+
+  /** Send what was typed to that seat as an errand.
+   *
+   * The answer is shown on the seat rather than raised as an error,
+   * because both outcomes are things the person asked for and needs to
+   * read: what opened, or which of the two keys is missing. A refusal
+   * here is not a fault — it is the permission model answering.
+   */
+  function sendErrand(profileId: string) {
+    const said = (errand[profileId] || "").trim();
+    if (!token || !open || !said) return;
+    setBusy(true);
+    api.roomErrand(open, profileId, said, token)
+       .then((r) => {
+         setErrand((m) => ({ ...m, [profileId]: "" }));
+         setSent((m) => ({ ...m, [profileId]:
+           r.eyes_only ? tr("ins.errand.watching", lang)
+                       : tr("ins.errand.acting", lang) }));
+       })
+       .catch((e) => setSent((m) => ({
+         ...m, [profileId]: (e && e.message) || String(e) })))
        .finally(() => setBusy(false));
   }
 
@@ -3769,6 +3799,41 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                 </div>
                 {openSeat === who.profile_id && (
                   <div className="rr-body">
+                    {/* Say it, and it goes.
+                     *
+                     *     asked     the profiles with connections should be
+                     *               verbally commanded or prompted to take
+                     *               action — cursor, screen, eyes, hands
+                     *     mattered  a permission nobody can spend does
+                     *               nothing
+                     *
+                     * Directly under the boxes that decided what this seat
+                     * may reach, because the two are one thought: you
+                     * allow, then you ask. The words never widen anything
+                     * — the errand can only spend a grant its owner wrote
+                     * and this room ticked, and the refusal says which of
+                     * the two is missing. */}
+                    <form className="rr-say"
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            sendErrand(who.profile_id);
+                          }}>
+                      <input value={errand[who.profile_id] || ""}
+                             placeholder={tr("ins.errand.ph", lang)}
+                             aria-label={tr("ins.errand.ph", lang)}
+                             onChange={(e) => setErrand((m) => ({
+                               ...m, [who.profile_id]: e.target.value }))} />
+                      <button type="submit" className="chip"
+                              disabled={busy
+                                        || !(errand[who.profile_id] || "").trim()}>
+                        {tr("ins.errand.send", lang)}
+                      </button>
+                    </form>
+                    {sent[who.profile_id] && (
+                      <p className="rr-sent muted small" role="status">
+                        {sent[who.profile_id]}
+                      </p>
+                    )}
                     <div className="rr-kind muted small">
                       {tr("ins.reach.hands.kind", lang)}
                     </div>

@@ -193,3 +193,4 @@ GET /video/direction/{profile_id}/log
 # very backlog while building nothing, which is what this file exists to stop.
 GET /rooms/{room_id}/reach
 PUT /rooms/{room_id}/reach
+POST /rooms/{room_id}/errand

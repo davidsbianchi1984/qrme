@@ -4062,104 +4062,86 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   }
 }
 
-/* The two marks, on the sphere rather than in the photograph.
+/* The two marks, drawn over the ones the photographs already carry.
  *
- *     asked     the AI and VERIFIED labels go on top of the profile
- *               photo sphere, not on the photo — same location, bumped
- *               to the outermost layer
- *     mattered  a circle was cutting both of them in half
+ *     asked     use the original photos and add a black glyph, same size
+ *               same colour, on the outermost layer rendering on top of
+ *               the profile photo
+ *     mattered  the photograph is the thing; the mark is not
  *
- * They were burned into the pixels: `AI` in the top-right corner of
- * every portrait, `VERIFIED` in the bottom-right of the one photograph
- * of a real person, so the mark would survive the file being hotlinked
- * or saved. Every face in this product is drawn as a CIRCLE, and a mark
- * in the corner of a square is exactly what a circle crops — so both
- * shipped sliced through the middle, reading as a rendering fault
- * instead of as a claim.
+ * The first attempt took the marks OFF the images — reproduced each
+ * marking tool's geometry as a mask and reconstructed what was under it.
+ * That was the wrong repair. An inpaint over a region that size is a
+ * guess, and it showed: mirrored hair against a scalp that no longer
+ * meets itself, visible at the top right of every face whose hair
+ * reached the corner. A photograph edited to remove a label is a damaged
+ * photograph, and the label was never the problem.
  *
- * Off the files (`tools/unmark_faces.py`) and onto the surface, in the
- * same two corners, on a layer nothing crops.
+ * The problem was only that a circle crops the corner of a square. So
+ * the originals come back untouched, and the mark is drawn again on the
+ * outermost layer — the same box, in the same place, in the same
+ * colours — where nothing clips it. It covers the burned one exactly and
+ * completes the half the circle was cutting off.
  *
- * Sitting ON the edge rather than inside it: "it overlaps a little bit
- * and hangs off the sphere at the very end of it." So each chip's centre
- * is placed at the circle's own radius — 60px out from the middle of a
- * 120px face — which puts half the pill on the photograph and half in
- * the air beside it. The AI mark takes the top-right at 45°; the gold
- * check takes the bottom, swung right, where the burned plate sat.
+ * Every number below is measured from the two marking tools rather than
+ * eyeballed, as a fraction of the image, so the overlay lands on the burn
+ * at any face size:
  *
- * The rule this follows is written down in `docs/media-provenance.md`. */
+ *     AI        left 56.2500%  top  3.5156%  w 40.2344%  h 18.9453%
+ *     VERIFIED  left 29.6875%  top 81.4453%  w 66.7969%  h 15.0391%
+ *
+ * At the room's 120px face, with the portrait's left edge at
+ * `50% - 96px` (its centre sits 36px left of the tile's middle, and its
+ * radius is 60), that resolves to the values here. */
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-ai,
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-real {
   position: absolute;
-  transform: translate(-50%, -50%);
+  transform: none;
   z-index: 6;
   pointer-events: none;
   white-space: nowrap;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
-/* The same black pill the portraits used to carry, in the same corner —
-   near-black plate, white sparkle, white letters. Nothing about the mark
-   changes; only the layer it is drawn on. */
+/* The dark pill, in the burn's own colours: plate rgba(9,7,24,205/255),
+   sparkle and letters at rgba(255,255,255,235/255). */
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-ai {
-  left: calc(50% + 6px); top: 30px;
-  font-size: 9px; letter-spacing: .06em; font-weight: 800;
-  color: #ffffff; background: rgba(9, 7, 24, .82);
-  border: 1px solid rgba(255, 255, 255, .18);
-  padding: 3px 8px; border-radius: 999px;
+  left: calc(50% - 28.5px); top: 16.2px;
+  width: 48.3px; height: 22.7px;
+  font-size: 13.8px; font-weight: 700; letter-spacing: 0;
+  color: rgba(255, 255, 255, .92);
+  background: rgba(9, 7, 24, .804);
+  border: none; padding: 0;
+  border-radius: 11.35px;
 }
-.screen.room-place > .card.room-stage > .room-scene > .rs-tile
-  > .rs-ai::before { color: #ffffff; }
-/* The gold check, drawn as the photograph drew it: a dark plate so it
-   stays legible over a light shoulder and a dark backdrop alike. */
+/* The gold plate: ground rgba(24,18,4,214/255), a two-pixel gold edge,
+   tick and letters in the lighter gold. */
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-real {
-  left: calc(50% - 2px); top: 121px;
-  font-size: 8px; letter-spacing: .07em; font-weight: 800;
-  color: #f7d87a; background: rgba(24, 18, 4, .86);
-  border: 1px solid #d4a83a;
-  padding: 3px 7px; border-radius: 999px;
+  left: calc(50% - 60.4px); top: 109.7px;
+  width: 80.2px; height: 18.0px;
+  font-size: 10.3px; font-weight: 700; letter-spacing: 0;
+  color: #f7d87a;
+  background: rgba(24, 18, 4, .839);
+  border: 2px solid #d4a83a;
+  padding: 0;
+  border-radius: 9px;
 }
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile
   > .rs-real::before { content: "\2713\00a0"; }
 @media (max-width: 719px) {
+  /* A 104px face, with the portrait's left edge at `50% - 82px`. */
   .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-ai {
-    left: calc(50% + 7px); top: 27px;
+    left: calc(50% - 23.5px); top: 15.7px;
+    width: 41.8px; height: 19.7px; font-size: 12px;
+    border-radius: 9.85px;
   }
   .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-real {
-    left: calc(50% - 1px); top: 107px;
+    left: calc(50% - 51.1px); top: 96.7px;
+    width: 69.5px; height: 15.6px; font-size: 8.9px;
+    border-radius: 7.8px;
   }
-}
-
-/* The side dock stands down inside a room.
- *
- *     asked     everything is hidden under the menu tab in the room
- *     mattered  one thing was neither hidden nor visible
- *
- * `.chat-rail-dock` — the talk rail and the room picker — lives against
- * the right edge of the screen. With the room card taking the window it
- * was pinned behind that card's edge, showing about fifty pixels of
- * every label: "me...", "h...", "Dr.", "hef". Measured by asking the
- * page what was under that strip, rather than by guessing at the shapes.
- *
- * It is a way of moving BETWEEN rooms, which is not something somebody
- * standing in one is doing, and the menu already holds it. */
-.app.in-room .chat-rail-dock { display: none; }
-
-/* ---- The room's permission window --------------------------------------- */
-
-/* A window you open, under a room that fills the screen.
- *
- *     asked     the purple box is another copy of what has been said —
- *               make it a window you can close and open, of all the
- *               synthetic profiles in the chat, their connections and
- *               skills, with boxes to tick and allow
- *     mattered  a permission has to be readable at a glance
- *
- * One row per box, the checkbox first, the name of the thing next to it.
- * Nothing decorative: somebody deciding whether a synthetic person may
- * drive their keyboard is reading, not browsing. */
-.rr-open {
-  background: none; border: none; padding: 0; cursor: pointer;
-  font: inherit; color: inherit; letter-spacing: inherit;
 }
 .rr-who { margin: 10px 0 0; }
 .rr-name {
@@ -4235,3 +4217,145 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 }
 .rs-hear:hover { opacity: 1; }
 .rs-hear:disabled { cursor: not-allowed; opacity: .35; }
+/* Say it, on the seat you just gave permission to. One line: the box and
+   the press, sitting above the lists that decided what it may reach. */
+.rr-say { display: flex; gap: 8px; align-items: center; padding: 4px 0 6px; }
+.rr-say input {
+  flex: 1 1 auto; min-width: 0;
+  padding: 6px 10px; font-size: 12.5px;
+  color: var(--text, #e8eaf6); background: rgba(5,7,15,0.6);
+  border: 1px solid var(--line); border-radius: 999px;
+}
+.rr-say button { flex: 0 0 auto; }
+.rr-sent { margin: 0 0 6px; }
+
+/* ---- The frame is the point of an avatar room -------------------------- */
+
+/* A box that can hold a whole figure.
+ *
+ *     asked     this turn as a figure should be its normal size, one that
+ *               can contain an entire video or avatar — and you cannot
+ *               reach the expand button, only half of it shows
+ *     mattered  which row of the card was taking the height
+ *
+ * Measured rather than guessed. The stage card is a GRID here, not the
+ * flex column the audio format turned it into, and its three rows came
+ * out `38px 476px 234px` inside an 828px card: the heading, the rail and
+ * frame, and the strip. The frame was handed 476 of 828 because its row
+ * is auto-sized and the strip's log had grown to 234 — so the figure was
+ * drawn into two-thirds of the space it needed and the controls under it
+ * fell past the card's edge.
+ *
+ * The middle row takes what is left now, which is what `1fr` is for, and
+ * the log goes back to being a glance. The audio format is untouched: it
+ * has no frame, its seats are the screen, and there the log SHOULD have
+ * the leftover. */
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats) {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  .rs-chatlog {
+  max-height: 96px; flex: 0 0 auto;
+}
+
+/* The rail beside it is a rail, not a column that scrolls forever.
+ *
+ * Nine seats stacked in a 250px column came to 1446px of scrollHeight in
+ * a 476px box — a scrollbar down the left of the room, and seven faces
+ * you have to drag to see. Two across, and the tiles shrink to suit:
+ * a rail is meant to be glanceable beside the frame, and the frame is
+ * what somebody is looking at. */
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: min-content;
+  align-content: start;
+  gap: 8px;
+}
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile,
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-empty {
+  min-height: 0; height: auto; padding: 8px 6px;
+}
+/* A rail's face is smaller than a room's face, and its roads go with it.
+   The seat still says who it is; it is just not the thing being looked
+   at. */
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-circle-btn.rs-solo,
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-empty > .rs-blank,
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-face,
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-photo,
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-live,
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-oncam,
+/* A put-up picture is sized here too. It draws through `.rs-fullbleed`,
+   which the audio round pinned to 120px — so on the rail one seat kept a
+   room-sized face while the rest were 72, and the gold plate burned into
+   that photograph showed clipped underneath an overlay measured for a
+   different size. */
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-photo.rs-fullbleed {
+  width: 72px; height: 72px;
+}
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile {
+  padding-right: 6px;
+}
+/* The two roads stand down on the rail: they are how you CHOOSE a format,
+   and the rail only exists once one is chosen. The marks do not — a mark
+   is drawn wherever the face is, at whatever size the face is.
+
+   The overlay has to scale with it or the burn shows through underneath,
+   clipped, which is the whole defect this covers. Same fractions as the
+   120px face, resolved for 72: the circle's left edge sits at
+   `50% - 39px` here, because the tile keeps only a 6px lane. */
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-side {
+  display: none;
+}
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-ai {
+  left: calc(50% + 1.5px); top: 10.5px;
+  width: 29px; height: 13.6px;
+  font-size: 8.3px; border-radius: 6.8px;
+}
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-real {
+  left: calc(50% - 17.6px); top: 66.6px;
+  width: 48.1px; height: 10.8px;
+  font-size: 6.2px; border-width: 1px; border-radius: 5.4px;
+}
+
+/* The way out is not under the visitor counter.
+ *
+ *     asked     the footsteps button might be blocking the little red X
+ *     mattered  they are seven pixels apart and it is on the higher layer
+ *
+ * Measured: the chip sits at y 6–23 and the ✕ at y 30–62, both against
+ * the right edge, both the same width, and the chip stacks at 90 to the
+ * door's 85. They do not literally overlap, which is why this survived a
+ * guard — but a door with a counter resting on it, on the layer above,
+ * is a door people report as blocked, and they are right to.
+ *
+ * A room owns the window, so the count of who holds an account here is
+ * not something the room needs. It stands down, like the drawer and the
+ * side dock, and the corner belongs to the way out. */
+.app.in-room .footsteps { display: none; }
+
+/* The side dock stands down inside a room.
+ *
+ * Re-stated here because it was written once and lost: the rule lived in
+ * the round that gave the room the window, and came back as fifty pixels
+ * of every label — "me...", "h...", "Dr.", "Chef" — down the right-hand
+ * edge, pinned behind the room card. `.talk-rail` and
+ * `.room-dock-picker` are both fixed children of it, so hiding the dock
+ * takes both.
+ *
+ * It is a way of moving BETWEEN rooms, which is not what somebody
+ * standing in one is doing, and the menu already holds it. */
+.app.in-room .chat-rail-dock { display: none; }

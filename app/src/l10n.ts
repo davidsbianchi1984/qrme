@@ -8988,6 +8988,22 @@ const CHROME: Table = {
   "ins.hear": {
     en: "Hear this", es: "Escuchar esto", fr: "Écouter", de: "Das anhören", pt: "Ouvir isto", it: "Ascolta", ja: "これを聞く", zh: "听这条", hi: "यह सुनिए", ar: "استمع إلى هذا",
   },
+  // Saying it out loud, on the seat you just gave permission to.
+  "ins.errand.ph": {
+    en: "Ask them to do something…", es: "Pídeles que hagan algo…", fr: "Demandez-leur de faire quelque chose…", de: "Bitte sie, etwas zu tun…", pt: "Peça-lhes que façam algo…", it: "Chiedi loro di fare qualcosa…", ja: "何かを頼む…", zh: "让他们做点什么……", hi: "उनसे कुछ करने को कहिए…", ar: "اطلب منهم فعل شيء…",
+  },
+  "ins.errand.send": {
+    en: "Ask", es: "Pedir", fr: "Demander", de: "Bitten", pt: "Pedir", it: "Chiedi", ja: "頼む", zh: "请求", hi: "कहिए", ar: "اطلب",
+  },
+  // What opened, in the words for what it can actually do. The two are
+  // never the same thing, and a person who asked for one and got the
+  // other has to be told on the spot.
+  "ins.errand.watching": {
+    en: "Watching — it can read the screen and tell you, nothing more.", es: "Observando: puede leer la pantalla y contártelo, nada más.", fr: "En observation — il peut lire l'écran et vous le dire, rien de plus.", de: "Beobachtend — es kann den Bildschirm lesen und es dir sagen, mehr nicht.", pt: "A observar — pode ler o ecrã e contar-te, nada mais.", it: "In osservazione: può leggere lo schermo e dirtelo, nulla di più.", ja: "見ているだけ — 画面を読んで伝えることしかできません。", zh: "只是观看——它能读屏幕并告诉你，仅此而已。", hi: "देख रहा है — यह स्क्रीन पढ़कर बता सकता है, इससे अधिक नहीं।", ar: "يشاهد فقط — يمكنه قراءة الشاشة وإخبارك، لا أكثر.",
+  },
+  "ins.errand.acting": {
+    en: "Its hands are on it — cursor and keyboard, inside what you allowed.", es: "Tiene las manos puestas: cursor y teclado, dentro de lo que permitiste.", fr: "Il y a mis les mains — curseur et clavier, dans les limites autorisées.", de: "Es hat die Hände daran — Zeiger und Tastatur, innerhalb des Erlaubten.", pt: "Tem as mãos nisso — cursor e teclado, dentro do que permitiste.", it: "Ci ha messo le mani: cursore e tastiera, entro ciò che hai consentito.", ja: "手を動かしています — 許可した範囲でカーソルとキーボードを。", zh: "它已经动手了——光标与键盘，都在你允许的范围内。", hi: "इसके हाथ लग चुके हैं — कर्सर और कीबोर्ड, आपकी अनुमति के भीतर।", ar: "بدأ العمل — المؤشر ولوحة المفاتيح، ضمن ما سمحت به.",
+  },
   "ins.reach": {
     en: "What they can reach", es: "Lo que pueden alcanzar", fr: "Ce qu'ils peuvent atteindre", de: "Worauf sie zugreifen können", pt: "O que podem alcançar", it: "Cosa possono raggiungere", ja: "彼らが手を伸ばせるもの", zh: "他们能触及的东西", hi: "वे किस तक पहुँच सकते हैं", ar: "ما يمكنهم الوصول إليه",
   },
