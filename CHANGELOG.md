@@ -6,6 +6,83 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.2] - 2026-08-31
+
+### Fixed
+
+- **The video road could not be chosen at all.** Pressing *Video
+  generation* on the Identity screen lit the button, showed the options
+  for an instant, and snapped back to *Profile photo*. Reported three
+  times — "it comes in and out too quick and goes away", "shows up for a
+  split second... goes right back to avatars" — and chased twice as a
+  layout fault, which it was not.
+
+  `req` in `app/src/api.ts` serialises the body it is given. Three
+  callers handed it a body they had already serialised, so what went on
+  the wire was the JSON *of a string*; FastAPI parsed it to a `str`,
+  found no fields, and answered 422 every time:
+
+      {"detail":[{"type":"model_attributes_type","loc":["body"],
+        "msg":"Input should be a valid dictionary or object..."}]}
+
+  All three were the video road — setting the road, amending the scene
+  direction, and starting a render — so the whole feature was
+  unreachable from the console however it was configured. The screen hid
+  it well: `chooseRoad` sets the road optimistically, the POST fails, and
+  the catch re-reads the server and puts the road back. What a person
+  sees is a button that will not stay pressed.
+
+  Found by driving the screen and watching the network rather than by
+  reading it; the call sites look entirely ordinary. A guard now refuses
+  any `req` caller that stringifies its own body, and pins the rule it
+  depends on — that `req` still stringifies — so the premise cannot
+  quietly invert.
+
+- **The road's panel opens where it was pressed.** The two panels share
+  one drawer with its own ground and a notch pointing back at the button
+  row, and choosing a road scrolls it into view. The markup order was
+  never wrong; the panel simply opened below the fold, which is the other
+  half of why it read as vanishing.
+
+- **The room stops holding empty bands on a phone.** Measured in the
+  live page: the card is a fixed 860px flex column and the seats were
+  getting 194 of it — a row and a half of faces. The transcript reserve
+  came down from five rows to three (it is fixed on purpose, so the
+  buttons below it do not travel as the conversation grows — an earlier
+  field report), the frame from 263 to 200, the strip from 52 to 32, and
+  a 62px reservation for a chat strip that no longer hovers was released.
+  The seats take the slack: 336px, two full rows with the third in
+  sight, so two people and the ＋ are visible without scrolling.
+
+  `aspect-ratio: 4/3` was setting the frame's height rather than
+  `min-height`, so the first cap sailed under a `32vh` limit without ever
+  biting.
+
+- **The verified photograph is a photograph.** `photos/` is the file
+  behind the VERIFIED badge, and it carried a burned-in gold plate that
+  doubled with the one every surface now draws. Every version in this
+  repository's history was checked and all of them were marked, so the
+  file had to be replaced rather than recovered. The new one is plain —
+  no burn, no filter, no synthetic backdrop, no burned-in text.
+
+- **The ears refuse in a person's words.** "This deployment has no
+  transcription service... set QRME_EARS_URL", shown in red beside a room
+  where the voices were playing, read as the whole audio path failing.
+  Dictation and playback are separate doors and only one was shut, so the
+  body says that now and the variable moved to an `X-QRME-Fix` header,
+  where an operator fact belongs.
+
+### Added
+
+- **A starter stops wearing a face this deployment minted.** `_backfill`
+  fills a face that is missing and cannot reach one nobody chose.
+  `_restore_face` acts only on evidence — a registry row with no owner
+  account and a source of `seeded` or `prompted` — and runs at startup
+  rather than behind the seed button. A path-based heuristic was tried
+  and removed: an existing guard broke on it, correctly, because reading
+  a path and inferring intent is a guess, and this is the one place where
+  a wrong guess destroys somebody's picture.
+
 ## [2.9.1] - 2026-08-31
 
 ### Added
@@ -16896,7 +16973,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.2...HEAD
+[2.9.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.1...app-v2.9.2
 [2.9.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.0...app-v2.9.1
 [2.9.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.8.0...app-v2.9.0
 [2.8.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.7.1...app-v2.8.0

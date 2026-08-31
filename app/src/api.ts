@@ -1097,8 +1097,30 @@ export interface ShopOrder {
   title: string; kind: string;
 }
 
+/** One call to the backend.
+ *
+ *     asked     video is selected but nothing happens
+ *     mattered  `body` is an OBJECT here, and three callers handed it a
+ *               string
+ *
+ * `body` is serialised below — `JSON.stringify(opts.body)` — so a caller
+ * that stringifies first sends the JSON *of a string*, FastAPI parses it
+ * to a `str` rather than a dict, and every one of them answered 422:
+ * "Input should be a valid dictionary or object to extract fields from".
+ *
+ * Three did it, and all three were the video road: setting the road,
+ * amending the scene direction, and starting a render. So the road could
+ * not be chosen, which is why pressing it lit up and snapped back — the
+ * screen sets the road, the POST fails, and the catch re-reads the
+ * server and puts it back the way it was. It looked like a display bug
+ * and read as one for three rounds.
+ *
+ * Caught by driving the screen and watching the network, not by reading
+ * the code: the call site looks completely ordinary.
+ */
 async function req<T>(
   path: string,
+  // An object, not a string — this function stringifies it. See above.
   opts: { method?: string; body?: unknown; token?: string; claim?: string } = {},
 ): Promise<T> {
   const headers: Record<string, string> = { "content-type": "application/json" };
@@ -5116,7 +5138,7 @@ export const api = {
                 surface: "window" | "fullscreen" = "window") =>
     req<{ direction: string; was: string; asked: string }>(
       `/video/direction/${profileId}`,
-      { method: "POST", body: JSON.stringify({ asked, surface }) }),
+      { method: "POST", body: { asked, surface } }),
   /** What was asked of this scene, newest first — so somebody who has
    *  amended five times can see which request caused the thing they now
    *  dislike, rather than only where they ended up. */
@@ -5151,8 +5173,7 @@ export const api = {
           providers: string[] }>(
       `/video/road/${profileId}`,
       { method: "POST",
-        body: JSON.stringify({ road, daily_seconds: dailySeconds,
-                               provider }) }),
+        body: { road, daily_seconds: dailySeconds, provider } }),
   /** The most recent render for this profile, however it ended.
    *
    *  Asked on opening a conversation, because a render outlives the page
@@ -5174,7 +5195,7 @@ export const api = {
           provider: string; seconds?: number; waited?: number;
           wait_seconds?: number }>("/video/render", {
       method: "POST",
-      body: JSON.stringify({ prompt, shape, wait, profile_id: profileId }),
+      body: { prompt, shape, wait, profile_id: profileId },
     }),
   /** A photograph becomes this profile's face — geometry, skin and a
    *  mouth — built on the deployment's own hardware. `shot` says how
