@@ -701,20 +701,11 @@ const CHROME: Table = {
   "idn.forge.sub": {
     en: "Your own photograph, with a mouth that moves when it speaks. Measured here, on this deployment's own machine — nothing is redrawn, so it goes on looking exactly like you. No provider account, nothing to subscribe to.", es: "Tu propia fotografía, con una boca que se mueve al hablar. Medida aquí, en la máquina de esta instalación: no se redibuja nada, así que sigue siendo idéntica a ti. Sin cuenta de proveedor, sin suscripción.", fr: "Votre propre photographie, avec une bouche qui bouge quand elle parle. Mesurée ici, sur la machine de ce déploiement — rien n'est redessiné, elle continue donc de vous ressembler exactement. Aucun compte fournisseur, rien à souscrire.", de: "Dein eigenes Foto, mit einem Mund, der sich beim Sprechen bewegt. Hier vermessen, auf der Maschine dieser Installation — nichts wird neu gezeichnet, also siehst du weiterhin genau aus wie du. Kein Anbieterkonto, kein Abo.", pt: "A tua própria fotografia, com uma boca que se mexe ao falar. Medida aqui, na máquina desta instalação — nada é redesenhado, por isso continua igualzinha a ti. Sem conta de fornecedor, sem subscrição.", it: "La tua fotografia, con una bocca che si muove quando parla. Misurata qui, sulla macchina di questa installazione — nulla viene ridisegnato, quindi continua a somigliarti esattamente. Nessun account fornitore, nessun abbonamento.", ja: "あなた自身の写真に、話すと動く口をつけます。この配備自身のマシンで計測するだけ — 描き直しは一切ないので、あなたのままです。プロバイダのアカウントも定期購入も不要です。", zh: "你自己的照片，配上说话时会动的嘴。就在本部署自己的机器上完成测量 — 什么都不会重画，所以看起来仍然完全是你。无需服务商账号，无需订阅。", hi: "आपकी अपनी फ़ोटो, जिसमें बोलते समय मुँह हिलता है। यहीं, इसी परिनियोजन की मशीन पर मापा जाता है — कुछ भी दोबारा नहीं बनाया जाता, इसलिए यह बिलकुल आप ही दिखते रहते हैं। न प्रदाता खाता, न सदस्यता।", ar: "صورتك أنت، بفم يتحرك عند الكلام. تُقاس هنا على جهاز هذا النشر نفسه — لا يُعاد رسم شيء، فتظل أنت تمامًا. بلا حساب مزوّد وبلا اشتراك.",
   },
-  "ins.format": {
-    en: "How this room looks to you", es: "Cómo ves tú esta sala", fr: "L'aspect de ce salon pour vous", de: "Wie dieser Raum für dich aussieht", pt: "Como esta sala aparece para você", it: "Come vedi tu questa stanza", ja: "この部屋のあなたの見え方", zh: "这个房间在你这边的样子", hi: "यह कमरा आपको कैसा दिखता है", ar: "كيف تبدو لك هذه الغرفة",
-  },
-  "ins.format.audio": {
-    en: "Audio", es: "Audio", fr: "Audio", de: "Audio", pt: "Áudio", it: "Audio", ja: "音声", zh: "音频", hi: "ऑडियो", ar: "صوت",
-  },
   "ins.format.avatar": {
     en: "Avatar", es: "Avatar", fr: "Avatar", de: "Avatar", pt: "Avatar", it: "Avatar", ja: "アバター", zh: "虚拟形象", hi: "अवतार", ar: "أفاتار",
   },
   "ins.format.video": {
     en: "Video", es: "Vídeo", fr: "Vidéo", de: "Video", pt: "Vídeo", it: "Video", ja: "映像", zh: "视频", hi: "वीडियो", ar: "فيديو",
-  },
-  "ins.format.sub": {
-    en: "This is your screen. Nobody else's changes.", es: "Esta es tu pantalla. La de los demás no cambia.", fr: "C'est votre écran. Celui des autres ne change pas.", de: "Das ist dein Bildschirm. Der der anderen ändert sich nicht.", pt: "Esta é a sua tela. A dos outros não muda.", it: "Questo è il tuo schermo. Quello degli altri non cambia.", ja: "これはあなたの画面です。ほかの人の画面は変わりません。", zh: "这是你的画面。别人的不会改变。", hi: "यह आपकी स्क्रीन है। किसी और की नहीं बदलती।", ar: "هذه شاشتك أنت. شاشة الآخرين لا تتغيّر.",
   },
   "ins.film.ai": {
     en: "AI-generated", es: "Generado por IA", fr: "Généré par IA", de: "KI-generiert", pt: "Gerado por IA", it: "Generato dall'IA", ja: "AI生成", zh: "AI 生成", hi: "AI से बनाया गया", ar: "من إنتاج الذكاء الاصطناعي",
@@ -742,6 +733,33 @@ const CHROME: Table = {
   },
   "ins.seat.room": {
     en: "{left} seats left", es: "Quedan {left} asientos", fr: "{left} places restantes", de: "Noch {left} Plätze frei", pt: "Restam {left} lugares", it: "Restano {left} posti", ja: "残り{left}席", zh: "还剩 {left} 个座位", hi: "{left} सीटें बाकी", ar: "بقي {left} مقعدًا",
+  },
+  "ins.bar.present": {
+    en: "· {count} present", es: "· {count} presentes", fr: "· {count} présents", de: "· {count} anwesend", pt: "· {count} presentes", it: "· {count} presenti", ja: "・{count}人", zh: "· {count} 人在场", hi: "· {count} मौजूद", ar: "· {count} حاضرون",
+  },
+  "ins.mode.audio": {
+    en: "Audio · profile photo", es: "Audio · foto de perfil", fr: "Audio · photo de profil", de: "Audio · Profilbild", pt: "Áudio · foto de perfil", it: "Audio · foto profilo", ja: "音声・プロフィール写真", zh: "音频 · 头像", hi: "ऑडियो · प्रोफ़ाइल फ़ोटो", ar: "صوت · صورة الملف",
+  },
+  "ins.mode.avatar": {
+    en: "Avatar · in three dimensions", es: "Avatar · en tres dimensiones", fr: "Avatar · en trois dimensions", de: "Avatar · dreidimensional", pt: "Avatar · em três dimensões", it: "Avatar · in tre dimensioni", ja: "アバター・立体", zh: "虚拟形象 · 三维", hi: "अवतार · त्रि-आयामी", ar: "أفاتار · مجسّم",
+  },
+  "ins.mode.video": {
+    en: "Video · this turn's footage", es: "Vídeo · las imágenes de este turno", fr: "Vidéo · les images de ce tour", de: "Video · Aufnahmen dieses Zugs", pt: "Vídeo · as imagens desta vez", it: "Video · le immagini di questo turno", ja: "映像・この発言の記録", zh: "视频 · 这一轮的画面", hi: "वीडियो · इस बारी का फ़ुटेज", ar: "فيديو · لقطات هذا الدور",
+  },
+  "ins.turn.avatar": {
+    en: "This turn, as a figure", es: "Este turno, como figura", fr: "Ce tour, en figure", de: "Dieser Zug, als Figur", pt: "Esta vez, como figura", it: "Questo turno, come figura", ja: "この発言を、立体の姿で", zh: "这一轮，以立体形象", hi: "यह बारी, एक आकृति के रूप में", ar: "هذا الدور، بهيئة مجسّمة",
+  },
+  "ins.turn.avatar.sub": {
+    en: "Their face in three dimensions, mouth on the voice", es: "Su rostro en tres dimensiones, con la boca siguiendo la voz", fr: "Son visage en trois dimensions, la bouche suivant la voix", de: "Ihr Gesicht dreidimensional, der Mund folgt der Stimme", pt: "O rosto em três dimensões, com a boca acompanhando a voz", it: "Il volto in tre dimensioni, la bocca segue la voce", ja: "立体の顔、声に合わせて動く口", zh: "三维的面孔，口型跟随声音", hi: "उनका चेहरा त्रि-आयामी, आवाज़ के साथ चलता मुँह", ar: "وجهه مجسّمًا، والفم يتبع الصوت",
+  },
+  "ins.turn.video": {
+    en: "This turn, as footage", es: "Este turno, como imágenes", fr: "Ce tour, en images", de: "Dieser Zug, als Aufnahme", pt: "Esta vez, como imagens", it: "Questo turno, come immagini", ja: "この発言を、映像で", zh: "这一轮，以影像", hi: "यह बारी, फ़ुटेज के रूप में", ar: "هذا الدور، كلقطات",
+  },
+  "ins.turn.video.sub": {
+    en: "Made for this reply, and nobody pressed play", es: "Creadas para esta respuesta, y nadie pulsó reproducir", fr: "Créées pour cette réponse, et personne n'a appuyé sur lecture", de: "Für diese Antwort entstanden, und niemand hat Play gedrückt", pt: "Feitas para esta resposta, e ninguém apertou play", it: "Create per questa risposta, e nessuno ha premuto play", ja: "この返答のために作られ、誰も再生を押していない", zh: "为这条回复生成，没人按过播放", hi: "इस जवाब के लिए बना, और किसी ने प्ले नहीं दबाया", ar: "صُنعت لهذا الرد، ولم يضغط أحد تشغيل",
+  },
+  "ins.seat.room.one": {
+    en: "One seat left", es: "Queda un asiento", fr: "Une place restante", de: "Noch ein Platz frei", pt: "Resta um lugar", it: "Resta un posto", ja: "残り1席", zh: "还剩 1 个座位", hi: "एक सीट बाकी", ar: "بقي مقعد واحد",
   },
   "idn.forge.shot": {
     en: "How the photo is framed", es: "Cómo está encuadrada la foto", fr: "Le cadrage de la photo", de: "Wie das Foto gerahmt ist", pt: "Como a foto está enquadrada", it: "Come è inquadrata la foto", ja: "写真の写り方", zh: "照片的取景", hi: "फ़ोटो का फ़्रेम", ar: "كيف أُطِّرت الصورة",

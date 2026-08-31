@@ -126,6 +126,32 @@ def seed(db_path: str) -> dict:
 
     founder = by_handle("david_bianchi_ai")
     amara = by_handle("dr_amara_osei")
+    # A third voice in the room.
+    #
+    #     asked     how many seats does the app open with
+    #     mattered  how many does a SCREENSHOT need
+    #
+    # The app opens two and an empty chair, which is the right default
+    # and a thin picture: two boxes and a blank say nothing about what a
+    # room is for. The owner's call — "for the screenshots and the readme
+    # files, I want three people in the conversation like in the photo."
+    #
+    # A third starter rather than an invented one: she is in the
+    # collection, she has a field, and nothing here is drawn that the
+    # product could not seat.
+    lena = by_handle("dr_lena_whitcomb")
+    # And three more, to fill the table.
+    #
+    #     asked     show two rows of four
+    #     mattered  have eight boxes to put in them
+    #
+    # A room is most itself when it is full, and the shape the seats take
+    # at eight is the shape worth photographing. All three are in the
+    # starter collection with a portrait and a field, so nothing here is
+    # drawn that the product could not seat.
+    others = [by_handle(h) for h in ("dr_marcus_adeyemi",
+                                     "cmdr_ellen_park",
+                                     "chef_henri_laurent")]
     # The account takes both starters.
     #
     #     asked     is there an avatar in the frame
@@ -139,31 +165,81 @@ def seed(db_path: str) -> dict:
     #
     # Owning more than one profile is a state any account reaches; this
     # one reaches it by the shortest road rather than through the studio.
-    for owned in (founder, amara):
+    for owned in [founder, amara, lena] + others:
         conn.execute("UPDATE profiles SET owner_id=? WHERE id=?",
                      (account, owned))
     conn.commit()
+
+    # The person's seat wears the PHOTOGRAPH of David; the profile seat
+    # wears the AI rendering of him.
+    #
+    #     asked     seat the founder in the room
+    #     mattered  which of the two Davids is which
+    #
+    # Both are in the collection on purpose — the platform's whole
+    # argument is that a synthetic thing must say so, hence a rendered
+    # David marked AI in his own pixels and a photographed David who is
+    # not. In the room they came out as the same face twice, once
+    # labelled "You" and once "Technology", which for somebody reading
+    # the README is the single confusion this product exists to prevent.
+    person_pic = "/photos/david_bianchi.webp"
 
     room_id = db.new_id("room")
     conn.execute(
         "INSERT INTO rooms (id, topic, channel, status, created_at)"
         " VALUES (?,?,'chat','active',?)",
         (room_id, "Rounds", db.utcnow()))
-    for kind, ref in (("user", person["id"]), ("profile", founder),
-                      ("profile", amara)):
+    for kind, ref in ([("user", person["id"]), ("profile", founder),
+                       ("profile", amara), ("profile", lena)]
+                      + [("profile", o) for o in others]):
         conn.execute(
             "INSERT OR IGNORE INTO room_participants (room_id, kind, ref_id)"
             " VALUES (?,?,?)", (room_id, kind, ref))
     conn.commit()
 
+    # `set_showing` is the product's own road: it is what putting your
+    # picture up in a room does.
+    from qrme import roomface
+    roomface.set_showing(room_id, person["id"], "photo",
+                         media_url=person_pic)
+
     # A turn apiece, so the transcript is a conversation and the light has
     # somebody to sit on. Approved, because a blocked turn draws
     # differently and that is a different picture.
+    # Enough turns that the transcript reads as a conversation rather
+    # than as a demo of one. Three voices, and the last word decides who
+    # the frame opens on.
     said = [
-        ("user", person["id"], "Where did we land on the discharge gap?"),
+        ("user", person["id"],
+         "My mother's discharge notes mention a follow-up nobody booked. "
+         "Is that on us or on them?"),
+        ("profile", lena,
+         "Before the logistics — how is she taking it? A missed follow-up "
+         "lands differently when somebody is already worried."),
+        ("profile", founder,
+         "Both, and the vault keeps the paper trail either way: whoever "
+         "owns the referral, the record of asking is yours."),
         ("profile", amara,
          "Usually on the discharging team, and usually it is a gap rather "
-         "than a decision."),
+         "than a decision. Ring the ward clerk with the discharge date and "
+         "ask who owns the referral — that is the sentence that gets it "
+         "booked."),
+        ("user", person["id"],
+         "She is eighty-one and she will not ring them herself. Can I do "
+         "it on her behalf?"),
+        ("profile", others[0],
+         "You can, and say that plainly when you call — a proxy who names "
+         "themselves gets further than one who does not."),
+        ("profile", lena,
+         "And tell her you have done it. The waiting is most of what is "
+         "wearing on her, not the appointment."),
+        ("profile", others[1],
+         "Write the date and the clerk's name down before you dial. Every "
+         "checklist I ever wrote existed because somebody trusted their "
+         "memory on the phone."),
+        ("profile", founder,
+         "It goes in the vault either way — hers, not ours, and she can "
+         "take it with her or burn it."),
     ]
     for kind, ref, words in said:
         conn.execute(
@@ -253,25 +329,72 @@ def go_in(page, session: dict, room_id: str) -> bool:
         print("  ? no Go button")
         return False
     page.wait_for_timeout(2500)
-    return page.query_selector(".room-focus") is not None
+    # Proof of arrival is a SEAT, not the frame.
+    #
+    # It was `.room-focus`, which is the box on the right — and that box
+    # does not render on the audio road any more, because there was
+    # nothing to put in it that the seats were not already showing. So
+    # every audio pass reported "never reached the room" from inside the
+    # room. A seat is the thing a room always has.
+    return page.query_selector(".rs-tile") is not None
 
 
-def press_format(page, key: str) -> bool:
-    """Press one of the three format chips, and check it took."""
-    for button in page.query_selector_all(".rs-format"):
-        if (button.get_attribute("aria-pressed") is not None
-                and _is(button, key)):
-            button.click()
-            page.wait_for_timeout(600)
-            return button.get_attribute("aria-pressed") == "true"
-    return False
+def press_format(page, key: str, who: str) -> bool:
+    """Set the format the way a person does: the seat's own two glyphs.
+
+        asked     press the format chip
+        mattered  press the thing the product actually has
+
+    There were three chips above the rail — Audio, Avatar, Video — and
+    the harness pressed them by their words. They are gone: the format
+    is set per seat now, by the standing figure and the movie camera
+    beside each face, and pressing a lit one puts the room back to
+    voices and photographs.
+
+    So this presses the roads on the seat being photographed. `audio` is
+    not a button; it is the state you are in when neither road is lit,
+    which is exactly what the product says and what this now checks.
+    """
+    tile = _tile_for(page, who)
+    if tile is None:
+        return False
+    roads = tile.query_selector_all(".rs-road")
+    if len(roads) < 2:
+        return False
+    avatar, video = roads[0], roads[1]
+    want = {"avatar": avatar, "video": video}.get(key)
+
+    if key == "audio":
+        # Release whichever is lit; if neither is, the room is already
+        # showing voices and photographs.
+        for road in (avatar, video):
+            if road.get_attribute("aria-pressed") == "true":
+                road.evaluate("el => el.click()")
+                page.wait_for_timeout(900)
+        return all(r.get_attribute("aria-pressed") != "true"
+                   for r in (avatar, video))
+
+    if want is None:
+        return False
+    if want.get_attribute("aria-pressed") != "true":
+        want.evaluate("el => el.click()")
+        page.wait_for_timeout(1400)
+    return want.get_attribute("aria-pressed") == "true"
 
 
-#: The chip's own word, per format, in the language the harness runs in.
-#: Matched on the visible text because the chips carry no data attribute —
-#: and if one is ever added, this is the line that changes.
-_WORDS = {"audio": "audio", "avatar": "avatar", "video": "video",
-          "face": "face", "upper": "upper", "full": "full"}
+def _tile_for(page, who: str):
+    """The rail card carrying this name."""
+    for tile in page.query_selector_all(".rs-tile"):
+        name = tile.query_selector(".rs-name")
+        if name and (name.inner_text() or "").strip() == who:
+            return tile
+    return None
+
+
+#: Each framing's own word, in the language the harness runs in. Matched
+#: on the visible text because the chips carry no data attribute — and if
+#: one is ever added, this is the line that changes.
+_WORDS = {"face": "face", "upper": "upper", "full": "full"}
 
 
 def _is(button, key: str) -> bool:
@@ -279,10 +402,22 @@ def _is(button, key: str) -> bool:
 
 
 def press_framing(page, key: str) -> bool:
-    for button in page.query_selector_all(".rs-framing .rs-format"):
+    """Face, upper torso, full body — pressed on the frame itself.
+
+    These were a fourth row of chips above the rail and are now where
+    they belong: on the stage that draws the figure, which is the only
+    place they mean anything. `.stage-shots` is that row.
+    """
+    for button in page.query_selector_all(".stage-shots button"):
         if _is(button, key):
-            button.click()
-            page.wait_for_timeout(900)
+            # `el.click()` rather than Playwright's, for the same reason
+            # `open_tab` uses it: changing the framing rebuilds the scene
+            # and reloads a 13 MB model on software GL, which blocks the
+            # main thread long past the actionability check's patience.
+            # The press itself is fine; waiting for the page to look calm
+            # afterwards is what times out.
+            button.evaluate("el => el.click()")
+            page.wait_for_timeout(4000)
             return button.get_attribute("aria-pressed") == "true"
     return False
 
@@ -327,18 +462,30 @@ def main() -> None:
                         print(f"  ! never reached the room at {width_name}")
                         page.close()
                         continue
-                    on = page.query_selector(".rf-who")
+                    # Read off the RAIL, not the frame.
+                    #
+                    #     asked     is the right person on the stage
+                    #     mattered  where does the screen say who that is
+                    #
+                    # This read `.rf-who`, which was the frame's heading
+                    # back when the frame repeated the name the rail had
+                    # already given. The frame says what it is SHOWING
+                    # now — "This turn, in their own voice" — and the
+                    # name lives once, on the lit seat. The check moved
+                    # with it rather than being deleted: a pass that
+                    # photographs the wrong person under the right
+                    # filename is the failure this guard exists for, and
+                    # it caught exactly that on the first run after the
+                    # heading changed.
+                    on = page.query_selector(".rs-tile.talking .rs-name")
                     got = (on.inner_text() if on else "").strip()
                     if got != person["name"]:
-                        # The frame is showing somebody else, so every
-                        # capture in this pass would carry the wrong name
-                        # under the right filename.
-                        print(f"  ! the frame says {got!r}, not "
+                        print(f"  ! the lit seat says {got!r}, not "
                               f"{person['name']!r}")
                         page.close()
                         continue
                     for fmt in FORMATS:
-                        if not press_format(page, fmt):
+                        if not press_format(page, fmt, person["name"]):
                             print(f"  ? {fmt} chip did not take "
                                   f"at {width_name}")
                             continue

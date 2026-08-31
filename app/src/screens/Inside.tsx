@@ -3,7 +3,6 @@ import { type Shot } from "../Avatar3D";
 import { isEcho, RECENT_TURNS } from "../echo";
 import { AvatarStage } from "../AvatarStage";
 import { TalkRail } from "../TalkRail";
-import { Waveform } from "../Waveform";
 import { accountApi, api, getBase, type Avatar, type RoomFaces,
          type RoomMsg } from "../api";
 import { field } from "../fields";
@@ -191,11 +190,23 @@ function fileWhy(key: string | null | undefined, lang: string): string | null {
  */
 const SEATS = 8;
 
-export function Inside({ onPlans, start = "", onLeave }: {
+export function Inside({ onPlans, start = "", onLeave, onInside }: {
   onPlans: () => void;
   /** A room id handed in by the Rooms screen's join — the field is
    *  prefilled so the person lands in the room they just entered. */
   start?: string;
+  /** Say when this screen is standing in a room, and when it stops.
+   *
+   *     asked     is the console in a room
+   *     mattered  does the CONSOLE know
+   *
+   * `.app.in-room` hides the drawer and the menu button and gives the
+   * window to the room — and `App` only ever set that from the Rooms
+   * screen's own join. Somebody who typed a room id here and pressed Go
+   * was every bit as inside, and got a room with the whole menu bar
+   * still sitting beside it. The screen knows; it just had no way to
+   * say so. */
+  onInside?: (yes: boolean) => void;
   /** Step back out. Required once a room owns the window: the sidebar
    *  that used to be the way out is hidden while somebody is standing in
    *  a room, and a full-screen place with no door is a trap. */
@@ -1066,6 +1077,15 @@ export function Inside({ onPlans, start = "", onLeave }: {
     || seats.find((x) => isTalking(x))
     || seats.find((x) => !(x.kind === "user" && x.id === me))
     || seats[0] || null;
+
+  // Told, not guessed: the effect runs on the transition, and the
+  // cleanup fires when this screen unmounts by any road — the door, the
+  // drawer, a reload — so the window is never left given away to a room
+  // nobody is standing in.
+  useEffect(() => {
+    onInside?.(inRoom);
+    return () => onInside?.(false);
+  }, [inRoom, onInside]);
 
   const act = (fn: () => Promise<unknown>, said?: string) => async () => {
     setError(null); setNote(null); setBusy(true);
@@ -2625,53 +2645,43 @@ export function Inside({ onPlans, start = "", onLeave }: {
         // stops painting its own light and chrome underneath. A
         // takeover the room paints through is not a takeover.
         <div className={"card" + (inRoom ? " room-stage" : "")
-                        + (filmFull ? " rs-behind-film" : "")}>
+                        + (filmFull ? " rs-behind-film" : "")
+                        + (format === "audio" ? " rs-allseats" : "")}>
           {/* In a room the faces ARE the screen, so the heading goes: it
               labels a section on a page, and there is no page left to be a
               section of. Outside a room — the same component, no room open
               — it still says what it is. */}
           {!inRoom && <h3>{tr("ins.scene", lang)}</h3>}
-          {/* The format switch, and the sentence that makes it safe to
-              press: this is YOUR screen. Two people in one room can sit
-              in different formats and neither moves the other's. It says
-              so out loud, because a control inside a shared room reads
-              by default as something everybody gets. */}
-          <div className="rs-formats" role="group"
-               aria-label={tr("ins.format", lang)}>
-            {/* Keys written out rather than built from the format name.
-                A lookup assembled with a template literal is invisible
-                to the extractor next door, which then reports three
-                strings translated into ten languages and read by
-                nobody. */}
-            {([["audio", tr("ins.format.audio", lang)],
-               ["avatar", tr("ins.format.avatar", lang)],
-               ["video", tr("ins.format.video", lang)]] as const).map(
-              ([key, name]) => (
-                <button key={key} type="button"
-                        className={"rs-format" + (format === key ? " lit" : "")}
-                        aria-pressed={format === key}
-                        onClick={() => { setFormat(key);
-                                         setRoomFormat(key); }}>
-                  {name}
-                </button>
-              ))}
-            {format === "avatar" && (
-              <div className="rs-framing" role="group"
-                   aria-label={tr("idn.forge.shot", lang)}>
-                {([["face", tr("idn.forge.face", lang)],
-                   ["upper", tr("idn.forge.upper", lang)],
-                   ["full", tr("idn.forge.full", lang)]] as const).map(
-                  ([key, name]) => (
-                    <button key={key} type="button"
-                            className={"rs-format small"
-                                       + (framing === key ? " lit" : "")}
-                            aria-pressed={framing === key}
-                            onClick={() => setFraming(key)}>{name}</button>
-                  ))}
-              </div>
-            )}
-            <span className="rs-formats-note muted small">
-              {tr("ins.format.sub", lang)}
+          {/* The room says what it is and how many are in it, and on the
+              right it says how YOU are seeing it.
+             *
+             *     asked     where does a person choose the format
+             *     mattered  where does a person LOOK to know it
+             *
+             * There were three chips and a sentence above the rail —
+             * Audio, Avatar, Video, then the framings, then "this is
+             * your screen". Four rows of furniture on top of a room, and
+             * the drawing this is held against has none of it: one line
+             * across the top, and a pill on the right saying what you
+             * are looking at.
+             *
+             * The pill reports; it does not switch. The switch is the
+             * two glyphs on each seat, which is the right place for it —
+             * "show me THEM, like this" is one press about one person,
+             * where three chips were a mode change about nobody. */}
+          <div className="rs-bar">
+            <span className="rs-live" aria-hidden="true" />
+            <strong className="rs-roomname">
+              {roomName || tr("ins.scene", lang)}
+            </strong>
+            <span className="rs-count muted">
+              {fill(tr("ins.bar.present", lang),
+                    { count: String(seats.length) })}
+            </span>
+            <span className="rs-mode" aria-live="polite">
+              {format === "video" ? tr("ins.mode.video", lang)
+               : format === "avatar" ? tr("ins.mode.avatar", lang)
+               : tr("ins.mode.audio", lang)}
             </span>
           </div>
 
@@ -2685,19 +2695,43 @@ export function Inside({ onPlans, start = "", onLeave }: {
 
                   asked     can every seat show its format
                   mattered  can you SEE the one that matters */}
-          {onStage && (
+          {/* The frame is for a figure or for footage, and for nothing
+              else.
+             *
+             *     asked     what goes in the frame
+             *     mattered  is there anything to put in it
+             *
+             * On the audio road it held a photograph the rail was
+             * already showing, blown up, beside a waveform — the same
+             * face twice on one screen and half the width spent on the
+             * repeat. Crossed out on a screenshot, and rightly:
+             * "technically we don't even need this box over here on the
+             * right for audio."
+             *
+             * Gone, the seats have the whole width, which is where the
+             * eight of them were always going to need to live. */}
+          {format !== "audio" && onStage && (
             <div className={"room-focus"
                             + (isTalking(onStage) ? " talking" : "")}>
+              {/* The frame says what it is showing, not who — the rail
+                  already said who, and repeating the name here spends the
+                  widest line on the screen saying it twice. */}
               <div className="rf-head">
                 <div>
-                  <div className="rf-who">{onStage.display}</div>
+                  <div className="rf-who">
+                    {format === "video" ? tr("ins.turn.video", lang)
+                     : format === "avatar" ? tr("ins.turn.avatar", lang)
+                     : tr("ins.turn.audio", lang)}
+                  </div>
                   <div className="rf-sub muted small">
-                    {format === "video" ? tr("ins.format.video", lang)
-                     : format === "avatar" ? tr("ins.format.avatar", lang)
-                     : tr("ins.format.audio", lang)}
+                    {format === "video" ? tr("ins.turn.video.sub", lang)
+                     : format === "avatar" ? tr("ins.turn.avatar.sub", lang)
+                     : tr("ins.turn.audio.sub", lang)}
                   </div>
                 </div>
-                <span className="rf-ai">{tr("ins.film.ai", lang)}</span>
+                <span className="rf-ai" title={tr("ins.film.ai", lang)}>
+                  {"\u2726 "}{tr("ins.seat.aimark", lang)}
+                </span>
               </div>
 
               {format === "video" && (
@@ -2710,6 +2744,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 <AvatarStage
                   inline
                   framing={framing}
+                  onFraming={setFraming}
                   onExpand={() => setStaged(onStage.id)}
                   clear={channel === "ar" || channel === "vr"}
                   profileId={onStage.id}
@@ -2732,34 +2767,6 @@ export function Inside({ onPlans, start = "", onLeave }: {
                   onError={setError} />
               )}
 
-              {/* The photograph road: the face, and the voice reading.
-                  An audio turn has no second thing to show, so the still
-                  is the whole picture — a circle on a dark ground with
-                  the reading under it, not a photograph stretched to the
-                  corners. Full-bleed was tried and the AI mark burned
-                  into the picture's own pixels came up the size of a
-                  poster with it. */}
-              {format === "audio" && (
-                <div className="rf-voice">
-                  <div className="rf-orb">
-                    {(onStage.kind === "user"
-                        ? myFace?.asset : aiFaces[onStage.id]?.asset)
-                      ? <img alt="" src={(() => {
-                          const a = (onStage.kind === "user"
-                            ? myFace?.asset
-                            : aiFaces[onStage.id]?.asset) as string;
-                          return a.startsWith("http") ? a : getBase() + a;
-                        })()} />
-                      : <span className="rf-none" aria-hidden="true">👤</span>}
-                  </div>
-                  {/* Only while a voice is actually in the air. The strip
-                      draws a reading, and a reading of silence that moves
-                      is not a reading. */}
-                  <Waveform lang={lang}
-                            presence={isTalking(onStage) ? "speaking"
-                                                         : "idle"} />
-                </div>
-              )}
             </div>
           )}
           <div className="room-scene">
@@ -3005,7 +3012,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
                     like this" — one press, one outcome. Pressing the
                     same one again lets go, and the frame goes back to
                     following whoever is talking. */}
-                {s.kind !== "user" && (
+                {(
                   <div className="rs-side">
                     <button type="button" className={"rs-road"
                               + (framed === s.id && format === "avatar"
@@ -3017,7 +3024,20 @@ export function Inside({ onPlans, start = "", onLeave }: {
                             onClick={(e) => {
                               e.stopPropagation();
                               if (framed === s.id && format === "avatar") {
+                                // Pressing the lit road puts the room
+                                // back to voices and photographs.
+                                //
+                                //     asked     how do you pin a seat
+                                //     mattered  how do you get BACK
+                                //
+                                // With the chip row gone these two glyphs
+                                // are the only way the format moves, so
+                                // releasing had to mean something. It
+                                // used to clear the pin and leave the
+                                // room in avatar — a door with no handle
+                                // on the inside.
                                 setFramed(null);
+                                setFormat("audio"); setRoomFormat("audio");
                               } else {
                                 setFramed(s.id);
                                 setFormat("avatar"); setRoomFormat("avatar");
@@ -3038,6 +3058,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
                               e.stopPropagation();
                               if (framed === s.id && format === "video") {
                                 setFramed(null);
+                                setFormat("audio"); setRoomFormat("audio");
                               } else {
                                 setFramed(s.id);
                                 setFormat("video"); setRoomFormat("video");
@@ -3341,9 +3362,17 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 </span>
                 <span className="rs-name">{tr("ins.seat.add", lang)}</span>
                 <span className="rs-role">
-                  {fill(tr("ins.seat.room", lang),
-                        { left: String(SEATS - seats.length
-                                       - invited.length) })}
+                  {(() => {
+                    // One seat is not "1 seats". The count is on a
+                    // screenshot people read, and a plural that does not
+                    // agree is the kind of thing a reader trusts less
+                    // than the thing it is counting.
+                    const left = SEATS - seats.length - invited.length;
+                    return left === 1
+                      ? tr("ins.seat.room.one", lang)
+                      : fill(tr("ins.seat.room", lang),
+                             { left: String(left) });
+                  })()}
                 </span>
               </button>
             )}

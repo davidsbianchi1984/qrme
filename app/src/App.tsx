@@ -200,7 +200,15 @@ export function App() {
   // shell's, not the room's — and the room reaching up to hide somebody
   // else's chrome would be the kind of reach that is impossible to find
   // later.
-  const inRoom = tab === "inside" && Boolean(insideRoom);
+  // Whether a room owns the window.
+  //
+  // This was `tab === "inside" && Boolean(insideRoom)`, and `insideRoom`
+  // is only ever set by the Rooms screen's own join — so somebody who
+  // opened the Inside tab, typed a room id and pressed Go was standing
+  // in a room the console did not know about, with the whole drawer
+  // still beside them. The screen says so now.
+  const [standing, setStanding] = useState(false);
+  const inRoom = tab === "inside" && (standing || Boolean(insideRoom));
   // Whose homepage is open, and where pressing Back should return to. The
   // trail is a stack rather than a single id because their Top 8 is eight
   // more doors: walking friend-to-friend and pressing Back should retrace
@@ -425,6 +433,7 @@ export function App() {
         {tab === "leaving" && <Leaving onPlans={toPlans} />}
         {tab === "selling" && <Selling onPlans={toPlans} />}
         {tab === "inside" && <Inside onPlans={toPlans} start={insideRoom}
+                                   onInside={setStanding}
                                    onLeave={() => { setInsideRoom(""); setTab("home"); }} />}
         {tab === "signing" && <Signing />}
         {tab === "visiting" && <Visiting />}
