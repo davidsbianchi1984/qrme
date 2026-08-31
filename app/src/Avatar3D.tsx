@@ -58,28 +58,100 @@ export type Shot = keyof typeof SHOTS;
  * bind pose rather than animated into: this is what the figure IS, not
  * something it does.
  *
- * Only the upper arm turns. Rotating the forearm as well compounds at
- * the elbow and folds it inward — tried, and it swept the arms back into
- * something nobody wanted. Seventy degrees is also where it stops: the
- * skin is weighted for the pose it was built in and tears past that, so
- * this is deliberately short of straight-down rather than as far as the
- * numbers would go.
+ * ## Why this measures instead of naming an axis
  *
- * A rig without these bones is left exactly as it arrived. A head has no
+ *     asked     bring the arms down
+ *     mattered  down in WHICH frame
+ *
+ * The first attempt added to `rotation.z`, and on a Mixamo-style rig the
+ * arm bone's own frame is turned so that a local-Z swing sends the arm
+ * BACKWARD rather than down. Measured on the models that ship: the hand
+ * starts at (0.692, 1.446, 0.034), and 1.22 radians about local Z puts it
+ * at (0.441, 1.459, −0.513) — thirteen millimetres of drop and half a
+ * metre behind the figure. That is the pose that came back as "that
+ * Naruto run is not funny". It was never a bad angle; it was the wrong
+ * axis, and picking a different letter would only have been a luckier
+ * guess.
+ *
+ * So nothing is named. Each arm is turned about each of its own three
+ * axes, both ways, and the one that puts the far end of the arm LOWEST
+ * is the one kept. `down` is the actual goal, so `down` is what gets
+ * measured — and a rig whose exporter chose different axes, or whose
+ * "Left" is on the right, gets arms that hang correctly without this
+ * function knowing anything about it. On both shipped models the winner
+ * is local +X, which puts the hand at (0.312, 0.947, 0.034): hip height,
+ * just clear of the thigh. A person standing.
+ *
+ * Six trial rotations on two bones, once, at load. The cost is nothing
+ * and the alternative is a constant that is right until somebody ships a
+ * model from a different tool.
+ *
+ * Only the upper arm turns. Rotating the forearm as well compounds at
+ * the elbow and folds it inward — tried, and it tore the elbows. The
+ * shoulders are left alone for the same reason: a nudge on an axis
+ * nobody measured is a guess, and a guess on top of a fix is how the fix
+ * gets blamed.
+ *
+ * A rig with no arm bones is left exactly as it arrived. A head has no
  * arms, and a model from a vendor with different names is better
  * untouched than bent by a guess.
  */
+const ARM_DOWN = 1.32;
+
+/** The far end of a limb: whichever descendant sits furthest from the
+ *  bone itself. The fingertip on a rig with hands, the elbow on one
+ *  without — either is a fair probe for whether the arm came down, and
+ *  neither has to be found by name. */
+function tip(bone: THREE.Object3D): THREE.Object3D | null {
+  const from = new THREE.Vector3();
+  bone.getWorldPosition(from);
+  const at = new THREE.Vector3();
+  let far: THREE.Object3D | null = null;
+  let best = 0;
+  bone.traverse((node) => {
+    if (node === bone) return;
+    node.getWorldPosition(at);
+    const away = at.distanceTo(from);
+    if (away > best) { best = away; far = node; }
+  });
+  return far;
+}
+
 function rest(root: THREE.Object3D) {
-  const DOWN: Record<string, number> = {
-    leftarm: -1.22, rightarm: 1.22,
-    leftshoulder: -0.08, rightshoulder: 0.08,
-  };
+  // The trials read world positions, so the tree has to be current
+  // before the first one runs.
+  root.updateMatrixWorld(true);
+  const arms: THREE.Object3D[] = [];
   root.traverse((node) => {
     const key = node.name.toLowerCase().replace(/^mixamorig:?/, "")
                          .replace(/[_.\s-]/g, "");
-    const turn = DOWN[key];
-    if (turn !== undefined) node.rotation.z += turn;
+    if (key === "leftarm" || key === "rightarm") arms.push(node);
   });
+
+  const AXES = [new THREE.Vector3(1, 0, 0),
+                new THREE.Vector3(0, 1, 0),
+                new THREE.Vector3(0, 0, 1)];
+  const at = new THREE.Vector3();
+  for (const arm of arms) {
+    const probe = tip(arm);
+    if (probe === null) continue;
+    const was = arm.quaternion.clone();
+    let bestAxis: THREE.Vector3 | null = null;
+    let bestWay = 1;
+    let lowest = Infinity;
+    for (const axis of AXES) {
+      for (const way of [1, -1]) {
+        arm.quaternion.copy(was);
+        arm.rotateOnAxis(axis, way * ARM_DOWN);
+        arm.updateMatrixWorld(true);
+        probe.getWorldPosition(at);
+        if (at.y < lowest) { lowest = at.y; bestAxis = axis; bestWay = way; }
+      }
+    }
+    arm.quaternion.copy(was);
+    if (bestAxis !== null) arm.rotateOnAxis(bestAxis, bestWay * ARM_DOWN);
+    arm.updateMatrixWorld(true);
+  }
 }
 
 export function Avatar3D({ src, speaking, motion, shot, className }: {
