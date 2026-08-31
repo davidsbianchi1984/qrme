@@ -35,13 +35,65 @@ import { Liveliness, Motion } from "./avatarMotion";
  * this does not pretend otherwise.
  */
 
-export function Avatar3D({ src, speaking, motion, className }: {
+/** How much of the figure is in the frame.
+ *
+ *  The three the forge already names, so a person choosing here is
+ *  choosing the same three words they chose when the face was built.
+ *  Each is a slice of the model's OWN measured height rather than a
+ *  distance in metres: the two shipped models stand 1.81 m and 1.73 m,
+ *  and a camera placed at a fixed height frames one of them properly
+ *  and beheads the other. */
+const SHOTS = {
+  face:  { at: 0.925, tall: 0.21 },
+  upper: { at: 0.760, tall: 0.56 },
+  full:  { at: 0.500, tall: 1.04 },
+} as const;
+
+export type Shot = keyof typeof SHOTS;
+
+/** Bring a T-posed rig's arms down toward its sides.
+ *
+ * Every model out of the exporter arrives in a T-pose, which is how a
+ * rig is authored and not how somebody stands in a room. Applied to the
+ * bind pose rather than animated into: this is what the figure IS, not
+ * something it does.
+ *
+ * Only the upper arm turns. Rotating the forearm as well compounds at
+ * the elbow and folds it inward — tried, and it swept the arms back into
+ * something nobody wanted. Seventy degrees is also where it stops: the
+ * skin is weighted for the pose it was built in and tears past that, so
+ * this is deliberately short of straight-down rather than as far as the
+ * numbers would go.
+ *
+ * A rig without these bones is left exactly as it arrived. A head has no
+ * arms, and a model from a vendor with different names is better
+ * untouched than bent by a guess.
+ */
+function rest(root: THREE.Object3D) {
+  const DOWN: Record<string, number> = {
+    leftarm: -1.22, rightarm: 1.22,
+    leftshoulder: -0.08, rightshoulder: 0.08,
+  };
+  root.traverse((node) => {
+    const key = node.name.toLowerCase().replace(/^mixamorig:?/, "")
+                         .replace(/[_.\s-]/g, "");
+    const turn = DOWN[key];
+    if (turn !== undefined) node.rotation.z += turn;
+  });
+}
+
+export function Avatar3D({ src, speaking, motion, shot, className }: {
   src: string;
   /** The audio in the air right now, if any. Its loudness moves the jaw. */
   speaking?: HTMLAudioElement | null;
   /** How this face carries itself, as `avatars.motion_of` derived it from
    *  the profile's own history. Absent means breathe at the default pace. */
   motion?: Motion | null;
+  /** Face, upper torso or full body. Omitted, the model is centred in
+   *  the frame the way every caller got before there was a choice — so
+   *  adding the option changes nothing for a surface that does not take
+   *  it. */
+  shot?: Shot;
   className?: string;
 }) {
   const holder = useRef<HTMLDivElement | null>(null);
@@ -138,12 +190,35 @@ export function Avatar3D({ src, speaking, motion, className }: {
       });
       // The skeleton, if this model brought one. A head with no rig still
       // speaks and blinks; it simply does not breathe.
+      // Arms down before `Liveliness` is built, and that ordering is the
+      // whole trick: it remembers each bone's rotation as the rest it
+      // breathes around, so posing first makes THIS the rest and the
+      // idle motion carries on from here. Posing afterwards would have
+      // the sway fighting the pose.
+      rest(loaded.scene);
       live = new Liveliness(loaded.scene, motion, calm);
       // Framed on the head: the model is built around its own centre, so
       // the camera only has to look at the middle of what arrived.
       const box = new THREE.Box3().setFromObject(loaded.scene);
-      const middle = box.getCenter(new THREE.Vector3());
-      loaded.scene.position.sub(middle);
+      if (shot) {
+        // Stood on the floor and framed from there. Centring works for a
+        // head and falls apart on a body: the middle of a standing figure
+        // is its waist, so "full" would have put the camera at the belt
+        // and cropped both ends.
+        const size = box.getSize(new THREE.Vector3());
+        const middle = box.getCenter(new THREE.Vector3());
+        loaded.scene.position.sub(
+          new THREE.Vector3(middle.x, box.min.y, middle.z));
+        const pick = SHOTS[shot];
+        const eye = size.y * pick.at;
+        const view = size.y * pick.tall;
+        const half = (camera.fov * Math.PI / 180) / 2;
+        camera.position.set(0, eye, (view / 2) / Math.tan(half) * 1.1);
+        camera.lookAt(0, eye, 0);
+      } else {
+        const middle = box.getCenter(new THREE.Vector3());
+        loaded.scene.position.sub(middle);
+      }
       scene.add(loaded.scene);
     }, undefined, () => {
       // A model that will not load leaves the portrait standing — the
@@ -232,7 +307,7 @@ export function Avatar3D({ src, speaking, motion, className }: {
       renderer.forceContextLoss();
       mount.removeChild(renderer.domElement);
     };
-  }, [src, speaking, motion]);
+  }, [src, speaking, motion, shot]);
 
   return <div ref={holder} className={className || "avatar3d"} />;
 }
