@@ -2571,3 +2571,151 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   border-color: var(--brand); color: #fff;
   background: linear-gradient(180deg, var(--brand2), var(--brand));
 }
+
+/* ---- The rail and the stage ---------------------------------------------
+ *
+ *     asked     can every seat show its format
+ *     mattered  can you SEE the one that matters
+ *
+ * The room was a grid, and every seat carried its own box: its own film,
+ * its own avatar, its own controls. That reads as a wall of small windows
+ * and it gets worse with every person who walks in — at eight seats there
+ * was nothing on the screen big enough to look at, which is the shape of
+ * the complaint.
+ *
+ * A room does not work that way. You look at whoever is talking, and you
+ * keep half an eye on who else is there. So: one frame, holding the turn,
+ * and a rail of faces beside it. The rail is still the same `.room-scene`
+ * grid with the same 179px tiles — nothing about a seat changed. It just
+ * stopped being the only thing on the screen. */
+
+/* The format switch, and the sentence under it. Wrapping, because three
+   formats plus three framings plus a sentence do not fit a phone's width
+   and a control that runs off the edge is a control nobody presses. */
+.rs-formats {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  margin: 0 0 10px;
+}
+.rs-format {
+  background: rgba(255,255,255,.05); border: 1px solid var(--line);
+  color: var(--t2); border-radius: 999px; padding: 5px 13px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: border-color .18s, background .18s, color .18s;
+}
+.rs-format:hover { color: var(--txt); border-color: var(--brand); }
+.rs-format.lit {
+  border-color: var(--brand); color: #fff;
+  background: linear-gradient(180deg, var(--brand2), var(--brand));
+}
+.rs-format.small { padding: 3px 10px; font-size: 11px; }
+/* The framings sit apart from the formats — they are a choice INSIDE the
+   avatar format, not a fourth format. A hairline says so without a word. */
+.rs-framing {
+  display: flex; gap: 5px; flex-wrap: wrap;
+  padding-left: 8px; margin-left: 2px;
+  border-left: 1px solid var(--line);
+}
+/* "this is your screen." It takes its own line whenever there is room for
+   one, because a note wedged between two buttons reads as a label for the
+   button beside it. */
+.rs-formats-note { flex: 1 1 100%; margin: 0; }
+
+/* The frame that holds the turn. */
+.room-focus {
+  display: flex; flex-direction: column; min-height: 0;
+  background: rgba(10,7,26,.72); border: 1px solid var(--line);
+  border-radius: 18px; overflow: hidden;
+  transition: border-color .2s, box-shadow .2s;
+}
+/* Green, and the same green the tile wears — the light follows the voice,
+   and it has to be the SAME light in both places or the rail and the frame
+   look like they are reporting on two different rooms. */
+.room-focus.talking {
+  border-color: var(--green);
+  box-shadow: 0 0 0 1px var(--green), 0 0 22px rgba(123,196,127,.22);
+}
+.rf-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 9px 13px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.rf-who { font-weight: 700; font-size: 14px; color: var(--txt); }
+.rf-sub { margin: 1px 0 0; }
+.rf-ai {
+  flex: 0 0 auto; font-size: 10px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--brand2);
+  background: rgba(123,92,255,.14); border: 1px solid rgba(123,92,255,.35);
+  border-radius: 999px; padding: 2px 8px;
+}
+/* Whatever the format put in the frame gets the whole frame. */
+.room-focus > :not(.rf-head) { flex: 1 1 auto; min-height: 0; }
+
+/* The photograph road: the still, big, and nothing else. An audio turn has
+   no second thing to show, and a small circle floated in a large dark box
+   is a frame apologising for being empty. */
+.rf-voice {
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.35); aspect-ratio: 4 / 3; overflow: hidden;
+}
+.rf-voice img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rf-none { font-size: 64px; opacity: .3; line-height: 1; }
+
+/* Windows: the rail down the left, the frame taking the rest.
+ *
+ * 250px because that is two 128px tiles and the 10px gutter the scene grid
+ * was already drawing — the rail is not a new size, it is the size the
+ * seats already were, in two columns instead of six. */
+@media (min-width: 720px) {
+  .screen.room-place > .card.room-stage {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    align-content: start;
+    gap: 0 12px;
+  }
+  /* Everything that is not the rail or the frame runs the full width:
+     the switch above, the strip below, the way into the headset. */
+  .screen.room-place > .card.room-stage > * { grid-column: 1 / -1; }
+  .screen.room-place > .card.room-stage > .room-scene {
+    grid-column: 1; grid-row: 2;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start; overflow-y: auto; min-height: 0;
+    margin: 0;
+  }
+  .screen.room-place > .card.room-stage > .room-focus {
+    grid-column: 2; grid-row: 2; min-height: 0;
+  }
+  .screen.room-place > .card.room-stage > .rs-chatstrip,
+  .screen.room-place > .card.room-stage > .rs-voicebar {
+    grid-row: 3; margin-top: 10px;
+  }
+}
+
+/* Phones: the frame first, the rail under it as a row you push sideways.
+ *
+ * `order` and not a second markup path — the same component draws both, and
+ * a phone that gets its own JSX is a phone that gets its own bugs. */
+@media (max-width: 719px) {
+  .screen.room-place > .card.room-stage > .room-focus { order: -1; }
+  .screen.room-place > .card.room-stage > .room-scene {
+    display: flex; overflow-x: auto; gap: 8px;
+    margin-top: 10px; padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch; touch-action: pan-x;
+  }
+  .screen.room-place > .card.room-stage > .room-scene > .rs-tile {
+    flex: 0 0 118px; min-height: 148px;
+  }
+}
+
+/* While the frame is full-screen, the room stops painting underneath it.
+ *
+ *     asked     does the frame cover the room
+ *     mattered  does the ROOM know it is covered
+ *
+ * A takeover the room paints through is not a takeover: the card's own
+ * border and ground kept drawing round the edges of a full-screen film,
+ * and the light on a talking tile still glowed through it. */
+.rs-behind-film {
+  background: transparent; border-color: transparent; box-shadow: none;
+}
+.rs-behind-film > :not(.room-focus) { visibility: hidden; }

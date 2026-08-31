@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Avatar3D } from "../Avatar3D";
+import { Avatar3D, type Shot } from "../Avatar3D";
 import { isEcho, RECENT_TURNS } from "../echo";
 import { AvatarStage } from "../AvatarStage";
 import { TalkRail } from "../TalkRail";
@@ -7,6 +7,9 @@ import { accountApi, api, getBase, type Avatar, type RoomFaces,
          type RoomMsg } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
+import { SeatFilm } from "../SeatFilm";
+import { roomFormat, setRoomFormat,
+         type RoomFormat } from "../roomFormat";
 import { nowPlaying, plainVoice, speakInPieces,
          type Speaking } from "../spoken";
 import { useSession } from "../store";
@@ -300,6 +303,28 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // are talking to alike; whether ITS wardrobe opens for you is the
   // profile's own guest_styling switch, read by the stage itself.
   const [staged, setStaged] = useState<string | null>(null);
+  /** How THIS person's screen is laid out, and nobody else's.
+   *
+   * "when that video button gets pressed it changed the shape and format
+   * of just the user screen. It doesn't affect everybody else's own chat
+   * room screens... it just renders formatting differently per user." So
+   * it is read from and written to this browser and never sent — a
+   * format on the server would be a value one person writes and another
+   * person's screen reads. See roomFormat.ts.
+   *
+   * It is not the road. `presence_road` decides whether a profile's
+   * replies are rendered into footage at all, on the owner's budget;
+   * this decides only what a viewer draws with what already exists. */
+  const [format, setFormat] = useState<RoomFormat>(roomFormat);
+  /** How much of the avatar is in the frame — the forge's own three
+   *  words. One choice for the room rather than one per seat: it says
+   *  how this person likes to look at people, and setting it eight times
+   *  would be a chore, not a choice. */
+  const [framing, setFraming] = useState<Shot>("upper");
+  // A film filling the screen. Kept here rather than in the frame so the
+  // room can hide everything behind it — a takeover the room paints
+  // through is not a takeover.
+  const [filmFull, setFilmFull] = useState(false);
   // The portrait taken to the screen — the OTHER circle of the pair.
   // "You click to just see the profile photo": no rail, no wardrobe,
   // just the picture big, and a tap anywhere puts it back.
@@ -994,6 +1019,21 @@ export function Inside({ onPlans, start = "", onLeave }: {
       : lastSaid !== null
         && (lastSaid.sender_kind === "user") === (s.kind === "user")
         && lastSaid.sender_id === s.id;
+
+  /** Whose turn the frame is showing.
+   *
+   * The room is a rail of seats and one stage, so exactly one person is
+   * in the frame at a time and something has to decide who. The turn
+   * decides: whoever is speaking, or whoever spoke last while the room
+   * is quiet. `isTalking` already answers both, and answering it once
+   * here means the rail and the frame cannot disagree about who is up.
+   *
+   * A room where nobody has said anything falls to the first seat that
+   * is not you — you are looking at the room, not at yourself.
+   */
+  const onStage = seats.find((x) => isTalking(x))
+    || seats.find((x) => !(x.kind === "user" && x.id === me))
+    || seats[0] || null;
 
   const act = (fn: () => Promise<unknown>, said?: string) => async () => {
     setError(null); setNote(null); setBusy(true);
@@ -2549,12 +2589,134 @@ export function Inside({ onPlans, start = "", onLeave }: {
         // square of whoever spoke last wears the light. The transcript
         // stays below — the scene is where you are, the transcript is
         // what was said.
-        <div className={"card" + (inRoom ? " room-stage" : "")}>
+        // `rs-behind-film` while the frame is full-screen: the room
+        // stops painting its own light and chrome underneath. A
+        // takeover the room paints through is not a takeover.
+        <div className={"card" + (inRoom ? " room-stage" : "")
+                        + (filmFull ? " rs-behind-film" : "")}>
           {/* In a room the faces ARE the screen, so the heading goes: it
               labels a section on a page, and there is no page left to be a
               section of. Outside a room — the same component, no room open
               — it still says what it is. */}
           {!inRoom && <h3>{tr("ins.scene", lang)}</h3>}
+          {/* The format switch, and the sentence that makes it safe to
+              press: this is YOUR screen. Two people in one room can sit
+              in different formats and neither moves the other's. It says
+              so out loud, because a control inside a shared room reads
+              by default as something everybody gets. */}
+          <div className="rs-formats" role="group"
+               aria-label={tr("ins.format", lang)}>
+            {/* Keys written out rather than built from the format name.
+                A lookup assembled with a template literal is invisible
+                to the extractor next door, which then reports three
+                strings translated into ten languages and read by
+                nobody. */}
+            {([["audio", tr("ins.format.audio", lang)],
+               ["avatar", tr("ins.format.avatar", lang)],
+               ["video", tr("ins.format.video", lang)]] as const).map(
+              ([key, name]) => (
+                <button key={key} type="button"
+                        className={"rs-format" + (format === key ? " lit" : "")}
+                        aria-pressed={format === key}
+                        onClick={() => { setFormat(key);
+                                         setRoomFormat(key); }}>
+                  {name}
+                </button>
+              ))}
+            {format === "avatar" && (
+              <div className="rs-framing" role="group"
+                   aria-label={tr("idn.forge.shot", lang)}>
+                {([["face", tr("idn.forge.face", lang)],
+                   ["upper", tr("idn.forge.upper", lang)],
+                   ["full", tr("idn.forge.full", lang)]] as const).map(
+                  ([key, name]) => (
+                    <button key={key} type="button"
+                            className={"rs-format small"
+                                       + (framing === key ? " lit" : "")}
+                            aria-pressed={framing === key}
+                            onClick={() => setFraming(key)}>{name}</button>
+                  ))}
+              </div>
+            )}
+            <span className="rs-formats-note muted small">
+              {tr("ins.format.sub", lang)}
+            </span>
+          </div>
+
+          {/* The stage: one frame, holding whoever the turn belongs to.
+              The room was a grid where every seat carried its own box.
+              That reads as a wall of small windows and gets worse with
+              every seat — at eight there was nothing big enough to look
+              at. A rail of faces and one frame is the shape a room
+              actually has: you look at whoever is talking, and you can
+              see who else is there.
+
+                  asked     can every seat show its format
+                  mattered  can you SEE the one that matters */}
+          {onStage && (
+            <div className={"room-focus"
+                            + (isTalking(onStage) ? " talking" : "")}>
+              <div className="rf-head">
+                <div>
+                  <div className="rf-who">{onStage.display}</div>
+                  <div className="rf-sub muted small">
+                    {format === "video" ? tr("ins.format.video", lang)
+                     : format === "avatar" ? tr("ins.format.avatar", lang)
+                     : tr("ins.format.audio", lang)}
+                  </div>
+                </div>
+                <span className="rf-ai">{tr("ins.film.ai", lang)}</span>
+              </div>
+
+              {format === "video" && (
+                <SeatFilm profileId={onStage.id} display={onStage.display}
+                          talking={isTalking(onStage)} lang={lang}
+                          onFull={setFilmFull} />
+              )}
+
+              {format === "avatar" && (
+                <AvatarStage
+                  inline
+                  framing={framing}
+                  onExpand={() => setStaged(onStage.id)}
+                  clear={channel === "ar" || channel === "vr"}
+                  profileId={onStage.id}
+                  token={(onStage.id === session.profileId
+                            ? session.ownerToken
+                            : onStage.id === dockedProfile
+                              ? dockOwner : null)
+                         || session.interactorToken || ""}
+                  owned={!!(onStage.id === session.profileId
+                              ? session.ownerToken
+                              : onStage.id === dockedProfile
+                                ? dockOwner : null)}
+                  avatar={(onStage.id === session.profileId ? myFace
+                             : aiFaces[onStage.id]) || null}
+                  onClose={() => undefined}
+                  onChanged={(a) => {
+                    setAiFaces((m) => ({ ...m, [onStage.id]: a }));
+                    if (onStage.id === session.profileId) setMyFace(a);
+                  }}
+                  onError={setError} />
+              )}
+
+              {/* The photograph road. The still, big, and nothing else —
+                  an audio turn has no second thing to show. */}
+              {format === "audio" && (
+                <div className="rf-voice">
+                  {(onStage.kind === "user"
+                      ? myFace?.asset : aiFaces[onStage.id]?.asset)
+                    ? <img alt="" src={(() => {
+                        const a = (onStage.kind === "user"
+                          ? myFace?.asset
+                          : aiFaces[onStage.id]?.asset) as string;
+                        return a.startsWith("http") ? a : getBase() + a;
+                      })()} />
+                    : <span className="rf-none" aria-hidden="true">👤</span>}
+                </div>
+              )}
+            </div>
+          )}
           <div className="room-scene">
             {seats.map((s) => {
               const face = scene?.faces[s.id];
