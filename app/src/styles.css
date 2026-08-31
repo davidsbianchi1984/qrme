@@ -2464,6 +2464,47 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 }
 .road.lit .road-name { color: #fff; }
 
+/* What the lit road opens, and it has to LOOK opened.
+ *
+ *     asked     it should pop up below the buttons so we don't have to
+ *               scroll even further past avatar
+ *     mattered  it already was below them, and read as the next section
+ *               of the page instead of as this button's contents
+ *
+ * The video block and the forge sat in the flow as plain headings, so a
+ * screen that had just grown by six hundred pixels looked the same as a
+ * screen somebody had scrolled — and the panel was reported as showing
+ * "for a split second" and going away. It never went anywhere; it opened
+ * out of sight.
+ *
+ * Its own ground and a notch pointing back at the row, so the eye lands
+ * on something that is visibly attached to what was pressed rather than
+ * on a heading that could belong to anything. `chooseRoad` scrolls it
+ * into view; this is what it arrives at. */
+.road-drawer {
+  position: relative;
+  margin: 12px 0 6px;
+  padding: 14px 13px 4px;
+  border: 1px solid var(--brand);
+  border-radius: 12px;
+  background: linear-gradient(180deg,
+              rgba(42, 33, 96, .34), rgba(34, 26, 78, .12) 120px,
+              transparent 240px);
+  scroll-margin-top: 12px;
+}
+/* The notch: a small square of the drawer's own edge, turned, sitting on
+   the seam so the panel reads as hanging off the row above it. */
+.road-drawer::before {
+  content: ""; position: absolute; top: -6px; left: 26px;
+  width: 10px; height: 10px; transform: rotate(45deg);
+  background: #2a2160;
+  border-left: 1px solid var(--brand);
+  border-top: 1px solid var(--brand);
+}
+/* The first heading inside sits against the top edge rather than adding
+   a second gap on top of the drawer's own padding. */
+.road-drawer > h4:first-of-type { margin-top: 0; }
+
 /* The quote. Amber because it is a cost being disclosed, not an error and
    not a success — the person is being told what this will take before
    they spend it. */
@@ -3127,6 +3168,59 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   flex: 0 0 auto;
 }
 
+/* Where the height goes, on a phone.
+ *
+ *     asked     shrink the composer, kill the empty bands above and
+ *               below it, and let me see three seats without scrolling
+ *     mattered  every band was somebody's fix, so none of them could
+ *               simply be deleted
+ *
+ * Measured in the room rather than guessed at. The card is a fixed 860px
+ * flex column and the four bands inside it were taking:
+ *
+ *     bar        26   seats 194   figure 329   strip 209   dead 63
+ *
+ * The seats got the least of anything and showed one and a half rows of
+ * faces, which is the report: two frames and a third with the plus,
+ * without scrolling.
+ *
+ * The empty band above the composer is `.rs-chatlog`, and it is empty on
+ * purpose — `flex: 0 0 135px` is a FIXED reserve so the strip below it
+ * does not travel down the page as the conversation grows. That was its
+ * own field report ("the buttons at the bottom I have circled disappear
+ * mid conversation"), so the band cannot be removed, only made smaller:
+ * three rows of reserve instead of five. The strip still never moves.
+ *
+ * The dead 63px at the bottom was the card's leftover, and leftover is
+ * exactly what the seats wanted. `flex: 1 1 auto` with a floor of two
+ * rows hands it to them instead of leaving it blank. */
+@media (max-width: 719px) {
+  /* Two rows of seats, floored, and the leftover on top of that. 128px
+     a tile plus the 8px gap. */
+  .screen.room-place > .card.room-stage > .room-scene {
+    /* 280, not 264. Two rows measured at 67..203 and 211..346 is 279px of
+       tiles, and a floor of 264 clipped the second row by fifteen pixels
+       — which is the same "half a row" the report was about, just a
+       smaller half. `flex: 1 1 auto` takes whatever the frame gives back
+       on top of that. */
+    flex: 1 1 auto; min-height: 280px; max-height: none;
+  }
+  /* The frame gives some back too, and its rule lives further down the
+     file with the other `.avatar-stage.inline` sizing — a media query
+     adds no specificity, so it has to come AFTER the plain rule it
+     overrides, not here. */
+  /* Three rows of reserve, not five. 54px back, and the strip is still
+     nailed in place. */
+  .screen.room-place .rs-chatlog { flex: 0 0 81px; height: 81px; }
+  /* The composer and its row of five, smaller. */
+  .screen.room-place .rs-chatpill { padding: 2px 6px; }
+  .screen.room-place .rs-chatpill input { font-size: 16px; }
+  .screen.room-place .rs-strip { padding: 2px 0 0; gap: 6px; }
+  .screen.room-place .rs-round {
+    width: 30px; height: 30px; min-height: 30px; font-size: 13px;
+  }
+}
+
 /* Smaller boxes on a phone.
  *
  *     asked     these look way too big of the user frames
@@ -3507,6 +3601,24 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .app.in-room .screen.room-place .rs-voicebar {
   flex: 0 0 auto; margin: 0;
 }
+/* And the room stops reserving a floor for something that is no longer
+   hovering over it.
+ *
+ *     asked     remove the gaps
+ *     mattered  the biggest one was a reservation for a strip that had
+ *               already stopped needing it
+ *
+ * On the flat page `.rs-chatstrip` is `position: absolute; bottom: 6px`,
+ * riding over the scene, and `.card:has(> .room-scene)` keeps 62px of
+ * padding underneath so it covers nothing. In the room the rule above
+ * puts the strip back into the flow as a flex item — and the reserve
+ * stayed, holding 63px of nothing at the bottom of the card. Measured
+ * twice, before and after the bands were rebalanced, and it was the same
+ * 63 both times, which is what gave it away: everything else moved and
+ * that did not. */
+.app.in-room .screen.room-place > .card.room-stage:has(> .room-scene) {
+  padding-bottom: 10px;
+}
 /* The frame stops being a fixed 4:3 box in a window it now owns. */
 .app.in-room .rf-voice { aspect-ratio: auto; flex: 1 1 auto; min-height: 0; }
 
@@ -3624,7 +3736,17 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .room-focus { min-height: min-content; }
 .avatar-stage.inline { min-height: 220px; }
 @media (max-width: 719px) {
-  .avatar-stage.inline { min-height: 200px; max-height: 40vh; }
+  /* The frame gives some back so the seats can hold three — asked for
+     directly: "if we have to shrink the video player, let's do that
+     because I wanna be able to see two frames and a 3rd with a blank
+     avatar with the plus". */
+  .avatar-stage.inline {
+    /* A `max-height` in pixels, because `aspect-ratio: 4/3` is what
+       actually sets this box: at a 350px-wide card it wanted 263px and
+       sailed under a 32vh cap without touching it. Measured, not
+       assumed — the min-height was never the binding constraint. */
+    min-height: 148px; max-height: 200px;
+  }
 }
 .app.in-room .screen.room-place > .card.room-stage { overflow-y: auto; }
 

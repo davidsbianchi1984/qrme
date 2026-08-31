@@ -85,6 +85,9 @@ export function Identity({ onPlans, onPassing }: {
   // `film` because that is the DEPLOYMENT's choice: once an owner picks,
   // the two disagree, and the tile has to light on the owner's.
   const [filmPick, setFilmPick] = useState("");
+  // The drawer the roads open, so pressing one can bring it to the eye
+  // rather than leaving it somewhere below the fold.
+  const drawer = useRef<HTMLDivElement | null>(null);
   const [film, setFilm] = useState<
     Awaited<ReturnType<typeof api.videoDoors>> | null>(null);
   const [passage, setPassage] = useState("");
@@ -420,6 +423,12 @@ export function Identity({ onPlans, onPassing }: {
    */
   async function chooseRoad(key: "photo" | "avatar" | "video") {
     setRoad(key);
+    // After the paint that adds it, not before — the element does not
+    // exist yet on the press that opens it, and scrolling to a ref that
+    // is still null is the silent no-op version of this whole bug.
+    requestAnimationFrame(() => {
+      drawer.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
     if (!me) return;
     try {
       const got = await api.videoSetRoad(me, key);
@@ -931,6 +940,29 @@ export function Identity({ onPlans, onPassing }: {
           ))}
         </div>
 
+        {/* What the pressed button opens, attached to it.
+          *
+          *     asked     when you press video generation or avatar it
+          *               should pop up below the buttons, so we don't
+          *               have to scroll even further past avatar
+          *     mattered  it already WAS below them, and that was not the
+          *               same thing as being findable
+          *
+          * The order was never wrong — roads, then the video block, then
+          * the forge. But the block is long and the page is longer, so
+          * pressing a road opened a panel below the fold: it "shows up
+          * for a split second" as the layout grows and then the screen is
+          * still showing the buttons, with the thing you asked for
+          * somewhere underneath. Reported as the options going away.
+          *
+          * So the two panels share one drawer that is visibly the
+          * button's own — its own ground, hairline and a notch pointing
+          * back up at the row — and choosing a road scrolls it into
+          * view. Nothing moved in the markup; what changed is that the
+          * screen now takes you to what you pressed. */}
+        {(road === "video" || (road === "avatar" && forge?.configured)) && (
+        <div className="road-drawer" ref={drawer}>
+
         {/* The video road. Drawn whatever the deployment has chosen: with
             nothing configured it says WHICH of the three variables is
             missing, because "not configured" teaches an operator nothing
@@ -1089,6 +1121,9 @@ export function Identity({ onPlans, onPassing }: {
                      onChange={(e) => void headFrom(e.target.files?.[0])} />
             </details>
           </>
+        )}
+
+        </div>
         )}
 
         <h4>{tr("idn.deck.market", lang)}</h4>
