@@ -3,8 +3,10 @@ import { type Shot } from "../Avatar3D";
 import { isEcho, RECENT_TURNS } from "../echo";
 import { AvatarStage } from "../AvatarStage";
 import { TalkRail } from "../TalkRail";
+import { Waveform } from "../Waveform";
 import { accountApi, api, getBase, type Avatar, type RoomFaces,
          type RoomMsg } from "../api";
+import { field } from "../fields";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { SeatFilm } from "../SeatFilm";
@@ -180,6 +182,15 @@ function fileWhy(key: string | null | undefined, lang: string): string | null {
   return null;
 }
 
+/** The table seats eight.
+ *
+ * The same eight `join_room` enforces — "this room is full — eight
+ * seats, and every one taken". Named here so the empty chair knows when
+ * to stop offering, and so a screen that offers a ninth seat and a door
+ * that refuses one cannot drift apart quietly.
+ */
+const SEATS = 8;
+
 export function Inside({ onPlans, start = "", onLeave }: {
   onPlans: () => void;
   /** A room id handed in by the Rooms screen's join — the field is
@@ -198,7 +209,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
   const [roomId, setRoomId] = useState(start);
   const [transcript, setTranscript] = useState<RoomMsg[]>([]);
   const [seats, setSeats] = useState<
-    { kind: string; id: string; display: string }[]>([]);
+    { kind: string; id: string; display: string;
+      /** What this seat is here for, under the name — the profile's own
+       *  field, as the server holds it. Absent on a person's seat and on
+       *  a profile that has not said, and the tile draws the name alone
+       *  rather than inventing one. */
+      role?: string | null }[]>([]);
   // Profiles asked in whose owners have not yet said yes — drawn as
   // waiting frames, so the press that invited somebody visibly did
   // something ("they never showed up a new frame").
@@ -2716,19 +2732,32 @@ export function Inside({ onPlans, start = "", onLeave }: {
                   onError={setError} />
               )}
 
-              {/* The photograph road. The still, big, and nothing else —
-                  an audio turn has no second thing to show. */}
+              {/* The photograph road: the face, and the voice reading.
+                  An audio turn has no second thing to show, so the still
+                  is the whole picture — a circle on a dark ground with
+                  the reading under it, not a photograph stretched to the
+                  corners. Full-bleed was tried and the AI mark burned
+                  into the picture's own pixels came up the size of a
+                  poster with it. */}
               {format === "audio" && (
                 <div className="rf-voice">
-                  {(onStage.kind === "user"
-                      ? myFace?.asset : aiFaces[onStage.id]?.asset)
-                    ? <img alt="" src={(() => {
-                        const a = (onStage.kind === "user"
-                          ? myFace?.asset
-                          : aiFaces[onStage.id]?.asset) as string;
-                        return a.startsWith("http") ? a : getBase() + a;
-                      })()} />
-                    : <span className="rf-none" aria-hidden="true">👤</span>}
+                  <div className="rf-orb">
+                    {(onStage.kind === "user"
+                        ? myFace?.asset : aiFaces[onStage.id]?.asset)
+                      ? <img alt="" src={(() => {
+                          const a = (onStage.kind === "user"
+                            ? myFace?.asset
+                            : aiFaces[onStage.id]?.asset) as string;
+                          return a.startsWith("http") ? a : getBase() + a;
+                        })()} />
+                      : <span className="rf-none" aria-hidden="true">👤</span>}
+                  </div>
+                  {/* Only while a voice is actually in the air. The strip
+                      draws a reading, and a reading of silence that moves
+                      is not a reading. */}
+                  <Waveform lang={lang}
+                            presence={isTalking(onStage) ? "speaking"
+                                                         : "idle"} />
                 </div>
               )}
             </div>
@@ -2957,6 +2986,18 @@ export function Inside({ onPlans, start = "", onLeave }: {
                   </span>
                 )}
                 <span className="rs-name">{s.display}</span>
+                {/* What they are here FOR, under the name.
+                    "Dr. Amara Osei" and "Dr. Amara Osei · Healthcare"
+                    answer different questions, and a room of specialists
+                    where nobody says what they specialise in makes the
+                    reader open three profiles to find out. A person's own
+                    seat says "You"; a profile that has not named a field
+                    draws the name alone rather than a made-up title. */}
+                <span className="rs-role">
+                  {s.kind === "user" && s.id === me
+                    ? tr("ins.seat.you", lang)
+                    : field(s.role, lang)}
+                </span>
                 {/* The two roads out of a seat, beside the face rather
                     than competing with it for the middle of the tile.
                     Each one puts THIS seat in the frame and sets the
@@ -3272,6 +3313,40 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 </span>
               </div>
             ))}
+            {/* The empty seat, and the way somebody gets into it.
+             *
+             *     asked     who is in this room
+             *     mattered  how does anybody ELSE get in
+             *
+             * A blank silhouette wearing a plus, drawn as a seat rather
+             * than as a button somewhere else on the screen — because
+             * the question "who else could be here" is asked while
+             * looking at who is, and the answer belongs in the same row
+             * of faces. Not a bare +: an empty chair reads as an empty
+             * chair, a floating plus reads as a control for whatever it
+             * happens to be sitting next to.
+             *
+             * It follows the last person in and keeps following as the
+             * room grows, until the table is full — eight seats, the cap
+             * `join_room` already enforces — and then it is gone, because
+             * an invitation to a room that cannot take anybody is an
+             * invitation to a refusal. */}
+            {inRoom && seats.length + invited.length < SEATS && (
+              <button type="button" className="rs-tile rs-empty"
+                      aria-label={tr("ins.seat.add", lang)}
+                      onClick={() => setAsking(true)}>
+                <span className="rs-blank" aria-hidden="true">
+                  <span className="rs-blank-face">{"\u{1F464}"}</span>
+                  <span className="rs-blank-plus">+</span>
+                </span>
+                <span className="rs-name">{tr("ins.seat.add", lang)}</span>
+                <span className="rs-role">
+                  {fill(tr("ins.seat.room", lang),
+                        { left: String(SEATS - seats.length
+                                       - invited.length) })}
+                </span>
+              </button>
+            )}
             {/* The conversation, worn on the room itself — the gallery's
                 design (screens 96–98, 105) the flat card below never
                 delivered until a field report held the mockups up next

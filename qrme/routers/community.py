@@ -150,6 +150,28 @@ def _display(kind: str, ref_id: str) -> str:
     return interactor_or_404(ref_id)["display_name"]
 
 
+def _role(kind: str, ref_id: str) -> str | None:
+    """What this seat is here for, under the name.
+
+        asked     who is in this room
+        mattered  what are they FOR
+
+    "Dr. Amara Osei" and "Dr. Amara Osei · Healthcare" answer different
+    questions, and a room full of specialists where nobody says what they
+    specialise in makes the reader open three profiles to find out.
+
+    Only for profiles, and only when one has said: a person's seat is the
+    person, and inventing a job title for them would be a claim the
+    product has no basis for. `None` is a profile that has not said, which
+    is most of them and is not a failure — the client draws the name
+    alone.
+    """
+    if kind != "profile":
+        return None
+    field = (profile_or_404(ref_id).get("industry") or "").strip()
+    return field or None
+
+
 def _media_brief(media_id: str | None, read: bool = False,
                  why: str | None = None, whole: int | None = None,
                  kept: int | None = None) -> dict | None:
@@ -695,7 +717,9 @@ def create_room(body: RoomCreate) -> dict:
         "id": room_id, "topic": body.topic, "channel": body.channel,
         "presence": _CHANNEL_NOTES[body.channel],
         "participants": [
-            {"kind": p.kind, "id": p.id, "display": _display(p.kind, p.id)}
+            {"kind": p.kind, "id": p.id,
+             "display": _display(p.kind, p.id),
+             "role": _role(p.kind, p.id)}
             for p in body.participants
         ],
     }
@@ -748,7 +772,8 @@ def open_standing_room(key: str, request: Request,
                 "opened": "joined",
                 "participants": [
                     {"kind": p["kind"], "id": p["ref_id"],
-                     "display": _display(p["kind"], p["ref_id"])}
+                     "display": _display(p["kind"], p["ref_id"]),
+             "role": _role(p["kind"], p["ref_id"])}
                     for p in _participants(row["id"])
                 ],
             }
@@ -776,7 +801,8 @@ def open_standing_room(key: str, request: Request,
         "opened": "created",
         "participants": [
             {"kind": p["kind"], "id": p["ref_id"],
-             "display": _display(p["kind"], p["ref_id"])}
+             "display": _display(p["kind"], p["ref_id"]),
+             "role": _role(p["kind"], p["ref_id"])}
             for p in _participants(room_id)
         ],
     }
@@ -822,7 +848,8 @@ def join_room(room_id: str, request: Request) -> dict:
         "presence": _CHANNEL_NOTES[room["channel"]],
         "participants": [
             {"kind": p["kind"], "id": p["ref_id"],
-             "display": _display(p["kind"], p["ref_id"])}
+             "display": _display(p["kind"], p["ref_id"]),
+             "role": _role(p["kind"], p["ref_id"])}
             for p in _participants(room_id)
         ],
         # The invites still standing — so the press that asked somebody in
@@ -1008,7 +1035,8 @@ def accept_room_invite(room_id: str, body: RoomInvite,
         "presence": _CHANNEL_NOTES[room["channel"]],
         "participants": [
             {"kind": p["kind"], "id": p["ref_id"],
-             "display": _display(p["kind"], p["ref_id"])}
+             "display": _display(p["kind"], p["ref_id"]),
+             "role": _role(p["kind"], p["ref_id"])}
             for p in _participants(room_id)
         ],
     }

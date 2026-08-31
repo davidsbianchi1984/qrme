@@ -439,6 +439,7 @@ def _seed_one_founder(conn, handle, name, persona, appearance, asset) -> str:
         _voice(conn, taken["profile_id"], handle)
         if handle == FOUNDER_HANDLE:
             for industry in FOUNDER_AI_PACKS:
+                _say_field(conn, taken["profile_id"], industry)
                 _ground(conn, taken["profile_id"], industry, force=True)
         return taken["profile_id"]
 
@@ -509,6 +510,7 @@ def _seed_one_founder(conn, handle, name, persona, appearance, asset) -> str:
     # The rendered half carries the industry libraries — see FOUNDER_AI_PACKS.
     if handle == FOUNDER_HANDLE:
         for industry in FOUNDER_AI_PACKS:
+            _say_field(conn, profile["id"], industry)
             _ground(conn, profile["id"], industry, force=True)
     return profile["id"]
 
@@ -732,6 +734,28 @@ def repair() -> dict:
         if row and _voice(conn, row["profile_id"], handle):
             repaired.append(f"{handle} (voice)")
     return {"repaired": len(repaired), "repaired_handles": repaired}
+
+
+def _say_field(conn, profile_id: str, industry: str) -> None:
+    """Record what field this profile works in, on the profile itself.
+
+        asked     which Field Pack does this starter get
+        mattered  can anything ASK what field this starter is in
+
+    The industry sat in the ``STARTERS`` table above — which is code, not
+    data. `_ground` read it, installed a pack from it, and let it go, so
+    no route could answer "what does Dr. Amara Osei do" and every screen
+    that wanted to say *Healthcare* under her name had to either invent it
+    or leave it blank. Writing it down costs one column and makes the
+    answer readable everywhere.
+
+    Blank-only, like every other backfill here: a profile whose owner has
+    set their own field does not get it overwritten on the next seed.
+    """
+    conn.execute(
+        "UPDATE profiles SET industry=? WHERE id=?"
+        " AND (industry IS NULL OR industry='')",
+        (industry, profile_id))
 
 
 def _ground(conn, profile_id: str, industry: str,
@@ -966,6 +990,7 @@ def seed() -> dict:
             # Grounding is part of the repair too: every deployment seeded
             # before this shipped has starters with no source material at
             # all, and they cannot be fixed by hand at 34 profiles.
+            _say_field(conn, taken["profile_id"], industry)
             if _ground(conn, taken["profile_id"], industry):
                 grounded.append(handle)
             continue
@@ -1030,6 +1055,7 @@ def seed() -> dict:
             provider_name=PROVIDER_NAME,
             business=True,
             profile_id=profile["id"]))
+        _say_field(conn, profile["id"], industry)
         if _ground(conn, profile["id"], industry):
             grounded.append(handle)
         created.append({"handle": f"@{handle}", "industry": industry,

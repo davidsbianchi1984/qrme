@@ -197,8 +197,13 @@ def open_tab(page, tab: str) -> bool:
     page.goto(BASE + "/", wait_until="networkidle")
     page.wait_for_timeout(700)
     page.evaluate("window.scrollTo(0, 0)")
+    # `is_visible`, not merely present. The fab is in the markup at every
+    # width and only *drawn* where the sidebar is not permanent, so at a
+    # desktop width this waited thirty seconds for a hidden button and
+    # then failed the whole run — on a page whose drawer was already open.
     fab = page.query_selector(".menu-fab")
-    if fab and page.get_attribute(".menu-fab", "aria-expanded") != "true":
+    if (fab and fab.is_visible()
+            and page.get_attribute(".menu-fab", "aria-expanded") != "true"):
         fab.click()
         page.wait_for_timeout(300)
     # The drawer stacks its tabs under collapsible group heads; open all

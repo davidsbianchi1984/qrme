@@ -2654,10 +2654,24 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
    no second thing to show, and a small circle floated in a large dark box
    is a frame apologising for being empty. */
 .rf-voice {
-  display: flex; align-items: center; justify-content: center;
+  display: flex; flex-direction: column; gap: 8px;
+  align-items: center; justify-content: center;
   background: rgba(0,0,0,.35); aspect-ratio: 4 / 3; overflow: hidden;
 }
-.rf-voice img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* A circle on a dark ground, not a photograph stretched to the corners.
+   Full-bleed was tried: the AI mark burned into the picture's own pixels
+   scaled up with it and arrived the size of a poster. */
+.rf-orb {
+  width: min(42%, 210px); aspect-ratio: 1 / 1; border-radius: 50%;
+  overflow: hidden; display: grid; place-items: center;
+  background: rgba(255,255,255,.05);
+  border: 2px solid rgba(255,255,255,.16);
+}
+.room-focus.talking .rf-orb {
+  border-color: var(--green);
+  box-shadow: 0 0 18px rgba(123,196,127,.35);
+}
+.rf-orb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .rf-none { font-size: 64px; opacity: .3; line-height: 1; }
 
 /* Windows: the rail down the left, the frame taking the rest.
@@ -2676,42 +2690,6 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   /* Everything that is not the rail or the frame runs the full width:
      the switch above, the strip below, the way into the headset. */
   .screen.room-place > .card.room-stage > * { grid-column: 1 / -1; }
-  /* ONE column, not two.
-   *
-   *     asked     how many faces fit across the rail
-   *     mattered  does a whole tile fit across the rail
-   *
-   * Two columns of a 250px rail is a 119px tile, and a 84px face beside
-   * two 28px controls does not fit in 119px — so the roads climbed onto
-   * the portrait. Read off the drawing that settled the tile: the faces
-   * are stacked, each one full rail width, the picture on the left and
-   * its two roads level with it on the right. A rail is a list of who is
-   * here. It was never supposed to be a small grid. */
-  .screen.room-place > .card.room-stage > .room-scene {
-    grid-column: 1; grid-row: 2;
-    grid-template-columns: minmax(0, 1fr);
-    align-content: start; overflow-y: auto; min-height: 0;
-    margin: 0;
-  }
-  /* And the tile is as tall as what is in it. The 179px floor was set
-     when a tile was a cell in a grid of equal squares; in a rail it just
-     leaves a hole under every name. */
-  .screen.room-place > .card.room-stage > .room-scene > .rs-tile {
-    /* `grid-auto-rows: 1fr` on the scene made every row an equal share of
-       the rail's height, which in a two-row grid is half the rail per
-       tile whatever is in it — hence the acre of empty ground under each
-       name. `auto` lets a tile be as tall as its own contents. */
-    min-height: 0;
-    /* And a lane for the roads. They are out of the flow, so without this
-       the portrait centres under them and the glyphs sit on the picture. */
-    padding-right: 44px;
-  }
-  .screen.room-place > .card.room-stage > .room-scene {
-    grid-auto-rows: auto;
-  }
-  .screen.room-place > .card.room-stage > .room-focus {
-    grid-column: 2; grid-row: 2; min-height: 0;
-  }
   .screen.room-place > .card.room-stage > .rs-chatstrip,
   .screen.room-place > .card.room-stage > .rs-voicebar {
     grid-row: 3; margin-top: 10px;
@@ -2724,14 +2702,13 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
  * a phone that gets its own JSX is a phone that gets its own bugs. */
 @media (max-width: 719px) {
   .screen.room-place > .card.room-stage > .room-focus { order: -1; }
-  .screen.room-place > .card.room-stage > .room-scene {
-    display: flex; overflow-x: auto; gap: 8px;
-    margin-top: 10px; padding-bottom: 4px;
-    -webkit-overflow-scrolling: touch; touch-action: pan-x;
-  }
-  .screen.room-place > .card.room-stage > .room-scene > .rs-tile {
-    flex: 0 0 118px; min-height: 148px;
-  }
+  /* The rail is the same rail here. It used to be a sideways strip of
+     118px tiles — a second layout for the same list, which is how the
+     tile rules written for the rail landed on a grid that was never
+     going to hold them: portraits over their own boxes, roles floating
+     across neighbours, nothing lining up with anything. One rail, both
+     widths, and only the numbers change. */
+  .screen.room-place > .card.room-stage > .room-scene { margin-top: 10px; }
 }
 
 /* While the frame is full-screen, the room stops painting underneath it.
@@ -2822,4 +2799,390 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   .rs-tile > .rs-side > .rs-road {
     width: 23px; height: 23px; font-size: 15px; border-radius: 8px; }
   .rs-circle-btn.rs-solo { width: 58px; }
+}
+
+/* ---- The empty seat, and what a seat says about itself ------------------- */
+
+/* The role, under the name. Small and quiet: the name is who, this is
+   what for, and a room of specialists where nobody says what they
+   specialise in makes the reader open three profiles to find out. */
+.rs-role {
+  display: block; font-size: 11px; line-height: 1.3;
+  color: var(--t3); margin-top: 1px;
+}
+.rs-tile.talking .rs-role { color: var(--t2); }
+
+/* The empty chair.
+ *
+ *     asked     who is in this room
+ *     mattered  how does anybody ELSE get in
+ *
+ * A blank silhouette wearing a plus, drawn as a SEAT rather than as a
+ * button somewhere else on the screen — because "who else could be here"
+ * is asked while looking at who is, and the answer belongs in the same
+ * column of faces. Not a bare +: an empty chair reads as an empty chair,
+ * and a floating plus reads as a control for whatever it happens to be
+ * sitting next to.
+ *
+ * Dashed, because a seat nobody is in should not look like a seat
+ * somebody is in. */
+.rs-empty {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px; justify-content: center; text-align: center;
+  background: rgba(255,255,255,.02);
+  border: 1px dashed rgba(255,255,255,.20);
+  border-radius: 16px; padding: 12px 8px; position: relative;
+  color: var(--t2); cursor: pointer;
+  transition: border-color .18s, background .18s, color .18s;
+}
+.rs-empty:hover {
+  border-color: var(--brand2); color: var(--txt);
+  background: rgba(123,92,255,.09);
+}
+.rs-blank {
+  position: relative; width: 84px; height: 84px; max-width: 62%;
+  display: grid; place-items: center;
+  border-radius: 50%; background: rgba(255,255,255,.05);
+  border: 1px dashed rgba(255,255,255,.22);
+}
+.rs-blank-face { font-size: 38px; line-height: 1; filter: grayscale(1);
+  opacity: .55; }
+/* The plus rides ON the silhouette rather than beside it, so the two read
+   as one idea — an empty person, and the way to fill them in. */
+.rs-blank-plus {
+  position: absolute; right: -2px; bottom: -2px;
+  width: 26px; height: 26px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 17px; font-weight: 700; line-height: 1; color: #fff;
+  background: linear-gradient(180deg, var(--brand2), var(--brand));
+  border: 2px solid var(--card);
+}
+.rs-empty .rs-name { color: inherit; }
+@media (max-width: 719px) {
+  .rs-blank { width: 58px; height: 58px; }
+  .rs-blank-face { font-size: 27px; }
+  .rs-blank-plus { width: 20px; height: 20px; font-size: 13px; }
+}
+
+/* ---- The rail, finished --------------------------------------------------
+ *
+ * Three corrections held against the drawing, each one a thing the rail
+ * got wrong on the way here.
+ */
+
+/* Round, not rounded. The portrait carries `border-radius: 50%` from its
+   base rule, and the rail's own sizing rule was more specific — so the
+   faces came back as rounded squares. */
+.screen.room-place > .card.room-stage > .room-scene
+  > .rs-tile > .rs-circle-btn.rs-solo .rs-photo {
+  border-radius: 50%;
+}
+
+/* Your own seat is a seat like the others.
+ *
+ *     asked     what is on my own tile
+ *     mattered  does my tile still LOOK like a tile
+ *
+ * The own-seat tile carries a sit-out button, a settings gear, a leave
+ * cross and the camera controls. In a wide grid of 179px squares there
+ * was room for all of it. In a rail box that shrinks with the room there
+ * is not, and it spilled over the neighbours — so in the rail those
+ * controls stand down.
+ *
+ * They are not deleted and they have not moved house: the room's own
+ * strip along the bottom carries the camera, the microphone and the way
+ * out, which is where a person reaches for them anyway. What the tile
+ * keeps is what every other tile has — a face, a name, and what they are
+ * here for. */
+.screen.room-place > .card.room-stage > .room-scene .rs-sitout,
+.screen.room-place > .card.room-stage > .room-scene .rs-controls,
+.screen.room-place > .card.room-stage > .room-scene .rs-gear,
+.screen.room-place > .card.room-stage > .room-scene .rs-hint,
+.screen.room-place > .card.room-stage > .room-scene .rs-worn,
+/* The old avatar ring, too. It was the door to the figure back when a
+   seat had no other one; the two roads beside the face are that door
+   now, and leaving both drew an empty rounded box around the role. */
+.screen.room-place > .card.room-stage > .room-scene .rs-avring {
+  display: none;
+}
+
+/* ---- The rail's cards, at every width ----------------------------------
+ *
+ * Lifted out of the desktop-only block. They were written for the rail
+ * and applied only above 720px, while a phone kept a sideways strip of
+ * 118px tiles — so on a phone the absolute glyph column, the percentage
+ * portrait and the shrink-to-fit boxes all landed on a layout none of
+ * them were written for. Photographed and sent back: "everything's not
+ * aligned."
+ *
+ * One rail. Only the numbers change with the width.
+ */
+/* ONE column, not two.
+ *
+ *     asked     how many faces fit across the rail
+ *     mattered  does a whole tile fit across the rail
+ *
+ * Two columns of a 250px rail is a 119px tile, and a 84px face beside
+ * two 28px controls does not fit in 119px — so the roads climbed onto
+ * the portrait. Read off the drawing that settled the tile: the faces
+ * are stacked, each one full rail width, the picture on the left and
+ * its two roads level with it on the right. A rail is a list of who is
+ * here. It was never supposed to be a small grid. */
+.screen.room-place > .card.room-stage > .room-scene {
+  grid-column: 1; grid-row: 2;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start; overflow-y: auto; min-height: 0;
+  margin: 0;
+}
+/* And the tile is as tall as what is in it. The 179px floor was set
+   when a tile was a cell in a grid of equal squares; in a rail it just
+   leaves a hole under every name. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile,
+.screen.room-place > .card.room-stage > .room-scene > .rs-empty {
+  /* `grid-auto-rows: 1fr` on the scene made every row an equal share of
+     the rail's height, which in a two-row grid is half the rail per
+     tile whatever is in it — hence the acre of empty ground under each
+     name. `auto` lets a tile be as tall as its own contents. */
+  min-height: 0;
+  /* And a lane for the roads. They are out of the flow, so without this
+     the portrait centres under them and the glyphs sit on the picture. */
+  padding-right: 44px;
+}
+/* Three standard boxes, and they shrink at the fourth.
+ *
+ *     asked     how many faces does the rail hold
+ *     mattered  what happens at the fourth
+ *
+ * The rule, in the owner's words: "standard framing size is three, so
+ * you'll always have two occupied, the third could be just a plus
+ * button... anything after three, the boxes start to shrink."
+ *
+ * Flex rather than grid rows, because that is exactly what `flex: 1 1
+ * 0` with a `max-height` says: share the rail equally, and never grow
+ * past the standard box. One, two or three boxes sit at 164px and the
+ * rail simply has room under them; the fourth pushes every box down
+ * together, so eight seats still fit the same rail with no scrollbar
+ * and no seat off the bottom. */
+.screen.room-place > .card.room-stage > .room-scene {
+  grid-column: 1; grid-row: 2;
+}
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile,
+.screen.room-place > .card.room-stage > .room-scene > .rs-empty {
+  /* One size, and it does not change.
+   *
+   *     asked     what happens when a fourth person arrives
+   *     mattered  what happens to the three already there
+   *
+   * The boxes shrank to fit, which turned three people into three
+   * different sizes of person the moment a fourth walked in — and took
+   * the faces down past the point of being faces: "you can't even see
+   * the faces any more." The size in the drawing was right to begin
+   * with. A box is a box now; the fourth sits below the third at the
+   * same size and the rail scrolls.
+   *
+   * Everything sits on the box's own centre line — the face, the name,
+   * the field, and on the empty seat the silhouette with its plus. */
+  flex: 0 0 auto; height: 172px; overflow: hidden;
+  display: flex; flex-direction: column; gap: 5px;
+  align-items: center; justify-content: center; text-align: center;
+}
+/* A face at the size a face is looked at.
+ *
+ * It was a percentage of the box, which tracked the box down as it
+ * shrank and left two people as dots. The box holds still now, so the
+ * circle can simply be the size it ought to be. */
+.screen.room-place > .card.room-stage > .room-scene
+  > .rs-tile > .rs-circle-btn.rs-solo,
+.screen.room-place > .card.room-stage > .room-scene
+  > .rs-empty > .rs-blank {
+  flex: 0 0 auto; width: 96px; height: 96px;
+  max-width: none; min-height: 0; aspect-ratio: 1 / 1;
+}
+.screen.room-place > .card.room-stage > .room-scene
+  > .rs-tile > .rs-circle-btn.rs-solo .rs-photo {
+  width: 100%; height: 100%;
+}
+/* The name and the role never shrink — they are the two things the
+   rail exists to say. */
+.screen.room-place > .card.room-stage > .room-scene .rs-name,
+.screen.room-place > .card.room-stage > .room-scene .rs-role {
+  flex: 0 0 auto;
+}
+.screen.room-place > .card.room-stage > .room-focus {
+  grid-column: 2; grid-row: 2; min-height: 0;
+}
+
+/* The AI mark, back in its corner.
+ *
+ * `.rs-ai` declares `position: absolute; top: 8px; left: 8px` — and
+ * `.rs-tile > *:not(.rs-behind)` pins every direct child to `relative`
+ * at (0,2,0), so on a shrunk card the mark sat in the flow under the
+ * role and was clipped in half. The third rule in this file to lose to
+ * that selector, and the last: matching its shape is what makes an
+ * absolute child of a tile actually absolute. */
+.rs-tile > .rs-ai {
+  position: absolute; top: 7px; left: 7px; z-index: 3;
+}
+/* Round, and round on every road into the tile. The profile seats draw
+   their portrait through `.rs-circle-btn`, a person's own draws it
+   directly, and only one of the two was coming out a circle. */
+.screen.room-place > .card.room-stage > .room-scene .rs-photo,
+.screen.room-place > .card.room-stage > .room-scene .rs-face {
+  border-radius: 50%;
+}
+
+/* The AI mark, back in its corner.
+ *
+ * `.rs-ai` declares `position: absolute; top: 8px; left: 8px` — and
+ * `.rs-tile > *:not(.rs-behind)` pins every direct child to `relative`
+ * at (0,2,0), so the mark sat in the flow under the role and was clipped
+ * by the box. The third rule here to lose to that selector, and the
+ * last: matching its shape is what makes an absolute child of a tile
+ * actually absolute. */
+.rs-tile > .rs-ai { position: absolute; top: 7px; left: 7px; z-index: 3; }
+
+/* Round, and round by every road into the tile. Profile seats draw their
+   portrait through `.rs-circle-btn`, a person's own draws it directly,
+   and only one of the two was coming out a circle. */
+.screen.room-place > .card.room-stage > .room-scene .rs-photo,
+.screen.room-place > .card.room-stage > .room-scene .rs-face {
+  border-radius: 50%;
+}
+
+/* Everything in a box sits on the box's own centre line — the face, the
+   name, the field, and on the empty seat the silhouette and its plus.
+   Said plainly because it was not true: the silhouette carried its plus
+   off to one side and the text under it lined up with neither. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile,
+.screen.room-place > .card.room-stage > .room-scene > .rs-empty {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; gap: 5px;
+}
+.rs-empty .rs-blank { margin: 0 auto; }
+
+/* The AI mark, back in its corner.
+ *
+ * `.rs-ai` declares `position: absolute; top: 8px; left: 8px` — and
+ * `.rs-tile > *:not(.rs-behind)` pins every direct child to `relative`
+ * at (0,2,0), so the mark sat in the flow under the field and was
+ * clipped by the box. The third rule in this file to lose to that
+ * selector, and the last: matching its shape is what makes an absolute
+ * child of a tile actually absolute. */
+.rs-tile > .rs-ai { position: absolute; top: 7px; left: 7px; z-index: 3; }
+
+/* Round, by every road into the tile. A profile seat draws its portrait
+   through `.rs-circle-btn`, a person's own draws it directly, and only
+   one of the two was coming out a circle. */
+.screen.room-place > .card.room-stage > .room-scene .rs-photo,
+.screen.room-place > .card.room-stage > .room-scene .rs-face {
+  border-radius: 50%;
+}
+
+/* Everything in a box sits on the box's own centre line: the face, the
+   name, the field, and on the empty seat the silhouette with its plus.
+   Said out loud because it was not true — the silhouette carried its
+   plus off to one side and the words under it lined up with neither. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile,
+.screen.room-place > .card.room-stage > .room-scene > .rs-empty {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; gap: 5px;
+}
+.rs-empty .rs-blank { margin: 0 auto; }
+
+/* The AI mark, back in its corner.
+ *
+ * `.rs-ai` declares `position: absolute; top: 8px; left: 8px` — and
+ * `.rs-tile > *:not(.rs-behind)` pins every direct child to `relative`
+ * at (0,2,0), so the mark sat in the flow under the field and was
+ * clipped by the box. The third rule in this file to lose to that
+ * selector, and the last: matching its shape is what makes an absolute
+ * child of a tile actually absolute. */
+.rs-tile > .rs-ai { position: absolute; top: 7px; left: 7px; z-index: 3; }
+
+/* Round, by every road into the tile. A profile seat draws its portrait
+   through `.rs-circle-btn`, a person's own draws it directly, and only
+   one of the two was coming out a circle. */
+.screen.room-place > .card.room-stage > .room-scene .rs-photo,
+.screen.room-place > .card.room-stage > .room-scene .rs-face {
+  border-radius: 50%;
+}
+
+/* Everything in a box sits on the box's own centre line: the face, the
+   name, the field, and on the empty seat the silhouette with its plus.
+   Said out loud because it was not true — the silhouette carried its
+   plus off to one side and the words under it lined up with neither. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile,
+.screen.room-place > .card.room-stage > .room-scene > .rs-empty {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; gap: 5px;
+}
+.rs-empty .rs-blank { margin: 0 auto; }
+
+/* ---- Last corrections against the drawing ------------------------------- */
+
+/* The two roads sit BESIDE the face, not against the far wall.
+ *
+ *     asked     where do the roads go
+ *     mattered  how far from the face
+ *
+ * Pinned to the tile's right edge they were fine while the box was wide
+ * and the portrait large. On a narrower box with a smaller portrait the
+ * same rule left a gulf of empty ground between the face and its own two
+ * controls: "look how far off the buttons are to the right — it should
+ * be pretty close to the profile photo."
+ *
+ * So they are placed off the CENTRE now, which is where the portrait
+ * is, rather than off an edge that moves independently of it. Half the
+ * portrait plus a small gap: they land against the circle at any box
+ * width, and the face keeps the middle by being nudged the same distance
+ * the other way. */
+.rs-tile > .rs-side {
+  top: 50%; right: auto; left: calc(50% + 54px);
+  transform: translateY(-50%);
+}
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile {
+  padding-right: 0;
+}
+/* The face, bumped left by half the lane the roads occupy, so the pair
+   of them together sit centred in the box. */
+.screen.room-place > .card.room-stage > .room-scene
+  > .rs-tile > .rs-circle-btn.rs-solo {
+  margin-left: -40px;
+}
+
+/* The AI mark, back in its corner. `.rs-ai` declares its own
+   `position: absolute`, and `.rs-tile > *:not(.rs-behind)` pins every
+   direct child to `relative` at (0,2,0) — so the mark sat in the flow
+   under the field and was clipped by the box. The third rule in this
+   file to lose to that selector, and the last. */
+.rs-tile > .rs-ai { position: absolute; top: 7px; left: 7px; z-index: 3; }
+
+/* Round, by every road into the tile. A profile seat draws its portrait
+   through `.rs-circle-btn`, a person's own draws it directly, and only
+   one of the two was coming out a circle. */
+.screen.room-place > .card.room-stage > .room-scene .rs-photo,
+.screen.room-place > .card.room-stage > .room-scene .rs-face {
+  border-radius: 50%;
+}
+
+/* The portrait is a picture, not a button that happens to hold one.
+ *
+ * `.card button:not(.primary)` paints a bordered, rounded-rectangle
+ * ground on every button inside a card, at (0,3,0). So a circular photo
+ * arrived sitting inside a visible rounded square, and the seat read as
+ * a badge rather than a face. The second control in this rail to lose to
+ * that same selector. */
+.screen.room-place > .card.room-stage > .room-scene .rs-circle-btn {
+  background: none; border: none; padding: 0; border-radius: 50%;
+}
+/* The mic-off dot, off the rail. It is a status mark for a seat that is
+   not speaking, and on a box this size it read as a control somebody had
+   left switched on — a red circle under a person's own name. The room's
+   own strip along the bottom already says whether your microphone is
+   open, and says it where the microphone is. */
+.screen.room-place > .card.room-stage > .room-scene .rs-mark {
+  display: none;
 }

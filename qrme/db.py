@@ -19,6 +19,12 @@ CREATE TABLE IF NOT EXISTS profiles (
     kind              TEXT NOT NULL,          -- self | other_person | fictional
     display_name      TEXT NOT NULL,
     persona           TEXT NOT NULL,          -- core identity description
+    -- The field this profile works in, in the marketplace's own vocabulary
+    -- ("healthcare", "mental_health"). Shown under the name wherever a
+    -- profile appears beside others, because "Dr. Amara Osei" and
+    -- "Dr. Amara Osei · Healthcare" answer different questions. NULL is a
+    -- profile that has not said, which is most of them.
+    industry          TEXT,
     demographics      TEXT NOT NULL DEFAULT '{}',
     sources           TEXT NOT NULL DEFAULT '[]',  -- imported content sources
     anonymous         INTEGER NOT NULL DEFAULT 0,
@@ -3042,6 +3048,14 @@ def db_path() -> str:
 #: considered migration with a backup, not in a startup path that runs on
 #: every connection.
 _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
+    # What field this profile works in — "healthcare", "mental_health" —
+    # so a seat in a room can say what somebody is there for under their
+    # name. It was only ever in the starter table in `seed.py`, which is
+    # code and not data: no route could read it, so every screen that
+    # wanted to say "Healthcare" under "Dr. Amara Osei" had to invent it
+    # or leave it out. Nullable, because a profile that has not said is a
+    # profile that has not said.
+    ("profiles", "industry", "TEXT"),
     ("briefcase_items", "unread_why", "TEXT"),
     ("briefcase_items", "full_chars", "INTEGER"),
     # What a memory landed under, and — when the arrangement is platform

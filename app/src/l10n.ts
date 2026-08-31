@@ -734,6 +734,15 @@ const CHROME: Table = {
   "ins.film.close": {
     en: "Back to the room", es: "Volver a la sala", fr: "Retour au salon", de: "Zurück in den Raum", pt: "Voltar para a sala", it: "Torna nella stanza", ja: "部屋に戻る", zh: "回到房间", hi: "कमरे में वापस", ar: "العودة إلى الغرفة",
   },
+  "ins.seat.you": {
+    en: "You", es: "Tú", fr: "Vous", de: "Du", pt: "Você", it: "Tu", ja: "あなた", zh: "你", hi: "आप", ar: "أنت",
+  },
+  "ins.seat.add": {
+    en: "Add someone", es: "Añadir a alguien", fr: "Inviter quelqu'un", de: "Jemanden einladen", pt: "Adicionar alguém", it: "Aggiungi qualcuno", ja: "だれかを招く", zh: "添加成员", hi: "किसी को जोड़ें", ar: "أضف شخصًا",
+  },
+  "ins.seat.room": {
+    en: "{left} seats left", es: "Quedan {left} asientos", fr: "{left} places restantes", de: "Noch {left} Plätze frei", pt: "Restam {left} lugares", it: "Restano {left} posti", ja: "残り{left}席", zh: "还剩 {left} 个座位", hi: "{left} सीटें बाकी", ar: "بقي {left} مقعدًا",
+  },
   "idn.forge.shot": {
     en: "How the photo is framed", es: "Cómo está encuadrada la foto", fr: "Le cadrage de la photo", de: "Wie das Foto gerahmt ist", pt: "Como a foto está enquadrada", it: "Come è inquadrata la foto", ja: "写真の写り方", zh: "照片的取景", hi: "फ़ोटो का फ़्रेम", ar: "كيف أُطِّرت الصورة",
   },
@@ -793,9 +802,6 @@ const CHROME: Table = {
   },
   "ins.pair.photo": {
     en: "Photo", es: "Foto", fr: "Photo", de: "Foto", pt: "Foto", it: "Foto", ja: "写真", zh: "照片", hi: "फ़ोटो", ar: "صورة",
-  },
-  "ins.pair.audio": {
-    en: "Audio", es: "Audio", fr: "Audio", de: "Audio", pt: "Áudio", it: "Audio", ja: "音声", zh: "语音", hi: "ऑडियो", ar: "الصوت",
   },
   "raise.time": {
     en: "The three time controls", es: "Los tres controles del tiempo", fr: "Les trois contrôles du temps", de: "Die drei Zeitregler", pt: "Os três controlos do tempo", it: "I tre controlli del tempo", ja: "3つの時間コントロール", zh: "三个时间控制", hi: "समय के तीन नियंत्रण", ar: "ضوابط الزمن الثلاثة",
