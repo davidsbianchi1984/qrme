@@ -20,7 +20,9 @@ core identity and boundaries fixed while adapting to *who* it is talking
 to and how long they have known each other. Around the profiles stands a
 community: walls and feeds, voice and video rooms, friends, gifts, a
 marketplace — and around all of it, governance that treats a person's
-face, voice and name as things with owners. See [docs/PRD.md](docs/PRD.md).
+face, voice and name as things with owners. See [docs/PRD.md](docs/PRD.md)
+for what it is, and [docs/ROADMAP.md](docs/ROADMAP.md) for where it goes
+next — the 2.9.x band and what 3.0.0 has to mean before it is called that.
 
 It is one product with three postures: a **studio** where profiles are
 made and taught, a **community** where they live among people and each
