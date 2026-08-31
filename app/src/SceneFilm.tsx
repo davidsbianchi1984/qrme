@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import { api, getBase, type SceneRender } from "./api";
-import { fill, t as tr, type Lang } from "./l10n";
+import { t as tr, fill, type Lang } from "./l10n";
+import { type SceneRender } from "./api";
+import { playable, useRenderRow } from "./sceneRender";
 
 /**
  * The reply, as footage — and the wait in between.
@@ -19,82 +19,13 @@ import { fill, t as tr, type Lang } from "./l10n";
  * to tell a render in progress from one that failed, or from a ceiling
  * they set themselves. So each says which it is, in words.
  *
- * The polling stops on unmount. That is not tidiness: leaving the screen
- * has to end the request loop, or every chat visited in a session goes on
- * asking the server about videos nobody is waiting for.
+ * The polling lives in `sceneRender`, shared with the room's own frame:
+ * two copies of a loop with a lifecycle and a stop is two chances to get
+ * the stop wrong, and a screen left polling has no symptom on the screen
+ * itself.
  */
-
-/** The render clock, asked once per session rather than per bubble.
- *
- *  `give_up_after` is the server's own ceiling on a job. Duplicating the
- *  number here would let a deployment that raised it keep a screen that
- *  quits early, so it is fetched — but a fetch per message bubble to
- *  learn one constant is a request storm, hence the memo. */
-let doorsOnce: Promise<{ give_up_after: number }> | null = null;
-function renderClock() {
-  if (!doorsOnce) {
-    doorsOnce = api.videoDoors()
-      // A deployment that will not answer its own door still gets a
-      // ceiling: a poller with no stop is worse than one that stops early.
-      .catch(() => ({ give_up_after: 15 * 60 }));
-  }
-  return doorsOnce;
-}
-
-const POLL_EVERY = 4000;
-
 export function SceneFilm({ scene, lang }: { scene: SceneRender; lang: Lang }) {
-  const [row, setRow] = useState<SceneRender>(scene);
-  const [gaveUp, setGaveUp] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const alive = useRef(true);
-
-  useEffect(() => setRow(scene), [scene]);
-
-  useEffect(() => {
-    alive.current = true;
-    // "capped" carries no id — it is the ceiling answering, not a job.
-    if (row.status !== "pending" || !row.id) return;
-    const started = Date.now();
-    const id = row.id;
-
-    async function tick() {
-      let ceiling = 15 * 60;
-      try {
-        ceiling = (await renderClock()).give_up_after;
-      } catch {
-        // Keep the fallback.
-      }
-      if (!alive.current) return;
-      if ((Date.now() - started) / 1000 > ceiling) {
-        // Not "failed". The job may well still be running, and the row
-        // keeps it — saying it failed would throw away a video somebody
-        // has already been billed for.
-        setGaveUp(true);
-        return;
-      }
-      try {
-        const got = await api.videoFollow(id);
-        if (!alive.current) return;
-        setRow(got);
-        if (got.status === "pending") {
-          timer.current = setTimeout(() => void tick(), POLL_EVERY);
-        }
-      } catch {
-        // An unreachable poll is not a failed render either. Try again.
-        if (alive.current) {
-          timer.current = setTimeout(() => void tick(), POLL_EVERY);
-        }
-      }
-    }
-    timer.current = setTimeout(() => void tick(), POLL_EVERY);
-
-    return () => {
-      alive.current = false;
-      if (timer.current) clearTimeout(timer.current);
-      timer.current = null;
-    };
-  }, [row.status, row.id]);
+  const { row, gaveUp } = useRenderRow(scene);
 
   if (row.status === "capped") {
     return (
@@ -117,8 +48,7 @@ export function SceneFilm({ scene, lang }: { scene: SceneRender; lang: Lang }) {
   }
 
   if (row.status === "done" && row.video_url) {
-    const src = row.video_url.startsWith("http")
-      ? row.video_url : getBase() + row.video_url;
+    const src = playable(row.video_url);
     return (
       <div className="bubble-scene done" data-screen="209">
         {/* Marked on the surface as well as in storage. `asset_is_marked`
