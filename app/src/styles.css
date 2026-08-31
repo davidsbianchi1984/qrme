@@ -2546,10 +2546,51 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   aspect-ratio: 4 / 3; max-height: 46vh; border-radius: 12px;
   overflow: hidden; border: 1px solid var(--line); background: #0b0820;
 }
-/* The rail keeps its four, smaller — it is the same rail. */
-.avatar-stage.inline .stage-rail { bottom: 10px; right: 8px; gap: 6px; }
-.avatar-stage.inline .stage-rail button { width: 30px; height: 30px;
-  font-size: 14px; }
+/* The rail keeps its four, smaller — it is the same rail.
+ *
+ *     asked     the expand button is hidden behind the pencil button
+ *     mattered  both are pinned to the same right edge, and only one of
+ *               them was told where to stop
+ *
+ * `.stage-grow` sits at `top: 8px; right: 8px` and is 8..38px down that
+ * edge. The rail is anchored at the BOTTOM of the same edge and grows
+ * upward as buttons are added, so its top button climbed into those
+ * thirty pixels and parked under the expand — which is not a z-order
+ * problem to be argued with, it is two things given the same address.
+ *
+ * A ceiling, so the rail cannot reach it: `top: 44px` is six clear
+ * pixels below where the expand ends, and `justify-content: flex-end`
+ * keeps the stack sitting on the bottom the way it did. If a fifth
+ * button is ever added the rail runs out of room and scrolls rather
+ * than climbing over the expand again. */
+.avatar-stage.inline .stage-rail {
+  top: 44px; bottom: 10px; right: 8px; gap: 6px;
+  justify-content: flex-end; overflow-y: auto;
+}
+/* `min-height` and not just `height`, on all three below.
+ *
+ * The phone lane carries `button { min-height: 44px }` — the touch-target
+ * floor — and a `min-height` beats a smaller `height` no matter how
+ * specific the selector setting it is. Measured: these came back 44px
+ * tall with `height: 28px` sitting right there in the rule, which is why
+ * the rail was 207px of buttons on a 263px frame. `button.chip` already
+ * had to learn this three hundred lines up.
+ *
+ * These four are glyphs inside a frame, not the frame's own actions, and
+ * they sit far enough apart that 28px is still a target you hit. */
+.avatar-stage.inline .stage-rail button { width: 28px; height: 28px;
+  min-height: 28px; font-size: 13px; flex: 0 0 auto; padding: 0; }
+/* And the expand comes down to the same size, so the corner reads as one
+   set of controls rather than one large button and three small ones. */
+.avatar-stage.inline .stage-grow { width: 28px; height: 28px;
+  min-height: 28px; font-size: 13px; }
+/* The three framing words, smaller. They are a choice you make once and
+   then stop looking at, and at full size they were the loudest thing on
+   the bottom edge of the frame. */
+.avatar-stage.inline .stage-shots { left: 8px; bottom: 8px; gap: 4px; }
+.avatar-stage.inline .stage-shots button {
+  padding: 2px 7px; font-size: 9px; min-height: 22px;
+}
 /* The wardrobe opens over the frame rather than beside the screen. */
 .avatar-stage.inline .wardrobe {
   bottom: 48px; right: 8px; left: 8px; width: auto; max-height: 70%;
@@ -2724,14 +2765,54 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
    * The bar is ordered ahead of it rather than the frame being ordered
    * back, so the seats stay below both. */
   .screen.room-place > .card.room-stage > .rs-bar { order: -2; }
-  .screen.room-place > .card.room-stage > .room-focus { order: -1; }
+  /* Who is here first, then what this turn looks like.
+   *
+   *     asked     the user and profile frames go at the top, and the
+   *               avatar or video below them
+   *     mattered  the frame is in the markup FIRST, so ordering it back
+   *               is not enough — the seats have to be ordered forward
+   *
+   * `.room-focus` used to carry `order: -1`, which put the figure above
+   * everything and left the seats under it. The room is the people in
+   * it; the figure is what one of them is doing this turn, and it reads
+   * that way round. The bar stays ahead of both at -2. */
+  .screen.room-place > .card.room-stage > .room-scene { order: -1; }
   /* The rail is the same rail here. It used to be a sideways strip of
      118px tiles — a second layout for the same list, which is how the
      tile rules written for the rail landed on a grid that was never
      going to hold them: portraits over their own boxes, roles floating
      across neighbours, nothing lining up with anything. One rail, both
      widths, and only the numbers change. */
-  .screen.room-place > .card.room-stage > .room-scene { margin-top: 10px; }
+  .screen.room-place > .card.room-stage > .room-scene { margin-top: 0; }
+  /* And the figure sits under them rather than over them. */
+  .screen.room-place > .card.room-stage > .room-focus { margin-top: 10px; }
+  /* Who gets the height, when there is not enough for both.
+   *
+   *     asked     the box that says "this turn, as a figure" only half
+   *               shows, and the expandable button can't be reached
+   *     mattered  the card is a fixed-height column that HIDES its
+   *               overflow, so anything squeezed out is not scrolled to
+   *               — it is gone
+   *
+   * Measured on the phone lane: `.card.room-stage` is 860px tall with
+   * `overflow: hidden`, and `.room-scene` takes `flex: 1 1 auto` and
+   * eats 502 of it (its own scrollHeight 542, so the rail was already
+   * scrolling inside itself). The figure card got the remainder and its
+   * bottom — the framing chips and the lower half of the rail — fell
+   * outside a box with nowhere to scroll.
+   *
+   * So the seats take a bounded share and scroll inside it, which they
+   * were doing anyway; the figure takes its own height and is never
+   * shrunk; and the card scrolls if the two still do not fit, because a
+   * control you cannot reach is worse than a scrollbar. */
+  .screen.room-place > .card.room-stage { overflow-y: auto; }
+  .screen.room-place > .card.room-stage > .room-scene {
+    flex: 0 1 auto; max-height: 46%;
+  }
+  .screen.room-place > .card.room-stage > .room-focus { flex: 0 0 auto; }
+  /* The seat's own size is set further down the file — see the note by
+     the 128px block, which has to come AFTER the plain rules it
+     overrides because a media query adds no specificity. */
 }
 
 /* While the frame is full-screen, the room stops painting underneath it.
@@ -3044,6 +3125,36 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .screen.room-place > .card.room-stage > .room-scene .rs-name,
 .screen.room-place > .card.room-stage > .room-scene .rs-role {
   flex: 0 0 auto;
+}
+
+/* Smaller boxes on a phone.
+ *
+ *     asked     these look way too big of the user frames
+ *     mattered  where the smaller number has to be WRITTEN
+ *
+ * This lived up in the phone block with the ordering rules, which is
+ * where it belongs by subject and the wrong place by cascade: a media
+ * query adds no specificity, and the 172px and 112px above are the same
+ * selectors later in the file, so they won on source order and the seats
+ * never shrank. The guard in `test_a_media_query_adds_no_specificity`
+ * caught it; the screenshot did not, because the rail's own height cap
+ * made the seats look smaller anyway.
+ *
+ * So it sits here, after the rules it overrides. A seat on a phone is a
+ * face and a name, and 172px of box around a 112px face spends a third
+ * of the screen saying so. The marks follow the face down on their own,
+ * because they are fractions of `--face`. */
+@media (max-width: 719px) {
+  .screen.room-place > .card.room-stage > .room-scene > .rs-tile,
+  .screen.room-place > .card.room-stage > .room-scene > .rs-empty {
+    height: 128px; padding: 8px 6px; padding-right: 40px;
+  }
+  .screen.room-place > .card.room-stage > .room-scene
+    > .rs-tile > .rs-circle-btn.rs-solo,
+  .screen.room-place > .card.room-stage > .room-scene
+    > .rs-empty > .rs-blank {
+    width: 84px; height: 84px;
+  }
 }
 .screen.room-place > .card.room-stage > .room-focus {
   grid-column: 2; grid-row: 2; min-height: 0;
@@ -3492,10 +3603,27 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
  *
  * A floor, so the frame is always a frame. Below it the card scrolls,
  * which is the honest outcome when a screen genuinely has no room. */
-.room-focus { min-height: 300px; }
+/* The floor is the contents, not a number.
+ *
+ *     asked     the expandable button only half shows, and the chips are
+ *               cut in half by the bottom of the box
+ *     mattered  a typed floor becomes a CEILING the moment the header
+ *               wraps
+ *
+ * This was `min-height: 260px` on a phone. The stage below the header
+ * carries its own `min-height: 200px`, and a flex item's min-height wins
+ * over shrinking — so once "Their face in three dimensions, mouth on the
+ * voice" wrapped to two lines, the header took ~90px, the stage insisted
+ * on 200, and 290px of content sat inside a 260px box. The overflow was
+ * the bottom of the stage: the framing chips at `bottom: 10px` and the
+ * lower half of the rail, outside the card and clipped.
+ *
+ * `min-content` on a flex column IS the sum of the items' own minimums —
+ * header plus stage, whatever the header turns out to be. It is the same
+ * floor the number was trying to name, and it cannot be outgrown. */
+.room-focus { min-height: min-content; }
 .avatar-stage.inline { min-height: 220px; }
 @media (max-width: 719px) {
-  .room-focus { min-height: 260px; }
   .avatar-stage.inline { min-height: 200px; max-height: 40vh; }
 }
 .app.in-room .screen.room-place > .card.room-stage { overflow-y: auto; }
@@ -4107,40 +4235,100 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 }
 /* The dark pill, in the burn's own colours: plate rgba(9,7,24,205/255),
    sparkle and letters at rgba(255,255,255,235/255). */
+/* Three variables, and every number below falls out of them.
+ *
+ *     asked     the badge does not cover the ones cropped differently
+ *     mattered  the badge's size was typed, and the face's was typed
+ *               somewhere else
+ *
+ * The geometry was written out in pixels three times over — once for the
+ * 120px face, once for the 104px phone face, once for the 72px rail —
+ * and the face's own size lives in a different rule again. Four numbers
+ * that have to agree, kept in four places, is a drift waiting to happen,
+ * and it had already happened: the rail rule sets a 112px face while the
+ * marks below it were still solving for 104.
+ *
+ * So the face declares `--face` and where its top-left corner sits, and
+ * the marks are the measured fractions of it. Checked against every
+ * value this replaces: at 120/`50% - 96px`/12px the AI plate resolves to
+ * left `50% - 28.5px`, top 16.2, 48.3 x 22.7, font 13.8 — the numbers
+ * that were there. Same for the phone's 104 and the rail's 72. Nothing
+ * moves; it just cannot come apart again. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile {
+  --face: 120px;
+  --face-left: calc(50% - 96px);
+  --face-top: 12px;
+}
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-ai {
-  left: calc(50% - 28.5px); top: 16.2px;
-  width: 48.3px; height: 22.7px;
-  font-size: 13.8px; font-weight: 700; letter-spacing: 0;
+  left: calc(var(--face-left) + var(--face) * 0.562500);
+  top: calc(var(--face-top) + var(--face) * 0.035156);
+  width: calc(var(--face) * 0.402344);
+  height: calc(var(--face) * 0.189453);
+  font-size: calc(var(--face) * 0.115234);
+  font-weight: 700; letter-spacing: 0;
   color: rgba(255, 255, 255, .92);
   background: rgba(9, 7, 24, .804);
   border: none; padding: 0;
-  border-radius: 11.35px;
+  border-radius: calc(var(--face) * 0.094727);
 }
 /* The gold plate: ground rgba(24,18,4,214/255), a two-pixel gold edge,
    tick and letters in the lighter gold. */
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-real {
-  left: calc(50% - 60.4px); top: 109.7px;
-  width: 80.2px; height: 18.0px;
-  font-size: 10.3px; font-weight: 700; letter-spacing: 0;
+  left: calc(var(--face-left) + var(--face) * 0.296875);
+  top: calc(var(--face-top) + var(--face) * 0.814453);
+  width: calc(var(--face) * 0.667969);
+  height: calc(var(--face) * 0.150391);
+  font-size: calc(var(--face) * 0.085938);
+  font-weight: 700; letter-spacing: 0;
   color: #f7d87a;
   background: rgba(24, 18, 4, .839);
   border: 2px solid #d4a83a;
   padding: 0;
-  border-radius: 9px;
+  border-radius: calc(var(--face) * 0.075195);
 }
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile
   > .rs-real::before { content: "\2713\00a0"; }
+
+/* A tile with no circle in it.
+ *
+ *     asked     the badge does not cover the ones cropped differently
+ *     mattered  on a full-bleed tile there is no circle to cover
+ *
+ * The marks are fractions of `--face`, which is the diameter of the
+ * sphere the face is drawn in — right for every seat that HAS one. Your
+ * own seat with a picture up does not: the photograph fills the tile
+ * edge to edge, the way the camera does. The variables still resolved,
+ * so the gold plate was solving the circle's geometry against a
+ * rectangle and landing at .98 of the way across the face — measured —
+ * hard against the right edge, under the name.
+ *
+ * Its own corner instead. This does NOT cover the mark burned into the
+ * file, and cannot: the burn sits at a fixed fraction of a SQUARE image,
+ * `object-fit: cover` crops that square by an amount only the browser
+ * knows, and CSS cannot be told where the crop left it. So on this one
+ * tile the burned mark and this one are both visible. The way that ends
+ * is unburned masters, not a cleverer offset. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile.rs-camtile
+  > .rs-real,
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile.rs-camtile
+  > .rs-ai {
+  left: auto; right: 6px;
+  width: auto; height: auto;
+  font-size: 9px; padding: 2px 7px;
+  border-radius: 999px;
+}
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile.rs-camtile
+  > .rs-ai { top: 6px; }
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile.rs-camtile
+  > .rs-real { top: auto; bottom: 6px; border-width: 1px; }
 @media (max-width: 719px) {
-  /* A 104px face, with the portrait's left edge at `50% - 82px`. */
-  .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-ai {
-    left: calc(50% - 23.5px); top: 15.7px;
-    width: 41.8px; height: 19.7px; font-size: 12px;
-    border-radius: 9.85px;
-  }
-  .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-real {
-    left: calc(50% - 51.1px); top: 96.7px;
-    width: 69.5px; height: 15.6px; font-size: 8.9px;
-    border-radius: 7.8px;
+  /* A smaller face on a phone, and the marks follow it because they are
+     fractions of it. This is the whole point of the variables: the size
+     below is the only number that changes. */
+  .screen.room-place > .card.room-stage > .room-scene > .rs-tile {
+    --face: 84px;
+    --face-left: calc(50% - 64px);
+    --face-top: 10px;
   }
 }
 .rr-who { margin: 10px 0 0; }
@@ -4319,16 +4507,23 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   display: none;
 }
 .app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
-  > .room-scene > .rs-tile > .rs-ai {
-  left: calc(50% + 1.5px); top: 10.5px;
-  width: 29px; height: 13.6px;
-  font-size: 8.3px; border-radius: 6.8px;
+  > .room-scene > .rs-tile {
+  --face: 72px;
+  /* 36, not 39. The 39 was derived from the tile keeping "only a 6px
+     lane"; measured against the face's own box the AI plate came back at
+     left .5208 of the face where the burn is at .5625 — three pixels
+     left, every time, on all four seats. Read off `getBoundingClientRect`
+     rather than recomputed from the padding, because the padding is what
+     was wrong. */
+  --face-left: calc(50% - 36px);
+  --face-top: 8px;
 }
+/* The gold edge is the one thing that is not a fraction — a two-pixel
+   border on a 72px face is a band across the plate rather than an edge
+   on it. */
 .app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
   > .room-scene > .rs-tile > .rs-real {
-  left: calc(50% - 17.6px); top: 66.6px;
-  width: 48.1px; height: 10.8px;
-  font-size: 6.2px; border-width: 1px; border-radius: 5.4px;
+  border-width: 1px;
 }
 
 /* The way out is not under the visitor counter.

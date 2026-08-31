@@ -659,6 +659,12 @@ const CHROME: Table = {
   "idn.video.service": {
     en: "Rendering service", es: "Servicio de representación", fr: "Service de rendu", de: "Renderdienst", pt: "Serviço de representação", it: "Servizio di rendering", ja: "レンダリングサービス", zh: "渲染服务", hi: "रेंडरिंग सेवा", ar: "خدمة التصيير",
   },
+  "idn.video.service.sub": {
+    en: "Press one. Every reply on this road is rendered by the service you pick here.", es: "Pulsa uno. Cada respuesta en este camino la representa el servicio que elijas aquí.", fr: "Appuie sur l'un d'eux. Chaque réponse sur cette voie est rendue par le service choisi ici.", de: "Wähl einen aus. Jede Antwort auf diesem Weg rendert der hier gewählte Dienst.", pt: "Carrega num deles. Cada resposta neste caminho é representada pelo serviço que escolheres aqui.", it: "Premine uno. Ogni risposta su questa strada è resa dal servizio che scegli qui.", ja: "ひとつ選んでください。この道でのすべての返答は、ここで選んだサービスが描き出します。", zh: "请选择一项。此路径上的每条回复都由这里选定的服务渲染。", hi: "एक चुनें। इस राह पर हर जवाब यहाँ चुनी गई सेवा से रेंडर होगा।", ar: "اختر واحدة. كل رد على هذا الطريق يصيّره ما تختاره هنا.",
+  },
+  "idn.video.service.shut": {
+    en: "Picking one is kept. Nothing renders until this deployment is pointed at a video service.", es: "Tu elección se guarda. Nada se representa hasta que esta instalación apunte a un servicio de vídeo.", fr: "Ton choix est conservé. Rien n'est rendu tant que ce déploiement ne pointe vers aucun service vidéo.", de: "Deine Wahl bleibt erhalten. Es wird nichts gerendert, bis diese Installation auf einen Videodienst zeigt.", pt: "A tua escolha fica guardada. Nada é representado até esta instalação apontar para um serviço de vídeo.", it: "La tua scelta viene conservata. Nulla viene reso finché questa installazione non punta a un servizio video.", ja: "選んだ内容は保存されます。この配備が動画サービスを指すまで、描き出しは行われません。", zh: "选择会被保存。在本部署指向某个视频服务之前，不会渲染任何内容。", hi: "आपकी पसंद रखी जाती है। जब तक यह परिनियोजन किसी वीडियो सेवा की ओर इशारा न करे, कुछ भी रेंडर नहीं होगा।", ar: "يُحفَظ اختيارك. ولا يُصيَّر شيء حتى يُوجَّه هذا النشر إلى خدمة فيديو.",
+  },
   "idn.video.passage": {
     en: "What is being rendered", es: "Qué se va a representar", fr: "Ce qui est rendu", de: "Was gerendert wird", pt: "O que vai ser representado", it: "Che cosa viene reso", ja: "何を描き出すか", zh: "要渲染的内容", hi: "क्या रेंडर किया जा रहा है", ar: "ما الذي يجري تصييره",
   },

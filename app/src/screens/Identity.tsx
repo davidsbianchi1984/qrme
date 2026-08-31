@@ -81,6 +81,10 @@ export function Identity({ onPlans, onPassing }: {
   const [budget, setBudget] = useState<
     { daily_seconds: number; spent: number; left: number } | null>(null);
   const [capDraft, setCapDraft] = useState("");
+  // Which company renders this profile. Held here rather than read off
+  // `film` because that is the DEPLOYMENT's choice: once an owner picks,
+  // the two disagree, and the tile has to light on the owner's.
+  const [filmPick, setFilmPick] = useState("");
   const [film, setFilm] = useState<
     Awaited<ReturnType<typeof api.videoDoors>> | null>(null);
   const [passage, setPassage] = useState("");
@@ -394,6 +398,7 @@ export function Identity({ onPlans, onPassing }: {
         setRoad(r.road as "photo" | "avatar" | "video");
         setBudget(r);
         setCapDraft(String(r.daily_seconds));
+        setFilmPick(r.provider);
       }).catch(() => setBudget(null));
       api.videoDirection(me).then((r) => setDirection(r.direction))
         .catch(() => setDirection(""));
@@ -421,11 +426,13 @@ export function Identity({ onPlans, onPassing }: {
       setRoad(got.road as "photo" | "avatar" | "video");
       setBudget(got);
       setCapDraft(String(got.daily_seconds));
+      setFilmPick(got.provider);
     } catch (e) {
       fail(e);
       api.videoRoad(me).then((r) => {
         setRoad(r.road as "photo" | "avatar" | "video");
         setBudget(r);
+        setFilmPick(r.provider);
       }).catch(() => undefined);
     }
   }
@@ -441,6 +448,27 @@ export function Identity({ onPlans, onPassing }: {
       const got = await api.videoSetRoad(me, road, Math.round(seconds));
       setBudget(got);
       setCapDraft(String(got.daily_seconds));
+      setFilmPick(got.provider);
+    } catch (e) {
+      fail(e);
+    }
+  }
+
+  /** Choose which company renders this profile's footage.
+   *
+   *  Sent with the road for the same reason the ceiling is — the three
+   *  live in one row — and the answer wins over the press, so a tile lit
+   *  on screen always names the service the next render will actually go
+   *  to. This picker had no handler at all until now: it drew every
+   *  provider, highlighted the deployment's, and dropped every click, so
+   *  picking a service looked like it worked and changed nothing.
+   */
+  async function chooseFilmProvider(key: string) {
+    if (!me) return;
+    try {
+      const got = await api.videoSetRoad(me, road, undefined, key);
+      setBudget(got);
+      setFilmPick(got.provider);
     } catch (e) {
       fail(e);
     }
@@ -936,11 +964,15 @@ export function Identity({ onPlans, onPassing }: {
             <p className="muted small">{tr("idn.road.spent", lang)}</p>
 
             <h4>{tr("idn.video.service", lang)}</h4>
+            <p className="muted small">{tr("idn.video.service.sub", lang)}</p>
             <SkinTiles
               sources={(film?.providers || [])
                 .map((k) => ({ key: k, name: k, how: "" }))}
-              chosen={film?.provider || ""}
-              onPick={() => undefined} />
+              chosen={filmPick}
+              onPick={(key) => void chooseFilmProvider(key)} />
+            {!film?.configured && (
+              <p className="muted small">{tr("idn.video.service.shut", lang)}</p>
+            )}
 
             {/* The standing direction, above the passage because it is
                 the frame the passage sits inside — and because somebody

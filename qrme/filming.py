@@ -347,12 +347,18 @@ def render(scene: str, *, seconds: int | None = None,
     # move the clock would make "put us on the beach" cost more money.
     prompt = compose(directed_for, scene) if directed_for else scene
 
+    # The service this PROFILE renders on, not whichever one the box was
+    # started with. Resolved once and used for the body, the answers and
+    # the give-up message alike, so every sentence about this render names
+    # the same company.
+    using = provider_for(directed_for or on_behalf_of)
+
     began = time.monotonic()
-    started = _ask(endpoint(), {"provider": provider(), "prompt": prompt,
+    started = _ask(endpoint(), {"provider": using, "prompt": prompt,
                                 "seconds": seconds, "shape": shape},
                    on_behalf_of=on_behalf_of)
     if started.get("video_url"):
-        return {"video_url": started["video_url"], "provider": provider(),
+        return {"video_url": started["video_url"], "provider": using,
                 "seconds": seconds, "waited": 0}
 
     job = started.get("id")
@@ -361,7 +367,7 @@ def render(scene: str, *, seconds: int | None = None,
             "the video service answered without a render or a job to "
             "follow — nothing here can be shown or waited for")
     if not wait:
-        return {"id": job, "pending": True, "provider": provider(),
+        return {"id": job, "pending": True, "provider": using,
                 **estimate(seconds)}
 
     while time.monotonic() - began < GIVE_UP_AFTER:
@@ -369,7 +375,7 @@ def render(scene: str, *, seconds: int | None = None,
         state = _ask(f"{endpoint()}/{job}", on_behalf_of=on_behalf_of)
         status = (state.get("status") or "").lower()
         if status == "done" and state.get("video_url"):
-            return {"video_url": state["video_url"], "provider": provider(),
+            return {"video_url": state["video_url"], "provider": using,
                     "seconds": seconds,
                     "waited": round(time.monotonic() - began)}
         if status == "failed":
@@ -378,7 +384,7 @@ def render(scene: str, *, seconds: int | None = None,
 
     raise FilmingError(i18n.fill(i18n.RENDER_GAVE_UP,
                                  minutes=GIVE_UP_AFTER // 60,
-                                 provider=provider(), job=job))
+                                 provider=using, job=job))
 
 
 def save(profile_id: str, data: bytes, *, name: str = "scene.mp4") -> dict:
@@ -580,21 +586,57 @@ DEFAULT_DAILY_SECONDS = 60
 
 
 def road_of(profile_id: str) -> dict:
-    """Which road this profile's presence takes, and its daily ceiling."""
+    """Which road this profile's presence takes, its ceiling, and its service.
+
+    ``provider`` is always a name a caller can act on: the profile's own
+    choice when it made one, and the deployment's otherwise. ``provider_set``
+    is how a screen tells those apart, so it can show a picked service
+    differently from an inherited one instead of claiming the owner chose
+    something they never touched.
+    """
     from . import db
     row = db.connect().execute(
-        "SELECT road, daily_seconds FROM presence_road WHERE profile_id=?",
-        (profile_id,)).fetchone()
+        "SELECT road, daily_seconds, provider FROM presence_road"
+        " WHERE profile_id=?", (profile_id,)).fetchone()
     if row is None:
         return {"road": DEFAULT_ROAD, "daily_seconds": DEFAULT_DAILY_SECONDS,
-                "set": False}
+                "set": False, "provider": provider(), "provider_set": False}
+    picked = row["provider"] if row["provider"] in PROVIDERS else None
     return {"road": row["road"], "daily_seconds": row["daily_seconds"],
-            "set": True}
+            "set": True, "provider": picked or provider(),
+            "provider_set": bool(picked)}
+
+
+def provider_for(profile_id: str | None) -> str:
+    """The service that renders THIS profile, falling back to the box's.
+
+    One place answers this, because the name has to be the same in the
+    body that is sent and in the row that records what was sent. Two
+    lookups is how a console ends up reporting a render against a service
+    that did not make it.
+    """
+    return road_of(profile_id)["provider"] if profile_id else provider()
 
 
 def set_road(profile_id: str, road: str,
-             daily_seconds: int | None = None) -> dict:
-    """Choose the road, and the ceiling that makes choosing video safe."""
+             daily_seconds: int | None = None,
+             film_provider: str | None = None) -> dict:
+    """Choose the road, the ceiling that makes choosing video safe, and the
+    service that renders it.
+
+    ``film_provider`` is left alone when None — the three settings live in
+    one row and one route, and a screen that sends the road has not
+    thereby said anything about the service. Passing ``"none"`` is how an
+    owner hands the choice back to the deployment.
+
+        asked     which video company will render this
+        mattered  does pressing the name change what gets sent
+
+    The endpoint and the credential stay deployment-wide. This module
+    speaks one submit-and-poll protocol and the model name rides in the
+    body, so an owner picking a service spends no new secret and reaches
+    nothing the operator did not already point at.
+    """
     from . import db
     if road not in ROADS:
         raise FilmingError(
@@ -603,13 +645,31 @@ def set_road(profile_id: str, road: str,
         else int(daily_seconds)
     if cap < 0:
         raise FilmingError("a ceiling below zero is not a ceiling")
+    if film_provider is not None and film_provider not in PROVIDERS:
+        raise FilmingError(
+            "this platform renders on one of these — "
+            + ", ".join(p for p in PROVIDERS if p != "none"))
+    # "none" is a real answer meaning "whatever the deployment named", so it
+    # is stored as NULL rather than as the string: a row holding "none"
+    # would later read as a profile that chose to render nowhere.
+    keep = None if film_provider in (None, "none") else film_provider
     conn = db.connect()
-    conn.execute(
-        "INSERT INTO presence_road (profile_id, road, daily_seconds,"
-        " updated_at) VALUES (?,?,?,?) ON CONFLICT (profile_id) DO UPDATE SET"
-        " road=excluded.road, daily_seconds=excluded.daily_seconds,"
-        " updated_at=excluded.updated_at",
-        (profile_id, road, cap, db.utcnow()))
+    if film_provider is None:
+        conn.execute(
+            "INSERT INTO presence_road (profile_id, road, daily_seconds,"
+            " updated_at) VALUES (?,?,?,?)"
+            " ON CONFLICT (profile_id) DO UPDATE SET"
+            " road=excluded.road, daily_seconds=excluded.daily_seconds,"
+            " updated_at=excluded.updated_at",
+            (profile_id, road, cap, db.utcnow()))
+    else:
+        conn.execute(
+            "INSERT INTO presence_road (profile_id, road, daily_seconds,"
+            " provider, updated_at) VALUES (?,?,?,?,?)"
+            " ON CONFLICT (profile_id) DO UPDATE SET"
+            " road=excluded.road, daily_seconds=excluded.daily_seconds,"
+            " provider=excluded.provider, updated_at=excluded.updated_at",
+            (profile_id, road, cap, keep, db.utcnow()))
     conn.commit()
     return road_of(profile_id)
 

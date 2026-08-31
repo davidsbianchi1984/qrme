@@ -827,11 +827,16 @@ def open_standing_room(key: str, request: Request,
                 "channel": row["channel"],
                 "presence": _CHANNEL_NOTES[row["channel"]],
                 "opened": "joined",
+                # `row["id"]` — this is the JOIN branch, and `room_id` is
+                # not bound until the open-fresh branch below it. Reaching
+                # for it here raised NameError on every join, which is the
+                # one path this endpoint takes most.
                 "participants": [
                     {"kind": p["kind"], "id": p["ref_id"],
                      "display": _display(p["kind"], p["ref_id"]),
-             "role": _role(p["kind"], p["ref_id"]),
-             "verified": _verified(p["kind"], p["ref_id"], room_id)}
+                     "role": _role(p["kind"], p["ref_id"]),
+                     "verified": _verified(p["kind"], p["ref_id"],
+                                           row["id"])}
                     for p in _participants(row["id"])
                 ],
             }

@@ -5135,19 +5135,24 @@ export const api = {
    *  see. `left` is the number that makes picking video safe to pick. */
   videoRoad: (profileId: string) =>
     req<{ road: string; daily_seconds: number; set: boolean;
-          spent: number; left: number; roads: string[] }>(
+          provider: string; provider_set: boolean;
+          spent: number; left: number; roads: string[];
+          providers: string[] }>(
       `/video/road/${profileId}`),
   /** Choose the road, and the ceiling that goes with it. The ceiling is
    *  sent with the road rather than on its own screen: somebody turning
    *  video on is exactly the person who needs to see what it will cost
    *  them per day, and a limit set later is a limit set after the bill. */
   videoSetRoad: (profileId: string, road: string,
-                 dailySeconds?: number) =>
+                 dailySeconds?: number, provider?: string) =>
     req<{ road: string; daily_seconds: number; set: boolean;
-          spent: number; left: number; roads: string[] }>(
+          provider: string; provider_set: boolean;
+          spent: number; left: number; roads: string[];
+          providers: string[] }>(
       `/video/road/${profileId}`,
       { method: "POST",
-        body: JSON.stringify({ road, daily_seconds: dailySeconds }) }),
+        body: JSON.stringify({ road, daily_seconds: dailySeconds,
+                               provider }) }),
   /** The most recent render for this profile, however it ended.
    *
    *  Asked on opening a conversation, because a render outlives the page

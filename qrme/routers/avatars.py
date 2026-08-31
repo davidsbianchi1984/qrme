@@ -130,24 +130,33 @@ class Road(BaseModel):
                                                   "footage per day. What "
                                                   "makes choosing video "
                                                   "safe.")
+    provider: str | None = Field(default=None,
+                                 description="Which video service renders "
+                                             "this profile. Omitted leaves "
+                                             "the choice as it stands; "
+                                             "\"none\" hands it back to the "
+                                             "deployment.")
 
 
 @router.get("/video/road/{profile_id}")
 def video_road(profile_id: str) -> dict:
     """Which road this profile takes, its ceiling, and what is left today."""
     return {**filming.road_of(profile_id), **filming.budget(profile_id),
-            "roads": list(filming.ROADS)}
+            "roads": list(filming.ROADS),
+            "providers": [p for p in filming.PROVIDERS if p != "none"]}
 
 
 @router.post("/video/road/{profile_id}")
 def video_set_road(profile_id: str, body: Road) -> dict:
     try:
-        filming.set_road(profile_id, body.road, body.daily_seconds)
+        filming.set_road(profile_id, body.road, body.daily_seconds,
+                         film_provider=body.provider)
     except filming.FilmingError as exc:
         raise HTTPException(status_code=400,
                             detail=i18n.raised(exc)) from None
     return {**filming.road_of(profile_id), **filming.budget(profile_id),
-            "roads": list(filming.ROADS)}
+            "roads": list(filming.ROADS),
+            "providers": [p for p in filming.PROVIDERS if p != "none"]}
 
 
 @router.get("/video/latest/{profile_id}")

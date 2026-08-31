@@ -1198,6 +1198,15 @@ CREATE TABLE IF NOT EXISTS presence_road (
     profile_id    TEXT PRIMARY KEY REFERENCES profiles(id),
     road          TEXT NOT NULL,      -- photo | avatar | video
     daily_seconds INTEGER NOT NULL,   -- of finished footage, per day
+    -- Which video service renders this profile's footage. NULL means "the
+    -- one the deployment named", which is what every existing row means
+    -- and why this is nullable rather than defaulted: a row written before
+    -- anybody could choose has not chosen, and saying so is different from
+    -- claiming it picked whatever the environment happened to hold that
+    -- day. The endpoint and the key stay deployment-wide -- the aggregator
+    -- this speaks to takes the model name in the body (`filming.render`),
+    -- so choosing a provider costs no new credential.
+    provider      TEXT,
     updated_at    TEXT NOT NULL
 );
 
@@ -3205,6 +3214,10 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     ("raised_characters", "visiting_day", "INTEGER"),
     ("raised_characters", "branch_of", "TEXT"),
     ("growth_record", "sim_day", "INTEGER"),
+    # Which video service renders this profile. NULL = the deployment's
+    # own choice, which is what every row written before the picker
+    # worked means.
+    ("presence_road", "provider", "TEXT"),
 )
 
 
