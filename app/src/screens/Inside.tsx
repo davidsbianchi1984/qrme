@@ -225,7 +225,12 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
        *  field, as the server holds it. Absent on a person's seat and on
        *  a profile that has not said, and the tile draws the name alone
        *  rather than inventing one. */
-      role?: string | null }[]>([]);
+      role?: string | null;
+      /** Whether this seat's face is a checked likeness of a real
+       *  person — a verification record with a named attestor, decided
+       *  by the server. The mark used to be burned into the photograph;
+       *  it is drawn on the sphere now, so it needs the fact. */
+      verified?: boolean }[]>([]);
   // Profiles asked in whose owners have not yet said yes — drawn as
   // waiting frames, so the press that invited somebody visibly did
   // something ("they never showed up a new frame").
@@ -3129,6 +3134,25 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                 ) : (
                   <span className="rs-ai" title={tr("ins.seat.profile", lang)}>
                     {tr("ins.seat.aimark", lang)}
+                  </span>
+                )}
+                {/* The checked likeness, on the sphere.
+
+                    The gold mark used to live in the photograph's own
+                    pixels, bottom-right, and every surface here draws a
+                    face as a CIRCLE — so the circle cut it in half, and
+                    a disclosure sliced through the middle reads as a
+                    rendering fault rather than as a claim. Both marks
+                    came off the files and onto the surface, in the same
+                    corners they were burned into, on a layer nothing
+                    crops.
+
+                    `verified` is the server's word, not the client's: a
+                    verification record with a named attestor, the same
+                    bar the burning tool refused to run without. */}
+                {s.verified && (
+                  <span className="rs-real" title={tr("ins.seat.real", lang)}>
+                    {tr("ins.seat.realmark", lang)}
                   </span>
                 )}
                 {/* The two corner marks screen 103 draws, and only where

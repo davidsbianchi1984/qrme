@@ -9600,6 +9600,16 @@ const CHROME: Table = {
   "ins.seat.aimark": {
     en: "AI", es: "AI", fr: "AI", de: "AI", pt: "AI", it: "AI", ja: "AI", zh: "AI", hi: "AI", ar: "AI",
   },
+  // The checked likeness. "VERIFIED" is the word already burned into the
+  // photograph it replaces, and the one every attestation document in
+  // this product uses, so the mark keeps it in every language rather
+  // than becoming a different claim in each.
+  "ins.seat.realmark": {
+    en: "VERIFIED", es: "VERIFIED", fr: "VERIFIED", de: "VERIFIED", pt: "VERIFIED", it: "VERIFIED", ja: "VERIFIED", zh: "VERIFIED", hi: "VERIFIED", ar: "VERIFIED",
+  },
+  "ins.seat.real": {
+    en: "verified likeness of a real person", es: "imagen verificada de una persona real", fr: "portrait vérifié d'une personne réelle", de: "verifiziertes Abbild einer echten Person", pt: "imagem verificada de uma pessoa real", it: "immagine verificata di una persona reale", ja: "実在の人物の確認済みの肖像", zh: "已核实的真人肖像", hi: "वास्तविक व्यक्ति की सत्यापित छवि", ar: "صورة موثَّقة لشخص حقيقي",
+  },
   "ins.seat.person": {
     en: "person", es: "persona", fr: "personne", de: "Person", pt: "pessoa", it: "persona", ja: "人", zh: "真人", hi: "व्यक्ति", ar: "شخص",
   },

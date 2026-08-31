@@ -239,10 +239,11 @@ and the line that changes it. On roads 1 and 2 that line is not greyed out
 — it is gone, because a control that cannot do anything is worse than no
 control at all.
 
-The AI mark rides every seat and the footage both. On the portraits it is
-burned into the pixels by `tools/mark_portraits.py`, because
-`/portraits/{handle}.webp` is a public URL and a composited badge does not
-travel with a scraped file.
+The AI mark rides every seat and the footage both. On a face it is drawn on
+top of the profile photo sphere, in the corner, on the outermost layer — it
+used to be burned into the pixels, and every surface here draws a face as a
+circle, so a mark in the corner of a square shipped cut in half. The rule and
+what it costs are in `docs/media-provenance.md`.
 
 ### Filling the screen, and leaving it
 

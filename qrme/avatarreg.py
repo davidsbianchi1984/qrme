@@ -77,12 +77,16 @@ class RowUnavailable(ValueError):
 def _burn(data: bytes) -> bytes:
     """The AI mark, into the pixels, at mint time.
 
-    The offline tool (`tools/mark_portraits.py`) argued against burning at
-    request time — an imaging library in the runtime and a redraw on every
-    fetch for a mark that never changes. Minting is the other case: the
-    mark is drawn once, when the face is made, exactly like the document
-    watermark. Geometry mirrors the tool's so a minted face sits beside a
-    shipped one as one collection.
+    Burning at request time was always wrong — an imaging library in the
+    runtime and a redraw on every fetch for a mark that never changes.
+    Minting is the other case: the mark is drawn once, when the face is
+    made, exactly like the document watermark.
+
+    Note that the SHIPPED collection is no longer burned: those marks
+    moved onto the profile photo sphere because a circle cropped them
+    (`docs/media-provenance.md`). A minted face is still burned here,
+    which is a live and separate decision — this one leaves the owner's
+    hands as a file, and `marked` is a column surfaces read.
     """
     from PIL import Image, ImageDraw, ImageFont
     img = Image.open(io.BytesIO(data)).convert("RGB")

@@ -499,8 +499,8 @@ def _seed_one_founder(conn, handle, name, persona, appearance, asset) -> str:
     # the rule works. It belongs to the photographed half because that is what
     # the badge is a claim about: a real person, whose picture is authentic.
     # The rendered half carries the AI mark instead, which is the claim that
-    # is true of *it*. `tools/mark_verified.py` burns the gold mark into a
-    # photograph for exactly the same reason.
+    # is true of *it*. The gold mark is drawn from this record — a
+    # verification with a named attestor — rather than from a filename.
     if handle == VERIFIED_HANDLE:
         from . import verification
         verification.verify(

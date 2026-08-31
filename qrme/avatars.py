@@ -21,11 +21,14 @@ Three rules the rest of the module exists to enforce:
   most-looked-at render QRME produces, so :func:`render` refuses to hand one
   back without the profile's AI watermark attached — and every shipped
   portrait *also* carries the mark burned in. The composited badge covers the
-  surfaces QRME controls; the burned one covers the rest. A file served at
-  ``/portraits/{handle}.webp`` can be hotlinked, embedded, scraped, saved or
-  screenshotted, and in none of those cases does a composited badge survive.
-  Burned by ``tools/mark_portraits.py``, pinned by a checksum manifest so an
-  unmarked replacement cannot arrive quietly.
+  surfaces QRME controls, and it is the only one now. The mark was burned
+  into these files as well, because ``/portraits/{handle}.webp`` can be
+  hotlinked, scraped or saved and a composited badge survives none of that —
+  but every surface draws a face as a circle, which cropped the burned mark
+  in half. It is drawn on top of the sphere instead
+  (``docs/media-provenance.md``), lifted off the files by
+  ``tools/unmark_faces.py``. The checksum manifest stays, so a shipped face
+  cannot be swapped for a different one quietly.
 
 The briefs lean funny on purpose. A stock headshot says "corporate mascot";
 a financial planner wearing far too much gold says "this is a character, and
@@ -69,12 +72,13 @@ ASSET_ROUTE = "/portraits"
 # Photographs, which are a different kind of thing from portraits and live
 # apart from them on purpose.
 #
-# Everything under ``/portraits`` is a synthetic face with the AI mark burned
-# into its pixels, checksummed by ``tools/mark_portraits.py``. A real
-# photograph of a real person is not that, and must not be burned with that
-# mark: the mark says *AI-generated synthetic media*, and stamping it on an
-# authentic photograph is a false statement in the opposite direction from the
-# one the mark exists to prevent.
+# Everything under ``/portraits`` is a synthetic face, checksummed against
+# ``MANIFEST.json``. A real photograph of a real person is not that, and must
+# never be labelled with that mark: the mark says *AI-generated synthetic
+# media*, and putting it on an authentic photograph is a false statement in
+# the opposite direction from the one the mark exists to prevent. The two
+# collections stay apart for that reason, whichever layer the mark is drawn
+# on.
 #
 # Keeping them in one directory would also mean an unburned file sitting in a
 # tree whose manifest check walks every file in it — so the check would either
@@ -191,15 +195,31 @@ def asset_is_marked(asset: str | None) -> bool:
     """Whether the image itself carries the AI mark, as opposed to needing a
     surface to composite one.
 
-    True only for the burned collection. An owner-attached asset is somebody
-    else's file and nothing here can vouch for its pixels; a photograph under
-    ``/photos`` is deliberately unburned because it is not AI-generated. Both
-    report False, so the surfaces keep drawing their own badge — which is the
-    safe direction to be wrong in, and in the photograph's case is the correct
-    answer rather than a fallback: the *profile* is synthetic and must say so,
-    while the *picture* is authentic and must not claim otherwise.
+    False for everything now, and that is the answer rather than a
+    fallback.
+
+        asked     the AI and VERIFIED labels go on the profile photo
+                  sphere, not on the photo
+        mattered  who draws them once they are not in the pixels
+
+    The shipped collection used to be burned — ``AI`` in the top-right
+    corner of every portrait — so this returned True for it and surfaces
+    skipped their own badge to avoid stacking a second one. Every surface
+    here draws a face as a CIRCLE, and a mark in the corner of a square
+    is what a circle crops: the disclosure shipped cut in half on every
+    screen it appeared on.
+
+    The marks came off the files (``tools/unmark_faces.py``) and are
+    drawn by the surface instead, on the outermost layer over the sphere.
+    So nothing in this product carries its own mark any more, every
+    surface draws one, and the rule is written down in
+    ``docs/media-provenance.md``.
+
+    An owner-attached asset was always False for a different reason and
+    still is: it is somebody else's file and nothing here can vouch for
+    its pixels.
     """
-    return bool(asset) and asset.startswith(f"{ASSET_ROUTE}/")
+    return False
 
 # handle -> the portrait, one line, played straight-faced.
 BRIEFS: dict[str, str] = {

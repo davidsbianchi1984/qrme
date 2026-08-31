@@ -24,7 +24,7 @@ from fastapi import APIRouter, HTTPException, Request
 
 from .. import (auth, db, engagement, identity, inbox, llm, marketplace,
                 moderation, persona, referral, roommic, society, storage,
-                tiers, watermark)
+                tiers, verification, watermark)
 from ..common import (age_of, clipped, interactor_or_404, profile_or_404,
                       require_interactor, require_owner_or_interactor,
                       source_items)
@@ -170,6 +170,46 @@ def _role(kind: str, ref_id: str) -> str | None:
         return None
     field = (profile_or_404(ref_id).get("industry") or "").strip()
     return field or None
+
+
+def _verified(kind: str, ref_id: str) -> bool:
+    """Whether this seat's face is a checked likeness of a real person.
+
+        asked     draw the verified mark on the sphere
+        mattered  from what
+
+    The mark used to be burned into the photograph, so the *file* was the
+    claim and nothing had to ask. Drawn on the surface instead, it needs a
+    fact behind it, and the fact already exists: a verification record
+    with a named attestor, which is the same bar the burning tool refused
+    to run without. A gold check that a surface draws from nothing is
+    worse than no check at all.
+
+    A person's own seat follows the same fact by way of their account.
+    The mark is a claim about a LIKENESS, and the seat of somebody who
+    holds a checked likeness on this platform is the seat that carried
+    it when it was burned into the photograph. So: the account behind
+    the seat owns a profile with a verification record and a named
+    attestor. An interactor with no account, or an account with no
+    checked likeness, gets nothing — which is most of them.
+    """
+    try:
+        if kind == "profile":
+            record = verification.status(ref_id)
+            return bool(record.get("verified") and record.get("attestor"))
+        person = interactor_or_404(ref_id)
+        account = person.get("account_id")
+        if not account:
+            return False
+        owned = db.connect().execute(
+            "SELECT id FROM profiles WHERE owner_id=?", (account,)).fetchall()
+        for row in owned:
+            record = verification.status(row["id"])
+            if record.get("verified") and record.get("attestor"):
+                return True
+        return False
+    except Exception:
+        return False
 
 
 def _media_brief(media_id: str | None, read: bool = False,
@@ -719,7 +759,8 @@ def create_room(body: RoomCreate) -> dict:
         "participants": [
             {"kind": p.kind, "id": p.id,
              "display": _display(p.kind, p.id),
-             "role": _role(p.kind, p.id)}
+             "role": _role(p.kind, p.id),
+             "verified": _verified(p.kind, p.id)}
             for p in body.participants
         ],
     }
@@ -773,7 +814,8 @@ def open_standing_room(key: str, request: Request,
                 "participants": [
                     {"kind": p["kind"], "id": p["ref_id"],
                      "display": _display(p["kind"], p["ref_id"]),
-             "role": _role(p["kind"], p["ref_id"])}
+             "role": _role(p["kind"], p["ref_id"]),
+             "verified": _verified(p["kind"], p["ref_id"])}
                     for p in _participants(row["id"])
                 ],
             }
@@ -802,7 +844,8 @@ def open_standing_room(key: str, request: Request,
         "participants": [
             {"kind": p["kind"], "id": p["ref_id"],
              "display": _display(p["kind"], p["ref_id"]),
-             "role": _role(p["kind"], p["ref_id"])}
+             "role": _role(p["kind"], p["ref_id"]),
+             "verified": _verified(p["kind"], p["ref_id"])}
             for p in _participants(room_id)
         ],
     }
@@ -849,7 +892,8 @@ def join_room(room_id: str, request: Request) -> dict:
         "participants": [
             {"kind": p["kind"], "id": p["ref_id"],
              "display": _display(p["kind"], p["ref_id"]),
-             "role": _role(p["kind"], p["ref_id"])}
+             "role": _role(p["kind"], p["ref_id"]),
+             "verified": _verified(p["kind"], p["ref_id"])}
             for p in _participants(room_id)
         ],
         # The invites still standing — so the press that asked somebody in
@@ -1036,7 +1080,8 @@ def accept_room_invite(room_id: str, body: RoomInvite,
         "participants": [
             {"kind": p["kind"], "id": p["ref_id"],
              "display": _display(p["kind"], p["ref_id"]),
-             "role": _role(p["kind"], p["ref_id"])}
+             "role": _role(p["kind"], p["ref_id"]),
+             "verified": _verified(p["kind"], p["ref_id"])}
             for p in _participants(room_id)
         ],
     }

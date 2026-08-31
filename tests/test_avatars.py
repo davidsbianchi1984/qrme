@@ -316,9 +316,13 @@ def test_a_starters_face_belongs_to_nobody(client):
 # --- the mark is in the pixels, not only in the chrome --------------------
 
 def test_every_shipped_portrait_matches_the_checksum_manifest():
-    """The AI mark is burned into these files. A portrait swapped for an
-    unmarked one would be a synthetic face circulating with no disclosure and
-    nothing in the API would notice, so the bytes are pinned."""
+    """The bytes stay pinned even though the mark no longer lives in them.
+
+    The manifest was written to catch a marked portrait being swapped for
+    an unmarked one. The mark is drawn by the surface now, so that is no
+    longer what it guards — what it still guards is a shipped face being
+    replaced by a different image without the suite noticing, which is
+    the part that was always doing the work."""
     import hashlib
     import json
     directory = avatars.portraits_dir()
@@ -330,13 +334,19 @@ def test_every_shipped_portrait_matches_the_checksum_manifest():
         assert manifest[name] == digest, f"{name} is not the marked file"
 
 
-def test_a_shipped_portrait_reports_that_it_is_already_marked(client):
-    """So a surface drawing its own badge can avoid stacking a second one."""
+def test_no_shipped_portrait_claims_to_carry_its_own_mark(client):
+    """Because none of them do any more, and the surfaces read this flag.
+
+    The AI label is drawn on top of the profile photo sphere rather than
+    burned into the photograph — a circle crops the corner of a square,
+    so a burned mark shipped sliced in half. `asset_marked: False` is
+    what tells every surface to draw its own. A stale True here would
+    mean each one politely skipping the badge that is no longer there."""
     from qrme import seed
     seed.seed()
     pid = client.get("/summon?ref=@dr_amara_osei").json()["profile"]["profile_id"]
     art = client.get(f"/profiles/{pid}/avatar").json()
-    assert art["asset_marked"] is True
+    assert art["asset_marked"] is False
 
 
 def test_an_owner_attached_asset_is_never_assumed_to_be_marked(client):
@@ -355,10 +365,18 @@ def test_an_owner_attached_asset_is_never_assumed_to_be_marked(client):
     assert art["asset_marked"] is False
 
 
-def test_a_portrait_served_directly_carries_the_disclosure_in_its_bytes(client):
-    """The gap this closes: /portraits/{handle}.webp is an ordinary file URL.
-    It can be hotlinked, embedded, scraped or saved, and a composited badge
-    survives none of that."""
+def test_a_portrait_is_served_as_the_exact_file_that_was_shipped(client):
+    """The route hands back the shipped bytes, unchanged and unsubstituted.
+
+    This test used to assert the opposite thing about the same bytes:
+    that they carried the AI mark, because /portraits/{handle}.webp is an
+    ordinary file URL that can be hotlinked, embedded, scraped or saved,
+    and a composited badge survives none of that. The mark moved onto the
+    sphere by decision, and that gap is open again — written down in
+    docs/media-provenance.md rather than left for somebody to discover.
+
+    What is still worth pinning: the route serves the file the manifest
+    describes, so a swapped or re-encoded portrait fails here."""
     import hashlib
     import json
     res = client.get("/portraits/otis_marsh.webp")
