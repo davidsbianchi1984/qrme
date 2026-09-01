@@ -73,6 +73,9 @@ whole loop: your words become tracked work.
 | **Community** | Walls, feeds, friends and circles, discovery with an offer, homepages, gifts, reviews, and a marketplace of knowledge and task packs — with starter professionals who look and sound like their trade. |
 | **The Studio and its agent** | A personal agent that edits your page, writes widgets, posts and searches the web on your word — acting only through published tools, each behind the same doors a person uses, with every act on the record. |
 | **The workforce** | Role-specific agents that answer for their own trade: specialist profiles JIM-mini reaches through the tandem, organizational desks, delegation with both sides' consent, and succession that survives its owner. |
+| **The Company Builder** | A founder starts a digital company in any industry, opens seats, and fills each one with a synthetic profile trained for that position through a dynamically composed interview — the platform studies the occupation first, predicts the roster a fully functioning storefront needs, seats the founder's own or blended profiles, publishes the staffed company into the marketplace, and opens each employee's file in place: embodiment on one side, hand-out on the other. |
+| **Wearables and screened devices** | Twenty kinds of worn device pair over Bluetooth — watches, bands, rings, pendants, glasses, headsets, earbuds including the ones worn as earrings, hearing aids, ankle monitors — against a published catalogue of models sold in America; devices with screens render the app's faces, and the rest pair as reach without powers. |
+| **The stage — AR and VR** | The same room rendered three ways: flat on any browser, overlaid on the person's real environment in AR with each reply's footage floating beside its seat, or entered as a WebXR session in a headset's own browser with the figures standing in a surrounding of the person's choosing — no store required, and the headset road is offered only where the browser can answer for one. |
 | **Memory in the vault** | What a pair builds together seals to the PDI vault — shown to its people, curatable, and forgettable down to the vectors. |
 | **The platform's eyes** | Shared pictures and screenshots are read (a screenshot is the phone's way of handing over its screen), shared videos are heard and their frames described, a watch party's direct video can be watched once for the whole room, and a screen can be shown to a room or the agent one frame at a time — every claimed sight a real one, made by the deployment's own ears-and-eyes sidecar. |
 | **The room society** | Eight seats that take turns: profiles announce who they speak to, answer when addressed, wait when not, rotate past your silent chair, join and summon each other on their own, collaborate on tasks — and pause after ten turns apiece, steered entirely by words, never a toggle. |
@@ -471,6 +474,137 @@ reasoning that kept agent names off face 01.
 
 The full desktop, mobile and portrait galleries live in
 [docs/gallery.md](docs/gallery.md).
+
+## The Company Builder, feature by feature
+
+A founder starts a digital company and staffs it one employee at a time.
+Every step below is a shipped behaviour of the running product, exercised
+by the test suite, and photographed from the console itself (screen 210 —
+the photograph, like every photograph in `docs/screens/`, is taken by
+`tools/shoot_screens.py` from the live app, and outranks any drawing).
+
+<table>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/210-companies.png"><img src="docs/screens/210-companies.png" width="220" alt="Companies"></a><br><sub><b>210</b> · Companies<br>founding, seats, interviews, the storefront</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/146-org.png"><img src="docs/screens/146-org.png" width="220" alt="Organization"></a><br><sub><b>146</b> · Organization<br>the departments a company's roster lands in</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/187-shop.png"><img src="docs/screens/187-shop.png" width="220" alt="Shop"></a><br><sub><b>187</b> · Shop<br>the marketplace rail a published company stands on</sub></td>
+  </tr>
+</table>
+
+**Founding.** `POST /companies` opens a company with a name, a free-text
+industry — any industry on Earth, a text box rather than a menu — and a
+headcount from one to fifty. Companies are folders: an account holds as
+many as it founds, each with its own roster, and each backed by a real
+organization on the organization rails.
+
+**Seats.** A seat is a position: a title and a department. Seats are
+opened by hand, or by the plan (below). The headcount is a wall the
+seats cannot pass.
+
+**The study.** Before an interview is written, the platform researches
+the occupation — the skills, the tools, the connections and the
+knowledge of the profession — through the same research rail the
+excursions use. Offline deployments degrade on the record to a local
+deterministic provider; the study never silently fails. The findings are
+stored on the seat and ground everything that follows.
+
+**The dynamic interview.** The interview is composed by the model per
+position, grounded in the study — eight to fourteen questions in the
+role's own vocabulary, each with a suggested answer the founder may
+edit. It is deliberately not a fixed questionnaire: the design goal is
+that any employee on the planet can be described, so a role-mapping
+questionnaire of professional caliber serves as the exemplar of depth,
+never as a template. Licensed or physical duties are acknowledged as
+assisted, never performed.
+
+**The hire.** Signing the interview is hiring: the answers become a
+synthetic profile through the same creation path as every other profile
+on the platform — the position and the study ride along as the new
+employee's source material, colleagues are connected as friends, and
+the seat closes with the employee's id on it.
+
+**The plan.** The founder says what the store is meant to be, in their
+own words, and the platform predicts the roster a fully functioning
+storefront needs — suggested positions with a title, a department and a
+reason, never more than the headcount, offered as one-press seats and
+never as a wall.
+
+**Bring your own.** An open seat also takes a profile the founder
+already holds — including hybrids built on the Blend rails — brought
+rather than interviewed. A stranger's profile is refused: a seat takes
+a profile this company's founder holds.
+
+**Open for business.** A staffed company enters the in-app marketplace
+with one press: a storefront on the existing shop rails, named for the
+company, tagged with its industry, each staffed department a service
+offering naming who answers. Nobody hired, no storefront. Closing takes
+the sign down and dissolves nothing; republishing is an edit.
+
+**Oversight, per employee.** Every hired employee is a full profile the
+founder controls, edits, modifies and oversees individually under the
+company folder — the same owner doors as any profile, opened from the
+seat.
+
+**The employee file — where they work.** Every hired seat opens its
+file in place, no other menu involved: the employee's current bodies
+and screens; the complete robot shelf of models sold in America, inline
+and grouped by maker, with availability told honestly — shipping,
+preorder, and announced, where an announced machine renders un-bindable
+rather than hidden; one press binds a body through the same embodiment
+rails as everywhere else, so identity stays invariant across
+embodiments; a fixed screen is placed with a kind and a name; and a
+nearby-device code opens the studio on anything with a camera on the
+same network.
+
+<table>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/163-robots.png"><img src="docs/screens/163-robots.png" width="220" alt="Robots and devices"></a><br><sub><b>163</b> · Robots &amp; Devices<br>the catalogue of bodies, availability told apart</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/162-placements.png"><img src="docs/screens/162-placements.png" width="220" alt="Placements"></a><br><sub><b>162</b> · Placements<br>fixed screens: a beacon with a plug in it</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/156-identity.png"><img src="docs/screens/156-identity.png" width="220" alt="Identity"></a><br><sub><b>156</b> · Identity<br>the signature that stays invariant across bodies</sub></td>
+  </tr>
+</table>
+
+**The employee file — hand them out.** Each employee can be given away
+as a code to input, a QR code to scan, a link, or a downloadable file
+of their complete export. The scan roads ride a single-use handoff
+ticket that lives ten minutes and unlocks exactly one read of exactly
+that profile's export, then dies — because a code on a screen is
+legible to any camera in the room, the founder's owner key never rides
+in a QR, a link, or anything else that leaves the screen.
+
+## The stage: the same room, flat, overlaid, and entered
+
+The room a person talks in renders three ways, and all three are the
+same room — one ring module, one photo resolver, one model resolver and
+one palette table, so nothing can drift apart.
+
+**Flat**, on any browser, phone or desktop — the room as screens 175 and
+189 photograph it.
+
+**AR**, over the person's own real environment: the seats' avatars
+overlay the passthrough camera, and film chips float each seat's
+rendered reply beside it — the reply as footage, in the room it was
+spoken to.
+
+**VR**, entered: wherever the browser can answer for a headset
+(`navigator.xr`), the stage offers "On your headset" and opens the same
+room as a WebXR session in the headset's own browser — no store and no
+launcher required. A seat with a body stands at its place in the visor,
+full-height, facing the center; the person chooses among five
+surroundings. The rooms screen's XR shelf names the honest browser road
+for every major headset family — Steam, Meta, Apple, PICO, HTC and
+Android XR.
+
+<table>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/175-inside.png"><img src="docs/screens/175-inside.png" width="220" alt="Inside a room"></a><br><sub><b>175</b> · Inside<br>the flat room: nine seats, files, voices</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/209-the-reply-as-footage.png"><img src="docs/screens/209-the-reply-as-footage.png" width="220" alt="The reply as footage"></a><br><sub><b>209</b> · The reply as footage<br>the rendered turn AR floats beside its seat</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/21-rooms.png"><img src="docs/screens/21-rooms.png" width="220" alt="Rooms"></a><br><sub><b>21</b> · Rooms<br>the doors in, including the XR shelf</sub></td>
+  </tr>
+</table>
+
+Nothing on the stage records: the headset session carries no capture
+vocabulary at all, which a test greps the source to prove.
 
 ## Release history
 
