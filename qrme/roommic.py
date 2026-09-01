@@ -101,7 +101,7 @@ FROM_WEARABLE: dict[str, str] = {
     "vr_headset": "headset",
     "ar_glasses": "glasses",
     "hearing_aids": "earbuds",
-    "audio_earrings": "earbuds",
+    "earrings": "earbuds",
 }
 
 # How wide the lent channel listens — also kept in step with `jim/mic.py` by

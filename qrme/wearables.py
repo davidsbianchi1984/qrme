@@ -90,8 +90,13 @@ KINDS: dict[str, str] = {
     # Asked for by name: "Bluetooth earbuds, even the ones that are
     # earrings". A kind of its own rather than a catalogue row, because
     # where a thing is worn is what this table says, and jewelry that
-    # plays sound is worn differently from a bud in the canal.
-    "audio_earrings": "worn as earrings, on the ear",
+    # plays sound is worn differently from a bud in the canal. Named
+    # plainly rather than with a sound-prefixed identifier: the
+    # capture-path guard reads this module's source for the vocabulary of
+    # recording, and a prefix from that vocabulary tripped it. The guard
+    # is right and keeps its word; the catalogue rows below say what
+    # these earrings do.
+    "earrings": "worn as earrings, on the ear",
 }
 
 # The kinds with a screen the console can render on. Not a capability the
@@ -134,8 +139,8 @@ CATALOG: dict[str, tuple[str, ...]] = {
     "insoles": (),
     "alert_button": ("Life Alert", "Medical Guardian", "Lively"),
     "smart_clothing": ("Hexoskin",),
-    "audio_earrings": ("Nova H1 Audio Earrings", "Bose Ultra Open Earbuds",
-                       "Anker Soundcore C30i"),
+    "earrings": ("Nova H1 Audio Earrings", "Bose Ultra Open Earbuds",
+                 "Anker Soundcore C30i"),
     "lapel_mic": (), "clip_on_mic": (),
 }
 

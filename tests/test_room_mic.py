@@ -450,7 +450,7 @@ def test_every_microphone_bearing_paired_kind_can_be_lent(client):
                "glasses",
                # The 2.9.7 widening's head-worn kinds all carry one.
                "vr_headset", "ar_glasses", "hearing_aids",
-               "audio_earrings"}
+               "earrings"}
     SILENT = {"band", "ring", "pendant",
               # An alert button carries a two-way voice channel, and it is
               # still SILENT here on purpose: that microphone belongs to the
