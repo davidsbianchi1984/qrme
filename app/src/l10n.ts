@@ -9796,7 +9796,7 @@ const CHROME: Table = {
     en: "Where you stand", es: "Dónde estás", fr: "Où vous êtes", de: "Wo du stehst", pt: "Onde você está", it: "Dove ti trovi", ja: "立つ場所", zh: "你站的地方", hi: "आप कहाँ खड़े हैं", ar: "حيث تقف",
   },
   "ins.place.studio": {
-    en: "Studio", es: "Estudio", fr: "Studio", de: "Studio", pt: "Estúdio", it: "Studio", ja: "スタジオ", zh: "摄影棚", hi: "स्टूडियो", ar: "الاستوديو",
+    en: "Studio", es: "Estudio", fr: "Studio", de: "Studio", pt: "Estúdio", it: "Studio", ja: "スタジオ", zh: "工作室", hi: "स्टूडियो", ar: "الاستوديو",
   },
   "ins.place.dusk": {
     en: "Dusk", es: "Anochecer", fr: "Crépuscule", de: "Dämmerung", pt: "Anoitecer", it: "Crepuscolo", ja: "夕暮れ", zh: "黄昏", hi: "गोधूलि", ar: "الغسق",

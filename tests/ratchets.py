@@ -1215,7 +1215,7 @@ RATCHETS: tuple[Ratchet, ...] = (
             "routes reachable by walking the included routers"),
     Ratchet("extractor.path_literals", 1120, _path_literals,
             "path literals found across all four surfaces"),
-    Ratchet("console.source_files", 52, _console_files,
+    Ratchet("console.source_files", 84, _console_files,
             "TypeScript sources the console sink sweep reads"),
     Ratchet("console.calls_typed", 340, _calls_typed,
             "console calls that declare the shape they expect back"),
