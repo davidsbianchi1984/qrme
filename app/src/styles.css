@@ -2968,6 +2968,26 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   display: block; font-size: 11px; line-height: 1.3;
   color: var(--t3); margin-top: 1px;
 }
+/* The field sits under the name, not adrift between it and the glyphs.
+   The seats carry a 5px gap between everything in them, which reads as
+   an even column of four unrelated things; the name and what somebody
+   is here FOR are one thing, and they are spaced like it. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-role {
+  margin-top: -3px;
+  /* Two lines' worth, whether the field needs two or one.
+   *
+   *     asked     bring the glyphs on the first three seats down to
+   *               match the fourth, so there is room for two lines
+   *     mattered  a row of seats where the glyphs sit at four different
+   *               heights reads as four different components
+   *
+   * "Mental health" wraps and "Technology" does not, so the roads under
+   * them landed at different heights across one row. The field keeps
+   * room for two lines either way — 2.6em is two lines at the 1.3
+   * line-height it is set in — so every seat's glyphs sit on the same
+   * line and a longer field pushes nothing. */
+  min-height: 2.6em;
+}
 .rs-tile.talking .rs-role { color: var(--t2); }
 
 /* The empty chair.
@@ -3139,10 +3159,13 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
    * same size and the rail scrolls.
    *
    * Everything sits on the box's own centre line — the face, the name,
-   * the field, and on the empty seat the silhouette with its plus. */
+   * the field, and on the empty seat the silhouette with its plus. That
+   * is the horizontal centre line only: down the box the contents pack
+   * from the top, because the marks are drawn a fixed distance down the
+   * tile and centring moves the face they are drawn over. */
   flex: 0 0 auto; height: 172px; overflow: hidden;
   display: flex; flex-direction: column; gap: 3px;
-  align-items: center; justify-content: center; text-align: center;
+  align-items: center; justify-content: flex-start; text-align: center;
   padding: 10px 8px;
 }
 /* A face at the size a face is looked at.
@@ -3198,12 +3221,29 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   /* Two rows of seats, floored, and the leftover on top of that. 128px
      a tile plus the 8px gap. */
   .screen.room-place > .card.room-stage > .room-scene {
-    /* 280, not 264. Two rows measured at 67..203 and 211..346 is 279px of
-       tiles, and a floor of 264 clipped the second row by fifteen pixels
-       — which is the same "half a row" the report was about, just a
-       smaller half. `flex: 1 1 auto` takes whatever the frame gives back
-       on top of that. */
-    flex: 1 1 auto; min-height: 280px; max-height: none;
+    /* The seats take the slack and give it back — no floor.
+     *
+     *     asked     the type bar and send button are cut off at the
+     *               bottom, at four people and at two
+     *     mattered  a floor under the seats is a ceiling over the
+     *               composer
+     *
+     * `min-height: 280px` here meant the rail could not shrink, so once
+     * the bar, the frame and the strip wanted more than the card had,
+     * the only thing left to give was the bottom of the card — and the
+     * bottom of the card is where you type. The composer is the one
+     * control that must always be reachable; the seats already scroll
+     * inside themselves, so they are the right thing to yield.
+     *
+     * `flex: 1 1 auto` with a basis of content: the rail sizes to its
+     * tiles, grows into whatever the frame gives back, and shrinks
+     * first when the room is tight. */
+    flex: 1 1 auto; min-height: 0; max-height: none;
+  }
+  /* And the composer never shrinks or scrolls away. It is `flex: 0 0
+     auto` already; this says so where the reason lives. */
+  .screen.room-place > .card.room-stage > .rs-chatstrip {
+    flex: 0 0 auto;
   }
   /* The frame gives some back too, and its rule lives further down the
      file with the other `.avatar-stage.inline` sizing — a media query
@@ -3298,7 +3338,25 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile,
 .screen.room-place > .card.room-stage > .room-scene > .rs-empty {
   display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
+  align-items: center;
+  /* From the top, not from the middle.
+   *
+   *     asked     the AI badge draws twice on the starter portraits
+   *     mattered  the badge is placed a fixed distance down the TILE
+   *
+   * `--face-top` is one number for every seat, so it is only right if
+   * every seat's face starts at the same height. Centred, it does not:
+   * a grid stretches the tiles in a row to the tallest of them, and the
+   * leftover is split above and below whatever is inside. A seat whose
+   * field wraps to two lines has less leftover than one whose does not,
+   * so its face rides up — measured at 9px on two seats and 16.1 on two
+   * others in the same row, which put the drawn mark up to seven pixels
+   * above the one burned into the file and showed both.
+   *
+   * Pinned to the top, the face begins at the border plus the padding on
+   * every seat in every row, which is a number the marks can be written
+   * against. */
+  justify-content: flex-start;
   text-align: center; gap: 5px;
 }
 .rs-empty .rs-blank { margin: 0 auto; }
@@ -3328,7 +3386,25 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile,
 .screen.room-place > .card.room-stage > .room-scene > .rs-empty {
   display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
+  align-items: center;
+  /* From the top, not from the middle.
+   *
+   *     asked     the AI badge draws twice on the starter portraits
+   *     mattered  the badge is placed a fixed distance down the TILE
+   *
+   * `--face-top` is one number for every seat, so it is only right if
+   * every seat's face starts at the same height. Centred, it does not:
+   * a grid stretches the tiles in a row to the tallest of them, and the
+   * leftover is split above and below whatever is inside. A seat whose
+   * field wraps to two lines has less leftover than one whose does not,
+   * so its face rides up — measured at 9px on two seats and 16.1 on two
+   * others in the same row, which put the drawn mark up to seven pixels
+   * above the one burned into the file and showed both.
+   *
+   * Pinned to the top, the face begins at the border plus the padding on
+   * every seat in every row, which is a number the marks can be written
+   * against. */
+  justify-content: flex-start;
   text-align: center; gap: 5px;
 }
 .rs-empty .rs-blank { margin: 0 auto; }
@@ -3358,7 +3434,25 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile,
 .screen.room-place > .card.room-stage > .room-scene > .rs-empty {
   display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
+  align-items: center;
+  /* From the top, not from the middle.
+   *
+   *     asked     the AI badge draws twice on the starter portraits
+   *     mattered  the badge is placed a fixed distance down the TILE
+   *
+   * `--face-top` is one number for every seat, so it is only right if
+   * every seat's face starts at the same height. Centred, it does not:
+   * a grid stretches the tiles in a row to the tallest of them, and the
+   * leftover is split above and below whatever is inside. A seat whose
+   * field wraps to two lines has less leftover than one whose does not,
+   * so its face rides up — measured at 9px on two seats and 16.1 on two
+   * others in the same row, which put the drawn mark up to seven pixels
+   * above the one burned into the file and showed both.
+   *
+   * Pinned to the top, the face begins at the border plus the padding on
+   * every seat in every row, which is a number the marks can be written
+   * against. */
+  justify-content: flex-start;
   text-align: center; gap: 5px;
 }
 .rs-empty .rs-blank { margin: 0 auto; }
@@ -4378,19 +4472,45 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
  * moves; it just cannot come apart again. */
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile {
   --face: 120px;
-  --face-left: calc(50% - 96px);
-  --face-top: 12px;
+  /* Both offsets read off the live page at 1280 wide, not derived from
+     the padding: the 96 and the 12 were arithmetic on a lane the tile
+     stopped keeping, and measured against the face's own box the plate
+     came back four pixels left and two pixels high of the burn on every
+     seat. The face's left edge sits at `50% - 92px` and its top at the
+     tile's own 10px of padding. */
+  --face-left: calc(50% - 92px);
+  --face-top: 10px;
 }
+/* The measured box is a FLOOR, not a cage.
+ *
+ *     asked     the word VERIFIED is not centred inside its badge
+ *     mattered  it was centred, and the badge was too small for it
+ *
+ * A plate pinned to exactly the burn's width fits the burning tool's
+ * font, not the reader's. Measured in this browser the gold plate has
+ * 37.4px of box for 30.5px of text — three and a half pixels of air
+ * each side, comfortably centred. On an iPhone the same string is set
+ * in SF, which is wider at that size, so it grew past both rounded ends
+ * and read as text falling out of its badge.
+ *
+ * Chasing the font would be chasing every font. So the measurement
+ * becomes `min-width` and `min-height` and the box takes whatever its
+ * own text needs on top of that. It can only ever be BIGGER than the
+ * burn, which is the direction that still covers it, and the text is
+ * centred in a box that has room for it on every platform. */
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-ai {
   left: calc(var(--face-left) + var(--face) * 0.562500);
   top: calc(var(--face-top) + var(--face) * 0.035156);
-  width: calc(var(--face) * 0.402344);
-  height: calc(var(--face) * 0.189453);
+  width: auto;
+  min-width: calc(var(--face) * 0.402344);
+  height: auto;
+  min-height: calc(var(--face) * 0.189453);
   font-size: calc(var(--face) * 0.115234);
   font-weight: 700; letter-spacing: 0;
   color: rgba(255, 255, 255, .92);
   background: rgba(9, 7, 24, .804);
-  border: none; padding: 0;
+  border: none;
+  padding: 0 calc(var(--face) * 0.02);
   border-radius: calc(var(--face) * 0.094727);
 }
 /* The gold plate: ground rgba(24,18,4,214/255), a two-pixel gold edge,
@@ -4398,59 +4518,73 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-real {
   left: calc(var(--face-left) + var(--face) * 0.296875);
   top: calc(var(--face-top) + var(--face) * 0.814453);
-  width: calc(var(--face) * 0.667969);
-  height: calc(var(--face) * 0.150391);
+  /* A floor, for the reason written over the AI plate above. */
+  width: auto;
+  min-width: calc(var(--face) * 0.667969);
+  height: auto;
+  min-height: calc(var(--face) * 0.150391);
   font-size: calc(var(--face) * 0.085938);
   font-weight: 700; letter-spacing: 0;
   color: #f7d87a;
   background: rgba(24, 18, 4, .839);
   border: 2px solid #d4a83a;
-  padding: 0;
+  padding: 0 calc(var(--face) * 0.02);
   border-radius: calc(var(--face) * 0.075195);
 }
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile
   > .rs-real::before { content: "\2713\00a0"; }
 
-/* A tile with no circle in it.
+/* Your own seat's marks are the same marks.
  *
- *     asked     the badge does not cover the ones cropped differently
- *     mattered  on a full-bleed tile there is no circle to cover
+ *     asked     isn't the verified supposed to be on top of the
+ *               outermost profile photo circle
+ *     mattered  it was, and this rule was the reason it was not
  *
- * The marks are fractions of `--face`, which is the diameter of the
- * sphere the face is drawn in — right for every seat that HAS one. Your
- * own seat with a picture up does not: the photograph fills the tile
- * edge to edge, the way the camera does. The variables still resolved,
- * so the gold plate was solving the circle's geometry against a
- * rectangle and landing at .98 of the way across the face — measured —
- * hard against the right edge, under the name.
+ * There used to be a tile in here with no circle in it. A picture you
+ * put up drew full-bleed — edge to edge, the way the live camera does —
+ * so the marks, which are fractions of the sphere a face is drawn in,
+ * had nothing to be fractions OF, and were sent to the tile's own corner
+ * instead. That was right at the time.
  *
- * Its own corner instead. This does NOT cover the mark burned into the
- * file, and cannot: the burn sits at a fixed fraction of a SQUARE image,
- * `object-fit: cover` crops that square by an amount only the browser
- * knows, and CSS cannot be told where the crop left it. So on this one
- * tile the burned mark and this one are both visible. The way that ends
- * is unburned masters, not a cleverer offset. */
-.screen.room-place > .card.room-stage > .room-scene > .rs-tile.rs-camtile
-  > .rs-real,
-.screen.room-place > .card.room-stage > .room-scene > .rs-tile.rs-camtile
-  > .rs-ai {
-  left: auto; right: 6px;
-  width: auto; height: auto;
-  font-size: 9px; padding: 2px 7px;
-  border-radius: 999px;
-}
-.screen.room-place > .card.room-stage > .room-scene > .rs-tile.rs-camtile
-  > .rs-ai { top: 6px; }
-.screen.room-place > .card.room-stage > .room-scene > .rs-tile.rs-camtile
-  > .rs-real { top: auto; bottom: 6px; border-width: 1px; }
+ * It is not a full-bleed tile any more, in either layout. The all-seats
+ * grid makes a put-up photograph the same circle as every portrait
+ * beside it — "one cell a photograph and seven cells portraits" is the
+ * thing that row was rebuilt to stop — and the rail does the same at 56.
+ * So the sphere is there, the fractions resolve, and the corner
+ * treatment was the only thing still moving the gold plate off it: the
+ * VERIFIED chip measured at 1.46 of the face's height down the tile,
+ * which is below the name, below the glyphs, and nowhere near the
+ * circle it belongs on.
+ *
+ * Nothing replaces it. The seat now falls through to the geometry every
+ * other seat uses, which is the point. */
+
 @media (max-width: 719px) {
-  /* A smaller face on a phone, and the marks follow it because they are
-     fractions of it. This is the whole point of the variables: the size
-     below is the only number that changes. */
+  /* The phone's face is 104px, and the marks are fractions of it.
+   *
+   *     asked     the AI badge doubles on the starter portraits
+   *     mattered  `--face` said 84 while the face was 104
+   *
+   * This block used to say 84, which was an estimate, and the rule that
+   * actually sizes the circle on a phone says 104 a few hundred lines
+   * up. So the plate came out at .325 of the face where the burn is at
+   * .4023 — small, high, and beside the mark it was supposed to cover.
+   *
+   * Every number here is now read off the live page rather than reasoned
+   * about: with the old values the plate measured .5986/-.0391 of a
+   * 104px face, which puts the face's own left edge at `50% - 79px` and
+   * its top at 17px down the tile. Those are the two offsets, and the
+   * size is the size the face actually is.
+   *
+   * The 79 is not 52 (half of 104) because the tile keeps a lane on the
+   * right for the two road glyphs, so the circle sits left of centre. */
   .screen.room-place > .card.room-stage > .room-scene > .rs-tile {
-    --face: 84px;
-    --face-left: calc(50% - 64px);
-    --face-top: 10px;
+    --face: 104px;
+    --face-left: calc(50% - 79px);
+    /* 8, and it is the padding above the face — see the rail's own note.
+       The 17 was read off a page whose tiles centred their contents, so
+       it described one seat's accident rather than the layout. */
+    --face-top: 8px;
   }
 }
 .rr-who { margin: 10px 0 0; }
@@ -4577,10 +4711,19 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
  * what somebody is looking at. */
 .app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
   > .room-scene {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Four across, two rows — the table, in the owner's words: "it always
+     in order gets filled from top left scrolling right two rows of four".
+     Eight seats is the cap `join_room` enforces, so four by two IS the
+     room, and nobody has to scroll to see who is in it.
+
+     `grid-auto-flow` is the default row order, which is already left to
+     right and top to bottom; it is named here because that ordering is
+     now a stated rule rather than a happy accident. */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-flow: row;
   grid-auto-rows: min-content;
   align-content: start;
-  gap: 8px;
+  gap: 6px;
 }
 .app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
   > .room-scene > .rs-tile,
@@ -4610,34 +4753,114 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
    different size. */
 .app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
   > .room-scene > .rs-tile > .rs-photo.rs-fullbleed {
-  width: 72px; height: 72px;
+  /* 56 with the rest — same number as `--face`, which is what keeps the
+     marks landing on the burn. */
+  width: 56px; height: 56px;
+}
+
+/* Your own seat is a seat, not a viewport.
+ *
+ *     asked     the extra boxes look wrong, and this one is broken
+ *     mattered  full-bleed was designed for a tile four times this wide
+ *
+ * `.rs-camtile` bleeds the picture to the tile's edges, absolutely
+ * positions the name over the bottom-left of it, and lets the marks sit
+ * where a large rectangle put them. At four across — about 93px a tile —
+ * that came out as a square photo jammed into the corner with the name
+ * lying across it and VERIFIED adrift underneath.
+ *
+ * In the rail it becomes what every other seat is: one circle, the name
+ * under it. The full-bleed treatment is still right where it was written
+ * for, which is the big single-seat stage, and this only overrides the
+ * rail. */
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile.rs-camtile > .rs-photo.rs-fullbleed,
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile.rs-camtile > .rs-live.rs-fullbleed {
+  position: static; inset: auto;
+  width: 56px; height: 56px;
+  border-radius: 50%; object-fit: cover; flex: 0 0 auto;
+}
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile.rs-camtile > .rs-name {
+  position: static; background: none; padding: 0; border-radius: 0;
 }
 .app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
   > .room-scene > .rs-tile {
+  /* No side lane any more — the roads sit under the name, in the flow.
+     See `.rs-side` below. */
   padding-right: 6px;
 }
-/* The two roads stand down on the rail: they are how you CHOOSE a format,
-   and the rail only exists once one is chosen. The marks do not — a mark
-   is drawn wherever the face is, at whatever size the face is.
-
-   The overlay has to scale with it or the burn shows through underneath,
-   clipped, which is the whole defect this covers. Same fractions as the
-   120px face, resolved for 72: the circle's left edge sits at
-   `50% - 39px` here, because the tile keeps only a 6px lane. */
+/* The two roads stay on the rail, because they are the chooser.
+ *
+ *     asked     the glyphs are missing, avatar and video
+ *     mattered  the rule that hid them assumed the format was already
+ *               chosen by the time you got here
+ *
+ * They were hidden on the reasoning that "the rail only exists once a
+ * format is chosen". That is no longer true and should not have been:
+ * every room opens in audio now and the person picks per seat, so these
+ * two glyphs ARE the picking. Hidden, the room offered no way into
+ * avatar or video at all — the format could only be inherited from
+ * whatever this browser was last left in.
+ *
+ * The marks keep their own note below: a mark is drawn wherever the face
+ * is, at whatever size the face is, and the overlay scales with it or
+ * the burn shows through clipped underneath. */
 .app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
   > .room-scene > .rs-tile > .rs-side {
-  display: none;
+  /* Under the face, not beside it. Four across leaves a tile about 93px
+     wide on a phone, and a side lane in that is a column of buttons with
+     a portrait squeezed against it. So the two roads come out of the
+     absolute lane and sit in the tile's own flow, centred, below the
+     name — which also means they cannot land on the picture however
+     narrow the tile gets. */
+  position: static; flex-direction: row; justify-content: center;
+  gap: 4px; margin-top: 4px;
+  display: flex;
+  /* And the lift comes off with the lane.
+   *
+   *     asked     get the profession off the top of the head of the
+   *               avatar and the movie camera
+   *     mattered  the row was PAINTED thirteen pixels above where it
+   *               was laid out
+   *
+   * `.rs-side` was an absolutely positioned lane pinned to the tile's
+   * middle, and it centred itself the usual way — `top: 50%` with
+   * `transform: translateY(-50%)`. Coming into the flow took the `top`
+   * and the `position` with it and left the transform behind, so the
+   * browser laid the row out cleanly under the field and then drew it
+   * thirteen pixels higher. Measured: laid out at 115px down the tile,
+   * painted at 102. On a seat whose field is one short word — "You" —
+   * the lit glyph landed on the word.
+   *
+   * A row in the flow does not need to be moved. */
+  transform: none;
+}
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-side > .rs-road {
+  width: 26px; height: 26px; min-height: 26px; font-size: 15px;
+  border-radius: 8px;
 }
 .app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
   > .room-scene > .rs-tile {
-  --face: 72px;
+  /* 56, not 72 — four across a phone leaves about 93px a tile, and the
+     marks follow because they are fractions of this one number. */
+  --face: 56px;
   /* 36, not 39. The 39 was derived from the tile keeping "only a 6px
      lane"; measured against the face's own box the AI plate came back at
      left .5208 of the face where the burn is at .5625 — three pixels
      left, every time, on all four seats. Read off `getBoundingClientRect`
      rather than recomputed from the padding, because the padding is what
      was wrong. */
-  --face-left: calc(50% - 36px);
+  --face-left: calc(50% - 28px);
+  /* 8: the padding above the face, which is what `top` on an absolutely
+     positioned child is measured from — the padding box, not the border
+     box. Now that the tile packs from the top, that is the same 8 on
+     every seat, lit or not, in this layout and in the other one. The 6
+     it replaces was measured back when the tile centred its contents, on
+     one seat, and was wrong on the rest by however much their field
+     wrapped. */
   --face-top: 8px;
 }
 /* The gold edge is the one thing that is not a fraction — a two-pixel

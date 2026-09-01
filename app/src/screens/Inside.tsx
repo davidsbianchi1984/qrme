@@ -9,7 +9,7 @@ import { field } from "../fields";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { SeatFilm } from "../SeatFilm";
-import { roomFormat, setRoomFormat,
+import { DEFAULT_FORMAT, setRoomFormat,
          type RoomFormat } from "../roomFormat";
 import { plainVoice, speakInPieces,
          type Speaking } from "../spoken";
@@ -361,7 +361,23 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
    * It is not the road. `presence_road` decides whether a profile's
    * replies are rendered into footage at all, on the owner's budget;
    * this decides only what a viewer draws with what already exists. */
-  const [format, setFormat] = useState<RoomFormat>(roomFormat);
+  // Audio, every time — not the format this browser was last left in.
+  //
+  //     asked     all the chats should start out in audio mode; users can
+  //               choose avatar or video from there
+  //     mattered  the DEFAULT was already audio, and it was never reached
+  //
+  // `roomFormat()` restores the last choice from `localStorage`, so a
+  // person who once looked at an avatar opened every subsequent room in
+  // avatar — for good, and with no memory of having chosen it. The seat
+  // glyphs are the chooser; a room that has already chosen for you is a
+  // room where they read as decoration.
+  //
+  // The cost is that somebody who always wants video picks it each time.
+  // That is the owner's call and this is it. `setRoomFormat` still
+  // records the choice for the life of the screen and for anything that
+  // wants to know what is being looked at.
+  const [format, setFormat] = useState<RoomFormat>(DEFAULT_FORMAT);
   /** How much of the avatar is in the frame — the forge's own three
    *  words. One choice for the room rather than one per seat: it says
    *  how this person likes to look at people, and setting it eight times

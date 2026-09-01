@@ -6,6 +6,103 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.3] - 2026-08-31
+
+### Fixed
+
+- **Every room opens in audio.** The format was restored from
+  `localStorage`, so somebody who once looked at an avatar opened every
+  room afterwards in avatar, for good and with no memory of having
+  chosen it — "all the chats should start out in audio mode. Users can
+  choose which one they want for avatar or video." The seat's two glyphs
+  are the chooser; a room that has already chosen makes them decoration.
+
+- **The two glyphs are back on the seats.** A rule hid them on the
+  reasoning that the rail only exists once a format has been chosen.
+  That stopped being true when the room started opening in audio, and
+  with them hidden there was no way into avatar or video at all.
+
+- **The seats are four across, two rows, filled from the top left.**
+  Eight is the cap `join_room` enforces, so four by two is the room, and
+  nobody has to scroll to see who is in it. *Add someone* keeps the last
+  place in line and is pushed along as people arrive.
+
+- **The composer is no longer clipped at the bottom of the room.** The
+  seats were holding a 280px floor whether or not the room was that
+  tall, so on a phone the type bar and send button sat below the card's
+  edge. The seats yield; the composer does not.
+
+- **Your own seat is a seat in the rail.** Full-bleed was designed for a
+  tile four times as wide; at four across it drew a square photograph
+  jammed into a corner with the name lying over it. In the rail it is
+  one circle with the name under it, like every other seat. The
+  full-bleed treatment stays where it was written for.
+
+- **The AI mark stops drawing twice.** Every starter portrait carries
+  the mark burned into its own pixels, and the console draws it again on
+  the outermost layer so that the circle a face sits in cannot slice a
+  disclosure in half. That reads as one mark only if the drawn one lands
+  on the burned one — and it did not, in any of the four layouts.
+
+  The drawn mark is placed a fixed distance down the tile. That is only
+  one distance if every seat's face starts at the same height, and the
+  seats were centring their contents inside boxes a grid had stretched
+  to the tallest in the row: a seat whose field wrapped to two lines had
+  its face ride up. Measured on a phone, four seats in one room, faces
+  at 9px and at 16.1px against a mark drawn at one offset.
+
+  The seats pack from the top, so a face begins at the tile's own
+  padding on every seat, in every row, lit or not. The three offsets
+  were then read off the live page rather than reasoned about, in both
+  layouts at both widths. The mark now lands at .5625 / .0350 of the
+  face against a burn at .5625 / .0352 — under a fifth of a pixel, at
+  56px, 104px and 120px alike.
+
+- **The two glyphs sit clear of the profession under the name.** The
+  row of roads used to be an absolutely positioned lane pinned to the
+  tile's middle, centred the usual way with `translateY(-50%)`. Bringing
+  it into the flow took the `position` and the `top` and left the
+  transform behind, so the browser laid the row out cleanly under the
+  field and then painted it thirteen pixels higher — measured, laid out
+  at 115px down the tile and drawn at 102. On a seat whose field is one
+  short word, "You", the lit glyph landed on the word. The field also
+  moves up under the name it belongs to, rather than floating evenly
+  between the name and the glyphs.
+
+- **VERIFIED is back on your own circle.** A picture you put up used to
+  draw full-bleed, edge to edge, the way the live camera does — so the
+  marks, which are fractions of the sphere a face sits in, had no sphere
+  to be fractions of and were sent to the tile's corner instead. Both
+  layouts draw that picture as a circle now, the same one every portrait
+  beside it gets, so the corner treatment was the only thing still
+  moving the gold plate off it: measured at 1.46 of the face's height
+  down the tile, below the name and below the glyphs. The seat falls
+  through to the geometry every other seat uses, and the plate lands at
+  .2969 / .8143 of the circle against a burn at .2969 / .8145.
+
+- **The word fits its badge, on fonts this machine cannot render.** The
+  plates were pinned to exactly the burn's width, which fits the burning
+  tool's font and not the reader's: measured here the gold plate has
+  37.4px of box for 30.5px of text, comfortably centred, and on an
+  iPhone the same string set in SF is wider and fell out of both rounded
+  ends. The measurement is a floor now — `min-width` and `min-height` —
+  and the badge takes whatever its own text needs on top of it, so it
+  can only ever be bigger than the burn it covers. Proved by widening
+  the run 30%: the plate grows 37.4 → 49.1px and nothing spills.
+
+- **Every seat in a row puts its glyphs on the same line.** "Mental
+  health" wraps and "Technology" does not, so the two roads sat at
+  different heights across one row. The field keeps room for two lines
+  either way, so a longer field pushes nothing and the row reads as one
+  row.
+
+### Added
+
+- A guard that refuses any rule laying the room's seats out from their
+  middle, and one that keeps `--face-top` declared on the seat it
+  measures. The offsets themselves are still measured, not asserted;
+  this pins the property that makes one measurement good for every seat.
+
 ## [2.9.2] - 2026-08-31
 
 ### Fixed
@@ -16973,7 +17070,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.2...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.3...HEAD
+[2.9.3]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.2...app-v2.9.3
 [2.9.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.1...app-v2.9.2
 [2.9.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.0...app-v2.9.1
 [2.9.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.8.0...app-v2.9.0
