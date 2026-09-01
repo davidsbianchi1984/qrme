@@ -653,6 +653,7 @@ if __name__ == "__main__":
         # each of those screens stayed a drawing while the console it was
         # drawn from shipped. `numbered()` skips loudly rather than
         # guessing, so the ones without a census row say so by name.
+        "companies",
         "signing", "visiting", "allowed", "stranger", "themark", "inwords",
         "remainder", "plugins", "named", "robots", "hands", "placements",
         "plans", "access", "matters", "settings",

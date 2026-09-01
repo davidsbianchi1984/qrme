@@ -941,7 +941,7 @@ const CHROME: Table = {
     en: "retired", es: "retirado", fr: "retiré", de: "aufgelöst", pt: "retirado", it: "ritirato", ja: "廃止", zh: "已撤销", hi: "हटाई गई", ar: "أُلغي",
   },
   "com.oversee": {
-    en: "Open their file", es: "Abrir su expediente", fr: "Ouvrir leur dossier", de: "Ihre Akte öffnen", pt: "Abrir a sua ficha", it: "Apri la sua scheda", ja: "ファイルを開く", zh: "打开档案", hi: "फ़ाइल खोलें", ar: "افتح ملفه",
+    en: "Open their file", es: "Abrir su expediente", fr: "Ouvrir leur dossier", de: "Die Akte öffnen", pt: "Abrir a sua ficha", it: "Apri la sua scheda", ja: "ファイルを開く", zh: "打开档案", hi: "फ़ाइल खोलें", ar: "افتح ملفه",
   },
   "com.interview": {
     en: "Draft the interview", es: "Redactar la entrevista", fr: "Rédiger l'entretien", de: "Das Interview entwerfen", pt: "Redigir a entrevista", it: "Prepara il colloquio", ja: "面接を作成", zh: "起草面试", hi: "साक्षात्कार तैयार करें", ar: "صِغ المقابلة",
