@@ -201,6 +201,23 @@ every discovery surface by `qrme/rated.py`, but this repository is public, so
 the brief is Old-Hollywood backstage glamour and nothing explicit. Gated in
 the product, tasteful in the source.
 
+## The figure below the face
+
+The portraits above are heads. A profile that steps onto the room's
+stage needs the rest, and Dr. Amara Osei's came the way a user's would:
+a MetaPerson export, converted by the forge, standing in the default
+tee and jeans the provider dresses every body in.
+
+<img src="portraits/figures/dr_amara_osei.webp" width="220"
+     alt="Dr. Amara Osei's full-body avatar: a woman standing in a
+          white tee, jeans and grey slip-on sneakers, on black">
+
+The still was photographed off a phone's photo library, and the
+library's own heart and adjust buttons happened to land on her
+sneakers. They were removed by reconstruction — only pixels brighter
+than the shoe fabric were touched, so the shoes underneath are the
+render's own.
+
 ## Using a real likeness
 
 For a profile that wears a real person's face, including your own:
