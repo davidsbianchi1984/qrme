@@ -6,6 +6,39 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.9] - 2026-09-01
+
+### Added
+
+- **The Company Builder.** Found a digital company — a name, any
+  industry in the founder's words, a headcount between 1 and 50, an
+  organization behind it — then open seats for any title on Earth, and
+  hire one interview at a time. Every hire begins as an interview the
+  platform writes for the role: the exemplar is the founder's own
+  role-mapping questionnaire, built years before this feature for
+  mapping transit personnel onto AI assistants, and what generalises
+  from it is its caliber, not its questions — the model writes an
+  interview in the role's own vocabulary, however many questions the
+  role needs, with a role-blind core offered honestly when no model is
+  reachable.
+
+  Signing is hiring: a profile minted under the founder's account, the
+  charter written into the persona and filed into source material so
+  every reply grounds on its own job description, colleagues already
+  hired become connections, and the seat joins its department — the
+  existing organization machinery, so a filled company coordinates the
+  way organizations already do. Duties that are licensed or physical
+  acts are assisted, never performed, in the employee's own job
+  description — the refusal-as-fact doctrine, at company scale.
+
+  Oversight is ownership: every employee belongs to the founder's
+  account, so the dials, the held replies, the memory shelf, the
+  transcript curation and the earnings ledger all apply to each one
+  individually; the Companies screen is the folder that organises them
+  and adds no power of its own. Retiring a seat is a staffing decision,
+  not a deletion. A stranger's GET answers 404, because knowing the id
+  is not being here.
+
 ## [2.9.8] - 2026-09-01
 
 ### Added
@@ -17323,7 +17356,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.8...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.9...HEAD
+[2.9.9]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.8...app-v2.9.9
 [2.9.8]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.7...app-v2.9.8
 [2.9.7]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.6...app-v2.9.7
 [2.9.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.5...app-v2.9.6
