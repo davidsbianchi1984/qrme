@@ -227,3 +227,7 @@ POST /companies/{company_id}/seats/{seat_id}/retire
 # same reason the builder's seven above are.
 POST /companies/{company_id}/publish
 POST /companies/{company_id}/unpublish
+# The study round (2.9.11): the plan and the brought hire, console-first
+# like the builder's doors above.
+POST /companies/{company_id}/plan
+POST /companies/{company_id}/seats/{seat_id}/assign

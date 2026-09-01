@@ -6,6 +6,36 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.11] - 2026-09-01
+
+### Added
+
+- **The platform studies the trade before it writes the interview.**
+  Opening a seat's interview now begins with a study: the occupation's
+  daily work, its skills, the tools of the trade, what it decides alone
+  and what it escalates, who it works with, and the working knowledge a
+  competent one carries — through the excursion machinery that already
+  owns the posture (sanitized before it leaves, answered by the local
+  provider while offline, who-answered on the record). The interview is
+  drafted FROM the study, and on hire the findings file into the
+  employee's source material as "The trade" — the hire arrives knowing
+  its profession, provenance-counted like every grounding.
+
+- **The staffing plan.** The founder says what the store is meant to
+  be, and the platform predicts the roster a fully functioning business
+  of that kind carries — each role with a title, a department, and one
+  line on why, capped at the headcount, most essential first.
+  Suggestions, never walls, and never deeds: nothing opens a seat but
+  the founder's own press, and when the model's answer does not parse,
+  an honest floor stands — the trade itself, a front desk, a
+  bookkeeper — said plainly rather than dressed as a study.
+
+- **Bring your own hire.** An open seat lists the founder's held
+  profiles — hybrids built in Blend included — and one press seats
+  them: same-account only (the organization's own staffing rule, kept
+  at this door and refusing in ten languages), colleagues connected,
+  the record saying brought rather than interviewed.
+
 ## [2.9.10] - 2026-09-01
 
 ### Added
@@ -17376,7 +17406,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.10...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.11...HEAD
+[2.9.11]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.10...app-v2.9.11
 [2.9.10]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.9...app-v2.9.10
 [2.9.9]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.8...app-v2.9.9
 [2.9.8]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.7...app-v2.9.8

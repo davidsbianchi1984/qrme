@@ -898,6 +898,15 @@ const CHROME: Table = {
     pt: "Campanhas", it: "Campagne", ja: "キャンペーン", zh: "筹款活动",
     hi: "अभियान", ar: "الحملات",
   },
+  "com.plan.ask": {
+    en: "What is this store meant to be?", es: "¿Qué quiere ser esta tienda?", fr: "Que doit être cette boutique ?", de: "Was soll dieser Laden sein?", pt: "O que esta loja quer ser?", it: "Cosa vuole essere questo negozio?", ja: "この店は何を目指しますか？", zh: "这家店想成为什么？", hi: "यह दुकान क्या बनना चाहती है?", ar: "ما الذي يُفترض أن يكون عليه هذا المتجر؟",
+  },
+  "com.plan.go": {
+    en: "Suggest the roles", es: "Sugerir los puestos", fr: "Suggérer les rôles", de: "Rollen vorschlagen", pt: "Sugerir os cargos", it: "Suggerisci i ruoli", ja: "役割を提案", zh: "建议职位", hi: "भूमिकाएँ सुझाएँ", ar: "اقترح الأدوار",
+  },
+  "com.bring": {
+    en: "Bring your own", es: "Trae el tuyo", fr: "Amenez le vôtre", de: "Bring deinen mit", pt: "Traga o seu", it: "Porta il tuo", ja: "自分の人材を", zh: "带自己的来", hi: "अपना लाएँ", ar: "أحضر ملفك",
+  },
   "com.publish": {
     en: "Open for business", es: "Abrir al público", fr: "Ouvrir au public", de: "Eröffnen", pt: "Abrir ao público", it: "Apri al pubblico", ja: "開業する", zh: "开业", hi: "कारोबार शुरू करें", ar: "افتح للجمهور",
   },

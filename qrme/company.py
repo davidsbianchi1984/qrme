@@ -212,6 +212,47 @@ def _seat(company: dict, seat_id: str) -> dict:
     return dict(r)
 
 
+def study_role(company: dict, seat_id: str, cloud=None) -> str:
+    """The platform studies the trade before it writes the interview.
+
+        asked     the platform goes online with the info given and
+                  researches the occupation, its skills, the connections
+                  needed, and the knowledge of its profession
+        mattered  an interview written from model memory is a guess
+                  about a job; a study is the job looked at
+
+    The brief goes through `research.gather`, which owns the whole
+    posture already: sanitized before it leaves, refused nothing while
+    offline but answered by the local deterministic provider instead,
+    and `llm.answered_by()` records who did the studying. The findings
+    are stored on the seat, ground the interview, and — on hire — file
+    into the employee's source material as the trade's own knowledge,
+    so the hire arrives knowing its profession and every reply can
+    ground on it.
+    """
+    from . import research
+    seat = _seat(company, seat_id)
+    brief = (
+        f"The occupation: {seat['title']}, in the {seat['department']} "
+        f"department of a small {company['industry']} business in the "
+        "United States. Describe, concretely and in the trade's own "
+        "vocabulary: what this role does day to day and how often; the "
+        "skills a competent one carries; the tools of the trade; what it "
+        "decides alone and what it escalates, and to whom; who it works "
+        "with inside and outside the business; and the working knowledge "
+        "of the profession a good one holds.")
+    findings = research.gather(brief, cloud=cloud)
+    conn = db.connect()
+    try:
+        conn.execute("ALTER TABLE company_seats ADD COLUMN study TEXT")
+    except Exception:
+        pass  # the column already stands
+    conn.execute("UPDATE company_seats SET study=? WHERE id=?",
+                 (findings, seat["id"]))
+    conn.commit()
+    return findings
+
+
 def draft_interview(company: dict, seat_id: str, cloud=None) -> list[dict]:
     """The platform writes the interview for this seat — questions in the
     role's own vocabulary with suggested answers, at the exemplar's
@@ -219,6 +260,7 @@ def draft_interview(company: dict, seat_id: str, cloud=None) -> list[dict]:
     core is offered instead: a degraded interview that admits it is one
     beats a hidden failure wearing a good one's clothes."""
     seat = _seat(company, seat_id)
+    findings = study_role(company, seat_id, cloud=cloud)
     system = (
         "You compose role interviews for a builder of synthetic employees. "
         "Shown below is the caliber expected — an exemplar's outline. Write "
@@ -233,7 +275,9 @@ def draft_interview(company: dict, seat_id: str, cloud=None) -> list[dict]:
         'with keys "question" and "suggested".\n\nEXEMPLAR OUTLINE:\n'
         + EXEMPLAR)
     ask = (f"Industry: {company['industry']}\nCompany: {company['name']}\n"
-           f"Department: {seat['department']}\nRole: {seat['title']}")
+           f"Department: {seat['department']}\nRole: {seat['title']}\n\n"
+           "WHAT THE PLATFORM'S OWN STUDY OF THIS TRADE FOUND — ground "
+           "every question in it:\n" + findings[:4000])
     questions: list[dict] | None = None
     try:
         raw = llm.get_provider(cloud=cloud).generate(
@@ -313,6 +357,15 @@ def hire(company: dict, seat_id: str, answers: list[dict]) -> dict:
         (db.new_id("src"), profile["id"], "knowledge",
          f"The position: {seat['title']} ({company['name']})",
          json.dumps(kept, indent=1), db.utcnow()))
+    if seat.get("study"):
+        # The trade's own knowledge, filed beside the job description —
+        # the hire arrives knowing its profession, provenance-counted
+        # like every grounding already is.
+        conn.execute(
+            "INSERT INTO source_items (id, profile_id, kind, title, content,"
+            " pdi_key, pack_id, created_at) VALUES (?,?,?,?,?,NULL,NULL,?)",
+            (db.new_id("src"), profile["id"], "knowledge",
+             f"The trade: {seat['title']}", seat["study"], db.utcnow()))
 
     # The colleagues: everyone already hired is a connection, because a
     # company whose employees are strangers to each other is an org chart,
@@ -341,6 +394,91 @@ def hire(company: dict, seat_id: str, answers: list[dict]) -> dict:
     conn.commit()
     return {"seat_id": seat["id"], "profile_id": profile["id"],
             "display_name": name}
+
+
+def plan_company(company: dict, description: str, cloud=None) -> list[dict]:
+    """Predict the roster a fully functioning business of this kind
+    needs, from the founder's own words about what the store is meant
+    to be. Suggestions, never walls: nothing here opens a seat — the
+    founder taps the ones they want, and typing their own stays exactly
+    as good."""
+    from . import research
+    description = (description or "").strip() or company["industry"]
+    findings = research.gather(
+        f"A small {company['industry']} business in the United States, "
+        f"described by its founder as: {description}. What staff does a "
+        "fully functioning one carry? For each role: its title, its "
+        "department, and one line on why this business needs it.",
+        cloud=cloud)
+    raw = llm.get_provider(cloud=cloud).generate(
+        "From the study below, answer ONLY as a JSON array of objects "
+        'with keys "title", "department" and "why" — every role a fully '
+        "functioning business of this kind carries, most essential "
+        "first, at most the company's headcount of "
+        f"{company['headcount']}.\n\nTHE STUDY:\n" + findings[:4000],
+        [{"role": "user", "content": description}])
+    import json as _json
+    start, end = raw.find("["), raw.rfind("]")
+    if start >= 0 and end > start:
+        try:
+            parsed = _json.loads(raw[start:end + 1])
+            rows = [{"title": str(r.get("title", "")).strip()[:80],
+                     "department": str(r.get("department", "")).strip()[:80],
+                     "why": str(r.get("why", "")).strip()[:200]}
+                    for r in parsed if isinstance(r, dict)]
+            rows = [r for r in rows if r["title"] and r["department"]]
+            if rows:
+                return rows[:company["headcount"]]
+        except Exception:
+            pass
+    # The honest floor: the trade itself, somebody at the front, and
+    # somebody minding the books — said plainly rather than dressed up
+    # as a study that did not parse.
+    return [
+        {"title": company["industry"].title() + " lead",
+         "department": "The trade",
+         "why": "somebody has to do the thing the sign says"},
+        {"title": "Front desk", "department": "Front of house",
+         "why": "somebody answers whoever walks in"},
+        {"title": "Bookkeeper", "department": "Back office",
+         "why": "somebody counts what came in and went out"},
+    ][:company["headcount"]]
+
+
+def fill_seat(company: dict, seat_id: str, profile_id: str) -> dict:
+    """Bring your own hire: an existing profile — the founder's, or a
+    hybrid they blended — takes the seat. Same-account only, the rule
+    the organization's own staffing keeps, and the seat's obligations
+    do not change: colleagues connect, the department seats them, and
+    the file says brought rather than interviewed."""
+    seat = _seat(company, seat_id)
+    if seat["status"] == "hired":
+        raise CompanyError("this seat is already filled — retire it first")
+    conn = db.connect()
+    prof = conn.execute("SELECT * FROM profiles WHERE id=?",
+                        (profile_id,)).fetchone()
+    if prof is None or prof["owner_id"] != company["owner_id"]:
+        raise CompanyError(
+            "a seat takes a profile this company's founder holds")
+    for other in seats(company["id"]):
+        if other["status"] == "hired" and other["profile_id"]:
+            try:
+                befriend(profile_id, other["profile_id"])
+            except Exception:
+                pass
+    org = organization.get(company["org_id"])
+    if org is not None:
+        try:
+            organization.add_department(
+                org, seat["department"], seat["title"], dict(prof), None)
+        except organization.OrganizationError:
+            pass
+    conn.execute(
+        "UPDATE company_seats SET status='hired', profile_id=?, hired_at=?"
+        " WHERE id=?", (profile_id, db.utcnow(), seat["id"]))
+    conn.commit()
+    return {"seat_id": seat["id"], "profile_id": profile_id,
+            "display_name": prof["display_name"], "brought": True}
 
 
 def retire(company: dict, seat_id: str) -> dict:

@@ -7164,6 +7164,17 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'hi': 'यह कंपनी बाज़ार में नहीं है',
         'ar': 'هذه الشركة ليست في السوق',
     },
+    'a seat takes a profile this company\'s founder holds': {
+        'es': 'un puesto solo acepta un perfil que posea quien fundó esta empresa',
+        'fr': "un poste ne prend qu'un profil détenu par la personne qui a fondé cette entreprise",
+        'de': 'eine Stelle nimmt nur ein Profil, das die Gründerin oder der Gründer dieses Unternehmens hält',
+        'pt': 'um lugar só aceita um perfil que pertença a quem fundou esta empresa',
+        'it': "un posto accetta solo un profilo di chi ha fondato quest'azienda",
+        'ja': 'この会社の設立者が保有するプロフィールだけが席に就けます',
+        'zh': '席位只接受这家公司创始人持有的档案',
+        'hi': 'सीट पर केवल वही प्रोफ़ाइल बैठ सकती है जो इस कंपनी के संस्थापक के पास हो',
+        'ar': 'المقعد لا يقبل إلا ملفًا يملكه مؤسس هذه الشركة',
+    },
     'no such company': {
         'es': 'no existe esa empresa',
         'fr': 'aucune entreprise de ce nom',

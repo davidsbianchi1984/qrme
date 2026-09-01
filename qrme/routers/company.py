@@ -135,6 +135,43 @@ def hire(company_id: str, seat_id: str, body: SeatHire,
         _fail(exc)
 
 
+class CompanyPlan(BaseModel):
+    description: str | None = Field(
+        default=None, max_length=2000,
+        description="What the store is meant to be, in the founder's "
+                    "words.")
+
+
+class SeatAssign(BaseModel):
+    profile_id: str = Field(max_length=80)
+
+
+@router.post("/companies/{company_id}/plan", status_code=201)
+def plan(company_id: str, body: CompanyPlan, request: Request) -> dict:
+    """The predicted roster — suggestions, never walls; nothing here
+    opens a seat."""
+    row = _company_or_404(company_id, request)
+    try:
+        return {"suggestions": companies.plan_company(
+            row, body.description or "",
+            cloud=getattr(request.app.state, "cloud", None))}
+    except companies.CompanyError as exc:
+        _fail(exc)
+
+
+@router.post("/companies/{company_id}/seats/{seat_id}/assign",
+             status_code=201)
+def assign(company_id: str, seat_id: str, body: SeatAssign,
+           request: Request) -> dict:
+    """Bring your own hire — an existing or blended profile takes the
+    seat; see qrme/company.py."""
+    row = _company_or_404(company_id, request)
+    try:
+        return companies.fill_seat(row, seat_id, body.profile_id)
+    except companies.CompanyError as exc:
+        _fail(exc)
+
+
 class CompanyPublish(BaseModel):
     tagline: str | None = Field(
         default=None, max_length=300,

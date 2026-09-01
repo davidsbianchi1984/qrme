@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, Company, CompanySeat, InterviewQ } from "../api";
+import { accountApi, api, Company, CompanySeat, InterviewQ } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
@@ -40,6 +40,16 @@ export function Companies({ onOpenProfile }: {
 
   // Open for business.
   const [tagline, setTagline] = useState("");
+
+  // The staffing plan: the founder's words about what the store is
+  // meant to be, and what the platform's study predicts it needs.
+  const [meantToBe, setMeantToBe] = useState("");
+  const [suggested, setSuggested] = useState<
+    { title: string; department: string; why: string }[] | null>(null);
+
+  // Bring your own: which seat is choosing from the held profiles.
+  const [assigning, setAssigning] = useState<string | null>(null);
+  const [held, setHeld] = useState<{ id: string; display_name: string }[]>([]);
 
   // Drafting a seat.
   const [title, setTitle] = useState("");
@@ -160,6 +170,45 @@ export function Companies({ onOpenProfile }: {
             )}
           </div>
 
+          {/* The staffing plan. The platform studies what the founder
+              says the store is meant to be and predicts the roster a
+              fully functioning one carries — suggestions, never walls,
+              and never deeds: only the founder's press opens a seat. */}
+          <div className="card">
+            <div className="row">
+              <input value={meantToBe}
+                     onChange={(e) => setMeantToBe(e.target.value)}
+                     placeholder={tr("com.plan.ask", lang)}
+                     style={{ flex: 1 }} />
+              <button disabled={busy}
+                      onClick={act(async () => {
+                        const out = await api.planCompany(open.id,
+                          { description: meantToBe.trim() || null }, token);
+                        setSuggested(out.suggestions);
+                      })}>
+                {tr("com.plan.go", lang)}
+              </button>
+            </div>
+            {suggested && suggested.map((s, i) => (
+              <div key={i} className="row">
+                <b>{s.title}</b>
+                <span className="muted small">{s.department}</span>
+                <span className="muted small" style={{ flex: 1 }}>
+                  {s.why}
+                </span>
+                <button disabled={busy}
+                        onClick={act(async () => {
+                          await api.addSeat(open.id,
+                            { title: s.title, department: s.department },
+                            token);
+                          setSuggested(suggested.filter((_, j) => j !== i));
+                        })}>
+                  {tr("com.seat.add", lang)}
+                </button>
+              </div>
+            ))}
+          </div>
+
           <div className="row">
             <input value={title} onChange={(e) => setTitle(e.target.value)}
                    placeholder={tr("com.seat.title", lang)}
@@ -196,6 +245,31 @@ export function Companies({ onOpenProfile }: {
                 </button>
               )}
 
+              {/* Bring your own: the founder's existing or blended
+                  profile takes the seat — the Blend screen builds
+                  hybrids, this door seats them. */}
+              {s.status === "open" && assigning !== s.id && (
+                <button className="muted small" disabled={busy}
+                        onClick={act(async () => {
+                          const mine = await accountApi.heldProfiles(
+                            session.accountId!, session.accountToken!);
+                          setHeld(mine.profiles.map((p) => ({
+                            id: p.profile_id, display_name: p.display_name })));
+                          setAssigning(s.id);
+                        })}>
+                  {tr("com.bring", lang)}
+                </button>
+              )}
+              {assigning === s.id && held.map((h) => (
+                <button key={h.id} className="muted small" disabled={busy}
+                        onClick={act(async () => {
+                          await api.assignSeat(open.id, s.id,
+                            { profile_id: h.id }, token);
+                          setAssigning(null);
+                        })}>
+                  {h.display_name}
+                </button>
+              ))}
               {s.status === "open" && interview?.seatId !== s.id && (
                 <button disabled={busy}
                         onClick={act(async () => {

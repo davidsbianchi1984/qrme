@@ -6290,6 +6290,17 @@ export const api = {
     req<{ seat_id: string; profile_id: string; display_name: string }>(
       `/companies/${companyId}/seats/${seatId}/hire`,
       { method: "POST", body, token }),
+  planCompany: (companyId: string, body: { description?: string | null },
+                token: string) =>
+    req<{ suggestions: { title: string; department: string;
+                         why: string }[] }>(
+      `/companies/${companyId}/plan`, { method: "POST", body, token }),
+  assignSeat: (companyId: string, seatId: string,
+               body: { profile_id: string }, token: string) =>
+    req<{ seat_id: string; profile_id: string; display_name: string;
+          brought: boolean }>(
+      `/companies/${companyId}/seats/${seatId}/assign`,
+      { method: "POST", body, token }),
   publishCompany: (companyId: string, body: { tagline?: string | null },
                    token: string) =>
     req<{ id: string; name: string }>(
