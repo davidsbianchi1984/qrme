@@ -59,6 +59,7 @@ import { Solitude } from "./screens/Solitude";
 import { Simulate } from "./screens/Simulate";
 import { Campaigns } from "./screens/Campaigns";
 import { Org } from "./screens/Org";
+import { Companies } from "./screens/Companies";
 import { Relationships } from "./screens/Relationships";
 import { Memory } from "./screens/Memory";
 import { Agent } from "./screens/Agent";
@@ -79,7 +80,7 @@ import { WatchLights } from "./WatchLights";
 // `profile` is deliberately not in NAV: somebody else's homepage is a place
 // you are taken to by pressing their face, not a standing destination — the
 // same reason `passing` is reachable and unlisted.
-type Tab = "capabilities" | "profile" | "home" | "circle" | "agent" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "raise" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "allowed" | "stranger" | "themark" | "inwords" | "remainder" | "plugins" | "named" | "passing" | "robots" | "hands" | "placements" | "plans" | "access" | "matters" | "settings";
+type Tab = "capabilities" | "profile" | "home" | "circle" | "agent" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "raise" | "solitude" | "simulate" | "campaigns" | "org" | "companies" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "allowed" | "stranger" | "themark" | "inwords" | "remainder" | "plugins" | "named" | "passing" | "robots" | "hands" | "placements" | "plans" | "access" | "matters" | "settings";
 
 // `art` is the one tab whose mark is a picture rather than a glyph. Kept as a
 // second, optional field rather than widening `icon` to a node: the nav guards
@@ -105,6 +106,7 @@ const NAV: { id: Tab; label: string; icon: string; art?: string;
   { id: "raise", label: "Raise", icon: "🌱", group: "create" },
   { id: "campaigns", label: "Campaigns", icon: "🎗", group: "business" },
   { id: "org", label: "Org", icon: "🏛", group: "business" },
+  { id: "companies", label: "Companies", icon: "🏢", group: "business" },
   { id: "relationships", label: "Relationships", icon: "👥", group: "profile" },
   { id: "memory", label: "Memory Vault", icon: "🔒", group: "profile" },
   { id: "studio", label: "Widgets", icon: "🛠", group: "create" },
@@ -404,6 +406,7 @@ export function App() {
         {tab === "simulate" && <Simulate onPlans={toPlans} />}
         {tab === "campaigns" && <Campaigns onPlans={toPlans} />}
         {tab === "org" && <Org onPlans={toPlans} />}
+        {tab === "companies" && <Companies />}
         {tab === "relationships" && <Relationships onPlans={toPlans} />}
         {tab === "memory" && <Memory onPlans={toPlans} />}
         {tab === "agent" && <Agent onPlans={toPlans}

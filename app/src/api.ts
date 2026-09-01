@@ -657,6 +657,22 @@ export type Wearable = {
   paired: boolean;
 };
 
+/** A digital company: a founder's folder of synthetic employees. */
+export type Company = {
+  id: string; owner_id: string; org_id: string;
+  name: string; industry: string; headcount: number;
+  shop_id: string | null; created_at: string;
+};
+export type CompanySeat = {
+  id: string; company_id: string; title: string; department: string;
+  status: "open" | "hired" | "retired";
+  interview: InterviewQ[] | null;
+  charter: { question: string; answer: string }[] | null;
+  profile_id: string | null; hired_at: string | null;
+};
+/** One drafted interview question, with the platform's suggestion. */
+export type InterviewQ = { question: string; suggested: string };
+
 export type WearableView = {
   profile_id: string;
   wearables: Wearable[];
@@ -6251,6 +6267,33 @@ export const api = {
   // delete — the row stays, with the date. Without asking for them the
   // console can never show that, and a promise nobody can see is a promise
   // that may as well not have been kept.
+  // The Company Builder: found, draft, interview, hire, oversee.
+  companies: (token: string) =>
+    req<Company[]>("/companies", { token }),
+  companyRoster: (companyId: string, token: string) =>
+    req<Company & { seats: CompanySeat[] }>(
+      `/companies/${companyId}`, { token }),
+  foundCompany: (body: { name: string; industry: string;
+                         headcount: number }, token: string) =>
+    req<Company>("/companies", { method: "POST", body, token }),
+  addSeat: (companyId: string,
+            body: { title: string; department: string }, token: string) =>
+    req<CompanySeat>(`/companies/${companyId}/seats`,
+                     { method: "POST", body, token }),
+  draftInterview: (companyId: string, seatId: string, token: string) =>
+    req<{ questions: InterviewQ[] }>(
+      `/companies/${companyId}/seats/${seatId}/interview`,
+      { method: "POST", token }),
+  hireSeat: (companyId: string, seatId: string,
+             body: { answers: { question: string; answer: string }[] },
+             token: string) =>
+    req<{ seat_id: string; profile_id: string; display_name: string }>(
+      `/companies/${companyId}/seats/${seatId}/hire`,
+      { method: "POST", body, token }),
+  retireSeat: (companyId: string, seatId: string, token: string) =>
+    req<{ seat_id: string; status: string }>(
+      `/companies/${companyId}/seats/${seatId}/retire`,
+      { method: "POST", token }),
   wearables: (profileId: string, token: string, includeRevoked = false) =>
     req<WearableView>(
       `/profiles/${profileId}/wearables`

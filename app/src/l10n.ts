@@ -898,6 +898,65 @@ const CHROME: Table = {
     pt: "Campanhas", it: "Campagne", ja: "キャンペーン", zh: "筹款活动",
     hi: "अभियान", ar: "الحملات",
   },
+  "com.title": {
+    en: "Companies", es: "Empresas", fr: "Entreprises", de: "Unternehmen", pt: "Empresas", it: "Aziende", ja: "会社", zh: "公司", hi: "कंपनियाँ", ar: "الشركات",
+  },
+  "com.pitch": {
+    en: "Found a digital company and fill its positions with synthetic employees, hired one interview at a time — any industry, any title, each one yours to oversee.", es: "Funda una empresa digital y cubre sus puestos con empleados sintéticos, contratados entrevista a entrevista — cualquier sector, cualquier puesto, cada uno bajo tu supervisión.", fr: "Fondez une entreprise numérique et pourvoyez ses postes avec des employés synthétiques, recrutés entretien par entretien — tout secteur, tout métier, chacun sous votre supervision.", de: "Gründe ein digitales Unternehmen und besetze seine Stellen mit synthetischen Angestellten, eingestellt Interview für Interview — jede Branche, jeder Titel, jede unter deiner Aufsicht.", pt: "Funde uma empresa digital e preencha os seus cargos com funcionários sintéticos, contratados entrevista a entrevista — qualquer setor, qualquer cargo, cada um sob a sua supervisão.", it: "Fonda un'azienda digitale e copri le sue posizioni con dipendenti sintetici, assunti un colloquio alla volta — qualsiasi settore, qualsiasi ruolo, ognuno sotto la tua supervisione.", ja: "デジタル会社を設立し、面接ごとに採用する合成社員でポストを埋めましょう — どんな業界でも、どんな職種でも、一人ひとりあなたの監督下に。", zh: "创立一家数字公司，用一次次面试聘来的合成员工填满职位——任何行业、任何头衔，每一位都由你监管。", hi: "एक डिजिटल कंपनी बनाएँ और उसके पद सिंथेटिक कर्मचारियों से भरें, एक-एक साक्षात्कार से — कोई भी उद्योग, कोई भी पद, हर एक आपकी निगरानी में।", ar: "أسّس شركة رقمية واملأ مناصبها بموظفين اصطناعيين يُعيَّنون مقابلةً بعد مقابلة — أي مجال وأي منصب، وكلٌّ تحت إشرافك.",
+  },
+  "com.found": {
+    en: "Found a company", es: "Fundar una empresa", fr: "Fonder une entreprise", de: "Ein Unternehmen gründen", pt: "Fundar uma empresa", it: "Fonda un'azienda", ja: "会社を設立", zh: "创立公司", hi: "कंपनी बनाएँ", ar: "أسّس شركة",
+  },
+  "com.name": {
+    en: "The company's name", es: "El nombre de la empresa", fr: "Le nom de l'entreprise", de: "Der Name des Unternehmens", pt: "O nome da empresa", it: "Il nome dell'azienda", ja: "会社名", zh: "公司名称", hi: "कंपनी का नाम", ar: "اسم الشركة",
+  },
+  "com.industry": {
+    en: "Its industry — any, in your words", es: "Su sector — el que sea, con tus palabras", fr: "Son secteur — n'importe lequel, dans vos mots", de: "Die Branche — jede, in deinen Worten", pt: "O setor — qualquer um, nas suas palavras", it: "Il settore — qualsiasi, con parole tue", ja: "業界 — どんな業界でも、あなたの言葉で", zh: "所属行业——任何行业，用你的话", hi: "उद्योग — कोई भी, आपके शब्दों में", ar: "مجالها — أيّ مجال، بكلماتك",
+  },
+  "com.headcount": {
+    en: "{n} seats", es: "{n} puestos", fr: "{n} postes", de: "{n} Stellen", pt: "{n} lugares", it: "{n} posti", ja: "{n}席", zh: "{n} 个席位", hi: "{n} सीटें", ar: "{n} مقاعد",
+  },
+  "com.found.go": {
+    en: "Found it", es: "Fundarla", fr: "La fonder", de: "Gründen", pt: "Fundá-la", it: "Fondala", ja: "設立する", zh: "创立", hi: "बनाएँ", ar: "أسّسها",
+  },
+  "com.back": {
+    en: "← All companies", es: "← Todas las empresas", fr: "← Toutes les entreprises", de: "← Alle Unternehmen", pt: "← Todas as empresas", it: "← Tutte le aziende", ja: "← すべての会社", zh: "← 全部公司", hi: "← सभी कंपनियाँ", ar: "← كل الشركات",
+  },
+  "com.seat.title": {
+    en: "The position — any job on Earth", es: "El puesto — cualquier oficio del mundo", fr: "Le poste — n'importe quel métier au monde", de: "Die Stelle — jeder Beruf der Welt", pt: "O cargo — qualquer ofício do mundo", it: "La posizione — qualsiasi mestiere al mondo", ja: "職種 — 世界中のどんな仕事でも", zh: "职位——世上任何工作", hi: "पद — दुनिया का कोई भी काम", ar: "المنصب — أي عمل على وجه الأرض",
+  },
+  "com.seat.dept": {
+    en: "Which department", es: "Qué departamento", fr: "Quel département", de: "Welche Abteilung", pt: "Qual departamento", it: "Quale reparto", ja: "どの部門", zh: "哪个部门", hi: "कौन-सा विभाग", ar: "أي قسم",
+  },
+  "com.seat.add": {
+    en: "Open the seat", es: "Abrir el puesto", fr: "Ouvrir le poste", de: "Stelle öffnen", pt: "Abrir o lugar", it: "Apri il posto", ja: "席を用意", zh: "开设席位", hi: "सीट खोलें", ar: "افتح المقعد",
+  },
+  "com.status.open": {
+    en: "open", es: "vacante", fr: "vacant", de: "offen", pt: "vago", it: "vacante", ja: "空席", zh: "空缺", hi: "रिक्त", ar: "شاغر",
+  },
+  "com.status.hired": {
+    en: "hired", es: "contratado", fr: "recruté", de: "eingestellt", pt: "contratado", it: "assunto", ja: "採用済み", zh: "已聘用", hi: "नियुक्त", ar: "معيَّن",
+  },
+  "com.status.retired": {
+    en: "retired", es: "retirado", fr: "retiré", de: "aufgelöst", pt: "retirado", it: "ritirato", ja: "廃止", zh: "已撤销", hi: "हटाई गई", ar: "أُلغي",
+  },
+  "com.oversee": {
+    en: "Open their file", es: "Abrir su expediente", fr: "Ouvrir leur dossier", de: "Ihre Akte öffnen", pt: "Abrir a sua ficha", it: "Apri la sua scheda", ja: "ファイルを開く", zh: "打开档案", hi: "फ़ाइल खोलें", ar: "افتح ملفه",
+  },
+  "com.interview": {
+    en: "Draft the interview", es: "Redactar la entrevista", fr: "Rédiger l'entretien", de: "Das Interview entwerfen", pt: "Redigir a entrevista", it: "Prepara il colloquio", ja: "面接を作成", zh: "起草面试", hi: "साक्षात्कार तैयार करें", ar: "صِغ المقابلة",
+  },
+  "com.sign": {
+    en: "Sign and hire", es: "Firmar y contratar", fr: "Signer et recruter", de: "Unterschreiben und einstellen", pt: "Assinar e contratar", it: "Firma e assumi", ja: "署名して採用", zh: "签署并聘用", hi: "हस्ताक्षर कर नियुक्त करें", ar: "وقّع وعيّن",
+  },
+  "com.retire": {
+    en: "Retire the seat", es: "Retirar el puesto", fr: "Retirer le poste", de: "Stelle auflösen", pt: "Retirar o lugar", it: "Ritira il posto", ja: "席を廃止", zh: "撤销席位", hi: "सीट हटाएँ", ar: "ألغِ المقعد",
+  },
+  "nav.companies": {
+    en: "Companies", es: "Empresas", fr: "Entreprises", de: "Unternehmen",
+    pt: "Empresas", it: "Aziende", ja: "会社", zh: "公司",
+    hi: "कंपनियाँ", ar: "الشركات",
+  },
   "nav.org": {
     en: "Org", es: "Organización", fr: "Organisation", de: "Organisation",
     pt: "Organização", it: "Organizzazione", ja: "組織", zh: "组织",

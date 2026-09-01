@@ -5036,3 +5036,14 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
  * It is a way of moving BETWEEN rooms, which is not what somebody
  * standing in one is doing, and the menu already holds it. */
 .app.in-room .chat-rail-dock { display: none; }
+
+/* ---- the company builder --------------------------------------------- */
+.com-row { display: flex; gap: 8px; align-items: baseline;
+  text-align: left; width: 100%; }
+.com-status { margin-left: auto; font-size: 12px; opacity: 0.8; }
+.com-status.hired { color: #7bc47f; }
+.com-status.open { color: #d9b45b; }
+.com-interview { display: flex; flex-direction: column; gap: 10px;
+  margin-top: 10px; }
+.com-q { display: flex; flex-direction: column; gap: 4px; }
+.com-q textarea { min-height: 56px; }
