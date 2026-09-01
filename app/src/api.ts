@@ -3872,7 +3872,7 @@ export const api = {
   stats: (id: string, token: string) =>
     req<Stats>(`/profiles/${id}/stats`, { token }),
 
-  createInteractor: (body: { display_name: string; birthdate?: string }) =>
+  createInteractor: (body: { display_name?: string; birthdate?: string }) =>
     req<Interactor>("/interactors", { method: "POST", body }),
 
   setRelationship: (

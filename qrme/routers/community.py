@@ -188,34 +188,64 @@ def _verified(kind: str, ref_id: str, room_id: str = "") -> bool:
     to run without. A gold check that a surface draws from nothing is
     worse than no check at all.
 
-    A person's seat is marked from the PICTURE it is showing, which is
-    the only checkable fact on that tile.
+    ## Two rules, and both of them were wrong on a live screen
 
-    The first rule here asked whether the account behind the seat owned a
-    profile with a verification record. That was a guess dressed as a
-    fact — it says something about a person's other profiles rather than
-    about the face on this seat — and it never once fired, which is how
-    guesses usually announce themselves.
+        asked     verified is on the wrong seat, it should be on the
+                  one that says You
+        mattered  it was on the seat that says AI
 
-    The mark is a claim about a LIKENESS. A seat showing a photograph
-    that belongs to a verified profile is showing a checked likeness, and
-    that is exactly what the gold plate asserted when it was burned into
-    that file. So the question is: is this seat putting up
-    `/photos/<handle>.webp` for a handle whose profile carries a
-    verification record with a named attestor.
+    A synthetic seat used to be marked from the PROFILE's own record,
+    without asking what the seat was drawing. In a room a profile seat
+    draws its AI portrait, which carries the burned AI mark — so the two
+    plates landed on one face, a sparkle saying *this is a rendering* and
+    a gold check saying *this likeness is checked*, on the same circle.
+    Photographed and sent back in one line. On this platform of all
+    platforms that is not a cosmetic fault: the gold plate is a claim
+    about a real person, and a seat that has just declared itself
+    synthetic cannot carry it. **A profile seat never wears it.** The
+    record is not deleted and the profile page still shows it; it simply
+    is not a claim this seat can make.
+
+    Meanwhile the person's own seat was marked only from a picture put up
+    THROUGH THE ROOM — `showing: photo` — and a person who set their face
+    on the Identity screen has no such row. Their seat draws from
+    `pictures_in`, which is the picture that follows them between rooms,
+    and that path was never consulted. So the human seat went bare while
+    the synthetic one wore the check: the exact inversion of what the
+    mark is for.
+
+    ## What it asks now
+
+    The same question, of whatever picture the seat is actually drawing,
+    resolved in the order the seat itself resolves it: a photograph put
+    up in this room if there is one, the person's own picture if there is
+    not, and nothing at all if the seat is on camera or empty. Then: is
+    that picture `/photos/<handle>.webp` for a handle whose profile
+    carries a verification record with a named attestor.
+
+    The mark follows the FACE, not the identity behind it. A person
+    showing something other than their checked likeness is not making the
+    claim, and does not get the plate.
     """
     try:
-        if kind == "profile":
-            record = verification.status(ref_id)
-            return bool(record.get("verified") and record.get("attestor"))
-        if not room_id:
+        # A synthetic seat makes no claim about a real person's likeness.
+        if kind != "user" or not room_id:
             return False
         from .. import avatars, roomface
 
-        shown = roomface.showing_in(room_id).get("faces", {}).get(ref_id)
-        url = (shown or {}).get("media_url") or ""
+        shown = roomface.showing_in(room_id).get("faces", {}).get(ref_id) or {}
+        showing = shown.get("showing")
+        if not showing:
+            # Their own picture, the one that follows them between rooms.
+            url = roomface.pictures_in(room_id).get(ref_id) or ""
+        elif showing == "photo":
+            url = shown.get("media_url") or ""
+        else:
+            # On camera, or a silhouette. No still face to check.
+            return False
+
         prefix = f"{avatars.PHOTO_ROUTE}/"
-        if not (shown or {}).get("showing") == "photo" or not url.startswith(prefix):
+        if not url.startswith(prefix):
             return False
         handle = url[len(prefix):].rsplit(".", 1)[0]
         row = db.connect().execute(

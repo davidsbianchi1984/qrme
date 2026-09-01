@@ -10,8 +10,8 @@ from datetime import date
 from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
-from .. import (adaptation, auth, briefcase, companion, contacts, db,
-                engagement, filming, i18n, llm, moderation, offline,
+from .. import (accounts, adaptation, auth, briefcase, companion, contacts,
+                db, engagement, filming, i18n, llm, moderation, offline,
                 opendoor, persona, referral, remembrance,
                 roles, scrape, voiceprint, watermark)
 from ..common import (require_may_publish, 
@@ -108,12 +108,20 @@ def create_interactor(body: InteractorCreate) -> dict:
     conn.execute(
         "INSERT INTO interactors (id, display_name, birthdate, created_at)"
         " VALUES (?,?,?,?)",
-        (interactor_id, body.display_name,
+        # A pronoun is not a name, whoever is asking. See
+        # `accounts.a_person_name`: this door accepted whatever a client
+        # sent, and a console screen sent the word the surface uses for
+        # the reader's own seat.
+        (interactor_id, accounts.a_person_name(body.display_name),
          body.birthdate.isoformat() if body.birthdate else None, db.utcnow()),
     )
     conn.commit()
     token = auth.issue("interactor", interactor_id)
-    return {"id": interactor_id, "display_name": body.display_name,
+    # The name that was STORED, not the one that was asked for. They differ
+    # exactly when the asked-for one was not a name, and a caller that is
+    # told its own input back has no way to find that out.
+    return {"id": interactor_id,
+            "display_name": accounts.a_person_name(body.display_name),
             "token": token}
 
 

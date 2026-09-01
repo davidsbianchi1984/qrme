@@ -766,6 +766,69 @@ def _backfill_founder(conn, profile_id: str, handle: str) -> bool:
     return changed
 
 
+def _unseat_the_nameless(conn) -> int:
+    """Take the people who are not people out of the rooms they are in.
+
+        asked     when I step into an existing room it shows ON AIR in
+                  frames that are not anybody
+        mattered  they were rows, and they are still there
+
+    The console's onboarding minted a person named "You" — the word the
+    surface uses for the reader's own seat — with no account behind it,
+    every single time it ran. Two of them turned up in one live room
+    beside the real seat, each drawing a red ON AIR circle for somebody
+    who had never been there.
+
+    The making of them is fixed at both doors. This is the other half:
+    the ones already sitting in rooms, which no amount of fixing the door
+    removes.
+
+    Deliberately narrow, because these rows look like people and one of
+    them being a real person would be the worse mistake by far. All four
+    must hold: no account, the stored name is the pronoun this bug wrote,
+    nothing was ever said by them, and nothing was ever shown for them.
+    A person who spoke is a person, whatever they are called.
+
+    And it UNSEATS rather than deletes. A row nobody can see is harmless;
+    a row somebody's memory is keyed on is not, and the difference between
+    the two is not something a startup repair should decide.
+    """
+    from . import accounts
+
+    gone = 0
+    rows = conn.execute(
+        "SELECT id FROM interactors WHERE account_id IS NULL").fetchall()
+    for row in rows:
+        who = row["id"]
+        name = conn.execute("SELECT display_name FROM interactors WHERE id=?",
+                            (who,)).fetchone()["display_name"]
+        if accounts.a_person_name(name) != accounts.UNNAMED:
+            continue          # a real name; not one of these
+        if name == accounts.UNNAMED:
+            continue          # already named by the rule; leave it seated
+        said = conn.execute(
+            "SELECT 1 FROM room_messages WHERE sender_kind='user'"
+            " AND sender_id=? LIMIT 1", (who,)).fetchone()
+        if said is not None:
+            continue          # somebody who spoke is somebody
+        shown = conn.execute(
+            "SELECT 1 FROM room_faces WHERE interactor_id=?"
+            " AND showing IN ('photo','camera') AND media_url IS NOT NULL"
+            " LIMIT 1", (who,)).fetchone()
+        if shown is not None:
+            continue          # a face was put up; that was somebody too
+        seated = conn.execute(
+            "DELETE FROM room_participants WHERE kind='user' AND ref_id=?",
+            (who,)).rowcount
+        # The camera state goes with the seat, or the next room they are
+        # put in draws ON AIR for them again.
+        conn.execute("DELETE FROM room_faces WHERE interactor_id=?", (who,))
+        if seated:
+            gone += seated
+    conn.commit()
+    return gone
+
+
 def repair() -> dict:
     """Portrait repair for profiles that already exist. Never creates one —
     a deployment that chose not to install the starters stays without them.
@@ -815,7 +878,13 @@ def repair() -> dict:
             repaired.append(handle)
         if row and _voice(conn, row["profile_id"], handle):
             repaired.append(f"{handle} (voice)")
-    return {"repaired": len(repaired), "repaired_handles": repaired}
+    # And the seats nobody is in. Reported by count, because the thing
+    # worth knowing is whether a box had any.
+    unseated = _unseat_the_nameless(conn)
+    if unseated:
+        repaired.append(f"{unseated} seat(s) held by nobody")
+    return {"repaired": len(repaired), "repaired_handles": repaired,
+            "unseated": unseated}
 
 
 def _say_field(conn, profile_id: str, industry: str) -> None:

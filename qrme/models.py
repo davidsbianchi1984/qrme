@@ -199,7 +199,13 @@ class ProfileOut(BaseModel):
 
 
 class InteractorCreate(BaseModel):
-    display_name: str
+    # Optional, because a caller who does not know somebody's name should
+    # say so rather than invent one. The console used to send the word its
+    # own surface uses for the reader's seat — "You" — which then became
+    # that person's name for everybody else in the room. What gets stored
+    # when this is absent is `accounts.a_person_name`'s answer, in one
+    # place, for both doors that make a person.
+    display_name: str | None = None
     birthdate: date | None = None
 
 

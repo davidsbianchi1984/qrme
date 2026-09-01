@@ -6,6 +6,77 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.4] - 2026-09-01
+
+### Fixed
+
+- **Nobody is called "You" any more, and nobody sits in a room who was
+  never there.** A live room came back holding two interactors with no
+  account, no picture, and the stored name `You` — the word the surface
+  uses for the reader's own seat — each drawing a red ON AIR circle for
+  somebody who had never been in the room.
+
+  Three things were wrong. The console's onboarding called
+  `POST /interactors` with the literal `display_name: "You"`; it called
+  it on every pass with no account to be idempotent on, so each visit
+  minted another person and seated them; and nothing on the way in
+  refused the word. `accounts.interactor_for` is careful about exactly
+  this and says so in its docstring — this simply was not that door.
+
+  Onboarding reuses the person the session already has, which sign-in
+  provides, so for anybody signed in nothing is minted at all. One rule,
+  `accounts.a_person_name`, now guards both write doors: a pronoun in any
+  of the ten shipped languages, or an empty name, stores as `Someone`.
+  Names that merely begin with a pronoun — Yousef, Tuomas, Duncan — are
+  untouched. The route returns the name it stored rather than the one it
+  was handed, so a caller can tell when the two differ.
+
+  A startup repair takes the ones already seated out of their rooms, and
+  the camera state with them. Deliberately narrow, because these rows
+  look like people: no account, *and* that pronoun for a name, *and*
+  never spoke, *and* never put a face up. Anybody who said a word stays
+  where they are. It unseats rather than deletes.
+
+- **The double tap and the long press reach the seat on a phone.** Both
+  gestures the seat is documented to have were dead on iOS: `dblclick`
+  is a mouse event and Safari spends the double tap on zoom, while a
+  long press on a picture raises the copy-and-save callout, which
+  cancels the pointer stream before the 550ms hold fires. The double tap
+  is counted off the pointer stream now, `touch-action` and the callout
+  rules stop the browser taking the press, and a browser that *does*
+  synthesise `dblclick` no longer counts the same gesture twice — that
+  bug turned the panel on and straight back off, which reads exactly
+  like a dead gesture.
+
+- **The gear is back on your own seat.** It is the visible twin of those
+  two gestures, written for the case where a gesture does not arrive,
+  and a later sweep set it to `display: none` on the reasoning that the
+  room's bottom strip carries what the tile gave up. The strip carries
+  the camera and the microphone; it does not carry the background, the
+  mask, or taking either down. With the gestures gone on iOS and the
+  gear hidden, there was no way to reach them from a phone at all.
+
+- **VERIFIED belongs to the person, not the rendering.** A synthetic
+  seat was marked from the profile's own verification record without
+  asking what the seat was drawing — and in a room a profile seat draws
+  its AI portrait, so one circle carried both the sparkle saying *this is
+  a rendering* and the gold plate saying *this likeness is checked*.
+  Meanwhile the human seat beside it went bare, because it was marked
+  only from a picture put up through the room and a person who sets their
+  face on the Identity screen has no such row.
+
+  The mark follows the face the seat is actually drawing, resolved in the
+  order the seat resolves it, and a profile seat never carries it. The
+  record is not deleted and the profile page still shows it; it is simply
+  not a claim that seat can make.
+
+### Added
+
+- Guards for each: that no room seat is laid out from its middle, that
+  `--face-top` stays on the seat it measures, that no pronoun in any
+  shipped language becomes a name, and that the repair leaves anybody who
+  ever spoke exactly where they are.
+
 ## [2.9.3] - 2026-08-31
 
 ### Fixed
@@ -17070,7 +17141,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.3...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.4...HEAD
+[2.9.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.3...app-v2.9.4
 [2.9.3]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.2...app-v2.9.3
 [2.9.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.1...app-v2.9.2
 [2.9.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.0...app-v2.9.1

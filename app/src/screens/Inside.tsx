@@ -464,6 +464,12 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
   // person's own picture, and the background behind them.
   const bgPicker = useRef<HTMLInputElement | null>(null);
   const hold = useRef<number | null>(null);
+  /** When this seat was last tapped, so two taps inside 350ms can be
+   *  counted as the double tap iOS will not report as one. */
+  const lastTap = useRef(0);
+  /** When a double tap was last counted off the pointer stream, so the
+   *  `dblclick` some browsers synthesise after it is not counted again. */
+  const counted = useRef(0);
   // The local preview. Rendering is the device's, exactly as `overlays` says —
   // what the backend holds is the fact that a camera is on, which is what
   // lets everybody else's client draw the same scene.
@@ -3004,13 +3010,69 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                     *
                     * Own seat, always. Somebody else's seat has no controls
                     * of yours on it, and never did. */
-                   onDoubleClick={isMe
-                     ? () => setReveal((v) => !v) : undefined}
-                   onPointerDown={isMe ? () => {
+                   /* Two gestures, and on a phone neither one arrived.
+                    *
+                    *     asked     long press or double tap reveals the
+                    *               buttons or hides them
+                    *     mattered  `dblclick` is a MOUSE event
+                    *
+                    * Safari on iOS owns the double tap — it is the zoom
+                    * gesture — and does not synthesise `dblclick` on a
+                    * plain div for it. So the handler below was dead on
+                    * the one device the report came from, and the hold
+                    * beside it went the same way for its own reason: a
+                    * long press on an element wrapping a picture raises
+                    * iOS's own copy-and-save callout, which cancels the
+                    * pointer stream before 550ms is up. Both doors, shut,
+                    * on a screen whose third door — the gear — a later
+                    * rule had set to `display: none`.
+                    *
+                    * The double tap is counted here instead, off the
+                    * pointer stream that every platform does send, and
+                    * `onPointerCancel` now clears the hold the way the
+                    * other three exits do. The CSS beside `.rs-camtile`
+                    * turns off the zoom gesture and the callout so the
+                    * browser stops taking the press away. `onDoubleClick`
+                    * stays for a mouse, where it has always worked and
+                    * where no pointer double-count should replace it. */
+                   /* One gesture must not be counted twice.
+                    *
+                    * A browser that DOES synthesise `dblclick` off a touch
+                    * stream — Chromium does, Safari sometimes — now has
+                    * two handlers for one double tap: the count below
+                    * turns the panel on and this one turns it straight
+                    * back off. Measured on a touch pointer: two taps, no
+                    * change, which reads exactly like a dead gesture and
+                    * is the opposite. So a pointer-counted tap stamps the
+                    * clock, and the synthesised `dblclick` that follows it
+                    * inside 700ms is the same press arriving twice. */
+                   onDoubleClick={isMe ? () => {
+                     if (Date.now() - counted.current < 700) {
+                       counted.current = 0;
+                       return;
+                     }
+                     setReveal((v) => !v);
+                   } : undefined}
+                   onPointerDown={isMe ? (e) => {
+                     const now = e.timeStamp || Date.now();
+                     const quick = now - lastTap.current < 350;
+                     lastTap.current = now;
+                     if (quick) {
+                       if (hold.current) window.clearTimeout(hold.current);
+                       hold.current = null;
+                       lastTap.current = 0;
+                       counted.current = Date.now();
+                       setReveal((v) => !v);
+                       return;
+                     }
                      hold.current = window.setTimeout(
                        () => setReveal((v) => !v), 550);
                    } : undefined}
                    onPointerUp={isMe ? () => {
+                     if (hold.current) window.clearTimeout(hold.current);
+                     hold.current = null;
+                   } : undefined}
+                   onPointerCancel={isMe ? () => {
                      if (hold.current) window.clearTimeout(hold.current);
                      hold.current = null;
                    } : undefined}

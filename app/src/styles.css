@@ -3074,7 +3074,6 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
  * here for. */
 .screen.room-place > .card.room-stage > .room-scene .rs-sitout,
 .screen.room-place > .card.room-stage > .room-scene .rs-controls,
-.screen.room-place > .card.room-stage > .room-scene .rs-gear,
 .screen.room-place > .card.room-stage > .room-scene .rs-hint,
 .screen.room-place > .card.room-stage > .room-scene .rs-worn,
 /* The old avatar ring, too. It was the door to the figure back when a
@@ -3082,6 +3081,44 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
    now, and leaving both drew an empty rounded box around the role. */
 .screen.room-place > .card.room-stage > .room-scene .rs-avring {
   display: none;
+}
+
+/* The gear stays. A control nobody can see is a control nobody has.
+ *
+ *     asked     the double tap will not open the window to turn the
+ *               camera on or put a background up
+ *     mattered  it was the ONLY door left, and it did not open
+ *
+ * The gear is the visible twin of the double tap and the hold, and it
+ * was written for exactly the case where a gesture does not arrive. It
+ * went out with the sit-out and the old controls in a sweep that was
+ * right about those and wrong about this one, on the reasoning that the
+ * room's bottom strip carries what the tile gave up. The strip carries
+ * the camera and the microphone. It does not carry the background, the
+ * mask, or taking either back down — those live behind the gesture, and
+ * with the gesture gone on iOS and the gear hidden there was no way to
+ * reach them from a phone at all.
+ *
+ * Small and in the corner, on your own seat only, where it always was. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-gear {
+  display: inline-flex;
+  width: 22px; height: 22px; font-size: 11px;
+  bottom: 6px; right: 6px;
+}
+
+/* And the browser stops taking the press away.
+ *
+ * `touch-action: manipulation` turns off double-tap-to-zoom, which is
+ * what Safari was spending the second tap on, and the callout rules stop
+ * a long press on the photograph raising iOS's own copy-and-save sheet —
+ * which cancelled the pointer stream before the 550ms hold could fire.
+ * Between them the two gestures the seat is documented to have both
+ * reach the handler. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile.rs-camtile {
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* ---- The rail's cards, at every width ----------------------------------
