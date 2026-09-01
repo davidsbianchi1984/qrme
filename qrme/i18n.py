@@ -7142,6 +7142,17 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'hi': 'वयस्क स्थलों पर केवल वयस्क-मोड प्रोफ़ाइलें रखी जाती हैं',
         'ar': 'لا تُوضع في أماكن البالغين إلا الملفات في وضع البالغين',
     },
+    'no such company': {
+        'es': 'no existe esa empresa',
+        'fr': 'aucune entreprise de ce nom',
+        'de': 'kein solches Unternehmen',
+        'pt': 'não existe essa empresa',
+        'it': 'nessuna azienda del genere',
+        'ja': 'その会社は存在しません',
+        'zh': '没有这家公司',
+        'hi': 'ऐसी कोई कंपनी नहीं है',
+        'ar': 'لا توجد شركة بهذا المعرف',
+    },
     'organization not found': {
         'es': 'organización no encontrada',
         'fr': 'organisation introuvable',
@@ -8360,6 +8371,10 @@ _WHERE_MARKERS = ("body", "query", "path", "header", "cookie")
 #: A field with no row keeps its identifier, exactly as before, and is recorded
 #: in `tests/field_labels_unmapped.txt`.
 _FIELD_LABELS: dict[str, dict[str, str]] = {
+    # The Company Builder's two form fields (qrme/routers/company.py),
+    # worded as the founding card asks them.
+    "department": {"en": "Which department", "es": "Qué departamento", "fr": "Quel département", "de": "Welche Abteilung", "pt": "Qual departamento", "it": "Quale reparto", "ja": "どの部門", "zh": "哪个部门", "hi": "कौन-सा विभाग", "ar": "أي قسم"},
+    "headcount": {"en": "How many seats", "es": "Cuántos puestos", "fr": "Combien de postes", "de": "Wie viele Stellen", "pt": "Quantos lugares", "it": "Quanti posti", "ja": "何席か", "zh": "多少个席位", "hi": "कितनी सीटें", "ar": "كم مقعدًا"},
     # The open door's two fields (qrme/routers/interaction.py).
     "hear_first": {"en": "Hear from them first", "es": "Escúchalos primero", "fr": "Les entendre en premier", "de": "Zuerst von ihnen hören", "pt": "Ouvi-los primeiro", "it": "Sentirli per primi", "ja": "先に連絡をもらう", "zh": "让它先联系你", "hi": "पहले उनसे सुनें", "ar": "اسمع منهم أولًا"},
     "cadence": {"en": "How often is welcome", "es": "Con qué frecuencia es bienvenido", "fr": "À quelle fréquence", "de": "Wie oft willkommen ist", "pt": "Com que frequência é bem-vindo", "it": "Quanto spesso è gradito", "ja": "どのくらいの頻度なら歓迎か", "zh": "多久一次合适", "hi": "कितनी बार स्वागत है", "ar": "كم مرة يكون مرحبًا به"},
