@@ -779,6 +779,19 @@ LESSONS: tuple[dict, ...] = (
               "passes to the successor they chose.",
          screens=(145,),
          try_it="Name a loved one and a share, then open a campaign."),
+    dict(key="company", chapter="Working", title="Found a company",
+         what="Found a digital company — a name, any industry in your own "
+              "words, a headcount — then open seats for any title on Earth "
+              "and hire one interview at a time: the platform drafts each "
+              "role's questions, you edit every answer, and signing is the "
+              "hire. Each employee lands under your account with its charter "
+              "in its own source material, colleagues connected, its "
+              "department seated. When somebody is behind the counter, "
+              "open for business puts the storefront into the marketplace; "
+              "closing it later dissolves nothing.",
+         screens=(210,),
+         try_it="Found a bakery, open a counter seat, and sign your first "
+                "hire."),
     dict(key="ecosystem", chapter="Working", title="Departments that coordinate",
          what="An organization gives each department its own role agent — "
               "your profiles, staffed to desks. Ask them to coordinate on a "

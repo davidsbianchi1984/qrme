@@ -362,6 +362,11 @@ DOORS: tuple[Door, ...] = (
          "what leaves this deployment, and on what terms",
          ("export", "licensing", "take it with me", "download my",
           "what leaves")),
+    Door("Companies", "Companies tab",
+         "a digital company of synthetic employees — founded, staffed one "
+         "interview at a time, and entered into the marketplace",
+         ("company", "companies", "business", "storefront", "staff",
+          "employees", "hire", "digital company")),
     Door("Org", "Org tab",
          "the ecosystem — an organisation of profiles, and who leads it",
          ("organisation", "organization", "org", "team of profiles",
