@@ -1,0 +1,7 @@
+{
+  "app_name": "QRME Studio",
+  "app_version": "2.9.12",
+  "package_name": "com.qrme.studio",
+  "binary": "QrmeStudio.exe",
+  "platform": "PC"
+}

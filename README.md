@@ -1048,6 +1048,12 @@ and your colleagues to reach from anywhere:
 Talking to a profile stays public either way; the key gates creating an
 account on your deployment, not using one.
 
+Beyond self-hosting, the [`stores/`](stores/README.md) room holds the
+three storefront counters — Meta Horizon as a packaged PWA, Steam and
+Viveport as thin launchers over the Windows shell — with one shared
+[listing](stores/listing.md) and a guard that keeps every shelf's
+version equal to the app's.
+
 The `Dockerfile` packages the studio and the API into one image so a hosted
 instance serves both from the same origin, exactly like the phone flow does:
 

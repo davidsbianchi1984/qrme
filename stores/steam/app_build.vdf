@@ -1,0 +1,17 @@
+// The Steam build script, run by steamcmd on the owner's machine:
+//   steamcmd +login <account> +run_app_build app_build.vdf +quit
+// <STEAM_APP_ID> and <STEAM_DEPOT_ID> arrive with the Steamworks
+// registration and are filled on the owner's machine, never here.
+// Desc carries the app version and the guard holds it current.
+"AppBuild"
+{
+	"AppID" "<STEAM_APP_ID>"
+	"Desc" "QRME Studio 2.9.12"
+	"ContentRoot" "content"
+	"BuildOutput" "output"
+	"SetLive" "beta"
+	"Depots"
+	{
+		"<STEAM_DEPOT_ID>" "depot_build.vdf"
+	}
+}

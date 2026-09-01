@@ -1,0 +1,10 @@
+{
+  "packageId": "com.qrme.studio",
+  "name": "QRME Studio",
+  "versionName": "2.9.12",
+  "versionCode": 2009012,
+  "startUrl": "https://sntheticprofiles.com/",
+  "webManifestUrl": "https://sntheticprofiles.com/manifest.webmanifest",
+  "display": "standalone",
+  "orientation": "any"
+}
