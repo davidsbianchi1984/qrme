@@ -36,7 +36,7 @@ def test_the_deck_is_on_the_screen_people_actually_open():
         assert needle in IDENTITY, f"Identity lost {needle}"
 
 
-def test_the_seat_is_one_face_with_two_roads_beside_it():
+def test_the_seat_is_one_face_with_four_roads_beside_it():
     """The twin circles are gone, and that was the correction.
 
     A seat used to carry two whole circles — the portrait opening the
@@ -46,10 +46,13 @@ def test_the_seat_is_one_face_with_two_roads_beside_it():
     do belong beside the face rather than competing with it for the
     middle of the tile.
 
-    So: one portrait, which still opens the picture big, and two road
-    glyphs stacked down its right — the avatar and the film. What this
-    guard protects is that neither road is quietly dropped and that the
-    portrait keeps its lightbox.
+    So: one portrait, which still opens the picture big, and the road
+    glyphs stacked straight down its right. Two when this was written —
+    the avatar and the film — and four now that AR and VR moved out of
+    their own "step in" button and onto the seat, in the same column:
+    "VR and AR will become glyph next to video and avatar... straight up
+    and down." What this guard protects is that no road is quietly
+    dropped and that the portrait keeps its lightbox.
     """
     assert "rs-circle-btn rs-solo" in INSIDE, (
         "the seat lost its single portrait circle")
@@ -58,11 +61,11 @@ def test_the_seat_is_one_face_with_two_roads_beside_it():
         "the twin circles are back — a person is one face")
     assert "AvatarStage" in INSIDE
 
-    # Both roads, on the seat, each pressing into a format.
+    # All four roads, on the seat, each pressing into a format.
     roads = INSIDE.split('className="rs-side"')[1].split("</div>")[0]
-    assert roads.count('className={"rs-road"') == 2, (
-        "a seat carries two roads: the avatar and the film")
-    for fmt in ('"avatar"', '"video"'):
+    assert roads.count('className={"rs-road"') == 4, (
+        "a seat carries four roads: the avatar, the film, AR and VR")
+    for fmt in ('"avatar"', '"video"', '"ar"', '"vr"'):
         assert fmt in roads, f"the {fmt} road is not on the seat"
 
     # The direct chat's header wears the ring, opening the same stage.

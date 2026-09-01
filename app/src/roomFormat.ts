@@ -37,9 +37,10 @@
  * frame or, worse, commissioning one.
  */
 
-export type RoomFormat = "audio" | "avatar" | "video";
+export type RoomFormat = "audio" | "avatar" | "video" | "ar" | "vr";
 
-export const FORMATS: readonly RoomFormat[] = ["audio", "avatar", "video"];
+export const FORMATS: readonly RoomFormat[] =
+  ["audio", "avatar", "video", "ar", "vr"];
 
 const KEY = "qrme.roomFormat";
 
@@ -48,7 +49,7 @@ const KEY = "qrme.roomFormat";
 export const DEFAULT_FORMAT: RoomFormat = "audio";
 
 function known(value: string | null): value is RoomFormat {
-  return value === "audio" || value === "avatar" || value === "video";
+  return FORMATS.includes(value as RoomFormat);
 }
 
 export function roomFormat(): RoomFormat {

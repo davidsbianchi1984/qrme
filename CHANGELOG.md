@@ -6,6 +6,53 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.6] - 2026-09-01
+
+### Added
+
+- **AR and VR are things you can do with a seat, in the column that
+  already says so.** They lived behind a "Step in" button under the
+  seats — a second grammar for the act every other format performs with
+  one press on the seat itself. The button is gone; two more roads
+  joined the avatar and the film beside each face, straight up and down
+  in the lane the tile already reserves, and nothing else moved: the
+  glyphs themselves got smaller, because four at the old size need more
+  column than the tile has. AR and VR are letters in a ring rather than
+  pictures — a standing figure IS the avatar and a movie camera IS the
+  film, but nothing pictures "this room, over the room you are standing
+  in" without being a riddle. The letters read from the language table
+  like every other label, so a French seat says RA and RV, matching the
+  road's own tooltip.
+
+  The stage now follows the viewer's own chosen format — the same
+  per-person, browser-only choice the other roads set, never sent to the
+  server — rather than the room's kind. Any room can be stepped into;
+  stepping out is the same act as pressing a lit road, and one way out
+  covers however you came in.
+
+### Fixed
+
+- **The gear goes back off the seat.** Put back one release ago for a
+  real reason — the double tap and long press were both dead on iOS and
+  it was the only remaining door to the camera, the background and the
+  mask — and reported this round as "a settings button showing up on my
+  photo". The reason is spent: both gestures were fixed and are driven
+  by a touch pointer in the tests. A third door earns a place on
+  somebody's face only while the first two are shut.
+
+- **The stage was being flattened by the card's own rules.** Two
+  different things wear the class `room-stage`: the flat participant
+  card, and the immersive stage — a fixed overlay covering the screen.
+  Three card rules were written against the bare class and caught both:
+  `position: relative` beat the stage's `fixed`, so it laid out as a
+  402×170 strip inside the screen with the room showing through it;
+  the composer rule pinned the stage's strip to the top of the screen,
+  across the transcript; and the room's own ✕ stood at a higher
+  z-index than the stage, so the button for leaving the ROOM drew on
+  top of the button for leaving the STAGE. All three now name the card,
+  the stage's strip is pinned above its leave row, and the stage stands
+  above the room's chrome — a modal's only way out is its own.
+
 ## [2.9.5] - 2026-09-01
 
 ### Added
@@ -17197,7 +17244,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.5...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.6...HEAD
+[2.9.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.5...app-v2.9.6
 [2.9.5]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.4...app-v2.9.5
 [2.9.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.3...app-v2.9.4
 [2.9.3]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.2...app-v2.9.3

@@ -19,9 +19,9 @@ the window.
 ## What this does not do
 
 It does not call the Fullscreen API and it does not touch a sensor. Those
-stay a deliberate press — `immersed` in Inside.tsx — because going
-fullscreen and turning a camera on are decisions a person makes rather
-than properties a room has. Filling the window with a room somebody
+stay a deliberate press — today the seat's AR and VR roads, which set the
+viewer's own format — because going fullscreen and turning a camera on
+are decisions a person makes rather than properties a room has. Filling the window with a room somebody
 already walked into is not one of those, and conflating the two is how the
 first version of this talked itself out of the fix.
 
@@ -260,8 +260,28 @@ def test_the_door_is_translated_like_everything_else():
 
 def test_fullscreen_and_the_sensors_are_still_a_press():
     """The reasoning that kept them a press is still right, and this round
-    must not be read as overturning it."""
-    assert "const [immersed, setImmersed] = useState(false);" in INSIDE
+    must not be read as overturning it.
+
+    Which press changed. This asserted the `immersed` boolean — a
+    dedicated flag behind a "Step in" button under the seats — and that
+    flag is gone because the seat's own AR and VR roads became the door:
+    pressing one sets the viewer's format, and the stage stands while
+    that format holds. The decision is still a person's deliberate press
+    on a control that says what it does; there is simply no second
+    grammar for the same act any more. What this guard holds is that
+    nothing OTHER than those presses opens the stage — the room's kind
+    cannot, walking in cannot, and the stylesheet still never reaches for
+    fullscreen on its own.
+    """
+    assert '{(format === "ar" || format === "vr") && (' in INSIDE, (
+        "the stage no longer stands on the viewer's own chosen format")
+    for press in ('setFormat("ar")', 'setFormat("vr")'):
+        assert INSIDE.count(press) == 1, (
+            f"{press} should have exactly one caller — the road on the "
+            "seat that a person presses")
+    assert "setImmersed" not in INSIDE, (
+        "the second door under the seats is back — one press, one "
+        "grammar")
     block = CSS[CSS.index("/* ---- a room is a place"):]
     block = block[:block.index("@media (max-height")]
     assert "requestFullscreen" not in block
@@ -274,7 +294,7 @@ def test_the_seats_come_first_in_the_room():
     faces below the fold, which was the original complaint and is still
     worth holding — the ordering survived the full-screen build being
     taken back out, because it was never the part that was wrong."""
-    block = CSS[CSS.index(".screen.room-place > .room-stage"):]
+    block = CSS[CSS.index(".screen.room-place > .card.room-stage"):]
     block = block[:block.index("}")]
     assert "order: -1" in block, (
         "the faces are still drawn under whatever the page put above them")
@@ -619,14 +639,14 @@ def test_the_strip_is_a_sibling_of_the_scene_not_a_child():
 
 def test_the_room_reserves_no_guessed_height():
     """The constant is the defect, not its value."""
-    block = CSS[CSS.index(".screen.room-place > .room-stage {"):]
+    block = CSS[CSS.index(".screen.room-place > .card.room-stage {"):]
     block = block[:block.index("}")]
     assert "padding-bottom: 104px" not in block, (
         "the stage is guessing the strip's height again")
 
 
 def test_the_strip_stops_floating_in_a_room():
-    block = CSS[CSS.index(".screen.room-place .rs-chatstrip,"):]
+    block = CSS[CSS.index(".screen.room-place > .card.room-stage .rs-chatstrip,"):]
     block = block[:block.index("}")]
     assert "position: static" in block, (
         "the strip is still an overlay in a room, so it can ride up over "

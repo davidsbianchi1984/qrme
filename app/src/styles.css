@@ -1456,7 +1456,19 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 
 /* The room stage — AR passthrough or the VR turntable. One fixed layer
    over everything, left by its own button; nothing behind it unmounts. */
-.room-stage { position: fixed; inset: 0; z-index: 80; overflow: hidden;
+/* Above the room's own chrome, because it covers the room.
+ *
+ *     asked     fix the top of the stage
+ *     mattered  the room's close button sat ON the stage's own
+ *
+ * The stage stood at 80 and `.room-out` — the room's ✕ — at 90, so the
+ * button for leaving the ROOM drew on top of a full-screen overlay and
+ * clipped the button for leaving the STAGE. Two exits, overlapping, one
+ * of them wrong for where you were standing.
+ *
+ * At 100 the stage covers the room completely, chrome included, and the
+ * only way out of it is its own — which is what a modal is. */
+.room-stage { position: fixed; inset: 0; z-index: 100; overflow: hidden;
   background: radial-gradient(90% 70% at 50% 20%, #101b30 0%, #070b15 70%);
   touch-action: none; cursor: grab; }
 .room-stage:active { cursor: grabbing; }
@@ -1580,8 +1592,23 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   color: #fff; border-radius: 50%; width: 26px; height: 26px;
   line-height: 1; cursor: pointer; flex: none; }
 .rs-chatbtn:disabled { opacity: 0.4; cursor: default; }
-/* On the stage the strip sits above the leave button's row. */
-.room-stage .rs-chatstrip { left: 12px; right: 12px; bottom: 64px; }
+/* On the stage the strip sits above the leave button's row.
+ *
+ *     asked     fix the top of the stage
+ *     mattered  the strip was AT the top
+ *
+ * Two faults in one line. It set three offsets and no `position`, so on
+ * the stage — where the seats are absolutely positioned on the turntable
+ * and the strip is the only child left in flow — the offsets did nothing
+ * and it landed at the top of the screen, across the transcript. And it
+ * was written against the bare class, which the flat participant card
+ * also wears, so scoping it correctly matters as much as positioning it:
+ * in the card the strip IS a normal flex child at the bottom, and must
+ * stay one.
+ *
+ * `:not(.card)` is the immersive stage and nothing else. */
+.room-stage:not(.card) .rs-chatstrip {
+  position: absolute; left: 12px; right: 12px; bottom: 64px; }
 
 /* What a voice room wears instead of the chat strip: one control that
    listens, and a line naming who is speaking. Centred rather than
@@ -1604,7 +1631,11 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
    the way the tiles do — the same green that means "this one is talking",
    so one colour carries one meaning across the room. */
 .rs-talk.live { background: rgba(123, 196, 127, 0.9); color: #08122a; }
-.room-stage .rs-voicebar { left: 12px; right: 12px; bottom: 64px; }
+/* The voice room's own bar, scoped the same way and for the same
+   reason — it already carries `position: absolute` from its base rule,
+   so only the collision with the card needed fixing. */
+.room-stage:not(.card) .rs-voicebar {
+  left: 12px; right: 12px; bottom: 64px; }
 
 /* A shared attachment in the transcript: the picture itself, the video
    playable, a file as a plain named link — sized to stay a turn in a
@@ -1701,7 +1732,25 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
  *
  * `order` rather than moving the JSX: the same component draws the
  * roomless state, where the reading order is right as written. */
-.screen.room-place > .room-stage { order: -1;
+/* `.card.room-stage`, not `.room-stage`.
+ *
+ *     asked     the AR and VR roads should open the stage
+ *     mattered  the stage was being flattened by the CARD's rule
+ *
+ * Two different things wear the class `room-stage`: the flat
+ * participant card, which every line of this rule is about — the strip,
+ * the gutter, the seat tiles — and the immersive stage, which is a
+ * `position: fixed` overlay covering the screen.
+ *
+ * Written bare, this selector caught both, and `position: relative` beat
+ * the stage's own `fixed` on specificity. So the stage laid out in flow
+ * as a 402x170 strip inside a 430x932 screen, with the room showing
+ * through it. Photographed from a phone and reported as "the VR room is
+ * broken", which it was.
+ *
+ * Naming the card here costs nothing — the card is the only thing this
+ * rule ever meant — and the stage gets its own rule back. */
+.screen.room-place > .card.room-stage { order: -1;
   display: flex; flex-direction: column; margin: 0;
   /* The strip lives BELOW the faces, not over them.
    *
@@ -1715,7 +1764,7 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
    * itself, so the scene — `flex: 1` — shrinks by exactly what the strip
    * occupies and the tiles can never sit under it. */
   position: relative; }
-.screen.room-place > .room-stage > .room-scene {
+.screen.room-place > .card.room-stage > .room-scene {
   position: static; padding-bottom: 0; }
 /* In a room the strip is a normal flex child at the bottom of the stage,
    not an overlay.
@@ -1730,8 +1779,17 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
  * frames". Static, it takes the room it actually needs and the scene
  * (flex: 1) shrinks by exactly that much, so they cannot overlap however
  * either one grows later. */
-.screen.room-place .rs-chatstrip,
-.screen.room-place .rs-voicebar {
+/* The CARD's strip, named as such.
+ *
+ * Every line below is about the room card's flex column — static so the
+ * scene shrinks by exactly the strip's height and the two can never
+ * overlap. Written against `.screen.room-place` alone it also caught the
+ * immersive stage, which is a different object that happens to share a
+ * class, and it pinned the stage's composer to the top of the screen
+ * across the transcript. Third rule in this file to make that mistake;
+ * naming the card is the fix in all three. */
+.screen.room-place > .card.room-stage .rs-chatstrip,
+.screen.room-place > .card.room-stage .rs-voicebar {
   position: static; left: auto; right: auto; bottom: auto;
   flex: 0 0 auto; padding: 0 2px;
   /* Out from under the loudness rail. The rail is fixed to the
@@ -2919,13 +2977,37 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 /* Bare glyphs. "Not so dark" — so no box, no border, no panel-coloured
    ground for them to disappear into. The picture IS the button, drawn
    big enough to press with a thumb and to read at a glance. */
+/* Four roads up and down, in the lane that already held two.
+ *
+ *     asked     VR and AR become a glyph next to video and avatar,
+ *               straight up and down
+ *     mattered  nothing else may move
+ *
+ * The tile reserves a lane (`padding-right`) for this column and places
+ * it from the tile's own middle. Both stay exactly as they were — the
+ * only thing that gives is the size of a glyph, because four at 48 need
+ * 213px of a 203px tile and four at 32 need 149. */
 .rs-tile > .rs-side > .rs-road {
-  width: 48px; height: 48px; padding: 0; border-radius: 12px;
+  width: 32px; height: 32px; padding: 0; border-radius: 10px;
   display: grid; place-items: center;
-  font-size: 34px; line-height: 1; cursor: pointer;
+  font-size: 23px; line-height: 1; cursor: pointer;
   background: none; border: none;
   transition: transform .12s;
 }
+/* AR and VR are letters in a ring. A ring rather than a filled pill:
+   the two roads above them are bare glyphs on the tile's own ground, and
+   a solid shape between them would read as the only real button of the
+   four. */
+.rs-tile > .rs-side > .rs-road > .rs-tag {
+  display: grid; place-items: center;
+  width: 84%; height: 84%; box-sizing: border-box;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  font-size: 10px; font-weight: 800; letter-spacing: .2px;
+  line-height: 1; font-family: inherit;
+}
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile
+  > .rs-side > .rs-road > .rs-tag { font-size: 12px; }
 .rs-tile > .rs-side > .rs-road:hover {
   transform: translateY(-1px) scale(1.08);
 }
@@ -2941,8 +3023,8 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   /* On the phone the rail is a row of narrow tiles, so the roads tuck in
      and the face keeps the middle. */
   .rs-tile > .rs-side > .rs-road {
-    width: 42px; height: 42px; font-size: 30px;
-    border-radius: 11px; }
+    width: 28px; height: 28px; font-size: 20px;
+    min-height: 28px; border-radius: 9px; }
   /* No `width: 58px` on the portrait here.
    *
    *     asked     does the phone need smaller faces
@@ -3083,27 +3165,23 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   display: none;
 }
 
-/* The gear stays. A control nobody can see is a control nobody has.
+/* And the gear goes back off the seat.
  *
- *     asked     the double tap will not open the window to turn the
- *               camera on or put a background up
- *     mattered  it was the ONLY door left, and it did not open
+ *     asked     there's a settings button showing up on my photo
+ *     mattered  it was insurance against a gesture that now works
  *
- * The gear is the visible twin of the double tap and the hold, and it
- * was written for exactly the case where a gesture does not arrive. It
- * went out with the sit-out and the old controls in a sweep that was
- * right about those and wrong about this one, on the reasoning that the
- * room's bottom strip carries what the tile gave up. The strip carries
- * the camera and the microphone. It does not carry the background, the
- * mask, or taking either back down — those live behind the gesture, and
- * with the gesture gone on iOS and the gear hidden there was no way to
- * reach them from a phone at all.
+ * It was put back one release ago for a real reason: the double tap and
+ * the long press were BOTH dead on iOS, so this was the only remaining
+ * way to reach the camera, the background and the mask from a phone —
+ * "a control nobody can see is a control nobody has".
  *
- * Small and in the corner, on your own seat only, where it always was. */
+ * That reason is spent. Both gestures were fixed and are driven by a
+ * touch pointer in the tests: two taps open the panel, two more close
+ * it, a hold opens it. A third door earns its place on the tile only
+ * while the first two are shut, and it does not get to sit on somebody's
+ * face for a fault that no longer exists. */
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-gear {
-  display: inline-flex;
-  width: 22px; height: 22px; font-size: 11px;
-  bottom: 6px; right: 6px;
+  display: none;
 }
 
 /* And the browser stops taking the press away.
@@ -4237,7 +4315,7 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 }
 .screen.room-place > .card.room-stage > .room-scene > .rs-tile
   > .rs-side > .rs-road {
-  width: 56px; height: 56px; font-size: 40px;
+  width: 40px; height: 40px; font-size: 28px;
 }
 
 /* One face, one number, whichever road it arrives by.
@@ -4283,7 +4361,7 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
      in that round's own media block now, which comes after it. */
   .screen.room-place > .card.room-stage > .room-scene > .rs-tile
     > .rs-side > .rs-road {
-    width: 48px; height: 48px; font-size: 34px;
+    width: 32px; height: 32px; font-size: 22px; min-height: 32px;
   }
   .screen.room-place > .card.room-stage > .room-scene
     > .rs-tile > .rs-circle-btn.rs-solo,

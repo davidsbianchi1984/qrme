@@ -307,7 +307,6 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
   // The immersive stage. Entered by a press and left by one — never on the
   // room's behalf, because going fullscreen and turning sensors on are
   // decisions a person makes, not properties a room has.
-  const [immersed, setImmersed] = useState(false);
   // VR look direction: degrees of yaw, driven by dragging the stage. The
   // seats sit on a turntable this angle turns.
   const [yaw, setYaw] = useState(0);
@@ -1126,7 +1125,7 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
   // the flat backdrop and says so, rather than presenting a black room as
   // though that were the feature.
   useEffect(() => {
-    if (!(immersed && channel === "ar")) {
+    if (format !== "ar") {
       passStream.current?.getTracks().forEach((t) => t.stop());
       passStream.current = null;
       if (pass.current) pass.current.srcObject = null;
@@ -1147,7 +1146,7 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
       passStream.current?.getTracks().forEach((t) => t.stop());
       passStream.current = null;
     };
-  }, [immersed, channel]);
+  }, [format]);
 
   /** What a seat shows at stage size: the photo somebody chose, a
    *  profile's own portrait with its AI mark, or the initials — the same
@@ -3319,6 +3318,53 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                             onPointerDown={(e) => e.stopPropagation()}>
                       {"\u{1F3A5}"}
                     </button>
+                    {/* The other two roads. Letters, not pictures: a
+                        standing figure IS the avatar and a movie camera
+                        IS the video, but nothing pictures "this room,
+                        over the room you are standing in" without being
+                        a riddle. */}
+                    <button type="button" className={"rs-road"
+                              + (framed === s.id && format === "ar"
+                                   ? " lit" : "")}
+                            aria-label={tr("ins.format.ar", lang)}
+                            title={tr("ins.format.ar", lang)}
+                            aria-pressed={framed === s.id
+                                          && format === "ar"}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (framed === s.id && format === "ar") {
+                                setFramed(null);
+                                setFormat("audio"); setRoomFormat("audio");
+                              } else {
+                                setFramed(s.id);
+                                setFormat("ar"); setRoomFormat("ar");
+                              }
+                            }}
+                            onDoubleClick={(e) => e.stopPropagation()}
+                            onPointerDown={(e) => e.stopPropagation()}>
+                      <span className="rs-tag">{tr("ins.format.ar.ring", lang)}</span>
+                    </button>
+                    <button type="button" className={"rs-road"
+                              + (framed === s.id && format === "vr"
+                                   ? " lit" : "")}
+                            aria-label={tr("ins.format.vr", lang)}
+                            title={tr("ins.format.vr", lang)}
+                            aria-pressed={framed === s.id
+                                          && format === "vr"}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (framed === s.id && format === "vr") {
+                                setFramed(null);
+                                setFormat("audio"); setRoomFormat("audio");
+                              } else {
+                                setFramed(s.id);
+                                setFormat("vr"); setRoomFormat("vr");
+                              }
+                            }}
+                            onDoubleClick={(e) => e.stopPropagation()}
+                            onPointerDown={(e) => e.stopPropagation()}>
+                      <span className="rs-tag">{tr("ins.format.vr.ring", lang)}</span>
+                    </button>
                   </div>
                 )}
                 {/* The avatar's door on the seats the pair cannot reach.
@@ -3676,26 +3722,20 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
           {scene && !inRoom && (
             <p className="muted small">{scene.note}</p>
           )}
-          {/* The way into the stage, offered only in the rooms whose whole
-              pitch is being a place. Flat rooms stay flat; nothing here
-              turns a chat room into a headset demand. */}
-          {(channel === "ar" || channel === "vr") && (
-            <button disabled={busy} onClick={() => {
-              setYaw(0); setImmersed(true);
-            }}>
-              {channel === "ar" ? tr("ins.stage.ar", lang)
-                                : tr("ins.stage.vr", lang)}
-            </button>
-          )}
+          {/* No "step in" button any more. The seat's own AR and VR
+              roads are the door, the same way the figure and the camera
+              are the door to avatar and video — one press, one outcome,
+              and the same gesture on every format. A separate button
+              under the seats was a second grammar for the same act. */}
         </div>
       )}
 
-      {immersed && (channel === "ar" || channel === "vr") && (
+      {(format === "ar" || format === "vr") && (
         // The stage: the same room, stood in. AR draws the seats over this
         // device's own passthrough; VR draws them around a turntable the
         // drag turns. Both are rendered here and only here — no pixels of
         // yours and no room of anybody else's crosses the wire for this.
-        <div className={"room-stage" + (channel === "vr" ? " vr" : "")}
+        <div className={"room-stage" + (format === "vr" ? " vr" : "")}
              role="dialog" aria-label={tr("ins.stage.title", lang)}
              onPointerDown={(e) => {
                dragFrom.current = { x: e.clientX, yaw };
@@ -3710,17 +3750,17 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
              }}
              onPointerUp={() => { dragFrom.current = null; }}
              onPointerLeave={() => { dragFrom.current = null; }}>
-          {channel === "ar" && !passDenied && (
+          {format === "ar" && !passDenied && (
             <video ref={pass} className="stage-pass" autoPlay playsInline muted
                    aria-label={tr("ins.stage.passlabel", lang)} />
           )}
-          {channel === "ar" && passDenied && (
+          {format === "ar" && passDenied && (
             <p className="stage-note">{tr("ins.stage.denied", lang)}</p>
           )}
-          {channel === "vr" && (
+          {format === "vr" && (
             <div className="stage-floor" aria-hidden="true" />
           )}
-          {channel === "vr" ? (
+          {format === "vr" ? (
             <div className="stage-turn">
               {seats.map((s, i) => {
                 // The circle: seats spaced evenly, each card counter-rotated
@@ -3776,11 +3816,17 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
               which for a voice room is the talk control. */}
           {spokenRoom ? voiceBar : chatStrip}
           <p className="stage-note">
-            {channel === "ar" ? tr("ins.stage.arnote", lang)
-                              : tr("ins.stage.vrnote", lang)}
+            {format === "ar" ? tr("ins.stage.arnote", lang)
+                             : tr("ins.stage.vrnote", lang)}
           </p>
+          {/* Leaving is the same act as pressing a lit road: the format
+              goes back to voices and photographs, and the seat lets go.
+              One way out, whichever way you came in. */}
           <button className="stage-leave"
-                  onClick={() => setImmersed(false)}>
+                  onClick={() => {
+                    setFramed(null);
+                    setFormat("audio"); setRoomFormat("audio");
+                  }}>
             {tr("ins.stage.leave", lang)}
           </button>
         </div>
@@ -4118,7 +4164,7 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
           wardrobe's switch is about. */}
       {staged && (
         <AvatarStage
-          clear={channel === "ar" || channel === "vr"}
+          clear={format === "ar" || format === "vr"}
           profileId={staged}
           token={(staged === session.profileId ? session.ownerToken
                     : staged === dockedProfile ? dockOwner : null)

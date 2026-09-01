@@ -707,6 +707,23 @@ const CHROME: Table = {
   "idn.forge.sub": {
     en: "Your own photograph, with a mouth that moves when it speaks. Measured here, on this deployment's own machine — nothing is redrawn, so it goes on looking exactly like you. No provider account, nothing to subscribe to.", es: "Tu propia fotografía, con una boca que se mueve al hablar. Medida aquí, en la máquina de esta instalación: no se redibuja nada, así que sigue siendo idéntica a ti. Sin cuenta de proveedor, sin suscripción.", fr: "Votre propre photographie, avec une bouche qui bouge quand elle parle. Mesurée ici, sur la machine de ce déploiement — rien n'est redessiné, elle continue donc de vous ressembler exactement. Aucun compte fournisseur, rien à souscrire.", de: "Dein eigenes Foto, mit einem Mund, der sich beim Sprechen bewegt. Hier vermessen, auf der Maschine dieser Installation — nichts wird neu gezeichnet, also siehst du weiterhin genau aus wie du. Kein Anbieterkonto, kein Abo.", pt: "A tua própria fotografia, com uma boca que se mexe ao falar. Medida aqui, na máquina desta instalação — nada é redesenhado, por isso continua igualzinha a ti. Sem conta de fornecedor, sem subscrição.", it: "La tua fotografia, con una bocca che si muove quando parla. Misurata qui, sulla macchina di questa installazione — nulla viene ridisegnato, quindi continua a somigliarti esattamente. Nessun account fornitore, nessun abbonamento.", ja: "あなた自身の写真に、話すと動く口をつけます。この配備自身のマシンで計測するだけ — 描き直しは一切ないので、あなたのままです。プロバイダのアカウントも定期購入も不要です。", zh: "你自己的照片，配上说话时会动的嘴。就在本部署自己的机器上完成测量 — 什么都不会重画，所以看起来仍然完全是你。无需服务商账号，无需订阅。", hi: "आपकी अपनी फ़ोटो, जिसमें बोलते समय मुँह हिलता है। यहीं, इसी परिनियोजन की मशीन पर मापा जाता है — कुछ भी दोबारा नहीं बनाया जाता, इसलिए यह बिलकुल आप ही दिखते रहते हैं। न प्रदाता खाता, न सदस्यता।", ar: "صورتك أنت، بفم يتحرك عند الكلام. تُقاس هنا على جهاز هذا النشر نفسه — لا يُعاد رسم شيء، فتظل أنت تمامًا. بلا حساب مزوّد وبلا اشتراك.",
   },
+  // The letters inside the seat's AR and VR rings. Each language keeps
+  // its own initialism where it has one (RA/RV in the Romance languages,
+  // matching the road's label), and the rest keep the Latin mark —
+  // Arabic included, because the full phrase belongs to the label a
+  // screen reader speaks, not inside a ten-pixel ring.
+  "ins.format.ar.ring": {
+    en: "AR", es: "RA", fr: "RA", de: "AR", pt: "RA", it: "AR", ja: "AR", zh: "AR", hi: "AR", ar: "AR",
+  },
+  "ins.format.vr.ring": {
+    en: "VR", es: "RV", fr: "RV", de: "VR", pt: "RV", it: "VR", ja: "VR", zh: "VR", hi: "VR", ar: "VR",
+  },
+  "ins.format.ar": {
+    en: "AR", es: "RA", fr: "RA", de: "AR", pt: "RA", it: "AR", ja: "AR", zh: "AR", hi: "AR", ar: "\u0627\u0644\u0648\u0627\u0642\u0639 \u0627\u0644\u0645\u0639\u0632\u0632",
+  },
+  "ins.format.vr": {
+    en: "VR", es: "RV", fr: "RV", de: "VR", pt: "RV", it: "VR", ja: "VR", zh: "VR", hi: "VR", ar: "\u0627\u0644\u0648\u0627\u0642\u0639 \u0627\u0644\u0627\u0641\u062a\u0631\u0627\u0636\u064a",
+  },
   "ins.format.avatar": {
     en: "Avatar", es: "Avatar", fr: "Avatar", de: "Avatar", pt: "Avatar", it: "Avatar", ja: "アバター", zh: "虚拟形象", hi: "अवतार", ar: "أفاتار",
   },
@@ -9726,12 +9743,6 @@ const CHROME: Table = {
   },
   "ins.stage.title": {
     en: "The stage", es: "El escenario", fr: "La scène", de: "Die Bühne", pt: "O palco", it: "Il palco", ja: "ステージ", zh: "舞台", hi: "मंच", ar: "المسرح",
-  },
-  "ins.stage.ar": {
-    en: "Step in (AR)", es: "Entrar (RA)", fr: "Entrer (RA)", de: "Eintreten (AR)", pt: "Entrar (RA)", it: "Entra (AR)", ja: "入る（AR）", zh: "走进（AR）", hi: "अंदर आएँ (AR)", ar: "ادخل (AR)",
-  },
-  "ins.stage.vr": {
-    en: "Step in (VR)", es: "Entrar (RV)", fr: "Entrer (RV)", de: "Eintreten (VR)", pt: "Entrar (RV)", it: "Entra (VR)", ja: "入る（VR）", zh: "走进（VR）", hi: "अंदर आएँ (VR)", ar: "ادخل (VR)",
   },
   "ins.link": {
     en: "Drop a link", es: "Poner un enlace", fr: "Déposer un lien", de: "Link einfügen", pt: "Colocar uma ligação", it: "Inserisci un link", ja: "リンクを貼る", zh: "放个链接", hi: "लिंक डालें", ar: "أضف رابطًا",
