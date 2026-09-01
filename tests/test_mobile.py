@@ -52,8 +52,8 @@ def test_console_is_served_when_built(tmp_path, monkeypatch):
     UI and API, so a phone needs no configuration."""
     dist = tmp_path / "dist"
     dist.mkdir()
-    (dist / "index.html").write_text("<!doctype html><title>QRME Studio</title>")
-    (dist / "manifest.webmanifest").write_text('{"name":"QRME Studio"}')
+    (dist / "index.html").write_text("<!doctype html><title>QRME Studios</title>")
+    (dist / "manifest.webmanifest").write_text('{"name":"QRME Studios"}')
     monkeypatch.setenv("QRME_CONSOLE_DIR", str(dist))
 
     from fastapi.testclient import TestClient
@@ -63,7 +63,7 @@ def test_console_is_served_when_built(tmp_path, monkeypatch):
         assert c.get("/health").json()["console"] is True
         index = c.get("/app/")
         assert index.status_code == 200
-        assert "QRME Studio" in index.text
+        assert "QRME Studios" in index.text
         assert c.get("/app/manifest.webmanifest").status_code == 200
         # Mounting the console must not shadow the API.
         assert c.get("/health").status_code == 200

@@ -81,7 +81,7 @@ def print_pairing(port: int) -> dict:
     info = mobile.pairing(port=port)
     print()
     print("─" * 62)
-    print("  QRME Studio — open on your phone (same Wi-Fi):")
+    print("  QRME Studios — open on your phone (same Wi-Fi):")
     print(f"  {info['console_url']}")
     print("─" * 62)
     if info["console_built"] and info["reachable"]:

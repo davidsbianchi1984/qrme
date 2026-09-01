@@ -39,7 +39,7 @@ def test_the_quest_manifest_carries_the_version():
 
 def test_the_steam_desc_carries_the_version():
     vdf = (ROOT / "stores/steam/app_build.vdf").read_text()
-    assert f'"Desc" "QRME Studio {_app_version()}"' in vdf
+    assert f'"Desc" "QRME Studios {_app_version()}"' in vdf
 
 
 def test_the_viveport_manifest_carries_the_version():

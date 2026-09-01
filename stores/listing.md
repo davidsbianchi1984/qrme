@@ -6,7 +6,7 @@ its own console; the words and pictures come from here.
 
 ## Name
 
-**QRME Studio**
+**QRME Studios**
 
 ## Short description
 
