@@ -6,6 +6,33 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.8] - 2026-09-01
+
+### Added
+
+- **The screens render.** 2.9.7 wrote into the pairing menu which kinds
+  have a screen; this release puts the room behind the claim. The stage
+  — already open from the seat's AR and VR rings — now offers "On your
+  headset" whenever the browser can actually answer for one, and opens
+  the same room as a WebXR session in the headset's own browser: Quest's,
+  Vision Pro's, no app store and no second codebase. VR stands the seats
+  around you on a floor in the dark; AR hands compositing to the device's
+  own passthrough, which this code never sees.
+
+  One geometry and one photo resolver, held by guards: the flat stage
+  and the headset read the seat circle from a single shared module, so
+  seat three of eight faces the same direction on a phone and in a
+  visor, and whose photograph may appear on a seat is decided once — the
+  marked-asset and real-person rules — for both renderings. The flat
+  stage's promise travels word for word: no pixels of yours and no room
+  of anybody else's crosses the wire for this, and a guard reads the
+  headset's source for the capture vocabulary the same way the pairing
+  model is read.
+
+  The wrist pair's claim is held too: a band pairs with every face a
+  watch may hold, asserted against the permission model rather than the
+  picker's sentence.
+
 ## [2.9.7] - 2026-09-01
 
 ### Added
@@ -17272,7 +17299,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.7...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.8...HEAD
+[2.9.8]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.7...app-v2.9.8
 [2.9.7]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.6...app-v2.9.7
 [2.9.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.5...app-v2.9.6
 [2.9.5]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.4...app-v2.9.5

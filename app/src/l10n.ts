@@ -9792,6 +9792,9 @@ const CHROME: Table = {
   "ins.leave": {
     en: "Leave the room", es: "Salir de la sala", fr: "Quitter la salle", de: "Raum verlassen", pt: "Sair da sala", it: "Esci dalla stanza", ja: "部屋を出る", zh: "离开房间", hi: "कमरे से बाहर जाएँ", ar: "غادر الغرفة",
   },
+  "ins.stage.headset": {
+    en: "On your headset", es: "En tu visor", fr: "Sur votre casque", de: "Auf deinem Headset", pt: "No seu visor", it: "Sul tuo visore", ja: "ヘッドセットで", zh: "在你的头显上", hi: "आपके हेडसेट पर", ar: "على نظارتك",
+  },
   "ins.stage.leave": {
     en: "Step out", es: "Salir del escenario", fr: "Sortir de la scène", de: "Bühne verlassen", pt: "Sair do palco", it: "Esci dal palco", ja: "ステージを出る", zh: "走出舞台", hi: "मंच से बाहर आएँ", ar: "اخرج من المسرح",
   },

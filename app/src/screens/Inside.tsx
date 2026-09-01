@@ -7,6 +7,8 @@ import { accountApi, api, getBase, type Avatar, type RoomFaces,
          type RoomMsg, type RoomReachProfile } from "../api";
 import { field } from "../fields";
 import { fill, t as tr, visitorLang } from "../l10n";
+import { seatAngle, RING_RADIUS_CSS } from "../stageRing";
+import { headsetDoor, enterHeadset } from "../xrStage";
 import { Refusal } from "../Refusal";
 import { SeatFilm } from "../SeatFilm";
 import { DEFAULT_FORMAT, setRoomFormat,
@@ -377,6 +379,18 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
   // records the choice for the life of the screen and for anything that
   // wants to know what is being looked at.
   const [format, setFormat] = useState<RoomFormat>(DEFAULT_FORMAT);
+  // Whether THIS browser can hand the stage to a headset — probed, never
+  // assumed, and probed again when the format flips because VR and AR
+  // are separate answers (a phone can often do immersive-ar and never
+  // immersive-vr). The button below only exists while this is true.
+  const [headset, setHeadset] = useState(false);
+  useEffect(() => {
+    let stood = true;
+    if (format !== "ar" && format !== "vr") { setHeadset(false); return; }
+    headsetDoor(format === "ar" ? "immersive-ar" : "immersive-vr")
+      .then((yes) => { if (stood) setHeadset(yes); });
+    return () => { stood = false; };
+  }, [format]);
   /** How much of the avatar is in the frame — the forge's own three
    *  words. One choice for the room rather than one per seat: it says
    *  how this person likes to look at people, and setting it eight times
@@ -1152,6 +1166,28 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
    *  profile's own portrait with its AI mark, or the initials — the same
    *  resolution order the flat tiles use, because the stage is a way of
    *  standing in the room, not a different room. */
+  // The URL a seat's face shows — one resolver for the flat stage and
+  // the headset, so the two can never show different pictures under
+  // different rules. The rules themselves are unchanged and documented
+  // on the branches below.
+  const stagePhoto = (s: { kind: string; id: string }): string | null => {
+    const face = scene?.faces[s.id];
+    if (face?.showing === "photo" && face.media_url) return face.media_url;
+    if (s.kind === "user" && s.id === me && myFace?.asset
+        && !myFace.asset_marked
+        && myFace.likeness?.real_person) {
+      return (myFace.asset as string).startsWith("http")
+        ? (myFace.asset as string) : getBase() + (myFace.asset as string);
+    }
+    if (s.kind !== "user" && aiFaces[s.id]?.asset
+        && !aiFaces[s.id]?.placeholder) {
+      return (aiFaces[s.id].asset as string).startsWith("http")
+        ? (aiFaces[s.id].asset as string)
+        : getBase() + (aiFaces[s.id].asset as string);
+    }
+    return null;
+  };
+
   const stageFace = (s: { kind: string; id: string; display: string }) => {
     const face = scene?.faces[s.id];
     if (face?.showing === "photo" && face.media_url) {
@@ -3766,11 +3802,12 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                 // The circle: seats spaced evenly, each card counter-rotated
                 // so it faces the viewer from wherever the turntable stops —
                 // a billboard, which is what a face is for.
-                const a = (360 / Math.max(seats.length, 1)) * i;
+                const a = seatAngle(i, seats.length);
                 return (
                   <div key={s.id} className="stage-anchor"
                        style={{ transform:
-                         `rotateY(${a + yaw}deg) translateZ(-280px)` }}>
+                         `rotateY(${a + yaw}deg)`
+                         + ` translateZ(${-RING_RADIUS_CSS}px)` }}>
                     <div className={"stage-seat"
                                     + (isTalking(s) ? " talking" : "")}
                          style={{ transform: `rotateY(${-(a + yaw)}deg)` }}>
@@ -3819,6 +3856,31 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
             {format === "ar" ? tr("ins.stage.arnote", lang)
                              : tr("ins.stage.vrnote", lang)}
           </p>
+          {/* The headset door, only where one exists. The same room, the
+              same circle, through WebXR in the headset's own browser —
+              the flat stage stays behind it, and the headset's own exit
+              lands back here. */}
+          {headset && (
+            <button className="stage-headset"
+                    onClick={() => {
+                      void enterHeadset({
+                        mode: format === "ar" ? "immersive-ar"
+                                              : "immersive-vr",
+                        seats: seats.map((s) => ({
+                          id: s.id, display: s.display,
+                          photo: stagePhoto(s),
+                          ai: s.kind !== "user",
+                        })),
+                        isTalking: (id) => {
+                          const seat = seats.find((x) => x.id === id);
+                          return seat ? isTalking(seat) : false;
+                        },
+                        onEnd: () => {},
+                      });
+                    }}>
+              {tr("ins.stage.headset", lang)}
+            </button>
+          )}
           {/* Leaving is the same act as pressing a lit road: the format
               goes back to voices and photographs, and the seat lets go.
               One way out, whichever way you came in. */}
