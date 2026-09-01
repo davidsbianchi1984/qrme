@@ -6,6 +6,29 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.12] - 2026-09-01
+
+### Added
+
+- **The employee file, inside the company builder.** Every hired seat now
+  opens its file in place — no other menu involved. **Where they work**:
+  the employee's current bodies and screens; the whole robot shelf of
+  American models right there, grouped by maker with availability told
+  honestly (an announced machine renders un-bindable rather than hidden);
+  one press binds a body through the same rails as everywhere else, so
+  identity stays invariant across embodiments; a fixed screen is placed
+  with a kind and a name; and the nearby-device code opens the studio on
+  anything with a camera on the same network. **Hand them out**: each
+  employee can be given away as a code to type, a QR code to scan, a link,
+  or a downloadable file — the scan roads ride a single-use, ten-minute
+  handoff ticket, and the founder's key never leaves the screen.
+- Not one new server door. The rails — embodiments, the robotics
+  catalogue, fixed displays, the export handoff, and the account door that
+  mints an owner key for a held profile — already stood; the release is
+  the Companies screen composing them per hired seat, plus the test file
+  pinning that a profile minted by an interview is exactly as embodiable
+  and exactly as portable as one minted any other way.
+
 ## [2.9.11] - 2026-09-01
 
 ### Added
@@ -17406,7 +17429,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.11...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.12...HEAD
+[2.9.12]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.11...app-v2.9.12
 [2.9.11]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.10...app-v2.9.11
 [2.9.10]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.9...app-v2.9.10
 [2.9.9]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.8...app-v2.9.9

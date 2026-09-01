@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v2.9.11** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v2.9.12** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -480,6 +480,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **2.9.12** | **The employee file** — every hired seat opens in place: “Where they work” lists the employee’s bodies and screens and offers the whole American robot shelf right there (shipping, preorder and announced told apart honestly — announced stays un-bindable rather than hidden), puts them on a fixed screen, and shows the nearby-device code; “Hand them out” gives a per-employee handoff — a QR code, a code to type, a link, a downloadable file — carried by a single-use ten-minute ticket, never the founder’s key. Not one new door: the builder composes rails that already stood. |
 | **2.9.11** | **The study, the plan, and bring-your-own** — every interview now begins with the platform studying the trade (skills, tools, escalations, who it works with), the findings ground the questions and ride the hire as the profession's own knowledge; the founder says what the store is meant to be and the platform predicts the fully functioning roster, suggestions never walls; and an open seat takes the founder's existing or Blend-built profiles with one press, brought rather than interviewed. |
 | **2.9.10** | **Open for business** — a staffed company enters the in-app marketplace with one press: a storefront on the existing shop rails, named for the company, tagged with its industry, each staffed department a service offering naming who answers. Nobody hired, no storefront — the refusal speaks ten languages. Closing takes the sign down and dissolves nothing; republishing is an edit; strangers get 404. |
 | **2.9.9** | **The Company Builder** — found a digital company in any industry, open seats for any title on Earth, and hire one interview at a time: the platform writes each role's interview at the founder's own questionnaire's caliber, and signing it is the hire — profile under your account, charter in the persona and source material, colleagues connected, seat filled in the org. Licensed and physical duties are assisted, never performed. Oversight is ownership: every employee answers to the owner doors that already exist, organised under the company folder. |

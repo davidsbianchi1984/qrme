@@ -12,8 +12,8 @@ android {
         applicationId = "app.qrme.studio"
         minSdk = 26
         targetSdk = 34
-        versionCode = 2009011
-        versionName = "2.9.11"
+        versionCode = 2009012
+        versionName = "2.9.12"
 
         // Where content-free problem reports go, and the token to post them
         // with. The console's equivalent is the `define` block in
