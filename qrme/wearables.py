@@ -64,6 +64,79 @@ KINDS: dict[str, str] = {
     "clip_on_mic": "clipped to clothing",
     "glasses": "worn on the face",
     "pendant": "worn at the neck",
+    # The 2.9.7 widening: everything a person in America can buy and wear.
+    #
+    #     asked     offer all the ones that are available in America — AR,
+    #               VR, watches, rings, pendants, and ankle monitors, and
+    #               any others you can think of
+    #     mattered  every one of these is worn by the person pairing it,
+    #               which is the rule the whole registry stands on
+    #
+    # Each addition answers the microphone question in
+    # tests/test_room_mic.py the day it lands, and the screened ones are
+    # named in SCREENS below — a device with a screen is somewhere the
+    # console can show itself; the rest pair as presence and, later,
+    # readings.
+    "vr_headset": "over the eyes",
+    "ar_glasses": "over the eyes, with the room still visible",
+    "hearing_aids": "in the ears, fitted",
+    "chest_strap": "across the chest",
+    "health_patch": "stuck to the skin",
+    "headband": "across the forehead",
+    "ankle_monitor": "on the ankle",
+    "insoles": "under the feet",
+    "alert_button": "worn within reach",
+    "smart_clothing": "woven into what you wear",
+    # Asked for by name: "Bluetooth earbuds, even the ones that are
+    # earrings". A kind of its own rather than a catalogue row, because
+    # where a thing is worn is what this table says, and jewelry that
+    # plays sound is worn differently from a bud in the canal.
+    "audio_earrings": "worn as earrings, on the ear",
+}
+
+# The kinds with a screen the console can render on. Not a capability the
+# device claims — a fact about the kind, said here so a client can offer
+# "show the console here" only where a surface exists. The watch's faces
+# are already real (`routers/watch.py`); the stage is what an eyes-covering
+# device will carry. Bands get the glance faces a watch does, smaller.
+SCREENS: dict[str, str] = {
+    "watch": "the faces — status lights, counts, the remote",
+    "band": "the glance faces, small",
+    "vr_headset": "the room's stage, as a place you enter",
+    "ar_glasses": "the room's stage, laid over where you stand",
+}
+
+# What people actually own, by kind — the American-market names offered as
+# suggestions when a device is being named. Suggestions and nothing else:
+# pairing stores the name the owner typed, and an unlisted device pairs
+# exactly as well. Kept server-side so all four clients offer one list,
+# and deliberately short — a menu, not a census.
+CATALOG: dict[str, tuple[str, ...]] = {
+    "watch": ("Apple Watch", "Samsung Galaxy Watch", "Google Pixel Watch",
+              "Garmin", "Fitbit"),
+    "band": ("Fitbit Charge", "WHOOP", "Amazfit Band"),
+    "ring": ("Oura Ring", "Samsung Galaxy Ring", "Ultrahuman Ring Air",
+             "RingConn"),
+    "earbuds": ("AirPods", "Galaxy Buds", "Pixel Buds", "Beats", "Sony",
+                "Bose QuietComfort", "Jabra Elite", "Skullcandy", "JLab"),
+    "headset": ("Bose", "Sony", "HyperX"),
+    "glasses": ("Ray-Ban Meta", "Amazon Echo Frames", "Solos AirGo"),
+    "pendant": ("Limitless Pendant", "Plaud NotePin", "Bee"),
+    "vr_headset": ("Meta Quest 3", "Meta Quest 3S", "Apple Vision Pro",
+                   "PlayStation VR2", "Valve Index", "Bigscreen Beyond"),
+    "ar_glasses": ("Xreal One", "Viture Pro", "Rokid AR", "Even Realities G1",
+                   "Meta Ray-Ban Display"),
+    "hearing_aids": ("Phonak", "Oticon", "Jabra Enhance", "Sony CRE"),
+    "chest_strap": ("Polar H10", "Garmin HRM-Pro", "Wahoo TICKR"),
+    "health_patch": ("Dexcom G7", "FreeStyle Libre 3"),
+    "headband": ("Muse S",),
+    "ankle_monitor": ("AngelSense", "Theora Connect"),
+    "insoles": (),
+    "alert_button": ("Life Alert", "Medical Guardian", "Lively"),
+    "smart_clothing": ("Hexoskin",),
+    "audio_earrings": ("Nova H1 Audio Earrings", "Bose Ultra Open Earbuds",
+                       "Anker Soundcore C30i"),
+    "lapel_mic": (), "clip_on_mic": (),
 }
 
 # What may **not** be paired, and why, in the words the refusal returns.
@@ -125,7 +198,7 @@ DEFAULT_FACES = ("agents", "activity")
 # Comfortably above the number of kinds, so somebody can own one of each and
 # still add a second watch. A limit below the catalogue would be a rule that
 # contradicts the menu it is printed next to.
-MAX_WEARABLES = 12
+MAX_WEARABLES = 24
 
 
 class WearableError(ValueError):

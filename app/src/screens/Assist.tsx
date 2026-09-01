@@ -320,7 +320,16 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
         <div className="row">
           <input value={deviceName}
                  onChange={(e) => setDeviceName(e.target.value)}
-                 placeholder={tr("asst.worn.name", lang)} style={{ flex: 1 }} />
+                 placeholder={tr("asst.worn.name", lang)} style={{ flex: 1 }}
+                 list="rs-worn-names" />
+          {/* The names people actually own, for the kind chosen — offered,
+              never required. The browser's own datalist so typing still
+              wins, and an unlisted device pairs exactly as well. */}
+          <datalist id="rs-worn-names">
+            {(devices?.catalog?.[deviceKind] || []).map((m) => (
+              <option key={m} value={m} />
+            ))}
+          </datalist>
           {/* A watch is a thing in the room, not a name you remember how to
               spell — a field report expected to pick it from a scan. The
               chooser is the browser's own; all that comes back is the name,
@@ -345,6 +354,14 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
               <option key={k} value={k}>{k.replace(/_/g, " ")} — {where}</option>
             ))}
           </select>
+          {/* Said before pairing, not after: a screen is the difference
+              between a device the console can show itself on and one that
+              is presence alone. */}
+          {devices?.kinds_screened?.[deviceKind] && (
+            <span className="muted small">
+              {devices.kinds_screened[deviceKind]}
+            </span>
+          )}
           <button disabled={busy || !token || !deviceName.trim()}
                   onClick={act(async () => {
                     await api.pairWearable(

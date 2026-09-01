@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v2.9.6** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v2.9.7** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -480,6 +480,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **2.9.7** | **Every worn thing in America can be added** — the pairing menu grows from nine kinds to twenty: VR headsets, AR glasses, ankle monitors, chest straps, health patches, hearing aids, headbands, insoles, alert buttons, smart clothing, and audio earrings. Each kind declared its microphone and its screen the day it landed, and a short American-market catalogue per kind rides the picker as suggestions — an unlisted device pairs exactly as well. Amara's full-body still joins the portraits with the phone's buttons off her sneakers. |
 | **2.9.6** | **AR and VR move onto the seat** — the "Step in" button under the seats is gone, and two more roads joined the avatar and the film beside each face, straight up and down in the lane the tile already had: letters in a ring, localized like every other label, smaller so four fit where two did and nothing else moves. The stage follows the viewer's own choice instead of the room's kind, the gear is off your photo now that both gestures work, and the stage itself was repaired — three card rules that flattened it now name the card, the composer sits above the leave row instead of across the transcript, and the stage stands above the room's chrome. |
 | **2.9.5** | **An FBX export becomes a face here, not in Blender** — the avatar shelf's one model row used to end in a page of Blender menus, and an FBX could not be uploaded at all. The forge converts it now, in the same tool the instructions named, taking the .zip as it downloads or the .fbx inside it. Verified against a real MetaPerson export and the provider's own .glb: 114 morph targets, 114 names, identical either way — so the mouth still moves. |
 | **2.9.4** | **Nobody is called "You", and the seat's two gestures reach a phone** — onboarding minted a nameless, account-less person on every pass and seated them, so live rooms filled with people called "You" drawing ON AIR for nobody. One rule now guards both doors that make a person, and a startup repair unseats the ones already there. The double tap and long press work on iOS, the gear is back as their visible twin, and VERIFIED moved off the AI seat onto the person it is a claim about. |

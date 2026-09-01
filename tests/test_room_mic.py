@@ -447,8 +447,17 @@ def test_every_microphone_bearing_paired_kind_can_be_lent(client):
     from qrme import roommic, wearables
 
     BEARING = {"watch", "earbuds", "headset", "lapel_mic", "clip_on_mic",
-               "glasses"}
-    SILENT = {"band", "ring", "pendant"}
+               "glasses",
+               # The 2.9.7 widening's head-worn kinds all carry one.
+               "vr_headset", "ar_glasses", "hearing_aids",
+               "audio_earrings"}
+    SILENT = {"band", "ring", "pendant",
+              # An alert button carries a two-way voice channel, and it is
+              # still SILENT here on purpose: that microphone belongs to the
+              # emergency service's loop, not to the owner's gift. Lending it
+              # to a room would put the room between a person and their help.
+              "chest_strap", "health_patch", "headband", "ankle_monitor",
+              "insoles", "alert_button", "smart_clothing"}
 
     unclassified = set(wearables.KINDS) - BEARING - SILENT
     assert not unclassified, (

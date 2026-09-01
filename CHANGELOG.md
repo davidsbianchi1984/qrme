@@ -6,6 +6,34 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.7] - 2026-09-01
+
+### Added
+
+- **Every worn thing in America can be added.** The pairing menu grows
+  from nine kinds to twenty: VR headsets and AR glasses, ankle monitors,
+  chest straps, health patches, hearing aids, headbands, insoles, alert
+  buttons, smart clothing — and audio earrings, asked for by name:
+  "Bluetooth earbuds, even the ones that are earrings." Each kind
+  answered its questions the day it landed: whether it carries a
+  microphone (the head-worn ones do, and land on the mic type whose
+  geometry they share; an alert button's two-way voice stays the
+  emergency service's, not the owner's to lend), and whether it has a
+  screen the console can render on (the watch, the band, and the two
+  eyes-covering kinds do — that fact is now said in the picker before
+  pairing, not discovered after).
+
+- **The names people actually own.** A short American-market catalogue
+  per kind — Quest and Vision Pro, Xreal and Viture, Oura and Galaxy
+  Ring, Dexcom and Libre, Polar straps, Limitless pendants, Nova H1
+  audio earrings — served by the backend so all four clients offer one
+  list, and offered as suggestions in the name box, never required: an
+  unlisted device pairs exactly as well.
+
+- **The figure below the face.** Dr. Amara Osei's full-body still joins
+  the portrait families, with the phone photo library's heart and
+  adjust buttons reconstructed off her sneakers.
+
 ## [2.9.6] - 2026-09-01
 
 ### Added
@@ -17244,7 +17272,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.6...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.7...HEAD
+[2.9.7]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.6...app-v2.9.7
 [2.9.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.5...app-v2.9.6
 [2.9.5]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.4...app-v2.9.5
 [2.9.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.3...app-v2.9.4

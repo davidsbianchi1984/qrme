@@ -663,6 +663,13 @@ export type WearableView = {
   /** What each watch face shows, in the backend's words. */
   faces: Record<string, string>;
   kinds_worn: Record<string, string>;
+  /** The kinds with a screen the console can render on, and what each
+   *  screen would carry — a fact about the kind, for offering "show the
+   *  console here" only where a surface exists. */
+  kinds_screened: Record<string, string>;
+  /** American-market names people actually own, per kind — suggestions for
+   *  the name box, nothing more. An unlisted device pairs exactly as well. */
+  catalog: Record<string, string[]>;
   /** Room-facing microphones, each with the paragraph saying why it cannot
    *  be paired. Rendered verbatim: the argument is that the people who walk
    *  into the room did not agree to anything. */

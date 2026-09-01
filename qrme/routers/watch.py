@@ -48,6 +48,11 @@ def list_wearables(profile_id: str, request: Request,
             "wearables": wearables.paired(profile_id, include_revoked),
             "faces": wearables.FACES,
             "kinds_worn": wearables.KINDS,
+            # Which kinds have a screen the console can show itself on, and
+            # the names people actually own — suggestions for the name box,
+            # one list for all four clients.
+            "kinds_screened": wearables.SCREENS,
+            "catalog": wearables.CATALOG,
             # Said out loud, so a client can grey these out with the reason
             # rather than offering them and returning a 422.
             "refusal_reasons": {k: wearables.REFUSAL.format(kind=k, what=v)

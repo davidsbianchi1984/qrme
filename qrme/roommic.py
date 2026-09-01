@@ -93,6 +93,15 @@ FROM_WEARABLE: dict[str, str] = {
     "lapel_mic": "lapel",
     "clip_on_mic": "clip_on",
     "glasses": "glasses",
+    # The 2.9.7 kinds that carry a microphone land on the mic type whose
+    # geometry they share — each one is worn on the head and points at its
+    # wearer, which is what the landing name means to `jim/mic.py` too. No
+    # new MIC_TYPES row, so the two products stay in step without an edit
+    # on the other side.
+    "vr_headset": "headset",
+    "ar_glasses": "glasses",
+    "hearing_aids": "earbuds",
+    "audio_earrings": "earbuds",
 }
 
 # How wide the lent channel listens — also kept in step with `jim/mic.py` by
