@@ -199,12 +199,62 @@ export function Identity({ onPlans, onPassing }: {
     } catch (e) { fail(e); }
   }
 
+  /** Every file a person actually has, taken by the same box.
+   *
+   *      asked     do the FBX conversion in the app
+   *      mattered  the door could not ACCEPT one to begin with
+   *
+   * `media.save` proves a format from its bytes and an FBX matches
+   * nothing it knows, so an FBX upload came back "unrecognized file" and
+   * the shelf's answer was a page of Blender menus. A model goes to the
+   * converter first and arrives here as the `.glb` it came back as; a
+   * picture goes the way it always did. */
+  function isModelExport(file: File): boolean {
+    const name = file.name.toLowerCase();
+    return name.endsWith(".fbx") || name.endsWith(".zip");
+  }
+
+  /** What this box may be handed, asked of the deployment rather than
+   *  assumed. A console that offers to convert an FBX on a box with no
+   *  forge is a button that fails, and the shelf's own row now promises
+   *  the conversion in writing — so the promise and the accept list come
+   *  from the same answer. */
+  const [takesModels, setTakesModels] = useState(false);
+  useEffect(() => {
+    let gone = false;
+    api.convertDoors()
+      .then((d) => { if (!gone) setTakesModels(!!d.configured); })
+      .catch(() => { if (!gone) setTakesModels(false); });
+    return () => { gone = true; };
+  }, []);
+
   async function importPhoto(file: File) {
     setError(null); setNote(null);
     try {
-      const saved = await api.uploadMedia(me, file, token);
-      await api.importAvatar(me, { source: "photos", asset: saved.url }, token);
-      setNote(tr("idn.deck.done", lang));
+      let asset: string;
+      if (isModelExport(file)) {
+        setNote(tr("idn.model.converting", lang));
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        let binary = "";
+        // Chunked for the same reason the forge's reader is: one apply()
+        // over a seven-megabyte model blows the argument limit.
+        for (let at = 0; at < bytes.length; at += 0x8000) {
+          binary += String.fromCharCode(...bytes.subarray(at, at + 0x8000));
+        }
+        const made = await api.convertModel(me, btoa(binary), file.name, token);
+        asset = made.asset;
+        // What survived, said rather than assumed. A conversion that
+        // dropped the mouth shapes would still return a model, and the
+        // only place anybody would notice is a face that stopped being
+        // able to speak.
+        setNote(tr("idn.model.done", lang)
+                  .replace("{shapes}", String(made.named)));
+      } else {
+        const saved = await api.uploadMedia(me, file, token);
+        asset = saved.url;
+      }
+      await api.importAvatar(me, { source: "photos", asset }, token);
+      if (!isModelExport(file)) setNote(tr("idn.deck.done", lang));
       reloadAvatar();
     } catch (e) { fail(e); }
   }
@@ -829,7 +879,10 @@ export function Identity({ onPlans, onPassing }: {
         <div className="row">
           <label className="chip" style={{ marginBottom: 0 }}>
             {tr("idn.deck.upload", lang)}
-            <input type="file" accept="image/*" style={{ display: "none" }}
+            <input type="file"
+                   accept={takesModels
+                     ? "image/*,.glb,.fbx,.zip" : "image/*,.glb"}
+                   style={{ display: "none" }}
                    onChange={(e) => {
                      const f = e.target.files?.[0];
                      if (f) importPhoto(f);

@@ -6,6 +6,62 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.5] - 2026-09-01
+
+### Added
+
+- **An FBX export becomes a face here, instead of in Blender.** The
+  avatar shelf's first row — the only one that hands over a model rather
+  than a picture — used to end in an instruction: *"an FBX export needs
+  converting to .glb first (Blender: File → Import → FBX, then File →
+  Export → glTF 2.0, leaving Shape Keys checked so the mouth
+  survives)"*. Every word of it was true, and it was still a shelf row
+  with a manual taped to it. Worse, an FBX could not be uploaded at all
+  even by somebody willing: `media.save` proves a format from its bytes,
+  an FBX matches nothing it knows, and the answer was "unrecognized
+  file".
+
+  The forge grew a `/convert` door and carries Blender to do it — the
+  same tool the instructions named, so the automatic path cannot produce
+  a different face from the documented one. Measured against `assimp`,
+  a tenth the size: round-tripping a real MetaPerson avatar, assimp
+  returned 111 of 114 morph targets — the three missing from
+  `AvatarHead` and `AvatarTeethLower`, the two meshes that move when a
+  face speaks — and none of their names, because its glTF writer emits
+  no `extras.targetNames`. The console drives the mouth by name, so that
+  is a face nothing can speak through.
+
+  Verified against a real MetaPerson export and the provider's own `.glb`
+  of the same avatar: 8 meshes, 114 morph targets, 114 of them named, 82
+  nodes, one skin — identical, from the bare `.fbx` and from the zip
+  alike.
+
+  Both shapes are taken, because both are real: a bare `.fbx` for
+  somebody with their own pipeline, and the `.zip` as it downloads, which
+  is what a person actually has after pressing export. The zip is opened
+  under rules an archive needs and a file does not — exactly one `.fbx`,
+  no path that escapes, no symlinks, a ceiling on the unpacked size, and
+  nothing written to disk while reading it.
+
+  The screen says what survived — "Converted — 114 mouth shapes came
+  through, so this face can speak" — rather than reporting success. A
+  conversion that dropped the visemes still returns a model that loads,
+  and the only place anybody would notice is a face that has quietly
+  stopped being able to speak.
+
+### Fixed
+
+- **The converter consults offline mode.** The forge is a container on
+  the stack's own network and the model never leaves the host — but that
+  is a property of how somebody deployed it, not of this code, and
+  `QRME_FORGE_URL` can name any host at all. Gated with `offline.allow`
+  like the face maker's own calls beside it.
+
+- **A floor that had stopped watching.** `host.egress_sites` stood at 12
+  against 25 real calls, so half the ways out of this package could have
+  vanished without a word. Raised to 20 — four-fifths of what is there,
+  which is what every floor in that register is held to.
+
 ## [2.9.4] - 2026-09-01
 
 ### Fixed
@@ -17141,7 +17197,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.4...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.5...HEAD
+[2.9.5]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.4...app-v2.9.5
 [2.9.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.3...app-v2.9.4
 [2.9.3]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.2...app-v2.9.3
 [2.9.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.1...app-v2.9.2

@@ -8,6 +8,7 @@ show the picture without also having been handed the disclosure.
 
 from __future__ import annotations
 
+import base64
 import json
 
 import os
@@ -17,6 +18,7 @@ from pydantic import BaseModel, Field
 from fastapi import APIRouter, Depends, HTTPException, Request
 
 from .. import (auth, avatarforge, avatarreg, avatars, filming, media,
+                modelshop,
                 portraitist,
                 presentation, skins)
 from ..common import profile_or_404, require_owner
@@ -444,6 +446,60 @@ def import_avatar(profile_id: str, body: AvatarImport,
             pdi=request.app.state.pdi)
     except ValueError as e:
         raise HTTPException(422, i18n.raised(e))
+
+
+class ModelConvert(BaseModel):
+    model: str = Field(..., description="The .fbx, or the provider's zip"
+                                        " with one inside it, base64.")
+    name: str | None = Field(default=None, max_length=200,
+                             description="The file's own name, so the .glb"
+                                         " that comes out keeps it.")
+
+
+@router.get("/avatars/convert")
+def convert_doors() -> dict:
+    """Whether an FBX can be converted here, said before anybody uploads.
+
+    The shelf's instructions read one way when the app can do this and
+    another when it cannot, and a screen that promises a conversion this
+    deployment has no forge for is worse than one that asks for a `.glb`.
+    """
+    return {"configured": modelshop.configured(),
+            "takes": list(modelshop.TAKES),
+            "max_bytes": modelshop.MAX_BYTES}
+
+
+@router.post("/profiles/{profile_id}/avatar/convert", status_code=201)
+def convert_model(profile_id: str, body: ModelConvert,
+                  request: Request) -> dict:
+    """An FBX export in, a stored `.glb` out, ready to import as a face.
+
+        asked     do the conversion in the app
+        mattered  the upload door could not even ACCEPT what the provider
+                  hands over
+
+    `media.save` proves a file's format from its bytes, and an FBX matches
+    nothing it knows — so before this door existed an FBX upload was
+    refused as an unrecognized file, and the shelf's answer was a page of
+    Blender menus. What comes back is a `.glb` stored the ordinary way,
+    which the existing import door then takes like any other asset.
+
+    The counts ride back with it. A conversion that dropped half the
+    morph targets would still return a model, and the only place anybody
+    would notice is a mouth that no longer moves.
+    """
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    try:
+        data = base64.b64decode(body.model, validate=True)
+    except Exception:
+        raise HTTPException(422, "the model is not valid base64") from None
+    try:
+        return modelshop.convert_and_store(profile_id, data, body.name)
+    except modelshop.ConversionError as exc:
+        raise HTTPException(422, exc.said) from None
+    except media.MediaError as exc:
+        raise HTTPException(exc.status, exc.message) from None
 
 
 # -- the avatar registry: one face ledger, three roads in --------------------

@@ -5228,6 +5228,17 @@ export const api = {
   avatarMarket: () =>
     req<{ skin_sources: { key: string; name: string; how: string }[]; note: string }>(
       "/avatars/market"),
+  /** Whether this deployment can turn an FBX into a face at all. */
+  convertDoors: () => req<{ configured: boolean; takes: string[];
+                            max_bytes: number }>("/avatars/convert"),
+  /** An FBX export — or the provider's zip with one inside — becomes a
+   *  stored `.glb`, with the counts saying what survived it. */
+  convertModel: (profileId: string, model: string, name: string,
+                 token: string) =>
+    req<{ asset: string; media_id: string; from: string; meshes: number;
+          targets: number; named: number; bytes: number }>(
+      `/profiles/${profileId}/avatar/convert`,
+      { method: "POST", token, body: { model, name } }),
   importAvatar: (profileId: string, body: { source: string; asset: string;
                                             extra?: string[];
                                             torso?: string;

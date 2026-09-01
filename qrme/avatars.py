@@ -414,16 +414,29 @@ MARKET: tuple[dict, ...] = (
     # today; a provider slot naming a road we cannot drive would be a
     # button that fails.
     #
-    # The export is FBX on the credit tier and the console loads `.glb`,
-    # so the conversion is named in the instructions rather than left for
-    # somebody to discover at the import box.
+    # The export is FBX on the credit tier and the console loads `.glb`.
+    #
+    #     asked     do the conversion in the app
+    #     mattered  this row used to end in two Blender menus
+    #
+    # It said: "an FBX export needs converting to .glb first (Blender:
+    # File -> Import -> FBX, then File -> Export -> glTF 2.0, leaving
+    # Shape Keys checked so the mouth survives)". Every word of that was
+    # true and it was still a shelf row with a manual taped to it — the
+    # one row that hands over a MODEL, ending in "go and install a
+    # desktop application". `qrme/modelshop.py` does it now, in the same
+    # tool, so the automatic path cannot produce a different face from
+    # the one those instructions produced.
+    #
+    # The zip is named because that is what pressing export actually
+    # gives you; unpacking it by hand was the other instruction nobody
+    # should need.
     {"key": "metaperson", "name": "MetaPerson (Avatar SDK)",
      "how": "At metaperson.avatarsdk.com, build your avatar from a "
-            "photograph and export it. A .glb can be pasted or uploaded "
-            "here as it is; an FBX export needs converting to .glb first "
-            "(Blender: File \u2192 Import \u2192 FBX, then File \u2192 "
-            "Export \u2192 glTF 2.0, leaving Shape Keys checked so the "
-            "mouth survives)."},
+            "photograph and export it. Bring whatever it gave you \u2014 "
+            "the .zip as it downloaded, the model.fbx from inside it, or "
+            "a .glb. An FBX is converted here, and the mouth shapes come "
+            "through with it."},
     # The owner runs his voices and avatars on this platform's surface and
     # asked for it to lead the list. The pattern is the market's own: made
     # there, exported as an image, referenced here.

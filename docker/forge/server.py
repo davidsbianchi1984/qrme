@@ -46,9 +46,12 @@ photograph is used and dropped: only the model and the render leave.
 
 import base64
 import io
+import json
 import os
 import struct
+import subprocess
 import tempfile
+import zipfile
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
@@ -118,10 +121,41 @@ def health() -> dict:
         # The maker's own imports too — a forge that can see and cannot
         # build is still a forge that cannot work.
         from facebuild import build_head  # noqa: F401
-        return {"status": "ok", "ready": True, "shots": list(SHOTS)}
+        return {"status": "ok", "ready": True, "shots": list(SHOTS),
+                "converts": _can_convert()}
     except Exception as exc:
         return {"status": "ok", "ready": False,
-                "why": f"{type(exc).__name__}: {exc}"}
+                "why": f"{type(exc).__name__}: {exc}",
+                "converts": _can_convert()}
+
+
+def _can_convert() -> bool:
+    """Whether an FBX could actually be opened, not whether Blender runs.
+
+        asked     is the converter ready
+        mattered  `blender --version` answers on a Blender that cannot
+                  import a single FBX
+
+    The importer is a Python addon and it does `import numpy` at the top
+    of `import_fbx`. An image built with `--no-install-recommends` and no
+    `python3-numpy` therefore has a Blender that starts, prints its
+    version, registers the addon — and throws `ModuleNotFoundError` at
+    the first file. This container shipped that way for exactly one
+    build, which is the same trap `/health` above already exists to avoid
+    for MediaPipe.
+
+    So the check OPENS the importer, in the same headless Blender the
+    conversion uses, and reports what happened rather than what is
+    installed.
+    """
+    try:
+        done = subprocess.run(
+            ["blender", "--background", "--factory-startup",
+             "--python-expr", "import io_scene_fbx.import_fbx"],
+            capture_output=True, timeout=60)
+        return done.returncode == 0 and b"Error" not in done.stderr
+    except Exception:
+        return False
 
 
 @app.post("/forge")
@@ -211,3 +245,192 @@ def speak(body: ForgeIn) -> dict:
     except Exception:
         raise HTTPException(
             500, "the forge could not measure that photograph") from None
+
+
+#: What a model may weigh coming in. A MetaPerson FBX is about 7MB and
+#: its zip about 6; a rig from somebody's own pipeline is legitimately
+#: larger than a photograph, so this is not the photo ceiling.
+MAX_MODEL_BYTES = 64 * 1024 * 1024
+
+#: And what it may weigh once unpacked. A zip that expands a thousandfold
+#: is not an avatar.
+MAX_UNPACKED_BYTES = 256 * 1024 * 1024
+
+#: How long Blender gets. The measured conversion of a MetaPerson avatar
+#: is under three seconds; a minute is room for a far heavier rig and a
+#: cold cache, and a wall for a file that has sent the importer somewhere
+#: it will not come back from.
+CONVERT_SECONDS = 120
+
+#: Where the conversion script lives inside the image.
+_SCRIPT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                       "to_glb.py")
+
+
+class ConvertIn(BaseModel):
+    model: str = Field(..., description="The .fbx or .zip, base64.")
+
+
+def _what_is_it(data: bytes) -> str:
+    """Read the bytes, not the file name.
+
+        asked     take the export the provider hands over
+        mattered  a name is a claim, and the door is the wrong place to
+                  believe one
+
+    A zip announces itself, and so does a binary FBX — Kaydara's writer
+    stamps its own name into the first twenty bytes. An ASCII FBX says so
+    in a comment near the top. Anything else is not something this door
+    converts, and saying so beats handing Blender a file to be surprised
+    by.
+    """
+    # An archive with nothing in it writes the end-of-central-directory
+    # signature and no local header, and one written across volumes
+    # writes a third. All three are zips, and a person handed "that is
+    # not a zip" about a file that plainly is would go looking in the
+    # wrong place — the honest answer for an empty one is that it holds
+    # no model.
+    if data[:4] in (b"PK\x03\x04", b"PK\x05\x06", b"PK\x07\x08"):
+        return "zip"
+    if data[:20] == b"Kaydara FBX Binary  ":
+        return "fbx"
+    if b"FBXHeaderExtension" in data[:4096]:
+        return "fbx"
+    return "?"
+
+
+def _fbx_out_of(data: bytes) -> bytes:
+    """The one model inside the archive, and nothing else out of it.
+
+    MetaPerson hands over `avatar/model.fbx` inside a zip, which is what
+    somebody actually has to drag in — so the door takes the zip. That
+    means opening an archive somebody else made, and every rule below is
+    there because an archive is not a file:
+
+    * exactly one `.fbx` member, so there is no question which model was
+      meant;
+    * no member whose path escapes the directory it is unpacked into —
+      `..` or a leading slash — which is the oldest bug in unzipping;
+    * no symlinks, which are the same bug wearing a hat;
+    * a ceiling on the unpacked size, so a small archive cannot become a
+      full disk.
+
+    Only the FBX's bytes are read. Nothing is written to disk here at
+    all, so a path that escapes is refused rather than merely landing
+    somewhere harmless.
+    """
+    try:
+        bundle = zipfile.ZipFile(io.BytesIO(data))
+    except Exception:
+        raise HTTPException(422, "that zip could not be opened")
+
+    models, total = [], 0
+    for item in bundle.infolist():
+        name = item.filename
+        if name.endswith("/"):
+            continue
+        if name.startswith("/") or ".." in name.replace("\\", "/").split("/"):
+            raise HTTPException(422, "that zip holds a path that points "
+                                     "outside itself")
+        # The high bits of `external_attr` carry the unix mode; 0xA000 is
+        # a symlink.
+        if (item.external_attr >> 16) & 0xF000 == 0xA000:
+            raise HTTPException(422, "that zip holds a link rather than "
+                                     "a file")
+        total += item.file_size
+        if total > MAX_UNPACKED_BYTES:
+            raise HTTPException(422, "that zip unpacks to more than the "
+                                     "forge takes")
+        if name.lower().endswith(".fbx"):
+            models.append(item)
+
+    if not models:
+        raise HTTPException(422, "that zip holds no .fbx — MetaPerson's "
+                                 "export has one inside a folder called "
+                                 "avatar")
+    if len(models) > 1:
+        raise HTTPException(422, "that zip holds more than one .fbx, so "
+                                 "which one is the avatar is not this "
+                                 "door's guess to make")
+    with bundle.open(models[0]) as handle:
+        return handle.read(MAX_UNPACKED_BYTES + 1)
+
+
+def _facts(glb: bytes) -> dict:
+    """What came out, counted — so a caller never has to trust the door.
+
+    The numbers that decide whether a face can speak: how many morph
+    targets survived and how many of them still have names. A conversion
+    that silently halves either is a conversion somebody would only find
+    out about from a mouth that does not move.
+    """
+    try:
+        length, = struct.unpack("<I", glb[12:16])
+        scene = json.loads(glb[20:20 + length])
+    except Exception:
+        return {"meshes": 0, "targets": 0, "named": 0}
+    targets = sum(len(p.get("targets", []))
+                  for m in scene.get("meshes", [])
+                  for p in m.get("primitives", []))
+    named = sum(len((m.get("extras") or {}).get("targetNames", []))
+                for m in scene.get("meshes", []))
+    return {"meshes": len(scene.get("meshes", [])),
+            "targets": targets, "named": named}
+
+
+@app.post("/convert")
+def convert(body: ConvertIn) -> dict:
+    """An FBX in, a `.glb` the console can load out.
+
+        asked     do the conversion in the app
+        mattered  the shelf's answer was "go and install Blender"
+
+    Both shapes, because both are real: a bare `.fbx` for somebody with
+    their own pipeline, and the `.zip` for somebody who has just pressed
+    export at MetaPerson and has whatever that gave them.
+    """
+    try:
+        data = base64.b64decode(body.model, validate=True)
+    except Exception:
+        raise HTTPException(422, "the model is not valid base64")
+    if not data:
+        raise HTTPException(422, "the model arrived empty")
+    if len(data) > MAX_MODEL_BYTES:
+        raise HTTPException(422, "that model is larger than the forge takes")
+
+    kind = _what_is_it(data)
+    if kind == "zip":
+        fbx = _fbx_out_of(data)
+    elif kind == "fbx":
+        fbx = data
+    else:
+        raise HTTPException(422, "that is neither an .fbx nor a zip with "
+                                 "one inside it")
+
+    with tempfile.TemporaryDirectory() as room:
+        src = os.path.join(room, "in.fbx")
+        dst = os.path.join(room, "out.glb")
+        with open(src, "wb") as handle:
+            handle.write(fbx)
+        try:
+            done = subprocess.run(
+                ["blender", "--background", "--factory-startup",
+                 "--python", _SCRIPT, "--", src, dst],
+                capture_output=True, timeout=CONVERT_SECONDS)
+        except subprocess.TimeoutExpired:
+            raise HTTPException(504, "the conversion did not finish in "
+                                     f"{CONVERT_SECONDS} seconds")
+        if not os.path.exists(dst):
+            # Blender's own last words, not a shrug. The importer is the
+            # part that fails on a file it does not like, and its message
+            # names the reason.
+            why = (done.stderr or done.stdout or b"").decode(
+                "utf-8", "replace").strip().splitlines()
+            raise HTTPException(
+                422, "that model could not be converted"
+                     + (f": {why[-1][:300]}" if why else ""))
+        with open(dst, "rb") as handle:
+            glb = handle.read()
+
+    return {"glb": base64.b64encode(glb).decode(), "from": kind,
+            "bytes": len(glb), **_facts(glb)}

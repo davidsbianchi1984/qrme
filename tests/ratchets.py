@@ -1072,7 +1072,12 @@ RATCHETS: tuple[Ratchet, ...] = (
             "the literal path segments this product's routes contribute"),
     Ratchet("form.controls_scanned", 21466, _scanned_controls,
             "the characters of form control the screen scan matches"),
-    Ratchet("host.egress_sites", 12, _egress_sites,
+    # 20, not 12. The floor had drifted to less than half of what it
+    # measures — 25 calls could have fallen to 12 without a word — and
+    # adding the converter's one call to the forge is what tipped the
+    # guard over. Four-fifths of the real count, which is what
+    # `test_no_registered_floor_is_decoration` asks of every floor here.
+    Ratchet("host.egress_sites", 20, _egress_sites,
             "the calls in this package that can put bytes on a wire"),
     Ratchet("shell.shown.ios", 1560, _shell_shown("ios"),
             "the literals the iOS scan finds on any screen"),

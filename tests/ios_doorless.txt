@@ -192,3 +192,19 @@ GET /video/direction/{profile_id}/log
 GET /rooms/{room_id}/reach
 PUT /rooms/{room_id}/reach
 POST /rooms/{room_id}/errand
+
+# GET /avatars/convert — and the POST below it. The conversion turns a
+# MetaPerson FBX export into the .glb the console loads, and the export is a
+# ZIP a person downloads from a website in a browser. That is where the file
+# lands and that is where the box for it is. A shell door would need a
+# document picker wired to the avatar screen and a multi-megabyte body pushed
+# up from a phone, for a file the phone did not download — so this is the one
+# road on this backlog that is here because of where the FILE is rather than
+# because of what the shell can do.
+#
+# It is not impossible and it is not refused: a person who has the zip in
+# Files on a phone has a real case, and the day this shell grows a document
+# picker these two rows come off together. Until then the console has the
+# door and this says so.
+GET /avatars/convert
+POST /profiles/{profile_id}/avatar/convert

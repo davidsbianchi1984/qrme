@@ -493,6 +493,17 @@ _PUBLIC: dict[str, dict[str, str]] = {
         "hi": "इस परिनियोजन के कान जवाब नहीं दे रहे — रिकॉर्डिंग रखी रहती है, देखी नहीं जाती",
         "ar": "آذان هذا النشر لا تجيب — يبقى التسجيل محفوظًا، غير مُشاهَد",
     },
+    "the model is not valid base64": {
+        "es": "el modelo no es base64 v\u00e1lido",
+        "fr": "le mod\u00e8le n'est pas du base64 valide",
+        "de": "das Modell ist kein g\u00fcltiges Base64",
+        "pt": "o modelo n\u00e3o \u00e9 base64 v\u00e1lido",
+        "it": "il modello non \u00e8 base64 valido",
+        "ja": "\u30e2\u30c7\u30eb\u304c\u6709\u52b9\u306a base64 \u3067\u306f\u3042\u308a\u307e\u305b\u3093",
+        "zh": "\u8fd9\u4e2a\u6a21\u578b\u4e0d\u662f\u6709\u6548\u7684 base64",
+        "hi": "\u092f\u0939 \u092e\u0949\u0921\u0932 \u0935\u0948\u0927 base64 \u0928\u0939\u0940\u0902 \u0939\u0948",
+        "ar": "\u0627\u0644\u0646\u0645\u0648\u0630\u062c \u0644\u064a\u0633 base64 \u0635\u0627\u0644\u062d\u064b\u0627",
+    },
     "the shown picture is not valid base64": {
         "es": "la imagen mostrada no es base64 válido",
         "fr": "l'image montrée n'est pas du base64 valide",
