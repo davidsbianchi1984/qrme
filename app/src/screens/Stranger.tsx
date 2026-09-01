@@ -110,7 +110,7 @@ export function Stranger() {
   useEffect(() => { go(() => api.openQuestions(), setQuestions); }, []);
 
   const cards = found
-    ? (found.profiles ?? (found.profile ? [found.profile] : []))
+    ? (found.summoned ?? (found.profile ? [found.profile] : []))
     : [];
 
   return (

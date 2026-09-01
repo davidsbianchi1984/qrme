@@ -90,7 +90,7 @@ struct PacksSection: View {
                         Text(blurb).font(.caption).foregroundStyle(Theme.t2)
                     }
                     Text(L10n.fill("nmg.pack.meta", state.language,
-                         ["industry": pack.industry, "items": "\(pack.items)",
+                         ["industry": pack.industry, "items": "\(pack.items_count)",
                           "installs": "\(pack.installs)", "publisher": pack.publisher]))
                         .font(.caption2).foregroundStyle(Theme.t3)
                     if let url = pack.origin_url {

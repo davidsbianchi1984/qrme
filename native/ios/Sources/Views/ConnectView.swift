@@ -270,7 +270,7 @@ private struct AppsSection: View {
     private func load() async {
         guard let pid = state.pid, let token = state.token else { return }
         if let cat = try? await ApiClient.shared.appsCatalog() {
-            flat = cat.providers.flatMap { p in
+            flat = cat.app_providers.flatMap { p in
                 p.apps.map { (key: "\(p.provider)/\($0.app)", provider: p.provider,
                               app: $0.app, label: $0.label, needs: $0.needs_first) }
             }

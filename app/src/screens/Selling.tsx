@@ -252,7 +252,7 @@ export function Selling({ onPlans }: { onPlans: () => void }) {
               <p className="muted small">
                 {fill(tr("sell.earn.receipt", lang), {
                   total: money(receipt.total_amount, receipt.currency),
-                  n: receipt.entries,
+                  n: receipt.entries_count,
                   note: receipt.note,
                 })}
                 {receipt.remaining.length > 0

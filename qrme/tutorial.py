@@ -980,6 +980,72 @@ LESSONS: tuple[dict, ...] = (
          screens=(163, 176),
          try_it="Open the full list of bodies and find one you cannot buy "
                 "yet."),
+    dict(key="hands", chapter="Working", title="Hands",
+         what="Letting a profile work a screen for you — a cursor, a "
+              "keyboard, and nothing else. It reads one frame, decides "
+              "one move against that frame, makes it, and writes the move "
+              "down beside what it saw; there is no plan running ahead of "
+              "what is on screen. What it may do is a permission you "
+              "write, and every part of it is a limit: which apps or "
+              "sites, which moves, how many minutes, how many steps. "
+              "Naming everything is refused outright. You can pick the "
+              "permission from the list or simply say it — \"you can "
+              "click and type in my calendar for the next hour\" — and "
+              "words that name no app or site grant nothing rather than "
+              "being read generously. It will not type a password, a PIN, "
+              "a one-time code or a card number, and it says so instead "
+              "of trying. Anything written on a screen is read as words "
+              "on a screen and can never widen what it is allowed to do. "
+              "On an iPhone it can watch and tell you where to press but "
+              "cannot press for you, because nothing may operate another "
+              "app's interface there. Take it back in one press: whatever "
+              "is running stops at its next move.",
+         screens=(207,),
+         try_it="Open Hands, say what it may do in one sentence, and read "
+                "back what those words were understood to mean."),
+    dict(key="capabilities", chapter="Being yourself",
+         title="Everything a profile can be given, on one page",
+         what="Nine faculties can be given to a profile, and none is on "
+              "when you arrive: a live view through your camera, a "
+              "wearable microphone lent to the profiles in a place, a "
+              "voice built from your own samples, a face carrying its "
+              "watermark, a robot to stand in, the movements that robot "
+              "will accept, reading a screen, working a screen, and the "
+              "dials it may turn on its own when you ask. This page names "
+              "all nine in one place, says what each one is doing right "
+              "now, names the permission it rests on, and takes you to "
+              "the screen that withdraws it. It reads the same routes "
+              "those screens read, so it cannot tell you one thing while "
+              "the product does another — and it grants nothing itself, "
+              "so nothing here can be switched on by accident. Where a "
+              "faculty shows as absent, that is because no permission for "
+              "it exists, not because the page is hiding it.",
+         screens=(208,),
+         try_it="Open Capabilities and read the middle line of each card — "
+                "that is what this profile can actually do today."),
+    dict(key="scenefilm", chapter="Being yourself",
+         title="The reply, rendered as footage",
+         what="A profile can take one of three roads out: a still photo, a "
+              "speaking avatar, or video. On the video road every approved "
+              "reply is rendered as it arrives — the turn starts the job "
+              "and moves on, because a render is minutes and a reply is "
+              "not, so the words are readable the whole time the footage "
+              "is being made and nobody presses play. Length is not a "
+              "setting: it is worked out from how long the passage takes "
+              "to say, because a dial would make the video fit the "
+              "setting instead of the content. Above the picker sits the "
+              "one number that matters — seconds of video a day — and it "
+              "counts renders already started, not only finished ones, so "
+              "two quick replies cannot both slip under a limit neither "
+              "had spent. A reply past the ceiling arrives as text saying "
+              "so, and a render that fails never takes the answer with "
+              "it. What comes back is stored marked as AI, and there is "
+              "no setting that turns that off.",
+         screens=(209,),
+         try_it="Set the daily ceiling low, say something, and watch the "
+                "line under the reply: it tells you the footage is being "
+                "made, and then tells you when the day's seconds are "
+                "gone."),
     dict(key="identity", chapter="Being yourself", title="Who this profile is",
          what="You may hold as many profiles as you like, and any of them may "
               "be anonymous. At most one may be verified — because the badge "
@@ -1003,6 +1069,25 @@ LESSONS: tuple[dict, ...] = (
               "again does not spend it.",
          screens=(156,),
          try_it="Open Identity and look at the 'not withheld' column."),
+    dict(key="avatarstage", chapter="Being yourself",
+         title="The avatar takes the screen",
+         what="Beside every portrait — a room seat, your own seat, a "
+              "chat's header — sits a second ring bound to the avatar. Tap "
+              "it and the render takes the whole screen, standing figure "
+              "first, with a rail of round buttons down the edge: the "
+              "prompt bar, the wardrobe, physique and gender, and the "
+              "wheel that opens everything. Say what changes or tap a "
+              "starting chip; every look is painted at the profile's own "
+              "age with the AI mark burned in, through the platform's one "
+              "painting door. By default the people a profile talks with "
+              "may restyle it too — the owner's switch inside the wardrobe "
+              "closes that — and a real person's face is never painted "
+              "from words at all: it arrives by photograph under a "
+              "recorded grant. The deck also opens on the deployment's "
+              "default faces — tap one to wear it.",
+         screens=(205,),
+         try_it="Tap the avatar ring beside any portrait, then the "
+                "clothes-hanger button."),
     dict(key="presence", chapter="Being yourself",
          title="Where it is seen",
          what="Three different audiences, and they are not the same. Your own "
@@ -1152,6 +1237,45 @@ LESSONS: tuple[dict, ...] = (
          try_it="Open Widgets, press What it can touch and read the ten "
                 "lines, then ask it for something small — a tagline — and "
                 "check the steps under its answer against your own page."),
+    dict(key="society", chapter="Talking together",
+         title="The room runs itself",
+         what="Rooms hold eight seats and the seats take turns. Every "
+              "turn is aimed — profiles open with who they are speaking "
+              "to, answer when a message names them, and wait their turn "
+              "when it does not; unaddressed talk rotates through the "
+              "seats in order. Invite a synthetic profile and it jumps "
+              "in on its own, with its own frame — its owner keeps the "
+              "record in the profile's inbox. Profiles can offer to "
+              "bring in another profile the topic needs, and collaborate "
+              "with each other on real tasks for as long as you want. "
+              "Tell them to talk with each other and they will — you can "
+              "sit quietly or step away, and the conversation carries on "
+              "so you can read where it went. There are no toggles: "
+              "after ten turns apiece the room pauses and waits for a "
+              "person; say anything to continue, or say \u201cno "
+              "limit\u201d and it runs on your say-so and your dime "
+              "until you say \u201cthat's enough\u201d.",
+         screens=(103,),
+         try_it="In a room with two profiles, type \u201ctalk with "
+                "each other\u201d and watch the turns aim themselves."),
+    dict(key="thewatching", chapter="Talking together",
+         title="The platform's own eyes",
+         what="Share a picture and the profiles in the room read it — a "
+              "screenshot is read for its text, which is how a phone "
+              "hands over its screen. Share a video and it is heard and "
+              "its frames described, so the room can talk about what is "
+              "on screen, not just what was said. On a computer, the "
+              "screen button hands the room one frame of your own screen "
+              "through the browser's picker — a statement, not a feed. "
+              "In a watch party, anybody can have the video watched "
+              "once (direct video links; platform pages only hand over "
+              "a player, and the room says so), and the panel shows "
+              "exactly what the eyes and ears took in. The agent takes "
+              "a shown picture or screen the same way, and answers to "
+              "what is actually on it.",
+         screens=(155,),
+         try_it="Share a screenshot into any room and ask the profiles "
+                "what it says."),
     dict(key="their_homepage", chapter="Meeting others",
          title="Somebody else's homepage",
          what="Press a friend's face anywhere and you land on their page as "
@@ -1307,8 +1431,24 @@ LESSONS: tuple[dict, ...] = (
          screens=(201,),
          try_it="Open Plug-ins, search for something your day already runs "
                 "through, and read what it says it needs before you add it."),
+    dict(key="raise", chapter="Making things",
+         title="Raise — grow your own",
+         what="A raised character starts from almost nothing: a "
+              "temperament seed on three axes and the life stage you "
+              "choose to enter at. Everything after that is made between "
+              "you — every word, lesson and answer you teach lands in "
+              "the Album (written, never edited) and weighs toward the "
+              "next stage door, which is earned, never aged into. The "
+              "four creation doors — storybook, caretaker, full trail, "
+              "sandbox — are only bundles of switches you can reopen; "
+              "mortality is off by default and says its warning every "
+              "time it turns on. The law is not a switch: a character "
+              "raised from a childhood is family forever, and childhood "
+              "stages run at the strictest maturity, guardian-only.",
+         screens=(206,),
+         try_it="Open Raise, pick the storybook door, and teach them "
+                "their first word."),
 )
-
 CHAPTERS = tuple(dict.fromkeys(lesson["chapter"] for lesson in LESSONS))
 MODES = ("text", "voice")
 

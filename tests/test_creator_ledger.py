@@ -87,7 +87,7 @@ def test_payout_sweeps_accrued_to_paid(client):
     receipt = client.post(f"/profiles/{pid}/earnings/payout")
     assert receipt.status_code == 201, receipt.text
     out = receipt.json()
-    assert out["total_amount"] == 40.0 and out["entries"] == 2
+    assert out["total_amount"] == 40.0 and out["entries_count"] == 2
 
     s = client.get(f"/profiles/{pid}/earnings").json()
     assert s["totals"]["accrued"] == 0 and s["totals"]["paid"] == 40.0

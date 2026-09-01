@@ -209,6 +209,10 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     "make_one": ("make a profile", "new profile", "create a profile",
                  "add a profile", "genesis", "character card",
                  "import a card", "sillytavern", "chara card"),
+    "scenefilm": ("where is my video", "render my replies", "video of the "
+                  "reply", "reply as video", "why did no video appear",
+                  "video generation", "daily video limit",
+                  "how long is the video"),
     "blend": ("blend", "hybrid", "combine profiles", "mix profiles",
               "both grandparents", "composite", "merge two profiles"),
     "predict": ("what would they do", "what would he do", "what would she do",
@@ -457,6 +461,18 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     "bodies": ("robot", "robots", "a body", "humanoid", "android",
                "my robot", "bind a robot", "embodiment", "speak through",
                "task pack", "robot skills"),
+    "capabilities": ("capabilities", "what can it do", "what can you do",
+                     "what is it allowed to do", "what is it able to do",
+                     "permissions", "what did i agree to", "what can it see",
+                     "what can it hear", "can it move", "can it see me",
+                     "can it hear me", "what is switched on",
+                     "what is turned on", "how do i turn it off",
+                     "what am i allowing", "everything it can do"),
+    "hands": ("hands", "use my computer", "use my screen", "work my screen",
+              "click for me", "type for me", "take over", "do it for me on "
+              "screen", "navigate for me", "do that again", "repeat that",
+              "let it use my calendar", "give it my screen",
+              "cursor", "sit at my computer"),
     "placement": ("adult venue", "onlyfans", "fansly", "rated placement",
                   "place my profile", "market my profile", "18+ venue",
                   "adult marketing", "where is it advertised"),
@@ -503,6 +519,23 @@ DIRECTIONS: dict[str, tuple[str, ...]] = {
     # tick, and somebody wanting out. Both belong here.
     # People arrive here from three directions — decorating a page, putting
     # a profile on a physical screen, and asking what a wall can show.
+    # The full-screen avatar and its wardrobe: people arrive wanting the
+    # render, the outfit, or the guest switch — three words for one stage.
+    "avatarstage": ("wardrobe", "full screen avatar", "avatar full screen",
+                    "restyle", "change outfit", "dress my avatar",
+                    "avatar ring", "physique", "render my avatar",
+                    "default faces", "let visitors restyle"),
+    "raise": ("raise", "grow your own", "raise a character", "teach them",
+              "the album", "life stages", "stage door", "tamagotchi",
+              "temperament", "watch them grow"),
+    "society": ("let them talk", "talk with each other", "keep talking",
+                "take turns", "whose turn is it", "invite another profile",
+                "they joined by themselves", "no limit", "stop talking",
+                "work together on a task"),
+    "thewatching": ("watch the video", "see my screen", "show my screen",
+                    "read this screenshot", "look at this picture",
+                    "what is on screen", "screen share", "the eyes",
+                    "can it see", "watch this with me"),
     "presence": ("my page", "customise", "customize", "theme", "layout",
                  "html", "tagline", "front page", "what people see",
                  "wall panel", "kiosk", "screen", "display", "shop window",

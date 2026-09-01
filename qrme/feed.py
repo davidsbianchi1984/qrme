@@ -362,7 +362,7 @@ def stream(viewer_profile_id: str | None = None, cursor: str | None = None,
     nxt = _cursor({"before": rows[-1]["created_at"]}) if len(rows) == limit \
         else None
     return {
-        "items": items,
+        "cards": items,
         "cursor": nxt,
         "counts": {"video": sum(1 for i in items if i["kind"] == "video"),
                    "offsite": sum(1 for i in items if i["kind"] == "offsite"),

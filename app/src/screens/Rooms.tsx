@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "../api";
+import { api, type XrPlatform } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
@@ -42,10 +42,44 @@ export function Rooms({ onPlans, onInside }: {
     useState<{ profile_id: string; display_name: string }[]>([]);
   const [asking, setAsking] = useState<Record<string, string>>({});
   const [asked, setAsked] = useState<string | null>(null);
+  // The two things you set *before* anybody is in the room with you.
+  // Both used to live behind a seat's gear inside the room, where you can
+  // only reach them once it is already running — the field asked for them
+  // out of that frame, and this row is where somebody actually stands
+  // before walking in.
+  const [naming, setNaming] = useState<Record<string, string>>({});
+  const [lent, setLent] = useState<Record<string, boolean>>({});
+  // What just happened, in the same words the room used to say it in.
+  // These three sentences lost their reader when the controls moved and
+  // would otherwise be ten translations nobody sees.
+  const [note, setNote] = useState<string | null>(null);
+  // The XR shelf: every headset on the market and its road into these
+  // rooms. The rooms are pages, so the road is the headset's own browser
+  // — the card says which, and marks the futures as futures.
+  const [xr, setXr] = useState<XrPlatform[]>([]);
+
+  /** Whether this account's microphone is already lent in each room —
+   *  read rather than remembered, so a reload does not offer to lend a
+   *  microphone that is already lent. */
+  function readMics(ids: string[]) {
+    const token = session.interactorToken;
+    const me = session.interactorId;
+    if (!token || !me) return;
+    ids.forEach((id) => {
+      api.micsInRoom(id, token).then((m) => {
+        setLent((cur) => ({
+          ...cur,
+          [id]: m.microphones_lent.some((row) => row.interactor_id === me),
+        }));
+      }).catch(() => {});
+    });
+  }
 
   function load() {
     api.listRooms().then(setRooms).catch((e) => setError(e));
     api.listDesks().then(setDesks).catch(() => setDesks([]));
+    api.xrPlatforms().then((r) => setXr(r.xr_platforms))
+      .catch(() => setXr([]));
     api.roomTemplates().then(setTemplates).catch(() => setTemplates([]));
     // This profile's own friends. Without one signed in there is nobody to
     // offer, and the control below is absent rather than empty.
@@ -179,6 +213,59 @@ export function Rooms({ onPlans, onInside }: {
                     }}>
               {tr("rms.standing.open", lang)}
             </button>
+            {/* Name it, and lend it your microphone — before you walk in.
+                Both were behind a seat's gear inside the room until the
+                field found them wedged between "Camera on" and
+                "Background" and asked for them out of that frame. */}
+            {session.profileId && session.ownerToken && (
+              <span className="rms-before">
+                <input value={naming[r.id] ?? (r.topic || "")}
+                       disabled={busy}
+                       aria-label={tr("ins.roomname", lang)}
+                       placeholder={tr("ins.roomname.ph", lang)}
+                       onChange={(e) => setNaming(
+                         { ...naming, [r.id]: e.target.value })} />
+                <button className="ghost"
+                        disabled={busy || !(naming[r.id] ?? "").trim()}
+                        onClick={async () => {
+                          setBusy(true); setError(null);
+                          try {
+                            await api.renameRoom(r.id, session.profileId!,
+                                                 naming[r.id].trim(),
+                                                 session.ownerToken!);
+                            setNote(tr("ins.roomname.saved", lang));
+                            load();
+                          } catch (e) { setError(e); }
+                          finally { setBusy(false); }
+                        }}>
+                  {tr("ins.roomname.save", lang)}
+                </button>
+              </span>
+            )}
+            {session.interactorId && session.interactorToken && (
+              <button className="ghost" disabled={busy}
+                      aria-pressed={!!lent[r.id]}
+                      title={tr("ins.micpitch", lang)}
+                      onClick={async () => {
+                        setBusy(true); setError(null);
+                        const me = session.interactorId!;
+                        const tok = session.interactorToken!;
+                        try {
+                          if (lent[r.id]) {
+                            await api.takeBackMicInRoom(r.id, me, tok);
+                            setNote(tr("ins.takenback", lang));
+                          } else {
+                            await api.lendMicInRoom(r.id, me, tok);
+                            setNote(tr("ins.lent", lang));
+                          }
+                          readMics([r.id]);
+                        } catch (e) { setError(e); }
+                        finally { setBusy(false); }
+                      }}>
+                {lent[r.id] ? tr("ins.takeback", lang)
+                            : tr("ins.lendmic", lang)}
+              </button>
+            )}
             {/* Asking somebody in. Rooms could be opened and walked into and
                 nobody could be invited to one: the only ways were to name
                 them in the create body — which needs their id before the
@@ -237,7 +324,42 @@ export function Rooms({ onPlans, onInside }: {
         ))}
       </div>
 
+      {/* Headsets & glasses — the market, honestly. Steam, Meta, Apple
+          and the rest each get their row: the browser road that works
+          today, the VR/AR badges the hardware earns, and the sign-in and
+          native-app futures said as futures rather than buttons. */}
+      {xr.length > 0 && (
+        <div className="card">
+          <h3>{tr("rms.xr.title", lang)}</h3>
+          <p className="muted small">{tr("rms.xr.lead", lang)}</p>
+          {xr.map((p) => (
+            <div key={p.platform} className="room-row">
+              <b>{p.name}</b>
+              {p.wears.includes("vr") && (
+                <span className="tag ch-vr">{tr("rms.ch.vr", lang)}</span>
+              )}
+              {p.wears.includes("ar") && (
+                <span className="tag ch-ar">{tr("rms.ch.ar", lang)}</span>
+              )}
+              {p.open_now && (
+                <span className="muted small">
+                  {fill(tr("rms.xr.now", lang), { browser: p.browser })}
+                </span>
+              )}
+              {p.signin === "planned" && (
+                <span className="muted small">{tr("rms.xr.signin", lang)}</span>
+              )}
+              {p.signin === "unconfigured" && (
+                <span className="muted small">{tr("rms.xr.off", lang)}</span>
+              )}
+            </div>
+          ))}
+          <p className="muted small">{tr("rms.xr.app", lang)}</p>
+        </div>
+      )}
+
       <Refusal error={error} onPlans={onPlans} variant="inline" />
+      {note && <p className="small">{note}</p>}
     </div>
   );
 }

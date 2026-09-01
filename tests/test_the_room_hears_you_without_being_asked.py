@@ -121,9 +121,70 @@ def test_entering_any_room_opens_the_ear():
     and put-away closes everything.
     """
     assert re.search(r"if \(!canDictate\) return;\s*\n\s*"
+                     r"byHand\.current = false;\s*\n\s*"
                      r"startTalking\(\);", INSIDE), (
         "nothing opens the microphone on the way into a room — the press "
         "the field reports asked to remove, twice, is still the only way in")
+
+
+def test_the_first_touch_is_the_grant_the_phone_wanted():
+    """iOS opens no microphone a touch didn't carry, so the entry above is
+    refused there with `not-allowed` — the phone waiting for a hand, not a
+    person saying no. The room's first touch anywhere is that hand: the
+    refusal of a machine-started ear raises `earWaiting` instead of a
+    fault, a pulsing chip says tap-anywhere in the reader's language, and
+    the root's pointer capture starts the ear inside the gesture. Without
+    each half of this the iPhone enters every room deaf, which is the
+    field report this exists for."""
+    assert "setEarWaiting(true)" in INSIDE, (
+        "a machine-started refusal must wait for a hand, not report a fault")
+    assert re.search(r"onPointerDownCapture=\{[^}]*\n?[^}]*earWaiting", INSIDE), (
+        "no touch anywhere opens the waiting ear")
+    assert 'tr("ins.ear.tap", lang)' in INSIDE, (
+        "the waiting ear says nothing — a person cannot know their tap "
+        "is the grant")
+
+
+def test_the_take_is_the_message_and_the_line_says_it_is_heard():
+    """The 🎤 by the paperclip, third design and the owner's words both
+    times: the strip wears the universal recording mark (a pulsing red
+    dot) and a heartbeat line drawn from the take's own levels — "users
+    know their audio is being recorded inside that line" — a take that
+    hears nothing ends itself in a few quiet seconds and sends nothing,
+    and what a voiced take sends is THE AUDIO: the share door stores the
+    bubble and reads the words into the transcript, and advance asks the
+    profile for the turn that answers them."""
+    assert 'className="dict-dot"' in INSIDE, (
+        "no recording mark — a red border on a button is an alarm, not a "
+        "recording sign")
+    assert 'className="dict-wave"' in INSIDE and "polyline" in INSIDE, (
+        "no heartbeat line — dots do not say 'this is being heard'")
+    assert re.search(r"recordRaw\(", INSIDE), (
+        "the take no longer records the audio itself")
+    assert re.search(r"recordRaw\([^)]*\n[^)]*\n[^)]*\n[^)]*5000", INSIDE,
+                     re.S) or ", 5000)" in INSIDE, (
+        "a silent take never ends itself")
+    assert "api.shareInRoom(open, me, file, token)" in INSIDE, (
+        "the memo no longer sends as an audio file")
+    assert "api.advanceRoom(open, token)" in INSIDE, (
+        "nothing asks the profile for the turn that answers the memo")
+
+
+def test_all_four_rail_buttons_stand_and_nobody_signs_in_twice():
+    """"There should be four" — and "users have already signed into their
+    accounts; best not pester them." A session without the owner's key
+    keeps all four buttons, the dock prefers a seat the session can hold
+    the key for, and an unowned profile's owner panels open onto the door
+    a visitor really has: asking, sent into the conversation itself."""
+    rail = (REPO / "app/src/TalkRail.tsx").read_text(encoding="utf-8")
+    assert "OWNERS.includes(p)) return !!ownerToken" not in rail, (
+        "the owner panels vanish again without the key")
+    assert "AskPanel" in rail and 'tr("rail.ask", lang)' in rail, (
+        "an unowned panel opens onto nothing instead of the ask")
+    assert "rail.locked" not in rail, (
+        "the sign-in errand came back")
+    assert re.search(r"s\.id === session\.profileId\)\?\.id", INSIDE), (
+        "the dock no longer prefers a seat this session owns")
     assert "!spokenRoom || !canDictate" not in INSIDE, (
         "the chat-room exemption is back; the owner removed it by name")
 

@@ -386,7 +386,7 @@ def browse(limit: int = 200) -> dict:
     kinds = {r["kind"]: r["n"] for r in conn.execute(
         f"SELECT p.kind, COUNT(*) AS n FROM profiles p WHERE {where}"
         " GROUP BY p.kind").fetchall()}
-    return {"profiles": _public_rows(rows),
+    return {"found": _public_rows(rows),
             "head_count": sum(kinds.values()),
             # `kind_counts`, not `kinds`: the overlays already put a `kinds`
             # on the wire and it is a list of overlay kinds — one name, one

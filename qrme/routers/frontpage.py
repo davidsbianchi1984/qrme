@@ -54,7 +54,7 @@ def list_reviews(profile_id: str, request: Request) -> dict:
     who = auth.principal(request)
     viewer = who["subject_id"] if who and who["role"] == "interactor" else None
     return {"profile_id": profile_id,
-            "rating": frontpage.rating(profile_id),
+            "rating_summary": frontpage.rating(profile_id),
             "reviews": frontpage.reviews(profile_id, viewer)}
 
 

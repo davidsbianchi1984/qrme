@@ -72,6 +72,11 @@ class AgentTurn(BaseModel):
         default_factory=list, description=(
             "The conversation so far, as `{role, content}` — the console "
             "keeps it, because the agent does not."))
+    shown: str | None = Field(
+        None, max_length=12_000_000, description=(
+            "A picture being shown to the agent for this turn — a photo, "
+            "a screenshot, a grabbed screen — as base64. The platform's "
+            "eyes read it and the account rides into the turn."))
 
 
 @router.get("/studio/agent")
@@ -129,11 +134,36 @@ def authoring_turn(profile_id: str, body: AgentTurn, request: Request) -> dict:
     # review is not putting new work in front of the person contesting it,
     # whether a person typed the change or a model did.
     require_may_publish(profile)
+    # The eye. A picture shown for this turn is read by the platform's
+    # own eyes (qrme/watching.py) and the account travels WITH the words,
+    # labelled for what it is — never passed off as something the person
+    # typed. Refused out loud when it cannot be read: an agent that
+    # quietly ignores what it was shown is agreeing to a lie.
+    said, seen = body.said, None
+    if body.shown:
+        import base64 as _b64
+        from .. import watching
+        try:
+            picture = _b64.b64decode(body.shown, validate=True)
+        except Exception:  # noqa: BLE001 — one honest reason
+            raise HTTPException(422, "the shown picture is not valid base64")
+        if watching.image_kind(picture) is None:
+            raise HTTPException(422, i18n.raised(RuntimeError(
+                "the eyes read JPEG, PNG and WebP pictures — this file "
+                "is none of them")))
+        seen = watching.see_picture(picture) or None
+        if seen is None:
+            raise HTTPException(503, i18n.raised(RuntimeError(
+                "this deployment's seeing door is closed — no vision "
+                "key is configured")))
+        said = (said + "\n\n[what is being shown on the attached picture "
+                       "or screen, as read by the platform's eyes: "
+                + seen + "]")
     provider = llm.provider_for_profile(profile_id,
                                         cloud=request.app.state.cloud)
     try:
         turn = authoring.converse(
-            body.said, body.history, app=request.app, profile_id=profile_id,
+            said, body.history, app=request.app, profile_id=profile_id,
             authorization=request.headers.get("authorization"),
             provider=provider)
     except authoring.AgentError as exc:
@@ -157,6 +187,9 @@ def authoring_turn(profile_id: str, body: AgentTurn, request: Request) -> dict:
                                                     step["refused"])
     turn["said"] = (i18n.STUDIO_REFUSALS[turn["stopped"]]
                     if turn["stopped"] else None)
+    # What the eyes read, returned beside the reply so the person can see
+    # exactly what their agent was told about the picture they showed it.
+    turn["seen"] = seen
     return turn
 
 

@@ -21,11 +21,14 @@ Three rules the rest of the module exists to enforce:
   most-looked-at render QRME produces, so :func:`render` refuses to hand one
   back without the profile's AI watermark attached — and every shipped
   portrait *also* carries the mark burned in. The composited badge covers the
-  surfaces QRME controls; the burned one covers the rest. A file served at
-  ``/portraits/{handle}.webp`` can be hotlinked, embedded, scraped, saved or
-  screenshotted, and in none of those cases does a composited badge survive.
-  Burned by ``tools/mark_portraits.py``, pinned by a checksum manifest so an
-  unmarked replacement cannot arrive quietly.
+  surfaces QRME controls, and it is the only one now. The mark was burned
+  into these files as well, because ``/portraits/{handle}.webp`` can be
+  hotlinked, scraped or saved and a composited badge survives none of that —
+  but every surface draws a face as a circle, which cropped the burned mark
+  in half. It is drawn on top of the sphere instead
+  (``docs/media-provenance.md``), lifted off the files by
+  ``tools/unmark_faces.py``. The checksum manifest stays, so a shipped face
+  cannot be swapped for a different one quietly.
 
 The briefs lean funny on purpose. A stock headshot says "corporate mascot";
 a financial planner wearing far too much gold says "this is a character, and
@@ -69,12 +72,13 @@ ASSET_ROUTE = "/portraits"
 # Photographs, which are a different kind of thing from portraits and live
 # apart from them on purpose.
 #
-# Everything under ``/portraits`` is a synthetic face with the AI mark burned
-# into its pixels, checksummed by ``tools/mark_portraits.py``. A real
-# photograph of a real person is not that, and must not be burned with that
-# mark: the mark says *AI-generated synthetic media*, and stamping it on an
-# authentic photograph is a false statement in the opposite direction from the
-# one the mark exists to prevent.
+# Everything under ``/portraits`` is a synthetic face, checksummed against
+# ``MANIFEST.json``. A real photograph of a real person is not that, and must
+# never be labelled with that mark: the mark says *AI-generated synthetic
+# media*, and putting it on an authentic photograph is a false statement in
+# the opposite direction from the one the mark exists to prevent. The two
+# collections stay apart for that reason, whichever layer the mark is drawn
+# on.
 #
 # Keeping them in one directory would also mean an unburned file sitting in a
 # tree whose manifest check walks every file in it — so the check would either
@@ -105,6 +109,12 @@ ADD_PHOTO = f"{FIGURE_ROUTE}/add-photo.svg"
 # would be worse than a slightly dated word.
 SILHOUETTE = ADD_PHOTO
 
+# Where a shipped 3-D face is served from. Its own mount, like the portraits
+# and the figures, and for the reason the figures got one: a `.glb` sitting in
+# a tree that promises pictures is a file smuggled into the wrong directory,
+# and the first surface to read it as an image would be right to.
+MODEL_ROUTE = "/models"
+
 
 def portraits_dir():
     from pathlib import Path
@@ -121,6 +131,11 @@ def photos_dir():
     return Path(__file__).resolve().parent / "assets" / "photos"
 
 
+def models_dir():
+    from pathlib import Path
+    return Path(__file__).resolve().parent / "assets" / "models"
+
+
 def asset_path(handle: str) -> str | None:
     """The served path for a starter's portrait, or None if it has no file."""
     return (f"{ASSET_ROUTE}/{handle}.webp"
@@ -131,6 +146,12 @@ def photo_path(handle: str) -> str | None:
     """The served path for a real photograph, or None if there is no file."""
     return (f"{PHOTO_ROUTE}/{handle}.webp"
             if (photos_dir() / f"{handle}.webp").is_file() else None)
+
+
+def model_path(handle: str) -> str | None:
+    """The served path for a shipped 3-D face, or None if there is no file."""
+    return (f"{MODEL_ROUTE}/{handle}.glb"
+            if (models_dir() / f"{handle}.glb").is_file() else None)
 
 
 def kind_of(asset: str | None) -> str | None:
@@ -174,15 +195,31 @@ def asset_is_marked(asset: str | None) -> bool:
     """Whether the image itself carries the AI mark, as opposed to needing a
     surface to composite one.
 
-    True only for the burned collection. An owner-attached asset is somebody
-    else's file and nothing here can vouch for its pixels; a photograph under
-    ``/photos`` is deliberately unburned because it is not AI-generated. Both
-    report False, so the surfaces keep drawing their own badge — which is the
-    safe direction to be wrong in, and in the photograph's case is the correct
-    answer rather than a fallback: the *profile* is synthetic and must say so,
-    while the *picture* is authentic and must not claim otherwise.
+    False for everything now, and that is the answer rather than a
+    fallback.
+
+        asked     the AI and VERIFIED labels go on the profile photo
+                  sphere, not on the photo
+        mattered  who draws them once they are not in the pixels
+
+    The shipped collection used to be burned — ``AI`` in the top-right
+    corner of every portrait — so this returned True for it and surfaces
+    skipped their own badge to avoid stacking a second one. Every surface
+    here draws a face as a CIRCLE, and a mark in the corner of a square
+    is what a circle crops: the disclosure shipped cut in half on every
+    screen it appeared on.
+
+    The marks came off the files (``tools/unmark_faces.py``) and are
+    drawn by the surface instead, on the outermost layer over the sphere.
+    So nothing in this product carries its own mark any more, every
+    surface draws one, and the rule is written down in
+    ``docs/media-provenance.md``.
+
+    An owner-attached asset was always False for a different reason and
+    still is: it is somebody else's file and nothing here can vouch for
+    its pixels.
     """
-    return bool(asset) and asset.startswith(f"{ASSET_ROUTE}/")
+    return False
 
 # handle -> the portrait, one line, played straight-faced.
 BRIEFS: dict[str, str] = {
@@ -363,15 +400,63 @@ def catalog() -> list[dict]:
 #: the honest verb is *import*, and the provider's own license keeps
 #: governing what the person may do with their avatar.
 MARKET: tuple[dict, ...] = (
-    # First on purpose — the owner runs his voices and avatars on this
-    # platform's surface and asked for it to lead the list. The pattern is
-    # the market's own: made there, exported as an image, referenced here.
+    # First on purpose, and the only row on this shelf that hands over a
+    # model rather than a picture. It is where the starter faces are being
+    # built, and the shelf's first row is what the picker opens on — which
+    # is the whole of what "default provider" can honestly mean here.
+    #
+    # It is NOT `avatarforge.PROVIDERS`, and the distinction is the point.
+    # That tuple names roads this deployment can *make* a face on, and the
+    # only one that exists is our own sidecar: Avatar SDK's generation API
+    # is their Enterprise tier, so there is no key an operator could set
+    # that would make `QRME_AVATAR_PROVIDER=avatarsdk` do anything but turn
+    # face-making off. A shelf row costs nobody a subscription and is true
+    # today; a provider slot naming a road we cannot drive would be a
+    # button that fails.
+    #
+    # The export is FBX on the credit tier and the console loads `.glb`.
+    #
+    #     asked     do the conversion in the app
+    #     mattered  this row used to end in two Blender menus
+    #
+    # It said: "an FBX export needs converting to .glb first (Blender:
+    # File -> Import -> FBX, then File -> Export -> glTF 2.0, leaving
+    # Shape Keys checked so the mouth survives)". Every word of that was
+    # true and it was still a shelf row with a manual taped to it — the
+    # one row that hands over a MODEL, ending in "go and install a
+    # desktop application". `qrme/modelshop.py` does it now, in the same
+    # tool, so the automatic path cannot produce a different face from
+    # the one those instructions produced.
+    #
+    # The zip is named because that is what pressing export actually
+    # gives you; unpacking it by hand was the other instruction nobody
+    # should need.
+    {"key": "metaperson", "name": "MetaPerson (Avatar SDK)",
+     "how": "At metaperson.avatarsdk.com, build your avatar from a "
+            "photograph and export it. Bring whatever it gave you \u2014 "
+            "the .zip as it downloaded, the model.fbx from inside it, or "
+            "a .glb. An FBX is converted here, and the mouth shapes come "
+            "through with it."},
+    # The owner runs his voices and avatars on this platform's surface and
+    # asked for it to lead the list. The pattern is the market's own: made
+    # there, exported as an image, referenced here.
     {"key": "elevenlabs", "name": "ElevenLabs",
      "how": "In ElevenLabs, open My Avatars, save your avatar's portrait "
             "image, then upload or paste it here."},
-    {"key": "ready_player_me", "name": "Ready Player Me",
-     "how": "Open your avatar at readyplayer.me, use Share/Export to get the "
-            "portrait image or the .glb link, and paste it here."},
+    # Ready Player Me stood second on this list from its first day, and is
+    # gone: Netflix bought the company in December 2025 and shut the public
+    # platform, the avatar creator and the developer APIs on 31 January
+    # 2026. The row is struck rather than left standing, because a shelf
+    # that sends somebody to a dead service is worse than a shelf one row
+    # shorter. Avatars already exported as `.glb` files still work — they
+    # are ordinary files — but nothing served from that company's servers
+    # does, so a face already imported under this name keeps its
+    # provenance and simply cannot be pointed at again.
+    #
+    # It left the standing lesson behind it: the road that MAKES a face
+    # runs on this deployment's own machine (qrme/avatarforge.py), and a
+    # provider is a slot rather than a foundation. A vendor's acquisition
+    # should cost a deployment one environment variable, never a release.
     {"key": "bitmoji", "name": "Bitmoji (Snap)",
      "how": "In the Bitmoji or Snapchat app, share a sticker of your avatar "
             "to save it as an image, then upload or paste it here."},
@@ -415,9 +500,15 @@ MARKET: tuple[dict, ...] = (
 
 IMPORT_SOURCES = {m["key"] for m in MARKET} | {"photos", "capture"}
 
+#: Which row the picker opens on. Stated here rather than left implicit in
+#: the tuple's order, so that reordering `MARKET` without meaning to change
+#: the default is caught by the guard next door instead of shipping.
+DEFAULT_MARKET_SOURCE = "metaperson"
+
 
 def import_avatar(profile_id: str, *, source: str, asset: str,
                   extra: list[str] | None = None, torso: str | None = None,
+                  provider_asset_id: str | None = None,
                   pdi=None) -> dict:
     """Attach an avatar that arrived from outside the starter collection.
 
@@ -436,7 +527,8 @@ def import_avatar(profile_id: str, *, source: str, asset: str,
     conn = db.connect()
     item_id = db.new_id("src")
     provenance = {"avatar_import": source, "asset": asset,
-                  "extra_frames": extra or [], "torso": torso}
+                  "extra_frames": extra or [], "torso": torso,
+                  "provider_asset_id": provider_asset_id}
     import json as _json
     content, pdi_key = _json.dumps(provenance), None
     if pdi is not None:
@@ -473,6 +565,83 @@ def torso_of(profile_id: str) -> str | None:
         "SELECT asset FROM avatar_torsos WHERE profile_id=?",
         (profile_id,)).fetchone()
     return row["asset"] if row else None
+
+
+def _shipped_model(profile_id: str) -> str | None:
+    """The `.glb` that ships with the collection, found by handle.
+
+    A registry row is what a *forged* face gets. A starter has never had
+    one — its portrait is found by handle in the asset tree — so a
+    console asking a starter for its model was told there was none while
+    the file sat on disk beside the picture.
+
+        asked     has somebody forged a face for this profile
+        mattered  does this profile have a face in three dimensions
+
+    A profile can hold more than one handle, so every one it holds is
+    tried rather than only the first the table happens to return.
+    """
+    rows = db.connect().execute(
+        "SELECT handle FROM handles WHERE profile_id=? ORDER BY handle",
+        (profile_id,)).fetchall()
+    for row in rows:
+        found = model_path(row["handle"])
+        if found:
+            return found
+    return None
+
+
+def model_of(profile_id: str) -> str | None:
+    """The `.glb` of this profile's face: the forge's own output when the
+    registry carries one, otherwise the model that ships with the
+    collection.
+
+    The registry wins where it answers, because an owner who forged their
+    own face is not overruled by the shipped one. None whenever neither
+    road has a model, which is most profiles and is not a failure.
+    """
+    from . import avatarreg
+    row = db.connect().execute(
+        "SELECT avatar_ref FROM profiles WHERE id=?",
+        (profile_id,)).fetchone()
+    if row is None:
+        return None
+    if row["avatar_ref"]:
+        try:
+            got = avatarreg.row(row["avatar_ref"])
+        except KeyError:
+            got = None
+        if got is not None:
+            # A retired face keeps its record and stops being shown — the
+            # model follows the portrait out rather than outliving the
+            # takedown, and the shipped one does not stand in for it.
+            if got["status"] != "active":
+                return None
+            forged = got["render_variants"].get("model")
+            if forged:
+                return forged
+    return _shipped_model(profile_id)
+
+
+def speaking_of(profile_id: str) -> str | None:
+    """Where this face's points sit, when it was measured so its mouth
+    could move — read through `avatar_ref` for the same reason `model_of`
+    is, and gone the moment the face is retired. None on a face nobody
+    measured, which is most of them and is not a failure: a still is a
+    perfectly good portrait and always was."""
+    from . import avatarreg
+    row = db.connect().execute(
+        "SELECT avatar_ref FROM profiles WHERE id=?",
+        (profile_id,)).fetchone()
+    if row is None or not row["avatar_ref"]:
+        return None
+    try:
+        got = avatarreg.row(row["avatar_ref"])
+    except KeyError:
+        return None
+    if got["status"] != "active":
+        return None
+    return got["render_variants"].get("speaking")
 
 
 def set_avatar(profile_id: str, asset: str) -> dict:
@@ -618,6 +787,18 @@ def render(profile_id: str) -> dict:
         # anonymous profile for the same reason the face is: a torso is a
         # picture of somebody too.
         "torso": None if anonymous else torso_of(profile_id),
+        # The 3-D form of this same face, forged or shipped — the `.glb` a
+        # seat draws in three dimensions and whose mouth the room's own
+        # audio moves. Withheld from an anonymous profile for
+        # exactly the reason the torso is: a head is a picture of
+        # somebody too, and hiding the face while shipping the model
+        # would be the flag leaking past itself a third time.
+        "model": None if anonymous else model_of(profile_id),
+        # And the measurements that let the photograph itself speak.
+        # Withheld from an anonymous profile for exactly the same reason
+        # the model is: this is where somebody's face sits in their own
+        # picture, which is a picture of somebody.
+        "speaking": None if anonymous else speaking_of(profile_id),
         "watermark": watermark.design(profile_id),
         "likeness": likeness(profile_id),
         # The moving image: how the portrait moves, derived from the

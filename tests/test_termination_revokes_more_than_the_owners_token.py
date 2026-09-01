@@ -56,6 +56,8 @@ from qrme import db, voiceprint, wearables
 
 from tests.test_capabilities import as_owner, make_profile
 
+from . import ratchets
+
 
 def _repo_root() -> Path:
     for d in Path(__file__).resolve().parents:
@@ -151,9 +153,10 @@ def test_the_capability_scan_is_finding_tables(client):
     """A guard on the guard: a scan that stopped matching would report nothing
     left behind and pass on an empty set."""
     found = _capability_tables()
-    assert len(found) >= 7, (
-        f"only {len(found)} profile-scoped capability table(s) found — this "
-        "schema has seven, and the check above is passing on almost nothing")
+    assert len(found) >= ratchets.floor("erase.capability_tables"), (
+        f"only {len(found)} profile-scoped capability table(s) found — the "
+        "registry floor says more exist, and the check above is passing on "
+        "almost nothing")
 
 
 def test_every_exemption_still_names_a_real_table(client):

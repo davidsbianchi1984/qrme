@@ -6540,7 +6540,11 @@ private fun AvaBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
     // held: eight systems is a picker, and re-fetching per tap is what the
     // old block did with an answer it then threw away.
     var shelf by remember { mutableStateOf<List<ApiClient.MarketSource>>(emptyList()) }
-    var chosenSource by remember { mutableStateOf("ready_player_me") }
+    // Empty rather than a named row: this was hard-coded to
+    // "ready_player_me" and that service was shut down, which is how a
+    // picker comes to open on a door nobody can walk through. The
+    // shelf's own first row decides once it arrives.
+    var chosenSource by remember { mutableStateOf("") }
     Column(Modifier.card(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(L10n.t("ava.title", lang), color = Qrme.Txt, fontSize = 16.sp,
             fontWeight = FontWeight.Bold)

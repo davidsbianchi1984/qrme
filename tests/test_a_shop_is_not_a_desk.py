@@ -117,7 +117,7 @@ def test_the_card_carries_offerings_and_the_list_counts_them(client):
               title="Candle-making class", price=60.0,
               availability="made_to_order")
     cards = client.get("/shops").json()
-    assert [c["offerings"] for c in cards] == [2]
+    assert [c["offerings_count"] for c in cards] == [2]
     card = client.get(f"/shops/{shop['id']}").json()
     assert {o["kind"] for o in card["offerings"]} == {"goods", "service"}
     assert card["seller"] == "Marta"

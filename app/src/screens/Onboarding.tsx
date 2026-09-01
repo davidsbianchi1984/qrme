@@ -58,7 +58,7 @@ function AccountGate() {
   const [oauthWaiting, setOauthWaiting] = useState(false);
 
   useEffect(() => {
-    oauthApi.providers().then((r) => setOauthDoors(r.providers)).catch(() => {});
+    oauthApi.providers().then((r) => setOauthDoors(r.signin_providers)).catch(() => {});
   }, []);
 
   async function signInWith(provider: string) {
@@ -412,7 +412,25 @@ function ProfileCreate() {
         verification: { birthdate },
         purpose: "companion_coach",
       });
-      const me = await api.createInteractor({ display_name: "You", birthdate });
+      // The person this browser already has, rather than another one.
+      //
+      //     asked     stepping into a room shows ON AIR seats that are
+      //               nobody
+      //     mattered  onboarding MINTED a person every time it ran
+      //
+      // `accounts.interactor_for` is careful about this — its docstring
+      // says outright that signing in twice must not produce two people
+      // — but it keys on the account, and this call had no account to
+      // key on. So each pass through onboarding made another human
+      // being, seated them, and left them there: a live room came back
+      // with two of them beside the real seat, both drawing ON AIR.
+      //
+      // Signing in already hands this session an interactor. Reuse is
+      // the whole fix for anybody signed in, and for anybody not, the
+      // session is written below and the next pass finds it here.
+      const me = session.interactorId && session.interactorToken
+        ? { id: session.interactorId, token: session.interactorToken }
+        : await api.createInteractor({ birthdate });
       await api.setRelationship(profile.id, me.id, {
         relationship_type: "friend",
         nickname: "me",
@@ -445,7 +463,10 @@ function ProfileCreate() {
       if (profile.withholdings.length > 0) {
         setWithheld(profile.withholdings.map((w) => w.item).join(" · "));
       }
-      const me = await api.createInteractor({ display_name: "You", birthdate });
+      // The same reuse as above, and for the same reason.
+      const me = session.interactorId && session.interactorToken
+        ? { id: session.interactorId, token: session.interactorToken }
+        : await api.createInteractor({ birthdate });
       await api.setRelationship(profile.id, me.id, {
         relationship_type: "friend", nickname: "me", tone: "warm",
       }, profile.owner_token);

@@ -22,7 +22,7 @@ const MIN_KEY = "qrme.lights.min";
 const COLORS = { green: "#43e08a", amber: "#ffb84d", red: "#e0687a" };
 
 function worst(face: WatchFace): keyof typeof COLORS {
-  if (face.summary.stopped > 0 || face.profile.light === "red") return "red";
+  if (face.summary.stopped > 0 || face.chip.light === "red") return "red";
   if (face.summary.needing_assistance > 0) return "amber";
   return "green";
 }
@@ -58,7 +58,9 @@ export function WatchLights() {
       <button className="wl-dot wl-dot-off"
               onClick={load}
               aria-label={tr("lights.unreachable", visitorLang())}
-              title={tr("lights.unreachable", visitorLang())} />
+              title={tr("lights.unreachable", visitorLang())}>
+        <span className="wl-dot-face" />
+      </button>
     );
   }
   const tone = worst(face);
@@ -71,9 +73,11 @@ export function WatchLights() {
 
   if (min) {
     return (
-      <button className="wl-dot" style={{ background: COLORS[tone] }}
+      <button className="wl-dot"
               onClick={() => setMinimized(false)}
-              aria-label="Show agent lights" title="Agent lights" />
+              aria-label="Show agent lights" title="Agent lights">
+        <span className="wl-dot-face" style={{ background: COLORS[tone] }} />
+      </button>
     );
   }
 
@@ -87,7 +91,7 @@ export function WatchLights() {
     <div className="watch-lights" role="status" aria-label="Agent lights"
          style={{ borderColor: COLORS[tone] }}>
       <div className="wl-head">
-        <span className="wl-name">{face.profile.display_name}</span>
+        <span className="wl-name">{face.chip.display_name}</span>
         <button className="wl-min" onClick={() => setMinimized(true)}
                 aria-label="Minimize agent lights">–</button>
       </div>
@@ -99,8 +103,8 @@ export function WatchLights() {
         </div>
       ))}
       <div className="wl-foot">
-        {face.profile.pending_approvals > 0
-          ? `${face.profile.pending_approvals} approval${face.profile.pending_approvals === 1 ? "" : "s"} waiting`
+        {face.chip.pending_approvals > 0
+          ? `${face.chip.pending_approvals} approval${face.chip.pending_approvals === 1 ? "" : "s"} waiting`
           : "all quiet"}
       </div>
     </div>

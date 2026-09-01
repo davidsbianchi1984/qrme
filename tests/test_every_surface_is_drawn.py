@@ -81,6 +81,16 @@ NOT_A_SURFACE = {
     # Voice.tsx it was covered by screen 147; moving files did not make it
     # a destination.
     "LoudnessRail",
+    # The crash boundary. It draws a card, and the card is a failure
+    # notice — the same category as the version guard above, and for the
+    # same reason it is not `undrawn`: a drawing of it would be a picture
+    # of something going wrong, which is not a place anybody navigates to
+    # and not a thing the tour is for. What it is held to instead lives in
+    # `test_a_screen_that_falls_over_does_not_take_the_app.py`: the rest
+    # of the console keeps working, the notice says so, and the failure is
+    # posted to the problem log rather than left as somebody's memory of a
+    # white page.
+    "Boundary",
 }
 
 
@@ -131,8 +141,16 @@ def test_the_manifest_has_not_gone_stale():
 def test_every_declared_screen_exists():
     """A mapping that points at nothing is worse than no mapping, because it
     reads as a promise that the surface was drawn."""
+    # Photographs count, and increasingly they are the only thing that
+    # should: the drawings in this folder were mockups presented as the
+    # product, and the owner's correction was blunt — "they never
+    # rendered that way, only actual snapshots of what the application
+    # looks like". `tools/shoot_screens.py` runs the real console and
+    # photographs it; a `.png` here is one of those, and it satisfies
+    # this check exactly as a drawing did.
     on_disk = {int(m.group(1))
-               for p in (REPO / "docs" / "screens").glob("*.svg")
+               for pattern in ("*.svg", "*.png")
+               for p in (REPO / "docs" / "screens").glob(pattern)
                if (m := re.match(r"(\d+)-", p.name))}
     broken = {}
     for name, status in _manifest().items():

@@ -55,4 +55,4 @@ def thread(profile_id: str, interactor_id: str, request: Request) -> dict:
     profile_or_404(profile_id)
     require_owner_or_interactor(profile_id, interactor_id, request)
     return {"profile_id": profile_id, "interactor_id": interactor_id,
-            "messages": revisions.thread(profile_id, interactor_id)}
+            "thread_turns": revisions.thread(profile_id, interactor_id)}

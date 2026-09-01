@@ -34,13 +34,13 @@ def test_seed_populates_catalog_and_marketplace(client):
     assert len(catalog) == total
     profile_packs = [p for p in catalog if p["audience"] == "profile"]
     assert len(profile_packs) == len(STARTER_PACKS)
-    assert all(p["free"] and p["items"] >= 3 for p in profile_packs)
+    assert all(p["free"] and p["items_count"] >= 3 for p in profile_packs)
 
     # Narrow by industry; detail shows titles, never contents.
     fin = client.get("/packs", params={"industry": "finance"}).json()
     assert len(fin) == 1
     detail = client.get(f"/packs/{fin[0]['id']}").json()
-    assert len(detail["item_titles"]) == fin[0]["items"]
+    assert len(detail["item_titles"]) == fin[0]["items_count"]
     assert "content" not in detail and "contents" not in detail
 
     # Packs surface in the marketplace browse under the pack tag.
@@ -59,11 +59,11 @@ def test_free_install_grows_the_knowledge_base(client, profile_id, interactor_id
                     json={"profile_id": profile_id})
     assert r.status_code == 201, r.text
     out = r.json()
-    assert out["installed_items"] == pack["items"] and out["price_paid"] == 0
+    assert out["installed_items"] == pack["items_count"] and out["price_paid"] == 0
 
     sources = client.get(f"/profiles/{profile_id}/sources").json()
     pack_items = [s for s in sources if s["kind"] == "pack"]
-    assert len(pack_items) == pack["items"]
+    assert len(pack_items) == pack["items_count"]
 
     # The persona's system prompt now carries the pack knowledge…
     from qrme import db, persona
@@ -78,7 +78,7 @@ def test_free_install_grows_the_knowledge_base(client, profile_id, interactor_id
     reply = client.post(f"/profiles/{profile_id}/chat",
                         json={"interactor_id": interactor_id,
                               "message": "how should I season a soup?"}).json()
-    assert reply["provenance"]["grounded_in"]["by_kind"]["pack"] == pack["items"]
+    assert reply["provenance"]["grounded_in"]["by_kind"]["pack"] == pack["items_count"]
 
     # Installed list reflects it; double-install is refused.
     installed = client.get(f"/profiles/{profile_id}/packs").json()
@@ -119,7 +119,7 @@ def test_uninstall_shrinks_the_knowledge_base(client, profile_id):
     client.post(f"/packs/{pack['id']}/install", json={"profile_id": profile_id})
     r = client.delete(f"/profiles/{profile_id}/packs/{pack['id']}")
     assert r.status_code == 200
-    assert r.json()["removed_items"] == pack["items"]
+    assert r.json()["removed_items"] == pack["items_count"]
     sources = client.get(f"/profiles/{profile_id}/sources").json()
     assert not any(s["kind"] == "pack" for s in sources)
     assert client.get(f"/profiles/{profile_id}/packs").json() == []

@@ -254,14 +254,20 @@ def test_friendships_and_relationships_are_separate_tables(client):
 
 # -- the founder profile itself ---------------------------------------------
 
-def test_the_rendered_founder_carries_the_mark_in_its_pixels(client):
-    """An AI rendering of a real face is exactly the case the burned mark
-    exists for, so it gets the same treatment as the other 34 rather than a
-    gentler one."""
+def test_the_rendered_founder_is_marked_like_the_other_thirty_four(client):
+    """An AI rendering of a real face is exactly the case the mark exists
+    for, so it gets the same treatment as the other 34 rather than a
+    gentler one — and the treatment is now a label drawn on the sphere
+    rather than pixels burned into the portrait, because every surface
+    here draws a face as a circle and a circle crops a square's corner.
+
+    `asset_marked: False` is what tells each of those surfaces to draw
+    its own badge. The claim that matters is unchanged: this face is a
+    real person's likeness, it is synthetic, and the grant is revocable."""
     live, rendered = _seeded(client)
     avatar = client.get(f"/profiles/{rendered}/avatar").json()
     assert avatar["asset"] == f"/portraits/{seed.FOUNDER_HANDLE}.webp"
-    assert avatar["asset_marked"] is True
+    assert avatar["asset_marked"] is False
     assert avatar["likeness"]["real_person"] is True
     assert avatar["likeness"]["revocable"] is True
 

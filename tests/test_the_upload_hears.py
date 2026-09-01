@@ -2,18 +2,19 @@
 
 `read_file` told a handed-over video "this deployment holds the bytes
 and cannot turn them into words" — true when it was written, untrue
-since the stack grew ears. The video branch now asks the ears' bytes
-door (`scrape.transcribe_bytes`), and the item carries the words said
-in the recording; without ears the old posture stands unchanged — held,
-said so, never invented.
+since the stack grew ears. The video branch asks the watching
+(`qrme.watching.observe_bytes`, over the sidecar's one-download watch
+door) and the item carries the words said in the recording — and,
+since the eyes, what its frames show; without the machinery the old
+posture stands unchanged — held, said so, never invented.
 
     asked     what does this recording say
     mattered  the words said in it — heard at home, or honestly "held"
 
 A voice memo rides the same branch: an .m4a opens with the same `ftyp`
-box an .mp4 does and sniffs as video. And these are ears, not eyes —
-the picture in the frames stays undescribed either way, exactly as a
-photograph does.
+box an .mp4 does and sniffs as video (and simply has no frames). The
+photograph test below keeps its OWN promise in the new world: a photo
+never reaches a transcriber — the eyes read it, or it stays held.
 """
 
 from __future__ import annotations
@@ -29,9 +30,10 @@ def _never_bytes(data, on_behalf_of=None):
 
 def test_a_video_upload_reads_as_the_words_said(monkeypatch):
     monkeypatch.setattr(
-        scrape, "transcribe_bytes",
-        lambda data, on_behalf_of=None: {"text": "The vault held through the restore drill.",
-                      "duration_seconds": 9.0, "language": "en"})
+        scrape, "watch_bytes",
+        lambda data, on_behalf_of=None: {
+            "text": "The vault held through the restore drill.",
+            "frames": [], "duration_seconds": 9.0, "language": "en"})
     kind, text, was_read = briefcase.read_file(_MP4, "briefing.mp4")
     assert (kind, was_read) == ("video", True)
     assert "restore drill" in text
@@ -66,9 +68,10 @@ def test_a_heard_upload_lands_read_on_the_pairs_list(client, profile_id,
     """The route-level account: the item arrives on the pair's list with
     the words and `read: true` — the same shape a document takes."""
     monkeypatch.setattr(
-        scrape, "transcribe_bytes",
-        lambda data, on_behalf_of=None: {"text": "Two lookouts standing, one letter waiting.",
-                      "duration_seconds": 5.5, "language": "en"})
+        scrape, "watch_bytes",
+        lambda data, on_behalf_of=None: {
+            "text": "Two lookouts standing, one letter waiting.",
+            "frames": [], "duration_seconds": 5.5, "language": "en"})
     made = client.post(
         f"/profiles/{profile_id}/briefcase/file",
         params={"interactor_id": interactor_id, "filename": "memo.m4a"},

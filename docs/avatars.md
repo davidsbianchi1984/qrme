@@ -42,13 +42,17 @@ invisible locally and total in a container.
 beacon page and both camera overlays composite it. That covers every surface
 QRME controls — and none of the ones it does not.
 
-`/portraits/{handle}.webp` is an ordinary file URL. It can be hotlinked,
-embedded in someone else's page, scraped, saved, or screenshotted, and a
-composited badge survives none of that. So every shipped portrait carries the
-mark **burned into the image**, top-right, drawn by
-`tools/mark_portraits.py` and pinned by a SHA-256 manifest that the test suite
-checks. A portrait quietly swapped for an unmarked one fails CI rather than
-shipping a synthetic face with nothing saying so.
+Every shipped portrait used to carry the mark **burned into the image**,
+top-right, because `/portraits/{handle}.webp` is an ordinary file URL that can
+be hotlinked, embedded in someone else's page, scraped, saved or screenshotted,
+and a composited badge survives none of that.
+
+It is **drawn on the sphere** now, top-right, on the outermost layer — every
+surface here draws a face as a circle, and a mark in the corner of a square is
+what a circle crops, so the burned mark shipped sliced in half on every screen.
+`tools/unmark_faces.py` lifted it off the files; the rule and the cost are in
+`docs/media-provenance.md`. The SHA-256 manifest stays and the test suite still
+checks it, so a portrait quietly swapped for a different image fails CI.
 
 Top-right is deliberate: every composited badge in the product sits
 bottom-left (`landing.py`, `BeaconScannerView`, `BeaconScanner.kt`), so the two

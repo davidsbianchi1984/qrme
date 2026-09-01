@@ -274,7 +274,7 @@ def page(profile_id: str, owner: bool = False, feed: bool = True) -> dict:
 
     return {
         "profile_id": profile_id,
-        "theme": {"id": theme_id, **theme},
+        "page_theme": {"id": theme_id, **theme},
         "accent": (row["accent"] if row else None),
         "layout": (row["layout"] if row else DEFAULT_LAYOUT) or DEFAULT_LAYOUT,
         "tagline": (row["tagline"] if row else None),

@@ -19,9 +19,9 @@ the window.
 ## What this does not do
 
 It does not call the Fullscreen API and it does not touch a sensor. Those
-stay a deliberate press — `immersed` in Inside.tsx — because going
-fullscreen and turning a camera on are decisions a person makes rather
-than properties a room has. Filling the window with a room somebody
+stay a deliberate press — today the seat's AR and VR roads, which set the
+viewer's own format — because going fullscreen and turning a camera on
+are decisions a person makes rather than properties a room has. Filling the window with a room somebody
 already walked into is not one of those, and conflating the two is how the
 first version of this talked itself out of the fix.
 
@@ -41,6 +41,14 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[1]
 APP = (REPO / "app/src/App.tsx").read_text(encoding="utf-8")
 INSIDE = (REPO / "app/src/screens/Inside.tsx").read_text(encoding="utf-8")
+#: The Rooms screen. Two controls moved here from inside the room — the
+#: room's name and the microphone lend — because both are things somebody
+#: sets *before* walking in, and both had been reachable only once the
+#: room was already running. The field found them wedged between "Camera
+#: on" and "Background" and asked for them out of that frame. These tests
+#: hold the capability, not the address, so they read both screens.
+ROOMS = (REPO / "app/src/screens/Rooms.tsx").read_text(encoding="utf-8")
+CONSOLE = INSIDE + ROOMS
 CSS = (REPO / "app/src/styles.css").read_text(encoding="utf-8")
 #: The stylesheet with its comments taken out.
 #:
@@ -55,22 +63,54 @@ L10N = (REPO / "app/src/l10n.ts").read_text(encoding="utf-8")
 # -- the room takes the window ----------------------------------------------
 
 def test_the_shell_knows_when_a_room_is_open():
-    assert 'const inRoom = tab === "inside" && Boolean(insideRoom);' in APP, (
+    """And knows it by both doors, not only the console's own.
+
+    This read `tab === "inside" && Boolean(insideRoom)`, which is the
+    room the console opened. A person can also type a room id on the
+    Inside screen and press Go — the same room, reached by the screen's
+    own door — and the shell knew nothing about it, so the drawer stayed
+    over a room somebody was standing in. `standing` is that second
+    door, reported up by the screen.
+    """
+    assert ('const inRoom = tab === "inside" '
+            '&& (standing || Boolean(insideRoom));') in APP, (
         "nothing in the shell distinguishes standing in a room from any "
         "other tab, so the room cannot be given the window")
+    assert "onInside={setStanding}" in APP, (
+        "the screen's own door into a room is not reported to the shell")
     assert '"app" + (inRoom ? " in-room" : "")' in APP
 
 
 def test_the_navigation_steps_out_of_the_way():
+    """The drawer stands down. The way back into it does not.
+
+    All three were hidden outright — the drawer, the button that opens
+    it and the scrim that closes it — which made a room a place with the
+    rest of the app painted over and no way back to it. The owner's
+    correction was specific: "add the menu button at the very top left
+    that uncovers the big menus to the app."
+
+    So the drawer hides only while it is shut, and the button and the
+    scrim stay: they are how it opens and how it shuts.
+    """
     block = CSS[CSS.index(".app.in-room"):]
     block = block[:block.index(".screen.room-place")]
-    for gone in (".sidebar", ".menu-fab", ".menu-scrim"):
-        assert gone in block, (
-            f"{gone} still occupies the window while somebody is standing "
-            "in a room")
+    assert ".sidebar:not(.open)" in block, (
+        "the drawer still occupies the window while somebody is standing "
+        "in a room")
     assert "grid-template-columns: 1fr" in block, (
         "the sidebar's column is still reserved, so hiding it leaves a "
         "232px hole rather than giving the room the width")
+
+    for kept in (".app.in-room .menu-fab", ".menu-scrim"):
+        assert kept in CSS, (
+            f"{kept} is gone, so a room is a place with no way back to "
+            "the rest of the app")
+    fab = CSS[CSS.index(".app.in-room .menu-fab"):]
+    fab = fab[:fab.index("}")]
+    assert "position: fixed" in fab and "top: 12px" in fab \
+        and "left: 12px" in fab, (
+        "the menu button is not pinned to the top left of the room")
 
 
 def test_the_room_does_not_take_the_window():
@@ -220,8 +260,28 @@ def test_the_door_is_translated_like_everything_else():
 
 def test_fullscreen_and_the_sensors_are_still_a_press():
     """The reasoning that kept them a press is still right, and this round
-    must not be read as overturning it."""
-    assert "const [immersed, setImmersed] = useState(false);" in INSIDE
+    must not be read as overturning it.
+
+    Which press changed. This asserted the `immersed` boolean — a
+    dedicated flag behind a "Step in" button under the seats — and that
+    flag is gone because the seat's own AR and VR roads became the door:
+    pressing one sets the viewer's format, and the stage stands while
+    that format holds. The decision is still a person's deliberate press
+    on a control that says what it does; there is simply no second
+    grammar for the same act any more. What this guard holds is that
+    nothing OTHER than those presses opens the stage — the room's kind
+    cannot, walking in cannot, and the stylesheet still never reaches for
+    fullscreen on its own.
+    """
+    assert '{(format === "ar" || format === "vr") && (' in INSIDE, (
+        "the stage no longer stands on the viewer's own chosen format")
+    for press in ('setFormat("ar")', 'setFormat("vr")'):
+        assert INSIDE.count(press) == 1, (
+            f"{press} should have exactly one caller — the road on the "
+            "seat that a person presses")
+    assert "setImmersed" not in INSIDE, (
+        "the second door under the seats is back — one press, one "
+        "grammar")
     block = CSS[CSS.index("/* ---- a room is a place"):]
     block = block[:block.index("@media (max-height")]
     assert "requestFullscreen" not in block
@@ -234,7 +294,7 @@ def test_the_seats_come_first_in_the_room():
     faces below the fold, which was the original complaint and is still
     worth holding — the ordering survived the full-screen build being
     taken back out, because it was never the part that was wrong."""
-    block = CSS[CSS.index(".screen.room-place > .room-stage"):]
+    block = CSS[CSS.index(".screen.room-place > .card.room-stage"):]
     block = block[:block.index("}")]
     assert "order: -1" in block, (
         "the faces are still drawn under whatever the page put above them")
@@ -341,7 +401,7 @@ def test_every_control_in_the_strip_does_something():
     # rather than pinned to the strip.
     for wired in ("api.lendMicInRoom(", "api.takeBackMicInRoom(",
                   "api.advanceRoom("):
-        assert wired in INSIDE, f"the only door is gone entirely: {wired}"
+        assert wired in CONSOLE, f"the only door is gone entirely: {wired}"
 
 
 def test_the_paperclip_takes_photos_video_and_files():
@@ -579,14 +639,14 @@ def test_the_strip_is_a_sibling_of_the_scene_not_a_child():
 
 def test_the_room_reserves_no_guessed_height():
     """The constant is the defect, not its value."""
-    block = CSS[CSS.index(".screen.room-place > .room-stage {"):]
+    block = CSS[CSS.index(".screen.room-place > .card.room-stage {"):]
     block = block[:block.index("}")]
     assert "padding-bottom: 104px" not in block, (
         "the stage is guessing the strip's height again")
 
 
 def test_the_strip_stops_floating_in_a_room():
-    block = CSS[CSS.index(".screen.room-place .rs-chatstrip,"):]
+    block = CSS[CSS.index(".screen.room-place > .card.room-stage .rs-chatstrip,"):]
     block = block[:block.index("}")]
     assert "position: static" in block, (
         "the strip is still an overlay in a room, so it can ride up over "
@@ -610,22 +670,45 @@ def test_the_flat_page_keeps_its_containing_block():
 
 # -- the room's name, from inside it -----------------------------------------
 
-def test_the_room_can_be_named_from_inside_it():
-    """"That's a good place to edit your room name while you're already
-    in, and the button that says Go in — I just need to say Save."" """
-    assert "ins.roomname" in INSIDE
-    assert "api.renameRoom(" in INSIDE, "the Save button saves nothing"
+def test_the_bottom_card_left_the_room():
+    """The naming card used to stay after entry, and the field report
+    retired it: "Get rid of the bottom purple room name — you just
+    could've set that up before they joined." The doorway keeps its card
+    (which room, Go in); the room keeps only the scene."""
+    assert '{inRoom ? tr("ins.roomname"' not in INSIDE, (
+        "the two-job card is back, standing under the scene")
+    assert 'tr("ins.whichroom"' in INSIDE
+    assert 'tr("ins.goin"' in INSIDE, "the way into a room was replaced"
 
 
-def test_the_same_card_does_both_jobs():
-    """Outside a room it asks which one; inside it names the one you are
-    in. One place, because that is where a person already is when they
-    notice the name is wrong."""
-    block = INSIDE[INSIDE.index('{inRoom ? tr("ins.roomname"'):]
-    block = block[:block.index("{!token && (")]
-    assert 'tr("ins.whichroom"' in block
-    assert 'tr("ins.goin"' in block, "the way into a room was replaced"
-    assert 'tr("ins.roomname.save"' in block
+def test_the_room_can_still_be_renamed_and_lent_a_microphone():
+    """Moved twice, deleted never.
+
+    Renaming and lending each have exactly one door. That door was behind
+    your own seat's gear, which put it out of reach until the room was
+    already running — "you just could've set that up before they joined"
+    was the reasoning that put it there, and it is the reasoning that
+    took it out again. Both live on the room's own row on the Rooms
+    screen now, which is where somebody stands before walking in.
+
+    The let-them-talk button is gone from every platform on the field
+    order ("users can just tell them to talk with each other..."); the
+    WORDS are the control now, and the society's chain answers them
+    (the socPaused effect, over api.advanceRoom)."""
+    assert 'tr("ins.roomname.save"' in ROOMS
+    assert "api.renameRoom(" in ROOMS, "the Save button saves nothing"
+    assert 'tr("ins.lendmic"' in ROOMS
+    # And gone from the frame it was pulled out of, not merely copied.
+    assert 'tr("ins.roomname.ph"' not in INSIDE, (
+        "the name box is back in the seat's gear")
+    assert 'tr("ins.lendmic"' not in INSIDE, (
+        "the lend button is back in the seat's gear")
+    assert 'tr("ins.letthemtalk"' not in INSIDE, (
+        "the toggle button is back — the order was to remove it "
+        "on all platforms")
+    assert "socPaused" in INSIDE, "the words-driven chain is gone"
+    assert 'tr("ins.tenpieces"' in INSIDE, (
+        "the governor's pause has no sentence on the screen")
 
 
 def test_the_name_box_shows_the_name_it_will_replace():
@@ -654,7 +737,11 @@ def test_no_control_is_offered_twice():
     # The doors themselves must survive the cards being removed.
     for door in ("api.inviteToRoom(", "api.lendMicInRoom(",
                  "api.takeBackMicInRoom("):
-        assert door in INSIDE, f"{door} left with the card that held it"
+        assert door in CONSOLE, f"{door} left with the card that held it"
+    # And exactly once across the console: a control offered on two
+    # screens is the same defect this test is named for, one screen wider.
+    for once in ("api.lendMicInRoom(", "api.renameRoom("):
+        assert CONSOLE.count(once) == 1, f"{once} is offered twice"
 
 
 def test_lending_says_which_way_it_points():
@@ -665,13 +752,19 @@ def test_lending_says_which_way_it_points():
     # words — the glyph read as "a person in a doorway" on a Windows
     # handheld, the third strip control in two rounds whose meaning
     # lived in a tooltip no phone shows.
-    block = INSIDE[INSIDE.index('className={"rs-round rs-worded lend"'):]
-    block = block[:block.index("</button>")]
+    block = ROOMS[ROOMS.index("api.lendMicInRoom("):]
+    block = block[:block.index("</button>") + 9]
+    # The aria and the class sit above the call; take the whole control.
+    head = ROOMS[:ROOMS.index("api.lendMicInRoom(")]
+    block = head[head.rindex("<button"):] + block
     assert 'tr("ins.takeback"' in block and 'tr("ins.lendmic"' in block
-    assert "aria-pressed={lentByMe}" in block
-    # The label IS the state: both sentences are rendered as the button's
-    # text, not only as aria strings.
-    assert block.count('tr("ins.lendmic"') >= 2 or "lentByMe ? tr(" in block
+    # Which way it points, said out loud rather than left to a tooltip no
+    # phone shows — and read from the room rather than remembered, so a
+    # reload does not offer to lend a microphone that is already lent.
+    assert "aria-pressed={!!lent[r.id]}" in block
+    assert "lent[r.id] ? tr(" in block
+    assert "api.micsInRoom(" in ROOMS, (
+        "the lend state is guessed rather than read")
 
 
 def test_a_lent_microphone_is_visible_across_the_room():

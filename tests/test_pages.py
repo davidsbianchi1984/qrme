@@ -30,7 +30,7 @@ def test_an_untouched_profile_still_has_a_page(client):
     me = make_profile(client, display_name="Plain")
     page = client.get(f"/profiles/{me['id']}/page").json()
     assert page["customised"] is False
-    assert page["theme"]["id"] == pages.DEFAULT_THEME
+    assert page["page_theme"]["id"] == pages.DEFAULT_THEME
     assert page["layout"] == pages.DEFAULT_LAYOUT
     assert page["top_friends"] == []
 
@@ -86,7 +86,7 @@ def test_a_partial_edit_leaves_the_other_fields_alone(client):
                headers=auth_header(me))
 
     page = client.get(f"/profiles/{me['id']}/page").json()
-    assert page["theme"]["id"] == "chrome"
+    assert page["page_theme"]["id"] == "chrome"
     assert page["tagline"] == "Money jokes."
     assert page["about"] == "Thirty years of it."
 

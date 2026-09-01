@@ -60,7 +60,7 @@ public sealed partial class CornerPage : Page
             HomepageSwitch.IsOn = flags.TryGetValue("homepage", out var h) && h;
             var box = await ApiClient.Shared.DmThreads(s.Pid, s.Token);
             ThreadList.ItemsSource = box.Threads.Select(t => new Row(
-                $"{t.OtherId} · {t.OtherName ?? ""} · {t.Messages}")).ToList();
+                $"{t.OtherId} · {t.OtherName ?? ""} · {t.MessagesCount}")).ToList();
         }
         catch { /* leave as-is */ }
         _loading = false;

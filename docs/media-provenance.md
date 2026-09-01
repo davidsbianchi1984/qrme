@@ -30,3 +30,40 @@ scheme:
 
 None of this blocks the v1 release; it is gated on the media-generation feature
 itself, which is a separate, later effort.
+
+## Where the AI and VERIFIED labels are drawn
+
+**The rule: both labels go on top of the profile photo sphere, not into the
+photo.**
+
+They used to be burned into the pixels — `AI` top-right on every portrait,
+`VERIFIED` bottom-right on the one photograph of a real person — so that the
+mark would survive a file being hotlinked, scraped, saved or screenshotted.
+
+Every surface in this product draws a face as a **circle**. A mark painted
+into the corner of a square image is cut in half by that circle, so both
+labels shipped sliced through the middle. A disclosure with its second half
+missing does not read as a disclosure; it reads as a rendering fault, which
+is the opposite of what a disclosure has to do.
+
+So:
+
+- The shipped images carry no label. `tools/unmark_faces.py` lifted the
+  burned ones off and is the record of how.
+- `avatars.asset_is_marked` reports **False** for the whole collection. Every
+  surface already reads that flag to decide whether to draw its own badge, so
+  they all draw one now.
+- The labels are drawn by the surface, on the **outermost layer**, sitting on
+  the sphere's edge in the same corners the burn used to occupy: `AI` at the
+  top-right, `VERIFIED` at the bottom-right. Nothing clips them, and they
+  stay the same size whatever size the face is drawn at.
+- `VERIFIED` is drawn from a fact, never from a filename: a verification
+  record with a named attestor, which is the same bar `mark_verified.py`
+  refused to run without.
+
+**What this costs, stated plainly.** A portrait fetched directly from
+`/portraits/{handle}.webp` no longer carries the disclosure in its bytes. That
+is the gap the burn existed to close, and it is open again by decision. The
+checksum manifest stays, so a shipped face still cannot be swapped for a
+different one without the suite noticing. The C2PA work above is where the
+durable, travels-with-the-file half of this belongs.

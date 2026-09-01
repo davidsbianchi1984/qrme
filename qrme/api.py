@@ -27,6 +27,7 @@ from . import terms as terms_mod
 from .cloud import CloudModelClient
 from .pdi_client import PDIClient
 from .routers import studio
+from .routers import raising as raising_routes
 from .routers import (accounts as account_routes,
                       attention as attention_routes,
                       solitude as solitude_routes,
@@ -55,7 +56,9 @@ from .routers import (accounts as account_routes,
                       summon, tiers as tier_routes, tutorial,
                       visits as visit_routes,
                       viewfinder as viewfinder_routes, wall,
-                      watch, watchparty, watermarks)
+                      hands as hands_routes,
+                      watch, watchparty, watermarks,
+                      xr as xr_routes)
 
 
 #: The unhandled-error path logs here and nowhere else: the traceback
@@ -69,7 +72,7 @@ def create_app(pdi_client: PDIClient | None = None,
     # cannot be added to the product and forgotten at one of its routes,
     # because no route opts in. See qrme/tiers.py for the table and for why
     # browsing stays open.
-    app = FastAPI(title="QRME", version="1.8.9",
+    app = FastAPI(title="QRME", version="2.9.6",
                   dependencies=[Depends(tiers.gate)])
 
     @app.get("/terms")
@@ -171,6 +174,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(dock.router)
     app.include_router(tier_routes.router)
     app.include_router(viewfinder_routes.router)
+    app.include_router(hands_routes.router)
     app.include_router(pages.router)
     app.include_router(studio.router)
     app.include_router(wall.router)
@@ -198,6 +202,8 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(earnings.router)
     app.include_router(organization_routes.router)
     app.include_router(watch.router)
+    app.include_router(xr_routes.router)
+    app.include_router(raising_routes.router)
     app.include_router(watermarks.router)
     app.include_router(avatars.router)
     app.include_router(steering.router)
@@ -344,6 +350,15 @@ def create_app(pdi_client: PDIClient | None = None,
         from fastapi.staticfiles import StaticFiles
         app.mount(avatar_assets.FIGURE_ROUTE,
                   StaticFiles(directory=str(_figures)), name="figures")
+    # The 3-D faces that ship with the collection. A fourth mount for the
+    # same reason as the third: a `.glb` is not a picture, and the surface
+    # that can draw one asks a different question of the asset than the
+    # surface that can only draw a still. `avatars.MODEL_ROUTE`.
+    _models = avatar_assets.models_dir()
+    if _models.is_dir():
+        from fastapi.staticfiles import StaticFiles
+        app.mount(avatar_assets.MODEL_ROUTE,
+                  StaticFiles(directory=str(_models)), name="models")
 
     # User uploads (qrme/media.py): the wall's photos and footage, served
     # read-only from the deployment's own media directory. Created up front

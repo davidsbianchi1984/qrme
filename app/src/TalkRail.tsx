@@ -29,11 +29,16 @@ const OWNERS: RailPanel[] = ["relationship", "controls"];
 
 export function TalkRail({
   profileId, interactorId, lang, ownerToken, interactorToken, onError,
+  onAsk,
 }: {
   profileId: string;
   interactorId: string | null;
   lang: string;
   ownerToken: string | null;
+  /** Where an unowned profile's two owner panels send the person's ask —
+   *  the room's own say. "Every dial on request": the panel does not need
+   *  the owner's key to carry a request the conversation already can. */
+  onAsk?: (words: string) => void;
   interactorToken: string | null;
   onError: (m: string) => void;
 }) {
@@ -47,14 +52,13 @@ export function TalkRail({
   const panels: RailPanel[] =
     (["profile", "memory", "relationship", "controls"] as RailPanel[])
       .filter((p) => {
-        if (OWNERS.includes(p)) return !!ownerToken;
         if (p === "memory") return !!interactorId && !!pairToken;
         return true;
       });
 
   return (
     <>
-      <div className="talk-rail" role="group"
+      <div className="talk-rail" data-screen="198" role="group"
            aria-label={tr("rail.group", lang)}>
         {panels.map((p) => (
           <button key={p}
@@ -98,12 +102,22 @@ export function TalkRail({
                                token={ownerToken} pairToken={pairToken}
                                lang={lang} onError={onError} />
           )}
-          {open === "relationship" && !interactorId && (
+          {open === "relationship" && ownerToken && !interactorId && (
             <p className="muted small">{tr("rail.rel.nobody", lang)}</p>
           )}
           {open === "controls" && ownerToken && (
             <ControlsPanel profileId={profileId} token={ownerToken}
                            lang={lang} onError={onError} />
+          )}
+          {/* "There should be four" — and nobody gets sent to sign in.
+            * For a profile this session cannot hold the key to, the two
+            * owner panels open onto the door that DOES exist for a
+            * visitor: asking. Every dial turns on request, and a request
+            * is a said thing — the input below sends it into the
+            * conversation like anything else said there. */}
+          {OWNERS.includes(open) && !ownerToken && (
+            <AskPanel lang={lang} onAsk={onAsk}
+                      onSent={() => setOpen(null)} />
           )}
         </div>
       )}
@@ -114,6 +128,33 @@ export function TalkRail({
 const GLYPH: Record<RailPanel, string> = {
   profile: "☰", memory: "◔", relationship: "⇄", controls: "🎛️",
 };
+
+function AskPanel({ lang, onAsk, onSent }: {
+  lang: string; onAsk?: (words: string) => void; onSent: () => void;
+}) {
+  const [words, setWords] = useState("");
+  return (
+    <div>
+      <p className="muted small">{tr("rail.ask", lang)}</p>
+      {onAsk && (
+        <div className="rail-ask-row">
+          <input value={words}
+                 placeholder={tr("rail.ask.ph", lang)}
+                 onChange={(e) => setWords(e.target.value)}
+                 onKeyDown={(e) => {
+                   if (e.key === "Enter" && words.trim()) {
+                     onAsk(words.trim()); setWords(""); onSent();
+                   }
+                 }} />
+          <button disabled={!words.trim()}
+                  onClick={() => {
+                    onAsk(words.trim()); setWords(""); onSent();
+                  }}>{tr("rail.ask.send", lang)}</button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 // -- who they are ----------------------------------------------------------
 

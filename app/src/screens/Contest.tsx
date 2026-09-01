@@ -201,7 +201,7 @@ export function Contest({ onPlans }: {
             {audit.vault_backed
               ? tr("con.sealedvault", lang) : tr("con.novault", lang)}
           </p>
-          {audit.events.map((e) => (
+          {audit.audit_events.map((e) => (
             <div key={e.id}>
               <p className="small">
                 {fill(tr("con.event", lang), {

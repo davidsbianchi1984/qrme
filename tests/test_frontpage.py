@@ -60,8 +60,8 @@ def test_the_front_page_carries_the_ai_mark_with_everything_else(client):
     assert page["display_name"] == "Marcus Bell"
     assert page["ai_disclosure"]                # never optional
     assert page["headline"] == "retired fee-only financial planner"
-    assert page["rating"]["count"] == 0
-    assert "no reviews yet" in page["rating"]["note"]
+    assert page["rating_summary"]["count"] == 0
+    assert "no reviews yet" in page["rating_summary"]["note"]
 
 
 def test_the_headline_comes_from_the_persona_not_a_second_field(client):
@@ -115,7 +115,7 @@ def test_the_average_reports_how_many_it_is_an_average_of(client):
                     json={"interactor_id": v["id"], "rating": score},
                     headers=_auth(v["token"]))
 
-    agg = client.get(f"/profiles/{p['id']}/reviews").json()["rating"]
+    agg = client.get(f"/profiles/{p['id']}/reviews").json()["rating_summary"]
     assert agg["count"] == 3
     assert agg["average"] == 4.0
     assert agg["distribution"]["5"] == 1

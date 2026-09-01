@@ -225,7 +225,7 @@ def test_the_scan_reaches_a_real_share_of_the_bindings(
         client, profile_id, interactor_id):
     driven = [f for _, _, f in _drive(client, profile_id, interactor_id)
               if f is not None]
-    assert len(driven) >= 25, (
+    assert len(driven) >= ratchets.floor("swift.driven"), (
         f"only {len(driven)} binding(s) were reachable — the fixture or the "
         f"extractor has stopped working")
 

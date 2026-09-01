@@ -33,7 +33,11 @@ struct AvatarSection: View {
     /// held: eight systems is a picker, and re-fetching per tap is what the
     /// old block did with the answer it then threw away.
     @State private var shelf: [ApiClient.MarketSource] = []
-    @State private var chosenSource = "ready_player_me"
+    /// Empty rather than a named row: this was hard-coded to
+    /// "ready_player_me" and that service was shut down, which is how a
+    /// picker comes to open on a door nobody can walk through. The
+    /// shelf's own first row decides once it arrives.
+    @State private var chosenSource = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -135,9 +139,9 @@ struct AvatarSection: View {
         .task {
             if shelf.isEmpty,
                let s = try? await ApiClient.shared.avatarMarket() {
-                shelf = s.sources
-                if !s.sources.contains(where: { $0.key == chosenSource }),
-                   let first = s.sources.first {
+                shelf = s.skin_sources
+                if !s.skin_sources.contains(where: { $0.key == chosenSource }),
+                   let first = s.skin_sources.first {
                     chosenSource = first.key
                 }
             }
@@ -237,7 +241,7 @@ struct PageSection: View {
                         let p = try await ApiClient.shared.page(
                             id: state.pid!)
                         let t = p.tagline ?? "—"
-                        line = (p.theme?.label ?? "—") + " · " + t
+                        line = (p.page_theme?.label ?? "—") + " · " + t
                     }
                 }.font(.caption).disabled(busy)
                 Button(L10n.t("pg.themes", state.language)) {
@@ -315,7 +319,7 @@ struct SurfaceSection: View {
                     run {
                         let c = try await ApiClient.shared.composition(
                             id: state.pid!)
-                        line = (c.sources ?? []).compactMap(\.name)
+                        line = (c.composition_sources ?? []).compactMap(\.name)
                             .joined(separator: " · ")
                     }
                 }.font(.caption).disabled(busy)

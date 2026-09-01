@@ -1,7 +1,7 @@
 """Eight systems on the shelf, and three clients filing every face as "other".
 
 `GET /avatars/market` has named eight places a person may already have a face
-— Ready Player Me, Bitmoji, Meta, Memoji, Xbox, Zepeto, Mii, and the catch-all
+— Bitmoji, Meta, Memoji, Xbox, Zepeto, Mii, and the catch-all
 — since the avatar deck was written. Each row carries the provider's own export
 route in that provider's words, which is the half somebody actually needs.
 
@@ -56,7 +56,11 @@ CALLERS = {
 #: And the console, which had it right and is here so the check reads the same
 #: question of all four clients rather than treating the phones as a special
 #: case. The odd-client-out is a thing this estate has been bitten by.
-CONSOLE = REPO / "app/src/SkinPicker.tsx"
+#: The deck lives on the Identity screen now — SkinPicker.tsx was the
+#: orphan component a whole deploy night was lost to (finished features
+#: nothing mounted), and it is gone so no guard can assert on an
+#: unmounted file again.
+CONSOLE = REPO / "app/src/screens/Identity.tsx"
 
 
 def test_the_shelf_still_names_more_than_one_system():
@@ -95,7 +99,7 @@ def test_no_client_hard_codes_the_source_it_imports_under():
         # than a variable. Deliberately narrow: the *declaration* of a default
         # in state is fine and every client has one, because a picker has to
         # open on something.
-        for hit in re.finditer(r'["\'](other|ready_player_me|bitmoji)["\']\s*,',
+        for hit in re.finditer(r'["\'](other|bitmoji|meta_avatar)["\']\s*,',
                                text):
             line = text[:hit.start()].count("\n") + 1
             guilty.setdefault(name, []).append(f"{path.name}:{line}")

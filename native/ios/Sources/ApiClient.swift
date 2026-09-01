@@ -282,7 +282,7 @@ struct EarningsStatement: Decodable {
 struct PayoutReceipt: Decodable {
     let payout_id: String
     let total_amount: Double
-    let entries: Int
+    let entries_count: Int
 }
 
 // MARK: Voiceprint (FIG. 800)
@@ -304,7 +304,7 @@ struct VoiceThreshold: Decodable {
 struct VoiceEnrollment: Decodable {
     let samples: Int
     let seconds: Double
-    let turns: Int
+    let turns_count: Int
     let mean_turn_seconds: Double?
     let ready: Bool
     let needs: [String]
@@ -533,7 +533,7 @@ struct CatalogApp: Decodable {
     let needs_first: String
 }
 struct CatalogProvider: Decodable { let provider: String; let label: String; let apps: [CatalogApp] }
-struct AppsCatalog: Decodable { let providers: [CatalogProvider] }
+struct AppsCatalog: Decodable { let app_providers: [CatalogProvider] }
 
 struct AppConn: Decodable {
     let id: String
@@ -621,7 +621,7 @@ struct SummonResult: Decodable {
     let location: String?
     let scans: Int?
     let profile: SummonCard?           // handle / beacon
-    let profiles: [SummonCard]?        // tag
+    let summoned: [SummonCard]?        // tag
 }
 
 struct Pack: Decodable {
@@ -636,7 +636,7 @@ struct Pack: Decodable {
     let free: Bool
     let origin: String                 // "local" | a registry key
     let origin_url: String?            // the federated storefront
-    let items: Int
+    let items_count: Int
     let installs: Int
 }
 
@@ -1132,14 +1132,14 @@ actor ApiClient {
     struct RehearsalRoom: Decodable {
         let id: String
         let scenario: String
-        let turns: Int
+        let turns_count: Int
         let remembered: Bool
     }
 
     struct RehearsalTurn: Decodable {
         let id: String
         let reply: String
-        let turns: Int
+        let turns_count: Int
         let remembered: Bool
     }
 
@@ -2387,7 +2387,7 @@ actor ApiClient {
     }
 
     struct BrowsePool: Decodable {
-        let profiles: [FoundPerson]
+        let found: [FoundPerson]
         let head_count: Int
         let kind_counts: [String: Int]
     }
@@ -2437,7 +2437,7 @@ struct ObjectionTimeline: Decodable {
     let reattested: Bool
     let vault_backed: Bool
     let note: String
-    let events: [ObjectionTimelineEvent]
+    let timeline_events: [ObjectionTimelineEvent]
 }
 
 // MARK: - Shops — storefronts, not desks (qrme/shops.py)
@@ -2451,7 +2451,7 @@ struct ShopCardRow: Decodable, Identifiable {
     let blurb: String?
     let tag: String?
     let seller: String
-    let offerings: Int
+    let offerings_count: Int
 }
 
 struct ShopOfferingRow: Decodable, Identifiable {
@@ -2558,7 +2558,7 @@ extension ApiClient {
 struct DmThreadRow: Decodable, Identifiable {
     let other_id: String
     let other_name: String?
-    let messages: Int
+    let messages_count: Int
     let last_at: String
     var id: String { other_id }
 }
@@ -2911,7 +2911,7 @@ struct ExchangeDeal: Decodable, Identifiable {
     let work: String?
     let industry: String?
     let state: String
-    let items: [ExchangeItem]?
+    let deal_items: [ExchangeItem]?
     let signed_by: [String]?
 }
 
@@ -3251,9 +3251,9 @@ extension ApiClient {
 
 struct AudienceCounts: Decodable {
     let likes: Int?
-    let comments: Int?
+    let comments_count: Int?
     let shares: Int?
-    let subscribers: Int?
+    let subscribers_count: Int?
     let you_liked: Bool?
 }
 
@@ -4063,7 +4063,7 @@ struct ObjectionAudit: Decodable {
         var identity: String { id ?? event ?? "?" }
     }
     let status: String?
-    let events: [Event]?
+    let audit_events: [Event]?
 }
 
 struct LobbySeat: Decodable, Identifiable {
@@ -4199,10 +4199,10 @@ extension ApiClient {
 
     func lobbyRoster(sessionId: String,
                      token: String) async throws -> [LobbySeat] {
-        struct Box: Decodable { let members: [LobbySeat]? }
+        struct Box: Decodable { let seats: [LobbySeat]? }
         let box: Box = try await request(
             "/gaming/sessions/\(sessionId)/lobby", token: token)
-        return box.members ?? []
+        return box.seats ?? []
     }
 
     func leaveLobby(sessionId: String, memberId: String,
@@ -4328,7 +4328,7 @@ struct CampaignCard: Decodable {
     let id: String?
     let title: String?
     let raised: Double?
-    let goal: Double?
+    let goal_amount: Double?
     let status: String?
 }
 
@@ -5277,7 +5277,7 @@ struct TriageOut: Decodable {
 struct TaskGrant: Decodable, Identifiable {
     let id: String
     let token: String
-    let scope: [String]
+    let scopes: [String]
 }
 
 struct TaskOut: Decodable {
@@ -5355,7 +5355,7 @@ extension ApiClient {
     }
 
     struct MarketSource: Decodable { let key: String; let name: String; let how: String }
-    struct MarketShelf: Decodable { let sources: [MarketSource]; let note: String }
+    struct MarketShelf: Decodable { let skin_sources: [MarketSource]; let note: String }
 
     func avatarMarket() async throws -> MarketShelf {
         try await request("/avatars/market")
@@ -6121,7 +6121,7 @@ extension ApiClient {
 struct MemoryRow: Decodable, Identifiable {
     let interactor_id: String
     let interactor_name: String
-    let turns: Int
+    let turns_count: Int
     var id: String { interactor_id }
 }
 
@@ -6135,7 +6135,7 @@ struct MemoryTurn: Decodable, Identifiable {
 
 struct ThreadOut: Decodable {
     struct Turn: Decodable { let role: String?; let content: String? }
-    let messages: [Turn]
+    let thread_turns: [Turn]
 }
 
 struct EngagementCard: Decodable {
@@ -6168,21 +6168,21 @@ struct TransparencyCard: Decodable {
 
 struct ExportOut: Decodable {
     struct Msg: Decodable {}
-    let messages: [Msg]
-    let posts: [Msg]
-    let sources: [Msg]
+    let message_rows: [Msg]
+    let post_rows: [Msg]
+    let source_rows: [Msg]
 }
 
 struct StatsCard: Decodable {
     let sessions: Int
     let memory_entries: Int
     let interactors: Int
-    let sources: Int
+    let sources_count: Int
 }
 
 struct FeedOut: Decodable {
     struct Entry: Decodable {}
-    let posts: [Entry]
+    let feed_posts: [Entry]
     let ranked_on: [String]
     let never_ranked_on: [String]
 }
@@ -6303,7 +6303,7 @@ struct PageTheme: Decodable {
 /// they ever decorated the page at all. A binding narrower than the route
 /// is how a screen ends up unable to show the thing it exists to show.
 struct PageCard: Decodable {
-    let theme: PageTheme?
+    let page_theme: PageTheme?
     let tagline: String?
     let about: String?
     let accent: String?
@@ -6352,7 +6352,7 @@ struct SurfacesCard: Decodable {
 
 struct CompositionCard: Decodable {
     struct Source: Decodable { let name: String?; let share: Double? }
-    let sources: [Source]?
+    let composition_sources: [Source]?
     let policy: String
 }
 
@@ -6401,7 +6401,7 @@ struct WatchFace: Decodable {
         let needing_assistance: Int
         let stopped: Int
     }
-    let profile: Chip
+    let chip: Chip
     let agents: [Agent]
     let summary: Summary
     let haptic: String?
@@ -6464,7 +6464,7 @@ struct OAuthProviderList: Decodable {
         let name: String?
         let configured: Bool?
     }
-    let providers: [Door]
+    let signin_providers: [Door]
 }
 
 struct OAuthStartOut: Decodable {
@@ -6535,7 +6535,7 @@ struct CampaignRow: Decodable, Identifiable {
     let id: String
     let title: String?
     let cause: String?
-    let goal: Double?
+    let goal_amount: Double?
     let raised: Double?
     let donors: Int?
     let status: String?
@@ -6590,7 +6590,7 @@ struct LocalProviderRow: Decodable, Identifiable {
 struct BeaconOverlayCard: Decodable {
     let profile_id: String?
     let display_name: String?
-    let watermark: String?
+    let watermark_line: String?
     let age_wall: Bool?
     let rated: Bool?
     let note: String?
@@ -6599,7 +6599,7 @@ struct BeaconOverlayCard: Decodable {
 /// A page of the stream. `rules` is the server saying, in words a screen can
 /// show, what it will and will not play without being asked.
 struct FeedPage: Decodable {
-    let items: [FeedCard]
+    let cards: [FeedCard]
     let cursor: String?
 }
 
@@ -6685,7 +6685,7 @@ struct ReviewBoard: Decodable {
         let body: String?
     }
     let profile_id: String?
-    let rating: Rating?
+    let rating_summary: Rating?
     let reviews: [Row]
 }
 
@@ -6842,7 +6842,8 @@ struct QuietHoursOut: Decodable {
 }
 
 struct FeedbackOut: Decodable {
-    let rating: String?
+    let score: Double?
+    let cloud_contributed: Bool?
     let engagement: Double?
 }
 

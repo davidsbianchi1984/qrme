@@ -33,8 +33,21 @@ sendProblems(CONSOLE_VERSION);
 // Installable on a phone: the shell is cached so the app opens instantly and
 // survives a brief drop in connectivity. Only over http(s) — the Electron
 // desktop shell runs from file://, where service workers don't apply.
+//
+// The worker is registered under the console's own version. A deploy
+// night taught why: `sw.js` never changed byte-for-byte, so browsers
+// kept the old worker (and its cache) across releases, and every tester
+// had to dig the site out of their browser's settings by hand. A new
+// version is a new URL, which is a new worker, which activates with
+// skipWaiting and drops every cache that is not its own — the eviction
+// is the deploy's job, never the tester's. `updateViaCache: "none"`
+// closes the other half: the worker script itself is never answered
+// from HTTP cache.
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js").catch(() => undefined);
+    navigator.serviceWorker
+      .register(`sw.js?v=${encodeURIComponent(CONSOLE_VERSION)}`,
+                { updateViaCache: "none" })
+      .catch(() => undefined);
   });
 }

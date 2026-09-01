@@ -94,6 +94,38 @@ ANTHROPIC_API_KEY=
 # voice and the say route refuses, naming this variable.
 ELEVENLABS_API_KEY=
 
+# --- optional: rendering a described scene as video ---------------------
+# A scene becomes video at a service that is not this one. All three are
+# needed together: naming a provider without a URL and a key leaves the
+# road built and pointed nowhere, and the console says which one is
+# missing rather than reporting "not configured".
+#
+# PROVIDER is one of: seedance, happyhorse, veo, kling, ltx, luma,
+# runway. URL points at whatever speaks submit-and-poll JSON for it —
+# the aggregators hosting these models already do.
+#
+# It is slow. Thirty seconds of 4K is minutes, not moments, and the
+# console quotes the wait before anybody commits to one; whether to wait
+# is the person's call. It also bills by the second of output, so a
+# deployment that sets these wants a spend limit above them.
+#
+# The key is typed on this box, never pasted into a document.
+QRME_FILM_PROVIDER=
+QRME_FILM_URL=
+QRME_FILM_KEY=
+
+# --- optional: somewhere else to point the hands ------------------------
+# The hands decide their next move with the model the profile chose on
+# the Settings screen, and a provider may decline to work a screen at
+# all — one returns a plain refusal with no content. That is its call to
+# make, and the answer is to point that one job somewhere else. A key
+# here puts its tile on the Settings screen; empty leaves the tile there
+# and unconfigured. None of these are needed for anything but choice.
+OPENAI_API_KEY=
+GEMINI_API_KEY=
+XAI_API_KEY=
+DEEPSEEK_API_KEY=
+
 # --- optional: the vault's real voice (section 8) ------------------------
 # Empty means PDI's resident answers with its honest stub and QRME's
 # offline provider points at loopback. Section 8 measures the box, picks
@@ -520,13 +552,35 @@ procedure, and the procedure looked like the four lines below it. So the
 ```bash
 ssh root@your-host
 
-cd /srv/qrme     && git pull --ff-only
-cd /srv/jim-mini && git pull --ff-only
-cd /srv/pdi      && git pull --ff-only
+cd /srv/qrme     && git checkout main && git pull --ff-only
+cd /srv/jim-mini && git checkout main && git pull --ff-only
+cd /srv/pdi      && git checkout main && git pull --ff-only
 
 cd /srv/qrme
 docker compose -f docker/beta-compose.yml --env-file .env up -d --build
 ```
+
+The `git checkout main` is the fifth repair of the same kind, and it cost
+two releases on the live beta before anybody saw it. `/srv/qrme` was on a
+local branch called `test-motor`, left there after a session on the box.
+`git pull --ff-only` on a checkout that is not on `main` does not fail — it
+fast-forwards the branch it *is* on, prints `Already up to date`, and looks
+exactly like a clean pull. The build then rebuilds the code that is there,
+the container comes up healthy, and the deploy reads as a success from
+beginning to end.
+
+    asked     did the pull succeed
+    mattered  did it pull the thing you are releasing
+
+It surfaced two releases later, in step 5: `sntheticprofiles.com` answering
+`"version":"2.5.0"` while the other two answered `2.7.0`. That check is the
+only thing on this page that could have caught it, and it caught it two
+releases late because nothing between the pull and the health object ever
+mentions a branch.
+
+`git checkout main` is idempotent — on a checkout already on `main` it
+prints one line and changes nothing — so it costs nothing to carry, and it
+lives inside the block for the same reason the `ssh` above it does.
 
 All three, every time, even for a release that changed only one of them —
 the version guard in each console compares itself against the backend
@@ -580,6 +634,18 @@ person pastes contains no change of machine at all.
 **Then run one of the two blocks below, not both.** They are the same three
 checks for two different machines, and which one you want is decided by what
 you are sitting at rather than by what you just deployed to.
+
+**Which of the two you want is decided by the prompt in front of you, not
+by the laptop under your hands.** Both blocks below say "your own machine",
+and that phrasing has now sent the Windows form to a host: a Windows
+machine SSH'd into Ubuntu is sitting at a Unix prompt, `curl.exe` is not a
+program there, and `curl.exe: command not found` reads like a broken
+deploy rather than a wrong room. If the prompt says `root@ubuntu`, you are
+on the host and you want plain `curl` — whatever the machine you are
+typing on happens to be. `exit` first if you meant to check from outside.
+
+    asked     does the page name the Windows form
+    mattered  does it say when you are not in Windows any more
 
 If your own machine runs a Unix shell:
 

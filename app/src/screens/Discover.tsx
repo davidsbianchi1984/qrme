@@ -56,7 +56,7 @@ export function Discover({ onPlans, onVisit }: {
     Promise.all([api.browsePeople(), api.marketplace(t || undefined)])
       .then(([pool, listings]) => {
         const extra = new Map(listings.map((l) => [l.profile_id, l]));
-        const merged: Card[] = pool.profiles.map((p) => {
+        const merged: Card[] = pool.found.map((p) => {
           const l = extra.get(p.profile_id);
           return {
             profile_id: p.profile_id,

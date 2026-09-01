@@ -80,7 +80,7 @@ export function Passing({ onPlans }: { onPlans: () => void }) {
   };
 
   return (
-    <div className="screen">
+    <div className="screen" data-screen="173">
       <h2>{tr("pas.title", lang)}</h2>
       <p className="muted small">{tr("pas.lead", lang)}</p>
 
@@ -214,8 +214,8 @@ export function Passing({ onPlans }: { onPlans: () => void }) {
           <p className="small">
             {fill(tr("pas.pack.row", lang), {
               title: <strong>{published.title}</strong>,
-              n: published.items,
-              s: published.items === 1 ? "" : "s",
+              n: published.items_count,
+              s: published.items_count === 1 ? "" : "s",
               price: published.free ? tr("pas.free", lang)
                 : `${published.price} ${published.currency}`,
               who: published.publisher,

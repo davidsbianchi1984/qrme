@@ -5,7 +5,7 @@ from qrme import catalog
 
 def test_catalog_endpoint(client):
     body = client.get("/connectors/catalog").json()
-    providers = {p["provider"] for p in body["providers"]}
+    providers = {p["provider"] for p in body["app_providers"]}
     assert providers == {"apple", "google", "microsoft", "canva",
                          "glasses", "gaming", "work", "search", "scrape"}
     assert body["provider_count"] == 9

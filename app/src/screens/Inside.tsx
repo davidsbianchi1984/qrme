@@ -1,15 +1,22 @@
 import { useEffect, useRef, useState } from "react";
+import { type Shot } from "../Avatar3D";
 import { isEcho, RECENT_TURNS } from "../echo";
+import { AvatarStage } from "../AvatarStage";
 import { TalkRail } from "../TalkRail";
-import { accountApi, api, getBase, type Avatar, type MicsHere, type RoomFaces,
-         type RoomMsg } from "../api";
+import { accountApi, api, getBase, type Avatar, type RoomFaces,
+         type RoomMsg, type RoomReachProfile } from "../api";
+import { field } from "../fields";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
-import { plainVoice, speakInPieces, type Speaking } from "../spoken";
+import { SeatFilm } from "../SeatFilm";
+import { DEFAULT_FORMAT, setRoomFormat,
+         type RoomFormat } from "../roomFormat";
+import { plainVoice, speakInPieces,
+         type Speaking } from "../spoken";
 import { useSession } from "../store";
 import { putAway, whenPutAway } from "../away";
 import { startWalking } from "../walk";
-import { canRecord, meterWhileSpeaking, recordAsked, recordTurn,
+import { canRecord, meterWhileSpeaking, recordRaw, recordTurn,
          type Recording } from "../roomear";
 
 /**
@@ -174,11 +181,32 @@ function fileWhy(key: string | null | undefined, lang: string): string | null {
   return null;
 }
 
-export function Inside({ onPlans, start = "", onLeave }: {
+/** The table seats eight.
+ *
+ * The same eight `join_room` enforces — "this room is full — eight
+ * seats, and every one taken". Named here so the empty chair knows when
+ * to stop offering, and so a screen that offers a ninth seat and a door
+ * that refuses one cannot drift apart quietly.
+ */
+const SEATS = 8;
+
+export function Inside({ onPlans, start = "", onLeave, onInside }: {
   onPlans: () => void;
   /** A room id handed in by the Rooms screen's join — the field is
    *  prefilled so the person lands in the room they just entered. */
   start?: string;
+  /** Say when this screen is standing in a room, and when it stops.
+   *
+   *     asked     is the console in a room
+   *     mattered  does the CONSOLE know
+   *
+   * `.app.in-room` hides the drawer and the menu button and gives the
+   * window to the room — and `App` only ever set that from the Rooms
+   * screen's own join. Somebody who typed a room id here and pressed Go
+   * was every bit as inside, and got a room with the whole menu bar
+   * still sitting beside it. The screen knows; it just had no way to
+   * say so. */
+  onInside?: (yes: boolean) => void;
   /** Step back out. Required once a room owns the window: the sidebar
    *  that used to be the way out is hidden while somebody is standing in
    *  a room, and a full-screen place with no door is a trap. */
@@ -191,9 +219,18 @@ export function Inside({ onPlans, start = "", onLeave }: {
 
   const [roomId, setRoomId] = useState(start);
   const [transcript, setTranscript] = useState<RoomMsg[]>([]);
-  const [mics, setMics] = useState<MicsHere | null>(null);
   const [seats, setSeats] = useState<
-    { kind: string; id: string; display: string }[]>([]);
+    { kind: string; id: string; display: string;
+      /** What this seat is here for, under the name — the profile's own
+       *  field, as the server holds it. Absent on a person's seat and on
+       *  a profile that has not said, and the tile draws the name alone
+       *  rather than inventing one. */
+      role?: string | null;
+      /** Whether this seat's face is a checked likeness of a real
+       *  person — a verification record with a named attestor, decided
+       *  by the server. The mark used to be burned into the photograph;
+       *  it is drawn on the sphere now, so it needs the fact. */
+      verified?: boolean }[]>([]);
   // Profiles asked in whose owners have not yet said yes — drawn as
   // waiting frames, so the press that invited somebody visibly did
   // something ("they never showed up a new frame").
@@ -202,13 +239,64 @@ export function Inside({ onPlans, start = "", onLeave }: {
   const [draft, setDraft] = useState("");
   // Whose four panels the dock shows, in a room with several profiles.
   const [railFor, setRailFor] = useState<string | null>(null);
+  const [mintedOwner, setMintedOwner] = useState<Record<string, string>>({});
+  // Prefer a seat this session can hold the key for — the person's own
+  // profile first, then any the account has minted for — so the four
+  // panels stand whole by default. "It worked before" was exactly this:
+  // the docked profile used to be one they owned. First-profile stays
+  // the fallback so an all-starter room still docks something.
   const dockedProfile = railFor
+    || seats.find((s) => s.kind === "profile"
+                  && s.id === session.profileId)?.id
+    || seats.find((s) => s.kind === "profile"
+                  && !!mintedOwner[s.id])?.id
     || seats.find((s) => s.kind === "profile")?.id || null;
   // The owner's two panels open only for the profile this session owns —
   // the token is read by the rail's own doors and never speaks into the
   // room (test_knowing_the_id_is_not_being_here names this line).
+  // The account's other profiles count too: a room seating a profile you
+  // own — just not the one this session is standing in — used to hide the
+  // two owner panels, and "two of the buttons are missing" is how that
+  // reads from a phone. The account token can mint an owner capability
+  // for any held profile, so the dock does, once, and shows all four.
+  useEffect(() => {
+    const pid = dockedProfile;
+    if (!pid || pid === session.profileId || mintedOwner[pid]) return;
+    if (!session.accountId || !session.accountToken) return;
+    let gone = false;
+    accountApi.heldProfiles(session.accountId, session.accountToken)
+      .then((held) => {
+        if (gone || !held.profiles.some((r) => r.profile_id === pid)) return null;
+        return accountApi.mintOwnerToken(
+          session.accountId as string, pid, session.accountToken as string);
+      })
+      .then((minted) => {
+        if (!gone && minted?.owner_token) {
+          setMintedOwner((m) => ({ ...m, [pid]: minted.owner_token }));
+        }
+      })
+      .catch(() => undefined);
+    return () => { gone = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dockedProfile, session.profileId, session.accountId,
+      session.accountToken]);
   const dockOwner =
-    dockedProfile === session.profileId ? session.ownerToken || null : null;
+    dockedProfile === session.profileId ? session.ownerToken || null
+      : (dockedProfile && mintedOwner[dockedProfile]) || null;
+  /** The owner token for the seat currently on the stage, or null.
+   *
+   * Hoisted rather than written inline in the stage's props: spread
+   * across four wrapped lines it could not be quoted, and the guard that
+   * holds this screen to the interactor's token reads lines. A rule
+   * enforced by quoting exact shapes needs the shape to fit on one.
+   *
+   * Same idea as `dockOwner` above and the same bound: the owner's token
+   * only where the session owns the profile, and never on a
+   * room-speaking door — the stage draws a face, it does not take a
+   * turn. */
+  const stageOwner = (framedSeat: string | null) =>
+    framedSeat === session.profileId ? session.ownerToken || null
+      : (framedSeat && framedSeat === dockedProfile && dockOwner) || null;
   const [scene, setScene] = useState<RoomFaces | null>(null);
   // The room's own channel, read off the join answer. `chat`, `voice` and
   // `video` present flat; `ar` and `vr` are the two the homepage sells as
@@ -219,7 +307,6 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // The immersive stage. Entered by a press and left by one — never on the
   // room's behalf, because going fullscreen and turning sensors on are
   // decisions a person makes, not properties a room has.
-  const [immersed, setImmersed] = useState(false);
   // VR look direction: degrees of yaw, driven by dragging the stage. The
   // seats sit on a turntable this angle turns.
   const [yaw, setYaw] = useState(0);
@@ -255,6 +342,103 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // has nothing of its own to fetch. Their own profile's is the honest
   // stand-in — with a rule attached, below.
   const [myFace, setMyFace] = useState<Avatar | null>(null);
+  // The seat whose avatar has taken the screen — the second ring, beside
+  // the portrait. Tapping it opens the same full-screen render the avatar
+  // deck uses, wardrobe and all, for your own profile and for the one you
+  // are talking to alike; whether ITS wardrobe opens for you is the
+  // profile's own guest_styling switch, read by the stage itself.
+  const [staged, setStaged] = useState<string | null>(null);
+  /** How THIS person's screen is laid out, and nobody else's.
+   *
+   * "when that video button gets pressed it changed the shape and format
+   * of just the user screen. It doesn't affect everybody else's own chat
+   * room screens... it just renders formatting differently per user." So
+   * it is read from and written to this browser and never sent — a
+   * format on the server would be a value one person writes and another
+   * person's screen reads. See roomFormat.ts.
+   *
+   * It is not the road. `presence_road` decides whether a profile's
+   * replies are rendered into footage at all, on the owner's budget;
+   * this decides only what a viewer draws with what already exists. */
+  // Audio, every time — not the format this browser was last left in.
+  //
+  //     asked     all the chats should start out in audio mode; users can
+  //               choose avatar or video from there
+  //     mattered  the DEFAULT was already audio, and it was never reached
+  //
+  // `roomFormat()` restores the last choice from `localStorage`, so a
+  // person who once looked at an avatar opened every subsequent room in
+  // avatar — for good, and with no memory of having chosen it. The seat
+  // glyphs are the chooser; a room that has already chosen for you is a
+  // room where they read as decoration.
+  //
+  // The cost is that somebody who always wants video picks it each time.
+  // That is the owner's call and this is it. `setRoomFormat` still
+  // records the choice for the life of the screen and for anything that
+  // wants to know what is being looked at.
+  const [format, setFormat] = useState<RoomFormat>(DEFAULT_FORMAT);
+  /** How much of the avatar is in the frame — the forge's own three
+   *  words. One choice for the room rather than one per seat: it says
+   *  how this person likes to look at people, and setting it eight times
+   *  would be a chore, not a choice. */
+  const [framing, setFraming] = useState<Shot>("upper");
+  // A film filling the screen. Kept here rather than in the frame so the
+  // room can hide everything behind it — a takeover the room paints
+  // through is not a takeover.
+  const [filmFull, setFilmFull] = useState(false);
+  /** The seat somebody put in the frame by hand, and it outranks the turn.
+   *
+   *     asked     whose turn is it
+   *     mattered  who did you ASK to look at
+   *
+   * The frame follows whoever spoke last, which is right while you are
+   * listening and wrong the moment you press a face on the rail. Pressing
+   * 🧍 or 🎥 on a seat means "put THEM in the frame", and a stage that
+   * hands it straight back to the last speaker has refused the press.
+   *
+   * Cleared by pressing the same seat again, so the frame goes back to
+   * following the conversation and there is no stuck state with no way
+   * out of it.
+   */
+  const [framed, setFramed] = useState<string | null>(null);
+
+  /** What the synthetic seats can reach, and what this room allows.
+   *
+   * Kept beside the seats rather than fetched when the window opens:
+   * the panel is below a room that takes the whole screen, so it is
+   * reached by scrolling, and a list that starts loading only once
+   * somebody has scrolled to it is a list they scroll to and find
+   * empty. */
+  const [reach, setReach] = useState<RoomReachProfile[]>([]);
+  const [reachOpen, setReachOpen] = useState(false);
+  /** Which seat's lists are open. One at a time: each seat carries the
+   *  whole catalog — 103 connectors across nine providers — and two of
+   *  those unfolded at once is a wall rather than a decision.
+   *
+   *  `openSeat`, not `shown`: `shown` is already the portrait lightbox
+   *  on this screen, and the fourth name collision in this file would
+   *  have compiled and quietly opened a photograph. */
+  const [openSeat, setOpenSeat] = useState<string | null>(null);
+  /** What is typed into each seat's errand box, and what came back.
+   *
+   * Kept per seat rather than one shared field: only one seat is open at
+   * a time, but a half-typed errand should still be there when you open
+   * that seat again rather than having quietly become somebody else's. */
+  const [errand, setErrand] = useState<Record<string, string>>({});
+  const [sent, setSent] = useState<Record<string, string>>({});
+  /** Seats this session has befriended, so the button can say so. Not
+   *  read back from the server: befriending is the owner's list and the
+   *  room does not hold it, so what this remembers is what happened
+   *  here — which is exactly what the button needs to report. */
+  const [friended, setFriended] = useState<Set<string>>(new Set());
+  // The portrait taken to the screen — the OTHER circle of the pair.
+  // "You click to just see the profile photo": no rail, no wardrobe,
+  // just the picture big, and a tap anywhere puts it back.
+  // The portrait, full screen. It keeps the seat as well as the picture:
+  // without the seat there is no way back to that face's avatar, and the
+  // field's ask was for both doors to stay reachable from the big view.
+  const [shown, setShown] =
+    useState<{ src: string; seat: string } | null>(null);
   // Which of the device's cameras. "user" is the selfie side; flipping asks
   // for the other and the effect below re-acquires the stream.
   const [facing, setFacing] = useState<"user" | "environment">("user");
@@ -279,6 +463,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // person's own picture, and the background behind them.
   const bgPicker = useRef<HTMLInputElement | null>(null);
   const hold = useRef<number | null>(null);
+  /** When this seat was last tapped, so two taps inside 350ms can be
+   *  counted as the double tap iOS will not report as one. */
+  const lastTap = useRef(0);
+  /** When a double tap was last counted off the pointer stream, so the
+   *  `dblclick` some browsers synthesise after it is not counted again. */
+  const counted = useRef(0);
   // The local preview. Rendering is the device's, exactly as `overlays` says —
   // what the backend holds is the fact that a camera is on, which is what
   // lets everybody else's client draw the same scene.
@@ -305,6 +495,14 @@ export function Inside({ onPlans, start = "", onLeave }: {
     () => localStorage.getItem("qrme.room.hear") !== "0");
   const heardUpTo = useRef<string | null>(null);
   const speaking = useRef(false);
+  // The ear re-opens when the room falls quiet. A turn that arrives
+  // WHILE a voice is playing hits the queue's guard and is dropped, and
+  // `speaking` is a ref — flipping it re-runs nothing. If the dropped
+  // turn was the last one said, it stayed silent until somebody else
+  // spoke: the field report was an invited profile's first words, seen
+  // on screen and never heard. Bumped at the end of every queue run so
+  // the effect looks again the moment the air is clear.
+  const [earTick, setEarTick] = useState(0);
   // Whose turn is being read aloud RIGHT NOW — an identity (kind + id),
   // for the talking light. Null when no voice is playing.
   const [voicing, setVoicing] = useState<{ kind: string; id: string } | null>(
@@ -323,6 +521,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // stays a decision. Only offered where the browser ships a recogniser
   // (iOS Safari does not), the same bargain the Agent screen struck.
   const [dictating, setDictating] = useState(false);
+  const [dictLevel, setDictLevel] = useState(0);
+  /** The last few seconds of levels, oldest first — the heartbeat line's
+   *  memory. A ref so 10Hz level ticks do not re-render on their own;
+   *  `dictLevel` is the tick that redraws it. */
+  const dictWave = useRef<number[]>([]);
+  const dictDropped = useRef(false);
   const dictation = useRef<{ stop: () => void } | null>(null);
   // Talking INTO a voice room: the same recogniser, but what it hears is
   // said in the room rather than typed into a box. The two cannot run at
@@ -376,6 +580,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // The sibling screen already carries this fix and the comment explaining
   // it. This room never got it.
   const [earFault, setEarFault] = useState<string | null>(null);
+  /** The platform wants a touch before it will open a microphone — iOS
+   *  refuses a start no gesture carried. Not a fault: the person never
+   *  said no, the phone is waiting for their hand. The first touch
+   *  anywhere in the room is that hand. */
+  const [earWaiting, setEarWaiting] = useState(false);
+  const byHand = useRef(false);
   /** Until when the ear disbelieves itself.
    *
    *  Field report, from Windows this time and after the text guard had
@@ -586,6 +796,19 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // Sharing into the room: whatever is typed in the box rides along as
   // the caption, so "look at this" and the picture arrive as one turn.
   const sharePick = useRef<HTMLInputElement>(null);
+  // The paperclip used to jump straight to the operating system's file
+  // dialog. On a phone that is the wrong first question: somebody
+  // attaching a photo in a room means the camera roll or the camera, and
+  // being dropped into a folder tree is a detour through the one place a
+  // picture is hardest to find. So the clip asks first, and each answer
+  // is its own input — `accept` and `capture` are read when the picker
+  // opens, so one input reconfigured on the way to `.click()` gets the
+  // dialog it had a moment ago, which is how a camera button ends up
+  // showing a folder.
+  const photoPick = useRef<HTMLInputElement>(null);
+  const cameraPick = useRef<HTMLInputElement>(null);
+  const videoPick = useRef<HTMLInputElement>(null);
+  const [attaching, setAttaching] = useState(false);
 
   const open = roomId.trim();
   // Whether a room is open, and therefore whether this screen is a PLACE
@@ -623,17 +846,9 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // to be the only reader. Declared with `inRoom` for that reason —
   // this is the third dead-zone crash on this screen from a const
   // sitting below its first use.
-  const lentByMe = mics?.microphones_lent.some((m) => m.interactor_id === me);
-  // The room's name, read off the join answer and editable in place.
+  // The room's name, read off the join answer. Renaming lives on the
+  // Rooms screen now — see the note where the box used to be.
   const [roomName, setRoomName] = useState("");
-  async function saveName() {
-    const want = roomName.trim();
-    if (!want || !token || busy) return;
-    await act(async () => {
-      await api.renameRoom(open, me, want, token);
-      setNote(tr("ins.roomname.saved", lang));
-    })();
-  }
 
   // A voice room is a voice room. Field report, holding a `voice` room up
   // against what it drew: "this is supposed to be audio chat only — we
@@ -650,7 +865,6 @@ export function Inside({ onPlans, start = "", onLeave }: {
   function load() {
     if (!open || !token) return;
     api.roomMessages(open, token).then(setTranscript).catch(setError);
-    api.micsInRoom(open, token).then(setMics).catch(() => setMics(null));
     // The seats. Joining twice is being there once, so the join door
     // doubles as the who-is-here read — and going in renders a scene
     // rather than leaving you on the same form, which a field report
@@ -660,6 +874,8 @@ export function Inside({ onPlans, start = "", onLeave }: {
         setSeats(r.participants);
         setInvited(r.invited ?? []);
         setChannel(r.channel);
+        // The seat's own posture, as the server holds it.
+        setSittingOut(!!r.sitting_out);
         // The name, so the box shows what the room is called rather than
         // an empty field somebody has to guess the current value of.
         setRoomName(r.topic || "");
@@ -668,12 +884,92 @@ export function Inside({ onPlans, start = "", onLeave }: {
     // What is in the seats, and who is wearing what — one call, because a
     // second one would draw a frame with a face and no disclosure on it.
     api.roomFaces(open, token).then(setScene).catch(() => setScene(null));
+    // And what the synthetic seats can reach. A profile whose owner has
+    // connected nothing comes back with empty lists rather than being
+    // left out, so an empty answer here means an empty room, not a
+    // room that failed to say.
+    api.roomReach(open, token)
+       .then((r) => setReach(r.profiles))
+       .catch(() => setReach([]));
   }
   // Loads when you go IN, not when an id appears. The dependency was
   // `[open, token]`, which is exactly the dive this screen was reported
   // for — and it also meant every keystroke in the id box tried to join a
   // half-typed room.
   useEffect(() => { if (entered) load(); }, [entered, open, token]);
+
+  /** Add a seat to your profile's friends, from inside the room.
+   *
+   *     asked     a button for add friend on top of each of the eight
+   *     mattered  somebody may have brought in a profile you have never
+   *               spoken with
+   *
+   * Above the lists rather than on another screen, because the order is
+   * the order somebody actually does it in: meet them here, add them,
+   * then delegate which connections or skills they may use. Your own
+   * profile does the befriending — the door is the owner's, and the
+   * console is signed in as one.
+   */
+  function befriendSeat(profileId: string) {
+    // The owner's door, so the owner's identity — `me` is the
+    // interactor, which is the person in the room and not a list that
+    // can hold anybody.
+    const mine = session.profileId || "";
+    // The friends door is the owner's own list, so it takes the owner's
+    // token — and this is the third and last place on this screen that
+    // may hold one. It never reaches a room-speaking door: a turn in a
+    // room is spoken by a person, and the guard next door names both by
+    // the exact shape of the line.
+    const befriendAs = session.ownerToken || "";
+    if (!mine || !befriendAs || profileId === mine) return;
+    setBusy(true);
+    api.addFriend(mine, profileId, befriendAs)
+       .then(() => setFriended((was) => new Set(was).add(profileId)))
+       .catch(setError)
+       .finally(() => setBusy(false));
+  }
+
+  /** Send what was typed to that seat as an errand.
+   *
+   * The answer is shown on the seat rather than raised as an error,
+   * because both outcomes are things the person asked for and needs to
+   * read: what opened, or which of the two keys is missing. A refusal
+   * here is not a fault — it is the permission model answering.
+   */
+  function sendErrand(profileId: string) {
+    const said = (errand[profileId] || "").trim();
+    if (!token || !open || !said) return;
+    setBusy(true);
+    api.roomErrand(open, profileId, said, token)
+       .then((r) => {
+         setErrand((m) => ({ ...m, [profileId]: "" }));
+         setSent((m) => ({ ...m, [profileId]:
+           r.eyes_only ? tr("ins.errand.watching", lang)
+                       : tr("ins.errand.acting", lang) }));
+       })
+       .catch((e) => setSent((m) => ({
+         ...m, [profileId]: (e && e.message) || String(e) })))
+       .finally(() => setBusy(false));
+  }
+
+  /** Turn the room's key on one box.
+   *
+   * The answer is re-read rather than assumed: a tick is a permission,
+   * and a checkbox that shows itself ticked because it was pressed —
+   * rather than because the room agreed — is the one control in this
+   * panel that must never lie. The owner may have revoked the thing
+   * underneath it a second ago.
+   */
+  function allowReach(profileId: string, kind: "app" | "cap" | "skill",
+                      key: string, allowed: boolean) {
+    if (!token || !open) return;
+    setBusy(true);
+    api.allowRoomReach(open, profileId, kind, key, allowed, token)
+       .then(() => api.roomReach(open, token))
+       .then((r) => setReach(r.profiles))
+       .catch(setError)
+       .finally(() => setBusy(false));
+  }
 
   // The transcript box follows the newest line, unless you have scrolled
   // up to read — then it stays where you put it, and follows again once
@@ -710,6 +1006,58 @@ export function Inside({ onPlans, start = "", onLeave }: {
     }, 4000);
     return () => window.clearInterval(tick);
   }, [open, token]);
+
+  // The society's chain — the words-only replacement for the toggle that
+  // was removed on the field order: "users can just tell them to talk
+  // with each other." When a profile's turn is aimed at another seat,
+  // the conversation is asking to continue, so the room advances itself
+  // one turn at a time — "rotation will continue, even though user isn't
+  // taking his turn, and will instigate a back-and-forth anyways." The
+  // server's governor is the floor: ten unprompted turns apiece, then
+  // {paused} comes back and the room waits for a person. Leaving the
+  // screen clears the timer — on the web, presence in the background is
+  // the seat (kept server-side), not the chatter; browsers throttle
+  // hidden tabs anyway, and pretending otherwise would be a lie.
+  const [socPaused, setSocPaused] = useState(false);
+  const chained = useRef<string | null>(null);
+  /** This seat sitting out of the room's waiting. Server-held (the seat
+   *  row), so a reopened room is the room you left — the state arrives
+   *  with the join and every tap writes it back. */
+  const [sittingOut, setSittingOut] = useState(false);
+
+  async function flipSitOut() {
+    if (!open || !token) return;
+    const want = !sittingOut;
+    try {
+      const r = await api.sitOutOfRoom(open, want, token);
+      setSittingOut(r.sitting_out);
+      // Sitting out un-pauses the room: the governor's hand-back was
+      // waiting for the person who just stepped away, and sitting back
+      // in restores the wait by the same rule on the server.
+      if (r.nobody_waiting) setSocPaused(false);
+    } catch (e) { setError(e); }
+  }
+  useEffect(() => {
+    if (!open || !token || socPaused || transcript.length === 0) return;
+    const newest = transcript[transcript.length - 1];
+    // Aimed profile→profile talk chains itself. While this seat sits
+    // out, so does everything else: the room was told nobody is waiting
+    // for the floor, so an unaimed turn is not the room stopping — it
+    // is the rotation's next seat's turn to speak.
+    if (newest.sender_kind !== "profile") return;
+    if (!newest.aimed_at && !sittingOut) return;
+    if (chained.current === newest.id) return;
+    chained.current = newest.id;
+    const t = window.setTimeout(() => {
+      api.advanceRoom(open, token).then((r) => {
+        if (r.paused) { setSocPaused(true); return; }
+        api.roomMessages(open, token).then(setTranscript)
+          .catch(() => { /* the poll carries it */ });
+      }).catch(() => { /* the poll, or the next action, will say */ });
+    }, 2500);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transcript, open, token, socPaused]);
 
   useEffect(() => {
     api.overlayCatalogue().then((c) => setMasks(c.kinds)).catch(() => setMasks([]));
@@ -777,7 +1125,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // the flat backdrop and says so, rather than presenting a black room as
   // though that were the feature.
   useEffect(() => {
-    if (!(immersed && channel === "ar")) {
+    if (format !== "ar") {
       passStream.current?.getTracks().forEach((t) => t.stop());
       passStream.current = null;
       if (pass.current) pass.current.srcObject = null;
@@ -798,7 +1146,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
       passStream.current?.getTracks().forEach((t) => t.stop());
       passStream.current = null;
     };
-  }, [immersed, channel]);
+  }, [format]);
 
   /** What a seat shows at stage size: the photo somebody chose, a
    *  profile's own portrait with its AI mark, or the initials — the same
@@ -864,6 +1212,31 @@ export function Inside({ onPlans, start = "", onLeave }: {
         && (lastSaid.sender_kind === "user") === (s.kind === "user")
         && lastSaid.sender_id === s.id;
 
+  /** Whose turn the frame is showing.
+   *
+   * The room is a rail of seats and one stage, so exactly one person is
+   * in the frame at a time and something has to decide who. The turn
+   * decides: whoever is speaking, or whoever spoke last while the room
+   * is quiet. `isTalking` already answers both, and answering it once
+   * here means the rail and the frame cannot disagree about who is up.
+   *
+   * A room where nobody has said anything falls to the first seat that
+   * is not you — you are looking at the room, not at yourself.
+   */
+  const onStage = seats.find((x) => x.id === framed)
+    || seats.find((x) => isTalking(x))
+    || seats.find((x) => !(x.kind === "user" && x.id === me))
+    || seats[0] || null;
+
+  // Told, not guessed: the effect runs on the transition, and the
+  // cleanup fires when this screen unmounts by any road — the door, the
+  // drawer, a reload — so the window is never left given away to a room
+  // nobody is standing in.
+  useEffect(() => {
+    onInside?.(inRoom);
+    return () => onInside?.(false);
+  }, [inRoom, onInside]);
+
   const act = (fn: () => Promise<unknown>, said?: string) => async () => {
     setError(null); setNote(null); setBusy(true);
     try { await fn(); if (said) setNote(said); load(); }
@@ -892,8 +1265,17 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // start a second voice over the first.
   useEffect(() => {
     if (!hearAll || speaking.current || transcript.length === 0) return;
-    const start = heardUpTo.current === null ? 0
-      : transcript.findIndex((m) => m.id === heardUpTo.current) + 1;
+    // The first look primes and says nothing: entering a room is not a
+    // request to have the scrollback read aloud — the toggle's own
+    // comment promised this and the null case contradicted it, trying to
+    // speak the whole backlog into a page whose voices the platform had
+    // not granted yet. On an iPhone that wedged the queue for good.
+    if (heardUpTo.current === null) {
+      heardUpTo.current = transcript[transcript.length - 1].id;
+      return;
+    }
+    const start =
+      transcript.findIndex((m) => m.id === heardUpTo.current) + 1;
     const fresh = transcript.slice(Math.max(start, 0))
       .filter((m) => m.sender_kind === "profile" && m.sender_id && m.content);
     heardUpTo.current = transcript[transcript.length - 1].id;
@@ -921,7 +1303,14 @@ export function Inside({ onPlans, start = "", onLeave }: {
             if (why) setEarNote(why);
             roomSpeaks(m.content || "");
             setVoicing({ kind: "profile", id: m.sender_id as string });
-            await plainVoice(m.content || "", lang);
+            try {
+              await plainVoice(m.content || "", lang);
+            } catch {
+              // Even the stand-in refused. Say so where the person is
+              // looking, and keep the queue moving — one silent turn must
+              // not silence the room.
+              setEarNote(tr("ins.ear.blocked", lang));
+            }
             setVoicing(null);
             roomFellQuiet();
             continue;
@@ -939,10 +1328,14 @@ export function Inside({ onPlans, start = "", onLeave }: {
       nowSaying.current = null;
       setVoicing(null);
       roomFellQuiet();
+      // Look again now the room is quiet: anything that arrived during
+      // this run is still past heardUpTo, and this is its turn.
+      setEarTick((t) => t + 1);
     })();
-    // heardUpTo/speaking are refs on purpose: the transcript is the signal.
+    // heardUpTo/speaking are refs on purpose: the transcript is the signal
+    // (and earTick is the queue telling itself the air is clear).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [transcript, hearAll, token]);
+  }, [transcript, hearAll, token, earTick]);
 
   // Switching rooms — or leaving the screen, which runs the same cleanup
   // — silences the old room's queue and its dictation. Without this, the
@@ -1035,6 +1428,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // everything — the liberty being taken is the one being asked for.
   useEffect(() => {
     if (!canDictate) return;
+    byHand.current = false;
     startTalking();
     // `open` in the deps so moving between rooms re-opens the ear
     // in the new one; the teardown above has already closed the old.
@@ -1190,8 +1584,10 @@ export function Inside({ onPlans, start = "", onLeave }: {
                                   nowSaying.current?.stop();
                                 });
       } catch {
-        // The microphone itself was refused. Nothing to retry into.
-        setEarFault(tr("ins.ear.blocked", lang));
+        // The microphone itself was refused. By the person, if a person
+        // pressed; by a phone still waiting for a touch, if nobody did.
+        if (byHand.current) setEarFault(tr("ins.ear.blocked", lang));
+        else setEarWaiting(true);
         wantTalking.current = false;
         setTalking(false);
         return;
@@ -1314,8 +1710,17 @@ export function Inside({ onPlans, start = "", onLeave }: {
     let fatal = false;
     rec.onerror = (e: { error?: string }) => {
       const code = e.error || "";
-      if (code === "not-allowed") {
-        fatal = true; setEarFault(tr("ins.ear.blocked", lang));
+      if (code === "not-allowed" && canRecord()) {
+        // iOS's third mask: a start no gesture carried. The recorded ear
+        // holds the stream the room-entry tap parked (primeMic), so the
+        // fork is the zero-tap way in; if that stream never got parked,
+        // the fork's own refusal raises the tap-anywhere chip below.
+        recorderOnly.current = true;
+        fatal = true;
+      } else if (code === "not-allowed") {
+        fatal = true;
+        if (byHand.current) setEarFault(tr("ins.ear.blocked", lang));
+        else setEarWaiting(true);
       } else if (code === "service-not-allowed" && canRecord()) {
         // The platform refusing its own recogniser — iOS, every time. There
         // is a second ear, so this is a fork in the road rather than a dead
@@ -1329,6 +1734,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
         fatal = true; setEarFault(tr("ins.ear.platform", lang));
       } else if (code === "audio-capture") {
         fatal = true; setEarFault(tr("ins.ear.nomic", lang));
+      } else if (code === "network" && canRecord()) {
+        // iOS wears two masks for the same refusal: `service-not-allowed`
+        // some days and `network` others — the chat overlay met the second
+        // in the field. Same fork, same second ear, nothing lost.
+        recorderOnly.current = true;
+        fatal = true;
       } else if (code === "network") {
         fatal = true; setEarFault(tr("ins.ear.unreachable", lang));
       }
@@ -1382,7 +1793,7 @@ export function Inside({ onPlans, start = "", onLeave }: {
 
   /** The control is now a mute, not a trigger. */
   function flipTalking() {
-    if (talking) stopTalking(); else startTalking();
+    if (talking) stopTalking(); else { byHand.current = true; startTalking(); }
   }
 
   /** The composer's recorded dictation: one take per press, ended by the
@@ -1393,6 +1804,24 @@ export function Inside({ onPlans, start = "", onLeave }: {
    *  no sentence, on the same screen whose talk ear already forked. */
   async function dictRecorded() {
     if (!token || dictation.current) return;
+    // Not over a voice that is already speaking.
+    //
+    // The room plays a profile's answer out of the same device the
+    // microphone is on. Open a take into that and the recording is the
+    // loudspeaker, and the transcriber does what a transcriber does with
+    // a loudspeaker: it locks onto a fragment and repeats it — "Nghei,
+    // Nghei, Nghei…" — which then lands in the room as this person's own
+    // message. `qrme/scrape.looped` catches the nonsense on the way back
+    // in; this stops it being recorded in the first place.
+    //
+    //     asked     did the microphone open
+    //     mattered  did it open onto the person or onto the speaker
+    //
+    // It clears itself: `voicing` is null the moment the answer finishes
+    // playing, and the button beside this is live again with no further
+    // press. Headphones make the whole question moot, which is why the
+    // sentence says so.
+    if (voicing) { setEarFault(tr("ins.ear.speaking", lang)); return; }
     // One capture at a time — iOS mutes the elder stream when a second
     // opens, the lesson the barge-in meter already paid for. Rooms open
     // the standing ear on entry now, so the ear that is already holding
@@ -1405,25 +1834,46 @@ export function Inside({ onPlans, start = "", onLeave }: {
       taping.current?.stop();
       talkRec.current?.stop();
     }
-    let recording: Recording;
+    let recording: { stop: () => void; done: Promise<Blob> };
     try {
-      recording = await recordAsked(me, token);
+      dictWave.current = [];
+      recording = await recordRaw((lvl) => {
+        dictWave.current.push(lvl);
+        if (dictWave.current.length > 72) dictWave.current.shift();
+        setDictLevel(lvl);
+      // A take that never hears a voice ends itself after five quiet
+      // seconds and sends nothing — "cut it off if it doesn't pick up
+      // anything in a few seconds."
+      }, 5000);
     } catch {
       setEarFault(tr("ins.ear.blocked", lang));
       if (wasStanding) startTalking();
       return;
     }
+    dictDropped.current = false;
     dictation.current = { stop: () => recording.stop() };
     setDictating(true);
     try {
-      const text = await recording.done;
-      // "It starts recording, you can stop it, it transcribes and sends
-      // automatically" — the words go as a turn, not into a field
-      // somebody must then find the send for.
-      if (text) await sendText(text);
+      const blob = await recording.done;
+      // The memo IS the message. The share door stores the audio as this
+      // person's bubble and reads the words out of it into the transcript
+      // (the upload-hears rails); advance asks the profile for the turn
+      // that answers them. One voice in, one reply back, no text bubble
+      // pretending the person typed.
+      if (!dictDropped.current && open) {
+        const kind = (blob.type || "audio/webm").split(";")[0];
+        const ext = kind.includes("mp4") ? "m4a"
+          : kind.includes("mpeg") ? "mp3" : "webm";
+        const file = new File([blob], `voice-memo.${ext}`, { type: kind });
+        await api.shareInRoom(open, me, file, token);
+        await api.advanceRoom(open, token);
+        api.roomMessages(open, token).then(setTranscript)
+          .catch(() => { /* the poll will carry it */ });
+      }
     } catch { /* a quiet take sends nothing */ }
     dictation.current = null;
     setDictating(false);
+    setDictLevel(0);
     if (wasStanding) startTalking();
   }
 
@@ -1489,6 +1939,10 @@ export function Inside({ onPlans, start = "", onLeave }: {
   async function sendText(text: string) {
     if (!text.trim() || !token || busy) return;
     personTakesTheTurn();
+    // Speaking is the resume: the governor resets server-side on any
+    // user turn, so the paused note comes down with the same word that
+    // lifts the pause.
+    setSocPaused(false);
     const cut = cutOff.current;
     cutOff.current = null;
     await act(async () => {
@@ -1530,6 +1984,47 @@ export function Inside({ onPlans, start = "", onLeave }: {
     }
     setNote(null);
     load();
+  }
+
+  /** Whether this shell can hand over a live screen. Desktop browsers and
+   *  Android Chrome can; iOS Safari cannot, and there the road is the one
+   *  the phone already has — screenshot, then share it, and the same eyes
+   *  read it. The button simply is not drawn where the door cannot open. */
+  const canGrabScreen = typeof navigator !== "undefined"
+    && !!navigator.mediaDevices?.getDisplayMedia;
+
+  /** One frame of the person's own screen, handed to the room as an
+   *  ordinary share. The browser's own picker chooses the window — nothing
+   *  is captured before the person says which thing — one still is taken,
+   *  the capture stops, and the share door does the rest: moderation,
+   *  storage, and the eyes reading what is on it so the profiles can talk
+   *  about it. A frame, not a stream: showing a screen to the room is a
+   *  statement, not a surveillance feed. */
+  async function grabScreen() {
+    setError(null);
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia(
+        { video: true });
+      const video = document.createElement("video");
+      video.srcObject = stream;
+      video.muted = true;
+      await video.play();
+      // One breath, so the first painted frame is the screen, not black.
+      await new Promise((r) => setTimeout(r, 300));
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth || 1280;
+      canvas.height = video.videoHeight || 720;
+      canvas.getContext("2d")?.drawImage(video, 0, 0);
+      stream.getTracks().forEach((t) => t.stop());
+      const blob: Blob | null = await new Promise((r) =>
+        canvas.toBlob(r, "image/jpeg", 0.85));
+      if (blob) {
+        await shareFiles([new File([blob], "screen.jpg",
+                                   { type: "image/jpeg" })]);
+      }
+    } catch {
+      // The person closed the picker. Their call, not a banner.
+    }
   }
 
   /** A person's own picture, absolute — theirs, and the same in every room
@@ -1614,24 +2109,154 @@ export function Inside({ onPlans, start = "", onLeave }: {
       <div className="rs-chatlog" ref={chatLog} onScroll={watchScroll}>
         {transcript.slice(-30).map((m) => (
           <p key={m.id} className="rs-chatline">
-            <strong>{m.from}</strong> {m.content}
+            <strong>{m.from}</strong>
+            {m.aimed_at && (
+              /* Who the turn was for — the announced aim, worn on the
+                 line the way the speaker said it. */
+              <span className="rs-aim muted">{" → "}{m.aimed_at}</span>
+            )}{" "}
+            {m.content}
             {/* The real attachment, not a filename in an emoji. The strip
                 printed `📎 name` as text, so in a full-screen room a
                 shared picture was a word and a shared document was a word
                 you could not open. Same renderer as the card below. */}
             {attachment(m)}
+            {/* Hear this one turn, in the voice its owner bound.
+             *
+             *     asked     the strip is the record now
+             *     mattered  the press per turn went with the card
+             *
+             * It lived on the transcript card, which was the same turns a
+             * second time and was replaced by the permission window. The
+             * press is not decoration: it is the fallback for every time
+             * the browser refuses autoplay, so deleting the card deleted
+             * the only way to hear a turn on a device that would not
+             * start sound by itself. It belongs on the line, and the line
+             * is here now.
+             *
+             * A press, never autoplay: the phone's rule and the room's are
+             * the same — sound starts on a gesture. */}
+            {m.sender_kind === "profile" && m.sender_id && (
+              <button className="rs-hear" disabled={busy}
+                      aria-label={tr("ins.hear", lang)}
+                      title={tr("ins.hear", lang)}
+                      onClick={() => {
+                        const id = m.sender_id as string;
+                        // Announced before a note of it plays, and through
+                        // the same door the backlog uses. This button once
+                        // put a profile's voice in the room with neither
+                        // echo net watching.
+                        roomSpeaks(m.content || "");
+                        speakInPieces(id, m.content || "", token)
+                          .then((sp) => {
+                            nowSaying.current = sp;
+                            sayingMsg.current = m.id;
+                            setVoicing({ kind: "profile", id });
+                            return sp.done;
+                          })
+                          .then(() => { setVoicing(null); roomFellQuiet(); })
+                          .catch((e) => {
+                            setVoicing(null);
+                            // Quiet again even when the voice failed: a
+                            // flag left standing would deafen the room
+                            // until it was reloaded.
+                            roomFellQuiet();
+                            setError(e);
+                          });
+                      }}>
+                🔊
+              </button>
+            )}
           </p>
         ))}
+        {socPaused && (
+          /* The governor's floor, said in the room's own voice: ten
+             pieces apiece, then the room waits for a person. */
+          <p className="rs-chatline muted">
+            <em>{tr("ins.tenpieces", lang)}</em>
+          </p>
+        )}
       </div>
+      {dictating ? (
+        /* The phone's own shape for a take in progress: cancel, a level
+         * that moves when you do, stop. Lives where the text bar was, so
+         * the words land exactly where you were about to type them. */
+        <div className="rs-chatpill dict-strip">
+          <button className="rs-chatbtn"
+                  aria-label={tr("ins.rec.cancel", lang)}
+                  title={tr("ins.rec.cancel", lang)}
+                  onClick={() => {
+                    dictDropped.current = true;
+                    dictation.current?.stop();
+                  }}>✕</button>
+          {/* The universal recording mark and the heartbeat line: a red
+            * dot that pulses, and the take's own levels drawn as one
+            * moving trace — flat when the room is quiet, spiking with a
+            * voice, so the line itself says "this is being heard." */}
+          <span className="dict-dot" aria-hidden="true"
+                style={{ transform: `scale(${1 + dictLevel * 0.5})` }} />
+          <svg className="dict-wave" viewBox="0 0 144 28"
+               preserveAspectRatio="none" aria-hidden="true">
+            <polyline fill="none" strokeWidth="2"
+              points={(dictWave.current.length
+                ? dictWave.current : [0]).map((v, i, arr) =>
+                  `${(144 * i) / Math.max(arr.length - 1, 1)},` +
+                  `${14 - Math.min(12, v * 26)
+                     * (i % 2 === 0 ? 1 : -1)}`).join(" ")} />
+          </svg>
+          <button className="rs-chatbtn dict-stop"
+                  aria-label={tr("ins.rec.stop", lang)}
+                  title={tr("ins.rec.stop", lang)}
+                  onClick={() => dictation.current?.stop()}>⏹</button>
+        </div>
+      ) : (
+      <>
+      {/* What the clip asks before anything opens. Four answers, and each
+          is the shortest road to the thing it names: the camera roll, the
+          camera itself, video, and — last, because it is the general case
+          rather than the common one — everything else. */}
+      {attaching && (
+        <div className="rs-attach" role="menu">
+          <button role="menuitem" onClick={() => {
+            setAttaching(false); photoPick.current?.click(); }}>
+            🖼 {tr("ins.attach.photos", lang)}
+          </button>
+          <button role="menuitem" onClick={() => {
+            setAttaching(false); cameraPick.current?.click(); }}>
+            📷 {tr("ins.attach.camera", lang)}
+          </button>
+          <button role="menuitem" onClick={() => {
+            setAttaching(false); videoPick.current?.click(); }}>
+            🎞 {tr("ins.attach.video", lang)}
+          </button>
+          <button role="menuitem" onClick={() => {
+            setAttaching(false); sharePick.current?.click(); }}>
+            📁 {tr("ins.attach.files", lang)}
+          </button>
+          <button className="rs-attach-x"
+                  onClick={() => setAttaching(false)}>
+            {tr("ins.attach.cancel", lang)}
+          </button>
+        </div>
+      )}
       <div className="rs-chatpill">
         <button className="rs-chatbtn" disabled={busy || !token}
                 aria-label={tr("ins.share", lang)}
                 title={tr("ins.share", lang)}
-                onClick={() => sharePick.current?.click()}>📎</button>
+                aria-expanded={attaching}
+                onClick={() => setAttaching((v) => !v)}>📎</button>
+        {canGrabScreen && (
+          <button className="rs-chatbtn" disabled={busy || !token}
+                  aria-label={tr("ins.screen", lang)}
+                  title={tr("ins.screen", lang)}
+                  onClick={() => void grabScreen()}>🖥️</button>
+        )}
         {canDictate && (
-          <button className="rs-chatbtn" disabled={busy}
+          <button className="rs-chatbtn" disabled={busy || !!voicing}
                   aria-pressed={dictating}
                   aria-label={tr("ins.dictate", lang)}
+                  title={voicing ? tr("ins.ear.speaking", lang)
+                                 : tr("ins.dictate", lang)}
                   onClick={flipDictation}>🎤</button>
         )}
         <input value={draft} placeholder={tr("ins.type.ph", lang)}
@@ -1641,6 +2266,8 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 aria-label={tr("ins.sayit", lang)}
                 onClick={() => void sendDraft()}>➤</button>
       </div>
+      </>
+      )}
       {/* The round controls screen 103 draws along the bottom.
        *
        *      asked     which buttons does the drawing have
@@ -1930,7 +2557,20 @@ export function Inside({ onPlans, start = "", onLeave }: {
   // screen is for, read by somebody deciding whether to open it — and a
   // person already standing in the room has decided.
   return (
-    <div className={"screen" + (inRoom ? " room-place" : "")}>
+    <div className={"screen" + (inRoom ? " room-place" : "")
+                    + (staged ? " staging" : "")}
+         onPointerDownCapture={() => {
+           if (!earWaiting) return;
+           setEarWaiting(false);
+           byHand.current = true;
+           setEarFault(null);
+           startTalking();
+         }}>
+      {earWaiting && (
+        <button className="ear-tap" type="button">
+          🎙 {tr("ins.ear.tap", lang)}
+        </button>
+      )}
       {inRoom && onAPhone && (
         // The gestures. Both, because neither is discoverable and two
         // chances beat one — the same reasoning the camera controls on
@@ -2102,72 +2742,20 @@ export function Inside({ onPlans, start = "", onLeave }: {
       <Refusal error={error} onPlans={onPlans} />
       {note && <div className="card"><p className="small">{note}</p></div>}
 
-      {/* One card, two jobs, decided by whether you are in a room yet.
-       *
-       *     asked     which room do you want
-       *     mattered  and once you are in it, what is it called
-       *
-       * Outside: the id box and Go in, as before. Inside: the same place
-       * becomes the room's NAME and the button becomes Save — which is
-       * where a person already is when they notice the name is wrong.
-       * Field request: "that's a good place to edit your room name while
-       * you're already in, and the button that says Go in — I just need to
-       * say Save and it'll save the name." */}
-      <div className="card">
-        <h3>{inRoom ? tr("ins.roomname", lang) : tr("ins.whichroom", lang)}</h3>
-        <div className="row">
-          {inRoom ? (
-            <input value={roomName}
-                   onChange={(e) => setRoomName(e.target.value)}
-                   onKeyDown={(e) => { if (e.key === "Enter") void saveName(); }}
-                   placeholder={tr("ins.roomname.ph", lang)}
-                   style={{ flex: 1 }} />
-          ) : (
+      {/* The bottom card belongs to the doorway, not the room. It used
+       * to stay after entry as the naming-and-controls card, and the
+       * field report retired that: "Get rid of the bottom purple room
+       * name — you just could've set that up before they joined." The
+       * name is chosen at creation (Rooms) and still editable behind
+       * your own seat's ⚙️, where the lend and let-them-talk doors
+       * moved too — moved, not deleted: each is still a capability's
+       * one door. Inside a room, the scene owns the whole screen. */}
+      {!inRoom && (
+        <div className="card">
+          <h3>{tr("ins.whichroom", lang)}</h3>
+          <div className="row">
             <input value={roomId} onChange={(e) => setRoomId(e.target.value)}
                    placeholder={tr("ins.roomid.ph", lang)} style={{ flex: 1 }} />
-          )}
-          {inRoom ? (<>
-            <button disabled={busy || !token || !roomName.trim()}
-                    onClick={() => void saveName()}>
-              {tr("ins.roomname.save", lang)}
-            </button>
-
-            {/* The microphone lend, out of the strip on the owner's word
-                ("get rid of the lend button") and into the room's own
-                settings card — moved, not deleted: this is the one door
-                to lending your microphone in a room, and deleting the
-                only door to a capability is a different act from moving
-                it below the fold. In words, both directions, exactly as
-                before. */}
-            <button className={"rs-round rs-worded lend" + (lentByMe ? " live" : "")}
-                    disabled={busy || !token || !me || !open}
-                    aria-pressed={lentByMe}
-                    aria-label={lentByMe ? tr("ins.takeback", lang)
-                                         : tr("ins.lendmic", lang)}
-                    title={tr("ins.micpitch", lang)}
-                    onClick={act(async () => {
-                      if (lentByMe) {
-                        await api.takeBackMicInRoom(open, me, token);
-                      } else {
-                        await api.lendMicInRoom(open, me, token);
-                      }
-                    }, lentByMe ? tr("ins.takenback", lang)
-                                : tr("ins.lent", lang))}>
-              {lentByMe ? tr("ins.takeback", lang) : tr("ins.lendmic", lang)}
-            </button>
-
-            {/* Let it talk first — out of the strip on the same word as
-                the lend ("get rid of the let it talk first button too")
-                and into this card beside it. The one door to hearing the
-                profiles without adding a line, kept rather than deleted. */}
-            <button className="rs-round rs-worded talkers"
-                    disabled={busy || !token || !open}
-                    aria-label={tr("ins.letthemtalk", lang)}
-                    title={tr("ins.letthemtalk", lang)}
-                    onClick={act(async () => {
-                      await api.advanceRoom(open, token);
-                    })}>{tr("ins.letthemtalk", lang)}</button>
-          </>) : (
             <button disabled={busy || !open || !token} onClick={act(async () => {
               setEntered(true);
               load();
@@ -2188,12 +2776,12 @@ export function Inside({ onPlans, start = "", onLeave }: {
             })}>
               {tr("ins.goin", lang)}
             </button>
+          </div>
+          {!token && (
+            <p className="muted small">{tr("ins.signinperson", lang)}</p>
           )}
         </div>
-        {!token && (
-          <p className="muted small">{tr("ins.signinperson", lang)}</p>
-        )}
-      </div>
+      )}
 
       {/* Who is coming, chosen on the way in rather than after arriving.
        *
@@ -2249,12 +2837,132 @@ export function Inside({ onPlans, start = "", onLeave }: {
         // square of whoever spoke last wears the light. The transcript
         // stays below — the scene is where you are, the transcript is
         // what was said.
-        <div className={"card" + (inRoom ? " room-stage" : "")}>
+        // `rs-behind-film` while the frame is full-screen: the room
+        // stops painting its own light and chrome underneath. A
+        // takeover the room paints through is not a takeover.
+        <div className={"card" + (inRoom ? " room-stage" : "")
+                        + (filmFull ? " rs-behind-film" : "")
+                        + (format === "audio" ? " rs-allseats" : "")}>
           {/* In a room the faces ARE the screen, so the heading goes: it
               labels a section on a page, and there is no page left to be a
               section of. Outside a room — the same component, no room open
               — it still says what it is. */}
           {!inRoom && <h3>{tr("ins.scene", lang)}</h3>}
+          {/* The room says what it is and how many are in it, and on the
+              right it says how YOU are seeing it.
+             *
+             *     asked     where does a person choose the format
+             *     mattered  where does a person LOOK to know it
+             *
+             * There were three chips and a sentence above the rail —
+             * Audio, Avatar, Video, then the framings, then "this is
+             * your screen". Four rows of furniture on top of a room, and
+             * the drawing this is held against has none of it: one line
+             * across the top, and a pill on the right saying what you
+             * are looking at.
+             *
+             * The pill reports; it does not switch. The switch is the
+             * two glyphs on each seat, which is the right place for it —
+             * "show me THEM, like this" is one press about one person,
+             * where three chips were a mode change about nobody. */}
+          <div className="rs-bar">
+            <span className="rs-live" aria-hidden="true" />
+            <strong className="rs-roomname">
+              {roomName || tr("ins.scene", lang)}
+            </strong>
+            <span className="rs-count muted">
+              {fill(tr("ins.bar.present", lang),
+                    { count: String(seats.length) })}
+            </span>
+            <span className="rs-mode" aria-live="polite">
+              {format === "video" ? tr("ins.mode.video", lang)
+               : format === "avatar" ? tr("ins.mode.avatar", lang)
+               : tr("ins.mode.audio", lang)}
+            </span>
+          </div>
+
+          {/* The stage: one frame, holding whoever the turn belongs to.
+              The room was a grid where every seat carried its own box.
+              That reads as a wall of small windows and gets worse with
+              every seat — at eight there was nothing big enough to look
+              at. A rail of faces and one frame is the shape a room
+              actually has: you look at whoever is talking, and you can
+              see who else is there.
+
+                  asked     can every seat show its format
+                  mattered  can you SEE the one that matters */}
+          {/* The frame is for a figure or for footage, and for nothing
+              else.
+             *
+             *     asked     what goes in the frame
+             *     mattered  is there anything to put in it
+             *
+             * On the audio road it held a photograph the rail was
+             * already showing, blown up, beside a waveform — the same
+             * face twice on one screen and half the width spent on the
+             * repeat. Crossed out on a screenshot, and rightly:
+             * "technically we don't even need this box over here on the
+             * right for audio."
+             *
+             * Gone, the seats have the whole width, which is where the
+             * eight of them were always going to need to live. */}
+          {format !== "audio" && onStage && (
+            <div className={"room-focus"
+                            + (isTalking(onStage) ? " talking" : "")}>
+              {/* The frame says what it is showing, not who — the rail
+                  already said who, and repeating the name here spends the
+                  widest line on the screen saying it twice. */}
+              <div className="rf-head">
+                <div>
+                  {/* Two formats, not three. The frame is only drawn for
+                      avatar and video — an audio turn has no second thing
+                      to show, and the box for it was removed. The third
+                      branch outlived its keys: `ins.turn.audio` was
+                      deleted with the box and the ternary went on asking
+                      for it, which is a raw key on the screen the moment
+                      anything reaches that branch again. */}
+                  <div className="rf-who">
+                    {format === "video" ? tr("ins.turn.video", lang)
+                                        : tr("ins.turn.avatar", lang)}
+                  </div>
+                  <div className="rf-sub muted small">
+                    {format === "video" ? tr("ins.turn.video.sub", lang)
+                                        : tr("ins.turn.avatar.sub", lang)}
+                  </div>
+                </div>
+                <span className="rf-ai" title={tr("ins.film.ai", lang)}>
+                  {"\u2726 "}{tr("ins.seat.aimark", lang)}
+                </span>
+              </div>
+
+              {format === "video" && (
+                <SeatFilm profileId={onStage.id} display={onStage.display}
+                          talking={isTalking(onStage)} lang={lang}
+                          onFull={setFilmFull} />
+              )}
+
+              {format === "avatar" && (
+                <AvatarStage
+                  inline
+                  framing={framing}
+                  onFraming={setFraming}
+                  onExpand={() => setStaged(onStage.id)}
+                  clear={channel === "ar" || channel === "vr"}
+                  profileId={onStage.id}
+                  token={stageOwner(onStage.id) || session.interactorToken || ""}
+                  owned={!!stageOwner(onStage.id)}
+                  avatar={(onStage.id === session.profileId ? myFace
+                             : aiFaces[onStage.id]) || null}
+                  onClose={() => undefined}
+                  onChanged={(a) => {
+                    setAiFaces((m) => ({ ...m, [onStage.id]: a }));
+                    if (onStage.id === session.profileId) setMyFace(a);
+                  }}
+                  onError={setError} />
+              )}
+
+            </div>
+          )}
           <div className="room-scene">
             {seats.map((s) => {
               const face = scene?.faces[s.id];
@@ -2301,9 +3009,61 @@ export function Inside({ onPlans, start = "", onLeave }: {
                     *
                     * Own seat, always. Somebody else's seat has no controls
                     * of yours on it, and never did. */
-                   onDoubleClick={isMe
-                     ? () => setReveal((v) => !v) : undefined}
-                   onPointerDown={isMe ? () => {
+                   /* Two gestures, and on a phone neither one arrived.
+                    *
+                    *     asked     long press or double tap reveals the
+                    *               buttons or hides them
+                    *     mattered  `dblclick` is a MOUSE event
+                    *
+                    * Safari on iOS owns the double tap — it is the zoom
+                    * gesture — and does not synthesise `dblclick` on a
+                    * plain div for it. So the handler below was dead on
+                    * the one device the report came from, and the hold
+                    * beside it went the same way for its own reason: a
+                    * long press on an element wrapping a picture raises
+                    * iOS's own copy-and-save callout, which cancels the
+                    * pointer stream before 550ms is up. Both doors, shut,
+                    * on a screen whose third door — the gear — a later
+                    * rule had set to `display: none`.
+                    *
+                    * The double tap is counted here instead, off the
+                    * pointer stream that every platform does send, and
+                    * `onPointerCancel` now clears the hold the way the
+                    * other three exits do. The CSS beside `.rs-camtile`
+                    * turns off the zoom gesture and the callout so the
+                    * browser stops taking the press away. `onDoubleClick`
+                    * stays for a mouse, where it has always worked and
+                    * where no pointer double-count should replace it. */
+                   /* One gesture must not be counted twice.
+                    *
+                    * A browser that DOES synthesise `dblclick` off a touch
+                    * stream — Chromium does, Safari sometimes — now has
+                    * two handlers for one double tap: the count below
+                    * turns the panel on and this one turns it straight
+                    * back off. Measured on a touch pointer: two taps, no
+                    * change, which reads exactly like a dead gesture and
+                    * is the opposite. So a pointer-counted tap stamps the
+                    * clock, and the synthesised `dblclick` that follows it
+                    * inside 700ms is the same press arriving twice. */
+                   onDoubleClick={isMe ? () => {
+                     if (Date.now() - counted.current < 700) {
+                       counted.current = 0;
+                       return;
+                     }
+                     setReveal((v) => !v);
+                   } : undefined}
+                   onPointerDown={isMe ? (e) => {
+                     const now = e.timeStamp || Date.now();
+                     const quick = now - lastTap.current < 350;
+                     lastTap.current = now;
+                     if (quick) {
+                       if (hold.current) window.clearTimeout(hold.current);
+                       hold.current = null;
+                       lastTap.current = 0;
+                       counted.current = Date.now();
+                       setReveal((v) => !v);
+                       return;
+                     }
                      hold.current = window.setTimeout(
                        () => setReveal((v) => !v), 550);
                    } : undefined}
@@ -2311,10 +3071,44 @@ export function Inside({ onPlans, start = "", onLeave }: {
                      if (hold.current) window.clearTimeout(hold.current);
                      hold.current = null;
                    } : undefined}
+                   onPointerCancel={isMe ? () => {
+                     if (hold.current) window.clearTimeout(hold.current);
+                     hold.current = null;
+                   } : undefined}
                    onPointerLeave={isMe ? () => {
                      if (hold.current) window.clearTimeout(hold.current);
                      hold.current = null;
                    } : undefined}>
+                {/* The sit-out, on your own frame's left corner. The field
+                    ask: "a sit out button for the user orchestrating
+                    chats... that stops rotation and allows the other
+                    synthetic profiles to go back-and-forth while your spot
+                    sits out, and un-tap that button to sit back in."
+                    What sits out is the WAITING, not the seat — you still
+                    read every turn, still hold the microphone, and one
+                    word puts you back in the middle of it. */}
+                {isMe && (
+                  <button className={"rs-sitout" + (sittingOut ? " out" : "")}
+                          type="button"
+                          aria-pressed={sittingOut}
+                          title={sittingOut ? tr("ins.sitin.hint", lang)
+                                            : tr("ins.sitout.hint", lang)}
+                          aria-label={sittingOut ? tr("ins.sitin", lang)
+                                                 : tr("ins.sitout", lang)}
+                          onClick={(e) => { e.stopPropagation();
+                                            void flipSitOut(); }}
+                          onDoubleClick={(e) => e.stopPropagation()}
+                          onPointerDown={(e) => e.stopPropagation()}>
+                    {/* The word, not a transport glyph. ▶/⏸ read as play
+                        and pause over a photograph — the field said so:
+                        "the play and pause button above my profile photo,
+                        it was supposed to be sit in and sit out." The
+                        label is the action about to happen, which is why
+                        it says "Sit out" while you are seated. */}
+                    {sittingOut ? tr("ins.sitin", lang)
+                                : tr("ins.sitout", lang)}
+                  </button>
+                )}
                 {/* What is behind the person, drawn first so everything
                     else sits on top of it. Never on a seat showing a live
                     camera: cutting somebody out of their own video frame
@@ -2393,13 +3187,47 @@ export function Inside({ onPlans, start = "", onLeave }: {
                   </>
                 ) : s.kind !== "user" && aiFaces[s.id]?.asset
                     && !aiFaces[s.id]?.placeholder ? (
-                  // The profile's own portrait, in the same circle a person's
-                  // photo uses. The AI mark on this tile is the disclosure the
-                  // avatar route insists travels with the picture.
-                  <img className="rs-photo" alt={s.display}
-                       src={(aiFaces[s.id].asset as string).startsWith("http")
-                              ? (aiFaces[s.id].asset as string)
-                              : getBase() + aiFaces[s.id].asset} />
+                  // ONE circle, and the roads out of it sit beside the
+                  // tile rather than inside it.
+                  //
+                  //     asked     can a seat reach its avatar and its film
+                  //     mattered  can it do that in a 250px rail
+                  //
+                  // This drew two equal captioned circles side by side —
+                  // "Audio" and "Avatar" — which was the right idea at
+                  // full width and fell apart the moment the seats became
+                  // a rail: two circles, two captions and a name inside a
+                  // quarter of the old width, so the second caption
+                  // clipped to "Avata" and the tile read as a mistake.
+                  // Photographed on a phone and sent back with four
+                  // words: "I don't like the way it looks."
+                  //
+                  // A person is ONE face. The formats are things you can
+                  // do with them, and things you can do belong beside the
+                  // face, not competing with it for the middle of the
+                  // tile.
+                  <button className="rs-circle-btn rs-solo" type="button"
+                          aria-label={s.display}
+                          onClick={(e) => { e.stopPropagation();
+                            setShown({
+                              seat: s.id,
+                              src: (aiFaces[s.id].asset as string)
+                                .startsWith("http")
+                                ? (aiFaces[s.id].asset as string)
+                                : getBase() + aiFaces[s.id].asset,
+                            }); }}>
+                    <img className="rs-photo" alt={s.display}
+                         src={(aiFaces[s.id].asset as string)
+                                .startsWith("http")
+                                ? (aiFaces[s.id].asset as string)
+                                : getBase() + aiFaces[s.id].asset} />
+                  </button>
+                ) : behind ? (
+                  // A chosen background with nothing standing in front of
+                  // it IS the seat's face. The silhouette circle used to
+                  // sit on top — "the whole circle needs to disappear so
+                  // that only the background shows."
+                  null
                 ) : (
                   // A person with no picture yet is a silhouette, not a
                   // letter. "Y" for *You* read as a monogram nobody chose —
@@ -2415,6 +3243,173 @@ export function Inside({ onPlans, start = "", onLeave }: {
                   </span>
                 )}
                 <span className="rs-name">{s.display}</span>
+                {/* What they are here FOR, under the name.
+                    "Dr. Amara Osei" and "Dr. Amara Osei · Healthcare"
+                    answer different questions, and a room of specialists
+                    where nobody says what they specialise in makes the
+                    reader open three profiles to find out. A person's own
+                    seat says "You"; a profile that has not named a field
+                    draws the name alone rather than a made-up title. */}
+                <span className="rs-role">
+                  {s.kind === "user" && s.id === me
+                    ? tr("ins.seat.you", lang)
+                    : field(s.role, lang)}
+                </span>
+                {/* The two roads out of a seat, beside the face rather
+                    than competing with it for the middle of the tile.
+                    Each one puts THIS seat in the frame and sets the
+                    frame's format, so pressing a face is "show me them,
+                    like this" — one press, one outcome. Pressing the
+                    same one again lets go, and the frame goes back to
+                    following whoever is talking. */}
+                {(
+                  <div className="rs-side">
+                    <button type="button" className={"rs-road"
+                              + (framed === s.id && format === "avatar"
+                                   ? " lit" : "")}
+                            aria-label={tr("ins.format.avatar", lang)}
+                            title={tr("ins.format.avatar", lang)}
+                            aria-pressed={framed === s.id
+                                          && format === "avatar"}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (framed === s.id && format === "avatar") {
+                                // Pressing the lit road puts the room
+                                // back to voices and photographs.
+                                //
+                                //     asked     how do you pin a seat
+                                //     mattered  how do you get BACK
+                                //
+                                // With the chip row gone these two glyphs
+                                // are the only way the format moves, so
+                                // releasing had to mean something. It
+                                // used to clear the pin and leave the
+                                // room in avatar — a door with no handle
+                                // on the inside.
+                                setFramed(null);
+                                setFormat("audio"); setRoomFormat("audio");
+                              } else {
+                                setFramed(s.id);
+                                setFormat("avatar"); setRoomFormat("avatar");
+                              }
+                            }}
+                            onDoubleClick={(e) => e.stopPropagation()}
+                            onPointerDown={(e) => e.stopPropagation()}>
+                      {"\u{1F9CD}\u{1F3FD}"}
+                    </button>
+                    <button type="button" className={"rs-road"
+                              + (framed === s.id && format === "video"
+                                   ? " lit" : "")}
+                            aria-label={tr("ins.format.video", lang)}
+                            title={tr("ins.format.video", lang)}
+                            aria-pressed={framed === s.id
+                                          && format === "video"}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (framed === s.id && format === "video") {
+                                setFramed(null);
+                                setFormat("audio"); setRoomFormat("audio");
+                              } else {
+                                setFramed(s.id);
+                                setFormat("video"); setRoomFormat("video");
+                              }
+                            }}
+                            onDoubleClick={(e) => e.stopPropagation()}
+                            onPointerDown={(e) => e.stopPropagation()}>
+                      {"\u{1F3A5}"}
+                    </button>
+                    {/* The other two roads. Letters, not pictures: a
+                        standing figure IS the avatar and a movie camera
+                        IS the video, but nothing pictures "this room,
+                        over the room you are standing in" without being
+                        a riddle. */}
+                    <button type="button" className={"rs-road"
+                              + (framed === s.id && format === "ar"
+                                   ? " lit" : "")}
+                            aria-label={tr("ins.format.ar", lang)}
+                            title={tr("ins.format.ar", lang)}
+                            aria-pressed={framed === s.id
+                                          && format === "ar"}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (framed === s.id && format === "ar") {
+                                setFramed(null);
+                                setFormat("audio"); setRoomFormat("audio");
+                              } else {
+                                setFramed(s.id);
+                                setFormat("ar"); setRoomFormat("ar");
+                              }
+                            }}
+                            onDoubleClick={(e) => e.stopPropagation()}
+                            onPointerDown={(e) => e.stopPropagation()}>
+                      <span className="rs-tag">{tr("ins.format.ar.ring", lang)}</span>
+                    </button>
+                    <button type="button" className={"rs-road"
+                              + (framed === s.id && format === "vr"
+                                   ? " lit" : "")}
+                            aria-label={tr("ins.format.vr", lang)}
+                            title={tr("ins.format.vr", lang)}
+                            aria-pressed={framed === s.id
+                                          && format === "vr"}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (framed === s.id && format === "vr") {
+                                setFramed(null);
+                                setFormat("audio"); setRoomFormat("audio");
+                              } else {
+                                setFramed(s.id);
+                                setFormat("vr"); setRoomFormat("vr");
+                              }
+                            }}
+                            onDoubleClick={(e) => e.stopPropagation()}
+                            onPointerDown={(e) => e.stopPropagation()}>
+                      <span className="rs-tag">{tr("ins.format.vr.ring", lang)}</span>
+                    </button>
+                  </div>
+                )}
+                {/* The avatar's door on the seats the pair cannot reach.
+                    A profile seat with a portrait draws the twin circles
+                    above and needs no badge — "no clear circles... I
+                    meant an entire profile photo circle, but for avatar."
+                    This small ring stays only where the frame is already
+                    spoken for: your own seat (camera, photo, silhouette)
+                    and a profile seat still waiting on its portrait. */}
+                {(s.kind !== "user"
+                    ? !(aiFaces[s.id]?.asset && !aiFaces[s.id]?.placeholder)
+                    : isMe && !!session.profileId) && (
+                  <button className="rs-avring" type="button"
+                          aria-label={tr("stage.open", lang)}
+                          title={tr("stage.open", lang)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setStaged(s.kind !== "user"
+                              ? s.id : (session.profileId as string));
+                          }}
+                          onDoubleClick={(e) => e.stopPropagation()}
+                          onPointerDown={(e) => e.stopPropagation()}>
+                    {(() => {
+                      const f = s.kind !== "user" ? aiFaces[s.id] : myFace;
+                      return f?.asset
+                        ? <img alt="" src={f.asset.startsWith("http")
+                            ? f.asset : getBase() + f.asset} />
+                        : <span aria-hidden="true">✦</span>;
+                    })()}
+                  </button>
+                )}
+                {/* The door the double-tap hides. The gesture stays — and
+                    a visible gear sits on your own tile, because a control
+                    nobody can see is a control nobody has. */}
+                {isMe && (
+                  <button className="rs-gear" type="button"
+                          aria-label={tr("ins.face.settings", lang)}
+                          title={tr("ins.face.settings", lang)}
+                          onClick={(e) => { e.stopPropagation();
+                                            setReveal((v) => !v); }}
+                          onDoubleClick={(e) => e.stopPropagation()}
+                          onPointerDown={(e) => e.stopPropagation()}>
+                    {"\u2699\uFE0F"}
+                  </button>
+                )}
                 {/* The mark, top left, on the synthetic seats and no others —
                     the way the screen this is drawn from does it, and the way
                     the rest of the platform does it.
@@ -2431,6 +3426,25 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 ) : (
                   <span className="rs-ai" title={tr("ins.seat.profile", lang)}>
                     {tr("ins.seat.aimark", lang)}
+                  </span>
+                )}
+                {/* The checked likeness, on the sphere.
+
+                    The gold mark used to live in the photograph's own
+                    pixels, bottom-right, and every surface here draws a
+                    face as a CIRCLE — so the circle cut it in half, and
+                    a disclosure sliced through the middle reads as a
+                    rendering fault rather than as a claim. Both marks
+                    came off the files and onto the surface, in the same
+                    corners they were burned into, on a layer nothing
+                    crops.
+
+                    `verified` is the server's word, not the client's: a
+                    verification record with a named attestor, the same
+                    bar the burning tool refused to run without. */}
+                {s.verified && (
+                  <span className="rs-real" title={tr("ins.seat.real", lang)}>
+                    {tr("ins.seat.realmark", lang)}
                   </span>
                 )}
                 {/* The two corner marks screen 103 draws, and only where
@@ -2573,6 +3587,23 @@ export function Inside({ onPlans, start = "", onLeave }: {
                         {tr("ins.face.hereoff", lang)}
                       </button>
                     )}
+                    {/* The room's name and the microphone lend are not
+                        here any more. Both are things you set *before*
+                        anybody is in the room with you, and both had been
+                        put behind a seat's gear where you can only reach
+                        them once the room is already running — a text box
+                        and a lend button wedged between "Camera on" and
+                        "Background", which is where the field found them
+                        and asked for them out. They are on the Rooms
+                        screen now, on the room's own row, which is the
+                        one place you stand before you walk in. */}
+                    {/* The let-them-talk button is gone from every
+                        platform, on the field order: "users can just tell
+                        them to talk with each other if they need to, or
+                        just quietly sit out." The words are the control
+                        now — a talk phrase in the chat starts the
+                        back-and-forth, the aims keep it going, and the
+                        ten-turn governor pauses it (qrme/society.py). */}
                     {/* The masks. Two records, not one: taking a mask off and
                         turning a camera off are different actions, so this
                         sits beside the three above rather than among them. */}
@@ -2619,6 +3650,48 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 </span>
               </div>
             ))}
+            {/* The empty seat, and the way somebody gets into it.
+             *
+             *     asked     who is in this room
+             *     mattered  how does anybody ELSE get in
+             *
+             * A blank silhouette wearing a plus, drawn as a seat rather
+             * than as a button somewhere else on the screen — because
+             * the question "who else could be here" is asked while
+             * looking at who is, and the answer belongs in the same row
+             * of faces. Not a bare +: an empty chair reads as an empty
+             * chair, a floating plus reads as a control for whatever it
+             * happens to be sitting next to.
+             *
+             * It follows the last person in and keeps following as the
+             * room grows, until the table is full — eight seats, the cap
+             * `join_room` already enforces — and then it is gone, because
+             * an invitation to a room that cannot take anybody is an
+             * invitation to a refusal. */}
+            {inRoom && seats.length + invited.length < SEATS && (
+              <button type="button" className="rs-tile rs-empty"
+                      aria-label={tr("ins.seat.add", lang)}
+                      onClick={() => setAsking(true)}>
+                <span className="rs-blank" aria-hidden="true">
+                  <span className="rs-blank-face">{"\u{1F464}"}</span>
+                  <span className="rs-blank-plus">+</span>
+                </span>
+                <span className="rs-name">{tr("ins.seat.add", lang)}</span>
+                <span className="rs-role">
+                  {(() => {
+                    // One seat is not "1 seats". The count is on a
+                    // screenshot people read, and a plural that does not
+                    // agree is the kind of thing a reader trusts less
+                    // than the thing it is counting.
+                    const left = SEATS - seats.length - invited.length;
+                    return left === 1
+                      ? tr("ins.seat.room.one", lang)
+                      : fill(tr("ins.seat.room", lang),
+                             { left: String(left) });
+                  })()}
+                </span>
+              </button>
+            )}
             {/* The conversation, worn on the room itself — the gallery's
                 design (screens 96–98, 105) the flat card below never
                 delivered until a field report held the mockups up next
@@ -2649,26 +3722,20 @@ export function Inside({ onPlans, start = "", onLeave }: {
           {scene && !inRoom && (
             <p className="muted small">{scene.note}</p>
           )}
-          {/* The way into the stage, offered only in the rooms whose whole
-              pitch is being a place. Flat rooms stay flat; nothing here
-              turns a chat room into a headset demand. */}
-          {(channel === "ar" || channel === "vr") && (
-            <button disabled={busy} onClick={() => {
-              setYaw(0); setImmersed(true);
-            }}>
-              {channel === "ar" ? tr("ins.stage.ar", lang)
-                                : tr("ins.stage.vr", lang)}
-            </button>
-          )}
+          {/* No "step in" button any more. The seat's own AR and VR
+              roads are the door, the same way the figure and the camera
+              are the door to avatar and video — one press, one outcome,
+              and the same gesture on every format. A separate button
+              under the seats was a second grammar for the same act. */}
         </div>
       )}
 
-      {immersed && (channel === "ar" || channel === "vr") && (
+      {(format === "ar" || format === "vr") && (
         // The stage: the same room, stood in. AR draws the seats over this
         // device's own passthrough; VR draws them around a turntable the
         // drag turns. Both are rendered here and only here — no pixels of
         // yours and no room of anybody else's crosses the wire for this.
-        <div className={"room-stage" + (channel === "vr" ? " vr" : "")}
+        <div className={"room-stage" + (format === "vr" ? " vr" : "")}
              role="dialog" aria-label={tr("ins.stage.title", lang)}
              onPointerDown={(e) => {
                dragFrom.current = { x: e.clientX, yaw };
@@ -2683,17 +3750,17 @@ export function Inside({ onPlans, start = "", onLeave }: {
              }}
              onPointerUp={() => { dragFrom.current = null; }}
              onPointerLeave={() => { dragFrom.current = null; }}>
-          {channel === "ar" && !passDenied && (
+          {format === "ar" && !passDenied && (
             <video ref={pass} className="stage-pass" autoPlay playsInline muted
                    aria-label={tr("ins.stage.passlabel", lang)} />
           )}
-          {channel === "ar" && passDenied && (
+          {format === "ar" && passDenied && (
             <p className="stage-note">{tr("ins.stage.denied", lang)}</p>
           )}
-          {channel === "vr" && (
+          {format === "vr" && (
             <div className="stage-floor" aria-hidden="true" />
           )}
-          {channel === "vr" ? (
+          {format === "vr" ? (
             <div className="stage-turn">
               {seats.map((s, i) => {
                 // The circle: seats spaced evenly, each card counter-rotated
@@ -2749,11 +3816,17 @@ export function Inside({ onPlans, start = "", onLeave }: {
               which for a voice room is the talk control. */}
           {spokenRoom ? voiceBar : chatStrip}
           <p className="stage-note">
-            {channel === "ar" ? tr("ins.stage.arnote", lang)
-                              : tr("ins.stage.vrnote", lang)}
+            {format === "ar" ? tr("ins.stage.arnote", lang)
+                             : tr("ins.stage.vrnote", lang)}
           </p>
+          {/* Leaving is the same act as pressing a lit road: the format
+              goes back to voices and photographs, and the seat lets go.
+              One way out, whichever way you came in. */}
           <button className="stage-leave"
-                  onClick={() => setImmersed(false)}>
+                  onClick={() => {
+                    setFramed(null);
+                    setFormat("audio"); setRoomFormat("audio");
+                  }}>
             {tr("ins.stage.leave", lang)}
           </button>
         </div>
@@ -2763,7 +3836,14 @@ export function Inside({ onPlans, start = "", onLeave }: {
         <>
           <div className="card">
             <h3>
-              {tr("ins.whatsaid", lang)}{" "}
+              {/* A window, opened and closed. It sits below a room that
+                  takes the whole screen, so it is reached by scrolling
+                  and its heading is the first thing that arrives — which
+                  makes the heading the right place for the handle. */}
+              <button className="rr-open" onClick={() => setReachOpen(!reachOpen)}
+                      aria-expanded={reachOpen}>
+                {reachOpen ? "\u25BE" : "\u25B8"}{" "}{tr("ins.reach", lang)}
+              </button>{" "}
               <button className={"chip" + (hearAll ? " primary" : "")}
                       onClick={flipHearAll}
                       title={hearAll ? tr("ins.hear.off", lang)
@@ -2780,55 +3860,199 @@ export function Inside({ onPlans, start = "", onLeave }: {
                         onClick={() => setEarNote(null)}>×</button>
               </div>
             )}
-            {transcript.length === 0 && (
-              <p className="muted small">{tr("ins.nothingyet", lang)}</p>
+            {/* The record card became the room's permission panel.
+             *
+             *     asked     this looks like another identical copy of what
+             *               has been said — make it a window you can close
+             *               and open, of all the synthetic profiles in the
+             *               chat, their connections and skills, with boxes
+             *               to tick and allow
+             *     mattered  which of the two keys this window turns
+             *
+             * The strip riding the room already carries the conversation,
+             * so this card was the same turns a second time in a different
+             * colour. What belongs here instead is the thing there was no
+             * room for anywhere else: what the synthetic people in this
+             * room are able to reach, and which of it they may.
+             *
+             * A profile in a room is very often somebody else's — a starter
+             * outsourced from another account, a specialist invited in by a
+             * person who does not own it. Its owner's grant says what it can
+             * ever do. These boxes say what it may do HERE, for the people
+             * here, and turning one never touches the owner's side. Both
+             * keys, every time, or nothing opens. */}
+            {reachOpen && reach.length === 0 && (
+              <p className="muted small">{tr("ins.reach.none", lang)}</p>
             )}
-            {transcript.map((m) => (
-              <p className="small" key={m.id}>
-                <strong>{m.from}</strong>: {m.content}
-                {attachment(m)}
-                {/* A profile turn can be heard in the voice its owner bound.
-                    A press, never autoplay: the phone's rule and the room's
-                    are the same — sound starts on a gesture. */}
-                {m.sender_kind === "profile" && m.sender_id && (
-                  <button className="chip" disabled={busy}
-                          aria-label={tr("ins.hear", lang)}
-                          onClick={() => {
-                            const id = m.sender_id as string;
-                            // Announced before a note of it plays, and
-                            // through the same door the backlog uses. This
-                            // button put the profile's voice in the room
-                            // with neither echo net watching.
-                            roomSpeaks(m.content || "");
-                            speakInPieces(id, m.content || "", token)
-                              .then((s) => {
-                                nowSaying.current = s;
-                                sayingMsg.current = m.id;
-                                setVoicing({ kind: "profile", id });
-                                return s.done;
-                              })
-                              .then(() => { setVoicing(null); roomFellQuiet(); })
-                              .catch((e) => {
-                                setVoicing(null);
-                                // Quiet again even when the voice failed:
-                                // a flag left standing would deafen the
-                                // room until it was reloaded.
-                                roomFellQuiet();
-                                setError(e);
-                              });
-                          }}>
-                    🔊
+            {reachOpen && reach.map((who) => (
+              <div className="rr-who" key={who.profile_id}>
+                {/* Everybody in the room, listed before anything is
+                    opened — two rows if there are two, eight if there
+                    are eight. One opens at a time: each row carries the
+                    whole catalog under it, and two of those open at once
+                    is a wall rather than a decision. */}
+                <div className="rr-head">
+                  <button className="rr-name"
+                          aria-expanded={openSeat === who.profile_id}
+                          onClick={() => setOpenSeat(
+                            openSeat === who.profile_id ? null : who.profile_id)}>
+                    {openSeat === who.profile_id ? "\u25BE" : "\u25B8"}{" "}
+                    {who.display}
+                    <span className="rr-tally muted small">
+                      {" "}{fill(tr("ins.reach.tally", lang), {
+                        sk: String(who.skills_allowed),
+                        skAll: String(who.skill_count),
+                        cn: String(who.apps_allowed),
+                        cnAll: String(who.app_count),
+                        hd: String(who.hands_allowed),
+                        hdAll: String(who.hands_count) })}
+                    </span>
                   </button>
+                  {/* Somebody may have brought a profile into this room
+                      that you have never spoken with. Adding them is the
+                      thing you do first, and delegating what they may
+                      reach is the thing you do underneath — so the
+                      button sits above the lists rather than on some
+                      other screen. */}
+                  <button className="chip rr-friend" disabled={busy}
+                          onClick={() => befriendSeat(who.profile_id)}>
+                    {friended.has(who.profile_id)
+                      ? tr("ins.reach.friended", lang)
+                      : tr("ins.reach.friend", lang)}
+                  </button>
+                </div>
+                {openSeat === who.profile_id && (
+                  <div className="rr-body">
+                    {/* Say it, and it goes.
+                     *
+                     *     asked     the profiles with connections should be
+                     *               verbally commanded or prompted to take
+                     *               action — cursor, screen, eyes, hands
+                     *     mattered  a permission nobody can spend does
+                     *               nothing
+                     *
+                     * Directly under the boxes that decided what this seat
+                     * may reach, because the two are one thought: you
+                     * allow, then you ask. The words never widen anything
+                     * — the errand can only spend a grant its owner wrote
+                     * and this room ticked, and the refusal says which of
+                     * the two is missing. */}
+                    <form className="rr-say"
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            sendErrand(who.profile_id);
+                          }}>
+                      <input value={errand[who.profile_id] || ""}
+                             placeholder={tr("ins.errand.ph", lang)}
+                             aria-label={tr("ins.errand.ph", lang)}
+                             onChange={(e) => setErrand((m) => ({
+                               ...m, [who.profile_id]: e.target.value }))} />
+                      <button type="submit" className="chip"
+                              disabled={busy
+                                        || !(errand[who.profile_id] || "").trim()}>
+                        {tr("ins.errand.send", lang)}
+                      </button>
+                    </form>
+                    {sent[who.profile_id] && (
+                      <p className="rr-sent muted small" role="status">
+                        {sent[who.profile_id]}
+                      </p>
+                    )}
+                    <div className="rr-kind muted small">
+                      {tr("ins.reach.hands.kind", lang)}
+                    </div>
+                    {who.skills.length === 0 && (
+                      <p className="muted small">
+                        {tr("ins.reach.noskills", lang)}
+                      </p>
+                    )}
+                    {who.skills.map((sk) => (
+                      <label className="rr-box" key={sk.key}>
+                        <input type="checkbox" checked={sk.allowed}
+                               disabled={busy}
+                               onChange={(e) =>
+                                 allowReach(who.profile_id, "skill", sk.key,
+                                            e.target.checked)} />
+                        <span className="rr-label">
+                          {sk.eyes_only ? tr("ins.reach.eyes", lang)
+                                        : tr("ins.reach.hands", lang)}
+                          {" \u00B7 "}{sk.places.join(", ")}
+                        </span>
+                      </label>
+                    ))}
+                    <div className="rr-kind muted small">
+                      {tr("ins.reach.connections", lang)}
+                    </div>
+                    {who.providers.map((group) => (
+                      <div className="rr-group" key={group.provider}>
+                        <div className="rr-provider">{group.label}</div>
+                        {group.apps.map((a) => (
+                          <div className="rr-app" key={a.provider + a.app}>
+                            <label className="rr-box">
+                              <input type="checkbox" checked={a.allowed}
+                                     disabled={busy || !a.connected || !a.ready}
+                                     onChange={(e) => a.key && allowReach(
+                                       who.profile_id, "app", a.key,
+                                       e.target.checked)} />
+                              <span className="rr-label">{a.label}</span>
+                              {/* Three different reasons a box is dark,
+                                  and they are not the same reason. */}
+                              {!a.connected && (
+                                <span className="rr-note muted small">
+                                  {tr("ins.reach.unconnected", lang)}
+                                </span>
+                              )}
+                              {a.connected && !a.ready && (
+                                <span className="rr-note muted small">
+                                  {tr("ins.reach.waiting", lang)}
+                                </span>
+                              )}
+                            </label>
+                            {/* Every skill the connection carries, shown
+                                whether or not it is switched on — "read
+                                the mail" and "send it" are not the same
+                                yes, and a list that hides them until
+                                after the app is allowed is a list that
+                                cannot be read before deciding.
+
+                                180 of them across the catalog. Tickable
+                                only where the owner granted the
+                                capability AND this room allowed the app
+                                it belongs to: a skill of a connector
+                                nobody has connected is not a thing to
+                                agree to. */}
+                            {a.capabilities.length > 0 && (
+                              // Named where they live. The 180 skills of
+                              // this catalog are capabilities OF
+                              // connections — "read the mail" belongs to
+                              // Mail — so a single "Skills" heading at
+                              // the top of the panel put the word
+                              // nowhere near the things it names, and
+                              // the panel read as a list of apps and a
+                              // count nobody could find.
+                              <div className="rr-caps muted small">
+                                {tr("ins.reach.skills", lang)}
+                              </div>
+                            )}
+                            {a.capabilities.map((c) => (
+                              <label className="rr-box rr-cap" key={c.name}>
+                                <input type="checkbox" checked={c.allowed}
+                                       disabled={busy || !a.allowed
+                                                 || !c.granted}
+                                       onChange={(e) => a.key && allowReach(
+                                         who.profile_id, "cap",
+                                         `${a.key}:${c.name}`,
+                                         e.target.checked)} />
+                                <span className="rr-label">{c.name}</span>
+                              </label>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
                 )}
-                {/* A profile's turn is always watermarked and a person's
-                    never is, so the mark is the honest way to tell which
-                    kind of speaker this was — not the name. */}
-                {m.watermark?.display?.line && (
-                  <span className="muted small">
-                    {" "}· {m.watermark.display.line}
-                  </span>
-                )}
-              </p>
+              </div>
             ))}
             {/* The compose row that used to sit here is gone.
              *
@@ -2850,6 +4074,31 @@ export function Inside({ onPlans, start = "", onLeave }: {
              * record is for reading. */}
             {/* The file picker stays: the strip's own attach button
                 clicks it, so it is this row's one surviving job. */}
+            {/* One input per answer, for the reason written where these
+                refs are declared. `capture` opens the camera on a phone
+                and is ignored on a desktop, where the file dialog is the
+                honest fallback rather than a broken button. */}
+            <input ref={photoPick} type="file" multiple accept="image/*"
+                   style={{ display: "none" }}
+                   onChange={(e) => {
+                     const picked = Array.from(e.target.files ?? []);
+                     e.target.value = "";
+                     if (picked.length) void shareFiles(picked);
+                   }} />
+            <input ref={cameraPick} type="file" accept="image/*"
+                   capture="environment" style={{ display: "none" }}
+                   onChange={(e) => {
+                     const picked = Array.from(e.target.files ?? []);
+                     e.target.value = "";
+                     if (picked.length) void shareFiles(picked);
+                   }} />
+            <input ref={videoPick} type="file" multiple accept="video/*"
+                   style={{ display: "none" }}
+                   onChange={(e) => {
+                     const picked = Array.from(e.target.files ?? []);
+                     e.target.value = "";
+                     if (picked.length) void shareFiles(picked);
+                   }} />
             <input ref={sharePick} type="file" multiple
                    style={{ display: "none" }}
                    accept="image/*,video/*,.pdf,.docx,.xlsx,.pptx,.zip,.txt"
@@ -2901,11 +4150,69 @@ export function Inside({ onPlans, start = "", onLeave }: {
                 interactorId={me || null}
                 lang={lang}
                 ownerToken={dockOwner}
+                onAsk={(words) => void sendText(words)}
                 interactorToken={token || null}
                 onError={setError} />
             </div>
           )}
         </>
+      )}
+      {/* The avatar, taken to the screen from either ring. The token is
+          the strongest key this session holds for THAT profile — its
+          owner token when this is your own or one you hold minted, your
+          interactor token otherwise, which is exactly the guest the
+          wardrobe's switch is about. */}
+      {staged && (
+        <AvatarStage
+          clear={format === "ar" || format === "vr"}
+          profileId={staged}
+          token={(staged === session.profileId ? session.ownerToken
+                    : staged === dockedProfile ? dockOwner : null)
+                  || token}
+          owned={!!(staged === session.profileId ? session.ownerToken
+                      : staged === dockedProfile ? dockOwner : null)}
+          avatar={(staged === session.profileId ? myFace
+                     : aiFaces[staged]) || null}
+          onClose={() => setStaged(null)}
+          onChanged={(a) => {
+            setAiFaces((m) => ({ ...m, [staged]: a }));
+            if (staged === session.profileId) setMyFace(a);
+          }}
+          onError={setError} />
+      )}
+      {/* The portrait, the whole screen.
+       *
+       * It used to be a boxed picture on a translucent scrim, with the
+       * room showing through around it — "I don't want it to bring up
+       * that whole background that's in the back behind the photo. I
+       * just wanted to fill the screen with their image centered in the
+       * frame like a background image." So it fills, centred and
+       * cropped to the frame, on solid ground.
+       *
+       * And the two doors stay on it. A full-screen picture with no way
+       * across to the avatar would make this a dead end, which is the
+       * one thing the pair of circles exists to avoid. */}
+      {shown && (
+        <div className="face-light" role="dialog" aria-modal="true"
+             onClick={() => setShown(null)}>
+          <img src={shown.src} alt="" />
+          <button className="stage-close" type="button"
+                  aria-label={tr("stage.close", lang)}
+                  onClick={() => setShown(null)}>
+            ✕
+          </button>
+          <div className="face-light-rail"
+               onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="lit" disabled>
+              {tr("ins.pair.photo", lang)}
+            </button>
+            <button type="button"
+                    onClick={() => { const seat = shown.seat;
+                                     setShown(null); setStaged(seat); }}>
+              {tr("ins.pair.avatar", lang)}
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

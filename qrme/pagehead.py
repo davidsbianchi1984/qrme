@@ -125,8 +125,36 @@ def console_policy() -> str:
         "script-src 'self'",
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: blob:",
-        "media-src 'self' blob:",
-        "connect-src 'self'",
+        # `data:` is the one-sample silent WAV the speech layer plays to
+        # unlock audio on a first user gesture (app/src/spoken.ts,
+        # SILENCE). Without it every visit logged a CSP violation in the
+        # tester's console — the sound still worked through blob: urls,
+        # but a red line on every load is a defect report nobody filed.
+        "media-src 'self' blob: data:",
+        # `blob:` here, and it is not decoration — it is why every avatar
+        # in the console rendered as an untextured grey mannequin.
+        #
+        #     asked     may the console load its own object URLs
+        #     mattered  which directive governs the way it loads them
+        #
+        # A `.glb` carries its textures inside the file. Three.js hands
+        # each one to the browser as an object URL and reads it back with
+        # `fetch` — and `fetch` is `connect-src`, not `img-src`. So
+        # `img-src ... blob:` was granted, looked like the permission the
+        # textures needed, and governed nothing: the browser refused the
+        # connection, GLTFLoader logged "Couldn't load texture blob:…"
+        # once per image, and the model arrived with every `map` null.
+        # Lit, shaped, rigged, and the colour of unpainted clay.
+        #
+        # It rendered that way on every host and in every browser, and no
+        # in-process test saw it — a `TestClient` reads this policy and
+        # enforces none of it, which is the same blind spot that shipped
+        # the missing nonce and the missing `frame-src`. Third time.
+        #
+        # The grant is narrow: a `blob:` URL is minted by this document,
+        # lives in this document, and cannot name anything the document
+        # did not already have.
+        "connect-src 'self' blob:",
         "manifest-src 'self'",
         "worker-src 'self'",
         # The video players. Absent, `frame-src` fell back to

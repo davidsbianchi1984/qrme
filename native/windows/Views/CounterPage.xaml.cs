@@ -439,7 +439,7 @@ public sealed partial class CounterPage : Page
         {
             var deal = await ApiClient.Shared.Exchange(Deal,
                 AppState.Current.Token!);
-            DealList.ItemsSource = (deal.Items ?? Array.Empty<ExchangeItemRow>())
+            DealList.ItemsSource = (deal.DealItems ?? Array.Empty<ExchangeItemRow>())
                 .Select(i => new Row($"{i.Id} · {i.Name} · {i.Kind}"))
                 .ToList();
         });

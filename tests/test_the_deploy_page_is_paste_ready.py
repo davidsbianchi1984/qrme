@@ -35,9 +35,18 @@ working down the page ran the Unix three, saw three health objects, and then
 ran the Windows three in the same shell — `curl.exe: command not found`,
 three times, after a deploy that had gone perfectly.
 
-All four are the same failure: a correction written *about* a command instead
-of *as* one, or a choice written where a step belongs. These guards hold the
-shape rather than the wording — the page is free to be rewritten, and the
+**The branch.** The pull lines named three directories and no branch.
+`/srv/qrme` was sitting on a local branch left there after a session on the
+box, and `git pull --ff-only` does not fail on a checkout that is not on
+`main` — it fast-forwards the branch it *is* on, says `Already up to date`,
+and reads as a clean pull. The build then rebuilt the code that was there.
+Two releases went out with the live site answering `"version":"2.5.0"` while
+its two siblings answered `2.7.0`, and nothing in the deploy said a word.
+
+All five are the same failure: a correction written *about* a command instead
+of *as* one, or a choice written where a step belongs, or a step nobody wrote
+down because the command it belongs to succeeds without it. These guards hold
+the shape rather than the wording — the page is free to be rewritten, and the
 commands have to stay runnable by the reader they are addressed to.
 """
 
@@ -99,6 +108,35 @@ def test_the_deploy_block_carries_the_step_that_changes_machine():
             "the deploy block does not say which machine to be on. It has "
             "been pasted into a laptop shell twice; the `ssh` belongs in the "
             "block rather than in the paragraph above it")
+
+
+@pytest.mark.parametrize("product", ["qrme", "jim-mini", "pdi"])
+def test_the_pull_names_the_branch_it_pulls(product):
+    """A pull that succeeds is not a pull that fetched the release.
+
+    `git pull --ff-only` in a checkout on some other branch fast-forwards
+    that branch and prints `Already up to date`. There is no error, the
+    build that follows rebuilds what is there, and the container comes up
+    healthy — the deploy reads as a success from beginning to end.
+
+        asked     did the pull succeed
+        mattered  did it pull the thing you are releasing
+
+    It happened, on `/srv/qrme`, and lasted two releases: the live site
+    answered `"version":"2.5.0"` while its two siblings answered `2.7.0`.
+    So the branch is named in the line that pulls it, where a reader cannot
+    paste past it, rather than in a sentence saying to check first.
+    """
+    deploys = [b for b in _fenced("bash") if "docker compose" in b]
+    assert deploys, "the update section has no deploy block any more"
+    for block in deploys:
+        line = [ln for ln in block.splitlines() if f"/srv/{product}" in ln
+                and "git pull" in ln]
+        assert line, f"the deploy block no longer pulls /srv/{product}"
+        assert "checkout main" in line[0], (
+            f"the pull for /srv/{product} names no branch. A checkout left "
+            "on another branch pulls that branch, prints `Already up to "
+            "date`, and ships the old code with no error anywhere")
 
 
 def _checks() -> list[str]:

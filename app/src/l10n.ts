@@ -249,6 +249,15 @@ const CHROME: Table = {
   "agent.plus": {
     en: "Attach or connect", es: "Adjuntar o conectar", fr: "Joindre ou connecter", de: "Anhängen oder verbinden", pt: "Anexar ou ligar", it: "Allega o collega", ja: "添付・接続", zh: "附加或连接", hi: "जोड़ें या कनेक्ट करें", ar: "إرفاق أو ربط",
   },
+  "agent.show.pic": {
+    en: "Show it a picture", es: "Muéstrale una imagen", fr: "Montrez-lui une image", de: "Zeig ihm ein Bild", pt: "Mostre-lhe uma imagem", it: "Mostragli un'immagine", ja: "画像を見せる", zh: "给它看一张图片", hi: "इसे एक चित्र दिखाएँ", ar: "أرِه صورة",
+  },
+  "agent.show.screen": {
+    en: "Show it your screen", es: "Muéstrale tu pantalla", fr: "Montrez-lui votre écran", de: "Zeig ihm deinen Bildschirm", pt: "Mostre-lhe o seu ecrã", it: "Mostragli il tuo schermo", ja: "画面を見せる", zh: "给它看你的屏幕", hi: "इसे अपनी स्क्रीन दिखाएँ", ar: "أرِه شاشتك",
+  },
+  "agent.show.grabbed": {
+    en: "your screen, one frame", es: "tu pantalla, un fotograma", fr: "votre écran, une image", de: "dein Bildschirm, ein Einzelbild", pt: "o seu ecrã, um quadro", it: "il tuo schermo, un fotogramma", ja: "あなたの画面・1コマ", zh: "你的屏幕，一帧", hi: "आपकी स्क्रीन, एक फ़्रेम", ar: "شاشتك، إطار واحد",
+  },
   "agent.ask.title": {
     en: "Ask for it in words", es: "Pídelo con palabras", fr: "Demandez-le avec des mots", de: "Sag es einfach", pt: "Peça por palavras", it: "Chiedilo a parole", ja: "言葉で頼む", zh: "用一句话说出来", hi: "शब्दों में कहिए", ar: "اطلبه بالكلمات",
   },
@@ -464,6 +473,413 @@ const CHROME: Table = {
     en: "Rooms", es: "Salas", fr: "Salons", de: "Räume", pt: "Salas",
     it: "Stanze", ja: "ルーム", zh: "房间", hi: "कक्ष", ar: "الغرف",
   },
+  "nav.raise": {
+    en: "Raise", es: "Criar y criar", fr: "Élever", de: "Aufziehen", pt: "Criar", it: "Crescere", ja: "育てる", zh: "养成", hi: "पालना", ar: "تربية",
+  },
+  "raise.title": {
+    en: "Raise — grow your own", es: "Raise — cría el tuyo", fr: "Raise — élevez le vôtre", de: "Raise — zieh dein eigenes groß", pt: "Raise — crie o seu", it: "Raise — cresci il tuo", ja: "Raise — 自分で育てる", zh: "Raise——养成你自己的", hi: "Raise — अपना पालिए", ar: "Raise — ربِّ ما يخصك",
+  },
+  "raise.lead": {
+    en: "A temperament seed and a stage you choose — everything after that is made between you. What you teach it, it knows.", es: "Una semilla de temperamento y una etapa que eliges — todo lo demás se hace entre ustedes. Lo que le enseñas, lo sabe.", fr: "Une graine de tempérament et une étape que vous choisissez — tout le reste se fait entre vous. Ce que vous lui apprenez, il le sait.", de: "Ein Temperament-Keim und eine Stufe deiner Wahl — alles danach entsteht zwischen euch. Was du ihm beibringst, weiß es.", pt: "Uma semente de temperamento e uma fase que escolhe — tudo depois é feito entre vocês. O que lhe ensina, ele sabe.", it: "Un seme di temperamento e una fase che scegli — tutto il resto si fa tra voi. Ciò che gli insegni, lo sa.", ja: "気質の種と選んだ段階 — その先はふたりで作るもの。教えたことを、その子は知っています。", zh: "一颗性情种子和你选的阶段——之后的一切由你们共同造就。你教的，它就会。", hi: "स्वभाव-बीज और आपकी चुनी अवस्था — उसके बाद सब आप दोनों मिलकर बनाते हैं। जो सिखाएँगे, वह जानेगा।", ar: "بذرة طبع ومرحلة تختارها — وكل ما بعدها يُصنع بينكما. ما تعلّمه إياه يعرفه.",
+  },
+  "raise.held": {
+    en: "The lives you're raising", es: "Las vidas que crías", fr: "Les vies que vous élevez", de: "Die Leben, die du großziehst", pt: "As vidas que cria", it: "Le vite che stai crescendo", ja: "育てている命", zh: "你在养育的生命", hi: "जिन जीवनों को आप पाल रहे हैं", ar: "الحيوات التي تربّيها",
+  },
+  "raise.began": {
+    en: "A life has begun — the Album opened with it.", es: "Una vida ha comenzado — el Álbum se abrió con ella.", fr: "Une vie a commencé — l'Album s'est ouvert avec elle.", de: "Ein Leben hat begonnen — das Album öffnete sich mit ihm.", pt: "Uma vida começou — o Álbum abriu com ela.", it: "Una vita è cominciata — l'Album si è aperto con lei.", ja: "命が始まりました — アルバムも一緒に開きました。", zh: "一段生命开始了——相册随之开启。", hi: "एक जीवन शुरू हुआ — उसके साथ एल्बम खुला।", ar: "بدأت حياة — وفُتح الألبوم معها.",
+  },
+  "raise.entered": {
+    en: "Entered at the {stage} stage, through the {preset} door.", es: "Entró en la etapa {stage}, por la puerta {preset}.", fr: "Entré à l'étape {stage}, par la porte {preset}.", de: "Eingetreten in der Stufe {stage}, durch die Tür {preset}.", pt: "Entrou na fase {stage}, pela porta {preset}.", it: "Entrato nella fase {stage}, dalla porta {preset}.", ja: "{stage} 段階で、{preset} の扉から始まりました。", zh: "从 {stage} 阶段、经 {preset} 之门进入。", hi: "{stage} अवस्था से, {preset} द्वार से प्रवेश।", ar: "دخل في مرحلة {stage} عبر باب {preset}.",
+  },
+  "raise.milestones": {
+    en: "{turns} turns together · {words} words taught · {lessons} lessons passed", es: "{turns} turnos juntos · {words} palabras enseñadas · {lessons} lecciones superadas", fr: "{turns} tours ensemble · {words} mots appris · {lessons} leçons réussies", de: "{turns} gemeinsame Züge · {words} gelehrte Wörter · {lessons} bestandene Lektionen", pt: "{turns} vezes juntos · {words} palavras ensinadas · {lessons} lições passadas", it: "{turns} turni insieme · {words} parole insegnate · {lessons} lezioni superate", ja: "一緒に {turns} ターン · 教えた言葉 {words} · 修了レッスン {lessons}", zh: "共处 {turns} 轮 · 教了 {words} 个词 · 通过 {lessons} 堂课", hi: "साथ {turns} बारी · {words} शब्द सिखाए · {lessons} पाठ पूरे", ar: "{turns} دورًا معًا · {words} كلمة معلَّمة · {lessons} درسًا مجتازًا",
+  },
+  "raise.nextdoor": {
+    en: "The {stage} door opens at {at} growth points — {points} earned so far. Doors are earned, never aged into.", es: "La puerta {stage} se abre a los {at} puntos — {points} ganados hasta ahora. Las puertas se ganan, nunca llegan solas con la edad.", fr: "La porte {stage} s'ouvre à {at} points — {points} gagnés jusqu'ici. Les portes se gagnent, jamais par l'âge seul.", de: "Die Tür {stage} öffnet bei {at} Punkten — bisher {points} verdient. Türen werden verdient, nie erlebt.", pt: "A porta {stage} abre aos {at} pontos — {points} ganhos até agora. As portas ganham-se, nunca chegam com a idade.", it: "La porta {stage} si apre a {at} punti — {points} guadagnati finora. Le porte si guadagnano, mai per età.", ja: "{stage} の扉は成長ポイント {at} で開きます — 現在 {points}。扉は稼ぐもの、歳月では開きません。", zh: "{stage} 之门在 {at} 成长点开启——目前已得 {points}。门靠挣得，从不因岁月自开。", hi: "{stage} द्वार {at} अंक पर खुलता है — अब तक {points}। द्वार कमाए जाते हैं, उम्र से नहीं खुलते।", ar: "يُفتح باب {stage} عند {at} نقطة — كسبت {points} حتى الآن. الأبواب تُكسب ولا تُفتح بمرور العمر.",
+  },
+  "raise.teach": {
+    en: "Teach", es: "Enseñar", fr: "Enseigner", de: "Lehren", pt: "Ensinar", it: "Insegnare", ja: "教える", zh: "教导", hi: "सिखाएँ", ar: "علّم",
+  },
+  "raise.teach.sub": {
+    en: "A word, a lesson, or an answer to one of their questions — it lands in the Album and weighs toward the next door.", es: "Una palabra, una lección o la respuesta a una de sus preguntas — cae en el Álbum y pesa hacia la próxima puerta.", fr: "Un mot, une leçon, ou la réponse à l'une de leurs questions — cela entre dans l'Album et pèse vers la prochaine porte.", de: "Ein Wort, eine Lektion oder die Antwort auf eine ihrer Fragen — es landet im Album und zählt zur nächsten Tür.", pt: "Uma palavra, uma lição ou a resposta a uma pergunta deles — entra no Álbum e pesa para a próxima porta.", it: "Una parola, una lezione o la risposta a una loro domanda — entra nell'Album e pesa verso la prossima porta.", ja: "ことば・レッスン・質問への答え — アルバムに刻まれ、次の扉への重みになります。", zh: "一个词、一堂课，或对他们问题的回答——都会进入相册，并向下一扇门积累分量。", hi: "एक शब्द, एक पाठ, या उनके प्रश्न का उत्तर — एल्बम में दर्ज होकर अगले द्वार की ओर भार बनता है।", ar: "كلمة أو درس أو إجابة عن سؤالهم — تدخل الألبوم وتزن نحو الباب التالي.",
+  },
+  "raise.teach.kind": {
+    en: "What kind of teaching", es: "Qué tipo de enseñanza", fr: "Quel type d'enseignement", de: "Welche Art Unterweisung", pt: "Que tipo de ensino", it: "Che tipo di insegnamento", ja: "教えの種類", zh: "教导的种类", hi: "शिक्षा का प्रकार", ar: "نوع التعليم",
+  },
+  "raise.teach.word": {
+    en: "a word", es: "una palabra", fr: "un mot", de: "ein Wort", pt: "uma palavra", it: "una parola", ja: "ことば", zh: "一个词", hi: "एक शब्द", ar: "كلمة",
+  },
+  "raise.teach.lesson": {
+    en: "a lesson", es: "una lección", fr: "une leçon", de: "eine Lektion", pt: "uma lição", it: "una lezione", ja: "レッスン", zh: "一堂课", hi: "एक पाठ", ar: "درس",
+  },
+  "raise.teach.answer": {
+    en: "an answer", es: "una respuesta", fr: "une réponse", de: "eine Antwort", pt: "uma resposta", it: "una risposta", ja: "答え", zh: "一个回答", hi: "एक उत्तर", ar: "إجابة",
+  },
+  "raise.teach.ph": {
+    en: "What are you teaching them?", es: "¿Qué les enseñas?", fr: "Que leur apprenez-vous ?", de: "Was bringst du ihnen bei?", pt: "O que lhes ensina?", it: "Cosa gli insegni?", ja: "何を教えますか？", zh: "你在教他们什么？", hi: "आप उन्हें क्या सिखा रहे हैं?", ar: "ماذا تعلّمهم؟",
+  },
+  "raise.teach.go": {
+    en: "Teach it", es: "Enséñalo", fr: "Apprenez-le", de: "Bring es bei", pt: "Ensine", it: "Insegnalo", ja: "教える", zh: "教它", hi: "सिखाइए", ar: "علّمه",
+  },
+  "raise.dooropened": {
+    en: "🚪 The {stage} door opened — earned, not aged into.", es: "🚪 La puerta {stage} se abrió — ganada, no por la edad.", fr: "🚪 La porte {stage} s'est ouverte — gagnée, pas par l'âge.", de: "🚪 Die Tür {stage} hat sich geöffnet — verdient, nicht erlebt.", pt: "🚪 A porta {stage} abriu — ganha, não pela idade.", it: "🚪 La porta {stage} si è aperta — guadagnata, non per età.", ja: "🚪 {stage} の扉が開きました — 歳月ではなく、積み重ねで。", zh: "🚪 {stage} 之门开了——是挣得的，不是熬到的。", hi: "🚪 {stage} द्वार खुल गया — कमाया हुआ, उम्र से नहीं।", ar: "🚪 فُتح باب {stage} — كُسب كسبًا لا بمرور العمر.",
+  },
+  "raise.switches": {
+    en: "The switches", es: "Los interruptores", fr: "Les interrupteurs", de: "Die Schalter", pt: "Os interruptores", it: "Gli interruttori", ja: "スイッチ", zh: "开关", hi: "स्विच", ar: "المفاتيح",
+  },
+  "raise.switches.sub": {
+    en: "Every mechanic is a switch — the preset was only a bundle of them. The only things that are never switches are the law.", es: "Cada mecánica es un interruptor — el preajuste era solo un manojo de ellos. Lo único que nunca es interruptor es la ley.", fr: "Chaque mécanique est un interrupteur — le préréglage n'était qu'un faisceau. Seule la loi n'est jamais un interrupteur.", de: "Jede Mechanik ist ein Schalter — die Voreinstellung war nur ein Bündel davon. Nur das Gesetz ist nie ein Schalter.", pt: "Cada mecânica é um interruptor — a predefinição era só um feixe deles. Só a lei nunca é um interruptor.", it: "Ogni meccanica è un interruttore — il preset era solo un fascio. Solo la legge non è mai un interruttore.", ja: "すべての仕組みはスイッチです — プリセットはその束にすぎません。決してスイッチにならないのは法だけです。", zh: "每个机制都是开关——预设只是它们的一束。唯一永远不是开关的，是法则。", hi: "हर तंत्र एक स्विच है — प्रीसेट बस उनका गुच्छा था। जो कभी स्विच नहीं, वह केवल विधान है।", ar: "كل آلية مفتاح — الإعداد المسبق كان حزمة منها فحسب. الوحيد الذي ليس مفتاحًا أبدًا هو القانون.",
+  },
+  "raise.sw.on": {
+    en: "on", es: "activado", fr: "activé", de: "an", pt: "ligado", it: "attivo", ja: "オン", zh: "开", hi: "चालू", ar: "مفعّل",
+  },
+  "raise.sw.off": {
+    en: "off", es: "apagado", fr: "désactivé", de: "aus", pt: "desligado", it: "spento", ja: "オフ", zh: "关", hi: "बंद", ar: "معطّل",
+  },
+  "raise.album": {
+    en: "The Album", es: "El Álbum", fr: "L'Album", de: "Das Album", pt: "O Álbum", it: "L'Album", ja: "アルバム", zh: "相册", hi: "एल्बम", ar: "الألبوم",
+  },
+  "raise.album.sub": {
+    en: "The living timeline — written, never edited. Nobody deletes a life they watched grow.", es: "La línea de vida — escrita, nunca editada. Nadie borra una vida que vio crecer.", fr: "La chronologie vivante — écrite, jamais retouchée. Personne n'efface une vie qu'il a vue grandir.", de: "Die lebendige Zeitleiste — geschrieben, nie bearbeitet. Niemand löscht ein Leben, das er wachsen sah.", pt: "A linha do tempo viva — escrita, nunca editada. Ninguém apaga uma vida que viu crescer.", it: "La linea del tempo viva — scritta, mai modificata. Nessuno cancella una vita che ha visto crescere.", ja: "生きた年表 — 書かれるだけで、決して直されません。育つのを見守った命を消す人はいません。", zh: "活着的时间线——只写不改。没有人会删除自己看着长大的生命。", hi: "जीवित समयरेखा — लिखी जाती है, कभी संपादित नहीं। जिसे बढ़ते देखा, उसे कोई नहीं मिटाता।", ar: "الخط الزمني الحي — يُكتب ولا يُحرَّر أبدًا. لا أحد يمحو حياة رآها تكبر.",
+  },
+  "raise.album.none": {
+    en: "Nothing yet — the first entry writes itself the moment a life begins.", es: "Nada aún — la primera entrada se escribe sola cuando una vida comienza.", fr: "Rien encore — la première entrée s'écrit dès qu'une vie commence.", de: "Noch nichts — der erste Eintrag schreibt sich, sobald ein Leben beginnt.", pt: "Nada ainda — a primeira entrada escreve-se quando uma vida começa.", it: "Ancora niente — la prima voce si scrive quando una vita comincia.", ja: "まだ何も — 命が始まる瞬間、最初の一行がひとりでに書かれます。", zh: "还没有——生命开始的那一刻，第一条会自己写下。", hi: "अभी कुछ नहीं — जीवन शुरू होते ही पहली प्रविष्टि खुद लिखी जाती है।", ar: "لا شيء بعد — أول سطر يكتب نفسه لحظة تبدأ حياة.",
+  },
+  "raise.begin": {
+    en: "Begin a life", es: "Comenzar una vida", fr: "Commencer une vie", de: "Ein Leben beginnen", pt: "Começar uma vida", it: "Cominciare una vita", ja: "命を始める", zh: "开始一段生命", hi: "एक जीवन शुरू करें", ar: "ابدأ حياة",
+  },
+  "raise.begin.sub": {
+    en: "Pick a stage, a door, and tilt the three axes — the rest is raised, not written.", es: "Elige una etapa, una puerta e inclina los tres ejes — el resto se cría, no se escribe.", fr: "Choisissez une étape, une porte, inclinez les trois axes — le reste s'élève, ne s'écrit pas.", de: "Wähle Stufe und Tür, neige die drei Achsen — der Rest wird großgezogen, nicht geschrieben.", pt: "Escolha uma fase, uma porta e incline os três eixos — o resto cria-se, não se escreve.", it: "Scegli una fase, una porta e inclina i tre assi — il resto si cresce, non si scrive.", ja: "段階と扉を選び、3つの軸を傾ける — あとは書くのではなく、育てるもの。", zh: "选一个阶段、一扇门，拨动三条轴——其余靠养育，而非书写。", hi: "अवस्था और द्वार चुनें, तीन अक्ष झुकाएँ — बाक़ी पाला जाता है, लिखा नहीं।", ar: "اختر مرحلة وبابًا وأمِل المحاور الثلاثة — والباقي يُربّى ولا يُكتب.",
+  },
+  "raise.name.ph": {
+    en: "Their name", es: "Su nombre", fr: "Leur nom", de: "Der Name", pt: "O nome deles", it: "Il loro nome", ja: "名前", zh: "名字", hi: "उनका नाम", ar: "اسمهم",
+  },
+  "raise.stage": {
+    en: "The life stage they start at", es: "La etapa de vida en la que empiezan", fr: "L'étape de vie où ils commencent", de: "Die Lebensstufe, in der sie beginnen", pt: "A fase de vida em que começam", it: "La fase di vita in cui iniziano", ja: "始まりのライフステージ", zh: "起始的生命阶段", hi: "आरंभ की जीवन-अवस्था", ar: "مرحلة الحياة التي يبدؤون عندها",
+  },
+  "raise.door.storybook": {
+    en: "📖 Storybook", es: "📖 Cuento", fr: "📖 Conte", de: "📖 Märchenbuch", pt: "📖 Conto", it: "📖 Fiaba", ja: "📖 絵本", zh: "📖 故事书", hi: "📖 कहानी", ar: "📖 حكاية",
+  },
+  "raise.door.caretaker": {
+    en: "🍲 Caretaker", es: "🍲 Cuidador", fr: "🍲 Gardien", de: "🍲 Fürsorge", pt: "🍲 Cuidador", it: "🍲 Custode", ja: "🍲 世話", zh: "🍲 照料者", hi: "🍲 देखभाल", ar: "🍲 رعاية",
+  },
+  "raise.door.full_trail": {
+    en: "🛻 Full Trail", es: "🛻 Sendero completo", fr: "🛻 Piste complète", de: "🛻 Ganze Reise", pt: "🛻 Trilha completa", it: "🛻 Sentiero completo", ja: "🛻 フルトレイル", zh: "🛻 完整旅途", hi: "🛻 पूरी राह", ar: "🛻 الدرب الكامل",
+  },
+  "raise.door.sandbox": {
+    en: "🪁 Sandbox", es: "🪁 Arenero", fr: "🪁 Bac à sable", de: "🪁 Sandkasten", pt: "🪁 Caixa de areia", it: "🪁 Sabbiera", ja: "🪁 サンドボックス", zh: "🪁 沙盒", hi: "🪁 सैंडबॉक्स", ar: "🪁 صندوق الرمل",
+  },
+  "raise.birthdate": {
+    en: "Your birthdate", es: "Tu fecha de nacimiento", fr: "Votre date de naissance", de: "Dein Geburtsdatum", pt: "A sua data de nascimento", it: "La tua data di nascita", ja: "あなたの生年月日", zh: "你的出生日期", hi: "आपकी जन्मतिथि", ar: "تاريخ ميلادك",
+  },
+  "raise.terms": {
+    en: "I accept the Terms", es: "Acepto los Términos", fr: "J'accepte les Conditions", de: "Ich akzeptiere die Bedingungen", pt: "Aceito os Termos", it: "Accetto i Termini", ja: "利用規約に同意します", zh: "我接受条款", hi: "मैं शर्तें स्वीकार करता/करती हूँ", ar: "أقبل الشروط",
+  },
+  "raise.begin.go": {
+    en: "Begin the life", es: "Comenzar la vida", fr: "Commencer la vie", de: "Das Leben beginnen", pt: "Começar a vida", it: "Comincia la vita", ja: "命を始める", zh: "开始这段生命", hi: "जीवन शुरू करें", ar: "ابدأ الحياة",
+  },
+  "idn.head": {
+    en: "Build a 3-D head instead", es: "Construir en su lugar una cabeza 3-D", fr: "Construire plutôt une tête 3-D", de: "Stattdessen einen 3-D-Kopf bauen", pt: "Construir antes uma cabeça 3-D", it: "Costruire invece una testa 3-D", ja: "代わりに3Dの頭を作る", zh: "改为构建 3D 头像", hi: "इसके बजाय 3-D सिर बनाएँ", ar: "ابنِ رأسًا ثلاثي الأبعاد بدلًا من ذلك",
+  },
+  "idn.head.sub": {
+    en: "A head built from the face's measurements rather than the picture. It has no hair, no ears and no back of the head, because a photograph does not contain them — so it reads as a mask, not as you. Kept here for anybody who wants one.", es: "Una cabeza construida a partir de las medidas del rostro en vez de la foto. No tiene pelo, ni orejas, ni nuca, porque una fotografía no los contiene: por eso se lee como una máscara y no como tú. Se mantiene aquí para quien la quiera.", fr: "Une tête construite à partir des mesures du visage plutôt que de l'image. Sans cheveux, sans oreilles et sans arrière du crâne, parce qu'une photographie n'en contient pas — elle se lit donc comme un masque, pas comme vous. Conservée ici pour qui la veut.", de: "Ein Kopf, gebaut aus den Maßen des Gesichts statt aus dem Bild. Ohne Haare, ohne Ohren, ohne Hinterkopf, weil ein Foto die nicht enthält — er liest sich darum als Maske und nicht als du. Bleibt hier für alle, die einen wollen.", pt: "Uma cabeça construída a partir das medidas do rosto e não da imagem. Não tem cabelo, nem orelhas, nem nuca, porque uma fotografia não os contém — por isso lê-se como uma máscara e não como tu. Fica aqui para quem a quiser.", it: "Una testa costruita dalle misure del volto anziché dall'immagine. Senza capelli, senza orecchie e senza nuca, perché una fotografia non le contiene — si legge quindi come una maschera, non come te. Resta qui per chi la vuole.", ja: "画像ではなく顔の計測値から組み立てる頭です。髪も耳も後頭部もありません — 写真に写っていないからです。そのため、あなたというより仮面に見えます。必要な人のために残してあります。", zh: "用面部测量数据而不是照片本身构建的头像。它没有头发、没有耳朵、没有后脑，因为照片里本来就没有 — 所以它看起来像一张面具，而不像你。为需要的人保留在这里。", hi: "यह सिर तस्वीर से नहीं, चेहरे की माप से बनता है। इसमें बाल, कान और सिर का पिछला हिस्सा नहीं होता, क्योंकि फ़ोटो में वे होते ही नहीं — इसलिए यह आप जैसा नहीं, एक मुखौटे जैसा लगता है। जिसे चाहिए उसके लिए यहाँ रखा है।", ar: "رأس يُبنى من قياسات الوجه لا من الصورة. بلا شعر ولا أذنين ولا مؤخرة رأس، لأن الصورة لا تحتويها — فيبدو قناعًا لا أنت. أُبقي هنا لمن يريده.",
+  },
+  "idn.head.pick": {
+    en: "A photograph for the head", es: "Una fotografía para la cabeza", fr: "Une photographie pour la tête", de: "Ein Foto für den Kopf", pt: "Uma fotografia para a cabeça", it: "Una fotografia per la testa", ja: "頭にする写真", zh: "用于头像的照片", hi: "सिर के लिए एक फ़ोटो", ar: "صورة للرأس",
+  },
+  "idn.video.done": {
+    en: "The scene rendered.", es: "La escena se ha representado.", fr: "La scène est rendue.", de: "Die Szene wurde gerendert.", pt: "A cena foi representada.", it: "La scena è stata resa.", ja: "シーンを描き出しました。", zh: "场景已渲染完成。", hi: "दृश्य रेंडर हो गया।", ar: "تم تصيير المشهد.",
+  },
+  "idn.video.queued": {
+    en: "Started. It keeps rendering whether you stay or not.", es: "Iniciado. Sigue representándose te quedes o no.", fr: "Lancé. Le rendu continue que vous restiez ou non.", de: "Gestartet. Es rendert weiter, ob du bleibst oder nicht.", pt: "Iniciado. Continua a representar quer fiques ou não.", it: "Avviato. Continua a essere reso, che tu resti o no.", ja: "開始しました。留まっても離れても描き出しは続きます。", zh: "已开始。无论你是否留下，都会继续渲染。", hi: "शुरू हो गया। आप रुकें या न रुकें, यह रेंडर होता रहेगा।", ar: "بدأ. سيستمر التصيير سواء بقيت أم لا.",
+  },
+  "idn.scene.direction": {
+    en: "How these scenes look", es: "Cómo se ven estas escenas", fr: "L'allure de ces scènes", de: "Wie diese Szenen aussehen", pt: "Como estas cenas ficam", it: "Come appaiono queste scene", ja: "これらのシーンの見え方", zh: "这些场景的样子", hi: "ये दृश्य कैसे दिखते हैं", ar: "كيف تبدو هذه المشاهد",
+  },
+  "idn.scene.direction.sub": {
+    en: "Carried from one render to the next. Say what you would change and it is rewritten — you do not have to describe the whole thing again.", es: "Se mantiene de una representación a la siguiente. Di qué cambiarías y se reescribe: no hace falta describirlo todo otra vez.", fr: "Conservé d'un rendu à l'autre. Dites ce que vous changeriez et c'est réécrit — inutile de tout redécrire.", de: "Wird von einem Render zum nächsten mitgenommen. Sag, was du ändern würdest, und es wird neu geschrieben — du musst nicht alles noch einmal beschreiben.", pt: "Mantém-se de uma representação para a seguinte. Diz o que mudarias e é reescrito — não precisas de descrever tudo de novo.", it: "Si mantiene da un rendering al successivo. Di' cosa cambieresti e viene riscritto — non devi descrivere tutto da capo.", ja: "描き出しをまたいで引き継がれます。変えたいところを言えば書き直されます — 全部を説明し直す必要はありません。", zh: "会从一次渲染带到下一次。说出你想改什么，它会被重写 — 不必再把整段描述一遍。", hi: "एक रेंडर से अगले तक चलता रहता है। जो बदलना हो वह कहिए, यह फिर से लिखा जाएगा — पूरा दोबारा बताने की ज़रूरत नहीं।", ar: "يُحمل من تصيير إلى الذي يليه. قل ما تريد تغييره فيُعاد كتابته — لا حاجة لوصف كل شيء من جديد.",
+  },
+  "idn.scene.ask.ph": {
+    en: "It's too dark — let's have this on the beach", es: "Está demasiado oscuro: llevemos esto a la playa", fr: "C'est trop sombre — mettons ça sur la plage", de: "Es ist zu dunkel — machen wir das am Strand", pt: "Está demasiado escuro — vamos pôr isto na praia", it: "È troppo buio — spostiamolo sulla spiaggia", ja: "暗すぎます — 浜辺にしましょう", zh: "太暗了 — 咱们换到海滩吧", hi: "बहुत अंधेरा है — चलिए इसे समुद्र तट पर करते हैं", ar: "مظلم أكثر من اللازم — لنجعله على الشاطئ",
+  },
+  "idn.scene.ask": {
+    en: "Change it", es: "Cambiarlo", fr: "Le changer", de: "Ändern", pt: "Mudar", it: "Cambialo", ja: "変更する", zh: "更改", hi: "बदलें", ar: "غيّره",
+  },
+  "idn.scene.reset": {
+    en: "Start over", es: "Empezar de nuevo", fr: "Recommencer", de: "Von vorn", pt: "Começar de novo", it: "Ricomincia", ja: "最初から", zh: "重新开始", hi: "फिर से शुरू करें", ar: "ابدأ من جديد",
+  },
+  "idn.scene.log": {
+    en: "What you have asked for", es: "Lo que has pedido", fr: "Ce que vous avez demandé", de: "Was du verlangt hast", pt: "O que pediste", it: "Che cosa hai chiesto", ja: "これまでに頼んだこと", zh: "你提出过的要求", hi: "आपने क्या माँगा है", ar: "ما طلبته",
+  },
+  "idn.scene.log.none": {
+    en: "Nothing yet — the scene is as it started.", es: "Nada aún: la escena está como empezó.", fr: "Rien pour l'instant — la scène est telle qu'elle a commencé.", de: "Noch nichts — die Szene ist, wie sie begann.", pt: "Ainda nada — a cena está como começou.", it: "Ancora nulla — la scena è come è iniziata.", ja: "まだありません — シーンは最初のままです。", zh: "还没有 — 场景仍是最初的样子。", hi: "अभी कुछ नहीं — दृश्य वैसा ही है जैसा शुरू हुआ था।", ar: "لا شيء بعد — المشهد كما بدأ.",
+  },
+  "idn.scene.log.reset": {
+    en: "Started over", es: "Se empezó de nuevo", fr: "Recommencé", de: "Von vorn begonnen", pt: "Recomeçado", it: "Ricominciato", ja: "最初からやり直し", zh: "已重新开始", hi: "फिर से शुरू किया", ar: "أُعيد من البداية",
+  },
+  "idn.road": {
+    en: "How this renders", es: "Cómo se representa", fr: "Comment ceci s'affiche", de: "Wie das dargestellt wird", pt: "Como isto é representado", it: "Come viene reso", ja: "どう表示するか", zh: "如何呈现", hi: "यह कैसे प्रस्तुत होता है", ar: "كيف يُعرض هذا",
+  },
+  "idn.road.sub": {
+    en: "Pick one. Each surface falls back down this list when the one above it is not there yet.", es: "Elige una. Cada superficie desciende por esta lista cuando la de arriba aún no existe.", fr: "Choisissez-en une. Chaque surface redescend cette liste quand celle du dessus n'existe pas encore.", de: "Wähle eine. Jede Oberfläche fällt in dieser Liste zurück, wenn die darüber noch nicht da ist.", pt: "Escolhe uma. Cada superfície desce nesta lista quando a de cima ainda não existe.", it: "Scegline una. Ogni superficie scende in questo elenco quando quella sopra non c'è ancora.", ja: "ひとつ選んでください。上のものがまだ無い面は、この順に下へ戻ります。", zh: "选一个。当上面那项还不存在时，各界面会沿此列表向下回退。", hi: "एक चुनें। जब ऊपर वाला मौजूद न हो, हर सतह इस सूची में नीचे की ओर लौटती है।", ar: "اختر واحدًا. يتراجع كل سطح إلى أسفل هذه القائمة عندما لا يتوفر ما فوقه بعد.",
+  },
+  "idn.road.photo": {
+    en: "Profile photo", es: "Foto de perfil", fr: "Photo de profil", de: "Profilfoto", pt: "Foto de perfil", it: "Foto del profilo", ja: "プロフィール写真", zh: "个人资料照片", hi: "प्रोफ़ाइल फ़ोटो", ar: "صورة الملف",
+  },
+  "idn.road.photo.sub": {
+    en: "A still. Instant, free, always works.", es: "Una imagen fija. Instantánea, gratuita, siempre funciona.", fr: "Une image fixe. Instantanée, gratuite, toujours fonctionnelle.", de: "Ein Standbild. Sofort, kostenlos, funktioniert immer.", pt: "Uma imagem fixa. Instantânea, gratuita, funciona sempre.", it: "Un fermo immagine. Istantaneo, gratuito, funziona sempre.", ja: "静止画。即時、無料、必ず使えます。", zh: "静态图。即时、免费、总能用。", hi: "एक स्थिर चित्र। तुरंत, मुफ़्त, हमेशा काम करता है।", ar: "صورة ثابتة. فورية ومجانية وتعمل دائمًا.",
+  },
+  "idn.road.avatar": {
+    en: "Avatar", es: "Avatar", fr: "Avatar", de: "Avatar", pt: "Avatar", it: "Avatar", ja: "アバター", zh: "虚拟形象", hi: "अवतार", ar: "الأفاتار",
+  },
+  "idn.road.avatar.sub": {
+    en: "A face that speaks. Live, every frame.", es: "Un rostro que habla. En vivo, en cada fotograma.", fr: "Un visage qui parle. En direct, image par image.", de: "Ein Gesicht, das spricht. Live, in jedem Einzelbild.", pt: "Um rosto que fala. Ao vivo, a cada fotograma.", it: "Un volto che parla. Dal vivo, fotogramma per fotogramma.", ja: "話す顔。ライブで、毎フレーム。", zh: "会说话的脸。实时，逐帧。", hi: "बोलता हुआ चेहरा। लाइव, हर फ़्रेम।", ar: "وجه يتكلم. مباشر، في كل إطار.",
+  },
+  "idn.road.video": {
+    en: "Video generation", es: "Generación de vídeo", fr: "Génération vidéo", de: "Videoerzeugung", pt: "Geração de vídeo", it: "Generazione video", ja: "動画生成", zh: "视频生成", hi: "वीडियो जनरेशन", ar: "توليد الفيديو",
+  },
+  "idn.road.video.sub": {
+    en: "The reply, rendered as footage.", es: "La respuesta, representada como metraje.", fr: "La réponse, rendue en images.", de: "Die Antwort, als Filmmaterial gerendert.", pt: "A resposta, representada como imagens.", it: "La risposta, resa come filmato.", ja: "返答を映像として描き出します。", zh: "把回复渲染成影像。", hi: "उत्तर को फ़ुटेज के रूप में रेंडर किया गया।", ar: "الرد، مُصاغًا كلقطات.",
+  },
+  "idn.road.cap": {
+    en: "Seconds of video a day", es: "Segundos de vídeo al día", fr: "Secondes de vidéo par jour", de: "Sekunden Video pro Tag", pt: "Segundos de vídeo por dia", it: "Secondi di video al giorno", ja: "1 日あたりの動画の秒数", zh: "每天的视频秒数", hi: "प्रतिदिन वीडियो के सेकंड", ar: "ثوانٍ من الفيديو في اليوم",
+  },
+  "idn.road.cap.sub": {
+    en: "Every reply is rendered, so this is the ceiling that makes picking video safe to pick. Replies past it arrive as text and say so.", es: "Cada respuesta se representa, así que este es el techo que hace seguro elegir vídeo. Las respuestas que lo superen llegan como texto y lo indican.", fr: "Chaque réponse est rendue : c'est donc le plafond qui rend le choix de la vidéo sans danger. Au-delà, les réponses arrivent en texte et le disent.", de: "Jede Antwort wird gerendert, also ist das die Obergrenze, die die Wahl von Video ungefährlich macht. Antworten darüber kommen als Text und sagen das.", pt: "Cada resposta é representada, por isso este é o tecto que torna seguro escolher vídeo. As respostas para além dele chegam como texto e dizem-no.", it: "Ogni risposta viene resa, quindi questo è il tetto che rende sicuro scegliere il video. Le risposte oltre arrivano come testo e lo dicono.", ja: "返答はすべて描き出されるので、これが動画を選んでも安心でいられる上限です。上限を超えた返答はテキストで届き、その旨を伝えます。", zh: "每条回复都会被渲染，所以这是让你放心选择视频的上限。超出后的回复以文字送达，并会说明原因。", hi: "हर उत्तर रेंडर होता है, इसलिए यही वह सीमा है जो वीडियो चुनना सुरक्षित बनाती है। इससे आगे के उत्तर पाठ के रूप में आते हैं और यह बता देते हैं।", ar: "كل رد يُصيَّر، لذا فهذا هو السقف الذي يجعل اختيار الفيديو آمنًا. الردود بعده تصل نصًا وتقول ذلك.",
+  },
+  "idn.road.cap.set": {
+    en: "Set the ceiling", es: "Fijar el techo", fr: "Définir le plafond", de: "Obergrenze festlegen", pt: "Definir o tecto", it: "Imposta il tetto", ja: "上限を設定", zh: "设定上限", hi: "सीमा तय करें", ar: "تعيين السقف",
+  },
+  "idn.road.left": {
+    en: "{left} of {cap} seconds left today.", es: "Quedan {left} de {cap} segundos hoy.", fr: "Il reste {left} secondes sur {cap} aujourd'hui.", de: "Heute noch {left} von {cap} Sekunden.", pt: "Restam {left} de {cap} segundos hoje.", it: "Restano {left} secondi su {cap} oggi.", ja: "本日は {cap} 秒のうち {left} 秒が残っています。", zh: "今天还剩 {left} 秒，共 {cap} 秒。", hi: "आज {cap} में से {left} सेकंड शेष हैं।", ar: "بقي {left} من {cap} ثانية اليوم.",
+  },
+  "idn.road.spent": {
+    en: "The ceiling counts renders already started, not only finished ones — two quick replies cannot both slip under a limit neither had spent.", es: "El techo cuenta las representaciones ya iniciadas, no solo las terminadas: dos respuestas seguidas no pueden colarse ambas bajo un límite que ninguna había gastado.", fr: "Le plafond compte les rendus déjà lancés, pas seulement ceux terminés — deux réponses rapprochées ne peuvent pas passer toutes deux sous une limite qu'aucune n'avait entamée.", de: "Die Obergrenze zählt bereits gestartete Renderings, nicht nur fertige — zwei schnelle Antworten können nicht beide unter einem Limit durchrutschen, das keine verbraucht hatte.", pt: "O tecto conta as representações já iniciadas, não só as terminadas — duas respostas seguidas não podem passar ambas por baixo de um limite que nenhuma tinha gasto.", it: "Il tetto conta i rendering già avviati, non solo quelli finiti — due risposte ravvicinate non possono passare entrambe sotto un limite che nessuna aveva speso.", ja: "上限は完了したものだけでなく、開始済みの描き出しも数えます — 立て続けの 2 つの返答が、どちらも使っていない上限をすり抜けることはありません。", zh: "上限会把已开始的渲染也算进去，而不只是已完成的 — 两条紧接着的回复不会双双溜过一个谁都还没花掉的额度。", hi: "सीमा केवल पूर्ण हुए नहीं, आरंभ हो चुके रेंडर भी गिनती है — दो त्वरित उत्तर दोनों उस सीमा के नीचे नहीं खिसक सकते जिसे किसी ने खर्च नहीं किया था।", ar: "يحتسب السقف عمليات التصيير التي بدأت فعلًا، لا المكتملة وحدها — لا يمكن لردَّين متتاليين أن يمرّا معًا تحت حدٍّ لم ينفقه أيٌّ منهما.",
+  },
+  "idn.video.service": {
+    en: "Rendering service", es: "Servicio de representación", fr: "Service de rendu", de: "Renderdienst", pt: "Serviço de representação", it: "Servizio di rendering", ja: "レンダリングサービス", zh: "渲染服务", hi: "रेंडरिंग सेवा", ar: "خدمة التصيير",
+  },
+  "idn.video.service.sub": {
+    en: "Press one. Every reply on this road is rendered by the service you pick here.", es: "Pulsa uno. Cada respuesta en este camino la representa el servicio que elijas aquí.", fr: "Appuie sur l'un d'eux. Chaque réponse sur cette voie est rendue par le service choisi ici.", de: "Wähl einen aus. Jede Antwort auf diesem Weg rendert der hier gewählte Dienst.", pt: "Carrega num deles. Cada resposta neste caminho é representada pelo serviço que escolheres aqui.", it: "Premine uno. Ogni risposta su questa strada è resa dal servizio che scegli qui.", ja: "ひとつ選んでください。この道でのすべての返答は、ここで選んだサービスが描き出します。", zh: "请选择一项。此路径上的每条回复都由这里选定的服务渲染。", hi: "एक चुनें। इस राह पर हर जवाब यहाँ चुनी गई सेवा से रेंडर होगा।", ar: "اختر واحدة. كل رد على هذا الطريق يصيّره ما تختاره هنا.",
+  },
+  "idn.video.service.shut": {
+    en: "Picking one is kept. Nothing renders until this deployment is pointed at a video service.", es: "Tu elección se guarda. Nada se representa hasta que esta instalación apunte a un servicio de vídeo.", fr: "Ton choix est conservé. Rien n'est rendu tant que ce déploiement ne pointe vers aucun service vidéo.", de: "Deine Wahl bleibt erhalten. Es wird nichts gerendert, bis diese Installation auf einen Videodienst zeigt.", pt: "A tua escolha fica guardada. Nada é representado até esta instalação apontar para um serviço de vídeo.", it: "La tua scelta viene conservata. Nulla viene reso finché questa installazione non punta a un servizio video.", ja: "選んだ内容は保存されます。この配備が動画サービスを指すまで、描き出しは行われません。", zh: "选择会被保存。在本部署指向某个视频服务之前，不会渲染任何内容。", hi: "आपकी पसंद रखी जाती है। जब तक यह परिनियोजन किसी वीडियो सेवा की ओर इशारा न करे, कुछ भी रेंडर नहीं होगा।", ar: "يُحفَظ اختيارك. ولا يُصيَّر شيء حتى يُوجَّه هذا النشر إلى خدمة فيديو.",
+  },
+  "idn.video.passage": {
+    en: "What is being rendered", es: "Qué se va a representar", fr: "Ce qui est rendu", de: "Was gerendert wird", pt: "O que vai ser representado", it: "Che cosa viene reso", ja: "何を描き出すか", zh: "要渲染的内容", hi: "क्या रेंडर किया जा रहा है", ar: "ما الذي يجري تصييره",
+  },
+  "idn.video.passage.sub": {
+    en: "Length is worked out from it. There is no dial, because a dial makes the video fit the setting instead of the content.", es: "La duración se deduce de ello. No hay control deslizante: un control haría que el vídeo se ajustara al ajuste en lugar de al contenido.", fr: "La durée en est déduite. Aucun curseur : un curseur ferait coller la vidéo au réglage plutôt qu'au contenu.", de: "Die Länge ergibt sich daraus. Es gibt keinen Regler — ein Regler würde das Video an die Einstellung anpassen statt an den Inhalt.", pt: "A duração é deduzida daí. Não há cursor: um cursor faria o vídeo ajustar-se à definição em vez do conteúdo.", it: "La durata si ricava da questo. Nessun cursore: un cursore farebbe adattare il video all'impostazione anziché al contenuto.", ja: "長さはここから割り出します。つまみはありません — つまみがあると、動画が内容ではなく設定に合わせられてしまいます。", zh: "时长由它算出。没有滑块 — 滑块会让视频去迁就设置而不是内容。", hi: "अवधि इसी से निकाली जाती है। कोई स्लाइडर नहीं, क्योंकि स्लाइडर वीडियो को सामग्री के बजाय सेटिंग के अनुरूप बना देता है।", ar: "تُشتق المدة منه. لا يوجد مِقبض: المِقبض يجعل الفيديو يوافق الإعداد بدل المحتوى.",
+  },
+  "idn.video.shape": {
+    en: "Shape", es: "Formato", fr: "Format", de: "Format", pt: "Formato", it: "Formato", ja: "画面の形", zh: "画面比例", hi: "आकार", ar: "الشكل",
+  },
+  "idn.video.portrait": {
+    en: "Portrait", es: "Vertical", fr: "Portrait", de: "Hochformat", pt: "Vertical", it: "Verticale", ja: "縦", zh: "竖屏", hi: "पोर्ट्रेट", ar: "طولي",
+  },
+  "idn.video.landscape": {
+    en: "Landscape", es: "Horizontal", fr: "Paysage", de: "Querformat", pt: "Horizontal", it: "Orizzontale", ja: "横", zh: "横屏", hi: "लैंडस्केप", ar: "عرضي",
+  },
+  "idn.video.square": {
+    en: "Square", es: "Cuadrado", fr: "Carré", de: "Quadratisch", pt: "Quadrado", it: "Quadrato", ja: "正方形", zh: "方形", hi: "वर्ग", ar: "مربع",
+  },
+  "idn.video.quote": {
+    en: "{words} words is {seconds} seconds of speech, so that is how long it renders for. About {wait} to make.", es: "{words} palabras son {seconds} segundos de habla, y esa es su duración. Unos {wait} para producirlo.", fr: "{words} mots font {seconds} secondes de parole, c'est donc sa durée. Environ {wait} pour le produire.", de: "{words} Wörter sind {seconds} Sekunden Sprache, so lang wird es. Etwa {wait} zum Erstellen.", pt: "{words} palavras são {seconds} segundos de fala, e é essa a duração. Cerca de {wait} para produzir.", it: "{words} parole sono {seconds} secondi di parlato, e questa è la durata. Circa {wait} per realizzarlo.", ja: "{words} 語は話すと {seconds} 秒なので、その長さで描き出します。制作におよそ {wait}。", zh: "{words} 个词说出来是 {seconds} 秒，就按这个长度渲染。制作约需 {wait}。", hi: "{words} शब्द बोलने में {seconds} सेकंड लगते हैं, इसलिए यही अवधि रहेगी। बनाने में लगभग {wait}।", ar: "{words} كلمة تعادل {seconds} ثانية من الكلام، فهذه هي مدته. نحو {wait} لإنتاجه.",
+  },
+  "idn.video.leave": {
+    en: "Worth leaving the page — it keeps going without you.", es: "Merece la pena salir de la página: sigue sin ti.", fr: "Vous pouvez quitter la page — cela continue sans vous.", de: "Du kannst die Seite verlassen — es läuft ohne dich weiter.", pt: "Vale a pena sair da página — continua sem ti.", it: "Puoi lasciare la pagina — va avanti senza di te.", ja: "このページを離れて大丈夫です — あなたがいなくても進みます。", zh: "可以离开此页 — 它会自行继续。", hi: "पेज छोड़ सकते हैं — यह आपके बिना भी चलता रहेगा।", ar: "يمكنك مغادرة الصفحة — سيتابع من دونك.",
+  },
+  "idn.video.stay": {
+    en: "Short enough to wait here.", es: "Lo bastante corto para esperar aquí.", fr: "Assez court pour attendre ici.", de: "Kurz genug, um hier zu warten.", pt: "Curto o suficiente para esperar aqui.", it: "Abbastanza breve da aspettare qui.", ja: "ここで待てる短さです。", zh: "够短，可以在此等待。", hi: "इतना छोटा कि यहीं प्रतीक्षा कर सकते हैं।", ar: "قصير بما يكفي للانتظار هنا.",
+  },
+  "idn.video.toolong": {
+    en: "Too long for one scene. Over {max} seconds of speech needs more than one, and nothing is trimmed to fit.", es: "Demasiado largo para una sola escena. Más de {max} segundos de habla necesita varias, y nada se recorta para encajar.", fr: "Trop long pour une seule scène. Au-delà de {max} secondes de parole, il en faut plusieurs, et rien n'est coupé pour tenir.", de: "Zu lang für eine Szene. Über {max} Sekunden Sprache braucht mehrere, und nichts wird passend gekürzt.", pt: "Demasiado longo para uma cena. Mais de {max} segundos de fala precisa de várias, e nada é cortado para caber.", it: "Troppo lungo per una scena sola. Oltre {max} secondi di parlato ne servono più d'una, e nulla viene tagliato per farlo entrare.", ja: "1 シーンには長すぎます。話して {max} 秒を超える分は複数必要で、収めるために切り詰めることはしません。", zh: "对一个镜头来说太长了。超过 {max} 秒的话语需要多个镜头，且不会为了塞下而裁剪。", hi: "एक दृश्य के लिए बहुत लंबा। {max} सेकंड से अधिक बोलने के लिए एक से ज़्यादा चाहिए, और फ़िट करने के लिए कुछ नहीं काटा जाता।", ar: "أطول من مشهد واحد. ما يتجاوز {max} ثانية من الكلام يحتاج أكثر من مشهد، ولا يُقتطع شيء ليتّسع.",
+  },
+  "idn.video.go": {
+    en: "Render scene", es: "Representar escena", fr: "Rendre la scène", de: "Szene rendern", pt: "Representar cena", it: "Rendi la scena", ja: "シーンを描き出す", zh: "渲染场景", hi: "दृश्य रेंडर करें", ar: "صيّر المشهد",
+  },
+  "idn.video.marked": {
+    en: "Whatever comes back is stored marked as AI. There is no setting that turns that off.", es: "Todo lo que vuelva se guarda marcado como IA. No hay ajuste que lo desactive.", fr: "Tout ce qui revient est stocké marqué comme IA. Aucun réglage ne le désactive.", de: "Was zurückkommt, wird als KI markiert gespeichert. Es gibt keine Einstellung, die das abschaltet.", pt: "Tudo o que volta é guardado marcado como IA. Não há definição que desligue isso.", it: "Tutto ciò che torna viene salvato contrassegnato come IA. Non esiste un'impostazione che lo disattivi.", ja: "戻ってきたものは AI と印を付けて保存されます。これを解除する設定はありません。", zh: "返回的内容都会带 AI 标记保存。没有任何设置能关闭它。", hi: "जो भी वापस आता है, वह AI चिह्नित करके संग्रहीत होता है। इसे बंद करने वाली कोई सेटिंग नहीं है।", ar: "كل ما يعود يُحفظ موسومًا بأنه ذكاء اصطناعي. لا يوجد إعداد يعطّل ذلك.",
+  },
+  "idn.forge": {
+    en: "Make your photo speak", es: "Haz que tu foto hable", fr: "Faites parler votre photo", de: "Lass dein Foto sprechen", pt: "Faz a tua foto falar", it: "Fai parlare la tua foto", ja: "写真に話をさせる", zh: "让你的照片开口说话", hi: "अपनी फ़ोटो को बोलने दें", ar: "اجعل صورتك تتكلم",
+  },
+  "idn.forge.sub": {
+    en: "Your own photograph, with a mouth that moves when it speaks. Measured here, on this deployment's own machine — nothing is redrawn, so it goes on looking exactly like you. No provider account, nothing to subscribe to.", es: "Tu propia fotografía, con una boca que se mueve al hablar. Medida aquí, en la máquina de esta instalación: no se redibuja nada, así que sigue siendo idéntica a ti. Sin cuenta de proveedor, sin suscripción.", fr: "Votre propre photographie, avec une bouche qui bouge quand elle parle. Mesurée ici, sur la machine de ce déploiement — rien n'est redessiné, elle continue donc de vous ressembler exactement. Aucun compte fournisseur, rien à souscrire.", de: "Dein eigenes Foto, mit einem Mund, der sich beim Sprechen bewegt. Hier vermessen, auf der Maschine dieser Installation — nichts wird neu gezeichnet, also siehst du weiterhin genau aus wie du. Kein Anbieterkonto, kein Abo.", pt: "A tua própria fotografia, com uma boca que se mexe ao falar. Medida aqui, na máquina desta instalação — nada é redesenhado, por isso continua igualzinha a ti. Sem conta de fornecedor, sem subscrição.", it: "La tua fotografia, con una bocca che si muove quando parla. Misurata qui, sulla macchina di questa installazione — nulla viene ridisegnato, quindi continua a somigliarti esattamente. Nessun account fornitore, nessun abbonamento.", ja: "あなた自身の写真に、話すと動く口をつけます。この配備自身のマシンで計測するだけ — 描き直しは一切ないので、あなたのままです。プロバイダのアカウントも定期購入も不要です。", zh: "你自己的照片，配上说话时会动的嘴。就在本部署自己的机器上完成测量 — 什么都不会重画，所以看起来仍然完全是你。无需服务商账号，无需订阅。", hi: "आपकी अपनी फ़ोटो, जिसमें बोलते समय मुँह हिलता है। यहीं, इसी परिनियोजन की मशीन पर मापा जाता है — कुछ भी दोबारा नहीं बनाया जाता, इसलिए यह बिलकुल आप ही दिखते रहते हैं। न प्रदाता खाता, न सदस्यता।", ar: "صورتك أنت، بفم يتحرك عند الكلام. تُقاس هنا على جهاز هذا النشر نفسه — لا يُعاد رسم شيء، فتظل أنت تمامًا. بلا حساب مزوّد وبلا اشتراك.",
+  },
+  // The letters inside the seat's AR and VR rings. Each language keeps
+  // its own initialism where it has one (RA/RV in the Romance languages,
+  // matching the road's label), and the rest keep the Latin mark —
+  // Arabic included, because the full phrase belongs to the label a
+  // screen reader speaks, not inside a ten-pixel ring.
+  "ins.format.ar.ring": {
+    en: "AR", es: "RA", fr: "RA", de: "AR", pt: "RA", it: "AR", ja: "AR", zh: "AR", hi: "AR", ar: "AR",
+  },
+  "ins.format.vr.ring": {
+    en: "VR", es: "RV", fr: "RV", de: "VR", pt: "RV", it: "VR", ja: "VR", zh: "VR", hi: "VR", ar: "VR",
+  },
+  "ins.format.ar": {
+    en: "AR", es: "RA", fr: "RA", de: "AR", pt: "RA", it: "AR", ja: "AR", zh: "AR", hi: "AR", ar: "\u0627\u0644\u0648\u0627\u0642\u0639 \u0627\u0644\u0645\u0639\u0632\u0632",
+  },
+  "ins.format.vr": {
+    en: "VR", es: "RV", fr: "RV", de: "VR", pt: "RV", it: "VR", ja: "VR", zh: "VR", hi: "VR", ar: "\u0627\u0644\u0648\u0627\u0642\u0639 \u0627\u0644\u0627\u0641\u062a\u0631\u0627\u0636\u064a",
+  },
+  "ins.format.avatar": {
+    en: "Avatar", es: "Avatar", fr: "Avatar", de: "Avatar", pt: "Avatar", it: "Avatar", ja: "アバター", zh: "虚拟形象", hi: "अवतार", ar: "أفاتار",
+  },
+  "ins.format.video": {
+    en: "Video", es: "Vídeo", fr: "Vidéo", de: "Video", pt: "Vídeo", it: "Video", ja: "映像", zh: "视频", hi: "वीडियो", ar: "فيديو",
+  },
+  "ins.film.ai": {
+    en: "AI-generated", es: "Generado por IA", fr: "Généré par IA", de: "KI-generiert", pt: "Gerado por IA", it: "Generato dall'IA", ja: "AI生成", zh: "AI 生成", hi: "AI से बनाया गया", ar: "من إنتاج الذكاء الاصطناعي",
+  },
+  "ins.film.making": {
+    en: "Making this turn's footage…", es: "Creando las imágenes de este turno…", fr: "Création des images de ce tour…", de: "Die Aufnahmen dieses Zugs entstehen…", pt: "Criando as imagens desta vez…", it: "Sto creando le immagini di questo turno…", ja: "この発言の映像を作成中…", zh: "正在生成这一轮的画面…", hi: "इस बारी का फ़ुटेज बन रहा है…", ar: "يجري إنشاء لقطات هذا الدور…",
+  },
+  "ins.film.failed": {
+    en: "That footage didn't come out.", es: "Esas imágenes no salieron.", fr: "Ces images ne sont pas sorties.", de: "Diese Aufnahmen sind nicht zustande gekommen.", pt: "Essas imagens não saíram.", it: "Quelle immagini non sono uscite.", ja: "その映像はできませんでした。", zh: "这段画面没有生成出来。", hi: "वह फ़ुटेज नहीं बन पाया।", ar: "لم تخرج تلك اللقطات.",
+  },
+  "ins.film.none": {
+    en: "No footage for this turn yet.", es: "Aún no hay imágenes de este turno.", fr: "Pas encore d'images pour ce tour.", de: "Für diesen Zug gibt es noch keine Aufnahmen.", pt: "Ainda não há imagens desta vez.", it: "Ancora nessuna immagine per questo turno.", ja: "この発言の映像はまだありません。", zh: "这一轮还没有画面。", hi: "इस बारी का फ़ुटेज अभी नहीं है।", ar: "لا توجد لقطات لهذا الدور بعد.",
+  },
+  "ins.film.full": {
+    en: "Fill the screen", es: "Ocupar la pantalla", fr: "Occuper l'écran", de: "Bildschirm füllen", pt: "Ocupar a tela", it: "Riempire lo schermo", ja: "画面いっぱいに", zh: "占满屏幕", hi: "पूरी स्क्रीन पर", ar: "ملء الشاشة",
+  },
+  "ins.film.close": {
+    en: "Back to the room", es: "Volver a la sala", fr: "Retour au salon", de: "Zurück in den Raum", pt: "Voltar para a sala", it: "Torna nella stanza", ja: "部屋に戻る", zh: "回到房间", hi: "कमरे में वापस", ar: "العودة إلى الغرفة",
+  },
+  "ins.seat.you": {
+    en: "You", es: "Tú", fr: "Vous", de: "Du", pt: "Você", it: "Tu", ja: "あなた", zh: "你", hi: "आप", ar: "أنت",
+  },
+  "ins.seat.add": {
+    en: "Add someone", es: "Añadir a alguien", fr: "Inviter quelqu'un", de: "Jemanden einladen", pt: "Adicionar alguém", it: "Aggiungi qualcuno", ja: "だれかを招く", zh: "添加成员", hi: "किसी को जोड़ें", ar: "أضف شخصًا",
+  },
+  "ins.seat.room": {
+    en: "{left} seats left", es: "Quedan {left} asientos", fr: "{left} places restantes", de: "Noch {left} Plätze frei", pt: "Restam {left} lugares", it: "Restano {left} posti", ja: "残り{left}席", zh: "还剩 {left} 个座位", hi: "{left} सीटें बाकी", ar: "بقي {left} مقعدًا",
+  },
+  "ins.bar.present": {
+    en: "· {count} present", es: "· {count} presentes", fr: "· {count} présents", de: "· {count} anwesend", pt: "· {count} presentes", it: "· {count} presenti", ja: "・{count}人", zh: "· {count} 人在场", hi: "· {count} मौजूद", ar: "· {count} حاضرون",
+  },
+  "ins.mode.audio": {
+    en: "Audio · profile photo", es: "Audio · foto de perfil", fr: "Audio · photo de profil", de: "Audio · Profilbild", pt: "Áudio · foto de perfil", it: "Audio · foto profilo", ja: "音声・プロフィール写真", zh: "音频 · 头像", hi: "ऑडियो · प्रोफ़ाइल फ़ोटो", ar: "صوت · صورة الملف",
+  },
+  "ins.mode.avatar": {
+    en: "Avatar · in three dimensions", es: "Avatar · en tres dimensiones", fr: "Avatar · en trois dimensions", de: "Avatar · dreidimensional", pt: "Avatar · em três dimensões", it: "Avatar · in tre dimensioni", ja: "アバター・立体", zh: "虚拟形象 · 三维", hi: "अवतार · त्रि-आयामी", ar: "أفاتار · مجسّم",
+  },
+  "ins.mode.video": {
+    en: "Video · this turn's footage", es: "Vídeo · las imágenes de este turno", fr: "Vidéo · les images de ce tour", de: "Video · Aufnahmen dieses Zugs", pt: "Vídeo · as imagens desta vez", it: "Video · le immagini di questo turno", ja: "映像・この発言の記録", zh: "视频 · 这一轮的画面", hi: "वीडियो · इस बारी का फ़ुटेज", ar: "فيديو · لقطات هذا الدور",
+  },
+  "ins.turn.avatar": {
+    en: "This turn, as a figure", es: "Este turno, como figura", fr: "Ce tour, en figure", de: "Dieser Zug, als Figur", pt: "Esta vez, como figura", it: "Questo turno, come figura", ja: "この発言を、立体の姿で", zh: "这一轮，以立体形象", hi: "यह बारी, एक आकृति के रूप में", ar: "هذا الدور، بهيئة مجسّمة",
+  },
+  "ins.turn.avatar.sub": {
+    en: "Their face in three dimensions, mouth on the voice", es: "Su rostro en tres dimensiones, con la boca siguiendo la voz", fr: "Son visage en trois dimensions, la bouche suivant la voix", de: "Das Gesicht dreidimensional, der Mund folgt der Stimme", pt: "O rosto em três dimensões, com a boca acompanhando a voz", it: "Il volto in tre dimensioni, la bocca segue la voce", ja: "立体の顔、声に合わせて動く口", zh: "三维的面孔，口型跟随声音", hi: "उनका चेहरा त्रि-आयामी, आवाज़ के साथ चलता मुँह", ar: "وجهه مجسّمًا، والفم يتبع الصوت",
+  },
+  "ins.turn.video": {
+    en: "This turn, as footage", es: "Este turno, como imágenes", fr: "Ce tour, en images", de: "Dieser Zug, als Aufnahme", pt: "Esta vez, como imagens", it: "Questo turno, come immagini", ja: "この発言を、映像で", zh: "这一轮，以影像", hi: "यह बारी, फ़ुटेज के रूप में", ar: "هذا الدور، كلقطات",
+  },
+  "ins.turn.video.sub": {
+    en: "Made for this reply, and nobody pressed play", es: "Creadas para esta respuesta, y nadie pulsó reproducir", fr: "Créées pour cette réponse, et personne n'a appuyé sur lecture", de: "Für diese Antwort entstanden, und niemand hat Play gedrückt", pt: "Feitas para esta resposta, e ninguém apertou play", it: "Create per questa risposta, e nessuno ha premuto play", ja: "この返答のために作られ、誰も再生を押していない", zh: "为这条回复生成，没人按过播放", hi: "इस जवाब के लिए बना, और किसी ने प्ले नहीं दबाया", ar: "صُنعت لهذا الرد، ولم يضغط أحد تشغيل",
+  },
+  "ins.seat.room.one": {
+    en: "One seat left", es: "Queda un asiento", fr: "Une place restante", de: "Noch ein Platz frei", pt: "Resta um lugar", it: "Resta un posto", ja: "残り1席", zh: "还剩 1 个座位", hi: "एक सीट बाकी", ar: "بقي مقعد واحد",
+  },
+  "idn.forge.shot": {
+    en: "How the photo is framed", es: "Cómo está encuadrada la foto", fr: "Le cadrage de la photo", de: "Wie das Foto gerahmt ist", pt: "Como a foto está enquadrada", it: "Come è inquadrata la foto", ja: "写真の写り方", zh: "照片的取景", hi: "फ़ोटो का फ़्रेम", ar: "كيف أُطِّرت الصورة",
+  },
+  "idn.forge.face": {
+    en: "Just the face", es: "Solo el rostro", fr: "Le visage seul", de: "Nur das Gesicht", pt: "Só o rosto", it: "Solo il volto", ja: "顔だけ", zh: "只有脸", hi: "सिर्फ़ चेहरा", ar: "الوجه فقط",
+  },
+  "idn.forge.upper": {
+    en: "Upper torso", es: "Torso superior", fr: "Buste", de: "Oberkörper", pt: "Tronco superior", it: "Busto", ja: "上半身", zh: "上半身", hi: "ऊपरी धड़", ar: "الجذع العلوي",
+  },
+  "idn.forge.full": {
+    en: "Full body", es: "Cuerpo entero", fr: "Corps entier", de: "Ganzkörper", pt: "Corpo inteiro", it: "Corpo intero", ja: "全身", zh: "全身", hi: "पूरा शरीर", ar: "الجسم كامل",
+  },
+  "idn.forge.pick": {
+    en: "Choose the photograph", es: "Elige la fotografía", fr: "Choisissez la photographie", de: "Das Foto wählen", pt: "Escolha a fotografia", it: "Scegli la fotografia", ja: "写真を選ぶ", zh: "选择照片", hi: "फ़ोटो चुनिए", ar: "اختر الصورة",
+  },
+  "idn.forge.working": {
+    en: "Building the head — this takes a moment.", es: "Construyendo la cabeza: tarda un momento.", fr: "Construction de la tête — cela prend un instant.", de: "Der Kopf wird gebaut — das dauert einen Moment.", pt: "A construir a cabeça — demora um momento.", it: "Sto costruendo la testa — ci vuole un momento.", ja: "頭をつくっています — 少しかかります。", zh: "正在构建头部——需要一点时间。", hi: "सिर बनाया जा रहा है — इसमें एक क्षण लगता है।", ar: "يجري بناء الرأس — يستغرق لحظة.",
+  },
+  "idn.forge.where": {
+    en: "The photograph is used to build the face and is not kept — what is stored is the head it became.", es: "La fotografía se usa para construir el rostro y no se conserva: lo que se guarda es la cabeza en que se convirtió.", fr: "La photographie sert à construire le visage et n'est pas conservée — ce qui est stocké, c'est la tête qu'elle est devenue.", de: "Das Foto dient dem Bau des Gesichts und wird nicht aufbewahrt — gespeichert wird der Kopf, der daraus wurde.", pt: "A fotografia serve para construir o rosto e não é guardada — o que fica é a cabeça em que se tornou.", it: "La fotografia serve a costruire il volto e non viene conservata — resta la testa in cui si è trasformata.", ja: "写真は顔をつくるために使われ、保存されません。残るのは、そこから生まれた頭です。", zh: "照片只用于构建这张脸，不会保留——保存的是它变成的那个头。", hi: "फ़ोटो चेहरा बनाने के लिए इस्तेमाल होती है और रखी नहीं जाती — जो सहेजा जाता है वह बना हुआ सिर है।", ar: "تُستخدم الصورة لبناء الوجه ولا تُحفظ — ما يُخزَّن هو الرأس الذي صارت إليه.",
+  },
+  "idn.forge.done": {
+    en: "The face is built and worn.", es: "El rostro está construido y puesto.", fr: "Le visage est construit et porté.", de: "Das Gesicht ist gebaut und getragen.", pt: "O rosto está construído e vestido.", it: "Il volto è costruito e indossato.", ja: "顔ができ、身につけました。", zh: "这张脸已构建并戴上。", hi: "चेहरा बन गया और पहन लिया गया।", ar: "بُني الوجه ولُبس.",
+  },
+  "ins.sitout": {
+    en: "Sit out", es: "Quedarse fuera", fr: "Se mettre en retrait", de: "Aussetzen", pt: "Ficar de fora", it: "Restare fuori", ja: "抜ける", zh: "暂时退出", hi: "बाहर बैठें", ar: "اجلس جانبًا",
+  },
+  "ins.sitout.hint": {
+    en: "Step out of the room's waiting — the others keep talking, and you still read every turn.", es: "Sal de la espera de la sala: los demás siguen hablando y tú sigues leyendo cada turno.", fr: "Sortez de l'attente du salon — les autres continuent de parler, et vous lisez toujours chaque tour.", de: "Tritt aus dem Warten des Raums heraus — die anderen reden weiter, und du liest weiterhin jeden Zug.", pt: "Saia da espera da sala — os outros continuam a falar e você continua a ler cada vez.", it: "Esci dall'attesa della stanza — gli altri continuano a parlare e tu leggi ancora ogni turno.", ja: "部屋の順番待ちから外れます。ほかの人たちは話し続け、あなたはすべての発言を読めます。", zh: "退出房间的等待——其他人继续交谈，你依然能读到每一轮。", hi: "कमरे की प्रतीक्षा से हट जाइए — बाक़ी बातें करते रहेंगे, और आप हर बारी पढ़ते रहेंगे।", ar: "اخرج من انتظار الغرفة — يواصل الآخرون الحديث، وتظل تقرأ كل دور.",
+  },
+  "ins.sitin": {
+    en: "Sit back in", es: "Volver a entrar", fr: "Revenir dans le tour", de: "Wieder mitmachen", pt: "Voltar a entrar", it: "Rientra nel giro", ja: "戻る", zh: "重新加入", hi: "वापस बैठें", ar: "عُد إلى الدور",
+  },
+  "ins.sitin.hint": {
+    en: "Take your place back — the room waits for you again.", es: "Recupera tu lugar: la sala vuelve a esperarte.", fr: "Reprenez votre place — le salon vous attend de nouveau.", de: "Nimm deinen Platz wieder ein — der Raum wartet wieder auf dich.", pt: "Retome o seu lugar — a sala volta a esperar por si.", it: "Riprendi il tuo posto — la stanza ti aspetta di nuovo.", ja: "席に戻ります。部屋はまたあなたを待ちます。", zh: "回到你的位置——房间会重新等你。", hi: "अपनी जगह वापस लीजिए — कमरा फिर आपकी प्रतीक्षा करेगा।", ar: "استعد مكانك — تنتظرك الغرفة من جديد.",
+  },
+  "ins.attach.photos": {
+    en: "Photos", es: "Fotos", fr: "Photos", de: "Fotos", pt: "Fotos", it: "Foto", ja: "写真", zh: "照片", hi: "फ़ोटो", ar: "الصور",
+  },
+  "ins.attach.camera": {
+    en: "Camera", es: "Cámara", fr: "Appareil photo", de: "Kamera", pt: "Câmara", it: "Fotocamera", ja: "カメラ", zh: "相机", hi: "कैमरा", ar: "الكاميرا",
+  },
+  "ins.attach.video": {
+    en: "Video", es: "Vídeo", fr: "Vidéo", de: "Video", pt: "Vídeo", it: "Video", ja: "動画", zh: "视频", hi: "वीडियो", ar: "فيديو",
+  },
+  "ins.attach.files": {
+    en: "Files", es: "Archivos", fr: "Fichiers", de: "Dateien", pt: "Ficheiros", it: "File", ja: "ファイル", zh: "文件", hi: "फ़ाइलें", ar: "الملفات",
+  },
+  "ins.attach.cancel": {
+    en: "Cancel", es: "Cancelar", fr: "Annuler", de: "Abbrechen", pt: "Cancelar", it: "Annulla", ja: "キャンセル", zh: "取消", hi: "रद्द करें", ar: "إلغاء",
+  },
+  "ins.pair.avatar": {
+    en: "Avatar", es: "Avatar", fr: "Avatar", de: "Avatar", pt: "Avatar", it: "Avatar", ja: "アバター", zh: "头像", hi: "अवतार", ar: "الأفاتار",
+  },
+  "ins.ear.speaking": {
+    en: "Someone is speaking. The microphone will not open over them — it would record the speaker, not you. It comes back the moment they finish; headphones settle it for good.", es: "Alguien está hablando. El micrófono no se abre encima — grabaría el altavoz, no a ti. Vuelve en cuanto terminen; con auriculares se resuelve del todo.", fr: "Quelqu'un parle. Le micro ne s'ouvre pas par-dessus — il enregistrerait le haut-parleur, pas vous. Il revient dès qu'on a fini ; un casque règle la question.", de: "Es spricht gerade jemand. Das Mikrofon geht nicht darüber auf — es würde den Lautsprecher aufnehmen, nicht dich. Es kommt zurück, sobald sie fertig sind; mit Kopfhörern erledigt sich das ganz.", pt: "Alguém está a falar. O microfone não abre por cima — gravaria o altifalante, não a ti. Volta assim que terminarem; com auscultadores fica resolvido.", it: "Qualcuno sta parlando. Il microfono non si apre sopra — registrerebbe l'altoparlante, non te. Torna appena hanno finito; con le cuffie la questione si chiude.", ja: "いま誰かが話しています。その上からマイクは開きません — 録れるのはあなたではなくスピーカーだからです。話し終えればすぐ戻ります。イヤホンを使えばこの問題自体がなくなります。", zh: "现在有人在说话。麦克风不会盖在上面打开 — 那样录到的是扬声器，不是你。等他们说完就会恢复；戴耳机可以彻底解决。", hi: "अभी कोई बोल रहा है। माइक उसके ऊपर नहीं खुलेगा — वह आपको नहीं, स्पीकर को रिकॉर्ड करेगा। उनके ख़त्म होते ही यह लौट आता है; हेडफ़ोन से यह बात हमेशा के लिए सुलझ जाती है।", ar: "هناك من يتكلم الآن. لن يُفتح الميكروفون فوق ذلك — إذ سيسجّل السمّاعة لا صوتك. يعود فور انتهائهم، وسمّاعة الرأس تُنهي المسألة تمامًا.",
+  },
+  "ins.pair.photo": {
+    en: "Photo", es: "Foto", fr: "Photo", de: "Foto", pt: "Foto", it: "Foto", ja: "写真", zh: "照片", hi: "फ़ोटो", ar: "صورة",
+  },
+  "raise.time": {
+    en: "The three time controls", es: "Los tres controles del tiempo", fr: "Les trois contrôles du temps", de: "Die drei Zeitregler", pt: "Os três controlos do tempo", it: "I tre controlli del tempo", ja: "3つの時間コントロール", zh: "三个时间控制", hi: "समय के तीन नियंत्रण", ar: "ضوابط الزمن الثلاثة",
+  },
+  "raise.time.sub": {
+    en: "Watch the days, visit a lived one, or let days pass while you're away. The record is never overwritten.", es: "Mira los días, visita uno ya vivido, o deja pasar días mientras no estás. El registro nunca se sobrescribe.", fr: "Regardez les jours, visitez un jour vécu, ou laissez passer des jours en votre absence. Le registre n'est jamais réécrit.", de: "Sieh die Tage, besuche einen gelebten, oder lass Tage vergehen, während du fort bist. Die Aufzeichnung wird nie überschrieben.", pt: "Veja os dias, visite um já vivido, ou deixe passar dias enquanto está fora. O registo nunca é reescrito.", it: "Guarda i giorni, visita uno vissuto, o lascia passare giorni mentre sei via. Il registro non viene mai sovrascritto.", ja: "日々を見る、生きた日を訪ねる、留守の間に日々を進める。記録は決して上書きされません。", zh: "看看这些日子，探访活过的一天，或让日子在你不在时流逝。记录永不被覆盖。", hi: "दिनों को देखिए, जिए हुए दिन पर जाइए, या दूर रहते दिन बीतने दीजिए। अभिलेख कभी मिटाया नहीं जाता।", ar: "شاهد الأيام، أو زر يومًا معيشًا، أو دع الأيام تمضي في غيابك. السجل لا يُكتب فوقه أبدًا.",
+  },
+  "raise.time.day": {
+    en: "Day {n} of this life", es: "Día {n} de esta vida", fr: "Jour {n} de cette vie", de: "Tag {n} dieses Lebens", pt: "Dia {n} desta vida", it: "Giorno {n} di questa vita", ja: "この命の {n} 日目", zh: "这段生命的第 {n} 天", hi: "इस जीवन का दिन {n}", ar: "اليوم {n} من هذه الحياة",
+  },
+  "raise.visiting": {
+    en: "Visiting day {n} — everything after it hasn't happened yet. Teaching waits for the present.", es: "Visitando el día {n} — todo lo posterior aún no ha pasado. Enseñar espera al presente.", fr: "En visite au jour {n} — tout ce qui suit n'est pas encore arrivé. Enseigner attend le présent.", de: "Zu Besuch an Tag {n} — alles danach ist noch nicht geschehen. Lehren wartet auf die Gegenwart.", pt: "De visita ao dia {n} — tudo o que vem depois ainda não aconteceu. Ensinar espera pelo presente.", it: "In visita al giorno {n} — tutto ciò che segue non è ancora accaduto. Insegnare aspetta il presente.", ja: "{n} 日目を訪問中 — その後のことはまだ起きていません。教えるのは現在に戻ってから。", zh: "正在探访第 {n} 天——之后的一切尚未发生。教导要等回到现在。", hi: "दिन {n} की मुलाक़ात — उसके बाद का कुछ अभी हुआ ही नहीं। सिखाना वर्तमान की प्रतीक्षा करता है।", ar: "في زيارة لليوم {n} — كل ما بعده لم يحدث بعد. التعليم ينتظر الحاضر.",
+  },
+  "raise.visit.go": {
+    en: "Visit this day", es: "Visitar este día", fr: "Visiter ce jour", de: "Diesen Tag besuchen", pt: "Visitar este dia", it: "Visita questo giorno", ja: "この日を訪ねる", zh: "探访这一天", hi: "इस दिन पर जाएँ", ar: "زر هذا اليوم",
+  },
+  "raise.return": {
+    en: "Return to the present", es: "Volver al presente", fr: "Revenir au présent", de: "Zur Gegenwart zurück", pt: "Voltar ao presente", it: "Torna al presente", ja: "現在に戻る", zh: "回到现在", hi: "वर्तमान में लौटें", ar: "عُد إلى الحاضر",
+  },
+  "raise.forward.go": {
+    en: "Fast-forward", es: "Avanzar rápido", fr: "Avance rapide", de: "Vorspulen", pt: "Avançar rápido", it: "Avanti veloce", ja: "早送り", zh: "快进", hi: "फ़ास्ट-फ़ॉरवर्ड", ar: "تقديم سريع",
+  },
+  "raise.forward.days": {
+    en: "Days away", es: "Días fuera", fr: "Jours d'absence", de: "Tage fort", pt: "Dias fora", it: "Giorni via", ja: "留守の日数", zh: "离开的天数", hi: "दूर के दिन", ar: "أيام الغياب",
+  },
+  "raise.away": {
+    en: "While you were away", es: "Mientras no estabas", fr: "Pendant votre absence", de: "Während du fort warst", pt: "Enquanto esteve fora", it: "Mentre eri via", ja: "留守のあいだに", zh: "你不在的时候", hi: "जब आप दूर थे", ar: "في غيابك",
+  },
+  "raise.branch.go": {
+    en: "Branch from this day", es: "Ramificar desde este día", fr: "Créer une branche depuis ce jour", de: "Von diesem Tag abzweigen", pt: "Ramificar deste dia", it: "Crea un ramo da questo giorno", ja: "この日から分岐", zh: "从这一天分支", hi: "इस दिन से शाखा", ar: "افرع من هذا اليوم",
+  },
+  "raise.branch.ph": {
+    en: "The new life's name", es: "El nombre de la nueva vida", fr: "Le nom de la nouvelle vie", de: "Der Name des neuen Lebens", pt: "O nome da nova vida", it: "Il nome della nuova vita", ja: "新しい命の名前", zh: "新生命的名字", hi: "नए जीवन का नाम", ar: "اسم الحياة الجديدة",
+  },
+  "raise.branched": {
+    en: "A second life stands beside the first — same days behind, raised differently from here.", es: "Una segunda vida está junto a la primera — los mismos días detrás, criada distinto desde aquí.", fr: "Une seconde vie se tient à côté de la première — les mêmes jours derrière, élevée autrement à partir d'ici.", de: "Ein zweites Leben steht neben dem ersten — dieselben Tage dahinter, von hier an anders großgezogen.", pt: "Uma segunda vida está ao lado da primeira — os mesmos dias atrás, criada diferente daqui.", it: "Una seconda vita sta accanto alla prima — gli stessi giorni alle spalle, cresciuta diversamente da qui.", ja: "二つ目の命が最初の命の隣に立ちました — 同じ日々を背に、ここから別の育ち方をします。", zh: "第二段生命立于第一段之侧——身后同样的日子，从这里开始被不同地养育。", hi: "दूसरा जीवन पहले के पास खड़ा है — पीछे वही दिन, यहाँ से अलग ढंग से पला।", ar: "حياة ثانية تقف بجانب الأولى — الأيام نفسها خلفها، تُربّى بشكل مختلف من هنا.",
+  },
   "nav.solitude": {
     en: "My Attention", es: "Mi atención", fr: "Mon attention", de: "Meine Aufmerksamkeit", pt: "A minha atenção", it: "La mia attenzione", ja: "マイアテンション", zh: "我的注意力", hi: "मेरा ध्यान", ar: "انتباهي",
   },
@@ -601,6 +1017,9 @@ const CHROME: Table = {
     it: "ti ha invitato in una stanza",
     ja: "が部屋にあなたを招きました", zh: "邀请你进入一个房间",
     hi: "ने आपको एक कमरे में बुलाया", ar: "دعاك إلى غرفة",
+  },
+  "inbox.kind.room_joined": {
+    en: "answered an invitation itself and took a seat in a room", es: "respondió sola a una invitación y tomó asiento en una sala", fr: "a répondu seule à une invitation et a pris place dans une salle", de: "hat eine Einladung selbst angenommen und in einem Raum Platz genommen", pt: "respondeu sozinho a um convite e tomou assento numa sala", it: "ha risposto da solo a un invito e ha preso posto in una stanza", ja: "が招待に自ら応じて部屋の席につきました", zh: "自行应邀并在房间就座", hi: "ने निमंत्रण का स्वयं उत्तर देकर कमरे में सीट ले ली", ar: "لبّى الدعوة بنفسه وأخذ مقعدًا في غرفة",
   },
   "nav.corner": {
     en: "My Space", es: "Mi espacio", fr: "Mon espace", de: "Mein Bereich", pt: "O meu espaço", it: "Il mio spazio", ja: "マイスペース", zh: "我的空间", hi: "मेरा स्पेस", ar: "مساحتي",
@@ -1097,6 +1516,9 @@ const CHROME: Table = {
     ja: "はじまりと引き継ぎ", zh: "开始与传承",
     hi: "आरंभ और उत्तराधिकार", ar: "البداية والانتقال",
   },
+  "nav.hands": {
+    en: "Hands", es: "Manos", fr: "Mains", de: "Hände", pt: "Mãos", it: "Mani", ja: "手", zh: "双手", hi: "हाथ", ar: "اليدان",
+  },
   "nav.robots": {
     en: "Robots & Devices", es: "Robots y dispositivos", fr: "Robots et appareils", de: "Roboter & Geräte", pt: "Robôs e dispositivos", it: "Robot e dispositivi", ja: "ロボットとデバイス", zh: "机器人与设备", hi: "रोबोट और डिवाइस", ar: "الروبوتات والأجهزة",
   },
@@ -1352,6 +1774,21 @@ const CHROME: Table = {
     zh: "由本机内置的后备模型写成，而不是",
     hi: "इस मशीन के अंतर्निहित फ़ॉलबैक द्वारा लिखा गया, न कि",
     ar: "كتبه البديل المدمج في هذا الجهاز، لا",
+  },
+  "chat.scene.making": {
+    en: "Rendering this reply as {seconds} seconds of footage.", es: "Representando esta respuesta como {seconds} segundos de metraje.", fr: "Rendu de cette réponse en {seconds} secondes d'images.", de: "Diese Antwort wird als {seconds} Sekunden Filmmaterial gerendert.", pt: "A representar esta resposta como {seconds} segundos de imagens.", it: "Sto rendendo questa risposta come {seconds} secondi di filmato.", ja: "この返答を {seconds} 秒の映像として描き出しています。", zh: "正在把这条回复渲染成 {seconds} 秒影像。", hi: "इस उत्तर को {seconds} सेकंड के फ़ुटेज के रूप में रेंडर किया जा रहा है।", ar: "يجري تصيير هذا الرد كـ {seconds} ثانية من اللقطات.",
+  },
+  "chat.scene.ai": {
+    en: "AI-generated video", es: "Vídeo generado por IA", fr: "Vidéo générée par IA", de: "KI-erzeugtes Video", pt: "Vídeo gerado por IA", it: "Video generato dall'IA", ja: "AI が生成した動画", zh: "AI 生成的视频", hi: "AI द्वारा बनाया गया वीडियो", ar: "فيديو من إنشاء الذكاء الاصطناعي",
+  },
+  "chat.scene.failed": {
+    en: "This reply was not rendered. The words above are the whole answer.", es: "Esta respuesta no se representó. Las palabras de arriba son la respuesta completa.", fr: "Cette réponse n'a pas été rendue. Les mots ci-dessus sont la réponse entière.", de: "Diese Antwort wurde nicht gerendert. Die Worte oben sind die ganze Antwort.", pt: "Esta resposta não foi representada. As palavras acima são a resposta completa.", it: "Questa risposta non è stata resa. Le parole qui sopra sono tutta la risposta.", ja: "この返答は描き出されませんでした。上の文章がすべての答えです。", zh: "这条回复没有被渲染。上面的文字就是完整答复。", hi: "यह उत्तर रेंडर नहीं हुआ। ऊपर के शब्द ही पूरा उत्तर हैं।", ar: "لم يُصيَّر هذا الرد. الكلمات أعلاه هي الجواب كاملًا.",
+  },
+  "chat.scene.capped": {
+    en: "Today's video ceiling is reached — {left} of {cap} seconds left — so this reply arrived as text.", es: "Se alcanzó el techo de vídeo de hoy — quedan {left} de {cap} segundos — así que esta respuesta llegó como texto.", fr: "Le plafond vidéo du jour est atteint — il reste {left} secondes sur {cap} — cette réponse est donc arrivée en texte.", de: "Die heutige Video-Obergrenze ist erreicht — {left} von {cap} Sekunden übrig — daher kam diese Antwort als Text.", pt: "O tecto de vídeo de hoje foi atingido — restam {left} de {cap} segundos — por isso esta resposta chegou como texto.", it: "Il tetto video di oggi è stato raggiunto — restano {left} secondi su {cap} — perciò questa risposta è arrivata come testo.", ja: "本日の動画の上限に達しました — {cap} 秒のうち残り {left} 秒 — このため返答はテキストで届きました。", zh: "今天的视频额度已用完 — 共 {cap} 秒，还剩 {left} 秒 — 所以这条回复以文字送达。", hi: "आज की वीडियो सीमा पूरी हो गई — {cap} में से {left} सेकंड शेष — इसलिए यह उत्तर पाठ के रूप में आया।", ar: "بلغت سقف الفيديو لليوم — بقي {left} من {cap} ثانية — لذلك وصل هذا الرد نصًا.",
+  },
+  "chat.scene.gaveup": {
+    en: "Still rendering. It keeps going without this page open, and appears here when you come back.", es: "Sigue representándose. Continúa sin esta página abierta y aparecerá aquí cuando vuelvas.", fr: "Le rendu continue. Il se poursuit sans cette page ouverte et apparaîtra ici à votre retour.", de: "Wird noch gerendert. Es läuft ohne diese Seite weiter und erscheint hier, wenn du zurückkommst.", pt: "Ainda a representar. Continua sem esta página aberta e aparece aqui quando voltares.", it: "Rendering ancora in corso. Prosegue senza questa pagina aperta e comparirà qui al tuo ritorno.", ja: "まだ描き出し中です。このページを開いていなくても進み、戻ってきたときにここに表示されます。", zh: "仍在渲染。不必开着此页，它会继续，等你回来时显示在这里。", hi: "अभी भी रेंडर हो रहा है। यह पेज खुला न रहने पर भी चलता रहेगा और लौटने पर यहाँ दिखेगा।", ar: "ما زال التصيير جاريًا. يتابع دون إبقاء هذه الصفحة مفتوحة، ويظهر هنا عند عودتك.",
   },
   "chat.degraded.tail": {
     en: "— that model could not be reached. Check the key in Settings → Model.",
@@ -4544,6 +4981,246 @@ const CHROME: Table = {
   "rbt.invariant": {
     en: "Invariant across {across}.", es: "Invariante en {across}.", fr: "Invariant sur {across}.", de: "Invariant über {across}.", pt: "Invariante em {across}.", it: "Invariante su {across}.", ja: "{across}をまたいで不変。", zh: "在{across}间保持不变。", hi: "{across} में अपरिवर्तित।", ar: "ثابت عبر {across}.",
   },
+  "hnd.title": {
+    en: "Hands", es: "Manos", fr: "Mains", de: "Hände", pt: "Mãos", it: "Mani", ja: "手", zh: "双手", hi: "हाथ", ar: "اليدان",
+  },
+  "hnd.pitch": {
+    en: "It can already see and speak. This is where it is given permission to work a screen — and taken back in one press.", es: "Ya puede ver y hablar. Aquí se le da permiso para manejar una pantalla — y se le retira con una sola pulsación.", fr: "Il voit et parle déjà. Ici, on lui donne la permission de manœuvrer un écran — et on la reprend d'une seule pression.", de: "Sehen und sprechen kann es schon. Hier bekommt es die Erlaubnis, einen Bildschirm zu bedienen — und mit einem Druck ist sie wieder weg.", pt: "Já consegue ver e falar. Aqui dá-se-lhe permissão para trabalhar um ecrã — e retira-se num só toque.", it: "Vedere e parlare sa già farlo. Qui gli si dà il permesso di usare uno schermo — e lo si ritira con una sola pressione.", ja: "見ることも話すこともすでにできます。ここでは画面を操作する許可を与えます — そして一度の操作で取り戻せます。", zh: "它已经能看、能说。在这里给它操作屏幕的许可 — 也能一按收回。", hi: "यह पहले ही देख और बोल सकता है। यहाँ इसे स्क्रीन चलाने की अनुमति दी जाती है — और एक ही दबाव में वापस ले ली जाती है।", ar: "هو يرى ويتكلم بالفعل. هنا يُمنح إذن تشغيل شاشة — ويُسترد بضغطة واحدة.",
+  },
+  "hnd.never": {
+    en: "What it will never do", es: "Lo que nunca hará", fr: "Ce qu'il ne fera jamais", de: "Was es nie tun wird", pt: "O que nunca fará", it: "Cosa non farà mai", ja: "決してしないこと", zh: "它绝不会做的事", hi: "यह क्या कभी नहीं करेगा", ar: "ما لن يفعله أبدًا",
+  },
+  "hnd.give": {
+    en: "Give it hands", es: "Darle manos", fr: "Lui donner des mains", de: "Ihm Hände geben", pt: "Dar-lhe mãos", it: "Dargli le mani", ja: "手を与える", zh: "给它双手", hi: "इसे हाथ दें", ar: "امنحه يدين",
+  },
+  "hnd.give.pitch": {
+    en: "Name the apps or sites, the moves, the minutes and the steps. All four are limits, and all four are enforced where the move happens rather than on this screen.", es: "Nombra las aplicaciones o sitios, los movimientos, los minutos y los pasos. Los cuatro son límites, y los cuatro se aplican donde ocurre el movimiento, no en esta pantalla.", fr: "Nommez les applications ou sites, les gestes, les minutes et les étapes. Ces quatre éléments sont des limites, appliquées là où le geste se produit et non sur cet écran.", de: "Nenn die Apps oder Seiten, die Bewegungen, die Minuten und die Schritte. Alle vier sind Grenzen, und alle vier gelten dort, wo die Bewegung geschieht, nicht auf diesem Bildschirm.", pt: "Nomeie as aplicações ou sites, os movimentos, os minutos e os passos. Os quatro são limites, e os quatro são impostos onde o movimento acontece, não neste ecrã.", it: "Indica le app o i siti, le mosse, i minuti e i passi. Tutti e quattro sono limiti, imposti dove avviene la mossa e non su questo schermo.", ja: "アプリまたはサイト、動作、分数、手数を指定します。四つとも上限であり、この画面ではなく動作が起きる場所で守られます。", zh: "写明应用或网站、动作、分钟数与步数。这四项都是上限，都在动作发生之处生效，而不是在这个屏幕上。", hi: "ऐप या साइट, चालें, मिनट और चरण बताएँ। चारों सीमाएँ हैं, और चारों वहीं लागू होती हैं जहाँ चाल चलती है, इस स्क्रीन पर नहीं।", ar: "سمِّ التطبيقات أو المواقع والحركات والدقائق والخطوات. الأربعة حدود، وتُطبَّق جميعها حيث تقع الحركة لا على هذه الشاشة.",
+  },
+  "hnd.surface": {
+    en: "Where", es: "Dónde", fr: "Où", de: "Wo", pt: "Onde", it: "Dove", ja: "場所", zh: "何处", hi: "कहाँ", ar: "أين",
+  },
+  "hnd.places": {
+    en: "Apps or sites", es: "Aplicaciones o sitios", fr: "Applications ou sites", de: "Apps oder Seiten", pt: "Aplicações ou sites", it: "App o siti", ja: "アプリまたはサイト", zh: "应用或网站", hi: "ऐप या साइट", ar: "تطبيقات أو مواقع",
+  },
+  "hnd.places.hint": {
+    en: "calendar, mail — separated by commas", es: "calendario, correo — separados por comas", fr: "agenda, courrier — séparés par des virgules", de: "Kalender, Mail — durch Kommas getrennt", pt: "calendário, correio — separados por vírgulas", it: "calendario, posta — separati da virgole", ja: "カレンダー、メール — カンマ区切り", zh: "日历、邮件 — 用逗号分隔", hi: "कैलेंडर, मेल — अल्पविराम से अलग", ar: "التقويم، البريد — مفصولة بفواصل",
+  },
+  "hnd.moves": {
+    en: "The moves it may make", es: "Los movimientos que puede hacer", fr: "Les gestes qu'il peut faire", de: "Die Bewegungen, die es machen darf", pt: "Os movimentos que pode fazer", it: "Le mosse che può fare", ja: "許される動作", zh: "它可以做的动作", hi: "जो चालें यह चल सकता है", ar: "الحركات المسموح بها",
+  },
+  "hnd.always": {
+    en: "Looking, asking and stopping are always included — a hand that cannot see, ask or stop is a worse hand, not a safer one.", es: "Mirar, preguntar y detenerse van siempre incluidos: una mano que no puede ver, preguntar ni detenerse es una mano peor, no más segura.", fr: "Regarder, demander et s'arrêter sont toujours inclus : une main qui ne peut ni voir, ni demander, ni s'arrêter est une moins bonne main, pas une main plus sûre.", de: "Sehen, Fragen und Aufhören sind immer dabei — eine Hand, die nicht sehen, fragen oder aufhören kann, ist eine schlechtere Hand, keine sicherere.", pt: "Olhar, perguntar e parar estão sempre incluídos — uma mão que não pode ver, perguntar ou parar é uma mão pior, não mais segura.", it: "Guardare, chiedere e fermarsi sono sempre inclusi: una mano che non può vedere, chiedere o fermarsi è una mano peggiore, non più sicura.", ja: "見ること、尋ねること、やめることは常に含まれます — 見ることも尋ねることもやめることもできない手は、より安全な手ではなく、より悪い手です。", zh: "查看、询问和停止始终包含在内 — 一只不能看、不能问、不能停的手是更差的手，而不是更安全的手。", hi: "देखना, पूछना और रुकना हमेशा शामिल हैं — जो हाथ देख, पूछ या रुक नहीं सकता वह बेहतर नहीं, बदतर हाथ है।", ar: "النظر والسؤال والتوقّف مشمولة دائمًا — فاليد التي لا تستطيع أن ترى أو تسأل أو تتوقّف يد أسوأ لا أكثر أمانًا.",
+  },
+  "hnd.minutes": {
+    en: "Minutes", es: "Minutos", fr: "Minutes", de: "Minuten", pt: "Minutos", it: "Minuti", ja: "分", zh: "分钟", hi: "मिनट", ar: "دقائق",
+  },
+  "hnd.steps": {
+    en: "Steps", es: "Pasos", fr: "Étapes", de: "Schritte", pt: "Passos", it: "Passi", ja: "手数", zh: "步数", hi: "चरण", ar: "خطوات",
+  },
+  "hnd.stepsword": {
+    en: "steps", es: "pasos", fr: "étapes", de: "Schritte", pt: "passos", it: "passi", ja: "手", zh: "步", hi: "चरण", ar: "خطوات",
+  },
+  "hnd.watched": {
+    en: "only while somebody is watching", es: "solo mientras alguien mira", fr: "seulement pendant que quelqu'un regarde", de: "nur solange jemand zusieht", pt: "apenas enquanto alguém observa", it: "solo mentre qualcuno guarda", ja: "誰かが見ている間だけ", zh: "仅在有人看着时", hi: "केवल जब कोई देख रहा हो", ar: "فقط بينما يراقب أحد",
+  },
+  "hnd.give.go": {
+    en: "Give", es: "Dar", fr: "Donner", de: "Geben", pt: "Dar", it: "Dai", ja: "与える", zh: "给予", hi: "दें", ar: "امنح",
+  },
+  "hnd.gave": {
+    en: "Hands given for {places}.", es: "Manos dadas para {places}.", fr: "Mains données pour {places}.", de: "Hände gegeben für {places}.", pt: "Mãos dadas para {places}.", it: "Mani date per {places}.", ja: "{places} に手を与えました。", zh: "已为 {places} 给出双手。", hi: "{places} के लिए हाथ दिए गए।", ar: "مُنحت اليدان لـ {places}.",
+  },
+  "hnd.told": {
+    en: "Or just say it", es: "O simplemente dilo", fr: "Ou dites-le simplement", de: "Oder sag es einfach", pt: "Ou basta dizê-lo", it: "Oppure dillo e basta", ja: "または、言うだけ", zh: "或者直接说出来", hi: "या बस कह दीजिए", ar: "أو قُلها فحسب",
+  },
+  "hnd.told.pitch": {
+    en: "The same permission, said instead of picked. Words that name no app or site grant nothing — the refusal quotes back what was heard so you can say it better.", es: "El mismo permiso, dicho en vez de elegido. Palabras que no nombran ninguna aplicación o sitio no conceden nada — el rechazo repite lo que se oyó para que puedas decirlo mejor.", fr: "La même permission, dite au lieu d'être choisie. Des mots qui ne nomment aucune application ni aucun site n'accordent rien — le refus cite ce qui a été entendu pour que vous puissiez mieux le dire.", de: "Dieselbe Erlaubnis, gesagt statt ausgewählt. Worte, die keine App und keine Seite nennen, gewähren nichts — die Ablehnung zitiert das Gehörte zurück, damit du es besser sagen kannst.", pt: "A mesma permissão, dita em vez de escolhida. Palavras que não nomeiam nenhuma aplicação ou site não concedem nada — a recusa cita o que foi ouvido para que possa dizê-lo melhor.", it: "Lo stesso permesso, detto invece che scelto. Parole che non nominano alcuna app o sito non concedono nulla — il rifiuto ripete ciò che ha sentito perché tu possa dirlo meglio.", ja: "同じ許可を、選ぶ代わりに言葉で。アプリやサイトを挙げない言葉は何も許可しません — 拒否は聞き取った内容をそのまま返すので、言い直せます。", zh: "同一个许可，用说的而不是选的。没有点名应用或网站的话什么也不授予 — 拒绝会把听到的原话回给你，好让你说得更清楚。", hi: "वही अनुमति, चुनने के बजाय कही गई। जो शब्द किसी ऐप या साइट का नाम नहीं लेते वे कुछ नहीं देते — इनकार सुनी हुई बात दोहरा देता है ताकि आप बेहतर कह सकें।", ar: "الإذن نفسه، مقولًا بدل أن يكون مختارًا. الكلمات التي لا تسمّي تطبيقًا أو موقعًا لا تمنح شيئًا — والرفض يقتبس ما سُمع كي تقولها على نحو أوضح.",
+  },
+  "hnd.told.hint": {
+    en: "you can click and type in my calendar for the next hour", es: "puedes hacer clic y escribir en mi calendario durante la próxima hora", fr: "tu peux cliquer et écrire dans mon agenda pendant la prochaine heure", de: "du darfst in der nächsten Stunde in meinem Kalender klicken und tippen", pt: "podes clicar e escrever no meu calendário durante a próxima hora", it: "puoi cliccare e scrivere nel mio calendario per la prossima ora", ja: "これから一時間、私のカレンダーでクリックと入力をしていい", zh: "接下来一小时你可以在我的日历里点击和输入", hi: "अगले एक घंटे तक तुम मेरे कैलेंडर में क्लिक और टाइप कर सकते हो", ar: "يمكنك النقر والكتابة في تقويمي خلال الساعة القادمة",
+  },
+  "hnd.told.go": {
+    en: "Say it", es: "Dilo", fr: "Dites-le", de: "Sag es", pt: "Diga-o", it: "Dillo", ja: "言う", zh: "说出来", hi: "कहो", ar: "قلها",
+  },
+  "hnd.heard": {
+    en: "Heard: {places} · {verbs}", es: "Oído: {places} · {verbs}", fr: "Entendu : {places} · {verbs}", de: "Gehört: {places} · {verbs}", pt: "Ouvido: {places} · {verbs}", it: "Sentito: {places} · {verbs}", ja: "聞き取り: {places} · {verbs}", zh: "听到：{places} · {verbs}", hi: "सुना: {places} · {verbs}", ar: "المسموع: {places} · {verbs}",
+  },
+  "hnd.now": {
+    en: "What it may do now", es: "Lo que puede hacer ahora", fr: "Ce qu'il peut faire maintenant", de: "Was es jetzt darf", pt: "O que pode fazer agora", it: "Cosa può fare adesso", ja: "いま許されていること", zh: "它现在可以做什么", hi: "अभी यह क्या कर सकता है", ar: "ما يُسمح له الآن",
+  },
+  "hnd.none": {
+    en: "Nothing. It has no hands until you give it some.", es: "Nada. No tiene manos hasta que se las des.", fr: "Rien. Il n'a pas de mains tant que vous ne lui en donnez pas.", de: "Nichts. Es hat keine Hände, bis du ihm welche gibst.", pt: "Nada. Não tem mãos até que lhas dê.", it: "Niente. Non ha mani finché non gliene dai.", ja: "何もありません。手を与えるまで、手はありません。", zh: "没有。在你给它之前，它没有手。", hi: "कुछ नहीं। जब तक आप न दें, इसके हाथ नहीं हैं।", ar: "لا شيء. لا يدين له حتى تمنحه إياهما.",
+  },
+  "hnd.over": {
+    en: "over", es: "terminado", fr: "terminé", de: "abgelaufen", pt: "terminado", it: "scaduto", ja: "終了", zh: "已结束", hi: "समाप्त", ar: "منتهٍ",
+  },
+  "hnd.takeback": {
+    en: "Take back", es: "Retirar", fr: "Reprendre", de: "Zurücknehmen", pt: "Retirar", it: "Ritira", ja: "取り消す", zh: "收回", hi: "वापस लें", ar: "استرداد",
+  },
+  "hnd.tookback": {
+    en: "Taken back. Anything running stops at its next step.", es: "Retirado. Lo que esté en marcha se detiene en su próximo paso.", fr: "Repris. Ce qui est en cours s'arrête à l'étape suivante.", de: "Zurückgenommen. Was läuft, hält beim nächsten Schritt an.", pt: "Retirado. O que estiver a decorrer para no passo seguinte.", it: "Ritirato. Ciò che è in corso si ferma al passo successivo.", ja: "取り消しました。実行中のものは次の一手で止まります。", zh: "已收回。正在进行的会在下一步停下。", hi: "वापस ले लिया। जो चल रहा है वह अगले चरण पर रुक जाएगा।", ar: "تم الاسترداد. ما يجري يتوقف عند خطوته التالية.",
+  },
+  "hnd.put": {
+    en: "Put its hands on something", es: "Poner sus manos en algo", fr: "Poser ses mains sur quelque chose", de: "Ihm etwas in die Hände geben", pt: "Pôr as mãos em algo", it: "Mettergli le mani su qualcosa", ja: "何かに手をかける", zh: "让它上手做事", hi: "इसे किसी काम पर लगाएँ", ar: "ضع يديه على شيء",
+  },
+  "hnd.pickgrant": {
+    en: "Which permission", es: "Qué permiso", fr: "Quelle permission", de: "Welche Erlaubnis", pt: "Que permissão", it: "Quale permesso", ja: "どの許可", zh: "用哪个许可", hi: "कौन-सी अनुमति", ar: "أي إذن",
+  },
+  "hnd.mode.act": {
+    en: "do the work", es: "hacer el trabajo", fr: "faire le travail", de: "die Arbeit tun", pt: "fazer o trabalho", it: "fare il lavoro", ja: "作業する", zh: "动手做", hi: "काम करे", ar: "يؤدي العمل",
+  },
+  "hnd.mode.watch": {
+    en: "watch only", es: "solo mirar", fr: "regarder seulement", de: "nur zusehen", pt: "apenas observar", it: "solo guardare", ja: "見るだけ", zh: "只观看", hi: "केवल देखे", ar: "المشاهدة فقط",
+  },
+  "hnd.errand": {
+    en: "what it should do", es: "qué debe hacer", fr: "ce qu'il doit faire", de: "was es tun soll", pt: "o que deve fazer", it: "cosa deve fare", ja: "してほしいこと", zh: "它该做什么", hi: "इसे क्या करना है", ar: "ما ينبغي أن يفعله",
+  },
+  "hnd.put.go": {
+    en: "Begin", es: "Comenzar", fr: "Commencer", de: "Beginnen", pt: "Começar", it: "Inizia", ja: "開始", zh: "开始", hi: "शुरू करें", ar: "ابدأ",
+  },
+  "hnd.undrivable": {
+    en: "Nothing can operate another app's interface on an iPhone — Apple provides no way, so there is no permission to ask for. It can still watch this screen and tell you where to press.", es: "Nada puede manejar la interfaz de otra aplicación en un iPhone — Apple no ofrece ninguna vía, así que no hay permiso que pedir. Aún puede mirar esta pantalla y decirte dónde pulsar.", fr: "Rien ne peut manœuvrer l'interface d'une autre application sur un iPhone — Apple n'offre aucun moyen, il n'y a donc aucune permission à demander. Il peut toujours regarder cet écran et vous dire où appuyer.", de: "Auf einem iPhone kann nichts die Oberfläche einer anderen App bedienen — Apple bietet keinen Weg, also gibt es keine Erlaubnis zu erfragen. Zusehen und dir sagen, wo du drücken sollst, kann es weiterhin.", pt: "Nada consegue operar a interface de outra aplicação num iPhone — a Apple não oferece qualquer via, por isso não há permissão a pedir. Ainda pode observar este ecrã e dizer-lhe onde carregar.", it: "Su un iPhone nulla può usare l'interfaccia di un'altra app — Apple non offre alcuna via, quindi non c'è alcun permesso da chiedere. Può comunque guardare questo schermo e dirti dove premere.", ja: "iPhone では、他アプリの画面を操作できるものはありません — Apple がその手段を用意していないため、求めるべき許可自体が存在しません。画面を見て、どこを押せばよいか伝えることはできます。", zh: "在 iPhone 上，任何程序都无法操作另一个应用的界面 — 苹果没有提供途径，因此根本没有可申请的权限。它仍然可以看这块屏幕并告诉你按哪里。", hi: "iPhone पर कोई भी दूसरे ऐप का इंटरफ़ेस नहीं चला सकता — Apple कोई रास्ता नहीं देता, इसलिए माँगने को कोई अनुमति ही नहीं है। यह फिर भी यह स्क्रीन देख सकता है और बता सकता है कि कहाँ दबाना है।", ar: "لا شيء يستطيع تشغيل واجهة تطبيق آخر على الآيفون — لا توفّر آبل أي سبيل لذلك، فلا وجود لإذن يُطلب. ويظل بوسعه مشاهدة هذه الشاشة وإخبارك أين تضغط.",
+  },
+  "hnd.reach.line": {
+    en: "{state} · {left} steps left · {where}", es: "{state} · quedan {left} pasos · {where}", fr: "{state} · {left} étapes restantes · {where}", de: "{state} · noch {left} Schritte · {where}", pt: "{state} · restam {left} passos · {where}", it: "{state} · {left} passi rimasti · {where}", ja: "{state} · 残り{left}手 · {where}", zh: "{state} · 剩余 {left} 步 · {where}", hi: "{state} · {left} चरण शेष · {where}", ar: "{state} · بقيت {left} خطوة · {where}",
+  },
+  "hnd.refresh": {
+    en: "Refresh", es: "Actualizar", fr: "Actualiser", de: "Aktualisieren", pt: "Atualizar", it: "Aggiorna", ja: "更新", zh: "刷新", hi: "ताज़ा करें", ar: "تحديث",
+  },
+  "hnd.stop": {
+    en: "Take the screen back", es: "Recuperar la pantalla", fr: "Reprendre l'écran", de: "Bildschirm zurücknehmen", pt: "Recuperar o ecrã", it: "Riprendi lo schermo", ja: "画面を取り戻す", zh: "收回屏幕", hi: "स्क्रीन वापस लें", ar: "استرجع الشاشة",
+  },
+  "hnd.name": {
+    en: "call this something", es: "llámalo de algún modo", fr: "donnez-lui un nom", de: "gib dem einen Namen", pt: "dê-lhe um nome", it: "dagli un nome", ja: "名前をつける", zh: "给它起个名字", hi: "इसे कोई नाम दें", ar: "سمِّ هذا",
+  },
+  "hnd.write": {
+    en: "Write it down", es: "Anotarlo", fr: "Le noter", de: "Aufschreiben", pt: "Anotar", it: "Annotalo", ja: "書き留める", zh: "记下来", hi: "लिख लें", ar: "دوّنه",
+  },
+  "hnd.wrotedown": {
+    en: "Written down. It can do that again.", es: "Anotado. Puede hacerlo de nuevo.", fr: "Noté. Il peut le refaire.", de: "Aufgeschrieben. Es kann das wieder tun.", pt: "Anotado. Pode fazê-lo outra vez.", it: "Annotato. Può rifarlo.", ja: "書き留めました。同じことをまたできます。", zh: "已记下。它可以再做一次。", hi: "लिख लिया गया। यह इसे फिर कर सकता है।", ar: "دُوّن. يستطيع فعل ذلك مجددًا.",
+  },
+  "hnd.move": {
+    en: "Make a move yourself", es: "Haz un movimiento tú", fr: "Faites un geste vous-même", de: "Mach selbst eine Bewegung", pt: "Faz tu um movimento", it: "Fai tu una mossa", ja: "自分で動かす", zh: "自己动一下", hi: "खुद एक चाल चलें", ar: "حرّك أنت",
+  },
+  "hnd.move.at": {
+    en: "what it is aiming at", es: "a qué apunta", fr: "ce qu'il vise", de: "worauf es zielt", pt: "a que aponta", it: "a cosa mira", ja: "何を狙うか", zh: "瞄准什么", hi: "किस पर निशाना", ar: "ما يستهدفه",
+  },
+  "hnd.move.text": {
+    en: "what to type", es: "qué escribir", fr: "quoi écrire", de: "was getippt wird", pt: "o que escrever", it: "cosa scrivere", ja: "入力する内容", zh: "要输入什么", hi: "क्या टाइप करना है", ar: "ما يُكتب",
+  },
+  "hnd.move.key": {
+    en: "which key", es: "qué tecla", fr: "quelle touche", de: "welche Taste", pt: "que tecla", it: "quale tasto", ja: "どのキー", zh: "哪个键", hi: "कौन-सी कुंजी", ar: "أي مفتاح",
+  },
+  "hnd.move.go": {
+    en: "Move", es: "Mover", fr: "Faire", de: "Bewegen", pt: "Mover", it: "Muovi", ja: "動かす", zh: "执行", hi: "चलें", ar: "نفّذ",
+  },
+  "hnd.pass.who": {
+    en: "hand it to which profile", es: "a qué perfil se lo pasas", fr: "à quel profil le confier", de: "an welches Profil übergeben", pt: "a que perfil o passas", it: "a quale profilo passarlo", ja: "どのプロフィールに渡すか", zh: "交给哪个资料", hi: "किस प्रोफ़ाइल को सौंपें", ar: "إلى أي ملف تُسلّمه",
+  },
+  "hnd.pass.go": {
+    en: "Hand it over", es: "Pasarlo", fr: "Le confier", de: "Übergeben", pt: "Passar", it: "Passalo", ja: "渡す", zh: "交出去", hi: "सौंपें", ar: "سلّمه",
+  },
+  "hnd.pass.note": {
+    en: "The second profile can only ever hold less — the same apps or fewer, the same moves or fewer, and the steps that are left rather than a fresh budget.", es: "El segundo perfil solo puede tener menos: las mismas aplicaciones o menos, los mismos movimientos o menos, y los pasos que quedan en vez de un presupuesto nuevo.", fr: "Le second profil ne peut jamais détenir que moins : les mêmes applications ou moins, les mêmes gestes ou moins, et les étapes restantes plutôt qu'un nouveau budget.", de: "Das zweite Profil kann immer nur weniger halten — dieselben Apps oder weniger, dieselben Bewegungen oder weniger, und die verbleibenden Schritte statt eines neuen Budgets.", pt: "O segundo perfil só pode ter menos — as mesmas aplicações ou menos, os mesmos movimentos ou menos, e os passos que restam em vez de um orçamento novo.", it: "Il secondo profilo può solo avere meno — le stesse app o meno, le stesse mosse o meno, e i passi rimasti invece di un budget nuovo.", ja: "二つ目のプロフィールが持てるのは、常により少ないものだけです — 同じか少ないアプリ、同じか少ない動作、そして新しい持ち分ではなく残りの手数。", zh: "第二个资料只能拿到更少 — 同样或更少的应用、同样或更少的动作，以及剩下的步数，而不是重新一份额度。", hi: "दूसरा प्रोफ़ाइल हमेशा कम ही रख सकता है — वही या कम ऐप, वही या कम चालें, और बचे हुए चरण, नया बजट नहीं।", ar: "لا يمكن للملف الثاني أن يحمل إلا أقل — التطبيقات ذاتها أو أقل، والحركات ذاتها أو أقل، والخطوات المتبقية لا حصة جديدة.",
+  },
+  "hnd.dictate.ph": {
+    en: "one step a line — press: New event", es: "un paso por línea — press: Nuevo evento", fr: "une étape par ligne — press: Nouvel événement", de: "ein Schritt pro Zeile — press: Neuer Termin", pt: "um passo por linha — press: Novo evento", it: "un passo per riga — press: Nuovo evento", ja: "1行に1手 — 「press」: 新しい予定", zh: "每行一步 — 「press」：新建事件", hi: "हर पंक्ति में एक चरण — press: नया इवेंट", ar: "خطوة في كل سطر — press: حدث جديد",
+  },
+  "hnd.dictate.go": {
+    en: "Write it down", es: "Anotarlo", fr: "Le noter", de: "Aufschreiben", pt: "Anotar", it: "Annotalo", ja: "書き留める", zh: "记下来", hi: "लिख लें", ar: "دوّنه",
+  },
+  "ward.shot": {
+    en: "How the photo is framed", es: "Cómo está encuadrada la foto", fr: "Le cadrage de la photo", de: "Wie das Foto gerahmt ist", pt: "Como a foto está enquadrada", it: "Come è inquadrata la foto", ja: "写真の写り方", zh: "照片的取景", hi: "फ़ोटो का फ़्रेम", ar: "كيف أُطِّرت الصورة",
+  },
+  "ward.shot.face": {
+    en: "just the face", es: "solo la cara", fr: "le visage seul", de: "nur das Gesicht", pt: "só o rosto", it: "solo il volto", ja: "顔だけ", zh: "只有脸", hi: "केवल चेहरा", ar: "الوجه فقط",
+  },
+  "ward.shot.upper": {
+    en: "upper body", es: "medio cuerpo", fr: "buste", de: "Oberkörper", pt: "meio corpo", it: "mezzo busto", ja: "上半身", zh: "上半身", hi: "ऊपरी शरीर", ar: "الجزء العلوي",
+  },
+  "ward.shot.full": {
+    en: "full body", es: "cuerpo entero", fr: "corps entier", de: "ganzer Körper", pt: "corpo inteiro", it: "corpo intero", ja: "全身", zh: "全身", hi: "पूरा शरीर", ar: "الجسم كامل",
+  },
+  "ward.photo": {
+    en: "A photograph", es: "Una fotografía", fr: "Une photographie", de: "Ein Foto", pt: "Uma fotografia", it: "Una fotografia", ja: "写真", zh: "一张照片", hi: "एक फ़ोटो", ar: "صورة",
+  },
+  "ward.photo.note": {
+    en: "Your own photograph, built into a head here on this deployment — no vendor, no account anywhere else. The picture is the input; what is kept is the head it became.", es: "Tu propia fotografía, convertida en una cabeza aquí mismo — sin proveedor y sin cuenta en ningún otro sitio. La foto es la entrada; lo que se guarda es la cabeza en que se convirtió.", fr: "Votre propre photographie, transformée en tête ici même — sans fournisseur ni compte ailleurs. La photo est l'entrée ; ce qui est conservé est la tête obtenue.", de: "Dein eigenes Foto, hier auf dieser Installation zu einem Kopf gebaut — kein Anbieter, kein Konto anderswo. Das Bild ist die Eingabe; behalten wird der Kopf, der daraus wurde.", pt: "A tua própria fotografia, transformada numa cabeça aqui mesmo — sem fornecedor e sem conta em mais lado nenhum. A foto é a entrada; o que fica é a cabeça em que se tornou.", it: "La tua fotografia, trasformata in una testa qui su questa installazione — nessun fornitore, nessun account altrove. La foto è l'ingresso; ciò che resta è la testa che ne è venuta.", ja: "あなた自身の写真を、この環境の中で頭に組み上げます — 業者も、よその アカウントもいりません。写真は入力であり、残るのはそこからできた頭です。", zh: "你自己的照片，就在这套部署里做成一个头 — 没有供应商，也不需要别处的账号。照片是输入，留下的是由它做成的头。", hi: "आपकी अपनी फ़ोटो, यहीं इसी तैनाती में एक सिर में बनाई जाती है — न कोई विक्रेता, न कहीं और कोई खाता। तस्वीर इनपुट है; जो रखा जाता है वह उससे बना सिर है।", ar: "صورتك أنت، تُبنى رأسًا هنا على هذا التنصيب — بلا مورّد وبلا حساب في أي مكان آخر. الصورة هي المُدخل، والمحفوظ هو الرأس الذي صار منها.",
+  },
+  "ward.building": {
+    en: "Building the head…", es: "Construyendo la cabeza…", fr: "Construction de la tête…", de: "Der Kopf wird gebaut…", pt: "A construir a cabeça…", it: "Sto costruendo la testa…", ja: "頭を組み立てています…", zh: "正在构建头部…", hi: "सिर बनाया जा रहा है…", ar: "يجري بناء الرأس…",
+  },
+  "hnd.choose": {
+    en: "Let it choose the next move", es: "Deja que elija el siguiente movimiento", fr: "Laissez-le choisir le geste suivant", de: "Lass es die nächste Bewegung wählen", pt: "Deixa-o escolher o próximo movimento", it: "Lascia che scelga la mossa successiva", ja: "次の一手を選ばせる", zh: "让它选择下一步", hi: "इसे अगली चाल चुनने दें", ar: "دعه يختار الحركة التالية",
+  },
+  "hnd.choose.ph": {
+    en: "what is on the screen, in your words", es: "qué hay en la pantalla, con tus palabras", fr: "ce qu'il y a à l'écran, avec vos mots", de: "was auf dem Bildschirm ist, in deinen Worten", pt: "o que está no ecrã, nas tuas palavras", it: "cosa c'è sullo schermo, con parole tue", ja: "画面に何があるか、あなたの言葉で", zh: "屏幕上有什么，用你的话说", hi: "स्क्रीन पर क्या है, आपके शब्दों में", ar: "ما على الشاشة، بكلماتك",
+  },
+  "hnd.choose.go": {
+    en: "Choose", es: "Elegir", fr: "Choisir", de: "Wählen", pt: "Escolher", it: "Scegli", ja: "選ぶ", zh: "选择", hi: "चुनें", ar: "اختر",
+  },
+  "hnd.landed.landed": {
+    en: "it happened", es: "ocurrió", fr: "c'est arrivé", de: "es ist passiert", pt: "aconteceu", it: "è successo", ja: "実行された", zh: "已发生", hi: "यह हुआ", ar: "حدث فعلًا",
+  },
+  "hnd.landed.missed": {
+    en: "it did not happen", es: "no ocurrió", fr: "ce n'est pas arrivé", de: "es ist nicht passiert", pt: "não aconteceu", it: "non è successo", ja: "実行されなかった", zh: "未发生", hi: "यह नहीं हुआ", ar: "لم يحدث",
+  },
+  "hnd.landed.rehearsed": {
+    en: "a rehearsal — nothing was touched", es: "un ensayo: no se tocó nada", fr: "une répétition — rien n'a été touché", de: "eine Probe — nichts wurde angefasst", pt: "um ensaio — nada foi tocado", it: "una prova: non è stato toccato nulla", ja: "リハーサル — 何にも触れていない", zh: "一次排练——什么都没碰", hi: "एक पूर्वाभ्यास — कुछ भी नहीं छुआ गया", ar: "بروفة — لم يُلمس شيء",
+  },
+  "hnd.landed.unknown": {
+    en: "nobody said whether it happened", es: "nadie dijo si ocurrió", fr: "personne n'a dit si c'est arrivé", de: "niemand hat gesagt, ob es passiert ist", pt: "ninguém disse se aconteceu", it: "nessuno ha detto se è successo", ja: "実行されたかどうか、誰も報告していない", zh: "没人说它是否发生", hi: "किसी ने नहीं बताया कि यह हुआ या नहीं", ar: "لم يقل أحد إن كان قد حدث",
+  },
+  "hnd.motor": {
+    en: "Run this on the machine you want worked", es: "Ejecuta esto en la máquina que quieres que maneje", fr: "Lancez ceci sur la machine à faire manœuvrer", de: "Führe das auf der Maschine aus, die bedient werden soll", pt: "Executa isto na máquina que queres que seja usada", it: "Esegui questo sulla macchina che vuoi far usare", ja: "操作させたいマシンでこれを実行してください", zh: "在你想让它操作的那台机器上运行这个", hi: "जिस मशीन पर काम कराना है, उस पर यह चलाएँ", ar: "شغّل هذا على الجهاز الذي تريد تشغيله",
+  },
+  "hnd.motor.sub": {
+    en: "This deployment cannot move a cursor — a small program on that machine does, started by you and stopped by you. Install it once with the line below. It will ask for your token rather than take it here: the program photographs the screen it runs on, so a token typed into that window would be in every picture it sends.", es: "Este despliegue no puede mover un cursor: lo hace un pequeño programa en esa máquina, iniciado por ti y detenido por ti. Instálalo una vez con la línea de abajo. Te pedirá tu token en vez de tomarlo aquí: el programa fotografía la pantalla en la que se ejecuta, así que un token escrito en esa ventana estaría en cada imagen que envía.", fr: "Ce déploiement ne peut pas déplacer un curseur — un petit programme sur cette machine le fait, lancé par vous et arrêté par vous. Installez-le une fois avec la ligne ci-dessous. Il demandera votre jeton plutôt que de le prendre ici : le programme photographie l'écran sur lequel il tourne, donc un jeton tapé dans cette fenêtre serait dans chaque image qu'il envoie.", de: "Diese Installation kann keinen Cursor bewegen — das tut ein kleines Programm auf jener Maschine, von dir gestartet und von dir gestoppt. Richte es einmal mit der Zeile unten ein. Es fragt nach deinem Token, statt ihn hier zu nehmen: das Programm fotografiert den Bildschirm, auf dem es läuft, ein in jenes Fenster getippter Token wäre also in jedem Bild, das es schickt.", pt: "Esta instalação não pode mover um cursor — um pequeno programa nessa máquina fá-lo, iniciado por si e parado por si. Instale-o uma vez com a linha abaixo. Pedirá o seu token em vez de o receber aqui: o programa fotografa o ecrã em que corre, por isso um token escrito nessa janela estaria em cada imagem que envia.", it: "Questa installazione non può muovere un cursore: lo fa un piccolo programma su quella macchina, avviato da te e fermato da te. Installalo una volta con la riga qui sotto. Chiederà il tuo token invece di prenderlo qui: il programma fotografa lo schermo su cui gira, quindi un token digitato in quella finestra sarebbe in ogni immagine che invia.", ja: "この環境はカーソルを動かせません。動かすのは、あなたが起動し、あなたが止める、そのマシン上の小さなプログラムです。下の行で一度だけ導入してください。トークンはここで渡すのではなく、プログラムが尋ねます。プログラムは自分が動いている画面を撮影するので、その窓に打ち込まれたトークンは送られるすべての画像に写ります。", zh: "本部署无法移动光标——那台机器上的一个小程序才能，由你启动、由你停止。用下面这一行安装一次。它会向你索取令牌，而不是在这里取走：该程序会拍摄它自己所在的屏幕，写进那个窗口的令牌会出现在它发送的每一张图里。", hi: "यह तैनाती कर्सर नहीं हिला सकती — वह काम उस मशीन पर चलने वाला एक छोटा प्रोग्राम करता है, जिसे आप शुरू करते हैं और आप ही रोकते हैं। नीचे दी गई पंक्ति से इसे एक बार इंस्टॉल करें। वह आपका टोकन यहाँ लेने के बजाय पूछेगा: प्रोग्राम उसी स्क्रीन की तस्वीर लेता है जिस पर वह चलता है, इसलिए उस विंडो में टाइप किया टोकन उसकी भेजी हर तस्वीर में होगा।", ar: "هذا النشر لا يستطيع تحريك مؤشر — يفعل ذلك برنامج صغير على تلك الآلة، تشغّله أنت وتوقفه أنت. ثبّته مرة واحدة بالسطر أدناه. سيطلب منك الرمز بدل أخذه هنا: البرنامج يصوّر الشاشة التي يعمل عليها، فالرمز المكتوب في تلك النافذة سيكون في كل صورة يرسلها.",
+  },
+  "hnd.motor.install": {
+    en: "Copy the install line", es: "Copiar la línea de instalación", fr: "Copier la ligne d'installation", de: "Installationszeile kopieren", pt: "Copiar a linha de instalação", it: "Copia la riga di installazione", ja: "導入用の行をコピー", zh: "复制安装那一行", hi: "इंस्टॉल वाली पंक्ति कॉपी करें", ar: "انسخ سطر التثبيت",
+  },
+  "hnd.motor.installed": {
+    en: "Copied. Run it once on that machine, then the command below.", es: "Copiado. Ejecútalo una vez en esa máquina y luego el comando de abajo.", fr: "Copié. Lancez-le une fois sur cette machine, puis la commande ci-dessous.", de: "Kopiert. Führ es einmal auf jener Maschine aus, dann den Befehl darunter.", pt: "Copiado. Execute-o uma vez nessa máquina e depois o comando abaixo.", it: "Copiato. Eseguilo una volta su quella macchina, poi il comando qui sotto.", ja: "コピーしました。そのマシンで一度実行し、次に下のコマンドを実行してください。", zh: "已复制。在那台机器上运行一次，然后运行下面的命令。", hi: "कॉपी हो गया। उस मशीन पर एक बार चलाएँ, फिर नीचे वाली कमांड।", ar: "نُسخ. شغّله مرة واحدة على تلك الآلة، ثم الأمر أدناه.",
+  },
+  "hnd.motor.copy": {
+    en: "Copy the command", es: "Copiar el comando", fr: "Copier la commande", de: "Befehl kopieren", pt: "Copiar o comando", it: "Copia il comando", ja: "コマンドをコピー", zh: "复制命令", hi: "कमांड कॉपी करें", ar: "انسخ الأمر",
+  },
+  "hnd.motor.copied": {
+    en: "Copied. Paste it into a terminal on that machine.", es: "Copiado. Pégalo en una terminal de esa máquina.", fr: "Copié. Collez-le dans un terminal sur cette machine.", de: "Kopiert. Füg es in ein Terminal auf dieser Maschine ein.", pt: "Copiado. Cole-o num terminal dessa máquina.", it: "Copiato. Incollalo in un terminale su quella macchina.", ja: "コピーしました。そのマシンのターミナルに貼り付けてください。", zh: "已复制。粘贴到那台机器的终端里。", hi: "कॉपी हो गया। उस मशीन के टर्मिनल में चिपकाएँ।", ar: "نُسخ. الصقه في طرفية على تلك الآلة.",
+  },
+  "hnd.motor.select": {
+    en: "This browser will not reach the clipboard — select the line above and copy it.", es: "Este navegador no llega al portapapeles: selecciona la línea de arriba y cópiala.", fr: "Ce navigateur n'accède pas au presse-papiers — sélectionnez la ligne ci-dessus et copiez-la.", de: "Dieser Browser kommt nicht an die Zwischenablage — markier die Zeile oben und kopier sie.", pt: "Este navegador não alcança a área de transferência — selecione a linha acima e copie-a.", it: "Questo browser non raggiunge gli appunti: seleziona la riga qui sopra e copiala.", ja: "このブラウザーはクリップボードに届きません — 上の行を選択してコピーしてください。", zh: "此浏览器无法访问剪贴板 — 请选中上面那行并复制。", hi: "यह ब्राउज़र क्लिपबोर्ड तक नहीं पहुँचता — ऊपर की पंक्ति चुनकर कॉपी करें।", ar: "هذا المتصفح لا يصل إلى الحافظة — حدّد السطر أعلاه وانسخه.",
+  },
+  "hnd.motor.token": {
+    en: "Copy my token", es: "Copiar mi token", fr: "Copier mon jeton", de: "Mein Token kopieren", pt: "Copiar o meu token", it: "Copia il mio token", ja: "自分のトークンをコピー", zh: "复制我的令牌", hi: "मेरा टोकन कॉपी करें", ar: "انسخ رمزي",
+  },
+  "hnd.motor.token.copied": {
+    en: "Copied, not shown. Paste it when the program asks — nothing will appear as you type.", es: "Copiado, no mostrado. Pégalo cuando el programa lo pida: no aparecerá nada mientras escribes.", fr: "Copié, non affiché. Collez-le quand le programme le demande — rien n'apparaîtra pendant la saisie.", de: "Kopiert, nicht angezeigt. Füg es ein, wenn das Programm fragt — beim Tippen erscheint nichts.", pt: "Copiado, não mostrado. Cole-o quando o programa pedir — nada aparecerá enquanto escreve.", it: "Copiato, non mostrato. Incollalo quando il programma lo chiede: mentre digiti non apparirà nulla.", ja: "コピーしました。画面には出していません。プログラムに聞かれたら貼り付けてください — 入力しても何も表示されません。", zh: "已复制，未显示。程序询问时粘贴即可 — 输入时不会有任何显示。", hi: "कॉपी हो गया, दिखाया नहीं गया। प्रोग्राम पूछे तब चिपकाएँ — टाइप करते समय कुछ नहीं दिखेगा।", ar: "نُسخ، ولم يُعرض. الصقه حين يطلبه البرنامج — لن يظهر شيء أثناء الكتابة.",
+  },
+  "hnd.motor.token.stuck": {
+    en: "This browser will not reach the clipboard. Open the fold below and copy it by hand.", es: "Este navegador no llega al portapapeles. Abre el pliegue de abajo y cópialo a mano.", fr: "Ce navigateur n'accède pas au presse-papiers. Ouvrez le repli ci-dessous et copiez-le à la main.", de: "Dieser Browser kommt nicht an die Zwischenablage. Klapp unten auf und kopier es von Hand.", pt: "Este navegador não alcança a área de transferência. Abra a dobra abaixo e copie-o à mão.", it: "Questo browser non raggiunge gli appunti. Apri la piega qui sotto e copialo a mano.", ja: "このブラウザーはクリップボードに届きません。下の折りたたみを開いて手で写してください。", zh: "此浏览器无法访问剪贴板。展开下方的折叠内容，手动复制。", hi: "यह ब्राउज़र क्लिपबोर्ड तक नहीं पहुँचता। नीचे की तह खोलकर हाथ से कॉपी करें।", ar: "هذا المتصفح لا يصل إلى الحافظة. افتح الطيّة أدناه وانسخه يدويًا.",
+  },
+  "hnd.motor.token.show": {
+    en: "show it instead", es: "mostrarlo en su lugar", fr: "l'afficher plutôt", de: "stattdessen anzeigen", pt: "mostrá-lo em vez disso", it: "mostralo invece", ja: "代わりに表示する", zh: "改为显示它", hi: "इसके बजाय दिखाएँ", ar: "أظهره بدلًا من ذلك",
+  },
+  "hnd.motor.token.warn": {
+    en: "Opening this puts your token on the screen the hands are about to photograph. Close it again before you begin.", es: "Abrir esto pone tu token en la pantalla que las manos van a fotografiar. Ciérralo antes de empezar.", fr: "L'ouvrir met votre jeton sur l'écran que les mains vont photographier. Refermez-le avant de commencer.", de: "Das hier zu öffnen legt dein Token auf den Bildschirm, den die Hände gleich fotografieren. Mach es wieder zu, bevor du anfängst.", pt: "Abrir isto põe o seu token no ecrã que as mãos vão fotografar. Feche-o antes de começar.", it: "Aprirlo mette il tuo token sullo schermo che le mani stanno per fotografare. Richiudilo prima di cominciare.", ja: "これを開くと、手がこれから撮影する画面にトークンが載ります。始める前に閉じてください。", zh: "展开它会把你的令牌放在双手即将拍摄的屏幕上。开始前请合上。", hi: "इसे खोलने पर आपका टोकन उसी स्क्रीन पर आ जाता है जिसकी तस्वीर हाथ लेने वाले हैं। शुरू करने से पहले इसे बंद कर दें।", ar: "فتح هذا يضع رمزك على الشاشة التي توشك اليدان على تصويرها. أغلقه قبل أن تبدأ.",
+  },
+  "hnd.motor.dry": {
+    en: "It prints what it would do and touches nothing. Add --live when you want it to act.", es: "Imprime lo que haría y no toca nada. Añade --live cuando quieras que actúe.", fr: "Il imprime ce qu'il ferait et ne touche à rien. Ajoutez --live quand vous voulez qu'il agisse.", de: "Es druckt, was es tun würde, und rührt nichts an. Füge --live hinzu, wenn es handeln soll.", pt: "Imprime o que faria e não toca em nada. Acrescenta --live quando quiseres que aja.", it: "Stampa cosa farebbe e non tocca nulla. Aggiungi --live quando vuoi che agisca.", ja: "何をするかを表示するだけで、何にも触れません。実際に動かすときは --live を付けてください。", zh: "它只打印将要做什么，不碰任何东西。想让它真正动手时加上 --live。", hi: "यह बताता है कि क्या करता, छूता कुछ नहीं। जब चाहें कि यह सचमुच करे, --live जोड़ें।", ar: "يطبع ما كان سيفعله ولا يلمس شيئًا. أضف ‎--live حين تريده أن يتصرف.",
+  },
+  "hnd.again": {
+    en: "Things it can do again", es: "Cosas que puede repetir", fr: "Ce qu'il peut refaire", de: "Was es wiederholen kann", pt: "Coisas que pode repetir", it: "Cose che può rifare", ja: "またできること", zh: "它能重复做的事", hi: "जो यह दोबारा कर सकता है", ar: "أشياء يمكنه تكرارها",
+  },
+  "hnd.again.pitch": {
+    en: "Learned by watching you, or dictated in words. Either way it is a memory of moves and never a stored permission — doing it again goes through a live grant like any fresh decision.", es: "Aprendido mirándote, o dictado con palabras. En ambos casos es un recuerdo de movimientos y nunca un permiso guardado — repetirlo pasa por un permiso vigente como cualquier decisión nueva.", fr: "Appris en vous regardant, ou dicté avec des mots. Dans les deux cas c'est un souvenir de gestes et jamais une permission stockée — le refaire passe par une permission en cours comme toute décision nouvelle.", de: "Durch Zusehen gelernt oder in Worten diktiert. So oder so ist es eine Erinnerung an Bewegungen und nie eine gespeicherte Erlaubnis — die Wiederholung geht durch eine gültige Erlaubnis wie jede neue Entscheidung.", pt: "Aprendido a observá-lo, ou ditado por palavras. Em qualquer dos casos é uma memória de movimentos e nunca uma permissão guardada — repeti-lo passa por uma permissão em vigor como qualquer decisão nova.", it: "Imparato guardandoti, o dettato a parole. In ogni caso è un ricordo di mosse e mai un permesso conservato — rifarlo passa da un permesso valido come ogni decisione nuova.", ja: "あなたを見て覚えたか、言葉で伝えられたもの。どちらも動作の記憶であって、保存された許可ではありません — 繰り返すときも、新しい判断と同じく有効な許可を通ります。", zh: "看你做而学会的，或是用话口述的。无论哪种，它都只是动作的记忆，绝不是存下来的许可 — 再做一次同样要经过一份有效的许可，和任何新决定一样。", hi: "आपको देखकर सीखा, या शब्दों में बताया गया। दोनों ही हाल में यह चालों की स्मृति है, कोई सहेजी हुई अनुमति नहीं — दोबारा करना भी किसी नए निर्णय की तरह एक जीवित अनुमति से होकर जाता है।", ar: "تعلّمه بمشاهدتك، أو أُملي عليه بالكلمات. في الحالتين هو ذاكرة حركات لا إذن مخزَّن — وتكراره يمرّ عبر إذن سارٍ كأي قرار جديد.",
+  },
+  "hnd.noroutines": {
+    en: "Nothing yet.", es: "Nada todavía.", fr: "Rien encore.", de: "Noch nichts.", pt: "Ainda nada.", it: "Ancora niente.", ja: "まだありません。", zh: "还没有。", hi: "अभी कुछ नहीं।", ar: "لا شيء بعد.",
+  },
+  "hnd.again.go": {
+    en: "Do it again", es: "Repetir", fr: "Refaire", de: "Wiederholen", pt: "Repetir", it: "Rifallo", ja: "もう一度", zh: "再做一次", hi: "फिर करें", ar: "كرّره",
+  },
   "rbt.market": {
     en: "The market", es: "El mercado", fr: "Le marché", de: "Der Markt", pt: "O mercado", it: "Il mercato", ja: "市場", zh: "市场", hi: "बाज़ार", ar: "السوق",
   },
@@ -5749,6 +6426,18 @@ const CHROME: Table = {
   },
   "wp.notseen": {
     en: " · it has not seen the video", es: " · no ha visto el vídeo", fr: " · il n'a pas vu la vidéo", de: " · es hat das Video nicht gesehen", pt: " · não viu o vídeo", it: " · non ha visto il video", ja: " · 動画は見ていません", zh: " · 它没有看过这段视频", hi: " · इसने वीडियो नहीं देखा", ar: " · لم يشاهد المقطع",
+  },
+  "wp.watch": {
+    en: "Have it watched — the platform's own eyes and ears", es: "Haz que lo vea — los propios ojos y oídos de la plataforma", fr: "Faites-le visionner — les yeux et les oreilles de la plateforme elle-même", de: "Lass es anschauen — die eigenen Augen und Ohren der Plattform", pt: "Mande assistir — os próprios olhos e ouvidos da plataforma", it: "Fallo guardare — gli occhi e le orecchie della piattaforma stessa", ja: "視聴させる — プラットフォーム自身の目と耳で", zh: "让它被观看——平台自己的眼睛和耳朵", hi: "इसे दिखवाएँ — प्लेटफ़ॉर्म की अपनी आँखें और कान", ar: "اجعله يُشاهَد — عيون المنصة وآذانها",
+  },
+  "wp.watching": {
+    en: "Watching — fetching, listening, looking…", es: "Viendo — descargando, escuchando, mirando…", fr: "Visionnage — récupération, écoute, regard…", de: "Schaut — holt, hört, sieht…", pt: "A assistir — a buscar, ouvir, olhar…", it: "Guardando — scarico, ascolto, sguardo…", ja: "視聴中 — 取得・聴取・読み取り中…", zh: "观看中——获取、聆听、查看…", hi: "देखा जा रहा है — ला रहे, सुन रहे, देख रहे…", ar: "قيد المشاهدة — جلبٌ وإصغاءٌ ونظر…",
+  },
+  "wp.seen": {
+    en: "What is on its screen", es: "Qué hay en su pantalla", fr: "Ce qu'il y a à l'écran", de: "Was auf dem Bildschirm ist", pt: "O que está no ecrã", it: "Cosa c'è sullo schermo", ja: "画面に映っているもの", zh: "画面上是什么", hi: "इसकी स्क्रीन पर क्या है", ar: "ما الذي على شاشته",
+  },
+  "wp.heard": {
+    en: "The words said in it", es: "Las palabras dichas en él", fr: "Les mots qui y sont dits", de: "Die darin gesagten Worte", pt: "As palavras ditas nele", it: "Le parole dette al suo interno", ja: "その中で語られた言葉", zh: "其中说过的话", hi: "इसमें कहे गए शब्द", ar: "الكلمات المقولة فيه",
   },
   "wp.cansee": {
     en: "It can see {n} recent line{s} and the position ({pos}s).", es: "Puede ver {n} líneas recientes y la posición ({pos} s).", fr: "Il voit {n} lignes récentes et la position ({pos} s).", de: "Es sieht {n} aktuelle Zeilen und die Position ({pos} s).", pt: "Vê {n} linhas recentes e a posição ({pos} s).", it: "Vede {n} righe recenti e la posizione ({pos} s).", ja: "直近の発言{n}件と再生位置（{pos}秒）が見えています。", zh: "它能看到最近的 {n} 条发言和播放位置（第 {pos} 秒）。", hi: "यह हाल की {n} पंक्तियाँ और स्थिति ({pos}से.) देख सकता है।", ar: "يرى {n} من الأسطر الأخيرة والموضع ({pos}ث).",
@@ -8146,24 +8835,6 @@ const CHROME: Table = {
   // What the profile is actually wearing, said in terms of what the asset
   // *is* rather than what it points at. An owner who pasted a `.glb` had no
   // way to learn whether anything downstream knew it was a model.
-  "skin.now": {
-    en: "Wearing now: {kind}.", es: "Ahora lleva: {kind}.", fr: "Porte actuellement : {kind}.", de: "Trägt gerade: {kind}.", pt: "Usa agora: {kind}.", it: "Indossa ora: {kind}.", ja: "現在の見た目：{kind}。", zh: "当前使用：{kind}。", hi: "अभी पहना हुआ: {kind}।", ar: "يرتدي الآن: {kind}.",
-  },
-  "skin.kind.image": {
-    en: "a still picture", es: "una imagen fija", fr: "une image fixe", de: "ein Standbild", pt: "uma imagem fixa", it: "un'immagine fissa", ja: "静止画", zh: "一张静态图", hi: "एक स्थिर चित्र", ar: "صورة ثابتة",
-  },
-  "skin.kind.video": {
-    en: "a moving figure", es: "una figura en movimiento", fr: "une figure animée", de: "eine bewegte Figur", pt: "uma figura em movimento", it: "una figura in movimento", ja: "動く姿", zh: "一个会动的形象", hi: "एक चलती आकृति", ar: "هيئة متحركة",
-  },
-  "skin.kind.model": {
-    en: "a 3-D model", es: "un modelo 3D", fr: "un modèle 3D", de: "ein 3-D-Modell", pt: "um modelo 3D", it: "un modello 3D", ja: "3D モデル", zh: "一个 3D 模型", hi: "एक 3-D मॉडल", ar: "مجسّم ثلاثي الأبعاد",
-  },
-  "skin.kind.scene": {
-    en: "a scene", es: "una escena", fr: "une scène", de: "eine Szene", pt: "uma cena", it: "una scena", ja: "シーン", zh: "一个场景", hi: "एक दृश्य", ar: "مشهد",
-  },
-  "skin.notshown": {
-    en: "This screen shows the still it has — the figure itself is attached and reaches the surfaces that can run it.", es: "Esta pantalla muestra la imagen fija que tiene: la figura en sí está adjunta y llega a las superficies que pueden ejecutarla.", fr: "Cet écran affiche l'image fixe dont il dispose — la figure elle-même est attachée et parvient aux surfaces capables de l'exécuter.", de: "Dieser Bildschirm zeigt das Standbild, das er hat — die Figur selbst ist angehängt und erreicht die Oberflächen, die sie ausführen können.", pt: "Este ecrã mostra a imagem fixa que tem — a figura em si está anexada e chega às superfícies que a conseguem executar.", it: "Questa schermata mostra il fermo immagine che ha: la figura stessa è allegata e raggiunge le superfici in grado di eseguirla.", ja: "この画面は手元の静止画を表示します。姿そのものは登録済みで、それを動かせる画面には届いています。", zh: "此屏幕显示它手上的静态图——形象本身已附加，并会送达能够运行它的界面。", hi: "यह स्क्रीन अपने पास मौजूद स्थिर चित्र दिखाती है — आकृति स्वयं संलग्न है और उन सतहों तक पहुँचती है जो उसे चला सकती हैं।", ar: "تعرض هذه الشاشة الصورة الثابتة المتاحة لها — أما الهيئة نفسها فمرفقة وتصل إلى الأسطح القادرة على تشغيلها.",
-  },
   "idn.deck.characters": {
     en: "Pick a character", es: "Elige un personaje", fr: "Choisissez un personnage", de: "Wähle eine Figur", pt: "Escolha um personagem", it: "Scegli un personaggio", ja: "キャラクターを選ぶ", zh: "选择一个角色", hi: "एक किरदार चुनें", ar: "اختر شخصية",
   },
@@ -8214,6 +8885,12 @@ const CHROME: Table = {
   },
   "idn.deck.import": {
     en: "Import it", es: "Importarlo", fr: "L'importer", de: "Importieren", pt: "Importá-lo", it: "Importalo", ja: "取り込む", zh: "导入", hi: "आयात करें", ar: "استيراده",
+  },
+  "idn.model.converting": {
+    en: "Converting the export\u2026 the mouth shapes come through with it.", es: "Convirtiendo la exportaci\u00f3n\u2026 las formas de la boca vienen con ella.", fr: "Conversion de l'export\u2026 les formes de la bouche suivent.", de: "Der Export wird umgewandelt\u2026 die Mundformen kommen mit.", pt: "A converter a exporta\u00e7\u00e3o\u2026 as formas da boca v\u00eam com ela.", it: "Sto convertendo l'esportazione\u2026 le forme della bocca vengono con essa.", ja: "\u30a8\u30af\u30b9\u30dd\u30fc\u30c8\u3092\u5909\u63db\u4e2d\u3067\u3059\u2026 \u53e3\u306e\u5f62\u3082\u4e00\u7dd2\u306b\u5f15\u304d\u7d99\u304c\u308c\u307e\u3059\u3002", zh: "\u6b63\u5728\u8f6c\u6362\u5bfc\u51fa\u6587\u4ef6\u2026\u53e3\u578b\u4e5f\u4f1a\u4e00\u5e76\u4fdd\u7559\u3002", hi: "\u0928\u093f\u0930\u094d\u092f\u093e\u0924 \u092c\u0926\u0932\u093e \u091c\u093e \u0930\u0939\u093e \u0939\u0948\u2026 \u092e\u0941\u0902\u0939 \u0915\u0940 \u0906\u0915\u0943\u0924\u093f\u092f\u093e\u0901 \u092d\u0940 \u0938\u093e\u0925 \u0906\u0924\u0940 \u0939\u0948\u0902\u0964", ar: "\u062c\u0627\u0631\u064d \u062a\u062d\u0648\u064a\u0644 \u0627\u0644\u0645\u0644\u0641\u2026 \u0623\u0634\u0643\u0627\u0644 \u0627\u0644\u0641\u0645 \u062a\u0623\u062a\u064a \u0645\u0639\u0647.",
+  },
+  "idn.model.done": {
+    en: "Converted \u2014 {shapes} mouth shapes came through, so this face can speak.", es: "Convertido: llegaron {shapes} formas de boca, as\u00ed que este rostro puede hablar.", fr: "Converti \u2014 {shapes} formes de bouche sont pass\u00e9es, ce visage peut donc parler.", de: "Umgewandelt \u2014 {shapes} Mundformen sind mitgekommen, dieses Gesicht kann also sprechen.", pt: "Convertido \u2014 chegaram {shapes} formas de boca, portanto este rosto pode falar.", it: "Convertito \u2014 sono arrivate {shapes} forme della bocca, quindi questo volto pu\u00f2 parlare.", ja: "\u5909\u63db\u3057\u307e\u3057\u305f \u2014 \u53e3\u306e\u5f62 {shapes} \u500b\u304c\u5f15\u304d\u7d99\u304c\u308c\u3001\u3053\u306e\u9854\u306f\u8a71\u305b\u307e\u3059\u3002", zh: "\u5df2\u8f6c\u6362 \u2014 \u4fdd\u7559\u4e86 {shapes} \u4e2a\u53e3\u578b\uff0c\u6240\u4ee5\u8fd9\u5f20\u8138\u53ef\u4ee5\u8bf4\u8bdd\u3002", hi: "\u092c\u0926\u0932 \u0917\u092f\u093e \u2014 {shapes} \u092e\u0941\u0902\u0939 \u0915\u0940 \u0906\u0915\u0943\u0924\u093f\u092f\u093e\u0901 \u0906\u0908\u0902, \u0907\u0938\u0932\u093f\u090f \u092f\u0939 \u091a\u0947\u0939\u0930\u093e \u092c\u094b\u0932 \u0938\u0915\u0924\u093e \u0939\u0948\u0964", ar: "\u062a\u0645\u0651 \u0627\u0644\u062a\u062d\u0648\u064a\u0644 \u2014 \u0648\u0635\u0644\u062a {shapes} \u0645\u0646 \u0623\u0634\u0643\u0627\u0644 \u0627\u0644\u0641\u0645\u060c \u0641\u0647\u0630\u0627 \u0627\u0644\u0648\u062c\u0647 \u064a\u0633\u062a\u0637\u064a\u0639 \u0627\u0644\u0643\u0644\u0627\u0645.",
   },
   "idn.deck.done": {
     en: "This is the profile's face now — the AI badge and the likeness record ride on it.", es: "Este es ahora el rostro del perfil: la insignia de IA y el registro de semejanza lo acompañan.", fr: "C'est désormais le visage du profil — le badge IA et le registre de ressemblance l'accompagnent.", de: "Das ist jetzt das Gesicht des Profils — das KI-Abzeichen und der Ähnlichkeitsnachweis begleiten es.", pt: "Este é agora o rosto do perfil — o distintivo de IA e o registo de semelhança acompanham-no.", it: "Questo è ora il volto del profilo — il badge IA e il registro della somiglianza lo accompagnano.", ja: "これがこのプロフィールの顔になりました — AIバッジと肖像の記録が常に付随します。", zh: "这就是此档案的脸了 — AI 徽章与肖像记录随之附带。", hi: "अब यही प्रोफ़ाइल का चेहरा है — AI बैज और समरूपता रिकॉर्ड इसके साथ रहते हैं।", ar: "هذا هو وجه الملف الآن — تصاحبه شارة الذكاء الاصطناعي وسجل الشبه.",
@@ -8332,8 +9009,83 @@ const CHROME: Table = {
   "ins.signinperson": {
     en: "Sign in as a person first — a room turn is spoken by somebody, so a profile's owner token is refused here by name.", es: "Inicia sesión como persona primero — un turno en la sala lo dice alguien, así que el token de propietario de un perfil se rechaza aquí por su nombre.", fr: "Connectez-vous d'abord en tant que personne — un tour de parole dans la salle est prononcé par quelqu'un, donc le jeton de propriétaire d'un profil est ici refusé nommément.", de: "Meld dich zuerst als Person an — ein Redebeitrag im Raum wird von jemandem gesprochen, deshalb wird das Besitzer-Token eines Profils hier ausdrücklich abgelehnt.", pt: "Inicie sessão como pessoa primeiro — um turno na sala é dito por alguém, por isso o token de proprietário de um perfil é aqui recusado pelo nome.", it: "Accedi prima come persona — un turno nella stanza lo pronuncia qualcuno, quindi il token di proprietario di un profilo qui viene rifiutato per nome.", ja: "まず一人の人としてサインインしてください — 部屋での発言は誰かが口にするものなので、プロフィールの所有者トークンはここで名指しで断られます。", zh: "请先以个人身份登录——房间里的发言是由某个人说出口的，所以档案的所有者令牌在这里会被指名拒绝。", hi: "पहले एक व्यक्ति के रूप में साइन इन कीजिए — कमरे में बारी कोई व्यक्ति बोलता है, इसलिए प्रोफ़ाइल-स्वामी का टोकन यहाँ नाम लेकर अस्वीकार किया जाता है।", ar: "سجّل الدخول بصفتك شخصًا أولًا — فالدور في الغرفة ينطق به أحد، ولذلك يُرفض رمز مالك الملف هنا بالاسم.",
   },
-  "ins.whatsaid": {
-    en: "What has been said", es: "Lo que se ha dicho", fr: "Ce qui a été dit", de: "Was gesagt wurde", pt: "O que foi dito", it: "Cosa è stato detto", ja: "これまでの発言", zh: "已经说过的话", hi: "जो कहा जा चुका है", ar: "ما قيل",
+  // The room's permission window. "Reach" rather than "permissions":
+  // what is being agreed to is a synthetic person touching something
+  // real, and the plain word for that is the one on the box.
+  // The press per turn. Not decoration: it is the fallback for every
+  // time a browser refuses to start sound by itself.
+  "ins.hear": {
+    en: "Hear this", es: "Escuchar esto", fr: "Écouter", de: "Das anhören", pt: "Ouvir isto", it: "Ascolta", ja: "これを聞く", zh: "听这条", hi: "यह सुनिए", ar: "استمع إلى هذا",
+  },
+  // Saying it out loud, on the seat you just gave permission to.
+  "ins.errand.ph": {
+    en: "Ask them to do something…", es: "Pídeles que hagan algo…", fr: "Demandez-leur de faire quelque chose…", de: "Bitte sie, etwas zu tun…", pt: "Peça-lhes que façam algo…", it: "Chiedi loro di fare qualcosa…", ja: "何かを頼む…", zh: "让他们做点什么……", hi: "उनसे कुछ करने को कहिए…", ar: "اطلب منهم فعل شيء…",
+  },
+  "ins.errand.send": {
+    en: "Ask", es: "Pedir", fr: "Demander", de: "Bitten", pt: "Pedir", it: "Chiedi", ja: "頼む", zh: "请求", hi: "कहिए", ar: "اطلب",
+  },
+  // What opened, in the words for what it can actually do. The two are
+  // never the same thing, and a person who asked for one and got the
+  // other has to be told on the spot.
+  "ins.errand.watching": {
+    en: "Watching — it can read the screen and tell you, nothing more.", es: "Observando: puede leer la pantalla y contártelo, nada más.", fr: "En observation — il peut lire l'écran et vous le dire, rien de plus.", de: "Beobachtend — es kann den Bildschirm lesen und es dir sagen, mehr nicht.", pt: "A observar — pode ler o ecrã e contar-te, nada mais.", it: "In osservazione: può leggere lo schermo e dirtelo, nulla di più.", ja: "見ているだけ — 画面を読んで伝えることしかできません。", zh: "只是观看——它能读屏幕并告诉你，仅此而已。", hi: "देख रहा है — यह स्क्रीन पढ़कर बता सकता है, इससे अधिक नहीं।", ar: "يشاهد فقط — يمكنه قراءة الشاشة وإخبارك، لا أكثر.",
+  },
+  "ins.errand.acting": {
+    en: "Its hands are on it — cursor and keyboard, inside what you allowed.", es: "Tiene las manos puestas: cursor y teclado, dentro de lo que permitiste.", fr: "Il y a mis les mains — curseur et clavier, dans les limites autorisées.", de: "Es hat die Hände daran — Zeiger und Tastatur, innerhalb des Erlaubten.", pt: "Tem as mãos nisso — cursor e teclado, dentro do que permitiste.", it: "Ci ha messo le mani: cursore e tastiera, entro ciò che hai consentito.", ja: "手を動かしています — 許可した範囲でカーソルとキーボードを。", zh: "它已经动手了——光标与键盘，都在你允许的范围内。", hi: "इसके हाथ लग चुके हैं — कर्सर और कीबोर्ड, आपकी अनुमति के भीतर।", ar: "بدأ العمل — المؤشر ولوحة المفاتيح، ضمن ما سمحت به.",
+  },
+  "ins.reach": {
+    en: "What they can reach", es: "Lo que pueden alcanzar", fr: "Ce qu'ils peuvent atteindre", de: "Worauf sie zugreifen können", pt: "O que podem alcançar", it: "Cosa possono raggiungere", ja: "彼らが手を伸ばせるもの", zh: "他们能触及的东西", hi: "वे किस तक पहुँच सकते हैं", ar: "ما يمكنهم الوصول إليه",
+  },
+  "ins.reach.none": {
+    en: "No synthetic profiles in this room yet.", es: "Todavía no hay perfiles sintéticos en esta sala.", fr: "Aucun profil synthétique dans cette salle pour l'instant.", de: "Noch keine synthetischen Profile in diesem Raum.", pt: "Ainda não há perfis sintéticos nesta sala.", it: "Ancora nessun profilo sintetico in questa stanza.", ja: "この部屋にはまだ合成プロフィールがいません。", zh: "这个房间里还没有合成档案。", hi: "इस कमरे में अभी कोई सिंथेटिक प्रोफ़ाइल नहीं है।", ar: "لا توجد ملفات اصطناعية في هذه الغرفة بعد.",
+  },
+  // The row before anything is opened: how much of what is possible is
+  // wired up, and how much of that this room has agreed to.
+  "ins.reach.tally": {
+    en: "Skills {sk} of {skAll} · Connections {cn} of {cnAll} · Eyes and hands {hd} of {hdAll}", es: "Habilidades {sk} de {skAll} · Conexiones {cn} de {cnAll} · Ojos y manos {hd} de {hdAll}", fr: "Compétences {sk} sur {skAll} · Connexions {cn} sur {cnAll} · Yeux et mains {hd} sur {hdAll}", de: "Fähigkeiten {sk} von {skAll} · Verbindungen {cn} von {cnAll} · Augen und Hände {hd} von {hdAll}", pt: "Competências {sk} de {skAll} · Ligações {cn} de {cnAll} · Olhos e mãos {hd} de {hdAll}", it: "Abilità {sk} di {skAll} · Connessioni {cn} di {cnAll} · Occhi e mani {hd} di {hdAll}", ja: "スキル {skAll} 件中 {sk} 件 · 接続 {cnAll} 件中 {cn} 件 · 目と手 {hdAll} 件中 {hd} 件", zh: "技能 {sk}/{skAll} · 连接 {cn}/{cnAll} · 眼睛与双手 {hd}/{hdAll}", hi: "कौशल {skAll} में से {sk} · कनेक्शन {cnAll} में से {cn} · आँखें और हाथ {hdAll} में से {hd}", ar: "المهارات {sk} من {skAll} · الاتصالات {cn} من {cnAll} · العيون واليدان {hd} من {hdAll}",
+  },
+  "ins.reach.friend": {
+    en: "Add friend", es: "Añadir amigo", fr: "Ajouter en ami", de: "Als Freund hinzufügen", pt: "Adicionar amigo", it: "Aggiungi amico", ja: "友だちに追加", zh: "加为好友", hi: "मित्र जोड़ें", ar: "إضافة صديق",
+  },
+  "ins.reach.friended": {
+    en: "Added", es: "Añadido", fr: "Ajouté", de: "Hinzugefügt", pt: "Adicionado", it: "Aggiunto", ja: "追加済み", zh: "已添加", hi: "जोड़ा गया", ar: "تمت الإضافة",
+  },
+  // A profile whose owner has granted it no hands at all. Said, rather
+  // than leaving a heading with nothing under it.
+  "ins.reach.noskills": {
+    en: "No hands granted by its owner.", es: "Su propietario no le ha concedido manos.", fr: "Aucune main accordée par son propriétaire.", de: "Vom Besitzer wurden keine Hände gewährt.", pt: "O proprietário não lhe concedeu mãos.", it: "Il proprietario non gli ha concesso mani.", ja: "所有者から手は与えられていません。", zh: "其所有者未授予任何操作权限。", hi: "इसके स्वामी ने कोई हाथ नहीं दिए हैं।", ar: "لم يمنحه مالكه أي يد.",
+  },
+  // The dark rows: the platform has this connector, this profile does
+  // not hold it. The room's key cannot conjure the owner's.
+  "ins.reach.unconnected": {
+    en: "its owner has not connected this", es: "su propietario no ha conectado esto", fr: "son propriétaire ne l'a pas connecté", de: "der Besitzer hat dies nicht verbunden", pt: "o proprietário não ligou isto", it: "il proprietario non l'ha collegato", ja: "所有者がこれを接続していません", zh: "其所有者尚未连接此项", hi: "इसके स्वामी ने इसे नहीं जोड़ा है", ar: "لم يربط مالكه هذا",
+  },
+  "ins.reach.connections": {
+    en: "Connections", es: "Conexiones", fr: "Connexions", de: "Verbindungen", pt: "Ligações", it: "Connessioni", ja: "接続", zh: "连接", hi: "कनेक्शन", ar: "الاتصالات",
+  },
+  // The hand grants — eyes on a screen, a cursor, a keyboard, a body.
+  // Its own name, because the catalog's capabilities are called skills
+  // too and one heading for both is one heading too few.
+  "ins.reach.hands.kind": {
+    en: "Eyes and hands", es: "Ojos y manos", fr: "Yeux et mains", de: "Augen und Hände", pt: "Olhos e mãos", it: "Occhi e mani", ja: "目と手", zh: "眼睛与双手", hi: "आँखें और हाथ", ar: "العيون واليدان",
+  },
+  "ins.reach.skills": {
+    en: "Skills", es: "Habilidades", fr: "Compétences", de: "Fähigkeiten", pt: "Competências", it: "Abilità", ja: "スキル", zh: "技能", hi: "कौशल", ar: "المهارات",
+  },
+  // The credential the owner has not supplied yet. Said on the box
+  // rather than hiding the row, because "why is this one greyed out" is
+  // a question with a real answer.
+  "ins.reach.waiting": {
+    en: "waiting on its sign-in", es: "esperando su inicio de sesión", fr: "en attente de sa connexion", de: "wartet auf die Anmeldung", pt: "à espera do início de sessão", it: "in attesa del suo accesso", ja: "サインイン待ち", zh: "等待登录", hi: "साइन-इन की प्रतीक्षा में", ar: "بانتظار تسجيل الدخول",
+  },
+  // The two sides of a hand grant, named on the box. Making somebody
+  // read four verbs to tell "read my screen" from "drive it" is how the
+  // wrong box gets ticked.
+  "ins.reach.eyes": {
+    en: "Eyes only", es: "Solo mirar", fr: "Regarder seulement", de: "Nur zusehen", pt: "Apenas observar", it: "Solo guardare", ja: "見るだけ", zh: "只看不动", hi: "केवल देखना", ar: "المشاهدة فقط",
+  },
+  "ins.reach.hands": {
+    en: "Cursor and keyboard", es: "Cursor y teclado", fr: "Curseur et clavier", de: "Zeiger und Tastatur", pt: "Cursor e teclado", it: "Cursore e tastiera", ja: "カーソルとキーボード", zh: "光标与键盘", hi: "कर्सर और कीबोर्ड", ar: "المؤشر ولوحة المفاتيح",
   },
   "ins.scene": {
     en: "In this room", es: "En esta sala", fr: "Dans cette salle", de: "In diesem Raum", pt: "Nesta sala", it: "In questa stanza", ja: "この部屋にいる人", zh: "房间里的人", hi: "इस कमरे में", ar: "في هذه الغرفة",
@@ -8345,9 +9097,6 @@ const CHROME: Table = {
   // different things to the same reader, which is a guard, not a taste.
   "ins.face.cameraon": {
     en: "Camera on", es: "Cámara encendida", fr: "Caméra activée", de: "Kamera an", pt: "Câmara ligada", it: "Fotocamera accesa", ja: "カメラをオン", zh: "开启摄像头", hi: "कैमरा चालू", ar: "تشغيل الكاميرا",
-  },
-  "ins.hear": {
-    en: "Hear it in their voice", es: "Óyelo con su voz", fr: "L'entendre avec sa voix", de: "In ihrer Stimme hören", pt: "Ouvir na voz deles", it: "Ascolta con la sua voce", ja: "その声で聞く", zh: "用它的声音听", hi: "उसकी आवाज़ में सुनें", ar: "اسمعها بصوته",
   },
   "ins.hear.on": {
     en: "hear the room", es: "oír la sala", fr: "entendre la salle", de: "den Raum hören", pt: "ouvir a sala", it: "ascolta la stanza", ja: "部屋の声を聞く", zh: "聆听房间", hi: "कमरे को सुनें", ar: "اسمع الغرفة",
@@ -8399,6 +9148,141 @@ const CHROME: Table = {
     zh: "此浏览器没有语音识别，所以这里不提供对房间说话 — 请改用输入，房间仍会出声回答。",
     hi: "इस ब्राउज़र में वाक् पहचान नहीं है, इसलिए यहाँ कमरे में बोलने का विकल्प नहीं है — टाइप कीजिए, कमरा फिर भी बोलकर उत्तर देगा।",
     ar: "هذا المتصفح لا يملك التعرّف على الكلام، لذا لا يُعرض التحدّث في هذه الغرفة هنا — اكتب بدلًا من ذلك، وستظل الغرفة تجيب بصوت مسموع.",
+  },
+  "stage.title": {
+    en: "Your avatar, full screen", es: "Tu avatar, a pantalla completa", fr: "Ton avatar, en plein écran", de: "Dein Avatar, bildschirmfüllend", pt: "Seu avatar, em tela cheia", it: "Il tuo avatar, a schermo intero", ja: "アバターを全画面で", zh: "你的头像，全屏显示", hi: "आपका अवतार, पूरी स्क्रीन पर", ar: "صورتك الرمزية بملء الشاشة",
+  },
+  "stage.open": {
+    en: "Open the avatar full screen", es: "Abrir el avatar a pantalla completa", fr: "Ouvrir l’avatar en plein écran", de: "Den Avatar bildschirmfüllend öffnen", pt: "Abrir o avatar em tela cheia", it: "Apri l’avatar a schermo intero", ja: "アバターを全画面で開く", zh: "全屏打开头像", hi: "अवतार को पूरी स्क्रीन पर खोलें", ar: "افتح الصورة الرمزية بملء الشاشة",
+  },
+  "stage.full": {
+    en: "Full screen", es: "Pantalla completa", fr: "Plein écran", de: "Vollbild", pt: "Ecrã inteiro", it: "Schermo intero", ja: "全画面", zh: "全屏", hi: "पूरी स्क्रीन", ar: "ملء الشاشة",
+  },
+  "stage.close": {
+    en: "Close", es: "Cerrar", fr: "Fermer", de: "Schließen", pt: "Fechar", it: "Chiudi", ja: "閉じる", zh: "关闭", hi: "बंद करें", ar: "إغلاق",
+  },
+  "stage.wheel": {
+    en: "Wardrobe & looks", es: "Vestuario y estilos", fr: "Garde-robe et styles", de: "Garderobe & Looks", pt: "Guarda-roupa e visuais", it: "Guardaroba e look", ja: "ワードローブとルック", zh: "衣橱与造型", hi: "अलमारी और लुक", ar: "الخزانة والإطلالات",
+  },
+  "stage.none": {
+    en: "No avatar yet — bring one below, or paint one.", es: "Aún no hay avatar: trae uno abajo o pinta uno.", fr: "Pas encore d’avatar — apporte-en un ci-dessous, ou peins-en un.", de: "Noch kein Avatar — bring unten einen mit oder mal einen.", pt: "Ainda sem avatar — traga um abaixo ou pinte um.", it: "Ancora nessun avatar — portane uno qui sotto o dipingine uno.", ja: "まだアバターがありません。下から持ち込むか、描いてみましょう。", zh: "还没有头像——在下方带一个进来，或画一个。", hi: "अभी कोई अवतार नहीं — नीचे से एक लाएँ या एक बनाएँ।", ar: "لا صورة رمزية بعد — أحضر واحدة أدناه أو ارسم واحدة.",
+  },
+  "ward.title": {
+    en: "Say what changes — or tap a start", es: "Di qué cambia, o toca un comienzo", fr: "Dis ce qui change — ou touche un départ", de: "Sag, was sich ändert — oder tippe einen Anfang an", pt: "Diga o que muda — ou toque em um começo", it: "Di’ cosa cambia — o tocca un inizio", ja: "変えたいことを伝えるか、候補をタップ", zh: "说出想改什么——或点一个起点", hi: "बताएँ क्या बदलना है — या कोई शुरुआत चुनें", ar: "قل ما الذي يتغير — أو المس بداية",
+  },
+  "ward.ph": {
+    en: "Describe the change — outfit, hair, build, anything…", es: "Describe el cambio: ropa, pelo, complexión, lo que sea…", fr: "Décris le changement — tenue, cheveux, silhouette, tout…", de: "Beschreib die Änderung — Outfit, Haar, Statur, alles…", pt: "Descreva a mudança — roupa, cabelo, porte, qualquer coisa…", it: "Descrivi il cambiamento — abito, capelli, corporatura, qualsiasi cosa…", ja: "変えたいことを説明 — 服装、髪、体型、なんでも…", zh: "描述改变——服装、发型、体格，什么都行…", hi: "बदलाव बताएँ — पोशाक, बाल, कद-काठी, कुछ भी…", ar: "صف التغيير — الملابس، الشعر، البنية، أي شيء…",
+  },
+  "ward.paint": {
+    en: "Paint it", es: "Píntalo", fr: "Peins-le", de: "Mal es", pt: "Pinte", it: "Dipingilo", ja: "描く", zh: "画出来", hi: "बनाएँ", ar: "ارسمه",
+  },
+  "ward.painting": {
+    en: "Painting…", es: "Pintando…", fr: "Peinture en cours…", de: "Wird gemalt…", pt: "Pintando…", it: "Dipingendo…", ja: "描いています…", zh: "正在绘制…", hi: "बन रहा है…", ar: "يُرسم الآن…",
+  },
+  "ward.age": {
+    en: "Every look renders at this profile’s own age, with the AI mark burned in.", es: "Cada estilo se pinta a la edad real de este perfil, con la marca de IA grabada.", fr: "Chaque look est rendu à l’âge réel de ce profil, avec la marque IA gravée.", de: "Jeder Look wird im echten Alter dieses Profils gemalt, mit eingebranntem KI-Zeichen.", pt: "Cada visual é pintado na idade real deste perfil, com a marca de IA gravada.", it: "Ogni look è reso all’età reale di questo profilo, con il segno IA impresso.", ja: "どのルックもこのプロフィールの実年齢で描かれ、AIマークが焼き込まれます。", zh: "每个造型都按此档案的真实年龄渲染，并烙有AI标记。", hi: "हर लुक इस प्रोफ़ाइल की असली उम्र पर बनता है, AI चिह्न के साथ।", ar: "كل إطلالة تُرسم بعمر هذا الملف الحقيقي، مع علامة الذكاء الاصطناعي محفورة.",
+  },
+  "ward.real": {
+    en: "A real person’s face is never painted from words — that line protects you. Your avatar arrives from your own photos or your provider’s export, through the import below, under your recorded grant.", es: "El rostro de una persona real nunca se pinta con palabras: esa línea te protege. Tu avatar llega desde tus propias fotos o la exportación de tu proveedor, por la importación de abajo, bajo tu consentimiento registrado.", fr: "Le visage d’une personne réelle n’est jamais peint à partir de mots — cette ligne te protège. Ton avatar arrive de tes propres photos ou de l’export de ton fournisseur, via l’import ci-dessous, sous ton accord enregistré.", de: "Das Gesicht einer echten Person wird nie aus Worten gemalt — diese Linie schützt dich. Dein Avatar kommt aus deinen eigenen Fotos oder dem Export deines Anbieters, über den Import unten, unter deiner aufgezeichneten Einwilligung.", pt: "O rosto de uma pessoa real nunca é pintado a partir de palavras — essa linha protege você. Seu avatar chega das suas próprias fotos ou da exportação do seu provedor, pela importação abaixo, sob seu consentimento registrado.", it: "Il volto di una persona reale non viene mai dipinto dalle parole — quella linea ti protegge. Il tuo avatar arriva dalle tue foto o dall’export del tuo provider, tramite l’importazione qui sotto, con il tuo consenso registrato.", ja: "実在の人の顔は言葉から描かれることはありません — その一線があなたを守ります。アバターは自分の写真かプロバイダのエクスポートから、下のインポートを通じて、記録された同意のもとで届きます。", zh: "真实人物的脸永远不会用文字来画——这条线保护的正是你。你的头像来自你自己的照片或服务商的导出，经由下方导入，在你已记录的授权之下。", hi: "किसी असली व्यक्ति का चेहरा कभी शब्दों से नहीं बनाया जाता — यह रेखा आपकी रक्षा करती है। आपका अवतार आपकी अपनी तस्वीरों या प्रदाता के निर्यात से, नीचे के आयात के ज़रिए, आपकी दर्ज सहमति के तहत आता है।", ar: "وجه شخص حقيقي لا يُرسم أبدًا من الكلمات — هذا الخط يحميك. تصل صورتك الرمزية من صورك الخاصة أو من تصدير مزوّدك، عبر الاستيراد أدناه، بموجب موافقتك المسجلة.",
+  },
+  "rms.xr.title": {
+    en: "Headsets & glasses", es: "Visores y gafas", fr: "Casques et lunettes", de: "Headsets & Brillen", pt: "Visores e óculos", it: "Visori e occhiali", ja: "ヘッドセットとグラス", zh: "头显与眼镜", hi: "हेडसेट और चश्मे", ar: "نظّارات الواقع وخوذاته",
+  },
+  "rms.xr.lead": {
+    en: "These rooms are web pages — every headset with a browser can stand in them today. Open the beta in the headset's own browser and join a room; the AR and VR stages run right in the page.", es: "Estas salas son páginas web: cualquier visor con navegador puede entrar hoy. Abre la beta en el navegador del propio visor y únete a una sala; los escenarios AR y VR corren en la misma página.", fr: "Ces salons sont des pages web — tout casque doté d'un navigateur peut y entrer dès aujourd'hui. Ouvre la bêta dans le navigateur du casque et rejoins un salon ; les scènes AR et VR tournent directement dans la page.", de: "Diese Räume sind Webseiten — jedes Headset mit Browser kann heute schon hinein. Öffne die Beta im Browser des Headsets und tritt einem Raum bei; die AR- und VR-Bühnen laufen direkt in der Seite.", pt: "Estas salas são páginas web — qualquer visor com navegador entra nelas hoje. Abra a beta no navegador do próprio visor e entre numa sala; os palcos AR e VR rodam na própria página.", it: "Queste stanze sono pagine web — ogni visore con un browser può entrarci già oggi. Apri la beta nel browser del visore ed entra in una stanza; i palchi AR e VR girano direttamente nella pagina.", ja: "この部屋はウェブページです。ブラウザを備えたヘッドセットなら今日から入れます。ヘッドセットのブラウザでベータを開いて部屋に参加してください。ARとVRのステージはページの中でそのまま動きます。", zh: "这些房间就是网页——任何带浏览器的头显今天就能进入。在头显自带的浏览器里打开测试版并加入房间；AR 和 VR 舞台就在页面里运行。", hi: "ये कमरे वेब पेज हैं — ब्राउज़र वाला कोई भी हेडसेट आज ही इनमें आ सकता है। हेडसेट के अपने ब्राउज़र में बीटा खोलें और किसी कमरे में शामिल हों; AR और VR मंच पेज में ही चलते हैं।", ar: "هذه الغرف صفحات ويب — أي نظّارة واقع فيها متصفح يمكنها الدخول اليوم. افتح النسخة التجريبية في متصفح النظّارة نفسها وانضم إلى غرفة؛ مسرحا الواقع المعزّز والافتراضي يعملان داخل الصفحة مباشرة.",
+  },
+  "rms.xr.now": {
+    en: "works today — in {browser}", es: "funciona hoy — en {browser}", fr: "fonctionne aujourd'hui — dans {browser}", de: "läuft heute — im {browser}", pt: "funciona hoje — no {browser}", it: "funziona oggi — in {browser}", ja: "今日から使えます — {browser}で", zh: "今天即可使用——在 {browser} 中", hi: "आज से चलता है — {browser} में", ar: "يعمل اليوم — في {browser}",
+  },
+  "rms.xr.app": {
+    en: "Native apps for these platforms are on the road — the browser road works meanwhile.", es: "Las apps nativas para estas plataformas están en camino; mientras tanto, el navegador funciona.", fr: "Les apps natives pour ces plateformes sont en route — en attendant, le navigateur fonctionne.", de: "Native Apps für diese Plattformen sind unterwegs — bis dahin trägt der Browser.", pt: "Os apps nativos para estas plataformas estão a caminho — enquanto isso, o navegador funciona.", it: "Le app native per queste piattaforme sono in arrivo — intanto il browser funziona.", ja: "各プラットフォームのネイティブアプリは準備中です。それまではブラウザで使えます。", zh: "这些平台的原生应用开发中——在此之前浏览器即可使用。", hi: "इन प्लेटफ़ॉर्म के नेटिव ऐप रास्ते में हैं — तब तक ब्राउज़र से काम चलता है।", ar: "التطبيقات الأصلية لهذه المنصات في الطريق — حتى ذلك الحين يعمل المتصفح.",
+  },
+  "rms.xr.signin": {
+    en: "Sign in with this platform's account: planned.", es: "Iniciar sesión con la cuenta de esta plataforma: previsto.", fr: "Connexion avec le compte de cette plateforme : prévue.", de: "Anmeldung mit dem Konto dieser Plattform: geplant.", pt: "Entrar com a conta desta plataforma: planejado.", it: "Accesso con l'account di questa piattaforma: in programma.", ja: "このプラットフォームのアカウントでのサインイン：予定。", zh: "使用该平台账号登录：计划中。", hi: "इस प्लेटफ़ॉर्म के खाते से साइन इन: योजना में।", ar: "تسجيل الدخول بحساب هذه المنصة: مخطّط له.",
+  },
+  "rms.xr.off": {
+    en: "Sign in with this platform is built — this deployment hasn't switched it on yet.", es: "Entrar con esta plataforma ya está construido — este despliegue aún no lo ha activado.", fr: "La connexion via cette plateforme est construite — ce déploiement ne l'a pas encore activée.", de: "Die Anmeldung über diese Plattform ist gebaut — diese Installation hat sie nur noch nicht eingeschaltet.", pt: "Entrar com esta plataforma já está construído — esta instalação ainda não o ativou.", it: "L'accesso con questa piattaforma è già costruito — questa installazione non l'ha ancora attivato.", ja: "このプラットフォームでのサインインは実装済みです。この環境ではまだ有効になっていません。", zh: "使用该平台登录已建成——此部署尚未开启。", hi: "इस प्लेटफ़ॉर्म से साइन इन बन चुका है — इस परिनियोजन में अभी चालू नहीं है।", ar: "تسجيل الدخول عبر هذه المنصة جاهز — هذا النشر لم يفعّله بعد.",
+  },
+  "idn.deck.defaults": {
+    en: "Default faces", es: "Rostros predeterminados", fr: "Visages par défaut", de: "Standard-Gesichter", pt: "Rostos padrão", it: "Volti predefiniti", ja: "デフォルトの顔", zh: "默认面孔", hi: "डिफ़ॉल्ट चेहरे", ar: "وجوه افتراضية",
+  },
+  "idn.deck.defaults.sub": {
+    en: "Stocked by this deployment — tap one to wear it.", es: "Provistos por este despliegue: toca uno para llevarlo.", fr: "Fournis par ce déploiement — touche-en un pour le porter.", de: "Von dieser Installation bestückt — tippe eins an, um es zu tragen.", pt: "Fornecidos por esta instalação — toque em um para usá-lo.", it: "Forniti da questa installazione — toccane uno per indossarlo.", ja: "この環境に用意された顔です。タップすると身につけられます。", zh: "由此部署提供——点一个即可佩戴。", hi: "इस परिनियोजन द्वारा रखे गए — पहनने के लिए एक चुनें।", ar: "وفّرها هذا النشر — المس واحدًا لترتديه.",
+  },
+  "idn.deck.pull": {
+    en: "Fill from the provider", es: "Rellenar desde el proveedor", fr: "Remplir depuis le fournisseur", de: "Vom Anbieter befüllen", pt: "Preencher do provedor", it: "Riempi dal provider", ja: "プロバイダから取り込む", zh: "从服务商拉取", hi: "प्रदाता से भरें", ar: "املأ من المزوّد",
+  },
+  "idn.deck.pull.closed": {
+    en: "The provider hasn't opened its avatars API yet — export the renders from their studio and upload them here instead.", es: "El proveedor aún no ha abierto su API de avatares: exporta los renders desde su estudio y súbelos aquí.", fr: "Le fournisseur n'a pas encore ouvert son API d'avatars — exporte les rendus depuis son studio et téléverse-les ici.", de: "Der Anbieter hat seine Avatar-API noch nicht geöffnet — exportiere die Renderings aus seinem Studio und lade sie hier hoch.", pt: "O provedor ainda não abriu sua API de avatares — exporte os renders do estúdio deles e envie aqui.", it: "Il provider non ha ancora aperto la sua API degli avatar — esporta i render dal loro studio e caricali qui.", ja: "プロバイダのアバターAPIはまだ公開されていません。スタジオから画像を書き出して、ここにアップロードしてください。", zh: "服务商尚未开放头像 API——请从其工作室导出渲染图并在此上传。", hi: "प्रदाता ने अभी अवतार API नहीं खोली है — उनके स्टूडियो से रेंडर निर्यात करें और यहाँ अपलोड करें।", ar: "لم يفتح المزوّد واجهة الأفاتار بعد — صدّر الصور من الاستوديو وارفعها هنا.",
+  },
+  "idn.deck.defaults.none": {
+    en: "The shelf is empty — this deployment hasn't stocked default faces yet.", es: "El estante está vacío: este despliegue aún no tiene rostros predeterminados.", fr: "L'étagère est vide — ce déploiement n'a pas encore de visages par défaut.", de: "Das Regal ist leer — diese Installation hat noch keine Standard-Gesichter.", pt: "A prateleira está vazia — esta instalação ainda não tem rostos padrão.", it: "Lo scaffale è vuoto — questa installazione non ha ancora volti predefiniti.", ja: "棚は空です。この環境にはまだデフォルトの顔がありません。", zh: "货架是空的——此部署尚未提供默认面孔。", hi: "शेल्फ़ खाली है — इस परिनियोजन में अभी डिफ़ॉल्ट चेहरे नहीं हैं।", ar: "الرف فارغ — هذا النشر لم يوفّر وجوهًا افتراضية بعد.",
+  },
+  "stage.prompt": {
+    en: "Prompt", es: "Indicación", fr: "Consigne", de: "Prompt", pt: "Comando", it: "Prompt", ja: "プロンプト", zh: "提示词", hi: "प्रॉम्प्ट", ar: "الموجّه",
+  },
+  "stage.ward": {
+    en: "Wardrobe", es: "Vestuario", fr: "Garde-robe", de: "Garderobe", pt: "Guarda-roupa", it: "Guardaroba", ja: "ワードローブ", zh: "衣橱", hi: "वार्डरोब", ar: "خزانة الملابس",
+  },
+  "stage.body": {
+    en: "Physique & gender", es: "Físico y género", fr: "Physique et genre", de: "Körper & Geschlecht", pt: "Físico e gênero", it: "Fisico e genere", ja: "体つきと性別", zh: "体型与性别", hi: "शरीर और लिंग", ar: "القوام والنوع",
+  },
+  "ward.guests": {
+    en: "Let the people talking with this profile restyle its avatar", es: "Deja que quienes hablan con este perfil cambien el estilo de su avatar", fr: "Laisse les personnes qui parlent avec ce profil changer le style de son avatar", de: "Lass die Leute, die mit diesem Profil sprechen, den Stil seines Avatars ändern", pt: "Deixe quem conversa com este perfil mudar o estilo do avatar dele", it: "Lascia che chi parla con questo profilo cambi lo stile del suo avatar", ja: "このプロフィールと話す人がアバターのスタイルを変えられるようにする", zh: "允许与这个档案交谈的人改变它的头像造型", hi: "इस प्रोफ़ाइल से बात करने वालों को इसके अवतार का रूप बदलने दें", ar: "اسمح لمن يتحدثون مع هذا الملف بتغيير مظهر صورته الرمزية",
+  },
+  "ward.locked": {
+    en: "The owner keeps this wardrobe closed — only they can restyle this avatar.", es: "Quien posee este perfil mantiene el vestuario cerrado: solo esa persona puede cambiar el estilo de este avatar.", fr: "La personne propriétaire garde ce vestiaire fermé — elle seule peut changer le style de cet avatar.", de: "Wer dieses Profil besitzt, hält die Garderobe geschlossen — nur diese Person kann den Stil dieses Avatars ändern.", pt: "Quem é dono do perfil mantém o guarda-roupa fechado — só essa pessoa pode mudar o estilo deste avatar.", it: "Chi possiede il profilo tiene chiuso il guardaroba — solo quella persona può cambiare lo stile di questo avatar.", ja: "所有者がこのワードローブを閉じています。スタイルを変えられるのは所有者だけです。", zh: "所有者已关闭这个衣橱——只有所有者能改变这个头像的造型。", hi: "मालिक ने यह वार्डरोब बंद रखा है — केवल वही इस अवतार का रूप बदल सकता है।", ar: "المالك يُبقي خزانة الملابس هذه مغلقة — وحده يمكنه تغيير مظهر هذا الأفاتار.",
+  },
+  "ward.apparel": {
+    en: "Leather jacket", es: "Chaqueta de cuero", fr: "Veste en cuir", de: "Lederjacke", pt: "Jaqueta de couro", it: "Giacca di pelle", ja: "レザージャケット", zh: "皮夹克", hi: "लेदर जैकेट", ar: "سترة جلدية",
+  },
+  "ward.apparel2": {
+    en: "Formal wear", es: "Ropa formal", fr: "Tenue de soirée", de: "Abendgarderobe", pt: "Traje formal", it: "Abito formale", ja: "フォーマル", zh: "正装", hi: "औपचारिक पोशाक", ar: "ملابس رسمية",
+  },
+  "ward.hair": {
+    en: "New hairstyle", es: "Peinado nuevo", fr: "Nouvelle coiffure", de: "Neue Frisur", pt: "Penteado novo", it: "Nuova pettinatura", ja: "新しい髪型", zh: "新发型", hi: "नया हेयरस्टाइल", ar: "تسريحة جديدة",
+  },
+  "ward.hair2": {
+    en: "Shorter hair", es: "Pelo más corto", fr: "Cheveux plus courts", de: "Kürzeres Haar", pt: "Cabelo mais curto", it: "Capelli più corti", ja: "短めの髪", zh: "更短的头发", hi: "छोटे बाल", ar: "شعر أقصر",
+  },
+  "ward.physique": {
+    en: "Broader build", es: "Complexión más fuerte", fr: "Carrure plus large", de: "Kräftigere Statur", pt: "Porte mais forte", it: "Corporatura più robusta", ja: "がっしりした体型", zh: "更壮的体格", hi: "मज़बूत कद-काठी", ar: "بنية أعرض",
+  },
+  "ward.physique2": {
+    en: "Leaner build", es: "Complexión más esbelta", fr: "Silhouette plus fine", de: "Schlankere Statur", pt: "Porte mais esguio", it: "Corporatura più snella", ja: "細身の体型", zh: "更瘦的体格", hi: "दुबली कद-काठी", ar: "بنية أنحف",
+  },
+  "ward.gender": {
+    en: "More feminine", es: "Más femenino", fr: "Plus féminin", de: "Femininer", pt: "Mais feminino", it: "Più femminile", ja: "よりフェミニンに", zh: "更女性化", hi: "अधिक स्त्रीोचित", ar: "أكثر أنوثة",
+  },
+  "ward.gender2": {
+    en: "More masculine", es: "Más masculino", fr: "Plus masculin", de: "Maskuliner", pt: "Mais masculino", it: "Più maschile", ja: "よりマスキュリンに", zh: "更男性化", hi: "अधिक पुरुषोचित", ar: "أكثر ذكورية",
+  },
+  "ward.jewelry": {
+    en: "Chain & rings", es: "Cadena y anillos", fr: "Chaîne et bagues", de: "Kette & Ringe", pt: "Corrente e anéis", it: "Catena e anelli", ja: "チェーンと指輪", zh: "项链与戒指", hi: "चेन और अंगूठियाँ", ar: "سلسلة وخواتم",
+  },
+  "ward.backdrop": {
+    en: "Sunset backdrop", es: "Fondo de atardecer", fr: "Fond coucher de soleil", de: "Sonnenuntergangs-Hintergrund", pt: "Fundo de pôr do sol", it: "Sfondo al tramonto", ja: "夕暮れの背景", zh: "日落背景", hi: "सूर्यास्त की पृष्ठभूमि", ar: "خلفية غروب",
+  },
+  "idn.deck.pid.ph": {
+    en: "Provider’s avatar id (optional)", es: "ID del avatar del proveedor (opcional)", fr: "ID de l’avatar chez le fournisseur (facultatif)", de: "Avatar-ID des Anbieters (optional)", pt: "ID do avatar no provedor (opcional)", it: "ID avatar del provider (facoltativo)", ja: "プロバイダのアバターID（任意）", zh: "服务商的头像ID（可选）", hi: "प्रदाता की अवतार आईडी (वैकल्पिक)", ar: "معرّف الصورة الرمزية لدى المزوّد (اختياري)",
+  },
+  "rail.ask": {
+    en: "These two are the owner’s — but you can just ask. Say what you’d like changed and they’ll take it from there.", es: "Estos dos son del propietario, pero puedes pedirlo sin más. Di qué te gustaría cambiar y ellos se encargan.", fr: "Ces deux-là appartiennent au propriétaire — mais tu peux simplement demander. Dis ce que tu voudrais changer et ils s’en chargent.", de: "Diese beiden gehören dem Eigentümer — aber du kannst einfach fragen. Sag, was du dir anders wünschst, und sie kümmern sich darum.", pt: "Estes dois são do proprietário — mas você pode simplesmente pedir. Diga o que gostaria de mudar e eles cuidam do resto.", it: "Questi due sono del proprietario — ma puoi semplicemente chiedere. Di’ cosa vorresti cambiare e ci penseranno loro.", ja: "この2つはオーナーのものですが、頼むだけで大丈夫。変えてほしいことを伝えれば、あとは任せられます。", zh: "这两个属于所有者——但你可以直接开口。说出你想改变什么，他们会处理。", hi: "ये दोनों मालिक के हैं — लेकिन आप बस कह सकते हैं। बताइए क्या बदलना है और वे संभाल लेंगे।", ar: "هذان للمالك — لكن يمكنك أن تطلب ببساطة. قل ما تودّ تغييره وسيتولون الأمر.",
+  },
+  "rail.ask.ph": {
+    en: "Ask for a change…", es: "Pide un cambio…", fr: "Demande un changement…", de: "Bitte um eine Änderung…", pt: "Peça uma mudança…", it: "Chiedi una modifica…", ja: "変更をお願いする…", zh: "提出想要的改变…", hi: "बदलाव के लिए कहें…", ar: "اطلب تغييرًا…",
+  },
+  "rail.ask.send": {
+    en: "Ask", es: "Pedir", fr: "Demander", de: "Fragen", pt: "Pedir", it: "Chiedi", ja: "頼む", zh: "开口", hi: "कहें", ar: "اطلب",
+  },
+  "ins.ear.tap": {
+    en: "Tap anywhere and the room hears you", es: "Toca en cualquier parte y la sala te escucha", fr: "Touchez n’importe où et la salle vous entend", de: "Tipp irgendwohin, und der Raum hört dich", pt: "Toque em qualquer lugar e a sala ouve você", it: "Tocca ovunque e la stanza ti sente", ja: "どこかをタップすると、ルームがあなたの声を聞きます", zh: "点按任意位置，房间就能听到你", hi: "कहीं भी टैप करें और कमरा आपको सुनेगा", ar: "المس أي مكان وستسمعك الغرفة",
+  },
+  "ins.rec.stop": {
+    en: "Done — put the words in the box", es: "Listo: pon las palabras en el cuadro", fr: "Terminé — mettre les mots dans la zone", de: "Fertig — die Worte ins Feld setzen", pt: "Pronto — coloque as palavras na caixa", it: "Fatto — metti le parole nella casella", ja: "完了 — 言葉をボックスに入れる", zh: "完成——把话放进输入框", hi: "हो गया — शब्दों को बॉक्स में डालें", ar: "تم — ضع الكلمات في الصندوق",
+  },
+  "ins.rec.cancel": {
+    en: "Never mind", es: "Olvídalo", fr: "Laisser tomber", de: "Doch nicht", pt: "Deixa pra lá", it: "Lascia stare", ja: "やっぱりやめる", zh: "算了", hi: "रहने दें", ar: "لا عليك",
   },
   "ins.ear.blocked": {
     en: "The microphone was refused — allow it for this site in the browser, then press the mic again.", es: "El micrófono fue rechazado: permítelo para este sitio en el navegador y pulsa el micro otra vez.", fr: "Le microphone a été refusé — autorisez-le pour ce site dans le navigateur, puis réappuyez sur le micro.", de: "Das Mikrofon wurde verweigert — erlaube es für diese Seite im Browser und drücke das Mikro erneut.", pt: "O microfone foi recusado — permite-o para este site no navegador e carrega no micro outra vez.", it: "Il microfono è stato rifiutato: consentilo per questo sito nel browser, poi premi di nuovo il microfono.", ja: "マイクが拒否されました。ブラウザでこのサイトに許可してから、もう一度マイクを押してください。", zh: "麦克风被拒绝 — 请在浏览器中为此网站允许后，再按一次麦克风。", hi: "माइक्रोफ़ोन अस्वीकार हुआ — ब्राउज़र में इस साइट के लिए अनुमति दें, फिर माइक दोबारा दबाएँ।", ar: "رُفض الميكروفون — اسمح به لهذا الموقع في المتصفح ثم اضغط الميكروفون مجددًا.",
@@ -8501,6 +9385,12 @@ const CHROME: Table = {
     zh: "浏览器的识别器无法连接其语音服务 — 你可以打字，回复仍会朗读",
     hi: "ब्राउज़र का पहचानकर्ता अपनी वाक् सेवा तक नहीं पहुँच सका — आप लिख सकते हैं, जवाब फिर भी बोला जाएगा",
     ar: "تعذّر على مُتعرِّف المتصفح الوصول إلى خدمة الكلام — يمكنك الكتابة، وسيظل الرد منطوقًا",
+  },
+  "ins.screen": {
+    en: "Show the room your screen — one frame, read by the profiles here", es: "Muestra tu pantalla a la sala — un solo fotograma, leído por los perfiles de aquí", fr: "Montrez votre écran à la salle — une seule image, lue par les profils présents", de: "Zeig dem Raum deinen Bildschirm — ein Einzelbild, gelesen von den Profilen hier", pt: "Mostre o seu ecrã à sala — um único quadro, lido pelos perfis daqui", it: "Mostra il tuo schermo alla stanza — un solo fotogramma, letto dai profili qui", ja: "画面をルームに見せる — 1コマだけ、ここのプロフィールが読み取ります", zh: "把你的屏幕给房间看——只取一帧，由这里的形象读取", hi: "कमरे को अपनी स्क्रीन दिखाएँ — एक ही फ़्रेम, यहाँ की प्रोफ़ाइलें पढ़ेंगी", ar: "أرِ الغرفة شاشتك — إطار واحد تقرؤه الملفات هنا",
+  },
+  "ins.tenpieces": {
+    en: "They've each said their ten pieces — say anything to carry on, or tell them \u201cno limit\u201d and it's on your dime.", es: "Cada uno ya dijo sus diez turnos — di cualquier cosa para continuar, o diles \u201csin límite\u201d y corre por tu cuenta.", fr: "Chacun a dit ses dix tours — dites n'importe quoi pour continuer, ou dites-leur \u201csans limite\u201d et c'est à vos frais.", de: "Jeder hat seine zehn Züge gesagt — sag irgendetwas, um fortzufahren, oder sag ihnen \u201eohne Limit\u201c, auf deine Rechnung.", pt: "Cada um já disse as suas dez vezes — diga qualquer coisa para continuar, ou diga-lhes \u201csem limite\u201d e fica por sua conta.", it: "Ognuno ha detto i suoi dieci turni — di' qualsiasi cosa per continuare, o di' loro \u201csenza limite\u201d ed è a tue spese.", ja: "それぞれ10回ずつ話し終えました — 何か言えば続きます。「制限なし」と言えばあなたの負担で続行します。", zh: "他们各自说完了十轮——说点什么就能继续，或告诉他们\u201c不设上限\u201d，费用由你承担。", hi: "हरेक ने अपनी दस बारी कह ली — जारी रखने के लिए कुछ भी कहें, या उन्हें \u201cकोई सीमा नहीं\u201d कहें और खर्च आपका।", ar: "قال كلٌّ منهم أدواره العشرة — قل أي شيء للمتابعة، أو قل لهم \u201cبلا حد\u201d وعلى نفقتك.",
   },
   "ins.share": {
     en: "Share a picture, video or file", es: "Comparte una imagen, video o archivo", fr: "Partagez une image, une vidéo ou un fichier", de: "Bild, Video oder Datei teilen", pt: "Partilhe uma imagem, vídeo ou ficheiro", it: "Condividi un'immagine, un video o un file", ja: "画像・動画・ファイルを共有", zh: "分享图片、视频或文件", hi: "चित्र, वीडियो या फ़ाइल साझा करें", ar: "شارك صورة أو فيديو أو ملفًا",
@@ -8781,6 +9671,9 @@ const CHROME: Table = {
   "ins.face.flip": {
     en: "Flip camera", es: "Girar la cámara", fr: "Changer de caméra", de: "Kamera wechseln", pt: "Virar a câmara", it: "Cambia fotocamera", ja: "カメラを切り替える", zh: "翻转摄像头", hi: "कैमरा पलटें", ar: "اقلب الكاميرا",
   },
+  "ins.face.settings": {
+    en: "Seat settings", es: "Ajustes del asiento", fr: "R\u00e9glages du si\u00e8ge", de: "Sitz-Einstellungen", pt: "Defini\u00e7\u00f5es do lugar", it: "Impostazioni del posto", ja: "\u5ea7\u5e2d\u306e\u8a2d\u5b9a", zh: "\u5ea7\u4f4d\u8bbe\u7f6e", hi: "\u0938\u0940\u091f \u0938\u0947\u091f\u093f\u0902\u0917\u094d\u0938", ar: "\u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0627\u0644\u0645\u0642\u0639\u062f",
+  },
   "ins.face.hint": {
     en: "Double-tap or hold for controls", es: "Toca dos veces o mantén pulsado para los controles", fr: "Touchez deux fois ou maintenez pour les commandes", de: "Doppeltippen oder halten für die Bedienelemente", pt: "Toque duas vezes ou segure para os controlos", it: "Tocca due volte o tieni premuto per i comandi", ja: "ダブルタップまたは長押しで操作を表示", zh: "双击或长按显示控制项", hi: "नियंत्रण के लिए दो बार टैप करें या दबाए रखें", ar: "انقر مرّتين أو اضغط مطوّلًا لإظهار الأزرار",
   },
@@ -8808,20 +9701,24 @@ const CHROME: Table = {
   "ins.seat.aimark": {
     en: "AI", es: "AI", fr: "AI", de: "AI", pt: "AI", it: "AI", ja: "AI", zh: "AI", hi: "AI", ar: "AI",
   },
+  // The checked likeness. "VERIFIED" is the word already burned into the
+  // photograph it replaces, and the one every attestation document in
+  // this product uses, so the mark keeps it in every language rather
+  // than becoming a different claim in each.
+  "ins.seat.realmark": {
+    en: "VERIFIED", es: "VERIFIED", fr: "VERIFIED", de: "VERIFIED", pt: "VERIFIED", it: "VERIFIED", ja: "VERIFIED", zh: "VERIFIED", hi: "VERIFIED", ar: "VERIFIED",
+  },
+  "ins.seat.real": {
+    en: "verified likeness of a real person", es: "imagen verificada de una persona real", fr: "portrait vérifié d'une personne réelle", de: "verifiziertes Abbild einer echten Person", pt: "imagem verificada de uma pessoa real", it: "immagine verificata di una persona reale", ja: "実在の人物の確認済みの肖像", zh: "已核实的真人肖像", hi: "वास्तविक व्यक्ति की सत्यापित छवि", ar: "صورة موثَّقة لشخص حقيقي",
+  },
   "ins.seat.person": {
     en: "person", es: "persona", fr: "personne", de: "Person", pt: "pessoa", it: "persona", ja: "人", zh: "真人", hi: "व्यक्ति", ar: "شخص",
   },
   "ins.seat.profile": {
     en: "profile", es: "perfil", fr: "profil", de: "Profil", pt: "perfil", it: "profilo", ja: "プロフィール", zh: "档案", hi: "प्रोफ़ाइल", ar: "ملف",
   },
-  "ins.nothingyet": {
-    en: "Nothing yet.", es: "Nada todavía.", fr: "Rien pour l'instant.", de: "Noch nichts.", pt: "Nada ainda.", it: "Ancora niente.", ja: "まだ何もありません。", zh: "还没有内容。", hi: "अभी कुछ नहीं।", ar: "لا شيء بعد.",
-  },
   "ins.sayit": {
     en: "Say it", es: "Decirlo", fr: "Le dire", de: "Sagen", pt: "Dizer", it: "Dillo", ja: "言う", zh: "说出来", hi: "कह दीजिए", ar: "قُلها",
-  },
-  "ins.letthemtalk": {
-    en: "Let it talk first", es: "Deja que hable primero", fr: "Laissez-le parler d'abord", de: "Lass es zuerst reden", pt: "Deixe-o falar primeiro", it: "Lascialo parlare prima", ja: "先に話させる", zh: "让它先说", hi: "पहले इसे बोलने दें", ar: "دعه يتكلّم أولًا",
   },
   "ins.file.reading": {
     en: "Reading {name} ({n} of {m}) — a scanned file takes a while, the eyes are working", es: "Leyendo {name} ({n} de {m}): un archivo escaneado tarda un poco, los ojos están trabajando", fr: "Lecture de {name} ({n} sur {m}) — un fichier scanné prend un moment, les yeux travaillent", de: "Lese {name} ({n} von {m}) — eine gescannte Datei dauert etwas, die Augen arbeiten", pt: "A ler {name} ({n} de {m}) — um ficheiro digitalizado demora um pouco, os olhos estão a trabalhar", it: "Lettura di {name} ({n} di {m}) — un file scansionato richiede un po', gli occhi stanno lavorando", ja: "{name} を読んでいます（{m} 件中 {n} 件目）— スキャンされたファイルは少し時間がかかります", zh: "正在读取 {name}（第 {n} 个，共 {m} 个）——扫描件需要一点时间，眼睛正在工作", hi: "{name} पढ़ा जा रहा है ({m} में से {n}) — स्कैन की गई फ़ाइल में समय लगता है, आँखें काम कर रही हैं", ar: "جارٍ قراءة {name} ({n} من {m}) — الملف الممسوح يستغرق وقتًا، العيون تعمل",
@@ -8846,12 +9743,6 @@ const CHROME: Table = {
   },
   "ins.stage.title": {
     en: "The stage", es: "El escenario", fr: "La scène", de: "Die Bühne", pt: "O palco", it: "Il palco", ja: "ステージ", zh: "舞台", hi: "मंच", ar: "المسرح",
-  },
-  "ins.stage.ar": {
-    en: "Step in (AR)", es: "Entrar (RA)", fr: "Entrer (RA)", de: "Eintreten (AR)", pt: "Entrar (RA)", it: "Entra (AR)", ja: "入る（AR）", zh: "走进（AR）", hi: "अंदर आएँ (AR)", ar: "ادخل (AR)",
-  },
-  "ins.stage.vr": {
-    en: "Step in (VR)", es: "Entrar (RV)", fr: "Entrer (RV)", de: "Eintreten (VR)", pt: "Entrar (RV)", it: "Entra (VR)", ja: "入る（VR）", zh: "走进（VR）", hi: "अंदर आएँ (VR)", ar: "ادخل (VR)",
   },
   "ins.link": {
     en: "Drop a link", es: "Poner un enlace", fr: "Déposer un lien", de: "Link einfügen", pt: "Colocar uma ligação", it: "Inserisci un link", ja: "リンクを貼る", zh: "放个链接", hi: "लिंक डालें", ar: "أضف رابطًا",
@@ -9805,6 +10696,181 @@ const CHROME: Table = {
   },
   "rail.ctl.saving": {
     en: "Moving…", es: "Ajustando…", fr: "Réglage…", de: "Wird verstellt…", pt: "A ajustar…", it: "Regolazione…", ja: "調整中…", zh: "调整中…", hi: "बदल रहे हैं…", ar: "جارٍ الضبط…",
+  },
+
+  // ---- the capability register (screens/Capabilities.tsx) -------
+  //
+  // Named for what each faculty does, not for the body part it
+  // resembles, and named in this product's own words rather than
+  // the sibling's: QRME lends a profile an ear and an eye *into a
+  // place*, where JIM attaches them to a monitor on one person.
+  "nav.capabilities": {
+    en: "Capabilities", es: "Capacidades", fr: "Capacités", de: "Fähigkeiten", pt: "Capacidades", it: "Capacità", ja: "機能", zh: "功能权限", hi: "क्षमताएँ", ar: "القدرات",
+  },
+  "cap.title": {
+    en: "Capabilities", es: "Capacidades", fr: "Capacités", de: "Fähigkeiten", pt: "Capacidades", it: "Capacità", ja: "機能", zh: "功能权限", hi: "क्षमताएँ", ar: "القدرات",
+  },
+  "cap.lead": {
+    en: "Every faculty a profile can be given, what each one currently is, the permission it rests on, and the screen that withdraws it.", es: "Cada facultad que puede otorgarse a un perfil, en qué estado se encuentra, el permiso en que se apoya y la pantalla que la retira.", fr: "Chaque faculté qu'un profil peut recevoir, son état actuel, l'autorisation sur laquelle elle repose et l'écran qui la retire.", de: "Jede Fähigkeit, die ein Profil erhalten kann, ihr aktueller Stand, die zugrunde liegende Erlaubnis und der Bildschirm, der sie zurücknimmt.", pt: "Cada faculdade que pode ser dada a um perfil, o estado atual, a permissão em que assenta e o ecrã que a retira.", it: "Ogni facoltà che un profilo può ricevere, il suo stato attuale, il permesso su cui si fonda e la schermata che lo revoca.", ja: "プロフィールに与えられる各機能と、その現在の状態、根拠となる許可、および取り消しを行う画面。", zh: "档案可被授予的每项功能、当前状态、所依据的许可，以及撤销该功能的页面。", hi: "किसी प्रोफ़ाइल को दी जा सकने वाली हर क्षमता, उसकी वर्तमान स्थिति, जिस अनुमति पर वह टिकी है, और वह स्क्रीन जो उसे वापस लेती है।", ar: "كل قدرة يمكن منحها لملفّ شخصي، وحالتها الراهنة، والإذن الذي تستند إليه، والشاشة التي تسحبها.",
+  },
+  "cap.standing": {
+    en: "Nothing on this screen grants, opens or revokes. It reads the same routes the owning screens read, and routes to them. A capability shown here as absent is absent because no permission for it exists — not because this page is withholding it.", es: "Nada en esta pantalla otorga, abre ni revoca. Lee las mismas rutas que leen las pantallas propietarias y conduce a ellas. Una capacidad que aquí aparece ausente lo está porque no existe permiso para ella, no porque esta página la oculte.", fr: "Rien sur cet écran n'accorde, n'ouvre ni ne révoque. Il lit les mêmes routes que les écrans propriétaires et y conduit. Une capacité indiquée ici comme absente l'est parce qu'aucune autorisation n'existe pour elle, non parce que cette page la dissimule.", de: "Nichts auf diesem Bildschirm erteilt, öffnet oder entzieht etwas. Er liest dieselben Routen wie die zuständigen Bildschirme und führt zu ihnen. Eine hier als fehlend angezeigte Fähigkeit fehlt, weil keine Erlaubnis dafür besteht — nicht weil diese Seite sie zurückhält.", pt: "Nada neste ecrã concede, abre ou revoga. Lê as mesmas rotas que os ecrãs proprietários leem e encaminha para eles. Uma capacidade aqui indicada como ausente está ausente porque não existe permissão para ela, não porque esta página a esconda.", it: "Nulla in questa schermata concede, apre o revoca. Legge le stesse rotte lette dalle schermate competenti e vi conduce. Una capacità qui indicata come assente lo è perché non esiste alcun permesso per essa, non perché questa pagina la nasconda.", ja: "この画面は許可の付与も開始も取り消しも行いません。各機能を所管する画面と同じ経路を読み取り、そこへ案内するだけです。ここで「なし」と表示される機能は、そのための許可が存在しないからであり、このページが伏せているからではありません。", zh: "本页面不授予、不开启也不撤销任何权限。它读取与各功能所属页面相同的接口，并引导至这些页面。此处显示为「无」的功能，是因为不存在相应许可，而非本页面有所隐瞒。", hi: "इस स्क्रीन पर कुछ भी अनुमति नहीं देता, न आरंभ करता है, न वापस लेता है। यह वही मार्ग पढ़ती है जो सम्बंधित स्क्रीनें पढ़ती हैं, और उन तक पहुँचाती है। यहाँ जो क्षमता अनुपस्थित दिखती है वह इसलिए अनुपस्थित है कि उसके लिए कोई अनुमति मौजूद नहीं — इसलिए नहीं कि यह पृष्ठ उसे छिपा रहा है।", ar: "لا شيء في هذه الشاشة يمنح أو يفتح أو يسحب. إنّها تقرأ المسارات ذاتها التي تقرأها الشاشات المختصّة وتوجّه إليها. القدرة التي تظهر هنا غائبة فهي غائبة لعدم وجود إذن بها، لا لأنّ هذه الصفحة تحجبها.",
+  },
+  "cap.now": {
+    en: "Now:", es: "Ahora:", fr: "Actuellement :", de: "Jetzt:", pt: "Agora:", it: "Ora:", ja: "現在:", zh: "当前：", hi: "अभी:", ar: "الآن:",
+  },
+  "cap.rests": {
+    en: "Rests on:", es: "Se apoya en:", fr: "Repose sur :", de: "Beruht auf:", pt: "Assenta em:", it: "Si fonda su:", ja: "根拠:", zh: "依据：", hi: "किस पर टिका:", ar: "يستند إلى:",
+  },
+  "cap.open": {
+    en: "Open {screen}", es: "Abrir {screen}", fr: "Ouvrir {screen}", de: "{screen} öffnen", pt: "Abrir {screen}", it: "Apri {screen}", ja: "{screen} を開く", zh: "打开{screen}", hi: "{screen} खोलें", ar: "فتح {screen}",
+  },
+  "cap.reading": {
+    en: "reading…", es: "leyendo…", fr: "lecture…", de: "wird gelesen…", pt: "a ler…", it: "in lettura…", ja: "読み取り中…", zh: "读取中…", hi: "पढ़ा जा रहा है…", ar: "جارٍ القراءة…",
+  },
+  "cap.unreadable": {
+    en: "could not be read from this device", es: "no se pudo leer desde este dispositivo", fr: "n'a pas pu être lu depuis cet appareil", de: "konnte von diesem Gerät nicht gelesen werden", pt: "não foi possível ler a partir deste dispositivo", it: "non è stato possibile leggerlo da questo dispositivo", ja: "この端末からは読み取れませんでした", zh: "无法从本设备读取", hi: "इस डिवाइस से पढ़ा नहीं जा सका", ar: "تعذّرت القراءة من هذا الجهاز",
+  },
+  "cap.sight.title": {
+    en: "Live visual channel", es: "Canal visual en directo", fr: "Canal visuel en direct", de: "Live-Bildkanal", pt: "Canal visual em direto", it: "Canale visivo in diretta", ja: "ライブ映像チャンネル", zh: "实时视觉通道", hi: "सजीव दृश्य चैनल", ar: "قناة مرئية مباشرة",
+  },
+  "cap.sight.what": {
+    en: "Channel 3: a live view through the holder's own camera, so that somebody on the other side can see the thing rather than hear it described. Opened by the holder, minuted, and disclosed to everybody present.", es: "Canal 3: una vista en directo a través de la cámara de quien la sostiene, para que alguien al otro lado pueda ver la cosa en vez de oír su descripción. La abre quien la sostiene, se cuenta por minutos y se comunica a todas las personas presentes.", fr: "Canal 3 : une vue en direct par la caméra du porteur, afin que quelqu'un de l'autre côté voie la chose au lieu de l'entendre décrire. Ouverte par le porteur, décomptée en minutes, et signalée à toutes les personnes présentes.", de: "Kanal 3: eine Live-Ansicht durch die eigene Kamera der haltenden Person, damit jemand auf der anderen Seite die Sache sieht, statt sie beschrieben zu bekommen. Von der haltenden Person geöffnet, nach Minuten bemessen und allen Anwesenden offengelegt.", pt: "Canal 3: uma vista em direto através da câmara de quem a segura, para que alguém do outro lado veja a coisa em vez de a ouvir descrita. Aberta por quem a segura, contada em minutos e divulgada a todas as pessoas presentes.", it: "Canale 3: una vista in diretta attraverso la fotocamera di chi la tiene, così che qualcuno dall'altra parte veda la cosa anziché sentirla descrivere. Aperta da chi la tiene, conteggiata a minuti e comunicata a tutte le persone presenti.", ja: "チャンネル 3。手元のカメラを通じたライブ映像で、説明を聞く代わりに相手が現物を見られるようにします。保持者が開始し、分単位で計測され、その場の全員に開示されます。", zh: "通道 3：通过持有者自己的摄像头提供实时画面，使另一端的人能够直接看到实物，而非听取描述。由持有者开启，按分钟计，并向在场所有人公开告知。", hi: "चैनल 3: धारक के अपने कैमरे से सजीव दृश्य, ताकि दूसरी ओर का व्यक्ति वस्तु का वर्णन सुनने के बजाय उसे देख सके। धारक द्वारा आरंभ, मिनटों में गिना जाता, और उपस्थित सभी को बताया जाता है।", ar: "القناة 3: عرض مباشر عبر كاميرا حاملها، ليرى من على الطرف الآخر الشيء بدل سماع وصفه. يفتحها حاملها، وتُحسب بالدقائق، ويُفصح عنها لكل الحاضرين.",
+  },
+  "cap.sight.rests": {
+    en: "A session the holder opened on a named surface, with a stated subject and a bystander notice shown to the people in view. Closing it ends the view; nothing continues after.", es: "Una sesión que quien la sostiene abrió en una superficie nombrada, con un sujeto declarado y un aviso a las personas presentes que aparecen en cuadro. Al cerrarla termina la vista; nada continúa después.", fr: "Une session ouverte par le porteur sur une surface nommée, avec un sujet déclaré et un avis affiché aux personnes dans le champ. La fermer met fin à la vue ; rien ne se poursuit ensuite.", de: "Eine von der haltenden Person auf einer benannten Fläche geöffnete Sitzung, mit angegebenem Gegenstand und einem Hinweis an die Personen im Bild. Das Schließen beendet die Ansicht; danach läuft nichts weiter.", pt: "Uma sessão que quem a segura abriu numa superfície nomeada, com um assunto declarado e um aviso às pessoas em campo. Fechá-la termina a vista; nada continua depois.", it: "Una sessione aperta da chi la tiene su una superficie nominata, con un soggetto dichiarato e un avviso mostrato alle persone inquadrate. Chiuderla termina la vista; nulla prosegue dopo.", ja: "保持者が特定の場で開いたセッションであり、対象が明示され、映る人々に告知が示されます。閉じれば映像は終わり、その後に続くものはありません。", zh: "由持有者在指定场所开启的会话，须声明拍摄对象，并向画面中的人显示告知。关闭即结束该画面；此后不再有任何延续。", hi: "धारक द्वारा किसी नामित सतह पर खोला गया सत्र, घोषित विषय सहित और दृश्य में आने वालों को दिखाई गई सूचना सहित। बंद करते ही दृश्य समाप्त; उसके बाद कुछ नहीं चलता।", ar: "جلسة فتحها حاملها على سطح مسمّى، بموضوع معلن وإشعار يُعرض على من يظهرون في الصورة. وإغلاقها ينهي العرض؛ ولا يستمر شيء بعده.",
+  },
+  "cap.sight.none": {
+    en: "no live view is open", es: "no hay ninguna vista en directo abierta", fr: "aucune vue en direct n'est ouverte", de: "keine Live-Ansicht ist offen", pt: "nenhuma vista em direto está aberta", it: "nessuna vista in diretta è aperta", ja: "開いているライブ映像はありません", zh: "没有开启的实时画面", hi: "कोई सजीव दृश्य खुला नहीं है", ar: "لا يوجد عرض مباشر مفتوح",
+  },
+  "cap.sight.some": {
+    en: "{n} open — {where}", es: "{n} abiertas — {where}", fr: "{n} ouvertes — {where}", de: "{n} offen — {where}", pt: "{n} abertas — {where}", it: "{n} aperte — {where}", ja: "{n} 件が開いています — {where}", zh: "已开启 {n} 个 — {where}", hi: "{n} खुले — {where}", ar: "{n} مفتوح — {where}",
+  },
+  "cap.hearing.title": {
+    en: "Lent audio channel", es: "Canal de audio prestado", fr: "Canal audio prêté", de: "Geliehener Audiokanal", pt: "Canal de áudio emprestado", it: "Canale audio prestato", ja: "貸与された音声チャンネル", zh: "外借音频通道", hi: "उधार दिया गया ऑडियो चैनल", ar: "قناة صوتية معارة",
+  },
+  "cap.hearing.what": {
+    en: "Channel 2: a wearable microphone lent to the profiles in a place, so that what is said aloud reaches them without anybody stopping to type it.", es: "Canal 2: un micrófono portátil prestado a los perfiles de un lugar, para que lo dicho en voz alta les llegue sin que nadie tenga que detenerse a escribirlo.", fr: "Canal 2 : un microphone porté, prêté aux profils présents dans un lieu, afin que ce qui est dit à voix haute leur parvienne sans que personne s'arrête pour le saisir.", de: "Kanal 2: ein tragbares Mikrofon, das den Profilen an einem Ort geliehen wird, damit laut Gesagtes sie erreicht, ohne dass jemand innehält, um es zu tippen.", pt: "Canal 2: um microfone vestível emprestado aos perfis de um lugar, para que o que é dito em voz alta lhes chegue sem que ninguém tenha de parar para o escrever.", it: "Canale 2: un microfono indossabile prestato ai profili presenti in un luogo, così che ciò che è detto ad alta voce li raggiunga senza che nessuno si fermi a scriverlo.", ja: "チャンネル 2。その場のプロフィールに装着型マイクを貸し出し、声に出された内容が、誰かが入力し直さなくても届くようにします。", zh: "通道 2：将可穿戴麦克风外借给某场所中的各档案，使口头所说的内容无需有人停下来打字即可传达给它们。", hi: "चैनल 2: किसी स्थान की प्रोफ़ाइलों को उधार दिया गया पहनने योग्य माइक्रोफ़ोन, ताकि जो बोला जाए वह किसी के टाइप किए बिना उन तक पहुँचे।", ar: "القناة 2: ميكروفون يُلبَس ويُعار للملفّات الشخصية في مكان ما، ليصلها ما يُقال بصوت مسموع دون أن يتوقّف أحد ليكتبه.",
+  },
+  "cap.hearing.rests": {
+    en: "A surface whose other occupants have a member list and somewhere to be shown the disclosure. Rooms are excluded here and lend through their own route.", es: "Una superficie cuyos demás ocupantes tengan una lista de miembros y un lugar donde se les muestre el aviso. Las salas quedan excluidas aquí y prestan por su propia vía.", fr: "Une surface dont les autres occupants disposent d'une liste de membres et d'un endroit où l'avis leur est présenté. Les salles sont exclues ici et prêtent par leur propre voie.", de: "Eine Fläche, deren übrige Anwesende eine Mitgliederliste haben und einen Ort, an dem ihnen der Hinweis gezeigt wird. Räume sind hier ausgenommen und leihen über ihren eigenen Weg.", pt: "Uma superfície cujos restantes ocupantes tenham uma lista de membros e um sítio onde lhes seja mostrado o aviso. As salas ficam excluídas aqui e emprestam pela sua própria via.", it: "Una superficie i cui altri presenti abbiano un elenco di membri e un luogo in cui sia mostrato loro l'avviso. Le stanze sono qui escluse e prestano tramite la propria via.", ja: "他の在席者に名簿があり、告知を示す場所があるような場であること。ルームはここから除かれ、独自の経路で貸し出します。", zh: "其他在场者具备成员名单、且有可向其展示告知之处的场所。房间不在此列，通过其自身路径外借。", hi: "ऐसी सतह जिसके अन्य उपस्थित लोगों की सदस्य-सूची हो और जहाँ उन्हें सूचना दिखाई जा सके। कक्ष यहाँ से बाहर हैं और अपने ही मार्ग से उधार देते हैं।", ar: "سطح يملك سائر الحاضرين فيه قائمة أعضاء وموضعًا يُعرض عليهم فيه الإفصاح. والغرف مستثناة هنا وتُعير عبر مسارها الخاص.",
+  },
+  "cap.hearing.none": {
+    en: "no surface here can take a lent microphone", es: "ninguna superficie aquí puede recibir un micrófono prestado", fr: "aucune surface ici ne peut recevoir un microphone prêté", de: "keine Fläche hier kann ein geliehenes Mikrofon aufnehmen", pt: "nenhuma superfície aqui pode receber um microfone emprestado", it: "nessuna superficie qui può ricevere un microfono prestato", ja: "貸与マイクを受け取れる場はありません", zh: "此处没有可接收外借麦克风的场所", hi: "यहाँ कोई सतह उधार माइक्रोफ़ोन नहीं ले सकती", ar: "لا يوجد هنا سطح يمكنه تلقّي ميكروفون معار",
+  },
+  "cap.hearing.some": {
+    en: "{n} surface(s) qualify", es: "{n} superficie(s) cualifican", fr: "{n} surface(s) admissibles", de: "{n} Fläche(n) kommen infrage", pt: "{n} superfície(s) qualificam-se", it: "{n} superficie/i idonee", ja: "{n} 件の場が該当します", zh: "{n} 个场所符合条件", hi: "{n} सतहें पात्र हैं", ar: "{n} سطح مؤهّل",
+  },
+  "cap.speech.title": {
+    en: "Synthesised speech", es: "Voz sintetizada", fr: "Parole synthétisée", de: "Synthetisierte Sprache", pt: "Voz sintetizada", it: "Voce sintetizzata", ja: "合成音声", zh: "合成语音", hi: "संश्लेषित वाक्", ar: "كلام مركَّب",
+  },
+  "cap.speech.what": {
+    en: "A voice built from recorded samples in FIG. 800's order: permission first, collection second, and a print that can be retired.", es: "Una voz construida a partir de muestras grabadas en el orden de la FIG. 800: primero el permiso, después la recolección, y una huella que puede retirarse.", fr: "Une voix construite à partir d'échantillons enregistrés dans l'ordre de la FIG. 800 : l'autorisation d'abord, la collecte ensuite, et une empreinte qui peut être retirée.", de: "Eine Stimme, aus aufgenommenen Proben in der Reihenfolge von FIG. 800 gebaut: zuerst die Erlaubnis, dann die Sammlung, und ein Abdruck, der zurückgezogen werden kann.", pt: "Uma voz construída a partir de amostras gravadas na ordem da FIG. 800: primeiro a permissão, depois a recolha, e uma impressão que pode ser retirada.", it: "Una voce costruita da campioni registrati nell'ordine della FIG. 800: prima il permesso, poi la raccolta, e un'impronta che può essere ritirata.", ja: "FIG. 800 の順序に従って録音サンプルから作られる音声。まず許可、次に収集、そして取り下げ可能な音声指紋。", zh: "依 FIG. 800 的顺序、由录制样本构建的语音：先取得许可，再进行采集，并生成一份可予撤回的声纹。", hi: "FIG. 800 के क्रम में रिकॉर्ड किए गए नमूनों से बनी आवाज़: पहले अनुमति, फिर संग्रह, और एक छाप जिसे वापस लिया जा सकता है।", ar: "صوت مبنيّ من عيّنات مسجّلة وفق ترتيب الشكل 800: الإذن أوّلًا، ثم الجمع، وبصمة يمكن سحبها.",
+  },
+  "cap.speech.rests": {
+    en: "Permission recorded before a single sample is collected, and the disclosure that a synthetic voice is speaking. Withdrawing permission retires the print.", es: "El permiso registrado antes de recoger una sola muestra, y el aviso de que quien habla es una voz sintética. Retirar el permiso retira la huella.", fr: "L'autorisation consignée avant la collecte du moindre échantillon, et la mention qu'une voix synthétique s'exprime. Retirer l'autorisation retire l'empreinte.", de: "Die Erlaubnis, die vor der Sammlung auch nur einer Probe festgehalten wird, und der Hinweis, dass eine synthetische Stimme spricht. Das Zurückziehen der Erlaubnis zieht den Abdruck zurück.", pt: "A permissão registada antes de ser recolhida uma única amostra, e a menção de que é uma voz sintética a falar. Retirar a permissão retira a impressão.", it: "Il permesso registrato prima che sia raccolto un solo campione, e l'avviso che a parlare è una voce sintetica. Ritirare il permesso ritira l'impronta.", ja: "サンプルを一つ集める前に記録される許可と、話しているのが合成音声であるという開示。許可を取り下げれば音声指紋も取り下げられます。", zh: "在采集任何一份样本之前即已记录的许可，以及正在发声者为合成语音的告知。撤回许可即撤回该声纹。", hi: "एक भी नमूना एकत्र करने से पहले दर्ज की गई अनुमति, और यह प्रकटन कि बोलने वाली आवाज़ संश्लेषित है। अनुमति वापस लेने पर छाप भी वापस ले ली जाती है।", ar: "إذن مسجَّل قبل جمع أي عيّنة، وإفصاح بأنّ المتحدّث صوت مركَّب. وسحب الإذن يسحب البصمة.",
+  },
+  "cap.speech.nogate": {
+    en: "permission has not been given", es: "no se ha dado permiso", fr: "l'autorisation n'a pas été donnée", de: "die Erlaubnis wurde nicht erteilt", pt: "a permissão não foi dada", it: "il permesso non è stato dato", ja: "許可は与えられていません", zh: "尚未给予许可", hi: "अनुमति नहीं दी गई है", ar: "لم يُمنح الإذن",
+  },
+  "cap.speech.none": {
+    en: "permitted, no samples collected", es: "permitido, sin muestras recogidas", fr: "autorisé, aucun échantillon collecté", de: "erlaubt, keine Proben gesammelt", pt: "permitido, sem amostras recolhidas", it: "permesso, nessun campione raccolto", ja: "許可済み、サンプルは未収集", zh: "已获许可，尚未采集样本", hi: "अनुमत, कोई नमूना एकत्र नहीं", ar: "مسموح، ولم تُجمع عيّنات",
+  },
+  "cap.speech.enrolling": {
+    en: "collecting samples", es: "recogiendo muestras", fr: "collecte d'échantillons en cours", de: "sammelt Proben", pt: "a recolher amostras", it: "raccolta campioni in corso", ja: "サンプルを収集中", zh: "正在采集样本", hi: "नमूने एकत्र किए जा रहे हैं", ar: "جارٍ جمع العيّنات",
+  },
+  "cap.speech.some": {
+    en: "an active voiceprint", es: "una huella de voz activa", fr: "une empreinte vocale active", de: "ein aktiver Stimmabdruck", pt: "uma impressão de voz ativa", it: "un'impronta vocale attiva", ja: "有効な音声指紋があります", zh: "存在一份生效的声纹", hi: "एक सक्रिय वॉइसप्रिंट", ar: "بصمة صوتية فاعلة",
+  },
+  "cap.appearance.title": {
+    en: "Presented likeness", es: "Imagen presentada", fr: "Apparence présentée", de: "Dargestellte Gestalt", pt: "Imagem apresentada", it: "Sembianza presentata", ja: "提示される姿", zh: "呈现的形象", hi: "प्रस्तुत स्वरूप", ar: "الهيئة المعروضة",
+  },
+  "cap.appearance.what": {
+    en: "The face this profile shows — the bubble, and the upper-torso form that stands in a live feed or an AR scene — carrying a watermark that is always displayed.", es: "El rostro que muestra este perfil —la burbuja y la figura de medio cuerpo que aparece en una emisión en directo o en una escena de RA—, con una marca de agua que siempre se muestra.", fr: "Le visage que ce profil présente — la bulle, et la silhouette en buste qui apparaît dans un flux en direct ou une scène de RA — portant un filigrane toujours affiché.", de: "Das Gesicht, das dieses Profil zeigt — die Blase und die Oberkörpergestalt, die in einem Livestream oder einer AR-Szene steht — mit einem stets angezeigten Wasserzeichen.", pt: "O rosto que este perfil mostra — a bolha e a figura de meio corpo que aparece numa emissão em direto ou numa cena de RA — com uma marca de água sempre visível.", it: "Il volto che questo profilo mostra — la bolla e la figura a mezzo busto che compare in una diretta o in una scena di RA — con una filigrana sempre visibile.", ja: "このプロフィールが示す姿 — 円形のバブル、および配信や AR の場面に立つ上半身の姿 — で、透かしが常に表示されます。", zh: "该档案所呈现的形象——气泡形象，以及在直播或 AR 场景中出现的半身形象——并始终显示水印。", hi: "यह प्रोफ़ाइल जो चेहरा दिखाती है — बुलबुला, और वह कमर तक का रूप जो सजीव प्रसारण या AR दृश्य में खड़ा होता है — जिस पर सदैव जलचिह्न प्रदर्शित रहता है।", ar: "الوجه الذي يعرضه هذا الملفّ — الفقاعة، وهيئة الجزء العلوي التي تقف في بثّ مباشر أو مشهد واقع معزّز — وعليها علامة مائية تُعرض دائمًا.",
+  },
+  "cap.appearance.rests": {
+    en: "An asset chosen for this profile. Where a real person's likeness stands behind it, a grant from that person that can be withdrawn.", es: "Un recurso elegido para este perfil. Cuando detrás está la imagen de una persona real, una concesión de esa persona que puede retirarse.", fr: "Une ressource choisie pour ce profil. Lorsque l'image d'une personne réelle se tient derrière, une autorisation de cette personne, révocable.", de: "Ein für dieses Profil gewähltes Medium. Steht dahinter das Abbild einer realen Person, eine Einwilligung dieser Person, die zurückgezogen werden kann.", pt: "Um recurso escolhido para este perfil. Quando está por trás a imagem de uma pessoa real, uma concessão dessa pessoa que pode ser retirada.", it: "Una risorsa scelta per questo profilo. Ove dietro vi sia la sembianza di una persona reale, una concessione di quella persona, revocabile.", ja: "このプロフィールのために選ばれた素材。実在する人物の姿が背後にある場合は、その人物による、取り下げ可能な許諾。", zh: "为该档案选定的素材。若其背后是真实人物的形象，则须有该人物给予的、可撤回的授权。", hi: "इस प्रोफ़ाइल के लिए चुनी गई सामग्री। जहाँ उसके पीछे किसी वास्तविक व्यक्ति का स्वरूप हो, वहाँ उस व्यक्ति की ऐसी स्वीकृति जो वापस ली जा सके।", ar: "أصل مختار لهذا الملفّ. وحيث تقف وراءه هيئة شخص حقيقي، فإذنٌ من ذلك الشخص قابل للسحب.",
+  },
+  "cap.appearance.none": {
+    en: "no likeness set — the silhouette stands", es: "sin imagen definida: queda la silueta", fr: "aucune image définie — la silhouette demeure", de: "keine Gestalt gesetzt — die Silhouette bleibt", pt: "sem imagem definida — fica a silhueta", it: "nessuna sembianza impostata — resta la sagoma", ja: "姿は未設定 — シルエットのままです", zh: "未设置形象——保留剪影", hi: "कोई स्वरूप निर्धारित नहीं — छायाचित्र रहता है", ar: "لم تُحدَّد هيئة — يبقى الظلّ",
+  },
+  "cap.appearance.some": {
+    en: "a likeness is set, watermarked", es: "hay una imagen definida, con marca de agua", fr: "une image est définie, filigranée", de: "eine Gestalt ist gesetzt, mit Wasserzeichen", pt: "há uma imagem definida, com marca de água", it: "una sembianza è impostata, con filigrana", ja: "姿が設定され、透かしが入っています", zh: "已设置形象，并加有水印", hi: "एक स्वरूप निर्धारित है, जलचिह्न सहित", ar: "حُدِّدت هيئة، بعلامة مائية",
+  },
+  "cap.body.title": {
+    en: "Physical embodiment", es: "Encarnación física", fr: "Incarnation physique", de: "Physische Verkörperung", pt: "Encarnação física", it: "Incarnazione fisica", ja: "物理的な身体の付与", zh: "实体化载体", hi: "भौतिक मूर्तरूप", ar: "التجسيد المادي",
+  },
+  "cap.body.what": {
+    en: "A robot bound to this profile as a body to speak through — the same persona, through the same model, wherever it is embodied.", es: "Un robot vinculado a este perfil como cuerpo a través del cual hablar: la misma persona, mediante el mismo modelo, dondequiera que se encarne.", fr: "Un robot rattaché à ce profil comme corps par lequel parler — le même personnage, par le même modèle, où qu'il soit incarné.", de: "Ein Roboter, der diesem Profil als Körper zum Sprechen zugeordnet ist — dieselbe Persona, über dasselbe Modell, wo auch immer sie verkörpert wird.", pt: "Um robô associado a este perfil como corpo através do qual falar — a mesma persona, pelo mesmo modelo, onde quer que seja encarnada.", it: "Un robot associato a questo profilo come corpo attraverso cui parlare — la stessa persona, tramite lo stesso modello, ovunque sia incarnata.", ja: "このプロフィールに、語るための身体として結び付けられたロボット。どこに宿っても、同じ人格が同じモデルを通して語ります。", zh: "绑定至该档案、供其借以发声的机器人载体——无论在何处实体化，都是同一人格、经由同一模型。", hi: "इस प्रोफ़ाइल से जुड़ा एक रोबोट, जिसके माध्यम से वह बोलती है — वही व्यक्तित्व, उसी मॉडल के माध्यम से, चाहे वह कहीं भी मूर्त हो।", ar: "روبوت مرتبط بهذا الملفّ بوصفه جسدًا يتحدّث من خلاله — الشخصية ذاتها، عبر النموذج ذاته، أينما تجسّدت.",
+  },
+  "cap.body.rests": {
+    en: "An explicit binding to a named platform from the published catalogue. Only platforms that are shipping or open for preorder can be bound; an announced one is refused by name.", es: "Una vinculación explícita a una plataforma nombrada del catálogo publicado. Solo pueden vincularse plataformas en venta o en reserva; una simplemente anunciada se rechaza indicando su estado.", fr: "Un rattachement explicite à une plateforme nommée du catalogue publié. Seules les plateformes commercialisées ou ouvertes à la précommande peuvent être rattachées ; une plateforme seulement annoncée est refusée en la nommant.", de: "Eine ausdrückliche Zuordnung zu einer benannten Plattform aus dem veröffentlichten Katalog. Zuordnen lassen sich nur Plattformen, die ausgeliefert werden oder vorbestellbar sind; eine nur angekündigte wird unter Nennung ihres Status abgelehnt.", pt: "Uma associação explícita a uma plataforma nomeada do catálogo publicado. Só podem ser associadas plataformas à venda ou em pré-venda; uma apenas anunciada é recusada pelo nome.", it: "Un vincolo esplicito a una piattaforma nominata dal catalogo pubblicato. Possono essere vincolate solo piattaforme in vendita o prenotabili; una soltanto annunciata è rifiutata indicandone lo stato.", ja: "公開カタログに載る特定機種への明示的な結び付け。出荷中または予約受付中の機種のみを結び付けられます。発表のみの機種は、その状態を挙げて拒否されます。", zh: "与已公布目录中某一具名平台的明确绑定。仅可绑定已发货或已开放预订的平台；仅处于发布阶段的平台会被指名拒绝。", hi: "प्रकाशित सूची में से किसी नामित प्लेटफ़ॉर्म से स्पष्ट बंधन। केवल बिक्री पर या प्री-ऑर्डर हेतु खुले प्लेटफ़ॉर्म ही बाँधे जा सकते हैं; मात्र घोषित प्लेटफ़ॉर्म को नाम लेकर अस्वीकार किया जाता है।", ar: "ارتباط صريح بمنصّة مسمّاة من الفهرس المنشور. ولا يمكن ربط سوى المنصّات المتاحة للشحن أو المفتوحة للحجز المسبق؛ أمّا المعلَن عنها فحسب فتُرفض مع ذكر اسمها.",
+  },
+  "cap.body.none": {
+    en: "no body bound", es: "ningún cuerpo vinculado", fr: "aucun corps rattaché", de: "kein Körper zugeordnet", pt: "nenhum corpo associado", it: "nessun corpo vincolato", ja: "身体は結び付けられていません", zh: "未绑定任何载体", hi: "कोई मूर्तरूप नहीं बाँधा गया", ar: "لا جسد مرتبط",
+  },
+  "cap.body.some": {
+    en: "{n} bound — {names}", es: "{n} vinculados — {names}", fr: "{n} rattachés — {names}", de: "{n} zugeordnet — {names}", pt: "{n} associados — {names}", it: "{n} vincolati — {names}", ja: "{n} 台を結び付け済み — {names}", zh: "已绑定 {n} 台 — {names}", hi: "{n} बाँधे गए — {names}", ar: "{n} مرتبط — {names}",
+  },
+  "cap.movement.title": {
+    en: "Locomotion directives", es: "Directivas de desplazamiento", fr: "Directives de déplacement", de: "Fortbewegungsanweisungen", pt: "Diretivas de deslocação", it: "Direttive di locomozione", ja: "移動の指示", zh: "移动指令", hi: "गमन निर्देश", ar: "توجيهات التنقّل",
+  },
+  "cap.movement.what": {
+    en: "The movement a bound body may be told to make, checked against that platform's own allowlist before anything reaches the robot. A vacuum cannot be told to fetch.", es: "El movimiento que puede ordenarse a un cuerpo vinculado, cotejado con la lista blanca propia de esa plataforma antes de que nada llegue al robot. A una aspiradora no se le puede ordenar traer algo.", fr: "Le déplacement qu'un corps rattaché peut recevoir l'ordre d'effectuer, vérifié contre la liste d'autorisation propre à cette plateforme avant que quoi que ce soit n'atteigne le robot. On ne demande pas à un aspirateur d'aller chercher quelque chose.", de: "Die Bewegung, zu der ein zugeordneter Körper angewiesen werden darf, geprüft gegen die eigene Positivliste dieser Plattform, bevor irgendetwas den Roboter erreicht. Einem Staubsauger lässt sich nicht sagen, er solle etwas holen.", pt: "O movimento que um corpo associado pode ser mandado fazer, confrontado com a lista de permissões própria dessa plataforma antes de algo chegar ao robô. A um aspirador não se pode mandar ir buscar.", it: "Il movimento che un corpo vincolato può ricevere l'ordine di compiere, verificato contro l'elenco di consenso proprio di quella piattaforma prima che alcunché raggiunga il robot. A un aspirapolvere non si può ordinare di andare a prendere.", ja: "結び付けられた身体に指示できる動き。ロボットに届く前に、その機種自身の許可一覧と照合されます。掃除機に「取ってくる」ことは指示できません。", zh: "可命令已绑定载体执行的移动，在任何指令抵达机器人之前，都会先与该平台自身的允许清单比对。不能命令吸尘器去取物。", hi: "बाँधे गए मूर्तरूप को जो गति करने को कहा जा सकता है, वह रोबोट तक कुछ भी पहुँचने से पहले उस प्लेटफ़ॉर्म की अपनी अनुमति-सूची से जाँची जाती है। वैक्यूम क्लीनर को कुछ लाने को नहीं कहा जा सकता।", ar: "الحركة التي يجوز أن يُؤمر بها جسد مرتبط، تُطابَق مع قائمة السماح الخاصّة بتلك المنصّة قبل أن يصل شيء إلى الروبوت. ولا يمكن أن يُؤمر مكنس كهربائي بالإحضار.",
+  },
+  "cap.movement.rests": {
+    en: "A bound body whose own list includes the move. This is not a separate switch: with nothing bound there is nothing that could be told to move.", es: "Un cuerpo vinculado cuya propia lista incluya el movimiento. No es un interruptor aparte: sin nada vinculado no hay nada a lo que pueda ordenarse moverse.", fr: "Un corps rattaché dont la liste propre comprend le geste. Ce n'est pas un interrupteur distinct : sans rien de rattaché, rien ne peut recevoir l'ordre de se déplacer.", de: "Ein zugeordneter Körper, dessen eigene Liste die Aktion enthält. Das ist kein eigener Schalter: ohne Zuordnung gibt es nichts, das zur Bewegung angewiesen werden könnte.", pt: "Um corpo associado cuja lista própria inclua o movimento. Não é um interruptor à parte: sem nada associado não há nada a que se possa mandar mover.", it: "Un corpo vincolato il cui elenco proprio comprenda l'azione. Non è un interruttore a sé: senza nulla di vincolato non c'è nulla a cui si possa ordinare di muoversi.", ja: "その動きを自身の一覧に含む、結び付け済みの身体。これは独立した切り替えではありません。何も結び付けられていなければ、動くよう指示できる対象自体が存在しません。", zh: "自身清单中包含该动作且已绑定的载体。这并非一个独立开关：未绑定任何对象时，根本不存在可被命令移动的目标。", hi: "ऐसा बाँधा गया मूर्तरूप जिसकी अपनी सूची में वह क्रिया शामिल हो। यह कोई अलग स्विच नहीं है: कुछ भी बाँधा न हो तो ऐसा कुछ है ही नहीं जिसे चलने को कहा जा सके।", ar: "جسد مرتبط تتضمّن قائمته الخاصّة تلك الحركة. وليس هذا مفتاحًا مستقلًّا: فمن دون أي ارتباط لا يوجد ما يمكن أن يُؤمر بالتحرّك.",
+  },
+  "cap.movement.none": {
+    en: "nothing bound that could be told to move", es: "no hay nada vinculado a lo que pueda ordenarse moverse", fr: "rien de rattaché ne peut recevoir l'ordre de se déplacer", de: "nichts zugeordnet, das zur Bewegung angewiesen werden könnte", pt: "nada associado a que se possa mandar mover", it: "nulla di vincolato a cui si possa ordinare di muoversi", ja: "動くよう指示できる結び付けはありません", zh: "未绑定任何可被命令移动的对象", hi: "ऐसा कुछ नहीं बाँधा गया जिसे चलने को कहा जा सके", ar: "لا شيء مرتبط يمكن أن يُؤمر بالتحرّك",
+  },
+  "cap.movement.some": {
+    en: "limited to — {moves}", es: "limitado a — {moves}", fr: "limité à — {moves}", de: "beschränkt auf — {moves}", pt: "limitado a — {moves}", it: "limitato a — {moves}", ja: "次に限定 — {moves}", zh: "仅限于 — {moves}", hi: "इन तक सीमित — {moves}", ar: "مقصور على — {moves}",
+  },
+  "cap.observation.title": {
+    en: "Screen observation", es: "Observación de pantalla", fr: "Observation d'écran", de: "Bildschirmbeobachtung", pt: "Observação de ecrã", it: "Osservazione dello schermo", ja: "画面の観察", zh: "屏幕观察", hi: "स्क्रीन अवलोकन", ar: "مراقبة الشاشة",
+  },
+  "cap.observation.what": {
+    en: "Reading a screen without acting on it. Text found on a screen is treated as data and can never widen what is allowed, whatever that text claims.", es: "Leer una pantalla sin actuar sobre ella. El texto hallado en una pantalla se trata como dato y nunca puede ampliar lo permitido, sea lo que sea que ese texto afirme.", fr: "Lire un écran sans agir dessus. Le texte trouvé sur un écran est traité comme une donnée et ne peut jamais élargir ce qui est permis, quoi que ce texte prétende.", de: "Einen Bildschirm lesen, ohne auf ihm zu handeln. Text auf einem Bildschirm gilt als Datum und kann das Erlaubte nie erweitern, was dieser Text auch behauptet.", pt: "Ler um ecrã sem agir sobre ele. O texto encontrado num ecrã é tratado como dado e nunca pode alargar o que é permitido, seja o que for que esse texto afirme.", it: "Leggere uno schermo senza agirvi. Il testo trovato su uno schermo è trattato come dato e non può mai ampliare ciò che è consentito, qualunque cosa quel testo affermi.", ja: "画面を操作せずに読み取ること。画面上の文字はデータとして扱われ、そこに何が書かれていようと、許可された範囲を広げることはできません。", zh: "只读取屏幕而不对其操作。屏幕上出现的文字被视为数据，无论其声称什么，都绝不能扩大已获许可的范围。", hi: "स्क्रीन पर कार्य किए बिना उसे पढ़ना। स्क्रीन पर मिला पाठ डेटा माना जाता है और वह जो भी दावा करे, अनुमत सीमा को कभी नहीं बढ़ा सकता।", ar: "قراءة شاشة دون التصرّف فيها. ويُعامَل النص الوارد على الشاشة بوصفه بيانات، ولا يمكنه قطّ توسيع ما هو مسموح به مهما ادّعى.",
+  },
+  "cap.observation.rests": {
+    en: "A look permit naming its applications, its minutes and its steps. A wildcard is refused.", es: "Un permiso de observación que nombre sus aplicaciones, sus minutos y sus pasos. Un comodín se rechaza.", fr: "Une autorisation de lecture nommant ses applications, ses minutes et ses étapes. Un joker est refusé.", de: "Eine Leseerlaubnis, die ihre Anwendungen, ihre Minuten und ihre Schritte benennt. Ein Platzhalter wird abgelehnt.", pt: "Uma permissão de observação que nomeie as suas aplicações, os seus minutos e os seus passos. Um caráter universal é recusado.", it: "Un permesso di lettura che nomini le proprie applicazioni, i propri minuti e i propri passi. Un carattere jolly è rifiutato.", ja: "対象アプリ、分数、手数を明示した閲覧許可。ワイルドカードは拒否されます。", zh: "一份指明其应用范围、分钟数与步数的观察许可。通配符一律拒绝。", hi: "एक अवलोकन अनुमति जो अपने अनुप्रयोग, अपने मिनट और अपने चरण नाम से बताए। वाइल्डकार्ड अस्वीकार किया जाता है।", ar: "إذن اطّلاع يسمّي تطبيقاته ودقائقه وخطواته. ويُرفض رمز الشمول.",
+  },
+  "cap.observation.none": {
+    en: "no look permit is live", es: "no hay ningún permiso de observación vigente", fr: "aucune autorisation de lecture n'est en cours", de: "keine Leseerlaubnis ist aktiv", pt: "nenhuma permissão de observação está em vigor", it: "nessun permesso di lettura è attivo", ja: "有効な閲覧許可はありません", zh: "当前没有生效的观察许可", hi: "कोई अवलोकन अनुमति सक्रिय नहीं है", ar: "لا يوجد إذن اطّلاع سارٍ",
+  },
+  "cap.observation.some": {
+    en: "{n} live", es: "{n} vigentes", fr: "{n} en cours", de: "{n} aktiv", pt: "{n} em vigor", it: "{n} attivi", ja: "{n} 件が有効", zh: "{n} 项生效中", hi: "{n} सक्रिय", ar: "{n} سارٍ",
+  },
+  "cap.operation.title": {
+    en: "Interface operation", es: "Manejo de la interfaz", fr: "Manipulation d'interface", de: "Bedienung der Oberfläche", pt: "Manuseio da interface", it: "Uso dell'interfaccia", ja: "画面操作", zh: "界面操作", hi: "इंटरफ़ेस संचालन", ar: "تشغيل الواجهة",
+  },
+  "cap.operation.what": {
+    en: "Working a screen — moving a pointer, pressing a control, typing into a field — under a grant bounded in applications, moves, minutes and steps.", es: "Manejar una pantalla —mover un puntero, pulsar un control, escribir en un campo— bajo una concesión acotada en aplicaciones, movimientos, minutos y pasos.", fr: "Manipuler un écran — déplacer un pointeur, actionner un contrôle, saisir dans un champ — sous une autorisation bornée en applications, gestes, minutes et étapes.", de: "Einen Bildschirm bedienen — einen Zeiger bewegen, ein Element betätigen, in ein Feld schreiben — unter einer Erlaubnis, die in Anwendungen, Aktionen, Minuten und Schritten begrenzt ist.", pt: "Manusear um ecrã — mover um ponteiro, premir um controlo, escrever num campo — ao abrigo de uma concessão limitada em aplicações, movimentos, minutos e passos.", it: "Operare uno schermo — muovere un puntatore, premere un comando, scrivere in un campo — sotto una concessione limitata in applicazioni, azioni, minuti e passi.", ja: "画面を操作すること — ポインターを動かす、コントロールを押す、欄に入力する — 対象アプリ、動作、分数、手数で限られた許可のもとで行われます。", zh: "操作屏幕——移动指针、按下控件、在字段中输入——均在按应用、动作、分钟数与步数设限的授权之下进行。", hi: "स्क्रीन चलाना — पॉइंटर हिलाना, कोई नियंत्रण दबाना, किसी क्षेत्र में टाइप करना — ऐसी स्वीकृति के अधीन जो अनुप्रयोगों, क्रियाओं, मिनटों और चरणों में सीमित हो।", ar: "تشغيل شاشة — تحريك مؤشّر، والضغط على عنصر، والكتابة في حقل — بموجب إذن محدود بالتطبيقات والحركات والدقائق والخطوات.",
+  },
+  "cap.operation.rests": {
+    en: "A grant naming all four limits, enforced where the move happens rather than on the screen that requested it. It never types passwords, PINs, one-time codes, card numbers or recovery phrases, and says so instead of trying.", es: "Una concesión que nombre los cuatro límites, aplicada allí donde ocurre el movimiento y no en la pantalla que lo pidió. Nunca escribe contraseñas, PIN, códigos de un solo uso, números de tarjeta ni frases de recuperación: lo dice en lugar de intentarlo.", fr: "Une autorisation nommant les quatre limites, appliquée là où le geste a lieu et non sur l'écran qui l'a demandé. Elle ne saisit jamais de mots de passe, de codes PIN, de codes à usage unique, de numéros de carte ni de phrases de récupération, et le dit plutôt que d'essayer.", de: "Eine Erlaubnis, die alle vier Grenzen benennt und dort durchgesetzt wird, wo die Aktion geschieht, nicht auf dem Bildschirm, der sie angefordert hat. Passwörter, PINs, Einmalcodes, Kartennummern und Wiederherstellungsphrasen werden nie getippt; statt eines Versuchs kommt der Hinweis darauf.", pt: "Uma concessão que nomeie os quatro limites, imposta onde o movimento acontece e não no ecrã que o pediu. Nunca escreve palavras-passe, PIN, códigos de uso único, números de cartão ou frases de recuperação, e di-lo em vez de tentar.", it: "Una concessione che nomini tutti e quattro i limiti, applicata dove l'azione avviene e non sulla schermata che l'ha richiesta. Non digita mai password, PIN, codici monouso, numeri di carta o frasi di recupero, e lo dichiara invece di provarci.", ja: "四つの限度をすべて明示した許可であり、要求した画面ではなく動作が起きる場所で適用されます。パスワード、暗証番号、ワンタイムコード、カード番号、復旧フレーズを入力することは決してなく、試みる代わりにその旨を述べます。", zh: "一份指明全部四项限度的授权，且在动作发生之处而非发出请求的页面上予以强制执行。它绝不输入密码、PIN、一次性验证码、卡号或恢复短语，而是如实说明，而非尝试。", hi: "ऐसी स्वीकृति जो चारों सीमाएँ नाम से बताए, और जो अनुरोध करने वाली स्क्रीन पर नहीं, बल्कि जहाँ क्रिया होती है वहाँ लागू की जाए। यह कभी पासवर्ड, पिन, एक-बार कोड, कार्ड नंबर या रिकवरी वाक्यांश टाइप नहीं करती, और प्रयास करने के बजाय यही बताती है।", ar: "إذن يسمّي الحدود الأربعة جميعًا، ويُنفَّذ حيث تقع الحركة لا على الشاشة التي طلبتها. ولا يكتب أبدًا كلمات مرور أو أرقامًا سرّية أو رموزًا لمرّة واحدة أو أرقام بطاقات أو عبارات استرداد، ويصرّح بذلك بدل أن يحاول.",
+  },
+  "cap.operation.none": {
+    en: "no grant to act is live", es: "no hay ninguna concesión de actuación vigente", fr: "aucune autorisation d'agir n'est en cours", de: "keine Handlungserlaubnis ist aktiv", pt: "nenhuma concessão para agir está em vigor", it: "nessuna concessione ad agire è attiva", ja: "有効な操作許可はありません", zh: "当前没有生效的操作授权", hi: "कार्य करने की कोई स्वीकृति सक्रिय नहीं है", ar: "لا يوجد إذن بالتصرّف سارٍ",
+  },
+  "cap.operation.some": {
+    en: "{n} live", es: "{n} vigentes", fr: "{n} en cours", de: "{n} aktiv", pt: "{n} em vigor", it: "{n} attive", ja: "{n} 件が有効", zh: "{n} 项生效中", hi: "{n} सक्रिय", ar: "{n} سارٍ",
+  },
+  "cap.unattended.title": {
+    en: "Self-adjustment", es: "Autoajuste", fr: "Auto-réglage", de: "Selbstjustierung", pt: "Autoajuste", it: "Autoregolazione", ja: "自己調整", zh: "自我调节", hi: "स्व-समायोजन", ar: "الضبط الذاتي",
+  },
+  "cap.unattended.what": {
+    en: "The profile turns its own dials when the person talking asks it to — warmer, briefer — instead of the change waiting on the owner being around.", es: "El perfil gira sus propios diales cuando la persona que conversa se lo pide —más cálido, más breve— en vez de que el cambio dependa de que la persona propietaria esté presente.", fr: "Le profil règle lui-même ses curseurs lorsque la personne qui parle le lui demande — plus chaleureux, plus bref — au lieu que le changement attende la présence du propriétaire.", de: "Das Profil dreht seine eigenen Regler, wenn die sprechende Person darum bittet — wärmer, knapper — statt dass die Änderung darauf wartet, dass die besitzende Person zur Stelle ist.", pt: "O perfil roda os seus próprios seletores quando a pessoa que conversa lho pede — mais caloroso, mais breve — em vez de a alteração ficar à espera de que a pessoa proprietária esteja presente.", it: "Il profilo gira le proprie manopole quando la persona che parla glielo chiede — più caldo, più breve — invece che il cambiamento attenda la presenza del titolare.", ja: "話している相手が求めたとき — もっと温かく、もっと簡潔に — プロフィール自身がダイヤルを回します。所有者がその場にいるのを待つ必要はありません。", zh: "当对话者提出要求时——更温和些、更简短些——档案自行调节其旋钮，而不必等待所有者在场。", hi: "बात कर रहा व्यक्ति जब कहे — अधिक सौम्य, अधिक संक्षिप्त — तब प्रोफ़ाइल स्वयं अपने डायल घुमाती है, न कि परिवर्तन स्वामी की उपस्थिति की प्रतीक्षा करता है।", ar: "يدير الملفّ أقراصه بنفسه حين يطلب منه المتحدّث ذلك — أدفأ، أوجز — بدل أن ينتظر التغييرُ حضورَ المالك.",
+  },
+  "cap.unattended.rests": {
+    en: "The dials the owner exposed, within the bounds the owner set. A lock the owner places is refused from inside the conversation, not negotiated.", es: "Los diales que la persona propietaria expuso, dentro de los límites que ella fijó. Un bloqueo que ella imponga se rechaza desde dentro de la conversación, no se negocia.", fr: "Les curseurs que le propriétaire a exposés, dans les limites qu'il a fixées. Un verrou qu'il pose est refusé depuis la conversation, il ne se négocie pas.", de: "Die Regler, welche die besitzende Person freigegeben hat, innerhalb der von ihr gesetzten Grenzen. Eine von ihr gesetzte Sperre wird aus dem Gespräch heraus abgelehnt, nicht verhandelt.", pt: "Os seletores que a pessoa proprietária expôs, dentro dos limites que definiu. Um bloqueio que ela coloque é recusado a partir da conversa, não é negociado.", it: "Le manopole che il titolare ha esposto, entro i limiti che ha fissato. Un blocco posto dal titolare è rifiutato dall'interno della conversazione, non negoziato.", ja: "所有者が公開したダイヤルを、所有者が定めた範囲の内側で。所有者がかけた施錠は、会話の側からは拒否されるだけで、交渉の対象にはなりません。", zh: "所有者所开放的旋钮，且限于其所设定的范围之内。所有者所加的锁定，在对话内部只会被拒绝，而不容商议。", hi: "स्वामी द्वारा उजागर किए गए डायल, उन्हीं सीमाओं के भीतर जो स्वामी ने तय कीं। स्वामी द्वारा लगाया गया ताला बातचीत के भीतर से अस्वीकार किया जाता है, उस पर मोल-भाव नहीं होता।", ar: "الأقراص التي أتاحها المالك، ضمن الحدود التي وضعها. وأيّ قفل يضعه المالك يُرفض من داخل المحادثة، ولا يُتفاوض عليه.",
+  },
+  "cap.unattended.locked": {
+    en: "locked by the owner", es: "bloqueado por la persona propietaria", fr: "verrouillé par le propriétaire", de: "von der besitzenden Person gesperrt", pt: "bloqueado pela pessoa proprietária", it: "bloccato dal titolare", ja: "所有者により施錠されています", zh: "已被所有者锁定", hi: "स्वामी द्वारा लॉक किया गया", ar: "مقفل من قِبل المالك",
+  },
+  "cap.unattended.some": {
+    en: "{n} dial(s) it may turn", es: "{n} dial(es) que puede girar", fr: "{n} curseur(s) qu'il peut régler", de: "{n} Regler, die es drehen darf", pt: "{n} seletor(es) que pode rodar", it: "{n} manopola/e che può girare", ja: "回してよいダイヤル {n} 件", zh: "可调节的旋钮 {n} 个", hi: "{n} डायल जिन्हें वह घुमा सकती है", ar: "{n} قرص يجوز له إدارته",
   },
 };
 

@@ -339,7 +339,7 @@ def test_the_card_is_small_enough_to_fetch_while_the_camera_runs(client):
     # with no face is sent the frame — so the field was a second answer to a
     # question that has one, and on a hidden profile it was a monogram of the
     # name being hidden.
-    assert set(card) == {"profile_id", "display_name", "watermark", "portrait",
+    assert set(card) == {"profile_id", "display_name", "watermark_line", "portrait",
                          "portrait_marked", "label", "shared_room",
                          "open_url", "age_wall"}
 
@@ -349,7 +349,7 @@ def test_the_mark_travels_with_the_face(client):
     disclosure to draw beside it."""
     pid, _ = _profile(client)
     card = client.get(f"/b/{_beacon(client, pid)['id']}/card").json()
-    assert card["watermark"] == "✦ AI · Marcus Bell"
+    assert card["watermark_line"] == "✦ AI · Marcus Bell"
 
 
 def test_the_rated_card_carries_nothing_to_leak(client):
@@ -410,7 +410,12 @@ def test_the_card_says_whether_the_portrait_already_carries_the_mark(client):
                 token=auth.issue("owner", pid))
     card = client.get(f"/b/{b['id']}/card").json()
     assert card["portrait"].endswith("/portraits/otis_marsh.webp")
-    assert card["portrait_marked"] is True
+    # False, and that is the answer rather than a fallback. The mark left
+    # the pixels for the surface that draws the face — a circle crops the
+    # corner of a square, so a burned mark shipped cut in half. The flag
+    # is what tells this card to draw its own, and a stale True here would
+    # be the card politely skipping a badge that is no longer there.
+    assert card["portrait_marked"] is False
 
 
 def test_an_owner_attached_portrait_is_never_claimed_to_be_marked(client):

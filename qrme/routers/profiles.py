@@ -55,6 +55,12 @@ def create_profile(body: ProfileCreate) -> dict:
         raise HTTPException(
             422, "hybrid profiles are created via POST /profiles/composite, "
                  "from at least two source profiles")
+    if body.kind == "raised":
+        # A raised life needs a stage, a preset and a guardian from birth —
+        # its own door records all three and writes the Album's first entry.
+        raise HTTPException(
+            422, "raised characters are created via POST /raise, with a "
+                 "stage, a preset and a temperament seed")
     owner_age = age_of(body.verification.birthdate)
     if owner_age < 18 and not body.verification.guardian_consent:
         raise HTTPException(403, "owners under 18 require parent/guardian consent")
@@ -207,7 +213,7 @@ def get_composition(profile_id: str) -> dict:
     if profile["kind"] != "hybrid":
         raise HTTPException(404, "this profile is not a hybrid")
     return {"profile_id": profile_id,
-            "sources": composite.composition(profile_id),
+            "composition_sources": composite.composition(profile_id),
             "policy": "a hybrid acknowledges openly that it is a blend and "
                       "never claims to be any single constituent"}
 
@@ -503,12 +509,12 @@ def _export_bundle(profile_id: str, pdi) -> dict:
     grab = lambda q: [dict(r) for r in conn.execute(q, (profile_id,)).fetchall()]
     return {
         "profile": profile,
-        "sources": source_items(profile_id, pdi),
+        "source_rows": source_items(profile_id, pdi),
         "relationships": grab("SELECT * FROM relationships WHERE profile_id=?"),
-        "messages": grab("SELECT * FROM messages WHERE profile_id=?"
+        "message_rows": grab("SELECT * FROM messages WHERE profile_id=?"
                          " ORDER BY created_at, rowid"),
         "engagement": grab("SELECT * FROM engagement WHERE profile_id=?"),
-        "posts": grab("SELECT * FROM posts WHERE profile_id=?"
+        "post_rows": grab("SELECT * FROM posts WHERE profile_id=?"
                       " ORDER BY created_at, rowid"),
         "surfaces": [r["surface"] for r in conn.execute(
             "SELECT surface FROM surfaces WHERE profile_id=?",
@@ -871,7 +877,7 @@ def profile_stats(profile_id: str, request: Request) -> dict:
             "SELECT COUNT(*) AS n FROM relationships WHERE profile_id=?")["n"],
         "engagement_avg": round(eng["avg_score"], 3),
         "interactors": eng["interactors"],
-        "sources": one(
+        "sources_count": one(
             "SELECT COUNT(*) AS n FROM source_items WHERE profile_id=?")["n"],
         "posts": one(
             "SELECT COUNT(*) AS n FROM posts WHERE profile_id=?")["n"],

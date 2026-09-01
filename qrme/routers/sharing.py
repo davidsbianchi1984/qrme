@@ -67,7 +67,7 @@ def vocabulary() -> dict:
         "skill_kinds": [{"key": k, "means": v}
                         for k, v in sharing.SKILL_KINDS.items()],
         "states": list(sharing.STATES),
-        "terms": [
+        "ground_rules": [
             "two people open a grant; either one alone closes it",
             "the skill is used, never copied — no install, no licence",
             "a grant lives in one place and ends when that place does",

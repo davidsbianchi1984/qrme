@@ -615,7 +615,7 @@ public sealed partial class PeoplePage : Page
             var memories = await ApiClient.Shared.Memories(
                 s.Pid, s.Token!);
             MemList.ItemsSource = memories.Select(m => new Row(
-                $"{m.InteractorName} · {m.Turns}")).ToList();
+                $"{m.InteractorName} · {m.TurnsCount}")).ToList();
             var sources = await ApiClient.Shared.Sources(s.Pid, s.Token!);
             SrcList.ItemsSource = sources.Select(r => new Row(
                 $"{r.Kind} · {r.Title}")).ToList();
@@ -665,7 +665,7 @@ public sealed partial class PeoplePage : Page
             var pool = await ApiClient.Shared.BrowsePeople();
             PoolCount.Text = L10n.T("frn.pool.count")
                 .Replace("{n}", pool.HeadCount.ToString());
-            PoolList.ItemsSource = pool.Profiles.Select(p => new Row(
+            PoolList.ItemsSource = pool.Found.Select(p => new Row(
                 $"{p.DisplayName}"
                 + (string.IsNullOrWhiteSpace(p.Handle) ? "" : $" · @{p.Handle}")
                 + (string.IsNullOrWhiteSpace(p.Kind)
@@ -1180,7 +1180,7 @@ public sealed partial class PeoplePage : Page
             var c = await ApiClient.Shared.AudienceOf(CrowdKindBox.Text.Trim(),
                 CrowdTargetBox.Text.Trim(), AppState.Current.Token!);
             CountsText.Text =
-                $"♥ {c.Likes} · 💬 {c.Comments} · ↗ {c.Shares} · ⊕ {c.Subscribers}";
+                $"♥ {c.Likes} · 💬 {c.CommentsCount} · ↗ {c.Shares} · ⊕ {c.SubscribersCount}";
         });
 
     private async void OnFollow(object sender, RoutedEventArgs e) =>
@@ -1313,7 +1313,7 @@ public sealed partial class PeoplePage : Page
         {
             var v = await ApiClient.Shared.GrantVocabulary();
             LendTermsList.ItemsSource =
-                v.Terms.Select(t => new Row($"· {t}")).ToList();
+                v.GroundRules.Select(t => new Row($"· {t}")).ToList();
         });
 
     private async void OnLendOffer(object sender, RoutedEventArgs e) =>
@@ -1691,7 +1691,7 @@ public sealed partial class PeoplePage : Page
         {
             var a = await ApiClient.Shared.ObjectionAuditOf(
                 ObjectIdBox.Text.Trim(), AppState.Current.Token!);
-            ObjectList.ItemsSource = (a.Events
+            ObjectList.ItemsSource = (a.AuditEvents
                 ?? Array.Empty<ObjectionEvent>()).Select(ev => new Row(
                     ev.Event + (ev.Sealed == true ? " ◆" : ""))).ToList();
         });
@@ -1740,7 +1740,7 @@ public sealed partial class PeoplePage : Page
         {
             var roster = await ApiClient.Shared.LobbyRosterOf(
                 LobbySessionBox.Text.Trim(), AppState.Current.Token!);
-            LobbyList.ItemsSource = (roster.Members
+            LobbyList.ItemsSource = (roster.Seats
                 ?? Array.Empty<LobbySeatRow>()).Select(m => new Row(
                     $"{m.Callsign ?? m.MemberId} · {m.MemberKind} · {m.Role}"))
                 .ToList();
@@ -2213,7 +2213,7 @@ public sealed partial class PeoplePage : Page
         await Try(async () =>
         {
             var c = await ApiClient.Shared.CampaignOf(CampIdBox.Text.Trim());
-            StatusText.Text = $"{c.Title} · {c.Raised} / {c.Goal} · {c.Status}";
+            StatusText.Text = $"{c.Title} · {c.Raised} / {c.GoalAmount} · {c.Status}";
         });
 
     private async void OnCampGive(object sender, RoutedEventArgs e) =>
@@ -2396,7 +2396,7 @@ public sealed partial class PeoplePage : Page
             // Labeled, as the phones label it — a bare "*" in the status
             // line answered a question nobody could know was being asked.
             StatusText.Text = L10n.T("task.scope") + ": "
-                + string.Join(",", g.Scope ?? []);
+                + string.Join(",", g.Scopes ?? []);
         });
 
     private async void OnTaskRevoke(object sender, RoutedEventArgs e) =>
@@ -2512,7 +2512,7 @@ public sealed partial class PeoplePage : Page
             var rows = await ApiClient.Shared.Memories(
                 AppState.Current.Pid!, AppState.Current.Token!);
             MemList.ItemsSource = rows.Select(m => new Row(
-                $"{m.InteractorName} \u00b7 {m.Turns}")).ToList();
+                $"{m.InteractorName} \u00b7 {m.TurnsCount}")).ToList();
         });
 
     private async void OnMemAccount(object sender, RoutedEventArgs e) =>
@@ -2603,7 +2603,7 @@ public sealed partial class PeoplePage : Page
             var t = await ApiClient.Shared.ThreadOf(
                 AppState.Current.Pid!, PairIdBox.Text.Trim(),
                 AppState.Current.Token!);
-            StatusText.Text = t.Messages.Length.ToString();
+            StatusText.Text = t.ThreadTurns.Length.ToString();
         });
 
     private async void OnPairEngagement(object sender, RoutedEventArgs e) =>
@@ -2663,7 +2663,7 @@ public sealed partial class PeoplePage : Page
             var s = await ApiClient.Shared.ProfileStats(
                 AppState.Current.Pid!, AppState.Current.Token!);
             StatusText.Text = $"{s.Sessions} \u00b7 {s.MemoryEntries} "
-                + $"\u00b7 {s.Interactors} \u00b7 {s.Sources}";
+                + $"\u00b7 {s.Interactors} \u00b7 {s.SourcesCount}";
         });
 
     private async void OnRecExport(object sender, RoutedEventArgs e) =>
@@ -2671,8 +2671,8 @@ public sealed partial class PeoplePage : Page
         {
             var o = await ApiClient.Shared.ExportProfile(
                 AppState.Current.Pid!, AppState.Current.Token!);
-            StatusText.Text = $"{o.Messages.Length} \u00b7 "
-                + $"{o.Posts.Length} \u00b7 {o.Sources.Length}";
+            StatusText.Text = $"{o.MessageRows.Length} \u00b7 "
+                + $"{o.PostRows.Length} \u00b7 {o.SourceRows.Length}";
         });
 
     private async void OnRecExportQr(object sender, RoutedEventArgs e) =>
@@ -2693,15 +2693,15 @@ public sealed partial class PeoplePage : Page
             var o = await ApiClient.Shared.ExportHandoff(
                 AppState.Current.Pid!, RecTicketBox.Text.Trim());
             RecTicketBox.Text = "";
-            StatusText.Text = $"{o.Messages.Length} · "
-                + $"{o.Posts.Length} · {o.Sources.Length}";
+            StatusText.Text = $"{o.MessageRows.Length} · "
+                + $"{o.PostRows.Length} · {o.SourceRows.Length}";
         });
 
     private async void OnRecFeed(object sender, RoutedEventArgs e) =>
         await Try(async () =>
         {
             var f = await ApiClient.Shared.FeedOf(AppState.Current.Pid!);
-            StatusText.Text = $"{f.Posts.Length} \u00b7 "
+            StatusText.Text = $"{f.FeedPosts.Length} \u00b7 "
                 + string.Join(", ", f.RankedOn);
         });
 
@@ -2840,7 +2840,7 @@ public sealed partial class PeoplePage : Page
     {
         if (_skinShelf.Length > 0) return;
         var shelf = await ApiClient.Shared.AvatarMarket();
-        _skinShelf = shelf.Sources;
+        _skinShelf = shelf.SkinSources;
         AvaSourceBox.ItemsSource = _skinShelf.Select(s => s.Name).ToArray();
         if (_skinShelf.Length > 0) AvaSourceBox.SelectedIndex = 0;
     }
@@ -2954,7 +2954,7 @@ public sealed partial class PeoplePage : Page
             var c = await ApiClient.Shared.CompositionOf(
                 AppState.Current.Pid!);
             StatusText.Text = string.Join(" \u00b7 ",
-                (c.Sources ?? []).Select(x =>
+                (c.CompositionSources ?? []).Select(x =>
                     $"{x.DisplayName} {(int)Math.Round((x.Weight ?? 0) * 100)}%"
                     + (x.Aspect is null ? "" : $" ({x.Aspect})")));
         });
@@ -3038,7 +3038,7 @@ public sealed partial class PeoplePage : Page
         {
             var f = await ApiClient.Shared.WatchFace(
                 AppState.Current.Pid!, AppState.Current.Token!);
-            StatusText.Text = $"{f.Profile.Light} \u00b7 "
+            StatusText.Text = $"{f.Chip.Light} \u00b7 "
                 + $"{f.Summary.Working} \u00b7 "
                 + $"{f.Summary.NeedingAssistance} \u00b7 "
                 + $"{f.Summary.Stopped}";
@@ -3154,11 +3154,11 @@ public sealed partial class PeoplePage : Page
         await Try(async () =>
         {
             var doors = await ApiClient.Shared.OAuthProviders();
-            if (doors.Providers.Length == 0) { StatusText.Text = "\u2014"; return; }
+            if (doors.SigninProviders.Length == 0) { StatusText.Text = "\u2014"; return; }
             var start = await ApiClient.Shared.OAuthStart(
-                doors.Providers[0].Provider);
+                doors.SigninProviders[0].Provider);
             _oauthState = start.State ?? "";
-            StatusText.Text = doors.Providers[0].Provider + " \u00b7 "
+            StatusText.Text = doors.SigninProviders[0].Provider + " \u00b7 "
                 + (start.Url ?? "");
         });
 
@@ -3302,7 +3302,7 @@ public sealed partial class PeoplePage : Page
             StatusText.Text = outp.AgeWall == true
                 ? (outp.Note ?? "18+")
                 : (outp.DisplayName ?? "\u2014") + " \u00b7 "
-                  + (outp.Watermark ?? "");
+                  + (outp.WatermarkLine ?? "");
         });
 
     private async void OnBcnDesk(object sender, RoutedEventArgs e) =>
@@ -3388,7 +3388,7 @@ public sealed partial class PeoplePage : Page
             var outp = await ApiClient.Shared.ReviewsOf(
                 AppState.Current.Pid!);
             StatusText.Text = outp.Reviews.Length + " \u00b7 "
-                + (outp.Rating?.Average ?? 0);
+                + (outp.RatingSummary?.Average ?? 0);
         });
 
     private async void OnRevwLeave(object sender, RoutedEventArgs e) =>
@@ -3602,7 +3602,7 @@ public sealed partial class PeoplePage : Page
             var outp = await ApiClient.Shared.GiveFeedback(
                 AppState.Current.Pid!, AppState.Current.InteractorId!,
                 "up", AppState.Current.InteractorToken!);
-            StatusText.Text = outp.Rating ?? "";
+            StatusText.Text = $"score {outp.Score ?? 0:0.00}";
         });
 
     private async void OnReachRateDown(object sender, RoutedEventArgs e) =>
@@ -3611,7 +3611,7 @@ public sealed partial class PeoplePage : Page
             var outp = await ApiClient.Shared.GiveFeedback(
                 AppState.Current.Pid!, AppState.Current.InteractorId!,
                 "down", AppState.Current.InteractorToken!);
-            StatusText.Text = outp.Rating ?? "";
+            StatusText.Text = $"score {outp.Score ?? 0:0.00}";
         });
 
     private async void OnReachQuietSet(object sender, RoutedEventArgs e) =>

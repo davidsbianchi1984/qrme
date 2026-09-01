@@ -194,6 +194,14 @@ export function Agent({ onPlans, go }: {
   const docPicker = useRef<HTMLInputElement>(null);
   const imgPicker = useRef<HTMLInputElement>(null);
   const mediaPicker = useRef<HTMLInputElement>(null);
+  // The eye: a picture being shown to the agent for the next turn — a
+  // photo, a screenshot, a grabbed screen — read by the platform's eyes,
+  // never uploaded to the gallery. And what those eyes read back, shown
+  // so the person knows exactly what their agent was told.
+  const showPick = useRef<HTMLInputElement>(null);
+  const [shown, setShown] = useState<{ b64: string; name: string } | null>(
+    null);
+  const [seenNote, setSeenNote] = useState<string | null>(null);
   const dictation = useRef<{ stop: () => void } | null>(null);
   // Which dictation is the live one. The recorded fallback's words arrive
   // only after the recording stops, and only the turn they belong to may
@@ -633,13 +641,49 @@ export function Agent({ onPlans, go }: {
     return sendSaid(ask);
   }
 
+  /** Whether this shell can hand the agent a live screen — the same rule
+   *  the room's grab chip follows: desktop and Android Chrome can, iOS
+   *  cannot and screenshots stand in there. */
+  const canGrabScreen = typeof navigator !== "undefined"
+    && !!navigator.mediaDevices?.getDisplayMedia;
+
+  /** One frame of the person's own screen, held as the shown picture for
+   *  the next turn. The browser's picker chooses the window, one still is
+   *  taken, the capture stops. A frame, not a stream. */
+  async function grabScreen() {
+    setError(null);
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia(
+        { video: true });
+      const video = document.createElement("video");
+      video.srcObject = stream;
+      video.muted = true;
+      await video.play();
+      await new Promise((r) => setTimeout(r, 300));
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth || 1280;
+      canvas.height = video.videoHeight || 720;
+      canvas.getContext("2d")?.drawImage(video, 0, 0);
+      stream.getTracks().forEach((t) => t.stop());
+      const url = canvas.toDataURL("image/jpeg", 0.85);
+      setShown({ b64: url.split(",", 2)[1] || "",
+                 name: tr("agent.show.grabbed", lang) });
+      askBox.current?.focus();
+    } catch {
+      // The person closed the picker. Their call, not a banner.
+    }
+  }
+
   async function sendSaid(saidWhat: string) {
     if (!session.profileId || !session.ownerToken) return;
     const said = saidWhat;
     setAsking(true); setError(null);
     try {
       const turn = await api.authoringTurn(
-        session.profileId, said, talk, session.ownerToken);
+        session.profileId, said, talk, session.ownerToken,
+        shown?.b64 || undefined);
+      setShown(null);
+      setSeenNote(turn.seen || null);
       setDid(turn);
       setAsks(turn.asks);
       setTalk([...talk, { role: "user", content: said },
@@ -896,6 +940,24 @@ export function Agent({ onPlans, go }: {
                      tr("agent.act.image.ask", lang) + " " + (up.id || f.name)))
                    .catch(setError);
                }} />
+        {/* The eye's own picker — this one is not an upload. The picture
+            never joins the gallery; it is read by the platform's eyes for
+            THIS turn and gone, the way showing somebody a screen works
+            in person. */}
+        <input ref={showPick} type="file" accept="image/*"
+               style={{ display: "none" }}
+               onChange={(e) => {
+                 const f = e.target.files?.[0]; e.target.value = "";
+                 if (!f) return;
+                 const rd = new FileReader();
+                 rd.onload = () => {
+                   const url = String(rd.result || "");
+                   setShown({ b64: url.split(",", 2)[1] || "",
+                              name: f.name });
+                   askBox.current?.focus();
+                 };
+                 rd.readAsDataURL(f);
+               }} />
       </div>
 
       {/* The orb: voice mode, visibly running. Tap it to stop. It relights
@@ -930,6 +992,19 @@ export function Agent({ onPlans, go }: {
                     onClick={() => { setPlus(false); setShowsReach(true); }}>
               ✦ {tr("agent.ask.title", lang)}
             </button>
+            {/* The eye's two doors: show it a picture anywhere, show it
+                the screen where the platform can hand one over. */}
+            <button role="menuitem"
+                    onClick={() => { setPlus(false);
+                                     showPick.current?.click(); }}>
+              👁 {tr("agent.show.pic", lang)}
+            </button>
+            {canGrabScreen && (
+              <button role="menuitem"
+                      onClick={() => { setPlus(false); void grabScreen(); }}>
+                🖥️ {tr("agent.show.screen", lang)}
+              </button>
+            )}
           </div>
         )}
         {pending && (
@@ -938,6 +1013,19 @@ export function Agent({ onPlans, go }: {
             <button aria-label={tr("agent.open.drop", lang)}
                     onClick={() => setPending(null)}>✕</button>
           </div>
+        )}
+        {shown && (
+          <div className="agent-pending">
+            <span className="small">👁 {shown.name}</span>
+            <button aria-label={tr("agent.open.drop", lang)}
+                    onClick={() => setShown(null)}>✕</button>
+          </div>
+        )}
+        {seenNote && (
+          /* What the eyes read, verbatim — the person checks the account
+             their agent was handed, the same honesty the watch party's
+             instruction panel keeps. */
+          <p className="muted small agent-michint">👁 {seenNote}</p>
         )}
         {micHint && (
           <p className="muted small agent-michint">

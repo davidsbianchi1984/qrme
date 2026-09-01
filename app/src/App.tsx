@@ -22,7 +22,10 @@ import { Contest } from "./screens/Contest";
 import { Guide } from "./screens/Guide";
 import { Placements } from "./screens/Placements";
 import { Plans } from "./screens/Plans";
+import { Boundary } from "./Boundary";
+import { Hands } from "./screens/Hands";
 import { Robots } from "./screens/Robots";
+import { Capabilities } from "./screens/Capabilities";
 import { Workshop } from "./screens/Workshop";
 import { Assist } from "./screens/Assist";
 import { Referrals } from "./screens/Referrals";
@@ -32,6 +35,7 @@ import { Beacons } from "./screens/Beacons";
 import { Leaving } from "./screens/Leaving";
 import { Selling } from "./screens/Selling";
 import { Inside } from "./screens/Inside";
+import { primeMic } from "./roomear";
 import { Signing } from "./screens/Signing";
 import { Visiting } from "./screens/Visiting";
 import { Allowed } from "./screens/Allowed";
@@ -48,6 +52,7 @@ import { Voice } from "./screens/Voice";
 import { Wall } from "./screens/Wall";
 import { Feed } from "./screens/Feed";
 import { Friends } from "./screens/Friends";
+import { Raise } from "./screens/Raise";
 import { Rooms } from "./screens/Rooms";
 import { Blend } from "./screens/Blend";
 import { Solitude } from "./screens/Solitude";
@@ -74,7 +79,7 @@ import { WatchLights } from "./WatchLights";
 // `profile` is deliberately not in NAV: somebody else's homepage is a place
 // you are taken to by pressing their face, not a standing destination — the
 // same reason `passing` is reachable and unlisted.
-type Tab = "profile" | "home" | "circle" | "agent" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "allowed" | "stranger" | "themark" | "inwords" | "remainder" | "plugins" | "named" | "passing" | "robots" | "placements" | "plans" | "access" | "matters" | "settings";
+type Tab = "capabilities" | "profile" | "home" | "circle" | "agent" | "feed" | "chat" | "discover" | "market" | "shop" | "corner" | "wall" | "friends" | "rooms" | "blend" | "raise" | "solitude" | "simulate" | "campaigns" | "org" | "relationships" | "memory" | "studio" | "voice" | "delegate" | "desk" | "exchanges" | "grants" | "party" | "identity" | "presence" | "live" | "contest" | "guide" | "workshop" | "assist" | "referrals" | "lobby" | "audience" | "beacons" | "reaching" | "leaving" | "selling" | "inside" | "signing" | "visiting" | "allowed" | "stranger" | "themark" | "inwords" | "remainder" | "plugins" | "named" | "passing" | "robots" | "hands" | "placements" | "plans" | "access" | "matters" | "settings";
 
 // `art` is the one tab whose mark is a picture rather than a glyph. Kept as a
 // second, optional field rather than widening `icon` to a node: the nav guards
@@ -97,6 +102,7 @@ const NAV: { id: Tab; label: string; icon: string; art?: string;
   { id: "blend", label: "Blend", icon: "🫱🏽‍🫲🏻", group: "create" },
   { id: "solitude", label: "My Attention", icon: "🪞", group: "profile" },
   { id: "simulate", label: "What If", icon: "🔮", group: "create" },
+  { id: "raise", label: "Raise", icon: "🌱", group: "create" },
   { id: "campaigns", label: "Campaigns", icon: "🎗", group: "business" },
   { id: "org", label: "Org", icon: "🏛", group: "business" },
   { id: "relationships", label: "Relationships", icon: "👥", group: "profile" },
@@ -132,6 +138,9 @@ const NAV: { id: Tab; label: string; icon: string; art?: string;
   { id: "plugins", label: "Plug-ins", icon: "🔌", group: "system" },
   { id: "named", label: "Lookup", icon: "🔎", group: "create" },
   { id: "robots", label: "Robots & Devices", icon: "🤖", group: "business" },
+  { id: "hands", label: "Hands", icon: "🖐", group: "trust" },
+  { id: "capabilities", label: "Capabilities", icon: "▤",
+    group: "trust" },
   { id: "placements", label: "Ad Placements", icon: "📌", group: "business" },
   { id: "plans", label: "Plans & Billing", icon: "🎟", group: "system" },
   { id: "access", label: "Accessibility", icon: "♿", group: "trust" },
@@ -191,7 +200,15 @@ export function App() {
   // shell's, not the room's — and the room reaching up to hide somebody
   // else's chrome would be the kind of reach that is impossible to find
   // later.
-  const inRoom = tab === "inside" && Boolean(insideRoom);
+  // Whether a room owns the window.
+  //
+  // This was `tab === "inside" && Boolean(insideRoom)`, and `insideRoom`
+  // is only ever set by the Rooms screen's own join — so somebody who
+  // opened the Inside tab, typed a room id and pressed Go was standing
+  // in a room the console did not know about, with the whole drawer
+  // still beside them. The screen says so now.
+  const [standing, setStanding] = useState(false);
+  const inRoom = tab === "inside" && (standing || Boolean(insideRoom));
   // Whose homepage is open, and where pressing Back should return to. The
   // trail is a stack rather than a single id because their Top 8 is eight
   // more doors: walking friend-to-friend and pressing Back should retrace
@@ -308,6 +325,7 @@ export function App() {
             <button
               key={n.id}
               className={"nav-item" + (tab === n.id ? " active" : "")}
+              data-tab={n.id}
               onClick={() => { setTab(n.id); setMenuOpen(false); }}
             >
               <span className={"nav-icon" + (n.art ? " nav-art" : "")}>
@@ -332,6 +350,7 @@ export function App() {
                   <button
                     key={n.id}
                     className={"nav-item" + (tab === n.id ? " active" : "")}
+                    data-tab={n.id}
                     onClick={() => { setTab(n.id); setMenuOpen(false); }}
                   >
                     <span className={"nav-icon" + (n.art ? " nav-art" : "")}>
@@ -353,12 +372,16 @@ export function App() {
       <WalkAlong />
       <main className="content" ref={contentRef}>
         <ProblemNotice />
+        {/* Keyed by tab so each screen gets a fresh
+            boundary rather than inheriting the last
+            one's failure. */}
+        <Boundary where={tab} key={tab}>
         {tab === "home" && <Home go={setTab} onVisit={visitProfile}
-                 onInside={(id) => { setInsideRoom(id); setTab("inside"); }} />}
+                 onInside={(id) => { primeMic(); setInsideRoom(id); setTab("inside"); }} />}
         {tab === "profile" && (
           <Profile profileId={visitingId} onBack={leaveProfile}
                    onPlans={toPlans} onVisit={visitProfile}
-                   onInside={(id) => { setInsideRoom(id); setTab("inside"); }} />
+                   onInside={(id) => { primeMic(); setInsideRoom(id); setTab("inside"); }} />
         )}
         {tab === "chat" && <Chat onPlans={toPlans} />}
         {tab === "discover" && <Discover onPlans={toPlans} onVisit={visitProfile} />}
@@ -374,7 +397,8 @@ export function App() {
         {tab === "feed" && <Feed onPlans={() => setTab("plans")}
           onParty={(id) => { setOpenParty(id); setTab("party"); }} />}
         {tab === "friends" && <Friends onPlans={toPlans} onVisit={visitProfile} />}
-        {tab === "rooms" && <Rooms onPlans={toPlans} onInside={(id) => { setInsideRoom(id); setTab("inside"); }} />}
+        {tab === "raise" && <Raise onPlans={toPlans} />}
+        {tab === "rooms" && <Rooms onPlans={toPlans} onInside={(id) => { primeMic(); setInsideRoom(id); setTab("inside"); }} />}
         {tab === "blend" && <Blend onPlans={toPlans} />}
         {tab === "solitude" && <Solitude />}
         {tab === "simulate" && <Simulate onPlans={toPlans} />}
@@ -409,6 +433,7 @@ export function App() {
         {tab === "leaving" && <Leaving onPlans={toPlans} />}
         {tab === "selling" && <Selling onPlans={toPlans} />}
         {tab === "inside" && <Inside onPlans={toPlans} start={insideRoom}
+                                   onInside={setStanding}
                                    onLeave={() => { setInsideRoom(""); setTab("home"); }} />}
         {tab === "signing" && <Signing />}
         {tab === "visiting" && <Visiting />}
@@ -421,11 +446,14 @@ export function App() {
         {tab === "named" && <Named onPlans={toPlans} />}
         {tab === "passing" && <Passing onPlans={toPlans} />}
         {tab === "robots" && <Robots onPlans={toPlans} />}
+        {tab === "hands" && <Hands />}
+        {tab === "capabilities" && <Capabilities go={(id) => setTab(id as Tab)} />}
         {tab === "placements" && <Placements onPlans={toPlans} />}
         {tab === "plans" && <Plans />}
         {tab === "access" && <Access />}
         {tab === "matters" && <Matters />}
         {tab === "settings" && <Settings onPlans={toPlans} />}
+        </Boundary>
       </main>
 
       {/* Outside the tab switch on purpose: it is part of the shell, so every

@@ -90,7 +90,11 @@ def test_a_wearable_is_not_an_embodiment(client):
 def test_there_is_a_watch_face_for_every_permission(client):
     """A face somebody can enable and never see would be a permission granting
     nothing; a face with no permission would be one nobody chose."""
-    src = pathlib.Path("docs/watch/build.py").read_text()
+    # Anchored to this file, not the invoker's cwd — the same fix as
+    # test_agent_light.py, found the same way: a battery launched with an
+    # absolute path resolved these against the wrong root and false-failed.
+    src = (pathlib.Path(__file__).resolve().parents[1]
+           / "docs" / "watch" / "build.py").read_text()
     # Read the permission each face declares, rather than lower-casing its
     # title and hoping. The title is prose — "On Camera" reads better on a
     # wrist than "Camera" — and a binding that breaks when somebody writes a

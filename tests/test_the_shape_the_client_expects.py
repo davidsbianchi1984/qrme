@@ -307,7 +307,7 @@ def test_the_scan_reaches_a_real_share_of_the_bindings(
     the most flattering possible way to be broken."""
     driven = [m for _, _, m in _drive(client, profile_id, interactor_id)
               if m is not None]
-    assert len(driven) >= 30, (
+    assert len(driven) >= ratchets.floor("windows.driven"), (
         f"only {len(driven)} binding(s) were reachable — the fixture or the "
         f"extractor has stopped working")
 

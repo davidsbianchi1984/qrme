@@ -48,6 +48,8 @@ KINDS = (
     "exchange_signed",  # the other party signed your exchange
     "guest_accepted",  # a host gave you your place on their stream
     "room_invite",     # somebody in a room asked you into it
+    "room_joined",     # your profile answered an invitation itself and took
+                       # a seat — the agentic join's record for its owner
     "published",       # somebody you subscribe to has more
 )
 

@@ -439,6 +439,7 @@ def _seed_one_founder(conn, handle, name, persona, appearance, asset) -> str:
         _voice(conn, taken["profile_id"], handle)
         if handle == FOUNDER_HANDLE:
             for industry in FOUNDER_AI_PACKS:
+                _say_field(conn, taken["profile_id"], industry)
                 _ground(conn, taken["profile_id"], industry, force=True)
         return taken["profile_id"]
 
@@ -498,8 +499,8 @@ def _seed_one_founder(conn, handle, name, persona, appearance, asset) -> str:
     # the rule works. It belongs to the photographed half because that is what
     # the badge is a claim about: a real person, whose picture is authentic.
     # The rendered half carries the AI mark instead, which is the claim that
-    # is true of *it*. `tools/mark_verified.py` burns the gold mark into a
-    # photograph for exactly the same reason.
+    # is true of *it*. The gold mark is drawn from this record — a
+    # verification with a named attestor — rather than from a filename.
     if handle == VERIFIED_HANDLE:
         from . import verification
         verification.verify(
@@ -509,6 +510,7 @@ def _seed_one_founder(conn, handle, name, persona, appearance, asset) -> str:
     # The rendered half carries the industry libraries — see FOUNDER_AI_PACKS.
     if handle == FOUNDER_HANDLE:
         for industry in FOUNDER_AI_PACKS:
+            _say_field(conn, profile["id"], industry)
             _ground(conn, profile["id"], industry, force=True)
     return profile["id"]
 
@@ -666,6 +668,73 @@ def _backfill(conn, profile_id: str, handle: str) -> bool:
     return changed
 
 
+def _restore_face(conn, profile_id: str, handle: str) -> bool:
+    """Put a starter's shipped portrait back when it is wearing one of ours.
+
+    :func:`_backfill` fills a BLANK and stops there, which is right for
+    the case it was written for and leaves this one untouched: a starter
+    that already has a face nobody chose. Field report, twice — "some of
+    the starter packs are still blue characters", and a seat in a room
+    that was "one of the old hologram ones". The repository ships
+    photographs; a cyan hologram on a live deployment is a generated face
+    the box minted for itself in an older release and then kept, because
+    ``COALESCE`` never overwrites.
+
+        asked     why is this starter still a blue character
+        mattered  is this face OURS to replace
+
+    That second question is the whole of this function. A starter is not
+    somebody's to dress, but it can be claimed, and an owner who chose
+    their own picture must keep it. So a face is replaced only when the
+    deployment demonstrably put it there:
+
+    a registry row for that exact asset carries no owner account and a
+    source of ``seeded`` or ``prompted`` — minted by the box, for itself.
+    An upload, a curated pick, or any row with an owner is left alone,
+    and so is a face this function cannot account for. Silence is the
+    correct answer for a face whose provenance is unknown: the cost of
+    skipping one hologram is one odd-looking seat, and the cost of a
+    wrong replacement is destroying somebody's chosen picture.
+
+    A first draft also treated any ``/portraits/`` path with no file
+    behind it as ours-by-route, on the reasoning that nothing else writes
+    that route. `test_backfill_never_overwrites_what_an_owner_set` said
+    otherwise by simply doing it, and it was right to: a rule that reads
+    a path and infers intent is a guess, and this is the one function in
+    the file where a wrong guess destroys something. The registry row is
+    evidence; the route was a hunch. Only the evidence is acted on.
+
+    The route case also turns out to be mostly imaginary. An older
+    release that shipped holograms at ``/portraits/<handle>.webp`` wrote
+    the same FILENAME the photographs use, so those rows were repaired
+    the day the files were replaced. The face that actually persists is
+    a minted one in the media store, which is what the registry sees.
+    """
+    from . import avatars
+
+    shipped = avatars.asset_path(handle)
+    if not shipped:
+        return False
+    row = conn.execute("SELECT avatar FROM profiles WHERE id=?",
+                       (profile_id,)).fetchone()
+    if row is None or not row["avatar"] or row["avatar"] == shipped:
+        return False
+    worn = row["avatar"]
+
+    got = conn.execute(
+        "SELECT owner_account_id, source FROM avatar_registry"
+        " WHERE asset=? ORDER BY created_at DESC LIMIT 1",
+        (worn,)).fetchone()
+    if not (got and got["owner_account_id"] is None
+            and got["source"] in ("seeded", "prompted")):
+        return False
+
+    conn.execute("UPDATE profiles SET avatar=? WHERE id=?",
+                 (shipped, profile_id))
+    conn.commit()
+    return True
+
+
 def _backfill_founder(conn, profile_id: str, handle: str) -> bool:
     """The founder's half of :func:`_backfill`, blank-only like it.
 
@@ -697,10 +766,77 @@ def _backfill_founder(conn, profile_id: str, handle: str) -> bool:
     return changed
 
 
+def _unseat_the_nameless(conn) -> int:
+    """Take the people who are not people out of the rooms they are in.
+
+        asked     when I step into an existing room it shows ON AIR in
+                  frames that are not anybody
+        mattered  they were rows, and they are still there
+
+    The console's onboarding minted a person named "You" — the word the
+    surface uses for the reader's own seat — with no account behind it,
+    every single time it ran. Two of them turned up in one live room
+    beside the real seat, each drawing a red ON AIR circle for somebody
+    who had never been there.
+
+    The making of them is fixed at both doors. This is the other half:
+    the ones already sitting in rooms, which no amount of fixing the door
+    removes.
+
+    Deliberately narrow, because these rows look like people and one of
+    them being a real person would be the worse mistake by far. All four
+    must hold: no account, the stored name is the pronoun this bug wrote,
+    nothing was ever said by them, and nothing was ever shown for them.
+    A person who spoke is a person, whatever they are called.
+
+    And it UNSEATS rather than deletes. A row nobody can see is harmless;
+    a row somebody's memory is keyed on is not, and the difference between
+    the two is not something a startup repair should decide.
+    """
+    from . import accounts
+
+    gone = 0
+    rows = conn.execute(
+        "SELECT id FROM interactors WHERE account_id IS NULL").fetchall()
+    for row in rows:
+        who = row["id"]
+        name = conn.execute("SELECT display_name FROM interactors WHERE id=?",
+                            (who,)).fetchone()["display_name"]
+        if accounts.a_person_name(name) != accounts.UNNAMED:
+            continue          # a real name; not one of these
+        if name == accounts.UNNAMED:
+            continue          # already named by the rule; leave it seated
+        said = conn.execute(
+            "SELECT 1 FROM room_messages WHERE sender_kind='user'"
+            " AND sender_id=? LIMIT 1", (who,)).fetchone()
+        if said is not None:
+            continue          # somebody who spoke is somebody
+        shown = conn.execute(
+            "SELECT 1 FROM room_faces WHERE interactor_id=?"
+            " AND showing IN ('photo','camera') AND media_url IS NOT NULL"
+            " LIMIT 1", (who,)).fetchone()
+        if shown is not None:
+            continue          # a face was put up; that was somebody too
+        seated = conn.execute(
+            "DELETE FROM room_participants WHERE kind='user' AND ref_id=?",
+            (who,)).rowcount
+        # The camera state goes with the seat, or the next room they are
+        # put in draws ON AIR for them again.
+        conn.execute("DELETE FROM room_faces WHERE interactor_id=?", (who,))
+        if seated:
+            gone += seated
+    conn.commit()
+    return gone
+
+
 def repair() -> dict:
-    """Blank-only portrait repair for profiles that already exist. Never
-    creates one — a deployment that chose not to install the starters stays
-    without them.
+    """Portrait repair for profiles that already exist. Never creates one —
+    a deployment that chose not to install the starters stays without them.
+
+    Two repairs, not one: :func:`_backfill` fills a face that is MISSING,
+    and :func:`_restore_face` replaces one this deployment minted for
+    itself — the cyan holograms an older release generated and then kept,
+    because a face already set is never a blank again.
 
     :func:`seed` repairs too, but only when somebody presses the seed button,
     and the field showed nobody knows the button is a repair: a deployment
@@ -717,6 +853,17 @@ def repair() -> dict:
                            (handle,)).fetchone()
         if row and _backfill(conn, row["profile_id"], handle):
             repaired.append(handle)
+        # And the wrong face goes the same way the missing one arrives.
+        #
+        # This function's own docstring records why: a repair that only
+        # runs when somebody presses the seed button is a repair nobody
+        # runs, and a deployment sat on initials for weeks because of it.
+        # Wiring `_restore_face` into `seed()` alone would have repeated
+        # that mistake exactly — the holograms would have waited for a
+        # button press by an operator who does not know the button is a
+        # repair.
+        if row and _restore_face(conn, row["profile_id"], handle):
+            repaired.append(f"{handle} (face)")
         if row and _voice(conn, row["profile_id"], handle):
             repaired.append(f"{handle} (voice)")
         # The dossier arrives the same way the faces did: on the first
@@ -731,7 +878,35 @@ def repair() -> dict:
             repaired.append(handle)
         if row and _voice(conn, row["profile_id"], handle):
             repaired.append(f"{handle} (voice)")
-    return {"repaired": len(repaired), "repaired_handles": repaired}
+    # And the seats nobody is in. Reported by count, because the thing
+    # worth knowing is whether a box had any.
+    unseated = _unseat_the_nameless(conn)
+    if unseated:
+        repaired.append(f"{unseated} seat(s) held by nobody")
+    return {"repaired": len(repaired), "repaired_handles": repaired,
+            "unseated": unseated}
+
+
+def _say_field(conn, profile_id: str, industry: str) -> None:
+    """Record what field this profile works in, on the profile itself.
+
+        asked     which Field Pack does this starter get
+        mattered  can anything ASK what field this starter is in
+
+    The industry sat in the ``STARTERS`` table above — which is code, not
+    data. `_ground` read it, installed a pack from it, and let it go, so
+    no route could answer "what does Dr. Amara Osei do" and every screen
+    that wanted to say *Healthcare* under her name had to either invent it
+    or leave it blank. Writing it down costs one column and makes the
+    answer readable everywhere.
+
+    Blank-only, like every other backfill here: a profile whose owner has
+    set their own field does not get it overwritten on the next seed.
+    """
+    conn.execute(
+        "UPDATE profiles SET industry=? WHERE id=?"
+        " AND (industry IS NULL OR industry='')",
+        (industry, profile_id))
 
 
 def _ground(conn, profile_id: str, industry: str,
@@ -942,6 +1117,7 @@ def seed() -> dict:
 
     conn = db.connect()
     created, skipped, repaired, grounded = [], [], [], []
+    refaced: list[str] = []
     # Before the starters, so every profile created below already has somebody
     # to stand first in its friends list.
     founder, founder_verified = _seed_founder(conn)
@@ -961,11 +1137,18 @@ def seed() -> dict:
             # missing, it does not restore starters to factory settings.
             if _backfill(conn, taken["profile_id"], handle):
                 repaired.append(handle)
+            # And the other half of the same repair: a starter wearing a
+            # face this deployment minted for itself, rather than one it
+            # is missing. `_backfill` cannot see these — it only ever
+            # fills a blank.
+            if _restore_face(conn, taken["profile_id"], handle):
+                refaced.append(handle)
             if _voice(conn, taken["profile_id"], handle):
                 repaired.append(f"{handle} (voice)")
             # Grounding is part of the repair too: every deployment seeded
             # before this shipped has starters with no source material at
             # all, and they cannot be fixed by hand at 34 profiles.
+            _say_field(conn, taken["profile_id"], industry)
             if _ground(conn, taken["profile_id"], industry):
                 grounded.append(handle)
             continue
@@ -1030,6 +1213,7 @@ def seed() -> dict:
             provider_name=PROVIDER_NAME,
             business=True,
             profile_id=profile["id"]))
+        _say_field(conn, profile["id"], industry)
         if _ground(conn, profile["id"], industry):
             grounded.append(handle)
         created.append({"handle": f"@{handle}", "industry": industry,
@@ -1065,6 +1249,11 @@ def seed() -> dict:
             # "34 skipped" on a deployment that just got 34 faces back is the
             # kind of summary that hides the thing you wanted to know.
             "repaired": len(repaired), "repaired_handles": repaired,
+            # Starters that were wearing a face this deployment minted and
+            # now wear the shipped portrait again. Its own count, because
+            # it answers a different question from `repaired`: not "did a
+            # missing face arrive" but "did the wrong one go".
+            "refaced": len(refaced), "refaced_handles": refaced,
             # Starters that just got their industry Field Pack. Separate from
             # `repaired` because it answers a different question: not "did the
             # faces come back" but "do these specialists know anything".

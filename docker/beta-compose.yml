@@ -117,6 +117,51 @@ services:
     expose:
       - "8500"
 
+  # --- the forge ----------------------------------------------------------
+  # POST /forge {photo, shot} answers a 3-D head built from that one
+  # photograph: geometry personalized to the face, the photograph as its
+  # skin, and morph targets named as ARKit names them so the room's own
+  # audio can move the mouth.
+  #
+  # It exists because the alternative was a subscription. The avatar shelf
+  # was an import list; the provider we picked to replace it (Ready Player
+  # Me) was bought by Netflix and shut down on 31 January 2026, and the two
+  # production replacements price their API at eight hundred dollars a
+  # month. A face is not a subscription, and a company that can be acquired
+  # should not be able to take everybody's face with it.
+  #
+  # The landmarker's weights are baked in at build, exactly like the ears'
+  # — a running forge never reaches out for a model. It looks only at the
+  # bytes it is handed: no URL is fetched here, so nothing in this
+  # container can be aimed at the stack behind it.
+  forge:
+    build:
+      context: ${QRME_CONTEXT:-..}/docker/forge
+    restart: unless-stopped
+    expose:
+      - "8600"
+
+  # --- the camera ---------------------------------------------------------
+  # POST / {provider, prompt, seconds, shape} starts a render at whichever
+  # video house was chosen and answers a job to poll; GET /{id} says how it
+  # went. The product speaks one submit-and-poll shape (qrme/filming.py) and
+  # no vendor speaks it, so this is the translator that was always named in
+  # that module's docstring and never built — which is why the video road
+  # answered "no footage for this turn yet" whatever anybody picked.
+  #
+  # FAL_KEY is the one credential, and it is the container's rather than the
+  # product's: the app never holds a video house's key, it holds the address
+  # of this door. Unset, /health says `keyed: false` and every render
+  # refuses in words instead of failing quietly.
+  film:
+    build:
+      context: ${QRME_CONTEXT:-..}/docker/film
+    restart: unless-stopped
+    environment:
+      FAL_KEY: ${QRME_FILM_HOUSE_KEY:-}
+    expose:
+      - "8700"
+
   # --- one-shot: mint the tenant tokens ----------------------------------
   #
   # The same `docker/bootstrap.py` the test harness runs, and for the same
@@ -181,6 +226,15 @@ services:
       # The stack's ears, for the briefcase's read-once links that are
       # recordings — same forwards-only-what-a-block-names reason.
       QRME_EARS_URL: http://ears:8500
+      QRME_FORGE_URL: http://forge:8600
+      # The house pick is `filming.DEFAULT_PROVIDER` (Veo) unless an
+      # operator names another here. The URL points at the adapter above
+      # rather than at a vendor, so swapping houses is one container.
+      QRME_FILM_PROVIDER: ${QRME_FILM_PROVIDER:-}
+      QRME_FILM_URL: ${QRME_FILM_URL:-http://film:8700}
+      # Present so `filming.keyed()` is true — the real credential is the
+      # adapter's FAL_KEY and never enters this container.
+      QRME_FILM_KEY: ${QRME_FILM_KEY:-stack-internal}
       # Advertised by GET /pair, so the QR a phone scans has to point at the
       # public name rather than the container.
       QRME_PUBLIC_URL: ${QRME_PUBLIC_URL:?set QRME_PUBLIC_URL in .env}
@@ -195,6 +249,12 @@ services:
       # answer on a box testers are using, so both are set together.
       QRME_LLM: anthropic
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?set ANTHROPIC_API_KEY in .env}
+      # Optional, and only so the owner has somewhere else to send
+      # the deciding half when a provider declines to work a screen.
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      XAI_API_KEY: ${XAI_API_KEY:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
     volumes:
       - shared:/shared
       - qrme-data:/data

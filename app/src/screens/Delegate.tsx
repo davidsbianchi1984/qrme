@@ -123,7 +123,7 @@ export function Delegate({ onPlans }: {
             <div className="row">
               <strong>{grant.id}</strong>
               <span className="muted">
-                {grant.scope.join(", ") || tr("dlg.noscope", lang)}
+                {grant.scopes.join(", ") || tr("dlg.noscope", lang)}
               </span>
               {grant.revoked &&
                 <span className="pill">{tr("dlg.revoked", lang)}</span>}

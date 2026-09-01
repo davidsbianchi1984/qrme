@@ -323,6 +323,48 @@ def signin(email: str, password: str,
             "interactor_token": auth.issue("interactor", who["id"])}
 
 
+#: A pronoun is not a name.
+#:
+#:     asked     when I step into an existing room it shows ON AIR seats
+#:               that are not anybody
+#:     mattered  they were people, and they were called "You"
+#:
+#: The viewer's own seat is labelled by the SURFACE — `ins.seat.you`, in
+#: whatever language the reader is in. That word stored in a name column
+#: is a different object entirely: it is right from exactly one seat and
+#: wrong from every other, so a room drew "You" for somebody who was not
+#: the reader, twice, beside their real seat.
+#:
+#: Every translation of it, because the console ships in ten languages and
+#: a guard that only knows English is a guard that moves the bug abroad.
+_PRONOUNS = {
+    "you", "tú", "tu", "vous", "du", "você", "あなた", "你", "आप", "أنت",
+    "me", "myself", "self",
+}
+
+#: What somebody is called when nobody said. Honest, and not a claim to be
+#: whoever is reading.
+UNNAMED = "Someone"
+
+
+def a_person_name(given: str | None) -> str:
+    """The name to store for a person, which is never a pronoun.
+
+        asked     stop seating people called "You"
+        mattered  two write paths, and only one of them was looked at
+
+    Both doors that make a person come through here: the account's own
+    person, and the public `POST /interactors`. Putting the rule in one
+    function rather than at each door is the point — the first door had a
+    fallback of `or "You"` for a year and the second accepted whatever a
+    client sent, which is how a console shipped a screen that mints them.
+    """
+    name = (given or "").strip()
+    if not name or name.casefold() in _PRONOUNS:
+        return UNNAMED
+    return name
+
+
 def interactor_for(account_id: str, display_name: str | None = None) -> dict:
     """This account's person, made once and returned thereafter.
 
@@ -348,7 +390,7 @@ def interactor_for(account_id: str, display_name: str | None = None) -> dict:
     conn.execute(
         "INSERT INTO interactors (id, display_name, account_id, created_at)"
         " VALUES (?,?,?,?)",
-        (interactor_id, (display_name or "").strip() or "You", account_id,
+        (interactor_id, a_person_name(display_name), account_id,
          db.utcnow()))
     conn.commit()
     return dict(conn.execute("SELECT * FROM interactors WHERE id=?",

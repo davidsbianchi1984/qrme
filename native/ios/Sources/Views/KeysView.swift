@@ -153,7 +153,7 @@ struct KeysSection: View {
                 Button(L10n.t("acct.oauth", state.language)) {
                     run {
                         let doors = try await ApiClient.shared
-                            .oauthProviders().providers
+                            .oauthProviders().signin_providers
                         if let first = doors.first {
                             let s = try await ApiClient.shared.oauthStart(
                                 provider: first.provider)

@@ -1,6 +1,9 @@
 # QRME — AI Synthetic Profile Platform
 
-**Current release: v1.8.9** ([changelog](CHANGELOG.md)) — one of three products
+**People, made of software — built by you, governed by you, honest about
+what they are.**
+
+**Current release: v2.9.6** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -10,22 +13,26 @@ one number names one combination of all three.
 > (U.S. Patent Application No. 19/056,418, Attorney Docket 526.P002;
 > **published as US 2025/0265659 A1 on August 21, 2025**).
 
-QRME lets a user create, customize, and interact with AI-driven synthetic
-profiles — versions of themselves, another person (with consent/rights
-handling), or a fictional persona. Profiles adapt to *who* they're talking to
-(relationship-aware behavior) and *how engaged* that person is, while keeping
-their core identity and boundaries fixed. See [docs/PRD.md](docs/PRD.md).
+QRME is a platform for creating, customizing and living alongside
+AI-driven synthetic profiles — a version of yourself, another person with
+consent and rights handling, or a fictional persona. A profile keeps its
+core identity and boundaries fixed while adapting to *who* it is talking
+to and how long they have known each other. Around the profiles stands a
+community: walls and feeds, voice and video rooms, friends, gifts, a
+marketplace — and around all of it, governance that treats a person's
+face, voice and name as things with owners. See [docs/PRD.md](docs/PRD.md)
+for what it is, and [docs/ROADMAP.md](docs/ROADMAP.md) for where it goes
+next — the 2.9.x band and what 3.0.0 has to mean before it is called that.
 
-**Roadmap — AI agent management.** When activated, the platform can deploy
-intelligent, role-specific AI agents that assist users, automate tasks, manage
-workflows, and enhance operational decision-making — running more efficiently
-and taking over mundane or outdated tasks and roles — all within the same
-secure, private network environment.
-
-QRME is one of three products versioned and released together — see the
-banner above. The sister products:
-[JIM-mini](https://github.com/davidsbianchi1984/jim-mini) (health guardian)
-and [PDI](https://github.com/davidsbianchi1984/pdi) (private data vault).
+It is one product with three postures: a **studio** where profiles are
+made and taught, a **community** where they live among people and each
+other, and a **workforce** — role-specific agents that take on tasks,
+automate workflows and staff real desks, acting only through published
+tools inside the same private network. The sister products complete it:
+[JIM-mini](https://github.com/davidsbianchi1984/jim-mini) reaches its
+specialists through the tandem, and
+[PDI](https://github.com/davidsbianchi1984/pdi) seals what the profiles
+remember.
 
 ## Ability is not a gate
 
@@ -54,17 +61,214 @@ whole loop: your words become tracked work.
 
 
 
+
 ## What it does
 
 | Capability | Description |
 |---|---|
-| **Synthetic profiles** | Create and interact with AI-driven profiles — yourself, another person with consent and rights handling, or a fictional persona — each conditioned on who it is talking to and how long they have known each other. |
-| **Community** | Walls, feeds, friends, rooms (voice, camera, watch parties, games), gifts, and a marketplace of knowledge and task packs. |
-| **The Studio and its agent** | A personal agent that edits your own page, writes widgets, posts, and searches the web — acting only through published tools, each behind the same doors a person uses. |
-| **Voice and likeness** | Voiceprint enrollment under attestation, spoken voices bound from the provider's surface, avatars and masks — every generated utterance watermarked and every AI face marked as one. |
-| **Governance** | Objections, takedowns, lifecycle states, signatures that survive dispute, tamper-evident provenance, and translated refusals in ten languages. |
-| **Privacy** | Room pixels never cross clients; disclosures are recorded, not footage. `QRME_OFFLINE=1` keeps everything on the host, enforced at every socket. |
+| **Synthetic profiles** | Create and interact with AI-driven profiles — yourself, another person with consent and rights handling, or a fictional persona — each conditioned on who it is talking to, how engaged they are, and what the pair's own sealed history holds. |
+| **Conversation everywhere** | Chat that hears and remembers, a hands-free talk face, and rooms for up to nine — audio, camera, AR, VR, watch parties and games — with dictation, streamed replies spoken piece by piece, barge-in, and pictures, video and files shared in the room. |
+| **Voice and likeness** | Voiceprint enrollment under attestation; spoken voices bound by reference with a first-account claim, an owner's on-the-record release for voices meant to be shared, and premades free for everybody. Every generated utterance is watermarked and every AI face marked as one. |
+| **Faces and avatars** | Portraits, masks and an avatar registry — painted from words where the deployment holds an image key — with the AI mark riding every invented face. |
+| **Community** | Walls, feeds, friends and circles, discovery with an offer, homepages, gifts, reviews, and a marketplace of knowledge and task packs — with starter professionals who look and sound like their trade. |
+| **The Studio and its agent** | A personal agent that edits your page, writes widgets, posts and searches the web on your word — acting only through published tools, each behind the same doors a person uses, with every act on the record. |
+| **The workforce** | Role-specific agents that answer for their own trade: specialist profiles JIM-mini reaches through the tandem, organizational desks, delegation with both sides' consent, and succession that survives its owner. |
+| **Memory in the vault** | What a pair builds together seals to the PDI vault — shown to its people, curatable, and forgettable down to the vectors. |
+| **The platform's eyes** | Shared pictures and screenshots are read (a screenshot is the phone's way of handing over its screen), shared videos are heard and their frames described, a watch party's direct video can be watched once for the whole room, and a screen can be shown to a room or the agent one frame at a time — every claimed sight a real one, made by the deployment's own ears-and-eyes sidecar. |
+| **The room society** | Eight seats that take turns: profiles announce who they speak to, answer when addressed, wait when not, rotate past your silent chair, join and summon each other on their own, collaborate on tasks — and pause after ten turns apiece, steered entirely by words, never a toggle. |
+| **Governance** | Objections, takedowns, lifecycle states, signatures that survive dispute, tamper-evident provenance, moderation that can hold a reply for its owner, and refusals translated in ten languages. |
+| **Privacy** | Room pixels never cross clients; disclosures are recorded, not footage; microphones pair without listening. `QRME_OFFLINE=1` keeps everything on the host, enforced at every socket. |
 | **Tandem** | Runs beside JIM-mini and on top of the PDI vault, one version number across the three. |
+
+## Capabilities, and what each one rests on
+
+Nine faculties can be given to a profile. None is on by default, each
+requires a permission that is recorded before the faculty exists, and
+each is withdrawn on one screen — the same screen the console reads to
+say whether it is on at all.
+
+The console carries this table as a live screen (**Capabilities**,
+screen 208): the same four columns, with the third read from the running
+deployment rather than written here. A register that could disagree with
+the product would be a brochure, so it is built to read the same routes
+the owning screens read.
+
+| Faculty | What it does | What it rests on | Withdrawn on |
+|---|---|---|---|
+| **Live visual channel** | Channel 3: a live view through the holder's own camera, so that somebody on the other side can see the thing rather than hear it described. | A session the holder opened on a named surface, with a stated subject and a bystander notice shown to the people in view. Closing it ends the view; nothing continues after. | Live Now |
+| **Lent audio channel** | Channel 2: a wearable microphone lent to the profiles in a place, so that what is said aloud reaches them without anybody stopping to type it. | A surface whose other occupants have a member list and somewhere to be shown the disclosure. Rooms are excluded and lend through their own route. | Rooms |
+| **Synthesised speech** | A voice built from recorded samples in FIG. 800's order: permission first, collection second, and a print that can be retired. | Permission recorded before a single sample is collected, and the disclosure that a synthetic voice is speaking. Withdrawing permission retires the print. | Voice |
+| **Presented likeness** | The face a profile shows — the bubble, and the upper-torso form that stands in a live feed or an AR scene — carrying a watermark that is always displayed. | An asset chosen for the profile. Where a real person's likeness stands behind it, a grant from that person that can be withdrawn. | Presence |
+| **Physical embodiment** | A robot bound to the profile as a body to speak through — the same persona, through the same model, wherever it is embodied. | An explicit binding to a named platform from the published catalogue. Only platforms shipping or open for preorder can be bound; an announced one is refused by name. | Robots & Devices |
+| **Locomotion directives** | The movement a bound body may be told to make, checked against that platform's own allowlist before anything reaches the robot. A vacuum cannot be told to fetch. | A bound body whose own list includes the move. Not a separate switch: with nothing bound there is nothing that could be told to move. | Robots & Devices |
+| **Screen observation** | Reading a screen without acting on it. Text found on a screen is treated as data and can never widen what is allowed, whatever that text claims. | A look permit naming its applications, its minutes and its steps. A wildcard is refused. | Hands |
+| **Interface operation** | Working a screen — moving a pointer, pressing a control, typing into a field — under a grant bounded in applications, moves, minutes and steps. | A grant naming all four limits, enforced where the move happens rather than on the screen that requested it. It never types passwords, PINs, one-time codes, card numbers or recovery phrases, and says so instead of trying. | Hands |
+| **Rendered scene** | The turn itself as footage — the reply spoken in a place, rendered by a service that is not this one and played without anybody pressing anything. | A rendering service the deployment named, a key to reach it with, and the standing direction the owner wrote. Everything it returns is stored marked, with no setting that turns the mark off. | Identity |
+| **Self-adjustment** | The profile turns its own dials when the person talking asks it to — warmer, briefer — instead of the change waiting on the owner being around. | The dials the owner exposed, within the bounds the owner set. A lock the owner places is refused from inside the conversation, not negotiated. | Agent |
+
+**On the naming.** These are named for what they do, not for the body
+part they resemble. The engineering shorthand behind them is anatomical
+— the eyes, the ears, the hands — and that shorthand is exactly wrong in
+front of a regulator or an attorney: *eyes* claims a faculty, where *a
+live view through the holder's own camera, opened by the holder, minuted,
+and disclosed to everybody present* states a behaviour that can be
+checked against the code and found true or false.
+
+**Why these nine are not JIM-mini's nine.** The sibling product carries a
+register of the same shape and it is deliberately not the same rows.
+QRME lends a profile an ear and an eye *into a place*, where JIM-mini
+attaches them to a monitor on one person; copying the sibling's wording
+would have produced a register that described the wrong product
+accurately.
+
+
+## How a profile is seen: three roads
+
+A presence has three roads, and each surface falls down the list when the
+one above it is not there yet. That is why they are three fillings of one
+frame rather than three layouts: the frame does not move, resize, or swap
+for a different panel — it simply gets more alive as each road becomes
+available, and a face is on screen the whole time.
+
+| | What fills the frame | Speed | What it costs |
+|---|---|---|---|
+| **1 · Profile photo** | The still, carrying the AI mark in its own pixels | Instant | Nothing |
+| **2 · Avatar** | The 3-D head, breathing, mouth on the voice | Live, every frame | Nothing, once the model exists |
+| **3 · Video generation** | The reply rendered as footage | Minutes | Ten to fifteen cents a second |
+
+**Length is not a setting.** `filming.length_for` works out how long the
+passage takes to say and renders for exactly that. A dial would make the
+video fit the setting instead of the content — two sentences padded to
+thirty seconds, or a paragraph hurried into five — so the console shows
+the number it arrived at and never offers to change it. Past the ceiling
+it says so rather than trimming: a video that quietly drops its last
+sentence is worse than one that was never made, because nobody watching
+can tell.
+
+**The direction is standing.** "It's too dark, let's have this on the
+beach" is not a note about one video; it is where this profile lives from
+now on. `filming.amend` rewrites the standing direction from what the
+owner said rather than appending to it, so twenty corrections stay one
+readable paragraph instead of a transcript of complaints that contradict
+each other.
+
+**Nobody presses play.** On the video road every approved reply is
+rendered as it arrives — the turn starts the job and moves on, because a
+render is minutes and a reply is not. What the response carries is a row
+and the screen polls it, so the words are readable the whole time the
+footage is being made.
+
+Two things keep that from being a bill nobody agreed to. The road is
+stored on the server rather than held on the screen that picks it — the
+turn runs where no console is looking, and a choice living in a component
+is one the chat endpoint cannot see. And a ceiling in seconds a day sits
+directly above the picker, counting renders already started so two quick
+replies cannot both slip under a limit neither had spent. A reply past it
+arrives as text that says so: an owner who set a limit and then stopped
+seeing video is owed the reason, because "you reached the limit you set"
+is a different sentence from "it broke".
+
+A render that fails never fails the turn, and a render outlives the page
+that started it — `GET /video/latest/{id}` is what a conversation asks on
+opening, so closing the tab does not lose a job that is still being paid
+for.
+
+    asked     should this reply become footage
+    mattered  can it, today, without spending what nobody agreed to
+
+**No vendor is load-bearing.** Seven services are named and none is
+depended on. Sora is absent on purpose: OpenAI deprecated it on 26 April
+2026 and shuts the API down on 24 September. Ready Player Me closed on
+31 January 2026 and is why `qrme/avatarforge.py` exists at all. Two
+shutdowns in fifteen months, in the two markets this platform would most
+like to buy from — so a shelf that sends somebody to a service with a
+published end date is worse than a shelf one row shorter.
+
+### Real output
+
+Two scenes this platform rendered, each of a profile that already had a
+face here. Frames from the footage, not stills posed for the page.
+
+<table>
+  <tr>
+    <td align="center" width="50%"><img src="docs/scenes/dr_amara_osei.jpg" alt="Dr Amara Osei, rendered"><br><sub><b>Dr. Amara Osei</b> · healthcare<br>the starter portrait, rendered into a place</sub></td>
+    <td align="center" width="50%"><img src="docs/scenes/david_bianchi_ai.jpg" alt="David Bianchi, rendered"><br><sub><b>David Bianchi</b> · the founder's own persona<br>same face, a different room</sub></td>
+  </tr>
+</table>
+
+### One exchange, two turns, four screens
+
+**These are compositions, not captures.** They are drawn from real assets
+— the portraits this repository ships and frames from the footage above —
+and they show a surface that is built at the module and route level and
+not yet on screen. The distinction is the one
+`tests/superseded_drawings.txt` exists to keep: a drawing standing in for
+a screen is honest until it is quiet about being a drawing.
+
+The same consultation, one turn each. The green ring moves with whoever
+the turn belongs to — their seat and their frame, so the eye joins the
+two — and the scene moves with them, because the standing direction
+belongs to the speaker rather than to the room. He asks from a walled
+garden after dark; she answers from a hospital ward at shift change.
+Neither pressed play.
+
+**His turn**
+
+<table>
+  <tr>
+    <td align="center" width="62%"><img src="docs/scenes/turn-david-desktop.png" alt="David's turn, desktop"><br><sub>Windows &amp; desktop</sub></td>
+    <td align="center" width="38%"><img src="docs/scenes/turn-david-phone.png" alt="David's turn, phone"><br><sub>Phone</sub></td>
+  </tr>
+</table>
+
+**Her reply**
+
+<table>
+  <tr>
+    <td align="center" width="62%"><img src="docs/scenes/turn-amara-desktop.png" alt="Amara's turn, desktop"><br><sub>Windows &amp; desktop</sub></td>
+    <td align="center" width="38%"><img src="docs/scenes/turn-amara-phone.png" alt="Amara's turn, phone"><br><sub>Phone</sub></td>
+  </tr>
+</table>
+
+On a phone the seats become a strip across the top and the stage takes the
+full width. A rail of faces down the side would leave the footage too
+narrow to read a face in, which defeats the point of rendering one.
+
+Underneath the frame sits the standing direction in the owner's own words,
+and the line that changes it. On roads 1 and 2 that line is not greyed out
+— it is gone, because a control that cannot do anything is worse than no
+control at all.
+
+The AI mark rides every seat and the footage both. On a face it is drawn on
+top of the profile photo sphere, in the corner, on the outermost layer — it
+used to be burned into the pixels, and every surface here draws a face as a
+circle, so a mark in the corner of a square shipped cut in half. The rule and
+what it costs are in `docs/media-provenance.md`.
+
+### Filling the screen, and leaving it
+
+The frame carries an expand in its bottom-right corner. Not video
+furniture — a still and a 3-D head are both worth filling a screen with,
+so it is on every road.
+
+Full screen the direction stays legible along the bottom **and so does the
+line that changes it**: this is where somebody is actually looking at the
+scene, so it is the likeliest place they will want to say "not like that",
+and leaving the prompt behind on the small frame would mean shrinking the
+thing in order to fix it. Whatever they ask here is the same standing
+direction the windowed frame reads — there are not two of them to keep in
+step — and `scene_direction_log` records which view it was asked from.
+
+Leaving is a red X, top right, and it is the only red control on the
+surface because it is the only one that ends something rather than
+changing it.
+
+<table>
+  <tr>
+    <td align="center" width="50%"><img src="docs/scenes/full-david.png" alt="David's scene, full screen"><br><sub>His scene, full screen</sub></td>
+    <td align="center" width="50%"><img src="docs/scenes/full-amara.png" alt="Amara's scene, full screen"><br><sub>Hers</sub></td>
+  </tr>
+</table>
 
 ## The screens you'll meet
 
@@ -72,7 +276,7 @@ The majority of what a person actually encounters, with what each screen
 does — drawn at phone scale, and the same screens serve the web console
 on a computer and the installed app. The Android tellings live beside
 these in `docs/screens/android/`, the watch has its own gallery below,
-and the complete tour of all 204 is in [docs/gallery.md](docs/gallery.md).
+and the complete tour of all 207 is in [docs/gallery.md](docs/gallery.md).
 
 **Getting in**
 
@@ -80,8 +284,8 @@ and the complete tour of all 204 is in [docs/gallery.md](docs/gallery.md).
   <tr>
     <td align="center" width="25%"><a href="docs/screens/01-welcome.svg"><img src="docs/screens/01-welcome.svg" width="165" alt="Welcome"></a><br><sub><b>01</b> · Welcome<br>the first door, no account needed to look</sub></td>
     <td align="center" width="25%"><a href="docs/screens/02-create-profile.svg"><img src="docs/screens/02-create-profile.svg" width="165" alt="Create a profile"></a><br><sub><b>02</b> · Create a profile<br>a synthetic person, made from your answers</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/39-sign-in.svg"><img src="docs/screens/39-sign-in.svg" width="165" alt="Sign in"></a><br><sub><b>39</b> · Sign in<br>your account, your held profiles</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/05-profile-home.svg"><img src="docs/screens/05-profile-home.svg" width="165" alt="Profile home"></a><br><sub><b>05</b> · Profile home<br>memory, engagement and moderation at a glance</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/39-sign-in.png"><img src="docs/screens/39-sign-in.png" width="165" alt="Sign in"></a><br><sub><b>39</b> · Sign in<br>your account, your held profiles</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/05-home.png"><img src="docs/screens/05-home.png" width="165" alt="Profile home"></a><br><sub><b>05</b> · Profile home<br>memory, engagement and moderation at a glance</sub></td>
   </tr>
 </table>
 
@@ -90,9 +294,9 @@ and the complete tour of all 204 is in [docs/gallery.md](docs/gallery.md).
 <table>
   <tr>
     <td align="center" width="25%"><a href="docs/screens/83-chat.svg"><img src="docs/screens/83-chat.svg" width="165" alt="Chat"></a><br><sub><b>83</b> · Chat<br>type or talk; it hears, answers and remembers</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/198-beside-the-face.svg"><img src="docs/screens/198-beside-the-face.svg" width="165" alt="The talk face"></a><br><sub><b>198</b> · The talk face<br>hands-free voice, with the four panels beside it</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/175-inside-a-room.svg"><img src="docs/screens/175-inside-a-room.svg" width="165" alt="Inside a room"></a><br><sub><b>175</b> · Inside a room<br>you and up to eight, files and links read aloud</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/200-agent.svg"><img src="docs/screens/200-agent.svg" width="165" alt="Agent"></a><br><sub><b>200</b> · Agent<br>builds your page and widgets on your word</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/198-beside-the-face.png"><img src="docs/screens/198-beside-the-face.png" width="165" alt="The talk face"></a><br><sub><b>198</b> · The talk face<br>hands-free voice, with the four panels beside it</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/175-inside.png"><img src="docs/screens/175-inside.png" width="165" alt="Inside a room"></a><br><sub><b>175</b> · Inside a room<br>you and up to eight, files and links read aloud</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/200-agent.png"><img src="docs/screens/200-agent.png" width="165" alt="Agent"></a><br><sub><b>200</b> · Agent<br>builds your page and widgets on your word</sub></td>
   </tr>
 </table>
 
@@ -100,9 +304,9 @@ and the complete tour of all 204 is in [docs/gallery.md](docs/gallery.md).
 
 <table>
   <tr>
-    <td align="center" width="25%"><a href="docs/screens/185-discover.svg"><img src="docs/screens/185-discover.svg" width="165" alt="Discover"></a><br><sub><b>185</b> · Discover<br>everybody here, described, with an offer</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/185-discover.png"><img src="docs/screens/185-discover.png" width="165" alt="Discover"></a><br><sub><b>185</b> · Discover<br>everybody here, described, with an offer</sub></td>
     <td align="center" width="25%"><a href="docs/screens/204-your-circle.svg"><img src="docs/screens/204-your-circle.svg" width="165" alt="Your circle"></a><br><sub><b>204</b> · Your circle<br>only your friends, and what they do</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/84-friends.svg"><img src="docs/screens/84-friends.svg" width="165" alt="Friends"></a><br><sub><b>84</b> · Friends<br>the workbench: search, add, remove</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/84-friends.png"><img src="docs/screens/84-friends.png" width="165" alt="Friends"></a><br><sub><b>84</b> · Friends<br>the workbench: search, add, remove</sub></td>
     <td align="center" width="25%"><a href="docs/screens/197-their-homepage.svg"><img src="docs/screens/197-their-homepage.svg" width="165" alt="Their homepage"></a><br><sub><b>197</b> · Their homepage<br>a face pressed anywhere lands here</sub></td>
   </tr>
 </table>
@@ -122,9 +326,9 @@ and the complete tour of all 204 is in [docs/gallery.md](docs/gallery.md).
 
 <table>
   <tr>
-    <td align="center" width="25%"><a href="docs/screens/07-memory-vault.svg"><img src="docs/screens/07-memory-vault.svg" width="165" alt="Memory vault"></a><br><sub><b>07</b> · Memory vault<br>what it holds about you, erasable by conversation</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/147-your-own-voice.svg"><img src="docs/screens/147-your-own-voice.svg" width="165" alt="Your own voice"></a><br><sub><b>147</b> · Your own voice<br>cloned by consent, watermarked every utterance</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/44-avatar-studio.svg"><img src="docs/screens/44-avatar-studio.svg" width="165" alt="Avatar studio"></a><br><sub><b>44</b> · Avatar studio<br>the face, aged and dressed as you choose</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/07-memory.png"><img src="docs/screens/07-memory.png" width="165" alt="Memory vault"></a><br><sub><b>07</b> · Memory vault<br>what it holds about you, erasable by conversation</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/147-voice.png"><img src="docs/screens/147-voice.png" width="165" alt="Your own voice"></a><br><sub><b>147</b> · Your own voice<br>cloned by consent, watermarked every utterance</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/44-avatar-studio.png"><img src="docs/screens/44-avatar-studio.png" width="165" alt="Avatar studio"></a><br><sub><b>44</b> · Avatar studio<br>the face, aged and dressed as you choose</sub></td>
     <td align="center" width="25%"><a href="docs/screens/85-my-page.svg"><img src="docs/screens/85-my-page.svg" width="165" alt="My page"></a><br><sub><b>85</b> · My page<br>your public corner, in real HTML</sub></td>
   </tr>
 </table>
@@ -133,10 +337,21 @@ and the complete tour of all 204 is in [docs/gallery.md](docs/gallery.md).
 
 <table>
   <tr>
-    <td align="center" width="25%"><a href="docs/screens/152-marketplace.svg"><img src="docs/screens/152-marketplace.svg" width="165" alt="Marketplace"></a><br><sub><b>152</b> · Marketplace<br>profiles listed, licensed and hired</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/130-choose-a-plan.svg"><img src="docs/screens/130-choose-a-plan.svg" width="165" alt="Choose a plan"></a><br><sub><b>130</b> · Choose a plan<br>what each tier adds, priced plainly</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/168-who-follows-and-what-they-pay.svg"><img src="docs/screens/168-who-follows-and-what-they-pay.svg" width="165" alt="Audience"></a><br><sub><b>168</b> · Audience<br>who follows a profile, and what they pay</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/145-where-the-money-goes.svg"><img src="docs/screens/145-where-the-money-goes.svg" width="165" alt="Where the money goes"></a><br><sub><b>145</b> · Where the money goes<br>every split, on the record</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/152-market.png"><img src="docs/screens/152-market.png" width="165" alt="Marketplace"></a><br><sub><b>152</b> · Marketplace<br>profiles listed, licensed and hired</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/130-plans.png"><img src="docs/screens/130-plans.png" width="165" alt="Choose a plan"></a><br><sub><b>130</b> · Choose a plan<br>what each tier adds, priced plainly</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/168-audience.png"><img src="docs/screens/168-audience.png" width="165" alt="Audience"></a><br><sub><b>168</b> · Audience<br>who follows a profile, and what they pay</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/145-campaigns.png"><img src="docs/screens/145-campaigns.png" width="165" alt="Where the money goes"></a><br><sub><b>145</b> · Where the money goes<br>every split, on the record</sub></td>
+  </tr>
+</table>
+
+**Together**
+
+<table>
+  <tr>
+    <td align="center" width="25%"><a href="docs/screens/205-avatar-stage.svg"><img src="docs/screens/205-avatar-stage.svg" width="165" alt="Avatar stage"></a><br><sub><b>205</b> · Avatar stage<br>the avatar full screen, wardrobe rail down the edge</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/155-party.png"><img src="docs/screens/155-party.png" width="165" alt="Watch party"></a><br><sub><b>155</b> · Watch party<br>watched together — and watchable by the platform's own eyes</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/156-identity.png"><img src="docs/screens/156-identity.png" width="165" alt="Identity"></a><br><sub><b>156</b> · Identity<br>who a profile is — and the avatar deck it dresses from</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/194-the-vastscape.svg"><img src="docs/screens/194-the-vastscape.svg" width="165" alt="A party you can find"></a><br><sub><b>194</b> · The vastscape<br>the wide view of everything running</sub></td>
   </tr>
 </table>
 
@@ -146,8 +361,8 @@ and the complete tour of all 204 is in [docs/gallery.md](docs/gallery.md).
   <tr>
     <td align="center" width="25%"><a href="docs/screens/148-who-wrote-this.svg"><img src="docs/screens/148-who-wrote-this.svg" width="165" alt="Who wrote this"></a><br><sub><b>148</b> · Who wrote this<br>the watermark answers, even reworded</sub></td>
     <td align="center" width="25%"><a href="docs/screens/32-moderation.svg"><img src="docs/screens/32-moderation.svg" width="165" alt="Moderation"></a><br><sub><b>32</b> · Moderation<br>review before a doubtful turn ships</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/202-what-it-may-do.svg"><img src="docs/screens/202-what-it-may-do.svg" width="165" alt="What it may do"></a><br><sub><b>202</b> · What it may do<br>every power off until somebody says yes</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/203-get-help.svg"><img src="docs/screens/203-get-help.svg" width="165" alt="Get help"></a><br><sub><b>203</b> · Get help<br>a person settles it, signed in or not</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/202-allowed.png"><img src="docs/screens/202-allowed.png" width="165" alt="What it may do"></a><br><sub><b>202</b> · What it may do<br>every power off until somebody says yes</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/203-matters.png"><img src="docs/screens/203-matters.png" width="165" alt="Get help"></a><br><sub><b>203</b> · Get help<br>a person settles it, signed in or not</sub></td>
   </tr>
 </table>
 
@@ -265,6 +480,26 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **2.9.6** | **AR and VR move onto the seat** — the "Step in" button under the seats is gone, and two more roads joined the avatar and the film beside each face, straight up and down in the lane the tile already had: letters in a ring, localized like every other label, smaller so four fit where two did and nothing else moves. The stage follows the viewer's own choice instead of the room's kind, the gear is off your photo now that both gestures work, and the stage itself was repaired — three card rules that flattened it now name the card, the composer sits above the leave row instead of across the transcript, and the stage stands above the room's chrome. |
+| **2.9.5** | **An FBX export becomes a face here, not in Blender** — the avatar shelf's one model row used to end in a page of Blender menus, and an FBX could not be uploaded at all. The forge converts it now, in the same tool the instructions named, taking the .zip as it downloads or the .fbx inside it. Verified against a real MetaPerson export and the provider's own .glb: 114 morph targets, 114 names, identical either way — so the mouth still moves. |
+| **2.9.4** | **Nobody is called "You", and the seat's two gestures reach a phone** — onboarding minted a nameless, account-less person on every pass and seated them, so live rooms filled with people called "You" drawing ON AIR for nobody. One rule now guards both doors that make a person, and a startup repair unseats the ones already there. The double tap and long press work on iOS, the gear is back as their visible twin, and VERIFIED moved off the AI seat onto the person it is a claim about. |
+| **2.9.3** | **The room opens in audio, and the mark stops drawing twice** — every chat starts in voices and photographs and the seat's two glyphs are the chooser again. The seats are four across in two rows, filled from the top left, and the composer is no longer clipped beneath them on a phone. The AI mark drawn over each portrait now lands on the one burned into it: the seats pack from the top, so a face starts at the same height on every seat, and the offsets were measured off the live page in both layouts at both widths, and the two road glyphs sit clear of the profession under the name, with VERIFIED back on your own circle rather than adrift under it. Each badge sizes to its own text so the word cannot fall out of it on a font this machine cannot render, and every seat in a row keeps room for two lines of profession so the glyphs sit on one line. |
+| **2.9.2** | **The button that would not stay pressed** — the video road could not be chosen at all. `req` serialises the body it is given, and three callers handed it one already serialised, so the wire carried the JSON of a string and the server answered 422 every time. All three were the video road, so the feature was unreachable however it was configured — and the screen hid it, setting the road optimistically and putting it back when the write failed. Found by driving the screen and watching the network, guarded so it cannot return. The road's panel now opens where it was pressed; the room gives its empty bands back to the seats on a phone; and the photograph behind the VERIFIED badge is a plain photograph again. |
+| **2.9.1** | **The camera gets an adapter, and the company is a choice** — video was selected and nothing rendered, whatever was picked. The service picker had no handler at all: it drew every provider, lit the deployment's, and dropped each click. Beneath that, `QRME_FILM_URL` had nothing to point at — `filming.py` speaks one submit-and-poll shape no vendor speaks, and the translator it named in its own docstring was never built. `docker/film` is it, the third sidecar beside the ears and the forge. Pika and Moonvalley join the shelf, Veo becomes the house pick, and a profile now stores the company it renders on. On a phone the seats moved above the figure and came down in size, the figure's frame stopped spilling its controls out of a box that hid its own overflow, and the expand button came out from behind the pencil. |
+| **2.9.0** | **The room holds the second key** — a profile's owner says what it can ever do; the room says what it may do here, for the people here, and nothing opens unless both are turned. The record card became that window: every synthetic seat listed with an Add friend button and a bar reading skills *n* of 180, connections *n* of 103; pressing a name drops one open at a time over all nine providers, all 103 connectors and each connector's own skills. A row its owner has not connected is shown and cannot be ticked — the room's key does not conjure the owner's. The AI and VERIFIED marks left the pixels and became labels on the sphere, because every face here is drawn as a circle and a mark in a square's corner is what a circle crops; the cost, a portrait fetched directly no longer carrying its disclosure, is written down rather than left to be found. |
+| **2.8.0** | Nine faculties on one page, in this product's own words — Channel 3, Channel 2, the voiceprint, the avatar, self-steering — each beside its live state, the permission it rests on, and the screen that withdraws it. The talk rail's four buttons open a whole window again: the panel was capped at 60vh of a sideways handheld because its override sat between two copies of the rule it was overriding. Seven more dead declarations were found by the guard written for that one. |
+| **2.7.1** | The minimized light is a circle again — a tap-target minimum was beating its declared height and drawing an ellipse. The screenshot harness builds the console before it photographs one, and can run at all: it had been raising NameError on every invocation since the reload round, so this gallery is the first shot since. |
+| **2.7.0** | A body is a surface, and moving one is refused with its reasons: `body` joins the hands' surfaces so the refusal has somewhere to live, watching through a robot is allowed, and acting on one names all four bounds a screen never needed — where the body may be, a ceiling on force and speed, a stop within reach of the person beside it, and a landing reported by a sensor rather than by the thing asked to move. The whole trio returns to one version number |
+| **2.6.0** | The hands get a motor — a small program on the person's own machine performs what the stack decides and permits, holding no authority, no daemon and no credential on disk, with a dry run as the default and a corner of the screen as the stop; the ledger learns whether a move actually landed, because permitting one and performing it are different facts from different ends; and the owner token stops being printed into a command line that the eyes were about to photograph |
+| **2.5.0** | The photograph is what speaks — the forge measures a picture instead of rebuilding it, and the console lays that mesh flat over the photo so the only thing that ever moves is a mouth; the 3-D head's mislabelled texture and blown-out lighting fixed, and the head itself moved behind a fold that says it is a mask |
+| **2.4.0** | The hands — a profile can work a screen under a grant that names its apps, its moves, its minutes and its steps, given by menu or by word; it will not type a password, cannot widen itself from anything written on a screen, and says out loud that no iPhone can be driven. Plus the Wall crash that blanked the whole console, and the capture harness that had photographed the same screen thirty-nine times |
+| **2.3.1** | The head the forge builds is actually drawn — `Avatar3D` shipped catalogued but mounted by nothing, and now stands on the avatar stage and in a room seat with its jaw moving to the voice; the avatar market becomes a tile picker; and a guard fails the suite for any component nothing imports |
+| **2.3.0** | **The forge** — a photograph becomes a 3-D face on the deployment's own hardware (MediaPipe sidecar, ARKit-named blendshapes, no vendor and no monthly bill) and the head's mouth moves with the voice the room already plays; the sit-out button lets a person's seat step out of the rotation's waiting; Ready Player Me struck from the shelf after its January shutdown; aimed turns survive a mid-paragraph marker and a mistyped name; the room's ear re-opens when it falls quiet |
+| **2.2.0** | **The timeline gets hands** — Raise's three time controls: every Album entry on a day of the life's own calendar; visits that rewind the voice read-only to a lived day; branches that copy the record into a second life raised differently (the original never overwritten); fast-forward days lived from the record alone with saved questions waiting — plus the avatar screen made a true takeover with its red close, and the word “avatar” under the seat pair's second circle |
+| **2.1.0** | **Raise — grow your own** — the fourth profile kind: a raised character started from a temperament seed and a chosen life stage, taught word by word, its stage doors earned through milestones and its whole life kept in an append-only Album; four preset doors that are only switch bundles, a mortality switch that says its warning every time, and the law that a childhood is family forever |
+| **2.0.1** | **The platform grows its own eyes, and the room becomes a society** — shared pictures and screenshots read, videos heard and their frames described, watch parties actually watchable, screens shown to rooms and the agent one frame at a time; rooms take aimed turns by seat rotation, invited profiles jump in on their own, summon each other by relevance and collaborate on tasks, with a ten-turn governor steered by words instead of the retired toggle; the service worker evicts its own ghosts |
+| **2.0.0** | **The avatar takes the screen, and every headset has a road in** — a second ring beside every portrait opens the full-screen wardrobe (prompt bar, chips, physique & gender) over the one painting door; guests may restyle a profile until its owner flips the new `guest_styling` switch; the avatar deck opens on the deployment's default faces with one-tap claiming and a pull door for the provider's catalog; the Rooms screen's XR shelf covers Steam, Meta, Apple, PICO, HTC and Android XR with honest browser roads |
+| **1.9.0** | **The room hears an iPhone, and every name says one thing** — Safari's second refusal mask forks to the recorded ear so an iPhone room stops sitting deaf, the voice queue wears a watchdog, the hear-loop primes to the present, seats show a visible ⚙️ beside the double-tap, a background-only seat stops painting its circle, and the dock mints owner tokens for every held profile; the wire-collision ledger closes its whole twenty-one-row backlog across the backend and all four clients, two floors join the live-measured registry, and the front page leads with the three postures |
 | **1.8.9** | **One face ledger, three roads in** — the avatar registry: the deployment's shelf and your own with named faces, a fuller import market, painted-from-words at the profile's own age, the AI mark burned at mint, takedowns as data operations; the room strip slims, the invite shows its waiting seat, and the panels dock fits every phone |
 | **1.8.8** | **The estate answers for itself** — profiles turn all their dials on request, with nine new ones and the guidance teaching every modification by its ends; the four panels gained their exits (tap outside, a red close); the paperclip is the phone's own chooser with the carried-things card behind its own door; the room walks with you on the person-walking button, every seat in its own voice through the room's echo door; the people in your phone reach all three native shells; and the README shows the screens you'll meet |
 | **1.8.7** | **The room grows hands, eyes and a memory — and the circle is only yours** — a link pasted into a room is fetched once and read to every seat; a room profile hands documents over as real files (and as multi-page PDFs when asked, from a built-in writer proven by the estate's own reader), with a stuttered fence filing the furthest draft; your own profile remembers you in a room — briefcase and recalled moments walk in when the room's one human is the other half of the pair, and a second human keeps all pair memory out; "See all" opens Your circle, friends only in the descriptive card style, while Discover's card of somebody already added says Friends; the 👤+ panel reaches the Windows handheld, your own profile seats on the press, rooms open with a live green mic, the lend button says which way it points, the loudness rail sleeps until touched, and shares take several files with a named reading in progress |
@@ -739,6 +974,15 @@ curl -s -X PUT localhost:8000/profiles/$PROFILE/relationships/$INTERACTOR \
 curl -s localhost:8000/profiles/$PROFILE/chat -H 'content-type: application/json' \
   -d '{"interactor_id": "'$INTERACTOR'", "message": "Tell me about your garden!"}'
 ```
+
+## Made by
+
+Founded, owned and directed by **David Bianchi**
+([davidsbianchi1984](https://github.com/davidsbianchi1984)) — the product
+vision, the field reports quoted throughout this codebase, and the tandem
+design that ties QRME to
+[JIM-mini](https://github.com/davidsbianchi1984/jim-mini) and
+[PDI](https://github.com/davidsbianchi1984/pdi) under one version number.
 
 ## License
 

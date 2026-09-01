@@ -234,10 +234,10 @@ function ObjectPane() {
             setBusy(false);
           }}>{L("pub.timeline.go")}</button>
         </div>
-        {timeline && (timeline.events.length === 0
+        {timeline && (timeline.timeline_events.length === 0
           ? <p className="muted small">{L("pub.timeline.empty")}</p>
           : <ul className="refs">
-              {timeline.events.map((e) => (
+              {timeline.timeline_events.map((e) => (
                 <li key={e.id}>
                   <strong>{L(`pub.event.${e.event}`)}</strong>{" · "}
                   {L(`pub.actor.${e.actor}`)}{" · "}{e.at}

@@ -377,6 +377,6 @@ def test_a_public_party_rides_the_feed_beside_rooms_and_desks(client):
     client.post(f"/watch-parties/{party['id']}/listing",
                 headers=auth_header(me))
     page = feed.stream()
-    kinds = [i["kind"] for i in page["items"]]
+    kinds = [i["kind"] for i in page["cards"]]
     assert "party" in kinds
     assert page["counts"]["party"] == 1

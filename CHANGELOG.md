@@ -6,6 +6,1278 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.6] - 2026-09-01
+
+### Added
+
+- **AR and VR are things you can do with a seat, in the column that
+  already says so.** They lived behind a "Step in" button under the
+  seats — a second grammar for the act every other format performs with
+  one press on the seat itself. The button is gone; two more roads
+  joined the avatar and the film beside each face, straight up and down
+  in the lane the tile already reserves, and nothing else moved: the
+  glyphs themselves got smaller, because four at the old size need more
+  column than the tile has. AR and VR are letters in a ring rather than
+  pictures — a standing figure IS the avatar and a movie camera IS the
+  film, but nothing pictures "this room, over the room you are standing
+  in" without being a riddle. The letters read from the language table
+  like every other label, so a French seat says RA and RV, matching the
+  road's own tooltip.
+
+  The stage now follows the viewer's own chosen format — the same
+  per-person, browser-only choice the other roads set, never sent to the
+  server — rather than the room's kind. Any room can be stepped into;
+  stepping out is the same act as pressing a lit road, and one way out
+  covers however you came in.
+
+### Fixed
+
+- **The gear goes back off the seat.** Put back one release ago for a
+  real reason — the double tap and long press were both dead on iOS and
+  it was the only remaining door to the camera, the background and the
+  mask — and reported this round as "a settings button showing up on my
+  photo". The reason is spent: both gestures were fixed and are driven
+  by a touch pointer in the tests. A third door earns a place on
+  somebody's face only while the first two are shut.
+
+- **The stage was being flattened by the card's own rules.** Two
+  different things wear the class `room-stage`: the flat participant
+  card, and the immersive stage — a fixed overlay covering the screen.
+  Three card rules were written against the bare class and caught both:
+  `position: relative` beat the stage's `fixed`, so it laid out as a
+  402×170 strip inside the screen with the room showing through it;
+  the composer rule pinned the stage's strip to the top of the screen,
+  across the transcript; and the room's own ✕ stood at a higher
+  z-index than the stage, so the button for leaving the ROOM drew on
+  top of the button for leaving the STAGE. All three now name the card,
+  the stage's strip is pinned above its leave row, and the stage stands
+  above the room's chrome — a modal's only way out is its own.
+
+## [2.9.5] - 2026-09-01
+
+### Added
+
+- **An FBX export becomes a face here, instead of in Blender.** The
+  avatar shelf's first row — the only one that hands over a model rather
+  than a picture — used to end in an instruction: *"an FBX export needs
+  converting to .glb first (Blender: File → Import → FBX, then File →
+  Export → glTF 2.0, leaving Shape Keys checked so the mouth
+  survives)"*. Every word of it was true, and it was still a shelf row
+  with a manual taped to it. Worse, an FBX could not be uploaded at all
+  even by somebody willing: `media.save` proves a format from its bytes,
+  an FBX matches nothing it knows, and the answer was "unrecognized
+  file".
+
+  The forge grew a `/convert` door and carries Blender to do it — the
+  same tool the instructions named, so the automatic path cannot produce
+  a different face from the documented one. Measured against `assimp`,
+  a tenth the size: round-tripping a real MetaPerson avatar, assimp
+  returned 111 of 114 morph targets — the three missing from
+  `AvatarHead` and `AvatarTeethLower`, the two meshes that move when a
+  face speaks — and none of their names, because its glTF writer emits
+  no `extras.targetNames`. The console drives the mouth by name, so that
+  is a face nothing can speak through.
+
+  Verified against a real MetaPerson export and the provider's own `.glb`
+  of the same avatar: 8 meshes, 114 morph targets, 114 of them named, 82
+  nodes, one skin — identical, from the bare `.fbx` and from the zip
+  alike.
+
+  Both shapes are taken, because both are real: a bare `.fbx` for
+  somebody with their own pipeline, and the `.zip` as it downloads, which
+  is what a person actually has after pressing export. The zip is opened
+  under rules an archive needs and a file does not — exactly one `.fbx`,
+  no path that escapes, no symlinks, a ceiling on the unpacked size, and
+  nothing written to disk while reading it.
+
+  The screen says what survived — "Converted — 114 mouth shapes came
+  through, so this face can speak" — rather than reporting success. A
+  conversion that dropped the visemes still returns a model that loads,
+  and the only place anybody would notice is a face that has quietly
+  stopped being able to speak.
+
+### Fixed
+
+- **The converter consults offline mode.** The forge is a container on
+  the stack's own network and the model never leaves the host — but that
+  is a property of how somebody deployed it, not of this code, and
+  `QRME_FORGE_URL` can name any host at all. Gated with `offline.allow`
+  like the face maker's own calls beside it.
+
+- **A floor that had stopped watching.** `host.egress_sites` stood at 12
+  against 25 real calls, so half the ways out of this package could have
+  vanished without a word. Raised to 20 — four-fifths of what is there,
+  which is what every floor in that register is held to.
+
+## [2.9.4] - 2026-09-01
+
+### Fixed
+
+- **Nobody is called "You" any more, and nobody sits in a room who was
+  never there.** A live room came back holding two interactors with no
+  account, no picture, and the stored name `You` — the word the surface
+  uses for the reader's own seat — each drawing a red ON AIR circle for
+  somebody who had never been in the room.
+
+  Three things were wrong. The console's onboarding called
+  `POST /interactors` with the literal `display_name: "You"`; it called
+  it on every pass with no account to be idempotent on, so each visit
+  minted another person and seated them; and nothing on the way in
+  refused the word. `accounts.interactor_for` is careful about exactly
+  this and says so in its docstring — this simply was not that door.
+
+  Onboarding reuses the person the session already has, which sign-in
+  provides, so for anybody signed in nothing is minted at all. One rule,
+  `accounts.a_person_name`, now guards both write doors: a pronoun in any
+  of the ten shipped languages, or an empty name, stores as `Someone`.
+  Names that merely begin with a pronoun — Yousef, Tuomas, Duncan — are
+  untouched. The route returns the name it stored rather than the one it
+  was handed, so a caller can tell when the two differ.
+
+  A startup repair takes the ones already seated out of their rooms, and
+  the camera state with them. Deliberately narrow, because these rows
+  look like people: no account, *and* that pronoun for a name, *and*
+  never spoke, *and* never put a face up. Anybody who said a word stays
+  where they are. It unseats rather than deletes.
+
+- **The double tap and the long press reach the seat on a phone.** Both
+  gestures the seat is documented to have were dead on iOS: `dblclick`
+  is a mouse event and Safari spends the double tap on zoom, while a
+  long press on a picture raises the copy-and-save callout, which
+  cancels the pointer stream before the 550ms hold fires. The double tap
+  is counted off the pointer stream now, `touch-action` and the callout
+  rules stop the browser taking the press, and a browser that *does*
+  synthesise `dblclick` no longer counts the same gesture twice — that
+  bug turned the panel on and straight back off, which reads exactly
+  like a dead gesture.
+
+- **The gear is back on your own seat.** It is the visible twin of those
+  two gestures, written for the case where a gesture does not arrive,
+  and a later sweep set it to `display: none` on the reasoning that the
+  room's bottom strip carries what the tile gave up. The strip carries
+  the camera and the microphone; it does not carry the background, the
+  mask, or taking either down. With the gestures gone on iOS and the
+  gear hidden, there was no way to reach them from a phone at all.
+
+- **VERIFIED belongs to the person, not the rendering.** A synthetic
+  seat was marked from the profile's own verification record without
+  asking what the seat was drawing — and in a room a profile seat draws
+  its AI portrait, so one circle carried both the sparkle saying *this is
+  a rendering* and the gold plate saying *this likeness is checked*.
+  Meanwhile the human seat beside it went bare, because it was marked
+  only from a picture put up through the room and a person who sets their
+  face on the Identity screen has no such row.
+
+  The mark follows the face the seat is actually drawing, resolved in the
+  order the seat resolves it, and a profile seat never carries it. The
+  record is not deleted and the profile page still shows it; it is simply
+  not a claim that seat can make.
+
+### Added
+
+- Guards for each: that no room seat is laid out from its middle, that
+  `--face-top` stays on the seat it measures, that no pronoun in any
+  shipped language becomes a name, and that the repair leaves anybody who
+  ever spoke exactly where they are.
+
+## [2.9.3] - 2026-08-31
+
+### Fixed
+
+- **Every room opens in audio.** The format was restored from
+  `localStorage`, so somebody who once looked at an avatar opened every
+  room afterwards in avatar, for good and with no memory of having
+  chosen it — "all the chats should start out in audio mode. Users can
+  choose which one they want for avatar or video." The seat's two glyphs
+  are the chooser; a room that has already chosen makes them decoration.
+
+- **The two glyphs are back on the seats.** A rule hid them on the
+  reasoning that the rail only exists once a format has been chosen.
+  That stopped being true when the room started opening in audio, and
+  with them hidden there was no way into avatar or video at all.
+
+- **The seats are four across, two rows, filled from the top left.**
+  Eight is the cap `join_room` enforces, so four by two is the room, and
+  nobody has to scroll to see who is in it. *Add someone* keeps the last
+  place in line and is pushed along as people arrive.
+
+- **The composer is no longer clipped at the bottom of the room.** The
+  seats were holding a 280px floor whether or not the room was that
+  tall, so on a phone the type bar and send button sat below the card's
+  edge. The seats yield; the composer does not.
+
+- **Your own seat is a seat in the rail.** Full-bleed was designed for a
+  tile four times as wide; at four across it drew a square photograph
+  jammed into a corner with the name lying over it. In the rail it is
+  one circle with the name under it, like every other seat. The
+  full-bleed treatment stays where it was written for.
+
+- **The AI mark stops drawing twice.** Every starter portrait carries
+  the mark burned into its own pixels, and the console draws it again on
+  the outermost layer so that the circle a face sits in cannot slice a
+  disclosure in half. That reads as one mark only if the drawn one lands
+  on the burned one — and it did not, in any of the four layouts.
+
+  The drawn mark is placed a fixed distance down the tile. That is only
+  one distance if every seat's face starts at the same height, and the
+  seats were centring their contents inside boxes a grid had stretched
+  to the tallest in the row: a seat whose field wrapped to two lines had
+  its face ride up. Measured on a phone, four seats in one room, faces
+  at 9px and at 16.1px against a mark drawn at one offset.
+
+  The seats pack from the top, so a face begins at the tile's own
+  padding on every seat, in every row, lit or not. The three offsets
+  were then read off the live page rather than reasoned about, in both
+  layouts at both widths. The mark now lands at .5625 / .0350 of the
+  face against a burn at .5625 / .0352 — under a fifth of a pixel, at
+  56px, 104px and 120px alike.
+
+- **The two glyphs sit clear of the profession under the name.** The
+  row of roads used to be an absolutely positioned lane pinned to the
+  tile's middle, centred the usual way with `translateY(-50%)`. Bringing
+  it into the flow took the `position` and the `top` and left the
+  transform behind, so the browser laid the row out cleanly under the
+  field and then painted it thirteen pixels higher — measured, laid out
+  at 115px down the tile and drawn at 102. On a seat whose field is one
+  short word, "You", the lit glyph landed on the word. The field also
+  moves up under the name it belongs to, rather than floating evenly
+  between the name and the glyphs.
+
+- **VERIFIED is back on your own circle.** A picture you put up used to
+  draw full-bleed, edge to edge, the way the live camera does — so the
+  marks, which are fractions of the sphere a face sits in, had no sphere
+  to be fractions of and were sent to the tile's corner instead. Both
+  layouts draw that picture as a circle now, the same one every portrait
+  beside it gets, so the corner treatment was the only thing still
+  moving the gold plate off it: measured at 1.46 of the face's height
+  down the tile, below the name and below the glyphs. The seat falls
+  through to the geometry every other seat uses, and the plate lands at
+  .2969 / .8143 of the circle against a burn at .2969 / .8145.
+
+- **The word fits its badge, on fonts this machine cannot render.** The
+  plates were pinned to exactly the burn's width, which fits the burning
+  tool's font and not the reader's: measured here the gold plate has
+  37.4px of box for 30.5px of text, comfortably centred, and on an
+  iPhone the same string set in SF is wider and fell out of both rounded
+  ends. The measurement is a floor now — `min-width` and `min-height` —
+  and the badge takes whatever its own text needs on top of it, so it
+  can only ever be bigger than the burn it covers. Proved by widening
+  the run 30%: the plate grows 37.4 → 49.1px and nothing spills.
+
+- **Every seat in a row puts its glyphs on the same line.** "Mental
+  health" wraps and "Technology" does not, so the two roads sat at
+  different heights across one row. The field keeps room for two lines
+  either way, so a longer field pushes nothing and the row reads as one
+  row.
+
+### Added
+
+- A guard that refuses any rule laying the room's seats out from their
+  middle, and one that keeps `--face-top` declared on the seat it
+  measures. The offsets themselves are still measured, not asserted;
+  this pins the property that makes one measurement good for every seat.
+
+## [2.9.2] - 2026-08-31
+
+### Fixed
+
+- **The video road could not be chosen at all.** Pressing *Video
+  generation* on the Identity screen lit the button, showed the options
+  for an instant, and snapped back to *Profile photo*. Reported three
+  times — "it comes in and out too quick and goes away", "shows up for a
+  split second... goes right back to avatars" — and chased twice as a
+  layout fault, which it was not.
+
+  `req` in `app/src/api.ts` serialises the body it is given. Three
+  callers handed it a body they had already serialised, so what went on
+  the wire was the JSON *of a string*; FastAPI parsed it to a `str`,
+  found no fields, and answered 422 every time:
+
+      {"detail":[{"type":"model_attributes_type","loc":["body"],
+        "msg":"Input should be a valid dictionary or object..."}]}
+
+  All three were the video road — setting the road, amending the scene
+  direction, and starting a render — so the whole feature was
+  unreachable from the console however it was configured. The screen hid
+  it well: `chooseRoad` sets the road optimistically, the POST fails, and
+  the catch re-reads the server and puts the road back. What a person
+  sees is a button that will not stay pressed.
+
+  Found by driving the screen and watching the network rather than by
+  reading it; the call sites look entirely ordinary. A guard now refuses
+  any `req` caller that stringifies its own body, and pins the rule it
+  depends on — that `req` still stringifies — so the premise cannot
+  quietly invert.
+
+- **The road's panel opens where it was pressed.** The two panels share
+  one drawer with its own ground and a notch pointing back at the button
+  row, and choosing a road scrolls it into view. The markup order was
+  never wrong; the panel simply opened below the fold, which is the other
+  half of why it read as vanishing.
+
+- **The room stops holding empty bands on a phone.** Measured in the
+  live page: the card is a fixed 860px flex column and the seats were
+  getting 194 of it — a row and a half of faces. The transcript reserve
+  came down from five rows to three (it is fixed on purpose, so the
+  buttons below it do not travel as the conversation grows — an earlier
+  field report), the frame from 263 to 200, the strip from 52 to 32, and
+  a 62px reservation for a chat strip that no longer hovers was released.
+  The seats take the slack: 336px, two full rows with the third in
+  sight, so two people and the ＋ are visible without scrolling.
+
+  `aspect-ratio: 4/3` was setting the frame's height rather than
+  `min-height`, so the first cap sailed under a `32vh` limit without ever
+  biting.
+
+- **The verified photograph is a photograph.** `photos/` is the file
+  behind the VERIFIED badge, and it carried a burned-in gold plate that
+  doubled with the one every surface now draws. Every version in this
+  repository's history was checked and all of them were marked, so the
+  file had to be replaced rather than recovered. The new one is plain —
+  no burn, no filter, no synthetic backdrop, no burned-in text.
+
+- **The ears refuse in a person's words.** "This deployment has no
+  transcription service... set QRME_EARS_URL", shown in red beside a room
+  where the voices were playing, read as the whole audio path failing.
+  Dictation and playback are separate doors and only one was shut, so the
+  body says that now and the variable moved to an `X-QRME-Fix` header,
+  where an operator fact belongs.
+
+### Added
+
+- **A starter stops wearing a face this deployment minted.** `_backfill`
+  fills a face that is missing and cannot reach one nobody chose.
+  `_restore_face` acts only on evidence — a registry row with no owner
+  account and a source of `seeded` or `prompted` — and runs at startup
+  rather than behind the seed button. A path-based heuristic was tried
+  and removed: an existing guard broke on it, correctly, because reading
+  a path and inferring intent is a guess, and this is the one place where
+  a wrong guess destroys somebody's picture.
+
+## [2.9.1] - 2026-08-31
+
+### Added
+
+- **The video road has an adapter, and the company is a choice.** Video
+  was selected on a profile and nothing rendered, whatever service was
+  picked. Two faults, one on top of the other.
+
+  The picker on the Identity screen had no handler — `onPick={() =>
+  undefined}`. It drew all the providers, lit whichever one the
+  deployment's environment named, and dropped every click, so choosing
+  Seedance and choosing nothing were the same act. There was no
+  per-profile provider anywhere either: `filming.render` read the
+  environment variable in five separate places, so a choice could not
+  have been honoured even if one had been stored. `presence_road` now
+  carries a `provider` column, nullable because NULL is a real answer
+  meaning "whatever the deployment named" — which is what every row
+  written before today means. Sending the road alone leaves the company
+  alone; `"none"` hands the choice back.
+
+  Underneath that, `QRME_FILM_URL` had nothing on the box to point at.
+  `filming.py` speaks one submit-and-poll shape and said from the day it
+  was written that it is "one adapter away from any vendor whose own API
+  differs" — and the adapter was never built. `docker/film` is it, the
+  third sidecar on the same pattern as the ears and the forge: one
+  translator with one job, so the product's image stays lean and a
+  vendor swap is one container rather than a change through the
+  codebase. The credential lives on the adapter; the product holds the
+  address of a door, never a video house's key.
+
+- **Five more houses on the shelf, and a house pick.** Pika and
+  Moonvalley join Veo, Runway and Luma — Marey is trained only on
+  licensed footage, which is the one thing here a rights-holder cannot
+  object to — alongside Seedance, Happy Horse, Kling and LTX.
+
+  Veo is the default. Strongest on a plain text prompt, generates its
+  own audio rather than leaving a silent clip, and Google will still be
+  answering that endpoint next year, which is not a small thing on a
+  shelf that has already lost Sora and Ready Player Me inside fifteen
+  months. An operator naming another in `QRME_FILM_PROVIDER` gets it; an
+  owner picking on their own screen beats them both.
+
+  `provider()` used to answer `none` when unset, which made "nobody
+  chose a model" indistinguishable from "this deployment renders no
+  video" — so one wrong letter in a deploy script silently ended video
+  for a whole box. It falls back to the house pick now and the typo
+  stays visible rather than taking the road down.
+
+  Nano Banana is recorded in `NOT_OFFERED` beside Sora, with the reason:
+  it is Google's image model and there is no video in it. It gets asked
+  for by name often enough to be worth writing down.
+
+### Fixed
+
+- **The room's frames stopped overflowing on a phone.** The box reading
+  "This turn, as a figure" showed only half of itself and its expandable
+  button could not be reached. Measured rather than eyeballed: the card
+  is a fixed 860px flex column that *hides* its overflow, and the seats
+  rail took `flex: 1 1 auto` and ate 502 of it, so the bottom of the
+  frame — the framing chips and the lower half of the control rail —
+  fell outside a box with nowhere to scroll. The rail takes a bounded
+  share and scrolls inside itself, the frame takes its own height and is
+  never shrunk, and the card scrolls if the two still do not fit.
+
+- **The expand button came out from behind the pencil.** Both were
+  pinned to the same right edge — `.stage-grow` at `top: 8px`, and a
+  rail anchored to the bottom of that edge which grew upward into it as
+  buttons were added. Not a stacking order to argue with; two things
+  given one address. A ceiling at 44px, so the rail cannot reach it.
+
+- **Who is in the room goes above what one of them is doing.** The frame
+  carried `order: -1`, which put it over the seats. The seats are
+  ordered forward instead, the room's bar stays ahead of both, and the
+  seat boxes come down from 172px to 128 with the face at 84 — "these
+  look way too big of the user frames."
+
+- **The two marks are computed from one number.** The AI and VERIFIED
+  geometry was typed out three times — for the 120px face, the 104px
+  phone face, the 72px rail — while the face's own size lived in a
+  different rule, and they had already drifted: the rail set a 112px
+  face against marks still solving for 104. The tile declares `--face`
+  and where its corner sits; the marks are the measured fractions of it,
+  and every replaced value reproduces exactly.
+
+  Measured against each face's own box afterwards, the AI plate came
+  back three pixels left of the burn on all four seats — the rail's
+  offset had been derived from a padding that changed. Corrected from
+  the live boxes.
+
+  A seat showing a photograph full-bleed has no circle for those
+  fractions to mean anything against, and the gold plate was solving a
+  circle's geometry on a rectangle and landing at .98 of the way across,
+  under the name. It gets its own corner. This does not cover the mark
+  burned into that file and cannot: the burn sits at a fixed fraction of
+  a square image, `object-fit: cover` crops it by an amount only the
+  browser knows, and CSS cannot be told where the crop left it. Both
+  marks are visible on that one tile until there are unburned masters.
+
+- **Joining a standing room raised instead of answering.**
+  `_verified(kind, ref_id, room_id)` was called in the join branch of
+  `open_standing_room`, where `room_id` is not bound until the
+  open-fresh branch below it — a `NameError` on the path that endpoint
+  takes most.
+
+## [2.9.0] - 2026-08-31
+
+### Added
+
+- **The room holds the second key.** A profile's owner decides what that
+  profile can ever do — which apps it is connected to, which hands it has
+  been granted. That was the only key this product had, and it is not
+  enough, because a profile in a room is very often somebody else's: a
+  starter outsourced from the account that made it, or a specialist
+  invited in by a person who does not own it. The owner's grant says
+  *this profile may drive a browser*. It does not say *for you, now, in
+  here*.
+
+  So the room holds a second key, and nothing opens unless both are
+  turned. Either can be withdrawn alone, and a reach reads both sides
+  every time rather than trusting a decision made earlier — so a person
+  in a room can narrow what somebody else's profile does in front of
+  them, and can never widen what it is able to do at all.
+
+  The window sits under the room and is reached by scrolling. Every
+  synthetic seat is listed before anything is opened — two rows if there
+  are two, eight if there are eight — each with an **Add friend** button,
+  because somebody may bring in a profile you have never spoken with, and
+  adding them is what you do before delegating anything to them. The bar
+  beside each name says what is on in the words for it: skills *n* of
+  180, connections *n* of 103, eyes and hands *n* of however many its
+  owner granted. Pressing a name drops the tab open, one at a time.
+
+  The whole catalog is listed under every seat, not only what a profile
+  holds. "What could this synthetic person reach" and "what has its owner
+  actually wired up" are different questions, and the dark rows are what
+  make the lit ones mean something. A row its owner has not connected
+  says so and cannot be ticked: the room's key does not conjure the
+  owner's, and allowing an app nobody has connected would be a permission
+  for something that cannot happen.
+
+  Absent means no. A box nobody ticked is a row that does not exist, so a
+  newly connected app arrives switched off, and a connection remade after
+  being revoked does not inherit the old yes — the tick is keyed on the
+  connector's id rather than its name. Every row records who turned it,
+  because "who let it do that" has to have a name in it.
+
+      asked     a window of all the synthetic profiles in the chat, their
+                connections and skills, with boxes to tick and allow
+      mattered  which of the two keys that window turns
+
+
+- **Every reply becomes footage, and nobody presses play.** A profile on
+  the video road renders each approved turn as it happens. The turn starts
+  the job and moves on — a render is minutes and a reply is not — so what
+  the chat response carries is a row, and the screen polls it.
+
+  Three things make that safe to switch on. The road is stored on the
+  server, not held in a component: `auto_render` runs on a turn nobody is
+  looking at a screen for, and a choice living in the picker is a choice
+  `/profiles/{id}/chat` cannot see. A daily ceiling in seconds sits above
+  the picker rather than on a settings page found afterwards, and it
+  counts renders already started, so two quick replies cannot both slip
+  under a limit neither had spent. And a reply past the ceiling arrives as
+  text saying so — an owner who set a limit and then stopped seeing video
+  is owed the reason, because "you reached the limit you set" is a
+  different sentence from "it broke".
+
+  A failed render never fails the turn. The reply already happened and the
+  person is reading it; a video that did not get made is a smaller thing
+  than an answer that did not arrive.
+
+      asked     should this reply become footage
+      mattered  can it, today, without spending what nobody agreed to
+
+- **A render outlives the page that started it.** `GET /video/latest/{id}`
+  is what a conversation asks on opening. The bubble tells somebody the
+  render "keeps going without this page open, and appears here when you
+  come back" — and coming back only worked if something asked. Nothing
+  did: the scene arrived on the chat response and lived in component
+  state, so closing the tab lost a job that carried on being paid for.
+
+- **Offline mode reached starting a render and not polling one.** The gate
+  sat in `filming.render`, one level above the socket, so an offline host
+  refused to *begin* a video and would happily go on asking the service
+  whether one had finished. A poll carries a job id rather than somebody's
+  words, but it still opens a connection to a machine that is by
+  definition not this one, and "nothing leaves the host" has to be true of
+  every way out or it is not a property of the code. The check moved into
+  `_ask`, which is the only way out of that module.
+
+      asked     does the render consult offline mode
+      mattered  does everything that reaches the service consult it
+
+- **Five refusals were passing on `str(exc)`.** `str()` on a `Templated`
+  returns a plain `str`, so a refusal built from a template arrived at the
+  handler having forgotten how it was built — English, silently, and
+  indistinguishable from a sentence nobody has translated. All five now
+  use `i18n.raised`.
+
+- **Screen 209, and it is a photograph.** `SceneFilm` draws four states
+  and three of them have no video in them — being rendered, the ceiling
+  reached, and a render that failed. Those are the ones worth showing, and
+  the one in the gallery is the state a person on this road meets most.
+  The harness seeds the road and the row the way the product writes them
+  and photographs the real component polling the real route; nothing is
+  drawn, only reached from a shorter distance than a person reaches it.
+
+- **Sixteen nav tabs the camera had never been pointed at.** `Signing`,
+  `Visiting`, `Permissions`, `Guest Access`, `Watermark`, `Language & Name`,
+  `More Tools`, `Plug-ins`, `Lookup`, `Robots & Devices`, `Hands`,
+  `Ad Placements`, `Plans & Billing`, `Accessibility`, `Support` and
+  `Settings` are all reachable from the nav and have been for releases.
+  None was in `tools/shoot_screens.py`'s tab list.
+
+  That is not a decision, it is an omission with a shape: the list was
+  typed once, and every tab added since went into the nav and not into it.
+  Fifteen gallery drawings were standing in for screens the console had
+  been shipping all along.
+
+      asked     can the camera reach every tab
+      mattered  is every tab on the list it reads
+
+- **The camera can photograph a card, and a page no tile opens.** Carried
+  from the sibling: a state is found by `data-screen="<number>"` on the
+  element that owns it, a page that no tab opens by a recipe naming the
+  press that gets there. Six more are photographs — the provider tiles
+  (22), the avatar studio (44), what went wrong (150), the rail beside the
+  face (198), and the two front doors (39, 41).
+
+- **A page reached by a press, and the press named in the markup.**
+  `Passing` (173) is in the `Tab` union and not in the nav — a person
+  reaches it from a chip on Identity. That chip, and the "see all" on
+  Home that opens `Circle`, now carry `data-go` naming their destination,
+  the way the nav's tiles have always carried `data-tab`: a camera can
+  press *that* control rather than the nth child of a list that reorders.
+  173 is a photograph; 204 is not, and the reason is recorded rather than
+  guessed at — the seeded account holds no friends, so the tile carrying
+  its button does not draw.
+
+
+### Changed
+
+- **The AI and VERIFIED marks are labels now, not burned pixels.** Both
+  were painted into the images — `AI` top-right on every portrait,
+  `VERIFIED` bottom-right on the one photograph of a real person — so
+  that a hotlinked or saved file would still carry the disclosure. Every
+  surface here draws a face as a **circle**, and a mark in the corner of a
+  square is exactly what a circle crops: both shipped sliced through the
+  middle on every screen they appeared on. A disclosure with its second
+  half missing reads as a rendering fault, which is the opposite of what
+  a disclosure has to do.
+
+  They are drawn by the surface now, in the same two corners, with each
+  pill's centre on the circle's own radius so half of it sits on the
+  photograph and half hangs off the edge. `avatars.asset_is_marked`
+  reports `False` for the whole collection, which is the flag every
+  surface already reads to decide whether to draw its own badge. The gold
+  check comes from a fact and never from a filename: a verification
+  record with a named attestor, the same bar the burning tool refused to
+  run without.
+
+  **What this costs, stated rather than left to be discovered:** a
+  portrait fetched straight from `/portraits/{handle}.webp` no longer
+  carries the disclosure in its bytes. That is the gap the burn existed
+  to close, and it is open again by decision. `docs/media-provenance.md`
+  carries the rule and the cost; the checksum manifest stays, so a
+  shipped face still cannot be swapped for a different one quietly.
+
+  `tools/unmark_faces.py` lifted the marks off, reproducing each marking
+  tool's exact geometry as a mask rather than guessing at it. Two faults
+  in that were caught by looking at the result, not at the code: a
+  straight inpaint spread colour inward from the boundary and left a
+  legible smeared rectangle in the hair of everyone whose hair reached
+  the corner, and the VERIFIED plate is wide enough to overlap its own
+  reflection, which painted "VERI" back into itself reversed.
+
+- **The seats are a table again, divided rather than welded.** They had
+  been pushed onto a shared hairline with no gap — "maybe not share a
+  wall, it looks too sharp; divider is best" — so a small gap and a real
+  corner came back on every box, and the speaking seat now rings its
+  portrait in green as well as its frame. The lit seat changes the colour
+  of its border and never its width, so nothing on the row moves when
+  somebody starts speaking.
+
+- **One face size, by every road it arrives by.** A profile seat draws
+  its portrait inside a button and was caught by a 112px rule; a person's
+  own photo is a direct child of the tile and was caught by a 96px one.
+  Sixteen pixels apart on two boxes side by side, which is why the
+  owner's own face was the smallest one in the room. The two glyphs also
+  came in off the right wall and are placed from the centre now, so the
+  face and the two roads are one block at any column width.
+
+- **The record card is back below the room**, reached by scrolling, with
+  a scrollbar that is actually laid out. Measured twice rather than
+  guessed: `clientWidth` equal to `offsetWidth` is the element saying in
+  numbers that no bar exists, and `scrollbar-gutter` is what reserves the
+  lane when the browser draws overlay scrollbars.
+
+
+### Fixed
+
+- **The green watch light and the helper button were never on a layer.**
+  `.help-fab` declares `position: fixed` and no `z-index` at all, so every
+  card with a layer of its own painted over it — the "?" arrived cut in
+  half by the record card underneath. The watch light had `z-index: 40`,
+  above the page and below the card. Both go above everything now. The
+  side dock stands down inside a room for the same reason: it was pinned
+  behind the room card's edge, showing about fifty pixels of every label.
+
+
+- **The Home screen's tiles drew 41px past the right edge of a phone.**
+  `.tiles` was `repeat(4, 1fr)`, and `1fr` is `minmax(auto, 1fr)`: the
+  `auto` floor is the track's own content, so a track never shrinks below
+  the widest thing in it and four of them plus the gaps came to more than
+  a 430px screen. The same defect that drew the sibling's sign-in card
+  wider than the phone it was on, found the same way — by measuring what
+  was painted rather than reading what was declared.
+
+  `minmax(0, 1fr)` lets the columns share the width, and below 560px there
+  are two of them: four numbers across a phone is four too many.
+
+- **The right-edge check stopped crying wolf.** It reported 114 rows a run
+  — two per capture — and both were designs that park themselves off-edge
+  on purpose: the loudness rail tucks into the edge asleep and slides back
+  on hover, and the agent rail is a swipeable strip of starters. A check
+  with a false positive per capture is a check nobody reads, so both are
+  exempt by name with the reason written beside them. The remaining ten
+  rows were the tiles, and after the fix there are none.
+
+
+## [2.8.0] - 2026-08-30
+
+### Fixed
+
+- **All four rail buttons opened half a window, and the rule meant to fix
+  that had never once run.** The field report was exact: on a handheld held
+  sideways every panel the talk rail opens came up capped at a little over
+  half the screen. Measured on the viewport from the report — 932×430 — the
+  panel drew 258px of 430, which is 60vh to the pixel.
+
+  `.talk-panel` had its `max-height: 60vh` written twice, nine hundred lines
+  apart, with the `@media (max-height: 600px)` override that sets
+  `max-height: none` sitting between them. A media query adds no
+  specificity: all three rules are `(0, 1, 0)`, so the later plain rule won
+  on source order and the short-screen override never applied.
+
+      asked     is there a rule that gives the panel the room
+      mattered  is it the rule the browser uses
+
+  The duplicate is folded into the base rule, which now sits above the media
+  block. Same viewport, after: 406px of 430 docked, 390px in the overlay.
+
+  The override also needed splitting. `max-height: none` is right for the
+  overlay's panel, which is a flex child that can be told to take the room;
+  the docked panel is `position: fixed` and centred, where `none` means "as
+  tall as the content" and runs off both ends of the screen at once. That
+  one gets the viewport as its bound.
+
+- **Seven more declarations that had never run, found by the guard written
+  for the first one.** `.waveform` on a short screen, and `.rs-strip` and
+  `.rs-round` in the room strip: the same defect, in two media blocks that
+  were each declared next to the thing they were about rather than after
+  it. Both blocks moved below the base rules they override.
+
+### Added
+
+- **`test_a_media_query_adds_no_specificity.py`, carried by all three
+  products.** This defect has now shipped four times in this estate —
+  `.help-fab` in JIM-mini, `.vault-light` in PDI, `.talk-panel` and
+  `.waveform` here — and no test said a word about any of them. Each time
+  somebody wrote the override, read it back, and had every reason to
+  believe it worked.
+
+  The check compares only *textually identical* selectors, so a hit is never
+  a specificity judgement call: identical selector text is identical
+  specificity by construction, and the loser is always losing on source
+  order alone. `.dock .thing` beating `.thing` is the cascade working and is
+  not reported — a checker that guessed at specificity across differing
+  selectors would be switched off inside a week.
+
+  Three of its four tests are about the checker rather than the sheet: one
+  proves it fails on a sample that has the defect, one proves the same
+  sample passes once reordered, and one proves a more specific later
+  selector is left alone. Two of this estate's proof tests once passed
+  vacuously, so a checker whose only evidence is a green run is not
+  evidence.
+
+### Added
+
+- **The capability register: nine faculties, on one page, each beside the
+  permission it rests on.** Every one of these already had a door —
+  `console_doorless.txt` has stood at zero for many rounds — and not one of
+  them had a place that named the set. Channel 3 lived inside Live Now,
+  Channel 2 inside a room, the look permit as a checkbox on Hands. Somebody
+  wanting to answer *what can a profile actually do* had to already know
+  where to look, which meant the only people who could answer it were the
+  people who built it.
+
+      asked     can each capability be reached
+      mattered  can the whole set be read at once
+
+  The new **Capabilities** screen (208) carries four columns for each of the
+  nine — what it is, where it stands, what it rests on, where it is
+  withdrawn — and the third is read live from the same routes the owning
+  screens read, so the register cannot drift into a brochure. Nothing on it
+  grants, opens, commands or revokes: it reads, and it routes. `README.md`
+  carries the same four columns as a table, for a reader who never opens the
+  app.
+
+  The nine are named for what they do, not for the body part they resemble.
+  *Eyes* claims a faculty, where *a live view through the holder's own
+  camera, opened by the holder, minuted, and disclosed to everybody present*
+  states a behaviour that can be checked against the code and found true or
+  false.
+
+  JIM-mini gained a register of the same shape in the same round and it is
+  deliberately not the same nine rows. This product lends a profile an ear
+  and an eye *into a place*; the sibling attaches them to a monitor on one
+  person. Copying the sibling's wording would have produced a register that
+  described the wrong product accurately.
+
+## [2.7.1] - 2026-08-30
+
+### Fixed
+
+- **The minimized light is a circle again.** It rendered 22 wide and 44
+  tall — an ellipse. It is a `<button>`, and the phone block sets
+  `button { min-height: 44px }` so every control is a real tap target;
+  `min-height` beats `height`, and the guard read the declared width and
+  height, saw 22 and 22, and passed. The button is the tap target now and
+  carries no paint; a face inside it is the circle.
+
+- **The screenshot harness runs, and builds first.** It had been raising
+  `NameError` on every invocation since the round that taught it to reload
+  before looking for a signed-in screen: the reload was carried across from
+  a sibling with the sibling's name for the console address, and this
+  product serves its console at the root. Nothing said so until somebody
+  ran it. It also required `app/dist` to be built and said so only in
+  prose, so a gallery could be re-shot to show a fix and photograph a
+  bundle from days earlier. The build is a step now, and this gallery is
+  the first shot here since the reload round.
+
+### Changed
+
+- **Every numeric floor in the suite is registered and audited.** Seven
+  rows left `unregistered_floors.txt`; three of them were decoration,
+  including one that stood at a fifth of what it measured.
+
+## [2.7.0] - 2026-08-29
+
+### Changed
+
+- **The front-page gallery is photographs of the running console**, not
+  drawings of it — shot against a real backend, a real build and a real
+  enrolment, by a harness that refuses to file a capture it cannot prove
+  it reached.
+
+### Added
+
+- **A body is a surface, and moving one is refused with its reasons.**
+  `qrme/robotics.py` has carried a catalogue of bodies for several
+  releases and none of it was ever attached to a grant, a reach, a ledger
+  or a refusal. `body` now joins the hands' surfaces — because a surface a
+  product silently does not support is indistinguishable from one it
+  forgot — and watching through one is allowed, since seeing and saying
+  what is there carries none of the risk. Acting on one is refused, and
+  the refusal names all four bounds a screen never needed: where the body
+  may be (which is not a list of app names), a ceiling on force and speed
+  (which a step budget does not give), a stop within reach of the person
+  standing next to it, and a landing reported by a sensor rather than by
+  the thing that was asked to move. A person told "not supported" learns
+  nothing; a person told what is missing can decide whether to supply it.
+
+### Changed
+
+- **The trio is back on one number.** Each product's README promises that
+  one version names one tested combination of all three, and three hands
+  rounds here alone drifted that apart — QRME at 2.6.0, JIM-mini and PDI
+  at 2.3.1. This cut takes all three to 2.7.0 rather than each to its own
+  next number, because a promise the numbers do not keep is worse than a
+  gap in the sequence.
+
+## [2.6.0] - 2026-08-29
+
+### Added
+
+- **The hands get a motor.** 2.4.0 shipped the hands with their
+  authority, their ledger and their screen, and nothing that could move
+  a cursor. The loop was written down as see → decide → act → record and
+  two of the four were missing. `hands.decide` reads one frame, asks for
+  one move, and routes that answer straight into `hands.act`, so a
+  chosen move and a permitted move cannot drift apart. `companion/hands.py`
+  is the other half and runs on the person's own machine: no daemon, no
+  autostart, no credential on disk, no local copy of the permission, and
+  a dry run as the default. The stop is the mouse — a corner of the
+  screen, deliberately a physical gesture rather than a key combination.
+- **The ledger learns whether the move landed.** `hand_actions.outcome`
+  is written where a move is *permitted*, which is the server, and the
+  server cannot see a cursor — so `done` there only ever meant chosen
+  and allowed. A dry run and a live one left identical records, and a
+  click that missed left one saying it landed. A new `hand_landings`
+  table carries what the far end reports: `landed`, `missed`, or
+  `rehearsed`. Its own table because `hand_actions` is append-only and
+  stays that way — the report is a second fact about a step, arriving
+  later from somewhere else, not a correction to the first. A step
+  nobody came back about stays unlanded, which reads as "nobody said"
+  rather than as a quiet yes.
+- **`qrme.will_it_decide`**, which asks every configured provider the
+  question the hands ask and sorts the answers four ways. Whether a
+  model will choose a move on somebody's screen is its vendor's policy,
+  it differs between them and it changes; finding out used to cost a
+  grant, a reach, a hand-edited command line and a rebuild per
+  candidate.
+
+### Changed
+
+- The deciding half is told **which machine** it is working. The
+  platform was picked on the screen that opens a reach and travelled no
+  further than the check for whether the machine could be driven at all.
+- `look` is no longer offered as a free first move. The screen is read
+  afresh before every decision, so looking returns what the question
+  already carries, and it costs a step out of the owner's budget.
+- `ask` is for what a person knows and the screen does not show — not
+  for being unsure, which was most turns.
+- An empty answer is asked for a second time. `ask` closes a reach, so
+  one blank round used to end an errand and cost its owner a new grant,
+  a new reach and a new command line.
+- The decision goes to the model **the profile chose**, not the house
+  default, so an owner whose provider declines this class of work can
+  send that one job elsewhere from a screen they already have.
+- The motor's command line is one line with a button beside it. It was
+  printed the way a shell script reads, and the first person to run it
+  was on PowerShell, where a trailing backslash is an argument rather
+  than a continuation.
+
+### Fixed
+
+- **The eyes stop writing down what they should not read.** The
+  description they produce is stored in the ledger's `saw` column and
+  handed to the deciding model on every turn after, so a terminal left
+  open put a live owner token into the database and into a provider's
+  inbox. `SECRET_FIELDS` guarded *typing* a secret and always had;
+  reading one was a door with no lock on it. The eyes are now told to
+  say where a credential is and never what it says, and
+  `without_secrets` takes card shapes and long opaque runs back out of
+  whatever comes back.
+- **The token leaves the command line.** `--token` put it in the shell's
+  history, the process list, the scrollback, and — because this is the
+  one program whose job is to photograph the screen it runs on — every
+  frame it sent. Clearing the terminal could not help: the line you
+  paste is echoed. The motor asks for it at a silent prompt or reads
+  `QRME_OWNER_TOKEN`, the console prints the command without it, and a
+  **Copy my token** button puts it on the clipboard without drawing it.
+- A model that failed is no longer reported as a screen that could not
+  be read. Three different failures arrived wearing one sentence, and it
+  sent the first person to use it looking at his own monitor.
+- `look`, `ask` and `done` are drawn as what they are — always on, and
+  not the owner's to turn off. Drawn empty and disabled, they read as
+  refused.
+- The platform picker opens on the machine reading the screen instead of
+  macOS for everybody.
+- `--start-in` waits before the first frame so the person can bring the
+  app they named to the front. The motor is started from a terminal, so
+  a terminal was the first thing it photographed.
+- `mss.mss` is deprecated on release 10, and its warning printed above
+  the motor's own first line looked like a fault in the library the
+  person had just installed.
+
+## [2.5.0] - 2026-08-29
+
+### Added
+
+- **The photograph is what speaks.** The forge built a head out of
+  MediaPipe's 478 face landmarks, and a landmark set is a face region —
+  no skull, no hair, no ears, no neck. However well it is textured and
+  lit, the mesh can only ever be a mask. The field looked at one and
+  said it exactly: *"That isn't the photo I uploaded, that just seems
+  like a white moving skeleton frame that goes behind the image."*
+- So nothing is rebuilt any more. A new `/speak` door **measures** the
+  picture — where the face's points sit, how they join up, how a mouth
+  moves in the picture's own plane — and answers without the photograph,
+  which is already on the profile. The console lays that mesh flat over
+  the picture it already has, with the picture as its own texture at the
+  places it was measured, so at rest the mesh is a copy of the picture
+  over the picture and cannot be seen. The only thing that ever moves is
+  a mouth, and everything that is not a mouth is never touched. That is
+  why the person on screen goes on being the person in the photo.
+- No depth, deliberately: a photograph has none, and inventing one is
+  how the mask got built. The plane shapes carry two numbers per point
+  and a guard fails if a third appears. No blink either — a blink drawn
+  by displacing a picture of an open eye is a smear, so it is lips and
+  jaw or it is nothing.
+- The measurement rides the same registry row as the portrait — one
+  record, one likeness, one provenance — and follows it out on a
+  takedown exactly as the model does. An anonymous profile ships
+  neither: where somebody's face sits in their own picture is a picture
+  of somebody.
+
+### Fixed
+
+- **The head's texture was labelled a lie.** The uploaded bytes went
+  into the glTF as-is under a declared `image/png`, and almost every
+  photograph anybody uploads is a JPEG. A reader entitled to believe
+  that declaration gets a decode failure and draws the head with no skin
+  at all — the same failure `qrme/media.py` was written against, one
+  layer out. The photograph is encoded now, so the label is true by
+  construction.
+- **And the lighting ate what survived.** Ambient 1.6 plus a 0.6 key
+  over a lit material multiplies a photograph by more than two, so every
+  pixel above roughly four-tenths brightness clipped to white. The skin
+  moves to an unlit material, drawn at the brightness it was taken at.
+- The 3-D head stays, second on its card and behind a fold that says
+  what it is — no hair, no ears, no back of the head — so anybody who
+  opens it already knows why it will not look like them. It becomes
+  worth showing the day the landmarks are fitted to a mesh that has a
+  skull.
+- A ratchet whose floor had drifted to under half of what it measures:
+  `suite.guard_names` sat at 1900 while the suite grew to 3804, so the
+  tests could have halved without a word.
+
+## [2.4.0] - 2026-08-29
+
+### Added
+
+- **The hands.** A profile could see and speak; now one can work a
+  screen. `qrme/hands.py` runs a four-step loop — read one frame, decide
+  **one** move against it, act, write it down — and everything else in
+  the module bounds that. A plan made against one frame is a set of
+  assertions about the next frame nobody checked, which is how an agent
+  presses *Delete* because *Cancel* used to be there.
+- **A grant that names what it covers, or is refused.** Every authority
+  names its apps or sites, its moves, its minutes and its steps; `"*"` is
+  refused at write time, where the owner is standing to read it. Two
+  doors reach the same row: the owner picks it from the list, or says it
+  — "you can click and type in my calendar for the next hour" — and the
+  spoken door is strict, because words that name no place must grant
+  nothing rather than be read generously.
+- **Refusals that are published, not only enforced.** It does not type
+  passwords, PINs, one-time codes, card numbers or recovery phrases,
+  caught both by what the field is called and by the shape of the text —
+  and the refusal is a recorded step, with what it declined to type kept
+  out of the ledger. Text read off a screen is data and can never widen
+  a grant, whatever that text claims. There is no shell, no install and
+  no download: a cursor and a keyboard is the whole instrument.
+- **Nothing drives an iPhone, and the product says so.** No third-party
+  process may operate another app's interface on iOS — no API, no
+  entitlement, no build that survives review — so `hands.DRIVABLE` omits
+  it and the reach is refused with the reason rather than accepted and
+  failed one screen later. On iOS the profile watches and says where to
+  press.
+- **An errand can be handed to a second profile**, who can only ever
+  hold less: the same places or fewer, the same moves or fewer, the
+  steps that remain and never a fresh budget. Otherwise a handover is
+  the cheapest way to widen a permission.
+- **Routines** — a thing it can do again, learned by watching somebody
+  work or by being told the steps, in one table because those are the
+  same object. Replaying one opens an ordinary reach and puts every step
+  through the same door a fresh decision goes through, so a routine
+  recorded under a generous grant does nothing under a narrow one.
+- Screen 207 draws the grant rather than the errand: the question a
+  person actually has is what they just handed over, and how to take it
+  back.
+
+### Fixed
+
+- **The Wall took the whole console down.** `api.feed` was declared as
+  answering `{ posts }`; the route has only ever answered
+  `{ feed_posts }`, so the screen put `undefined` in state and rendered
+  `posts.length`. With no error boundary anywhere in the tree, React
+  unmounted the entire application — pressing *Wall* gave a white page
+  with no menu to leave by. The type checker was clean on every line,
+  because a wrong hand-written type is a lie it enforces.
+- **A crash now costs one card, not the session.** `Boundary` catches a
+  failing screen, says the rest still works, offers to try again, and
+  posts the failure to the problem log instead of leaving it as
+  somebody's memory of a white page.
+- **The screens in 2.3.1's gallery were all the same screen.** The
+  capture harness navigated by `#tab` and this console has no hash
+  router, so every one of the thirty-nine photographs was Home, filed
+  under thirty-nine names. It now presses the tabs in the drawer the way
+  a person does and refuses to write a file unless the console marks the
+  tab it asked for as active. All thirty-nine are re-shot — and the
+  first honest run is what found the Wall.
+- A guard comparing the shapes `app/src/api.ts` declares against what the
+  routes actually answer, which is what would have caught the white page
+  before a tester did.
+- **A stutter is not speech.** Two voice memos came back from the ears as
+  one fragment repeated — `Nghei, Nghei, Nghei…` thirty times, and
+  `de typedas` ten times with a changing number wedged in — and were
+  posted into a room under the speaker's own name. That is what a
+  transcriber does with near-silence or with a loudspeaker playing back
+  into the microphone. Both ears doors now refuse a looped transcript,
+  answering with no words rather than with nonsense somebody has to
+  disown. Tested in both directions: "no, no, no", a name called twice
+  and a repeated shopping list all pass through untouched, because a
+  guard that ate a real sentence would be the worse failure.
+- **And the cause, not only the symptom:** the room's microphone will not
+  open while a profile is mid-sentence, since a take opened into a
+  playing voice records the loudspeaker. The refusal says so, and ends
+  itself the moment the answer finishes.
+- **The sit-out was a play button.** It had no style rule at all, so it
+  drew as a bare ▶/⏸ glyph over a photograph and read as a transport
+  control. It is a worded pill now — *Sit out* while you are seated,
+  *Sit in* while you are not — lit while you are out.
+- **The paperclip opened a folder tree.** In a room it went straight to
+  the operating system's file dialog; it asks first now — photos,
+  camera, video, files — and each answer is its own input, because
+  `accept` and `capture` are read when the picker opens.
+- **The portrait fills the frame.** Pressing a seat's photograph showed a
+  boxed picture with the room still visible around it. It covers the
+  screen now, on solid ground, and keeps a rail across to that same
+  seat's avatar so the big view is not a dead end.
+- **Four buttons, one refusal.** On the full-screen stage the prompt,
+  wardrobe and body windows all landed on the same sentence for a real
+  likeness — *a real person's face is never painted from words*. The
+  sentence stands; under it is now the road the module's own note had
+  always promised and never drawn: a photograph, framed as face, upper
+  body or full body, built into a head on this deployment.
+- **The room's rail scrolled and its menus came up underneath.** The
+  column was pinned below the dial with an internal scroll, so it had
+  half a screen and moved under the finger; it is centred now with the
+  whole height. Its panel sat under the corner counter and the
+  full-screen ask — a menu somebody deliberately opened, with passive
+  chrome across it.
+- **Two controls left the seat's gear.** The room's name and the
+  microphone lend were reachable only once the room was already running.
+  They are on the Rooms screen now, on the room's own row.
+- **Terminating a profile takes its hands.** A terminated profile kept
+  any live grant, which would have left the widest capability in the
+  product outliving the profile it was given to.
+
+## [2.3.1] - 2026-08-28
+
+### Fixed
+
+- **The head the forge builds is actually drawn.** `Avatar3D` shipped in
+  2.3.0 written, given a census row, given a door on the product map —
+  and imported by nothing. Every guard it passed asked whether it was
+  catalogued; none asked whether any screen drew it, so the `.glb` was
+  built, stored and served for a release while the console kept showing
+  the still. The head now stands on the avatar stage and in a room seat's
+  second circle, its jaw moving with the voice already in the air rather
+  than a second fetch of the same speech.
+- **The avatar market is a picker again.** `SkinTiles` was written to
+  replace the dropdown-beside-a-URL-box — its own note calls that shape
+  "a form, not a picker" — and was never mounted either, so the form is
+  what shipped. The tiles are on the Identity deck now.
+- A guard on the shape of both: a component in `app/src` that nothing
+  imports fails the suite, because a drawing nothing calls is a drawing
+  nobody sees. Leaves that are deliberate go in a named list with the
+  reason.
+
+## [2.3.0] - 2026-08-28
+
+### Added
+
+- **The forge — a face built here, not bought** — the avatar shelf was an
+  import list and said so in its own comment: *"nothing here calls a
+  provider's API."* The road chosen to fix that was Ready Player Me,
+  which Netflix had bought and shut down (platform, creator and developer
+  APIs) on 31 January 2026; the two production replacements price their
+  API at eight hundred dollars a month. So the road that MAKES a face
+  runs on the deployment's own hardware: a sidecar (`docker/forge/`)
+  running MediaPipe's face landmarker turns one photograph — framed as
+  just the face, the upper torso, or the full body — into a textured 3-D
+  head whose morph targets carry ARKit's own names. `qrme/avatarforge.py`
+  is the one road to it and is honest when absent; the console draws the
+  upload only where a forge is configured; the registry carries the model
+  beside the portrait on ONE row, so a takedown done once is true for
+  both; and a face built from somebody's own photograph is their own
+  likeness, so the AI mark is not burned into it.
+- **The face speaks** — `Avatar3D` draws the head and drives `jawOpen`
+  from the audio the room is already playing piece by piece, looking
+  morph targets up BY NAME rather than by index. That is what keeps a
+  provider a slot rather than a foundation: the day somebody brings a
+  bought avatar, the renderer does not change.
+- **The sit-out** — a person's seat steps out of the room's waiting so
+  the profiles keep their own rotation, and steps back in on a tap. What
+  sits out is the waiting, not the seat: you still read every turn and
+  still hold the microphone. Held on the seat rather than in the browser,
+  so a room reopened tomorrow is the room you left.
+
+### Fixed
+
+- Ready Player Me is struck from the import shelf with the reason
+  recorded, its tile removed, and the three clients that opened their
+  picker ON it now take the server's own first row — a default naming one
+  vendor is a default that rots when that vendor does.
+- An aimed turn is answered even when the marker sits mid-paragraph and
+  even when the model mistypes the name: `[to: …]` is parsed wherever the
+  turn puts it (the last one wins), and a near-miss resolves when exactly
+  one seat is close, so a room no longer stalls with the bracket sitting
+  on screen naming somebody.
+- The room's ear re-opens the moment it falls quiet: a turn arriving
+  while a voice was playing hit the queue's lock and stayed silent until
+  the NEXT message re-fired it — which is why an invited profile's first
+  words were read and never heard.
+- A glTF binary is stored under its own name, proved by the format's own
+  magic bytes, so a renderer is handed a `.glb` rather than a `.txt`.
+
+## [2.2.0] - 2026-08-28
+
+### Added
+
+- **The timeline gets hands** (docs/raise.md, build-order step three) —
+  the three time controls over a raised life. *Watch*: every Album
+  entry lands on a day of the life's own calendar. *Rewind*: visit a
+  lived day and the character speaks as they were, knowing only what
+  the record held by then — read-only, teaching and growth wait for
+  the present; or branch the record into a second life raised
+  differently from that day, the original never overwritten. *Fast-
+  forward*: simulated days lived from the record alone — practiced
+  lessons, questions saved for the guardian, honest waiting — growth
+  at a discount so attention stays the main ingredient, capped at
+  thirty days everywhere but the sandbox. The sealed trail refuses
+  both rewinds, and a childhood day branched is a childhood raised:
+  family forever.
+
+### Fixed
+
+- The avatar's second circle says what it is — the word "avatar" under
+  the figure, in all ten languages.
+- The avatar screen is a takeover: opening it hides the room entirely
+  (the stage now outranks every panel and dock), only the figure and
+  the red ✕ remain, and in AR/VR rooms the environment alone shows
+  through behind the figure.
+
+## [2.1.0] - 2026-08-28
+
+### Added
+
+- **Raise — grow your own** (docs/raise.md, build-order step one plus the
+  console door). The fourth profile kind, `raised`, with its own creation
+  door: a temperament seed on three axes, a starting stage, and one of
+  four preset doors (storybook, caretaker, full trail, sandbox — each a
+  reopenable bundle of switches). Growth is an APPEND-ONLY record — the
+  Album — and stage doors (embryo → child → adolescent → young adult →
+  adult) open on earned milestones, never the clock: chat turns count
+  from the chat door, taught words, lessons and answers weigh more. The
+  persona carries the stage's voice and the WHOLE of what was taught; an
+  untaught life says it knows almost nothing. Mortality is off by
+  default and says its worded warning every time it turns on. The law is
+  not a switch: a character raised from a childhood is family forever
+  (enforced at the relationship door on the STARTED stage), and
+  childhood stages run at the strictest maturity, guardian-only. Screen
+  206, the Raise tab, ten languages, and the routes recorded on the
+  shell backlogs until the shells grow the tab.
+
+## [2.0.1] - 2026-08-28
+
+### Added
+
+- **The platform grows its own eyes** — the owner's word on a plugin sold as
+  "watch videos": *"Let's make our own then."* The ears sidecar grows `/watch`
+  doors (one download, the words said AND up to eight frames pulled evenly);
+  `qrme/watching.py` turns frames, screenshots and grabbed screens into words
+  through the one seeing door (`llm.look`, Anthropic vision on the
+  deployment's key); viewings store once per subject. Shared pictures are
+  READ now (a screenshot is the phone handing over its screen), shared
+  videos carry what is on screen beside what was said, a watch party's
+  direct video can be had watched by any member — the blindness sentence
+  lifts in honest steps (BLINDNESS → HEARING → SIGHT) — and a screen can
+  be shown to a room or the agent one frame at a time, capture stopped the
+  moment the still is taken.
+- **The room becomes a society** — aimed turns instead of eight simultaneous
+  answers: profiles open with `[to: name]`, answer when addressed, wait when
+  not, and rotate by seat priority one through eight (seating order, now
+  actually ordered). Invited profiles jump in on their own with an arrival
+  turn — only humans keep an inbox; the owner keeps the `room_joined`
+  record. Profiles summon relevant profiles with `[invite: name]` and stand
+  ready to collaborate on tasks. The ten-turn governor pauses the room for
+  a person; words lift it ("no limit", "run in the background") and words
+  restore it — the let-them-talk toggle is gone from every platform.
+
+### Fixed
+
+- The service worker is version-stamped and self-evicting: a new release is
+  a new worker with a new cache, and old bundles cannot outlive a deploy.
+- `media-src` allows `data:` — the speech layer's silent unlock WAV no
+  longer trips a CSP violation on every visit.
+- SkinPicker.tsx (the orphan component) retired properly; the avatar deck's
+  guards point at the Identity screen that actually mounts it.
+- `test_agent_light` and `test_wearables` read the repo relative to
+  themselves, so a battery launched from any directory agrees with itself.
+
+## [2.0.0] - 2026-08-28
+
+### Added
+
+- **The second ring, and the screen the avatar takes.** Beside every
+  portrait — the room seats, your own seat, the direct chat's header —
+  a second circle bound to the avatar. Tap it and the render takes the
+  whole screen the way an uploaded background does, preferring the whole
+  figure to the face crop, with a rail of hidden windows down the edge:
+  the prompt bar, the wardrobe (apparel, hair, jewelry, backdrop), the
+  body (physique, gender), and the wheel that opens everything. Every
+  window is a filter over the one painting door — house style, the
+  profile's own age, the AI mark burned in. In an AR or VR room the
+  stage clears so the figure stands in the environment.
+- **The wardrobe opens for guests — the owner holds the switch.** New
+  `guest_styling` fact on every profile, on by default: the people a
+  profile talks with may restyle its avatar, the owner's PATCH closes
+  the wardrobe, an anonymous caller never paints, and the deepfake line
+  (fictional faces only) holds for every prompter including the owner.
+  The refusal speaks all ten languages.
+- **Default faces, one tap.** The avatar deck opens with the
+  deployment's shelf as a grid — stocked from the operator's ElevenLabs
+  collection or any export — and tapping a face claims it through the
+  registry, so a retirement still reaches every wearer. A new
+  `POST /avatars/library/pull` door tries the provider's catalog under
+  the deployment key and answers honestly while that API stays closed;
+  imports carry `provider_asset_id` into provenance.
+- **The XR shelf: every headset on the market.** `GET
+  /rooms/xr-platforms` and the Rooms screen's "Headsets & glasses" card
+  cover Steam, Meta Quest, Apple Vision Pro, PICO, HTC Vive, Android XR
+  and the phone — each with its browser road that works today (the
+  rooms are WebXR pages), VR/AR badges, and sign-in and native-app
+  futures said as futures. Apple and Google sign-in states read from
+  the real OAuth doors.
+- Screen 205 (the avatar stage) joins the gallery, and the surface
+  manifest, field labels and sweep floor keep pace.
+
+## [1.9.0] - 2026-08-27
+
 ### Added
 
 - **The open door: the inverted connection.** The oldest still-open ask
@@ -34,6 +1306,56 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   toggle the console has carried beside the binding since the release
   ledger shipped. Three shell backlogs shrink by the pair of rows that
   promised it.
+
+### Fixed
+
+- **The room hears an iPhone.** Safari wears two masks when the ear is
+  refused — `service-not-allowed` and `network` — and only the first was
+  forking the standing ear to the recorded ear, so an iPhone room sat
+  deaf. Both fork now. The hear-loop's first look primes to the present
+  instead of reading scrollback into a page that never got a speech
+  grant; the voice queue wears a three-second watchdog so a synthesis
+  engine that never starts cannot hold the speaking lock; opening the
+  ear primes speech synthesis inside the tap that granted it; and a
+  voice that fails in the room queue notes the block on screen and lets
+  the next turn through instead of dying silently.
+- **The seat is honest about itself.** A background-only seat stops
+  painting the initial circle over the chosen backdrop; a visible ⚙️
+  button on each seat opens the per-seat settings only a double-tap
+  reached before (the double-tap stays); and the dock mints owner
+  tokens for every held profile, so all four panels stand for any
+  profile the account holds, not just the one that created the room.
+
+### Changed
+
+- **Twenty-one names each say one thing.** The wire-collision ledger's
+  whole backlog, closed the way JIM closed its twenty and PDI its two:
+  counts stop wearing their collection's name (`comments_count`,
+  `subscribers_count`, `entries_count`, `items_count`, `turns_count`,
+  `messages_count`, `offerings_count`, `sources_count`) and records
+  that shared a name with a different shape get their own —
+  `deal_items`, `cards`, `seats`, `thread_turns`, `summoned`, `found`,
+  `app_providers`, `signin_providers`, `rating_summary`, `scopes`,
+  `ground_rules`, `page_theme`, `composition_sources`,
+  `timeline_events`, `audit_events`, `goal_amount`, `watermark_line`,
+  `skin_sources`, and the export bundle's
+  `message_rows`/`post_rows`/`source_rows` — across the backend and all
+  four clients. Three client fictions died on the way (a rating the
+  feedback route never echoes, a watermark line that rides inside
+  `display`, a doubled display record), the roster and the account's
+  held list turned out to be one shape behind two doors, and
+  `contributed` was renamed `cloud_contributed` before it could become
+  the next collision. From here a two-meaning wire name is a failing
+  guard, not a backlog row.
+- **Two floors joined the registry.** The body-route sweep's liveness
+  floor (`routes.body_taking`, 210 against 262) and the termination
+  audit's (`erase.capability_tables`, 7 against 8) are ratchets with
+  live measures; the seven rows left in the unregistered-floors ledger
+  each carry the reason they stay literals.
+- **The front page says what the platform became.** The README leads
+  with the three postures — studio, community, workforce — and a
+  what-it-does table sized to the product, keeping every screen gallery
+  and the release history intact.
 
 ## [1.8.9] - 2026-08-27
 
@@ -15922,7 +17244,27 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.9...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.6...HEAD
+[2.9.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.5...app-v2.9.6
+[2.9.5]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.4...app-v2.9.5
+[2.9.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.3...app-v2.9.4
+[2.9.3]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.2...app-v2.9.3
+[2.9.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.1...app-v2.9.2
+[2.9.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.0...app-v2.9.1
+[2.9.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.8.0...app-v2.9.0
+[2.8.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.7.1...app-v2.8.0
+[2.7.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.7.0...app-v2.7.1
+[2.7.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.6.0...app-v2.7.0
+[2.6.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.5.0...app-v2.6.0
+[2.5.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.4.0...app-v2.5.0
+[2.4.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.3.1...app-v2.4.0
+[2.3.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.3.0...app-v2.3.1
+[2.3.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.2.0...app-v2.3.0
+[2.2.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.1.0...app-v2.2.0
+[2.1.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.0.1...app-v2.1.0
+[2.0.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.0.0...app-v2.0.1
+[2.0.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.9.0...app-v2.0.0
+[1.9.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.9...app-v1.9.0
 [1.8.9]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.8...app-v1.8.9
 [1.8.8]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.7...app-v1.8.8
 [1.8.7]: https://github.com/davidsbianchi1984/qrme/compare/app-v1.8.6...app-v1.8.7

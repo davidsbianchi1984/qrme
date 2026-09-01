@@ -10,7 +10,13 @@
  * straight to the network, untouched.
  */
 
-const CACHE = "qrme-shell-v1";
+/* The cache is named by the console version the page registered with
+ * (`sw.js?v=<version>`), so every release is a new worker with a new
+ * cache — and the activate step below deletes every cache that is not
+ * this one. Old bundles cannot outlive a deploy any more; that used to
+ * cost testers a trip into their browser's site-data settings. */
+const CACHE = "qrme-shell-"
+  + (new URL(self.location.href).searchParams.get("v") || "v1");
 
 self.addEventListener("install", (event) => {
   // Take over as soon as the new shell is stored; no stale worker lingering.

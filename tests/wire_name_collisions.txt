@@ -1,5 +1,5 @@
-# status: backlog — 21 rows
-# ceiling: 21
+# status: backlog — 0 rows
+# ceiling: 0
 #
 # One wire field name carrying more than one type across this product's API.
 #
@@ -11,45 +11,35 @@
 # interface `extends` another there — so `tsc` had been failing on `main` and
 # nothing in any suite ran `tsc`.
 #
-# Two kinds of row, and the first is the sharper one:
+# ## after 1.8.9 — the twenty-one close
 #
-#   * a **primitive** clash (bool/int, bool/string, double/int, string/list)
-#     is dangerous, because a decoder coerces rather than refusing and the
-#     reader gets a plausible wrong answer;
-#   * an **object-shape** clash (`Row[]` vs `int`, one record vs another) is
-#     usually a count beside a collection, or two views of one concept. A
-#     decoder fails loudly on those, so somebody finds out.
+# Every backlog row resolved in one round, the same way JIM closed its
+# twenty and PDI its two: the count stops wearing its collection's name
+# (comments_count, subscribers_count, entries_count, items_count,
+# turns_count, messages_count, offerings_count, sources_count), and a
+# record that shared a name with a different shape gets its own
+# (deal_items, cards, seats, thread_turns, summoned, found,
+# app_providers, signin_providers, rating_summary, scopes, ground_rules,
+# page_theme, composition_sources, timeline_events, audit_events,
+# goal_amount, watermark_line, message_rows / post_rows / source_rows).
 #
-# Neither is good. A field name is the one piece of an API a reader carries
-# from one route to the next, and a name that changes meaning between them is
-# the reader being misled by the thing they were told to rely on.
+# Two rows closed inside the Windows client without touching the wire,
+# because they were never two wire types at all: `display` was one shape
+# (watermark.design()) declared twice as WatermarkDisplay and
+# WatermarkDesign, and `watermark` on /perceive was the same stamp block
+# the posts carry, declared again as PerceiveWatermark with a `line` field
+# the route never sends. Unifying the records fixed the count and deleted
+# a fiction in the same edit. FeedbackOut.rating was the other fiction:
+# the feedback route echoes the engagement record, never the rating.
+# `profiles` closed both ways at once: browse and summon got their own
+# names (found, summoned), and the roster and the account's held list
+# turned out to be one function serving one shape through two doors —
+# one record now decodes both.
 #
-# Read from the Windows client, because its records declare every wire name
-# and its type explicitly with `JsonPropertyName` — the only place in this
-# codebase where the whole surface is stated in one file.
+# One name arrived while closing: renaming FeedbackOut's field exposed
+# `contributed` carrying bool beside ContributionRow[] — the feedback
+# route's bool is now `cloud_contributed`, so the close did not mint the
+# next collision on its way out.
 #
-# Ratcheted: this list may shrink and must never grow. Fix one by giving each
-# meaning its own name, the way `spoken` became `spoken_steps`,
-# `deepened_line` and `spoken`.
-#
-comments
-display
-entries
-events
-goal
-items
-members
-messages
-offerings
-posts
-profile
-profiles
-providers
-rating
-scope
-sources
-subscribers
-terms
-theme
-turns
-watermark
+# Ratcheted at zero: `test_no_wire_name_carries_two_types` fails on the
+# first name that ever carries two types again, and this file may not grow.

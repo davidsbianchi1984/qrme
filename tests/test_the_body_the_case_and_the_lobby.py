@@ -98,7 +98,7 @@ def test_the_objection_is_readable_and_endable_by_its_subject(client):
     card = client.get(f"/objections/{oid}").json()
     assert card["status"] == "open"
     audit = client.get(f"/objections/{oid}/audit", headers=ha).json()
-    assert audit["events"], audit
+    assert audit["audit_events"], audit
     # The reviewer verb refuses an owner token by role: an owner cannot
     # adjudicate an objection against their own profile. From localhost
     # with no QRME_ADMIN_TOKEN the gate deliberately stands open (the
@@ -132,7 +132,7 @@ def test_the_lobby_roster_says_what_every_callsign_is(client):
     assert r.status_code == 201, r.text
     roster = client.get(f"/gaming/sessions/{sid}/lobby",
                         headers=ha).json()
-    seat = next(m for m in roster["members"] if m["member_id"] == a)
+    seat = next(m for m in roster["seats"] if m["member_id"] == a)
     # The kind travels with the callsign — a lobby that reads as five
     # friends when it is one player and four generated voices is the
     # impression this product must not create.

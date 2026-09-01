@@ -120,14 +120,143 @@ def _markup_strings() -> int:
     return scanned()
 
 
+# -- measures that have to run to be counted ---------------------------------
+#
+# Five floors in `unregistered_floors.txt` stood under *what a live drive
+# reached*, and every other measure in this file is a static scan. A scan of
+# the population is the wrong denominator for them: most of a client's
+# templates carry an id the fixture cannot substitute and are unreachable by
+# construction, so measuring 25 against the Swift client's bindings would
+# demand a floor above anything the drive can ever reach.
+#
+#     asked     how much of this client exists
+#     mattered  how much of it did the probe actually reach
+#
+# The two erase measures came here for a different reason. Both read
+# `db.connect()`, which answers about whichever database the process is
+# pointed at — inside the suite one fixture's temporary file, chosen by
+# whatever ran last; alone, the repository's own. The number moved with the
+# run, so the audit compared the floor against a different quantity each time
+# and could report on neither. They get a database of their own.
+#
+#     asked     is the floor near what it measures
+#     mattered  is it measuring the same thing twice
+
+
+def _in_a_fresh_qrme(work):
+    """Run `work()` against an empty QRME, then put the room back.
+
+    The environment is borrowed and restored: this runs inside a suite whose
+    own fixtures point `QRME_DB` at their own temporary files, and a measure
+    that left the pointer moved would be a guard breaking the run it audits.
+    """
+    import os
+    import pathlib
+    import tempfile
+    from qrme import db as qrme_db
+
+    kept = {name: os.environ.get(name) for name in ("QRME_DB", "QRME_LLM")}
+    with tempfile.TemporaryDirectory() as tmp:
+        os.environ["QRME_DB"] = str(pathlib.Path(tmp) / "test.db")
+        os.environ["QRME_LLM"] = "stub"
+        qrme_db.reset()
+        try:
+            return work()
+        finally:
+            qrme_db.reset()
+            for name, value in kept.items():
+                if value is None:
+                    os.environ.pop(name, None)
+                else:
+                    os.environ[name] = value
+            qrme_db.reset()
+
+
+def _driving(work):
+    """Run `work(client, profile_id, interactor_id)` and count.
+
+    The scene comes from `conftest.make_profile` / `make_interactor` — the
+    fixtures' own bodies — because a measure that set its own scene would be
+    measuring a different drive than the guard it audits, and the two would
+    agree right up until the day the fixture changed.
+    """
+    def go() -> int:
+        from fastapi.testclient import TestClient
+
+        def driven() -> int:
+            from qrme.api import create_app
+            from .conftest import make_interactor, make_profile
+            with TestClient(create_app()) as client:
+                return work(client, make_profile(client),
+                            make_interactor(client))
+
+        return _in_a_fresh_qrme(driven)
+    return go
+
+
+def _reached(module: str):
+    """The bindings one client's drive actually got an answer out of."""
+    def work(client, profile_id, interactor_id) -> int:
+        from importlib import import_module
+        driven = import_module(f".{module}", __package__)._drive(
+            client, profile_id, interactor_id)
+        return sum(1 for row in driven if row[-1] is not None)
+    return _driving(work)
+
+
+def _bodies_validated() -> int:
+    """The body-taking routes the canary sweep got as far as validation on."""
+    def work(client, _profile_id, _interactor_id) -> int:
+        from .test_the_refusal_that_handed_the_body_back import _sweep
+        return _sweep(client)[1]
+    return _driving(work)()
+
+
+def _shortest_refusal() -> int:
+    """The shortest sentence the wearables view publishes as a reason.
+
+    `len(why) > 40` read as an exemptible not-a-floor — a length, like a
+    status code — and the count guard was right to refuse it. 40 stands for
+    "is this a sentence at all", and the sentences these routes publish are
+    two hundred characters of explanation. A floor at a fifth of that would
+    sit quiet while a reason was cut down to a stub, which is the whole thing
+    the screen shows it for.
+    """
+    def work(client, _profile_id, _interactor_id) -> int:
+        from .test_two_questions_a_mark_answers import _owner
+        owner, head = _owner(client, "acct_micpub")
+        view = client.get(f"/profiles/{owner['id']}/wearables",
+                          headers=head).json()
+        return min((len(why) for why in view["refusal_reasons"].values()),
+                   default=0)
+    return _driving(work)()
+
+
 def _erase_planted() -> int:
-    from .test_an_erase_is_measured_against_the_schema import plantable
-    return plantable()
+    def go():
+        from .test_an_erase_is_measured_against_the_schema import plantable
+        return plantable()
+    return _in_a_fresh_qrme(go)
 
 
 def _erase_scoped() -> int:
-    from .test_an_erase_is_measured_against_the_schema import scoped_tables
-    return len(scoped_tables())
+    def go():
+        from .test_an_erase_is_measured_against_the_schema import scoped_tables
+        return len(scoped_tables())
+    return _in_a_fresh_qrme(go)
+
+
+def _body_routes_count() -> int:
+    from qrme.api import app
+
+    from .test_the_refusal_that_handed_the_body_back import _body_routes
+    return len(_body_routes(app))
+
+
+def _capability_tables_count() -> int:
+    from .test_termination_revokes_more_than_the_owners_token import (
+        _capability_tables)
+    return len(_capability_tables())
 
 
 def _route_shapes() -> int:
@@ -723,6 +852,24 @@ def _screens_localizer_calls(shell: str):
     return go
 
 
+def _room_format_guards() -> int:
+    """How many storage accesses in `roomFormat.ts` are inside a try.
+
+    Every read and every write of `localStorage` has to be caught: a
+    private window, cleared site data or a browser set to block storage
+    make the access itself raise, and a screen that cannot remember the
+    viewer's chosen format still has to draw the room.
+
+    Counted rather than asserted at a literal 2, because the number is a
+    property of the module — it moves when a third access is added, and a
+    floor that does not move with it stops measuring anything.
+    """
+    from pathlib import Path
+    root = Path(__file__).resolve().parent.parent
+    text = (root / "app" / "src" / "roomFormat.ts").read_text(encoding="utf-8")
+    return text.count("try {")
+
+
 def _problems_recorded(shell: str):
     def go() -> int:
         from .test_native_shells_record_nothing_private import _record_calls
@@ -925,7 +1072,12 @@ RATCHETS: tuple[Ratchet, ...] = (
             "the literal path segments this product's routes contribute"),
     Ratchet("form.controls_scanned", 21466, _scanned_controls,
             "the characters of form control the screen scan matches"),
-    Ratchet("host.egress_sites", 12, _egress_sites,
+    # 20, not 12. The floor had drifted to less than half of what it
+    # measures — 25 calls could have fallen to 12 without a word — and
+    # adding the converter's one call to the forge is what tipped the
+    # guard over. Four-fifths of the real count, which is what
+    # `test_no_registered_floor_is_decoration` asks of every floor here.
+    Ratchet("host.egress_sites", 20, _egress_sites,
             "the calls in this package that can put bytes on a wire"),
     Ratchet("shell.shown.ios", 1560, _shell_shown("ios"),
             "the literals the iOS scan finds on any screen"),
@@ -1067,17 +1219,44 @@ RATCHETS: tuple[Ratchet, ...] = (
             "TypeScript sources the console sink sweep reads"),
     Ratchet("console.calls_typed", 340, _calls_typed,
             "console calls that declare the shape they expect back"),
-    Ratchet("erase.tables_planted", 40, _erase_planted,
+    Ratchet("refusals.shortest_reason", 165, _shortest_refusal,
+            "the shortest sentence the wearables view publishes as a reason"),
+    Ratchet("swift.driven", 46,
+            _reached("test_the_shape_the_swift_client_expects"),
+            "the Swift bindings the shape drive gets an answer out of"),
+    Ratchet("windows.driven", 58,
+            _reached("test_the_shape_the_client_expects"),
+            "the Windows records the shape drive gets an answer out of"),
+    Ratchet("console.driven", 74,
+            _reached("test_the_shape_the_console_expects"),
+            "the console read calls the shape drive gets an answer out of"),
+    Ratchet("android.driven", 83,
+            _reached("test_the_keys_the_android_client_reads"),
+            "the Android reads the key drive gets an answer out of"),
+    Ratchet("routes.body_validated", 144, _bodies_validated,
+            "the body-taking routes the canary sweep reaches validation on"),
+    Ratchet("erase.tables_planted", 59, _erase_planted,
             "tables this suite can put a probe row into"),
-    Ratchet("erase.scoped_tables", 55, _erase_scoped,
+    Ratchet("erase.scoped_tables", 69, _erase_scoped,
             "tables the schema scopes to a single profile"),
+    Ratchet("erase.capability_tables", 7, _capability_tables_count,
+            "profile-scoped tables carrying a revocation flag or a live "
+            "token — what termination must reach"),
+    Ratchet("routes.body_taking", 210, _body_routes_count,
+            "routes that read a request body, as the refusal sweep fills "
+            "their paths"),
     Ratchet("route.declared_shapes", 350, _route_shapes,
             "routes whose answer is decisively a list or an object"),
     Ratchet("markup.strings_scanned", 16, _markup_strings,
             "f-strings in this package that build markup"),
-    Ratchet("suite.guard_names", 1900, _guard_names,
+    # 3040 against 3804 — four-fifths, which is what the floor guard next
+    # door asks of every ratchet here. It sat at 1900 while the suite
+    # doubled past it, so half the tests could have disappeared without
+    # a word. A floor that cannot notice its own subject leaving is
+    # decoration.
+    Ratchet("suite.guard_names", 3040, _guard_names,
             "test functions this suite declares"),
-    Ratchet("sweep.files_parsed", 175, _files_swept,
+    Ratchet("sweep.files_parsed", 280, _files_swept,
             "test files the bare-floor sweep can read"),
     # 40 against 51, not the 20 this was first written with. That 20 came
     # from the sibling product, where it is four-fifths of a 24-tab console
@@ -1088,6 +1267,10 @@ RATCHETS: tuple[Ratchet, ...] = (
     Ratchet("console.nav_tabs", 40, _nav_tabs,
             "tabs the console navigation declares — the floor under the "
             "check that every one of them has a label"),
+    Ratchet("console.room_format_guards", 2, _room_format_guards,
+            "storage accesses in roomFormat.ts wrapped in a try — the floor "
+            "under the check that a browser blocking storage cannot take the "
+            "room down with it"),
     Ratchet("avatars.skin_shelf", 12, _skin_shelf,
             "systems a face can be imported from — the floor under the "
             "check that a source picker is picking between things"),

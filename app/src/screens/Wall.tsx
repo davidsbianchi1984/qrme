@@ -40,11 +40,15 @@ export function Wall({ onPlans }: {
 
   function load() {
     if (!session.profileId) return;
-    api.feed(session.profileId).then((r) => setPosts(r.posts))
+    // `|| []` on both, and not as a style. A list this screen renders
+    // with `.length` is a crash-to-blank-page if the route ever answers
+    // without it, which is exactly what happened here.
+    api.feed(session.profileId).then((r) => setPosts(r.feed_posts || []))
       .catch((e) => setError(e));
     // The For You feed deliberately excludes your own posts, so without
     // this section a solo owner posts into apparent silence.
-    api.myWall(session.profileId).then((r) => setMine(r.posts)).catch(() => {});
+    api.myWall(session.profileId).then((r) => setMine(r.posts || []))
+      .catch(() => {});
   }
   useEffect(() => {
     load();

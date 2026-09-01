@@ -136,7 +136,7 @@ def feed(profile_id: str, limit: int = 25, adult: bool = False) -> dict:
     profile_or_404(profile_id)
     return {
         "profile_id": profile_id,
-        "posts": wall.for_you(profile_id, limit=limit, adult_ok=adult),
+        "feed_posts": wall.for_you(profile_id, limit=limit, adult_ok=adult),
         "ranked_on": ["friends", "profiles you have talked to",
                       "tags you engage with", "likes", "recency"],
         "never_ranked_on": ["source material", "memories", "vaulted data"],

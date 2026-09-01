@@ -276,10 +276,10 @@ export function Friends({ onPlans, onVisit }: {
               </button>
             </div>
           )}
-          {pool.profiles.length === 0 && (
+          {pool.found.length === 0 && (
             <p className="muted center">{tr("frn.pool.none", lang)}</p>
           )}
-          {pool.profiles.map((p) => {
+          {pool.found.map((p) => {
             const mine = (data?.friends || []).some(
               (f) => f.profile_id === p.profile_id);
             const me = p.profile_id === session.profileId;

@@ -77,12 +77,16 @@ class RowUnavailable(ValueError):
 def _burn(data: bytes) -> bytes:
     """The AI mark, into the pixels, at mint time.
 
-    The offline tool (`tools/mark_portraits.py`) argued against burning at
-    request time — an imaging library in the runtime and a redraw on every
-    fetch for a mark that never changes. Minting is the other case: the
-    mark is drawn once, when the face is made, exactly like the document
-    watermark. Geometry mirrors the tool's so a minted face sits beside a
-    shipped one as one collection.
+    Burning at request time was always wrong — an imaging library in the
+    runtime and a redraw on every fetch for a mark that never changes.
+    Minting is the other case: the mark is drawn once, when the face is
+    made, exactly like the document watermark.
+
+    Note that the SHIPPED collection is no longer burned: those marks
+    moved onto the profile photo sphere because a circle cropped them
+    (`docs/media-provenance.md`). A minted face is still burned here,
+    which is a live and separate decision — this one leaves the owner's
+    hands as a file, and `marked` is a column surfaces read.
     """
     from PIL import Image, ImageDraw, ImageFont
     img = Image.open(io.BytesIO(data)).convert("RGB")
@@ -198,6 +202,31 @@ def shelf(owner_account_id: str | None = None) -> list[dict]:
         + " ORDER BY created_at DESC, rowid DESC",
         () if owner_account_id is None else (owner_account_id,)).fetchall()
     return [row(r["id"]) for r in rows]
+
+
+def set_variant(registry_id: str, name: str, asset: str) -> dict:
+    """Record another rendering of the same face.
+
+    A row's `asset` is the still every surface already draws; a variant
+    is another FORM of that same face — today the `.glb` the forge
+    builds from a photograph, which the seats draw in three dimensions.
+
+    One row rather than two, and that is the whole point of putting it
+    here: a face with a model and a face with only a portrait are the
+    same face, so a takedown, a dispute or a claim done once is true for
+    both. Split across two rows, each of those would have to be done
+    twice to be done at all — which is the failure the ledger exists to
+    make impossible.
+    """
+    got = row(registry_id)
+    variants = dict(got["render_variants"])
+    variants[name] = asset
+    conn = db.connect()
+    conn.execute(
+        "UPDATE avatar_registry SET render_variants=? WHERE id=?",
+        (json.dumps(variants), registry_id))
+    conn.commit()
+    return row(registry_id)
 
 
 def claim(registry_id: str, profile_id: str) -> dict:

@@ -141,20 +141,39 @@ DOORS: tuple[Door, ...] = (
     Door("Rooms", "Rooms tab",
          "shared places — flat, AR and VR rooms",
          ("room", "meet in", "shared space", "vr", "ar")),
+    Door("Raise", "the Raise tab",
+         "growing your own: a raised character started from a temperament "
+         "seed and a stage, taught word by word, its stage doors earned "
+         "and its whole life kept in an append-only Album — presets as "
+         "reopenable switch bundles, and the law that a childhood is "
+         "family forever",
+         ("raise", "grow your own", "raise a character", "teach them",
+          "the album", "life stages", "tamagotchi", "raise a child",
+          "watch them grow")),
     Door("Inside", "the Room screen",
-         "inside a room — the camera, the microphone, and what is shared "
-         "between the people in it",
-         ("inside a room", "share my screen", "share a file",
-          "in the room")),
+         "inside a room — the camera, the microphone, what is shared "
+         "between the people in it (pictures and screenshots are read by "
+         "the platform's eyes, videos heard and described), and the "
+         "room's own conversation: aimed turns, seat rotation, agentic "
+         "joins and summons, the ten-turn governor — steered by words, "
+         "never a toggle",
+         ("inside a room", "share my screen", "show my screen",
+          "share a file", "in the room", "let them talk",
+          "talk with each other", "keep talking", "whose turn",
+          "no limit", "invite a specialist",
+          "they joined on their own", "read this screenshot")),
     Door("Live", "Live Now tab",
          "what is live in a shared place — a camera being shared, a "
          "microphone lent",
          ("live", "going live", "broadcast", "streaming now")),
     Door("WatchParty", "Watch Party tab",
-         "watching a posted video together, with synthetic profiles in the "
-         "room",
+         "watching a posted video together, with synthetic profiles in "
+         "the room — and, for a direct video link, having it actually "
+         "watched by the platform's own eyes and ears so the profiles "
+         "can talk about what is on screen",
          ("watch party", "watch together", "watch it with me",
-          "watch this", "watch a video", "video with you")),
+          "watch this", "watch a video", "video with you",
+          "watch the video", "the eyes", "can it see")),
     Door("Solitude", "My Attention tab",
          "who may reach you, and when",
          ("do not disturb", "my attention", "leave me alone", "quiet hours",
@@ -168,13 +187,49 @@ DOORS: tuple[Door, ...] = (
     Door("Presence", "Presence tab",
          "how this profile presents itself, everywhere it is seen",
          ("presence", "how i look", "appearance", "avatar", "portrait")),
-    Door("SkinPicker", "the avatar deck on Identity",
-         "choosing what a profile wears",
+    Door("SkinTiles", "the avatar deck on Identity",
+         "choosing what a profile wears, from the faces there are to "
+         "choose from",
          ("avatar", "avatar deck", "change my picture", "pick a face",
-          "skin")),
-    Door("SkinTiles", "the avatar tiles",
-         "the faces there are to choose from",
-         ("avatar tiles", "which faces", "face options")),
+          "skin", "avatar tiles", "which faces", "face options")),
+    Door("SeatFilm", "inside a room",
+         "the seat's own footage in the room's frame — the turn a profile "
+         "just spoke, rendered as video, or the honest state when there is "
+         "none yet and why",
+         ("play the video", "watch this turn", "the footage",
+          "see them say it", "is the render done")),
+    Door("AvatarStage", "the avatar full screen",
+         "the avatar taking the whole screen, with the wardrobe rail — "
+         "prompt, apparel, physique and gender — over the one painting "
+         "door",
+         ("full screen avatar", "wardrobe", "restyle", "change outfit",
+          "dress the avatar", "physique", "render my avatar")),
+    Door("SpeakingPortrait", "the avatar full screen",
+         "your own photograph with a mouth that moves when it speaks — "
+         "nothing is redrawn, so it goes on looking exactly like you",
+         ("make my photo speak", "talking photo", "moving mouth",
+          "speaking portrait", "my picture talks", "animate my photo")),
+    Door("Avatar3D", "the avatar full screen",
+         "the face in three dimensions — the head the forge built from a "
+         "photograph, drawn on the stage and on a room's seats, its mouth "
+         "moving with the voice being spoken",
+         ("3d avatar", "moving face", "talking head", "my face in 3d",
+          "make my avatar talk", "lip sync", "animated avatar")),
+    Door("VideoQuote", "Identity tab",
+         "how long a scene will run and how long it takes to make — "
+         "worked out from the passage, stated and never offered as a "
+         "dial, because a dial makes the video fit the setting instead "
+         "of the content",
+         ("how long will the video be", "video length", "how long to "
+          "render", "why is my video that long", "make the video longer")),
+    Door("SceneFilm", "the conversation",
+         "the reply rendered as footage, playing under the words it is a "
+         "video of — started by the turn itself, so nobody presses play, "
+         "and saying which of the four things is happening when there is "
+         "no video yet",
+         ("where is my video", "render my replies", "video of the answer",
+          "why did no video appear", "reply as video",
+          "daily video limit")),
     Door("InWords", "Language & Name tab",
          "the words a profile uses, and the name it answers to",
          ("language", "my name", "what to call", "rename",
@@ -234,6 +289,20 @@ DOORS: tuple[Door, ...] = (
     Door("Robots", "Robots & Devices tab",
          "a body to speak through",
          ("robot", "device", "speak through", "hardware")),
+    Door("Hands", "Hands tab",
+         "let it work a screen for you — what it may touch, for how long, "
+         "and what it will never type",
+         ("hands", "use my computer", "do it on my screen", "click for me",
+          "take over", "navigate for me", "do that again")),
+    Door("Capabilities", "Capabilities tab",
+         "the register of every faculty a profile can be given — what each "
+         "one currently is, the permission it rests on, and the screen "
+         "that withdraws it; it reads and routes, and grants nothing "
+         "itself",
+         ("capabilities", "what can it do", "what can you do",
+          "what is it allowed to do", "permissions",
+          "what did i agree to", "what can it see", "what can it hear",
+          "can it move", "what is switched on", "how do i turn it off")),
     Door("Plugins", "Plug-ins tab",
          "the plug-in storefront, and what each row can reach",
          ("plug-in", "plugin", "integration", "connect an app")),

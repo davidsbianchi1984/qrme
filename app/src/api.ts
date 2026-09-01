@@ -72,7 +72,7 @@ export function setLlmKey(key: string) {
 // account is what owns — its id is the owner_id profiles are created under.
 export const oauthApi = {
   providers: () =>
-    req<{ providers: { provider: string; name: string; configured: boolean;
+    req<{ signin_providers: { provider: string; name: string; configured: boolean;
                        setup?: string }[] }>(`/auth/oauth/providers`),
   start: (provider: string) =>
     req<{ url: string; state: string }>(
@@ -681,7 +681,7 @@ export type ReviewsView = {
   profile_id: string;
   /** `average` and `distribution` are absent until somebody has reviewed —
    *  the empty case carries a `note` instead, and the screen shows it. */
-  rating: {
+  rating_summary: {
     average: number | null; count: number;
     note?: string;
     distribution?: Record<string, number>;
@@ -703,7 +703,7 @@ export type ThreadMessage = {
 
 export type ThreadView = {
   profile_id: string; interactor_id: string;
-  messages: ThreadMessage[];
+  thread_turns: ThreadMessage[];
 };
 
 export type MessageRevision = Record<string, unknown>;
@@ -971,7 +971,7 @@ export type Seat = {
 
 export type Lobby = {
   session_id: string; game: string; platform: string;
-  members: Seat[];
+  seats: Seat[];
   people: number; profiles: number; agents: number;
   synthetic_seats_left: number;
   maturity: string;
@@ -983,7 +983,7 @@ export type Lobby = {
  *  believes every callsign is a person will address them as people. */
 export type LobbyContext = {
   game: string;
-  members: { callsign: string | null; role: string; synthetic: boolean }[];
+  seats: { callsign: string | null; role: string; synthetic: boolean }[];
   people: number;
   synthetic_here: number;
   maturity: string;
@@ -1046,8 +1046,8 @@ export type GiftsView = {
 };
 
 export type AudienceView = {
-  likes: number; comments: number; shares: number;
-  subscribers: number;
+  likes: number; comments_count: number; shares: number;
+  subscribers_count: number;
   you_liked: boolean;
   your_subscription: Subscription | null;
 };
@@ -1067,7 +1067,7 @@ export interface DmMessage {
   body: string; sent_at: string;
 }
 export interface DmThread {
-  other_id: string; other_name?: string | null; messages: number;
+  other_id: string; other_name?: string | null; messages_count: number;
   last_at: string;
 }
 export interface Homepage {
@@ -1080,14 +1080,14 @@ export interface Homepage {
 
 export interface ShopCard {
   id: string; profile_id: string; name: string; blurb?: string | null;
-  tag?: string | null; seller: string; offerings: number;
+  tag?: string | null; seller: string; offerings_count: number;
 }
 export interface ShopOffering {
   id: string; shop_id: string; kind: string; title: string;
   blurb?: string | null; price: number; currency: string;
   availability: string; retired: number;
 }
-export interface ShopDetail extends Omit<ShopCard, "offerings"> {
+export interface ShopDetail extends Omit<ShopCard, "offerings_count"> {
   offerings: ShopOffering[];
 }
 export interface ShopOrder {
@@ -1097,8 +1097,30 @@ export interface ShopOrder {
   title: string; kind: string;
 }
 
+/** One call to the backend.
+ *
+ *     asked     video is selected but nothing happens
+ *     mattered  `body` is an OBJECT here, and three callers handed it a
+ *               string
+ *
+ * `body` is serialised below — `JSON.stringify(opts.body)` — so a caller
+ * that stringifies first sends the JSON *of a string*, FastAPI parses it
+ * to a `str` rather than a dict, and every one of them answered 422:
+ * "Input should be a valid dictionary or object to extract fields from".
+ *
+ * Three did it, and all three were the video road: setting the road,
+ * amending the scene direction, and starting a render. So the road could
+ * not be chosen, which is why pressing it lit up and snapped back — the
+ * screen sets the road, the POST fails, and the catch re-reads the
+ * server and puts it back the way it was. It looked like a display bug
+ * and read as one for three rounds.
+ *
+ * Caught by driving the screen and watching the network, not by reading
+ * the code: the call site looks completely ordinary.
+ */
 async function req<T>(
   path: string,
+  // An object, not a string — this function stringifies it. See above.
   opts: { method?: string; body?: unknown; token?: string; claim?: string } = {},
 ): Promise<T> {
   const headers: Record<string, string> = { "content-type": "application/json" };
@@ -1205,6 +1227,10 @@ export interface Profile {
    *  another real person, a plan that can hold rated content — so there is
    *  no field to change it and the state is displayed read-only. */
   adult_mode?: boolean;
+  /** May the people this profile talks with restyle its avatar. On by
+   *  default; the owner's PATCH closes the wardrobe. The stage reads it
+   *  before offering a visitor the prompt bar. */
+  guest_styling?: boolean;
   owner_token?: string;
 }
 export interface Stats {
@@ -1214,7 +1240,7 @@ export interface Stats {
   relationship_graph: number;
   engagement_avg: number;
   interactors: number;
-  sources: number;
+  sources_count: number;
   posts: number;
   surfaces: string[];
 }
@@ -1224,6 +1250,24 @@ export interface ChatMessage {
   content: string;
   status: string;        // "approved" | "held" | "rejected"
   flag_reason?: string | null;
+}
+/** A reply being rendered as footage — the row `auto_render` starts and
+ *  `videoFollow` polls.
+ *
+ *  `status` is "pending", "done", "failed" or "capped". "capped" is the
+ *  only one with no row behind it: it is the ceiling answering, and it
+ *  carries `left` instead of an id, because an owner who set a limit and
+ *  then stopped seeing video is owed the reason. */
+export interface SceneRender {
+  id?: string;
+  profile_id?: string;
+  job?: string | null;
+  status: string;
+  video_url?: string | null;
+  seconds?: number;
+  detail?: string | null;
+  left?: number;
+  daily_seconds?: number;
 }
 export interface ChatReply {
   interactor_message: ChatMessage;
@@ -1245,6 +1289,11 @@ export interface ChatReply {
     generated_by?: string;
     degraded_from?: string | null;
   } | null;
+  /** Set only when this profile's road is video and there was room
+   *  under today's ceiling. Never an error: a video that did not get
+   *  made is a smaller thing than an answer that did not arrive, so the
+   *  turn returns null rather than failing. */
+  scene?: SceneRender | null;
 }
 export interface CompositionRow {
   source_profile_id: string;
@@ -1288,7 +1337,7 @@ export interface CampaignOut {
   profile_id: string;
   title: string;
   cause?: string | null;
-  goal: number;
+  goal_amount: number;
   raised: number;
   donors: number;
   status: string;
@@ -1353,7 +1402,7 @@ export interface PairInfo {
 // The wrist's glanceable payload (GET /profiles/{id}/watch), reused by the
 // always-on lights widget: counts and the profile chip are all it reads.
 export interface WatchFace {
-  profile: {
+  chip: {
     id: string; display_name: string; status: string;
     light: "green" | "orange" | "red"; pending_approvals: number;
   };
@@ -1364,7 +1413,7 @@ export interface WatchFace {
 // FIG. 800's voiceprint (qrme/voiceprint.py) — permission, enrollment,
 // characteristics, print.
 export interface VoiceEnrollment {
-  samples: number; seconds: number; turns: number;
+  samples: number; seconds: number; turns_count: number;
   mean_turn_seconds: number | null; mean_chars_per_turn: number | null;
   by_source: Record<string, number>;
   ready: boolean; needs: string[];
@@ -1383,7 +1432,7 @@ export interface VoiceprintStatus {
 export interface ObjectionTimeline {
   objection_id: string; profile_id: string; status: string;
   reattested: boolean; vault_backed: boolean; note: string;
-  events: { id: string; event: string; actor: string;
+  timeline_events: { id: string; event: string; actor: string;
             sealed: boolean; at: string }[];
 }
 
@@ -1459,7 +1508,7 @@ export interface WatermarkRecovery {
 export type Grant = {
   id: string;
   token: string;
-  scope: string[];
+  scopes: string[];
   revoked: boolean;
 };
 
@@ -1590,7 +1639,7 @@ export type Exchange = {
   fee: number; fee_note: string;
   state: "draft" | "proposed" | "signed" | "delivered" | "closed" | "withdrawn";
   created_at: string;
-  items: ExchangeItem[];
+  deal_items: ExchangeItem[];
   /** Names only — the screen lists these before anybody signs. */
   runs_on_your_machine: string[];
   runs_warning: string | null;
@@ -1616,7 +1665,7 @@ export type Exchange = {
 /** Two shapes, not one. A closed channel says why; an open one says what. */
 export type ExchangeChannel =
   | { open: false; reason: string; unsigned: string[] }
-  | { open: true; items: ExchangeItem[]; fingerprint: string;
+  | { open: true; deal_items: ExchangeItem[]; fingerprint: string;
       auto_download: boolean; note: string };
 
 export type ExchangeVocabulary = {
@@ -1663,7 +1712,7 @@ export type SkillGrantVocabulary = {
   surfaces: { key: string; means: string }[];
   skill_kinds: { key: string; means: string }[];
   states: string[];
-  terms: string[];
+  ground_rules: string[];
 };
 
 export type PartyVideo = {
@@ -1724,7 +1773,11 @@ export type PostedLine = {
 export type PartyContext = {
   watching: { title: string; platform: string;
               description_available: boolean;
-              transcript_available: boolean };
+              transcript_available: boolean;
+              /** The viewing, once a member has the video watched: the
+               *  ears' words and the seeing door's account. Empty until
+               *  then — never invented. */
+              heard: string; seen: string };
   position_s: number; playing: boolean;
   recent: { who: string; said: string; at: number | null }[];
   you_have_not_seen_it: boolean;
@@ -1828,6 +1881,17 @@ export type Avatar = {
   /** The upper-torso form — the figure that stands in a live feed or an
    *  AR scene at 1:1; the circular bubble is only the avatar-less form. */
   torso?: string | null;
+  /** The 3-D form of the same face, when the forge built one from a
+   *  photograph: a `.glb` whose morph targets carry ARKit's names, so
+   *  the seats can draw it and the room's own audio can move its
+   *  mouth. Null on every face nobody forged, which is most of them. */
+  model?: string | null;
+  /** Where this face's points sit in its own photograph, when it was
+   *  measured so its mouth could move — a small JSON, not a model. The
+   *  console lays that mesh over the picture it already has, so what
+   *  speaks is the photograph rather than a head built to replace it.
+   *  Null on every face nobody measured, which is most of them. */
+  speaking?: string | null;
   /** Always displayed, by the product's own rule. */
   watermark: { mark: string; label: string; line: string; custom: boolean;
                always_displayed: boolean; disclosure: string };
@@ -1872,6 +1936,47 @@ export type AvatarBrief = {
   handle: string; portrait: string; style: string; prompt?: string;
   asset?: string | null;
 };
+
+/** One vendor on the XR shelf. These rooms are pages, so the honest road
+ *  in from any headset is its own browser — `browser` names it. Futures
+ *  say so: `native_app` stays "planned" until somebody actually ships
+ *  one, and `signin` is live / unconfigured / planned / none, read from
+ *  the real OAuth doors. */
+export type XrPlatform = {
+  platform: string; name: string; wears: string[];
+  browser: string;
+  open_now: boolean;
+  native_app: string;
+  signin: string;
+};
+
+// ---------------------------------------------------------------------
+// Raise — grow your own (docs/raise.md). Fresh wire vocabulary: stage,
+// preset, temperament, milestones — no collisions with the profile door.
+// ---------------------------------------------------------------------
+export type RaiseDoors = {
+  stages: string[];
+  presets: Record<string, Record<string, unknown>>;
+  temperament_axes: string[];
+  mortality_warning: string;
+};
+export type RaisedCharacter = {
+  profile_id: string; guardian_id: string;
+  stage: string; started_stage: string; preset: string;
+  switches: Record<string, unknown>;
+  temperament: Record<string, number>;
+  growth_points: number;
+  milestones: { turns_together: number; words_taught: number;
+                lessons_passed: number; questions_answered: number };
+  next_stage: string | null; next_stage_at: number | null;
+  // The three time controls: the life's own calendar (day 1 = the day
+  // the guardian entered), where the guardian stands on it (null = the
+  // present), and — on a branched life — whose day it grew from.
+  sim_day: number; visiting_day: number | null; branch_of: string | null;
+  created_at: string;
+};
+export type GrowthEntry = { id: string; kind: string; note: string;
+                            sim_day: number; at: string };
 
 /** What sunsetting did. `archive_key` is non-null only where a vault holds it. */
 export type Sunset = {
@@ -1929,7 +2034,7 @@ export type PageOffer = {
 
 export type ProfilePage = {
   profile_id: string;
-  theme: Theme;
+  page_theme: Theme;
   accent: string | null; layout: string;
   tagline: string | null;
   about: string | null;
@@ -1961,7 +2066,7 @@ export type Front = {
   ai_disclosure: string;
   verification: Verification;
   skills: unknown[]; experience: unknown[];
-  rating: { average: number | null; count: number; note?: string };
+  rating_summary: { average: number | null; count: number; note?: string };
   reviews: unknown[];
   talked_with: number; interactions: number; adult: boolean;
 };
@@ -2090,6 +2195,10 @@ export type RoomMsg = {
                                 // to reach the spoken-voice route
   from: string;
   content: string | null;
+  /** Who this turn was aimed at — a seat's display name, or absent for
+   *  the whole room. The society's chain reads it: a profile aiming at a
+   *  profile is a conversation asking to continue. */
+  aimed_at?: string | null;
   watermark: { display?: { line?: string } } | null;
   // A shared picture, video or file riding the turn. `url` is relative to
   // the API base, the way every media url in this product is. `read` says
@@ -2111,6 +2220,69 @@ export type RoomMsg = {
   created_at?: string;
 };
 
+/** The hands (qrme/hands.py). A permission before it is a capability:
+ *  every field here is a bound, and the console draws them as bounds. */
+export type HandGrant = {
+  id: string; profile_id: string; surface: string;
+  places: string[]; verbs: string[];
+  steps: number; watched: boolean;
+  /** `picked` from the list, or `told` in words. Both write this row. */
+  door: string;
+  /** The words themselves, when the door was `told` — kept so the owner can
+   *  read back exactly what their sentence was understood to mean. */
+  said: string | null;
+  expires_at: string; revoked_at: string | null;
+  live: boolean; created_at: string;
+};
+
+/** One session of having hands on a surface. `mode` is the whole
+ *  difference between watching somebody work and doing the work. */
+export type Reach = {
+  id: string; profile_id: string; grant_id: string;
+  surface: string; platform: string; errand: string;
+  mode: string; state: string; why: string | null;
+  handed_to: string | null; routine_id: string | null;
+  steps_used: number; steps_left: number; hands_on: boolean;
+  opened_at: string; closed_at: string | null;
+};
+
+/** One move, including the refused ones — a ledger that only kept the
+ *  moves that worked would be a story about the errand, not a record. */
+export type HandAction = {
+  n: number; profile_id: string; verb: string;
+  target: string | null; detail: Record<string, unknown>;
+  saw: string | null; outcome: string; note: string | null;
+  // `outcome` is what the stack permitted; `landed` is what the machine
+  // came back and said became of it. null means nobody ever did — which
+  // is a third state, not a quiet no.
+  landed: "landed" | "missed" | "rehearsed" | null;
+  landed_note: string | null;
+  at: string;
+};
+
+export type HandStep = {
+  id?: string; reach_id?: string; profile_id?: string; n?: number;
+  verb: string; target: string | null;
+  detail: Record<string, unknown>;
+  outcome?: string; note?: string | null;
+};
+
+/** A thing it can do again — watched (`shown`) or dictated (`told`). */
+export type Routine = {
+  id: string; profile_id: string; name: string; surface: string;
+  learned: string; steps: HandStep[]; runs: number;
+  last_run: string | null; created_at: string;
+};
+
+export type HandsVocabulary = {
+  surfaces: string[]; platforms: string[]; drivable: string[];
+  verbs: string[]; eyes_only: string[]; keys: string[]; doors: string[];
+  caps: { steps: number; minutes: number; wait_seconds: number };
+  /** Published, not merely enforced. A client that knew only what was
+   *  allowed would draw the iPhone case as a missing feature. */
+  never: string[];
+};
+
 export type RobotCatalogue = {
   robots: RobotModel[];
   by_maker: Record<string, RobotModel[]>;
@@ -2123,7 +2295,7 @@ export type RobotCatalogue = {
 };
 
 export type ConnectorCatalogue = {
-  providers: { provider: string; label: string;
+  app_providers: { provider: string; label: string;
                apps: { app: string; label: string; capabilities: string[];
                        directions: string[]; needs_first: string }[] }[];
   app_count: number; provider_count: number;
@@ -2256,7 +2428,7 @@ export type ObjectionAudit = {
   /** False when no vault is configured — and the screen says so, because
    *  "tamper-evident" is a claim that depends on it. */
   vault_backed: boolean;
-  events: ObjectionEvent[];
+  audit_events: ObjectionEvent[];
 };
 
 /** What any of resolve / withdraw / revoke returns. */
@@ -2453,7 +2625,7 @@ export type DeskCard = {
   };
   portrait: string | null;
   feed: { url: string; live: boolean; note: string;
-          watermark: string | null; ai: boolean };
+          watermark_line: string | null; ai: boolean };
 };
 
 export type BellRung = {
@@ -2510,7 +2682,7 @@ export type PlacedBeacon = {
 export type BeaconScanCard = {
   profile_id?: string;
   display_name?: string;
-  watermark?: string;
+  watermark_line?: string;
   portrait?: string | null;
   /** Whether the disclosure is already burned into the image. A surface QRME
    *  does not control needs to know if compositing is mandatory. */
@@ -2615,7 +2787,7 @@ export type PackSummary = {
   id: string; industry: string; audience: string; title: string;
   blurb: string | null; publisher: string; price: number; currency: string;
   free: boolean; origin: string; origin_url: string | null; rated: boolean;
-  items: number; installs: number;
+  items_count: number; installs: number;
 };
 
 /** Seeding is idempotent, and says so by counting both sides. A press that
@@ -2984,7 +3156,7 @@ export type EarningsStatement = {
  *  of it" are distinguishable without a second request. */
 export type PayoutReceipt = {
   payout_id: string; owner_id: string; total_amount: number; currency: string;
-  entries: number; at: string; remaining: string[]; note: string;
+  entries_count: number; at: string; remaining: string[]; note: string;
 };
 
 /** How this profile and one person are going.
@@ -3088,7 +3260,7 @@ export type Summoned = {
   type: "handle" | "tag" | "beacon";
   ref: string;
   profile?: SummonCard;
-  profiles?: SummonCard[];
+  summoned?: SummonCard[];
   label?: string;
   location?: string | null;
   scans?: number;
@@ -3246,7 +3418,7 @@ export type PackDetail = {
   id: string; industry: string; audience: string; title: string;
   blurb: string; publisher: string; price: number; currency: string;
   free: boolean; origin: string; origin_url: string; rated: boolean;
-  items: number; installs: number; item_titles: string[];
+  items_count: number; installs: number; item_titles: string[];
 };
 
 export type PackRegistry = {
@@ -3399,7 +3571,7 @@ export interface FeedItem {
 /** One page of the public stream. `rules` is the server saying, in words a
  *  screen can show, what it will and will not play without being asked. */
 export interface FeedPage {
-  items: FeedItem[];
+  cards: FeedItem[];
   cursor: string | null;
   counts: { video: number; offsite: number; room: number; desk: number;
             party: number };
@@ -3443,6 +3615,10 @@ export interface AgentTurn {
    *  arguments it chose, handed back untouched to `authoringAct`. */
   asks: { tool: string; arguments: Record<string, unknown>;
            says: string } | null;
+  /** What the platform's eyes read off a picture shown for this turn —
+   *  returned beside the reply so the person can see exactly what their
+   *  agent was told. Null when nothing was shown. */
+  seen?: string | null;
 }
 
 export interface MatterStep {
@@ -3503,6 +3679,49 @@ export interface ProfileVoice {
    *  this voice. False for everything not deliberately let go. */
   released: boolean;
 }
+
+/** One synthetic seat's reachable things, and the room's answer to each.
+ *
+ * `ready` on a connection is the owner's side: a connector that has never
+ * been given its credential cannot reach anything yet, and a box ticked
+ * against one would be a yes to something that cannot happen.
+ *
+ * `eyes_only` on a skill is the difference between "you may read my
+ * screen" and "you may drive it" — the two sides of this panel, and
+ * making somebody read four verbs to tell them apart is how the wrong
+ * box gets ticked.
+ */
+export type RoomReachApp = {
+  /** The connector's id, or null where its owner has not connected it.
+   *  Null is what makes the box untickable: the room's key cannot
+   *  conjure the owner's. */
+  key: string | null;
+  provider: string; app: string; label: string;
+  connected: boolean; ready: boolean; allowed: boolean;
+  capabilities: { name: string; granted: boolean; allowed: boolean }[];
+};
+
+export type RoomReachProfile = {
+  profile_id: string;
+  display: string;
+  /** The whole catalog, grouped by its nine providers — not only what
+   *  this profile holds. "What could this reach" and "what has its owner
+   *  wired up" are different questions, and the dark rows are what make
+   *  the lit ones mean something. */
+  providers: { provider: string; label: string; apps: RoomReachApp[] }[];
+  skills: { key: string; surface: string; places: string[]; verbs: string[];
+            steps: number; watched: boolean; expires_at: string;
+            eyes_only: boolean; allowed: boolean }[];
+  connected_count: number;
+  app_count: number;
+  apps_allowed: number;
+  skill_count: number;
+  skills_allowed: number;
+  hands_allowed: number;
+  hands_count: number;
+};
+
+export type RoomReach = { room_id: string; profiles: RoomReachProfile[] };
 
 export const api = {
   // `health` used to sit here: the same route, the body thrown away, a
@@ -3653,7 +3872,7 @@ export const api = {
   stats: (id: string, token: string) =>
     req<Stats>(`/profiles/${id}/stats`, { token }),
 
-  createInteractor: (body: { display_name: string; birthdate?: string }) =>
+  createInteractor: (body: { display_name?: string; birthdate?: string }) =>
     req<Interactor>("/interactors", { method: "POST", body }),
 
   setRelationship: (
@@ -3734,7 +3953,7 @@ export const api = {
   // profile is listed until its owner goes private; the switch below is
   // that door, per profile and reversible both ways.
   browsePeople: () =>
-    req<{ profiles: { profile_id: string; display_name: string;
+    req<{ found: { profile_id: string; display_name: string;
                       handle: string | null; avatar: string | null;
                       // "ai" | "real_photo" | null, decided server side by
                       // `avatars.kind_of` — the badge is not optional, so
@@ -3768,8 +3987,14 @@ export const api = {
   inboxSeen: (profileId: string, token: string) =>
     req<{ marked_seen: number }>(`/profiles/${profileId}/inbox/seen`,
       { method: "POST", token }),
+  // `feed_posts`, and the name is load-bearing. This was declared as
+  // `posts` — a hand-written shape that the route has never sent — so the
+  // console read `undefined`, put it in state, and `posts.length` took the
+  // whole application down to a blank page the moment anybody opened the
+  // Wall. TypeScript agreed with every line of it, because a lie in a
+  // type declaration is a lie the type checker enforces.
   feed: (profileId: string, adult = false) =>
-    req<{ posts: WallPost[]; ranked_on: string[] }>(
+    req<{ feed_posts: WallPost[]; ranked_on: string[] }>(
       `/profiles/${profileId}/feed${adult ? "?adult=true" : ""}`),
   myWall: (profileId: string) =>
     req<{ posts: WallPost[] }>(`/profiles/${profileId}/wall`),
@@ -3974,9 +4199,10 @@ export const api = {
   // something a person can actually do.
   authoringTurn: (profileId: string, said: string,
                   history: { role: string; content: string }[],
-                  token: string) =>
+                  token: string, shown?: string) =>
     req<AgentTurn>(`/profiles/${profileId}/authoring/turn`,
-      { method: "POST", body: { said, history }, token }),
+      { method: "POST",
+        body: { said, history, ...(shown ? { shown } : {}) }, token }),
   // The press. The arguments go back exactly as the turn showed them — a
   // console that rebuilt them would make the sentence on screen a summary of
   // what happens rather than the thing being agreed to.
@@ -4071,8 +4297,16 @@ export const api = {
   joinRoom: (roomId: string, token: string) =>
     req<{ id: string; topic?: string | null; channel: string;
           participants: { kind: string; id: string; display: string }[];
-          invited?: { kind: string; id: string; display: string }[] }>(
+          invited?: { kind: string; id: string; display: string }[];
+          /** Whether THIS seat is sitting out of the room's waiting —
+           *  so a reopened room paints the button as it was left. */
+          sitting_out?: boolean }>(
       `/rooms/${roomId}/join`, { method: "POST", token }),
+  /** Step this seat out of the room's waiting, or back in. The profiles
+   *  keep their own rotation while every person present sits out. */
+  sitOutOfRoom: (roomId: string, out: boolean, token: string) =>
+    req<{ sitting_out: boolean; nobody_waiting: boolean }>(
+      `/rooms/${roomId}/sit-out`, { method: "POST", body: { out }, token }),
   // The room's name, changed from inside it. Authorized like speaking: a
   // participant, held by their own token — naming somebody else's room
   // from outside it is not a thing this product offers.
@@ -4116,7 +4350,10 @@ export const api = {
                                cut_off_heard: cutOff.heard } : {}) },
         token }),
   advanceRoom: (roomId: string, token: string) =>
-    req<{ replies: RoomMsg[] }>(`/rooms/${roomId}/advance`,
+    req<{ replies: RoomMsg[];
+          /** True when every seat has said its ten pieces and the room
+           *  is waiting for a person — the governor's floor. */
+          paused?: boolean }>(`/rooms/${roomId}/advance`,
       { method: "POST", token }),
   listDesks: () =>
     req<{ id: string; display_name: string; trade: string; location?: string;
@@ -4786,6 +5023,12 @@ export const api = {
   // has not seen, instead of taking on trust that it was given one.
   watchPartyContext: (partyId: string, token: string) =>
     req<PartyContext>(`/watch-parties/${partyId}/context`, { token }),
+  /** Have the party's video actually watched — the platform's own eyes and
+   *  ears. Once per video; every profile in the party reads the viewing. */
+  watchPartyWatch: (partyId: string, token: string) =>
+    req<{ party_id: string; subject: string; heard: boolean; seen: boolean;
+          duration_seconds: number | null }>(
+      `/watch-parties/${partyId}/watch`, { method: "POST", token }),
 
   endWatchParty: (partyId: string, hostId: string, token: string) =>
     req<PartyEnded>(`/watch-parties/${partyId}/end`,
@@ -4863,6 +5106,116 @@ export const api = {
   // it under a grant that can be withdrawn.
   avatar: (profileId: string, token: string) =>
     req<Avatar>(`/profiles/${profileId}/avatar`, { token }),
+  /** What the forge offers here, asked before anybody picks a photo:
+   *  a deployment with no forge says so instead of drawing a button
+   *  that fails at the worst possible moment. */
+  forgeDoors: () =>
+    req<{ provider: string; configured: boolean; shots: string[];
+          blendshapes: string[] }>("/avatars/forge"),
+  /** Whether a described passage can be rendered as video here, which
+   *  service would do it, and — when it cannot — which of the three
+   *  variables is missing. Answered before anybody writes anything, so
+   *  the console draws the road only where there is one. */
+  videoDoors: () =>
+    req<{ provider: string; configured: boolean; why: string | null;
+          providers: string[]; max_seconds: number; min_seconds: number;
+          words_per_minute: number; length_is_derived: boolean;
+          seconds_per_second: number; give_up_after: number;
+          shapes: string[]; marked: boolean }>("/video/doors"),
+  /** Render a passage as video. Length is NOT sent: the backend derives
+   *  it from the passage, because a dial makes the video fit the setting
+   *  instead of the content. Defaults to not waiting — a render is
+   *  minutes, and a held request is not. */
+  /** How this profile's scenes are shot, carried from one render to the
+   *  next. The default until somebody says otherwise. */
+  videoDirection: (profileId: string) =>
+    req<{ direction: string; default: string; max_length: number }>(
+      `/video/direction/${profileId}`),
+  /** Change how they look, in the owner's own words. Rewrites the
+   *  standing direction rather than appending, and answers with `was` so
+   *  a screen can show what it replaced. */
+  videoDirect: (profileId: string, asked: string,
+                surface: "window" | "fullscreen" = "window") =>
+    req<{ direction: string; was: string; asked: string }>(
+      `/video/direction/${profileId}`,
+      { method: "POST", body: { asked, surface } }),
+  /** What was asked of this scene, newest first — so somebody who has
+   *  amended five times can see which request caused the thing they now
+   *  dislike, rather than only where they ended up. */
+  videoDirectionLog: (profileId: string) =>
+    req<{ log: { asked: string | null; was: string; became: string;
+                 surface: string | null; created_at: string }[] }>(
+      `/video/direction/${profileId}/log`),
+  /** Back to the default, in one press. */
+  videoUndirect: (profileId: string) =>
+    req<{ direction: string }>(`/video/direction/${profileId}`,
+                               { method: "DELETE" }),
+  /** Which road this profile's presence takes, its daily ceiling, and
+   *  what is left of it today. The road is stored server-side because
+   *  auto-render reads it on a turn nobody is looking at a screen for:
+   *  a choice held in a component is a choice the chat endpoint cannot
+   *  see. `left` is the number that makes picking video safe to pick. */
+  videoRoad: (profileId: string) =>
+    req<{ road: string; daily_seconds: number; set: boolean;
+          provider: string; provider_set: boolean;
+          spent: number; left: number; roads: string[];
+          providers: string[] }>(
+      `/video/road/${profileId}`),
+  /** Choose the road, and the ceiling that goes with it. The ceiling is
+   *  sent with the road rather than on its own screen: somebody turning
+   *  video on is exactly the person who needs to see what it will cost
+   *  them per day, and a limit set later is a limit set after the bill. */
+  videoSetRoad: (profileId: string, road: string,
+                 dailySeconds?: number, provider?: string) =>
+    req<{ road: string; daily_seconds: number; set: boolean;
+          provider: string; provider_set: boolean;
+          spent: number; left: number; roads: string[];
+          providers: string[] }>(
+      `/video/road/${profileId}`,
+      { method: "POST",
+        body: { road, daily_seconds: dailySeconds, provider } }),
+  /** The most recent render for this profile, however it ended.
+   *
+   *  Asked on opening a conversation, because a render outlives the page
+   *  that started it. The bubble says "it keeps going without this page
+   *  open, and appears here when you come back" — and coming back only
+   *  works if there is something to ask. `scene` is null when there has
+   *  never been one, which is the ordinary case on every road but video. */
+  videoLatest: (profileId: string) =>
+    req<{ scene: SceneRender | null }>(`/video/latest/${profileId}`),
+  /** Whether a render started by a turn has finished. What a screen
+   *  polls after a reply comes back carrying a pending `scene`. A
+   *  settled render answers from the row rather than the service, so
+   *  polling a finished job costs nothing. */
+  videoFollow: (renderId: string) =>
+    req<SceneRender>(`/video/render/${renderId}`),
+  videoRender: (prompt: string, shape: string, profileId: string | null = null,
+                wait = false) =>
+    req<{ video_url?: string; id?: string; pending?: boolean;
+          provider: string; seconds?: number; waited?: number;
+          wait_seconds?: number }>("/video/render", {
+      method: "POST",
+      body: { prompt, shape, wait, profile_id: profileId },
+    }),
+  /** A photograph becomes this profile's face — geometry, skin and a
+   *  mouth — built on the deployment's own hardware. `shot` says how
+   *  the picture is framed: face, upper (torso) or full (body). */
+  // The photograph, measured so its mouth can move. This is the door a
+  // person is shown; `forgeFace` below builds a head, and a head from
+  // face landmarks has no skull, no hair and no ears — it can only be a
+  // mask. Both stay; only one is put in front of anybody.
+  speakingFace: (profileId: string, photo: string, shot: string,
+                 token: string) =>
+    req<{ registry_id: string; portrait: string; speaking: string;
+          mouth_shapes: string[]; avatar: Avatar }>(
+      `/profiles/${profileId}/avatar/speaking`,
+      { method: "POST", body: { photo, shot }, token }),
+  forgeFace: (profileId: string, photo: string, shot: string,
+              token: string) =>
+    req<{ registry_id: string; portrait: string; model: string;
+          blendshapes: string[]; avatar: Avatar }>(
+      `/profiles/${profileId}/avatar/forge`,
+      { method: "POST", body: { photo, shot }, token }),
   // Takes `asset`, not a brief — the brief is the prompt you would hand a
   // generator, and generating is not this endpoint's job.
   setAvatar: (profileId: string, asset: string, token: string,
@@ -4873,11 +5226,23 @@ export const api = {
         token }),
 
   avatarMarket: () =>
-    req<{ sources: { key: string; name: string; how: string }[]; note: string }>(
+    req<{ skin_sources: { key: string; name: string; how: string }[]; note: string }>(
       "/avatars/market"),
+  /** Whether this deployment can turn an FBX into a face at all. */
+  convertDoors: () => req<{ configured: boolean; takes: string[];
+                            max_bytes: number }>("/avatars/convert"),
+  /** An FBX export — or the provider's zip with one inside — becomes a
+   *  stored `.glb`, with the counts saying what survived it. */
+  convertModel: (profileId: string, model: string, name: string,
+                 token: string) =>
+    req<{ asset: string; media_id: string; from: string; meshes: number;
+          targets: number; named: number; bytes: number }>(
+      `/profiles/${profileId}/avatar/convert`,
+      { method: "POST", token, body: { model, name } }),
   importAvatar: (profileId: string, body: { source: string; asset: string;
                                             extra?: string[];
-                                            torso?: string },
+                                            torso?: string;
+                                            provider_asset_id?: string },
                  token: string) =>
     req<Avatar>(`/profiles/${profileId}/avatar/import`,
       { method: "POST", body, token }),
@@ -4909,6 +5274,64 @@ export const api = {
     const text = await res.text();
     if (!res.ok) throw new Error(text || res.statusText);
     return JSON.parse(text) as RegistryRow;
+  },
+  // The XR shelf: every headset that can stand in the rooms, and how.
+  xrPlatforms: () =>
+    req<{ xr_platforms: XrPlatform[] }>("/rooms/xr-platforms"),
+  /** Raise — the fourth kind's own doors. */
+  raiseDoors: () => req<RaiseDoors>("/raise/doors"),
+  raiseBegin: (body: { owner_id: string; display_name: string;
+                       stage: string; preset: string;
+                       temperament: Record<string, number>;
+                       verification: { birthdate: string;
+                                       guardian_consent?: boolean };
+                       terms_consent: boolean; language?: string }) =>
+    req<{ profile_id: string; owner_token: string; display_name: string;
+          kind: string; character: RaisedCharacter }>(
+      "/raise", { method: "POST", body }),
+  raiseCharacter: (profileId: string, token: string) =>
+    req<RaisedCharacter>(`/raise/${profileId}`, { token }),
+  raiseAlbum: (profileId: string, token: string) =>
+    req<{ profile_id: string; entries: GrowthEntry[] }>(
+      `/raise/${profileId}/album`, { token }),
+  raiseTeach: (profileId: string,
+               body: { teaching: string; what: string }, token: string) =>
+    req<{ taught: GrowthEntry; stage_door: GrowthEntry | null;
+          character: RaisedCharacter }>(
+      `/raise/${profileId}/teach`, { method: "POST", body, token }),
+  raiseSwitches: (profileId: string, changes: Record<string, unknown>,
+                  token: string) =>
+    req<{ switches: Record<string, unknown>; warning: string | null }>(
+      `/raise/${profileId}/switches`,
+      { method: "PATCH", body: { changes }, token }),
+  /** Rewind as presence: stand on a lived day (null = the present). */
+  raiseVisit: (profileId: string, simDay: number | null, token: string) =>
+    req<RaisedCharacter>(`/raise/${profileId}/visit`,
+      { method: "POST", body: { sim_day: simDay }, token }),
+  /** Fast-forward: simulated days lived from the record alone. */
+  raiseForward: (profileId: string, days: number, token: string) =>
+    req<{ days: number; while_away: GrowthEntry[];
+          stage_door: GrowthEntry | null; character: RaisedCharacter }>(
+      `/raise/${profileId}/forward`, { method: "POST", body: { days },
+                                       token }),
+  /** Rewind as a second life: the record to a day, raised differently. */
+  raiseBranch: (profileId: string,
+                body: { sim_day: number; display_name: string },
+                token: string) =>
+    req<{ profile_id: string; owner_token: string; display_name: string;
+          kind: string; character: RaisedCharacter }>(
+      `/raise/${profileId}/branch`, { method: "POST", body, token }),
+  // The operator's one-button shelf fill: tries the provider's catalog
+  // under the deployment key. `note` is a machine word — "stocked", or
+  // "provider_door_closed" while the provider has no listing API — so
+  // the screen translates the truth instead of parsing a sentence.
+  pullShelf: async (provider = "elevenlabs") => {
+    const res = await fetch(getBase()
+        + `/avatars/library/pull?provider=${encodeURIComponent(provider)}`,
+      { method: "POST", headers: { "x-signup-key": getSignupKey() } });
+    const text = await res.text();
+    if (!res.ok) throw new Error(text || res.statusText);
+    return JSON.parse(text) as { pulled: number; note: string };
   },
   myShelf: (accountId: string, token: string) =>
     req<{ shelf: RegistryRow[] }>(`/accounts/${accountId}/avatars`, { token }),
@@ -5114,6 +5537,44 @@ export const api = {
   takeBackMicInRoom: (roomId: string, interactorId: string, token: string) =>
     req<{ lending: boolean; id: string }>(
       `/rooms/${roomId}/mic/${interactorId}`, { method: "DELETE", token }),
+
+  /** What the room lets the synthetic people in it reach.
+   *
+   * Two keys. The owner's grant says what a profile can ever do; the
+   * room's tick says what it may do here, for the people here — which
+   * matters because a profile in a room is very often somebody else's.
+   * Reading is wide among the people in the room, for the same reason
+   * `/faces` is: a permission each person sees a different version of is
+   * a room where nobody can say what is allowed.
+   */
+  /** Tell a seat to go and do something, in the room's own words.
+   *
+   * The other half of the two keys: `/reach` decides what a profile in
+   * this room may do, this spends it. Nothing here grants — the errand
+   * can only pick among grants the owner already wrote and this room
+   * already ticked, and narrows again by what the words name.
+   */
+  roomErrand: (roomId: string, profileId: string, said: string,
+               token: string) =>
+    req<{ id: string; mode: string; grant_id: string; eyes_only: boolean;
+          asked_by: string; room_id: string }>(
+      `/rooms/${roomId}/errand`, {
+        method: "POST", token,
+        body: { profile_id: profileId, said },
+      }),
+
+  roomReach: (roomId: string, token: string) =>
+    req<RoomReach>(`/rooms/${roomId}/reach`, { token }),
+  allowRoomReach: (roomId: string, profileId: string,
+                   kind: "app" | "cap" | "skill", key: string,
+                   allowed: boolean,
+                   token: string) =>
+    req<{ profile_id: string; kind: string; key: string; allowed: boolean;
+          decided_by: string; decided_at: string }>(
+      `/rooms/${roomId}/reach`, {
+        method: "PUT", token,
+        body: { profile_id: profileId, kind, key, allowed },
+      }),
 
   // What each box in the room scene holds. Three answers and all three are a
   // box — see qrme/roomface.py. `faces` is keyed on the person and is sparse:
@@ -5510,6 +5971,81 @@ export const api = {
   // with a 409 that names the status — a 404 would be a lie about a machine
   // its maker has publicly shown.
   robotCatalogue: () => req<RobotCatalogue>("/robotics/catalog"),
+
+  // ---- the hands ------------------------------------------------------
+  // Every door that writes authority is owner-gated. The vocabulary is not:
+  // it publishes the refusals by name, including the one this product
+  // cannot engineer its way around (an iPhone's interface is not drivable
+  // by anything, so on iOS the profile watches and says where to press).
+  handsVocabulary: () => req<HandsVocabulary>("/hands/vocabulary"),
+  handGrants: (profileId: string, token: string, live = false) =>
+    req<{ grants: HandGrant[] }>(
+      `/profiles/${profileId}/hands/grants${live ? "?live=true" : ""}`,
+      { token }),
+  grantHands: (profileId: string, token: string, body: {
+    surface: string; places: string[]; verbs: string[];
+    minutes?: number; steps?: number; watched?: boolean;
+  }) => req<HandGrant>(`/profiles/${profileId}/hands/grants`,
+                       { method: "POST", token, body }),
+  // The second door onto the same row: the owner says it instead of
+  // picking it. Strict about what the words named — words that name no
+  // place are refused rather than read generously.
+  tellHands: (profileId: string, token: string, body: {
+    in_words: string; surface?: string; watched?: boolean;
+  }) => req<HandGrant>(`/profiles/${profileId}/hands/told`,
+                       { method: "POST", token, body }),
+  takeHandsBack: (profileId: string, token: string, grantId: string) =>
+    req<HandGrant>(`/profiles/${profileId}/hands/grants/${grantId}`,
+                   { method: "DELETE", token }),
+  openReach: (profileId: string, token: string, body: {
+    grant_id: string; errand: string; platform: string; mode?: string;
+  }) => req<Reach>(`/profiles/${profileId}/hands/reaches`,
+                   { method: "POST", token, body }),
+  readReach: (profileId: string, token: string, reachId: string) =>
+    req<{ reach: Reach; ledger: HandAction[] }>(
+      `/profiles/${profileId}/hands/reaches/${reachId}`, { token }),
+  // A refusal comes back 200 with the refusal in the row: a hand declining
+  // to type a password is the system working, not the request failing.
+  handAct: (profileId: string, token: string, reachId: string, body: {
+    verb: string; target?: string | null;
+    detail?: Record<string, unknown>; saw?: string | null;
+  }) => req<HandStep>(
+    `/profiles/${profileId}/hands/reaches/${reachId}/act`,
+    { method: "POST", token, body }),
+  // One frame in, one bounded move out. What comes back has already
+  // been through every bound the grant carries and is already written in
+  // the ledger — a refusal arrives the same way, 200 with the refusal in
+  // the row. A caller performs only what carries `outcome: "done"`.
+  nextMove: (profileId: string, token: string, reachId: string, body: {
+    frame?: string | null; saw?: string | null;
+  }) => req<HandStep>(
+    `/profiles/${profileId}/hands/reaches/${reachId}/next`,
+    { method: "POST", token, body }),
+  handOver: (profileId: string, token: string, reachId: string, body: {
+    to_profile_id: string; places?: string[]; verbs?: string[];
+  }) => req<Reach>(
+    `/profiles/${profileId}/hands/reaches/${reachId}/hand-over`,
+    { method: "POST", token, body }),
+  stopReach: (profileId: string, token: string, reachId: string,
+              why?: string) =>
+    req<Reach>(`/profiles/${profileId}/hands/reaches/${reachId}/stop`,
+               { method: "POST", token, body: { why: why || undefined } }),
+  routines: (profileId: string, token: string) =>
+    req<{ routines: Routine[] }>(`/profiles/${profileId}/hands/routines`,
+                                 { token }),
+  writeRoutine: (profileId: string, token: string, body: {
+    name: string; surface: string; learned: string; steps: HandStep[];
+  }) => req<Routine>(`/profiles/${profileId}/hands/routines`,
+                     { method: "POST", token, body }),
+  routineFromReach: (profileId: string, token: string, body: {
+    reach_id: string; name: string;
+  }) => req<Routine>(`/profiles/${profileId}/hands/routines/from-reach`,
+                     { method: "POST", token, body }),
+  replayRoutine: (profileId: string, token: string, routineId: string,
+                  body: { grant_id: string; platform: string }) =>
+    req<{ reach: Reach; steps: HandStep[] }>(
+      `/profiles/${profileId}/hands/routines/${routineId}/replay`,
+      { method: "POST", token, body }),
 
   // The connections bracket: what a body is taught, and what it is plugged
   // into. A task pack installed on a robot turns each of its tasks into a

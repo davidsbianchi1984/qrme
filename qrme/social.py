@@ -159,7 +159,7 @@ def threads(profile_id: str) -> list[dict]:
                             (other,)).fetchone()
         out.append({"other_id": other,
                     "other_name": name["display_name"] if name else None,
-                    "messages": r["n"], "last_at": r["last_at"]})
+                    "messages_count": r["n"], "last_at": r["last_at"]})
     return out
 
 

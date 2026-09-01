@@ -114,10 +114,10 @@ def test_tag_browse_omits_rated_for_unverified(client):
 
     anon = client.get("/summon", params={"ref": "#cabaret"},
                       headers={"authorization": ""}).json()
-    assert anon["profiles"] == []                # not even a hint in browse
+    assert anon["summoned"] == []                # not even a hint in browse
     adult = _interactor(client, "1990-01-01")
     found = client.get("/summon", params={"ref": "#cabaret"},
-                       headers=adult).json()["profiles"]
+                       headers=adult).json()["summoned"]
     assert len(found) == 1 and found[0]["rated"] is True
 
 

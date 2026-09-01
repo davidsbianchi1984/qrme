@@ -116,8 +116,8 @@ def test_pending_approval_turns_the_profile_chip_orange(client):
                 json={"interactor_id": interactor, "message": "hello"})
 
     face = client.get(f"/profiles/{pid}/watch").json()
-    assert face["profile"]["light"] == "orange"
-    assert face["profile"]["pending_approvals"] == 1
+    assert face["chip"]["light"] == "orange"
+    assert face["chip"]["pending_approvals"] == 1
     assert face["haptic"] == "alert"
 
     from qrme import db
@@ -129,8 +129,8 @@ def test_pending_approval_turns_the_profile_chip_orange(client):
                           "action": "approve"})
     assert r.status_code == 201
     face = client.get(f"/profiles/{pid}/watch").json()
-    assert face["profile"]["light"] == "green"
-    assert face["profile"]["pending_approvals"] == 0
+    assert face["chip"]["light"] == "green"
+    assert face["chip"]["pending_approvals"] == 0
     assert face["haptic"] is None
 
 

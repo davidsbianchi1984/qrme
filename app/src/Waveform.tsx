@@ -76,6 +76,7 @@ export function Waveform({ presence, lang }: {
 
   return (
     <div ref={ref}
+         data-screen="199"
          className={`waveform wf-${reading}`}
          // The strip is a reading, so it is announced as one rather than
          // left as decoration a screen reader walks into and cannot name.

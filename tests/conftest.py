@@ -21,8 +21,15 @@ def client(tmp_path, monkeypatch):
 ADULT_VERIFICATION = {"birthdate": "1984-06-01"}
 
 
-@pytest.fixture()
-def profile_id(client):
+def make_profile(client) -> str:
+    """Dana, signed in as her own owner. The fixture's body, callable.
+
+    A plain function as well as a fixture because `ratchets.py` drives these
+    same clients to measure how much of each one a probe reaches, and a
+    measure that set its own scene would be measuring a different drive than
+    the guard it audits — the two would agree until the day the fixture
+    changed, which is the day the number would matter.
+    """
     response = client.post(
         "/profiles",
         json={
@@ -45,6 +52,11 @@ def profile_id(client):
 
 
 @pytest.fixture()
+def profile_id(client):
+    return make_profile(client)
+
+
+@pytest.fixture()
 def interactor_id(client):
     """Sam — an ordinary signed-in person, with an account and a plan.
 
@@ -60,6 +72,11 @@ def interactor_id(client):
     The fixture agreeing with the product is the point: use
     `visitor_interactor` for somebody who really has not signed in.
     """
+    return make_interactor(client)
+
+
+def make_interactor(client) -> str:
+    """Sam, enrolled. The fixture's body, callable — see `make_profile`."""
     response = client.post(
         "/interactors",
         json={"display_name": "Sam", "birthdate": "2000-01-15"},

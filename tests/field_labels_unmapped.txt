@@ -1,4 +1,4 @@
-# status: backlog — 120 rows
+# status: backlog — 121 rows
 #
 # Request-model fields with no row in `qrme/i18n._FIELD_LABELS`, so a 422 that
 # names one shows the API's identifier rather than the label on the form.
@@ -70,7 +70,6 @@ demographics
 depicts_real_person
 depicts_someone_else
 description
-detail
 device
 effective_age
 embodiment
@@ -155,3 +154,11 @@ verification
 view_style
 watermark
 watermark_id
+# `scene` is a *response* field — `ChatResponse.scene`, the render a turn
+# started. The scan walks every annotated class field and cannot tell a
+# request from an answer, so it arrives here; nobody can mistype it.
+scene
+# `wait` is a flag the client owns: hold the request open, or take a job
+# id and poll. A person never sees it, and a 422 naming it is a client
+# bug rather than something somebody got wrong on a form.
+wait

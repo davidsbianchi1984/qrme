@@ -135,11 +135,11 @@ struct WithoutAnAccountView: View {
                     .font(.headline).foregroundStyle(Theme.txt)
                 if let timeline {
                     Text(timeline.note).font(.caption2).foregroundStyle(Theme.t2)
-                    if timeline.events.isEmpty {
+                    if timeline.timeline_events.isEmpty {
                         Text(L10n.t("obj.timeline.empty", lang))
                             .font(.caption2).foregroundStyle(Theme.t3)
                     }
-                    ForEach(timeline.events, id: \.id) { e in
+                    ForEach(timeline.timeline_events, id: \.id) { e in
                         // Built in steps: one chained expression of five
                         // string operands is what the type checker gave up
                         // on, and a row nobody could compile is a row

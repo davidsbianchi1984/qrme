@@ -584,7 +584,7 @@ object ApiClient {
      *  Carries no free text: event, actor, time, sealed. */
     suspend fun objectionTimeline(objectionId: String): ObjectionTimeline {
         val o = JSONObject(request("/objections/$objectionId/timeline"))
-        val arr = o.optJSONArray("events")
+        val arr = o.optJSONArray("timeline_events")
         return ObjectionTimeline(
             o.optString("status"),
             o.optString("note"),
@@ -728,7 +728,7 @@ object ApiClient {
         val o = JSONObject(request("/profiles/$id/earnings/payout", "POST",
             JSONObject(), token))
         return PayoutReceipt(o.getString("payout_id"), o.optDouble("total_amount"),
-            o.optInt("entries"))
+            o.optInt("entries_count"))
     }
 
     // ---- relationship: how the profile relates to you ----
@@ -1412,7 +1412,7 @@ object ApiClient {
         return BeaconCard(
             o.optString("profile_id", bid),
             o.optString("display_name", ""),
-            o.optString("watermark", ""),
+            o.optString("watermark_line", ""),
             if (o.isNull("portrait")) null else o.optString("portrait", null),
             if (o.isNull("label")) null else o.optString("label", null),
             !o.isNull("shared_room"),
@@ -1435,7 +1435,7 @@ object ApiClient {
     suspend fun publicFeed(cursor: String? = null): FeedPage {
         val tail = if (cursor.isNullOrEmpty()) "" else "&cursor=$cursor"
         val o = JSONObject(request("/feed?limit=12" + tail))
-        val arr = o.optJSONArray("items")
+        val arr = o.optJSONArray("cards")
         val items = mutableListOf<FeedCard>()
         for (i in 0 until (arr?.length() ?: 0)) {
             items.add(feedCard(arr!!.getJSONObject(i)))
@@ -1702,7 +1702,7 @@ object ApiClient {
             java.net.URLEncoder.encode(ref, "UTF-8")))
         val cards = mutableListOf<SummonCard>()
         o.optJSONObject("profile")?.let { cards += summonCardOf(it) }
-        o.optJSONArray("profiles")?.let { arr ->
+        o.optJSONArray("summoned")?.let { arr ->
             for (i in 0 until arr.length()) cards += summonCardOf(arr.getJSONObject(i))
         }
         return SummonResult(o.optString("type", ""), o.optString("label", null),
@@ -1737,7 +1737,7 @@ object ApiClient {
                 o.optString("publisher", ""), o.optDouble("price", 0.0),
                 o.optString("currency", "USD"), o.optBoolean("free"),
                 o.optString("origin", "local"), o.optString("origin_url", null),
-                o.optInt("items"), o.optInt("installs"))
+                o.optInt("items_count"), o.optInt("installs"))
         }
     }
 
@@ -1915,7 +1915,7 @@ object ApiClient {
     }
 
     suspend fun appsCatalog(): List<CatalogApp> {
-        val providers = JSONObject(request("/connectors/catalog")).getJSONArray("providers")
+        val providers = JSONObject(request("/connectors/catalog")).getJSONArray("app_providers")
         val out = mutableListOf<CatalogApp>()
         for (i in 0 until providers.length()) {
             val p = providers.getJSONObject(i)
@@ -1990,7 +1990,7 @@ object ApiClient {
             val needs = e.optJSONArray("needs")
             val th = e.getJSONObject("threshold")
             VoiceEnrollment(
-                e.optInt("samples"), e.optDouble("seconds"), e.optInt("turns"),
+                e.optInt("samples"), e.optDouble("seconds"), e.optInt("turns_count"),
                 if (e.isNull("mean_turn_seconds")) null
                 else e.optDouble("mean_turn_seconds"),
                 e.optBoolean("ready"),
@@ -2065,7 +2065,7 @@ object ApiClient {
      *  side by side, listed until its owner goes private. */
     suspend fun browsePeople(): BrowsePool {
         val o = JSONObject(request("/people/browse"))
-        val arr = o.optJSONArray("profiles") ?: org.json.JSONArray()
+        val arr = o.optJSONArray("found") ?: org.json.JSONArray()
         val kindsObj = o.optJSONObject("kind_counts") ?: JSONObject()
         val kinds = kindsObj.keys().asSequence()
             .associateWith { kindsObj.optInt(it, 0) }
@@ -2275,7 +2275,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
             ShopCard(o.getString("id"), o.optString("name"),
                 o.optString("seller"),
                 if (o.isNull("tag")) null else o.optString("tag"),
-                o.optInt("offerings"))
+                o.optInt("offerings_count"))
         }
     }
 
@@ -2347,7 +2347,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
             val t = a.getJSONObject(i)
             DmThread(t.optString("other_id"),
                 if (t.isNull("other_name")) null else t.optString("other_name"),
-                t.optInt("messages"))
+                t.optInt("messages_count"))
         }
     }
 
@@ -2799,7 +2799,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
 
     private fun dealOf(o: JSONObject): ExchangeDeal {
         val items = mutableListOf<ExchangeItemRow>()
-        o.optJSONArray("items")?.let { a ->
+        o.optJSONArray("deal_items")?.let { a ->
             for (i in 0 until a.length()) {
                 val it = a.getJSONObject(i)
                 items.add(ExchangeItemRow(it.getString("id"),
@@ -2902,8 +2902,8 @@ data class SpokenBinding(val provider: String, val voiceId: String,
                        token: String): AudienceCounts {
         val o = JSONObject(request("/$kind/$targetId/audience",
             token = token))
-        return AudienceCounts(o.optInt("likes"), o.optInt("comments"),
-            o.optInt("shares"), o.optInt("subscribers"))
+        return AudienceCounts(o.optInt("likes"), o.optInt("comments_count"),
+            o.optInt("shares"), o.optInt("subscribers_count"))
     }
 
     suspend fun subscribe(kind: String, subjectId: String, token: String) {
@@ -3038,7 +3038,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
     suspend fun grantTerms(): List<String> {
         val o = JSONObject(request("/skill-grants/vocabulary"))
         val out = mutableListOf<String>()
-        o.optJSONArray("terms")?.let { a ->
+        o.optJSONArray("ground_rules")?.let { a ->
             for (i in 0 until a.length()) out.add(a.getString(i))
         }
         return out
@@ -3449,7 +3449,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
         val o = JSONObject(request("/objections/$objectionId/audit",
             token = token))
         val out = mutableListOf<String>()
-        o.optJSONArray("events")?.let { a ->
+        o.optJSONArray("audit_events")?.let { a ->
             for (i in 0 until a.length()) {
                 val e = a.getJSONObject(i)
                 out.add(e.optString("event") +
@@ -3501,7 +3501,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
         val o = JSONObject(request("/gaming/sessions/$sessionId/lobby",
             token = token))
         val out = mutableListOf<String>()
-        o.optJSONArray("members")?.let { a ->
+        o.optJSONArray("seats")?.let { a ->
             for (i in 0 until a.length()) {
                 val m = a.getJSONObject(i)
                 out.add(m.optString("callsign", m.optString("member_id")) +
@@ -3994,7 +3994,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
     suspend fun campaign(campaignId: String): String {
         val o = JSONObject(request("/campaigns/$campaignId"))
         return o.optString("title") + " · " + o.optDouble("raised", 0.0) +
-            " / " + o.optDouble("goal", 0.0) + " · " + o.optString("status")
+            " / " + o.optDouble("goal_amount", 0.0) + " · " + o.optString("status")
     }
 
     /** No token required — a donor arriving from a beacon scan has no
@@ -4155,7 +4155,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
             token))
         // The scope comes back from the door rather than being echoed from
         // the request: what the grant reaches is the server's to say.
-        val scope = o.optJSONArray("scope")?.let { a ->
+        val scope = o.optJSONArray("scopes")?.let { a ->
             (0 until a.length()).joinToString(",") { a.optString(it) } } ?: ""
         return Triple(o.optString("id"), o.optString("token"), scope)
     }
@@ -4251,7 +4251,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
             token = token))
         return (0 until arr.length()).map {
             val o = arr.getJSONObject(it)
-            o.optString("interactor_name") + " \u00b7 " + o.optInt("turns")
+            o.optString("interactor_name") + " \u00b7 " + o.optInt("turns_count")
         }
     }
 
@@ -4360,7 +4360,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
                        token: String): String {
         val o = JSONObject(request("/profiles/$id/thread/$interactorId",
             token = token))
-        return (o.optJSONArray("messages")?.length() ?: 0).toString()
+        return (o.optJSONArray("thread_turns")?.length() ?: 0).toString()
     }
 
     suspend fun engagement(id: String, interactorId: String,
@@ -4433,22 +4433,22 @@ data class SpokenBinding(val provider: String, val voiceId: String,
 
     suspend fun exportProfile(id: String, token: String): String {
         val o = JSONObject(request("/profiles/$id/export", token = token))
-        return (o.optJSONArray("messages")?.length() ?: 0).toString() +
-            " \u00b7 " + (o.optJSONArray("posts")?.length() ?: 0) +
-            " \u00b7 " + (o.optJSONArray("sources")?.length() ?: 0)
+        return (o.optJSONArray("message_rows")?.length() ?: 0).toString() +
+            " \u00b7 " + (o.optJSONArray("post_rows")?.length() ?: 0) +
+            " \u00b7 " + (o.optJSONArray("source_rows")?.length() ?: 0)
     }
 
     suspend fun profileStats(id: String, token: String): String {
         val o = JSONObject(request("/profiles/$id/stats", token = token))
         return o.optInt("sessions").toString() + " \u00b7 " +
             o.optInt("memory_entries") + " \u00b7 " +
-            o.optInt("interactors") + " \u00b7 " + o.optInt("sources")
+            o.optInt("interactors") + " \u00b7 " + o.optInt("sources_count")
     }
 
     suspend fun feed(id: String): String {
         val o = JSONObject(request("/profiles/$id/feed"))
         val ranked = o.optJSONArray("ranked_on")
-        return (o.optJSONArray("posts")?.length() ?: 0).toString() +
+        return (o.optJSONArray("feed_posts")?.length() ?: 0).toString() +
             " \u00b7 " + (ranked?.join(", ") ?: "")
     }
 
@@ -4565,7 +4565,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
      */
     suspend fun avatarMarket(): List<MarketSource> {
         val o = JSONObject(request("/avatars/market"))
-        val arr = o.optJSONArray("sources") ?: JSONArray()
+        val arr = o.optJSONArray("skin_sources") ?: JSONArray()
         return (0 until arr.length()).map {
             val s = arr.getJSONObject(it)
             MarketSource(s.getString("key"), s.optString("name", ""),
@@ -4625,7 +4625,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
 
     suspend fun page(id: String): String {
         val o = JSONObject(request("/profiles/$id/page"))
-        return (o.optJSONObject("theme")?.optString("label") ?: "\u2014") +
+        return (o.optJSONObject("page_theme")?.optString("label") ?: "\u2014") +
             " \u00b7 " + o.optString("tagline", "\u2014")
     }
 
@@ -4723,7 +4723,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
      *  profile's provenance. */
     suspend fun composition(id: String): String {
         val arr = JSONObject(request("/profiles/$id/composition"))
-            .optJSONArray("sources")
+            .optJSONArray("composition_sources")
         return (0 until (arr?.length() ?: 0)).joinToString(" \u00b7 ") {
             arr!!.getJSONObject(it).optString("name")
         }
@@ -4789,7 +4789,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
     suspend fun watchFace(id: String, token: String): String {
         val o = JSONObject(request("/profiles/$id/watch", token = token))
         val sum = o.getJSONObject("summary")
-        return o.getJSONObject("profile").optString("light") +
+        return o.getJSONObject("chip").optString("light") +
             " \u00b7 " + sum.optInt("working") + " \u00b7 " +
             sum.optInt("needing_assistance") + " \u00b7 " +
             sum.optInt("stopped")
@@ -4900,7 +4900,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
 
     suspend fun oauthProviders(): List<String> {
         val arr = JSONObject(request("/auth/oauth/providers"))
-            .getJSONArray("providers")
+            .getJSONArray("signin_providers")
         return (0 until arr.length()).map {
             arr.getJSONObject(it).getString("provider")
         }
@@ -5023,7 +5023,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
         val o = JSONObject(request("/b/$id/card"))
         return if (o.optBoolean("age_wall")) o.optString("note", "18+")
                else o.optString("display_name") + " \u00b7 " +
-                   o.optString("watermark")
+                   o.optString("watermark_line")
     }
 
     fun beaconScanUrl(id: String): String =
@@ -5094,7 +5094,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
     suspend fun reviewsOf(id: String): String {
         val o = JSONObject(request("/profiles/$id/reviews"))
         val n = o.getJSONArray("reviews").length()
-        val avg = o.optJSONObject("rating")?.optDouble("average") ?: 0.0
+        val avg = o.optJSONObject("rating_summary")?.optDouble("average") ?: 0.0
         return "$n \u00b7 $avg"
     }
 
@@ -5446,7 +5446,7 @@ data class SpokenBinding(val provider: String, val voiceId: String,
                              rating: String, token: String): String {
         return JSONObject(request(
             "/profiles/$id/interactions/$interactorId/feedback", "POST",
-            JSONObject().put("rating", rating), token)).optString("rating")
+            JSONObject().put("rating", rating), token)).optDouble("score", 0.0).toString()
     }
 
     suspend fun myReferrals(interactorId: String, token: String): Int {

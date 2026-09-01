@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { api, getBase, type Anonymity, type Avatar, type AvatarBrief, type Deleted,
-         type Emblem, type IdentityVocabulary, type Memorial, type Sibling,
+import { SkinTiles } from "../SkinTiles";
+import { VideoQuote } from "../VideoQuote";
+import { api, getBase, getSignupKey, type Anonymity, type Avatar,
+         type AvatarBrief, type Deleted,
+         type Emblem, type IdentityVocabulary, type Memorial,
+         type RegistryRow, type Sibling,
          type Sunset, type Verifiable, type Verification } from "../api";
 import { Refusal } from "../Refusal";
 import { fill, t as tr, visitorLang } from "../l10n";
@@ -56,9 +60,61 @@ export function Identity({ onPlans, onPassing }: {
   // media door as any photo, then imported as the portrait).
   const [market, setMarket] = useState<{ key: string; name: string;
                                          how: string }[]>([]);
-  const [marketKey, setMarketKey] = useState("ready_player_me");
+  // The first live row of the market list. It used to be a hard-coded
+  // "ready_player_me", which is how a picker came to open on a service
+  // Netflix had shut down — a default naming one row is a default that
+  // rots when that row goes. The server's own list decides now.
+  const [marketKey, setMarketKey] = useState("");
+  // The forge: what this deployment can build from a photograph, and the
+  // framing of the picture being handed to it.
+  // Which of the three roads this profile's presence takes.
+  //
+  // Stored on the server, not held here. It used to be component state,
+  // and that was fine while the only thing it did was decide which block
+  // this screen drew — but auto-render reads the road on a turn nobody
+  // is looking at this screen for, and a choice living in a component is
+  // a choice `/profiles/{id}/chat` cannot see. `budget` is the other
+  // half: every reply renders, so the ceiling is what makes video safe
+  // to pick, and it is shown next to the road rather than on a settings
+  // page somebody finds after the bill.
+  const [road, setRoad] = useState<"photo" | "avatar" | "video">("photo");
+  const [budget, setBudget] = useState<
+    { daily_seconds: number; spent: number; left: number } | null>(null);
+  const [capDraft, setCapDraft] = useState("");
+  // Which company renders this profile. Held here rather than read off
+  // `film` because that is the DEPLOYMENT's choice: once an owner picks,
+  // the two disagree, and the tile has to light on the owner's.
+  const [filmPick, setFilmPick] = useState("");
+  // The drawer the roads open, so pressing one can bring it to the eye
+  // rather than leaving it somewhere below the fold.
+  const drawer = useRef<HTMLDivElement | null>(null);
+  const [film, setFilm] = useState<
+    Awaited<ReturnType<typeof api.videoDoors>> | null>(null);
+  const [passage, setPassage] = useState("");
+  const [videoShape, setVideoShape] = useState("landscape");
+  const [filming, setFilming] = useState(false);
+  // How this profile's scenes are shot, carried from one render to the
+  // next. Amended in the owner's own words rather than typed out again.
+  const [direction, setDirection] = useState("");
+  const [sceneAsk, setSceneAsk] = useState("");
+  const [directing, setDirecting] = useState(false);
+  const [sceneLog, setSceneLog] = useState<
+    Awaited<ReturnType<typeof api.videoDirectionLog>>["log"]>([]);
+
+  const [forge, setForge] = useState<
+    { provider: string; configured: boolean; shots: string[] } | null>(null);
+  const [shot, setShot] = useState("face");
+  const [forging, setForging] = useState(false);
   const [marketUrl, setMarketUrl] = useState("");
   const [marketTorso, setMarketTorso] = useState("");
+  // The provider's own id for an imported avatar (an ElevenLabs avatar
+  // id, a Ready Player Me GUID) — recorded into the registry row's
+  // provenance so the face remembers where it came from.
+  const [marketPid, setMarketPid] = useState("");
+  // The deployment's default faces: the shelf the operator stocked.
+  // Tapping one claims it through the registry, so a takedown later
+  // still reaches every profile that wore it.
+  const [shelfRows, setShelfRows] = useState<RegistryRow[]>([]);
   const [capturing, setCapturing] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -143,14 +199,105 @@ export function Identity({ onPlans, onPassing }: {
     } catch (e) { fail(e); }
   }
 
+  /** Every file a person actually has, taken by the same box.
+   *
+   *      asked     do the FBX conversion in the app
+   *      mattered  the door could not ACCEPT one to begin with
+   *
+   * `media.save` proves a format from its bytes and an FBX matches
+   * nothing it knows, so an FBX upload came back "unrecognized file" and
+   * the shelf's answer was a page of Blender menus. A model goes to the
+   * converter first and arrives here as the `.glb` it came back as; a
+   * picture goes the way it always did. */
+  function isModelExport(file: File): boolean {
+    const name = file.name.toLowerCase();
+    return name.endsWith(".fbx") || name.endsWith(".zip");
+  }
+
+  /** What this box may be handed, asked of the deployment rather than
+   *  assumed. A console that offers to convert an FBX on a box with no
+   *  forge is a button that fails, and the shelf's own row now promises
+   *  the conversion in writing — so the promise and the accept list come
+   *  from the same answer. */
+  const [takesModels, setTakesModels] = useState(false);
+  useEffect(() => {
+    let gone = false;
+    api.convertDoors()
+      .then((d) => { if (!gone) setTakesModels(!!d.configured); })
+      .catch(() => { if (!gone) setTakesModels(false); });
+    return () => { gone = true; };
+  }, []);
+
   async function importPhoto(file: File) {
     setError(null); setNote(null);
     try {
-      const saved = await api.uploadMedia(me, file, token);
-      await api.importAvatar(me, { source: "photos", asset: saved.url }, token);
-      setNote(tr("idn.deck.done", lang));
+      let asset: string;
+      if (isModelExport(file)) {
+        setNote(tr("idn.model.converting", lang));
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        let binary = "";
+        // Chunked for the same reason the forge's reader is: one apply()
+        // over a seven-megabyte model blows the argument limit.
+        for (let at = 0; at < bytes.length; at += 0x8000) {
+          binary += String.fromCharCode(...bytes.subarray(at, at + 0x8000));
+        }
+        const made = await api.convertModel(me, btoa(binary), file.name, token);
+        asset = made.asset;
+        // What survived, said rather than assumed. A conversion that
+        // dropped the mouth shapes would still return a model, and the
+        // only place anybody would notice is a face that stopped being
+        // able to speak.
+        setNote(tr("idn.model.done", lang)
+                  .replace("{shapes}", String(made.named)));
+      } else {
+        const saved = await api.uploadMedia(me, file, token);
+        asset = saved.url;
+      }
+      await api.importAvatar(me, { source: "photos", asset }, token);
+      if (!isModelExport(file)) setNote(tr("idn.deck.done", lang));
       reloadAvatar();
     } catch (e) { fail(e); }
+  }
+
+  /** A photograph becomes a face, built here rather than bought.
+   *
+   *  The bytes go up as base64 rather than through the media door,
+   *  because the photograph is the INPUT and not the keepsake: what is
+   *  stored afterwards is the head it became. */
+  /** The 3-D head, for anybody who wants one.
+   *
+   * It is second on the card and says what it is, because a head built
+   * from 478 face landmarks has no skull, no hair and no ears — it is a
+   * mask, and the field said so looking at one. It stays reachable
+   * because it is real and it works, and because deleting the only door
+   * to a capability is a different act from taking it off the front of a
+   * screen. Sharing `forgeFrom`'s reading and encoding rather than
+   * copying them: one road in, two things it can build.
+   */
+  async function headFrom(file: File | undefined) {
+    await forgeFrom(file, "head");
+  }
+
+  async function forgeFrom(file: File | undefined,
+                           makes: "speaking" | "head" = "speaking") {
+    if (!file) return;
+    setError(null); setNote(null); setForging(true);
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      let binary = "";
+      // Chunked: one apply() over a multi-megabyte photograph blows the
+      // argument limit on every browser that matters.
+      for (let at = 0; at < bytes.length; at += 0x8000) {
+        binary += String.fromCharCode(...bytes.subarray(at, at + 0x8000));
+      }
+      if (makes === "head") {
+        await api.forgeFace(me, btoa(binary), shot, token);
+      } else {
+        await api.speakingFace(me, btoa(binary), shot, token);
+      }
+      setNote(tr("idn.forge.done", lang));
+      reloadAvatar();
+    } catch (e) { fail(e); } finally { setForging(false); }
   }
 
   async function importMarket() {
@@ -159,7 +306,9 @@ export function Identity({ onPlans, onPassing }: {
     try {
       await api.importAvatar(me,
         { source: marketKey, asset: marketUrl.trim(),
-          ...(marketTorso.trim() ? { torso: marketTorso.trim() } : {}) },
+          ...(marketTorso.trim() ? { torso: marketTorso.trim() } : {}),
+          ...(marketPid.trim()
+            ? { provider_asset_id: marketPid.trim() } : {}) },
         token);
       setNote(tr("idn.deck.done", lang));
       setMarketUrl("");
@@ -282,8 +431,151 @@ export function Identity({ onPlans, onPassing }: {
     }).catch(fail);
     api.emblems().then((r) => setEmblems(r.emblems)).catch(() => undefined);
     api.avatarBriefs().then((r) => setBriefs(r.briefs)).catch(() => undefined);
-    api.avatarMarket().then((r) => setMarket(r.sources)).catch(() => undefined);
+    api.avatarMarket().then((r) => {
+      setMarket(r.skin_sources);
+      // Open on whatever the server actually offers first, so a row
+      // being struck from the list can never leave the picker pointing
+      // at it.
+      setMarketKey((k) => k || r.skin_sources[0]?.key || "");
+    }).catch(() => undefined);
+    api.forgeDoors().then(setForge).catch(() => setForge(null));
+    // The video road's own door, asked before anybody writes anything:
+    // a screen that draws the road on a deployment with none is a button
+    // that fails, and somebody who has just written what they wanted is
+    // the worst moment to find out.
+    api.videoDoors().then(setFilm).catch(() => setFilm(null));
+    if (me) {
+      // The stored road, so the picker opens on what the chat endpoint
+      // will actually do rather than on this component's default.
+      api.videoRoad(me).then((r) => {
+        setRoad(r.road as "photo" | "avatar" | "video");
+        setBudget(r);
+        setCapDraft(String(r.daily_seconds));
+        setFilmPick(r.provider);
+      }).catch(() => setBudget(null));
+      api.videoDirection(me).then((r) => setDirection(r.direction))
+        .catch(() => setDirection(""));
+      api.videoDirectionLog(me).then((r) => setSceneLog(r.log))
+        .catch(() => setSceneLog([]));
+    }
+    api.avatarShelf().then((r) => setShelfRows(r.shelf))
+      .catch(() => setShelfRows([]));
   }, []);
+
+  /** Take the road, and keep it.
+   *
+   * The picker moves first and the request follows, because the block
+   * below it is the whole reason somebody pressed: making them wait on a
+   * round trip to see the video options would be a spinner in place of a
+   * fold. If the write fails the server's answer wins — a picker showing
+   * "video" over a profile still stored as "photo" is the one state that
+   * would have somebody wondering why no footage ever arrives.
+   */
+  async function chooseRoad(key: "photo" | "avatar" | "video") {
+    setRoad(key);
+    // After the paint that adds it, not before — the element does not
+    // exist yet on the press that opens it, and scrolling to a ref that
+    // is still null is the silent no-op version of this whole bug.
+    requestAnimationFrame(() => {
+      drawer.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    if (!me) return;
+    try {
+      const got = await api.videoSetRoad(me, key);
+      setRoad(got.road as "photo" | "avatar" | "video");
+      setBudget(got);
+      setCapDraft(String(got.daily_seconds));
+      setFilmPick(got.provider);
+    } catch (e) {
+      fail(e);
+      api.videoRoad(me).then((r) => {
+        setRoad(r.road as "photo" | "avatar" | "video");
+        setBudget(r);
+        setFilmPick(r.provider);
+      }).catch(() => undefined);
+    }
+  }
+
+  /** Move the ceiling. Sent with the road it belongs to, since that is
+   *  the pair the server stores — and a ceiling is only ever raised or
+   *  lowered by the person who has to live under it. */
+  async function setCeiling() {
+    if (!me) return;
+    const seconds = Number(capDraft);
+    if (!Number.isFinite(seconds) || seconds < 0) return;
+    try {
+      const got = await api.videoSetRoad(me, road, Math.round(seconds));
+      setBudget(got);
+      setCapDraft(String(got.daily_seconds));
+      setFilmPick(got.provider);
+    } catch (e) {
+      fail(e);
+    }
+  }
+
+  /** Choose which company renders this profile's footage.
+   *
+   *  Sent with the road for the same reason the ceiling is — the three
+   *  live in one row — and the answer wins over the press, so a tile lit
+   *  on screen always names the service the next render will actually go
+   *  to. This picker had no handler at all until now: it drew every
+   *  provider, highlighted the deployment's, and dropped every click, so
+   *  picking a service looked like it worked and changed nothing.
+   */
+  async function chooseFilmProvider(key: string) {
+    if (!me) return;
+    try {
+      const got = await api.videoSetRoad(me, road, undefined, key);
+      setBudget(got);
+      setFilmPick(got.provider);
+    } catch (e) {
+      fail(e);
+    }
+  }
+
+  /** Send the passage to be rendered. Length is never passed: the
+   *  backend derives it from the words, which is the whole reason there
+   *  is no dial on this screen. */
+  async function renderScene() {
+    setFilming(true);
+    setNote(null);
+    try {
+      const got = await api.videoRender(passage, videoShape, me);
+      // `fill` answers nodes for the places that render markup; this is a
+      // plain note, so the two strings are plain too.
+      setNote(got.video_url ? tr("idn.video.done", lang)
+                            : tr("idn.video.queued", lang));
+    } catch (e) {
+      fail(e);
+    } finally {
+      setFilming(false);
+    }
+  }
+
+  /** Their words, applied. The direction comes back rewritten rather
+   *  than lengthened — see `filming.amend` for why appending degrades. */
+  async function directScene() {
+    setDirecting(true);
+    try {
+      const got = await api.videoDirect(me, sceneAsk, "window");
+      setDirection(got.direction);
+      setSceneAsk("");
+      setSceneLog((await api.videoDirectionLog(me)).log);
+    } catch (e) {
+      fail(e);
+    } finally {
+      setDirecting(false);
+    }
+  }
+
+  async function undirectScene() {
+    try {
+      setDirection((await api.videoUndirect(me)).direction);
+      setSceneLog((await api.videoDirectionLog(me)).log);
+    } catch (e) {
+      fail(e);
+    }
+  }
 
   function reload() {
     if (!me || !token) return;
@@ -325,7 +617,7 @@ export function Identity({ onPlans, onPassing }: {
         {/* Beginning and passing on left the sidebar: pre-building an
             account, recovery, and how it ends are options taken from the
             identity they concern. */}
-        <button className="chip" onClick={onPassing}>
+        <button className="chip" data-go="passing" onClick={onPassing}>
           {tr("idn.passing", lang)}
         </button>
       </header>
@@ -587,7 +879,10 @@ export function Identity({ onPlans, onPassing }: {
         <div className="row">
           <label className="chip" style={{ marginBottom: 0 }}>
             {tr("idn.deck.upload", lang)}
-            <input type="file" accept="image/*" style={{ display: "none" }}
+            <input type="file"
+                   accept={takesModels
+                     ? "image/*,.glb,.fbx,.zip" : "image/*,.glb"}
+                   style={{ display: "none" }}
                    onChange={(e) => {
                      const f = e.target.files?.[0];
                      if (f) importPhoto(f);
@@ -624,15 +919,277 @@ export function Identity({ onPlans, onPassing }: {
           </div>
         )}
 
+        {/* The deployment's default faces, first: most people pick, few
+            import. One tap claims through the registry — the road a
+            takedown can still travel. */}
+        <h4>{tr("idn.deck.defaults", lang)}</h4>
+        <p className="muted small">{tr("idn.deck.defaults.sub", lang)}</p>
+        {getSignupKey() && (
+          <button className="chip" onClick={async () => {
+            setError(null); setNote(null);
+            try {
+              const got = await api.pullShelf();
+              setNote(got.note === "provider_door_closed"
+                ? tr("idn.deck.pull.closed", lang)
+                : tr("idn.deck.done", lang));
+              const r = await api.avatarShelf();
+              setShelfRows(r.shelf);
+            } catch (e) { fail(e); }
+          }}>{tr("idn.deck.pull", lang)}</button>
+        )}
+        {shelfRows.length === 0 ? (
+          <p className="muted small">{tr("idn.deck.defaults.none", lang)}</p>
+        ) : (
+          <div className="shelf-grid">
+            {shelfRows.map((row) => (
+              <button key={row.id} className="shelf-face"
+                      title={row.label || row.provider}
+                      aria-label={row.label || row.provider}
+                      onClick={async () => {
+                        setError(null); setNote(null);
+                        try {
+                          await api.claimFace(me, row.id, token);
+                          setNote(tr("idn.deck.done", lang));
+                          reloadAvatar();
+                        } catch (e) { fail(e); }
+                      }}>
+                <img alt="" src={row.asset.startsWith("http")
+                  ? row.asset : getBase() + row.asset} />
+                {row.marked && (
+                  <span className="shelf-mark" aria-hidden="true">✦</span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* The three roads, one question above the framing choice.
+            Framing — face, upper torso, full body — is about the
+            photograph going IN. This is about which road the presence
+            takes on the way out, and video is not a fourth way to crop a
+            photo. Each surface already falls back down this list when
+            the one above it is not there, so the picker names something
+            true rather than inventing a hierarchy. */}
+        <h4>{tr("idn.road", lang)}</h4>
+        <p className="muted small">{tr("idn.road.sub", lang)}</p>
+        <div className="roads">
+          {/* Keys written out rather than built from the road name. A
+              lookup assembled with a template literal is invisible to the
+              extractor next door, which then reports six strings
+              translated into ten languages and read by nobody — and it
+              would be right, because it could not prove otherwise. */}
+          {([
+            ["photo", tr("idn.road.photo", lang), tr("idn.road.photo.sub", lang)],
+            ["avatar", tr("idn.road.avatar", lang), tr("idn.road.avatar.sub", lang)],
+            ["video", tr("idn.road.video", lang), tr("idn.road.video.sub", lang)],
+          ] as const).map(([key, name, note]) => (
+            <button key={key} type="button"
+                    className={"road" + (road === key ? " lit" : "")}
+                    aria-pressed={road === key}
+                    onClick={() => void chooseRoad(key)}>
+              <span className="road-name">{name}</span>
+              <span className="road-note">{note}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* What the pressed button opens, attached to it.
+          *
+          *     asked     when you press video generation or avatar it
+          *               should pop up below the buttons, so we don't
+          *               have to scroll even further past avatar
+          *     mattered  it already WAS below them, and that was not the
+          *               same thing as being findable
+          *
+          * The order was never wrong — roads, then the video block, then
+          * the forge. But the block is long and the page is longer, so
+          * pressing a road opened a panel below the fold: it "shows up
+          * for a split second" as the layout grows and then the screen is
+          * still showing the buttons, with the thing you asked for
+          * somewhere underneath. Reported as the options going away.
+          *
+          * So the two panels share one drawer that is visibly the
+          * button's own — its own ground, hairline and a notch pointing
+          * back up at the row — and choosing a road scrolls it into
+          * view. Nothing moved in the markup; what changed is that the
+          * screen now takes you to what you pressed. */}
+        {(road === "video" || (road === "avatar" && forge?.configured)) && (
+        <div className="road-drawer" ref={drawer}>
+
+        {/* The video road. Drawn whatever the deployment has chosen: with
+            nothing configured it says WHICH of the three variables is
+            missing, because "not configured" teaches an operator nothing
+            and is how a door stays shut by accident rather than by
+            decision. */}
+        {road === "video" && (
+          <>
+            {/* The ceiling, first — above the service and above the
+                passage, because it is the sentence that makes the rest of
+                this block a safe thing to have pressed. Every reply is
+                rendered once this road is taken; a limit offered after
+                that is a limit offered after the bill. */}
+            <h4>{tr("idn.road.cap", lang)}</h4>
+            <p className="muted small">{tr("idn.road.cap.sub", lang)}</p>
+            <div className="row">
+              <input type="number" min={0} max={3600} value={capDraft}
+                     aria-label={tr("idn.road.cap", lang)}
+                     onChange={(e) => setCapDraft(e.target.value)} />
+              <button className="chip" onClick={() => void setCeiling()}>
+                {tr("idn.road.cap.set", lang)}
+              </button>
+            </div>
+            {budget && (
+              <p className="muted small">
+                {fill(tr("idn.road.left", lang), {
+                  left: String(budget.left),
+                  cap: String(budget.daily_seconds),
+                })}
+              </p>
+            )}
+            <p className="muted small">{tr("idn.road.spent", lang)}</p>
+
+            <h4>{tr("idn.video.service", lang)}</h4>
+            <p className="muted small">{tr("idn.video.service.sub", lang)}</p>
+            <SkinTiles
+              sources={(film?.providers || [])
+                .map((k) => ({ key: k, name: k, how: "" }))}
+              chosen={filmPick}
+              onPick={(key) => void chooseFilmProvider(key)} />
+            {!film?.configured && (
+              <p className="muted small">{tr("idn.video.service.shut", lang)}</p>
+            )}
+
+            {/* The standing direction, above the passage because it is
+                the frame the passage sits inside — and because somebody
+                who does not like what they saw looks here first. Shown
+                as prose rather than as fields: the vocabulary of a shot
+                is not a form, and "it's too dark" is not a dropdown. */}
+            <h4>{tr("idn.scene.direction", lang)}</h4>
+            <p className="muted small">
+              {tr("idn.scene.direction.sub", lang)}
+            </p>
+            {direction !== "" && <p className="scene-direction">{direction}</p>}
+            <div className="row">
+              <input value={sceneAsk} style={{ flex: 1 }}
+                     placeholder={tr("idn.scene.ask.ph", lang)}
+                     aria-label={tr("idn.scene.ask", lang)}
+                     onChange={(e) => setSceneAsk(e.target.value)} />
+              <button disabled={directing || sceneAsk.trim() === ""}
+                      onClick={() => void directScene()}>
+                {tr("idn.scene.ask", lang)}
+              </button>
+              <button className="chip" onClick={() => void undirectScene()}>
+                {tr("idn.scene.reset", lang)}
+              </button>
+            </div>
+
+            {/* What was asked, in their own words. Folded away because
+                it is a record rather than a control — but present,
+                because a direction that only says where somebody ended
+                up cannot tell them which request took them there. */}
+            <details className="scene-log">
+              <summary>{tr("idn.scene.log", lang)}</summary>
+              {sceneLog.length === 0
+                ? <p className="muted small">{tr("idn.scene.log.none", lang)}</p>
+                : <ul>
+                    {sceneLog.map((entry, at) => (
+                      <li key={at}>
+                        <span>{entry.asked || tr("idn.scene.log.reset", lang)}</span>
+                        {entry.surface !== null && (
+                          <em className="muted"> · {entry.surface}</em>
+                        )}
+                      </li>
+                    ))}
+                  </ul>}
+            </details>
+
+            <h4>{tr("idn.video.passage", lang)}</h4>
+            <p className="muted small">{tr("idn.video.passage.sub", lang)}</p>
+            <textarea rows={4} value={passage}
+                      aria-label={tr("idn.video.passage", lang)}
+                      onChange={(e) => setPassage(e.target.value)} />
+
+            <h4>{tr("idn.video.shape", lang)}</h4>
+            <div className="row">
+              {["portrait", "landscape", "square"].map((shape) => (
+                <button key={shape} type="button"
+                        className={"chip" + (videoShape === shape ? " lit" : "")}
+                        aria-pressed={videoShape === shape}
+                        onClick={() => setVideoShape(shape)}>
+                  {shape === "portrait" ? tr("idn.video.portrait", lang)
+                   : shape === "landscape" ? tr("idn.video.landscape", lang)
+                   : tr("idn.video.square", lang)}
+                </button>
+              ))}
+            </div>
+
+            {/* The number this screen SHOWS and never offers to change. */}
+            {film && passage.trim() !== "" && (
+              <VideoQuote text={passage} film={film} lang={lang} />
+            )}
+
+            {film?.configured
+              ? <button className="primary"
+                        disabled={filming || passage.trim() === ""}
+                        onClick={() => void renderScene()}>
+                  {tr("idn.video.go", lang)}
+                </button>
+              : <p className="muted small">{film?.why}</p>}
+
+            <p className="muted small">{tr("idn.video.marked", lang)}</p>
+          </>
+        )}
+
+        {/* The forge, above the import list on purpose: this is the road
+            that MAKES a face, and the list below is for a face somebody
+            already has somewhere else. It draws only where a forge is
+            actually configured — a button that fails is worse than an
+            absence, and worst of all at the moment somebody has just
+            chosen a photograph of themselves. */}
+        {road === "avatar" && forge?.configured && (
+          <>
+            <h4>{tr("idn.forge", lang)}</h4>
+            <p className="muted small">{tr("idn.forge.sub", lang)}</p>
+            <div className="row">
+              <select value={shot} aria-label={tr("idn.forge.shot", lang)}
+                      onChange={(e) => setShot(e.target.value)}>
+                <option value="face">{tr("idn.forge.face", lang)}</option>
+                <option value="upper">{tr("idn.forge.upper", lang)}</option>
+                <option value="full">{tr("idn.forge.full", lang)}</option>
+              </select>
+              <input type="file" accept="image/*" disabled={forging}
+                     aria-label={tr("idn.forge.pick", lang)}
+                     onChange={(e) => void forgeFrom(e.target.files?.[0])} />
+            </div>
+            <p className="muted small">
+              {forging ? tr("idn.forge.working", lang)
+                       : tr("idn.forge.where", lang)}
+            </p>
+            {/* The head, second and labelled. See `headFrom`. */}
+            <details className="idn-head">
+              <summary>{tr("idn.head", lang)}</summary>
+              <p className="muted small">{tr("idn.head.sub", lang)}</p>
+              <input type="file" accept="image/*" disabled={forging}
+                     aria-label={tr("idn.head.pick", lang)}
+                     onChange={(e) => void headFrom(e.target.files?.[0])} />
+            </details>
+          </>
+        )}
+
+        </div>
+        )}
+
         <h4>{tr("idn.deck.market", lang)}</h4>
         <p className="muted small">{tr("idn.deck.market.sub", lang)}</p>
+        {/* Tiles, not a dropdown. This component was written for exactly
+            this spot — its own note says the old shape was "a dropdown
+            next to a URL box — which is a form, not a picker" — and then
+            nothing mounted it, so the form is what shipped. A person
+            choosing where their face comes from should see the places,
+            not read a list. */}
+        <SkinTiles sources={market} chosen={marketKey}
+                   onPick={setMarketKey} />
         <div className="row">
-          <select value={marketKey}
-                  onChange={(e) => setMarketKey(e.target.value)}>
-            {market.map((m) => (
-              <option key={m.key} value={m.key}>{m.name}</option>
-            ))}
-          </select>
           <input value={marketUrl} placeholder={tr("idn.deck.url.ph", lang)}
                  onChange={(e) => setMarketUrl(e.target.value)}
                  style={{ flex: 1 }} />
@@ -641,6 +1198,11 @@ export function Identity({ onPlans, onPassing }: {
           <input value={marketTorso}
                  placeholder={tr("idn.deck.torso.ph", lang)}
                  onChange={(e) => setMarketTorso(e.target.value)}
+                 style={{ flex: 1 }} />
+          <input value={marketPid}
+                 placeholder={tr("idn.deck.pid.ph", lang)}
+                 aria-label={tr("idn.deck.pid.ph", lang)}
+                 onChange={(e) => setMarketPid(e.target.value)}
                  style={{ flex: 1 }} />
           <button disabled={!marketUrl.trim()} onClick={importMarket}>
             {tr("idn.deck.import", lang)}

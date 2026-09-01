@@ -118,7 +118,7 @@ def test_the_feed_answers_without_an_account(client):
     r = client.get("/feed")
     assert r.status_code == 200, r.text
     body = r.json()
-    assert set(body) >= {"items", "cursor", "counts", "rules"}
+    assert set(body) >= {"cards", "cursor", "counts", "rules"}
     assert "posted publicly" in body["rules"]["public"] \
         or "publicly" in body["rules"]["public"]
 
@@ -126,7 +126,7 @@ def test_the_feed_answers_without_an_account(client):
 def test_footage_this_deployment_holds_plays_and_loops(client):
     pid, head = _profile(client, "Rosa")
     _hosted_post(client, pid, head)
-    items = client.get("/feed").json()["items"]
+    items = client.get("/feed").json()["cards"]
     videos = [i for i in items if i["kind"] == "video"]
     assert videos, f"the hosted post is not in the feed: {items}"
     one = videos[0]
@@ -144,7 +144,7 @@ def test_an_offsite_video_never_plays_by_itself(client):
     """
     pid, head = _profile(client, "Marcus")
     _offsite_post(client, pid, head)
-    items = client.get("/feed").json()["items"]
+    items = client.get("/feed").json()["cards"]
     offsite = [i for i in items if i["kind"] == "offsite"]
     assert offsite, f"the off-site post is not in the feed: {items}"
     one = offsite[0]
@@ -164,7 +164,7 @@ def test_every_item_says_why_it_is_there(client):
     _hosted_post(client, pid, head)
     _offsite_post(client, pid, head)
     _desk(client, pid, head)
-    items = client.get("/feed").json()["items"]
+    items = client.get("/feed").json()["cards"]
     assert items
     missing = [i for i in items if not i.get("reason")]
     assert not missing, (
@@ -175,7 +175,7 @@ def test_every_item_says_why_it_is_there(client):
 def test_a_desk_says_what_ringing_does_before_it_is_rung(client):
     pid, head = _profile(client, "Amara")
     _desk(client, pid, head)
-    items = client.get("/feed").json()["items"]
+    items = client.get("/feed").json()["cards"]
     desks = [i for i in items if i["kind"] == "desk"]
     assert desks, items
     one = desks[0]
@@ -200,7 +200,7 @@ def test_the_shop_behind_a_desk_is_reachable_from_the_stream(client):
     client.post(f"/shops/{shop_id}/offerings", headers=head, json={
         "kind": "goods", "title": "Oak bench", "blurb": "Two metres.",
         "price": 240.0})
-    desks = [i for i in client.get("/feed").json()["items"]
+    desks = [i for i in client.get("/feed").json()["cards"]
              if i["kind"] == "desk"]
     assert desks and desks[0]["shop"], "the shop is not reachable from the feed"
     assert desks[0]["shop"]["offerings"], desks[0]["shop"]
@@ -219,7 +219,7 @@ def test_a_rated_desk_is_absent_rather_than_blurred(client):
         "rated": True})
     assert r.status_code == 201, r.text
     desk_id = r.json()["desk_id"] if "desk_id" in r.json() else r.json()["id"]
-    items = client.get("/feed").json()["items"]
+    items = client.get("/feed").json()["cards"]
     assert not [i for i in items if i["kind"] == "desk" and i["id"] == desk_id]
     assert client.get(f"/feed/{desk_id}").status_code == 404, (
         "404 rather than 403: a 403 announces that the item exists")

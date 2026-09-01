@@ -121,5 +121,5 @@ def test_the_owner_path_still_works_behind_the_stricter_gate(client):
     r = client.get(f"/objections/{obj['id']}/audit",
                    headers={"authorization": f"Bearer {p['owner_token']}"})
     assert r.status_code == 200, r.text
-    assert r.json()["events"], "the owner cannot read their own case"
+    assert r.json()["audit_events"], "the owner cannot read their own case"
     assert governance is not None

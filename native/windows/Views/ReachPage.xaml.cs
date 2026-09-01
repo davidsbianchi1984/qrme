@@ -266,7 +266,7 @@ public sealed partial class ReachPage : Page
             PayoutText.Text = L10n.Fill("nmg.payout.done", AppState.Current.Language,
                                         ("id", r.PayoutId),
                                         ("total", Money(r.TotalAmount, "USD")),
-                                        ("n", $"{r.Entries}"));
+                                        ("n", $"{r.EntriesCount}"));
             PayoutText.Visibility = Visibility.Visible;
             await ReloadEarnings();
         }
@@ -310,7 +310,7 @@ public sealed partial class ReachPage : Page
                 Blurb = p.Blurb ?? "",
                 Meta = L10n.Fill("nmg.pack.meta", AppState.Current.Language,
                                  ("industry", p.Industry),
-                                 ("items", p.Items.ToString()),
+                                 ("items", p.ItemsCount.ToString()),
                                  ("installs", p.Installs.ToString()),
                                  ("publisher", p.Publisher))
                        + (p.OriginUrl is { } u
@@ -528,7 +528,7 @@ public sealed partial class ReachPage : Page
             var r = await ApiClient.Shared.Summon(reference);
             var cards = r.Profile is not null
                 ? new[] { r.Profile }
-                : r.Profiles ?? Array.Empty<SummonCard>();
+                : r.Summoned ?? Array.Empty<SummonCard>();
             SummonList.ItemsSource = cards.Select(c => new CardVm
             {
                 DisplayName = c.DisplayName,

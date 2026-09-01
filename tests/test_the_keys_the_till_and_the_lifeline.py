@@ -135,7 +135,7 @@ def test_a_reset_kills_every_old_session(client, monkeypatch):
 
 def test_the_oauth_doors_tell_the_truth(client):
     doors = client.get("/auth/oauth/providers",
-                       headers={"authorization": ""}).json()["providers"]
+                       headers={"authorization": ""}).json()["signin_providers"]
     assert doors and all("configured" in d for d in doors)
     # An unconfigured or unknown door refuses rather than pretending.
     assert client.post("/auth/oauth/nobody/start",

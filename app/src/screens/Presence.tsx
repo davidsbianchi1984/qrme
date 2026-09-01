@@ -81,7 +81,7 @@ export function Presence({ onPlans }: {
     if (!me) return;
     api.page(me).then((p) => {
       setPage(p);
-      setTheme(p.theme.id);
+      setTheme(p.page_theme.id);
       setLayout(p.layout);
       setTagline(p.tagline || "");
       setAbout(p.about || "");
@@ -138,11 +138,11 @@ export function Presence({ onPlans }: {
           {/* Part of the page, not chrome around it. */}
           <p className="muted small">{front.ai_disclosure}</p>
           <p className="muted small">
-            {front.rating.count > 0
-              ? fill(front.rating.count === 1
+            {front.rating_summary.count > 0
+              ? fill(front.rating_summary.count === 1
                   ? tr("prs.review", lang) : tr("prs.reviews", lang),
-                  { avg: front.rating.average, n: front.rating.count })
-              : front.rating.note}
+                  { avg: front.rating_summary.average, n: front.rating_summary.count })
+              : front.rating_summary.note}
             {fill(front.talked_with === 1
                 ? tr("prs.talked.one", lang) : tr("prs.talked", lang),
                 { n: front.talked_with })}

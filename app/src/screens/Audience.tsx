@@ -104,8 +104,8 @@ export function Audience({ onPlans }: { onPlans: () => void }) {
           <h3>{tr("aud.audience", lang)}</h3>
           <p className="small">
             {fill(tr("aud.counts", lang), {
-              subs: view.subscribers, likes: view.likes,
-              comments: view.comments, shares: view.shares,
+              subs: view.subscribers_count, likes: view.likes,
+              comments: view.comments_count, shares: view.shares,
             })}
           </p>
         </div>

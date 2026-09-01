@@ -163,6 +163,50 @@ def test_painted_lands_with_provenance_age_and_mark(client, monkeypatch):
     assert row["prompt_text"] and row["generation_params"]["model"] == "fake"
 
 
+def test_the_wardrobe_opens_for_guests_until_the_owner_closes_it(
+        client, monkeypatch):
+    """The people a profile talks with get to dress it — by default.
+
+    `guest_styling` starts on: a signed-in visitor can prompt a restyle.
+    The owner's PATCH closes the wardrobe, and from then on the same
+    visitor reads the refusal while the owner still paints. A caller with
+    no token at all was never a guest — 401, switch or no switch."""
+    from qrme import auth
+    profile = make_profile(client, kind="fictional")
+    owner = dict(client.headers)
+    monkeypatch.setattr(
+        portraitist, "paint",
+        lambda prof, words="": (_png((5, 5, 5)), "p", {"model": "fake"}))
+
+    assert client.get(f"/profiles/{profile['id']}").json()[
+        "guest_styling"] is True, "the wardrobe did not start open"
+
+    guest = {"authorization": f"Bearer {auth.issue('interactor', 'int_g')}"}
+    r = client.post(f"/profiles/{profile['id']}/avatar/painted",
+                    json={"direction": "a red scarf"}, headers=guest)
+    assert r.status_code == 201, r.text
+
+    nobody = client.post(f"/profiles/{profile['id']}/avatar/painted",
+                         json={"direction": "a hat"},
+                         headers={"authorization": ""})
+    assert nobody.status_code == 401, (
+        "an anonymous caller repainted somebody's avatar")
+
+    closed = client.patch(f"/profiles/{profile['id']}",
+                          json={"guest_styling": False}, headers=owner)
+    assert closed.status_code == 200, closed.text
+    assert closed.json()["guest_styling"] is False
+
+    r = client.post(f"/profiles/{profile['id']}/avatar/painted",
+                    json={"direction": "a red scarf"}, headers=guest)
+    assert r.status_code == 403
+    assert "wardrobe closed" in r.json()["detail"]
+
+    r = client.post(f"/profiles/{profile['id']}/avatar/painted",
+                    json={"direction": "a red scarf"}, headers=owner)
+    assert r.status_code == 201, "closing the wardrobe locked the owner out"
+
+
 def test_both_refusals_speak_ten_languages():
     from qrme import i18n
     for text in (
@@ -191,12 +235,20 @@ def test_a_face_carries_its_name(client, monkeypatch):
 
 def test_the_market_names_many_companies_and_the_default_leads():
     """The same format the model keys took: many options, and the
-    deployment's own — ElevenLabs — first on the owner's word."""
+    deployment's chosen one first.
+
+    Which one that is has changed once already and will change again, so
+    the check is against the *stated* default rather than a name written
+    twice. Reordering the shelf without moving the default is the bug
+    this catches; picking a different default is a one-line edit.
+    """
     from qrme import avatars
     keys = [m["key"] for m in avatars.MARKET]
-    assert keys[0] == "elevenlabs", "the owner's provider no longer leads"
-    for expected in ("ready_player_me", "roblox", "vroid_hub", "dicebear",
-                     "gravatar", "heygen", "avaturn"):
+    assert keys[0] == avatars.DEFAULT_MARKET_SOURCE, (
+        f"the shelf opens on {keys[0]} but the stated default is "
+        f"{avatars.DEFAULT_MARKET_SOURCE}")
+    for expected in ("roblox", "vroid_hub", "dicebear", "gravatar",
+                     "heygen", "avaturn", "elevenlabs", "metaperson"):
         assert expected in keys, f"{expected} fell off the market"
     for m in avatars.MARKET:
         assert m["key"] and m["name"] and m["how"], (

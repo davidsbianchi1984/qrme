@@ -19,6 +19,12 @@ CREATE TABLE IF NOT EXISTS profiles (
     kind              TEXT NOT NULL,          -- self | other_person | fictional
     display_name      TEXT NOT NULL,
     persona           TEXT NOT NULL,          -- core identity description
+    -- The field this profile works in, in the marketplace's own vocabulary
+    -- ("healthcare", "mental_health"). Shown under the name wherever a
+    -- profile appears beside others, because "Dr. Amara Osei" and
+    -- "Dr. Amara Osei · Healthcare" answer different questions. NULL is a
+    -- profile that has not said, which is most of them.
+    industry          TEXT,
     demographics      TEXT NOT NULL DEFAULT '{}',
     sources           TEXT NOT NULL DEFAULT '[]',  -- imported content sources
     anonymous         INTEGER NOT NULL DEFAULT 0,
@@ -32,6 +38,10 @@ CREATE TABLE IF NOT EXISTS profiles (
     base_age          INTEGER,
     appearance        TEXT NOT NULL DEFAULT '',  -- how the profile looks/presents
                                               -- (steering hub); rides on the prompt
+    guest_styling     INTEGER NOT NULL DEFAULT 1,  -- may the people a profile
+                                              -- talks with restyle its avatar;
+                                              -- the owner's switch, on until
+                                              -- the owner says otherwise
     consent_basis     TEXT,                   -- required when kind=other_person
     consent_attestor  TEXT,
     successor_owner   TEXT,                   -- legacy succession
@@ -110,13 +120,56 @@ CREATE TABLE IF NOT EXISTS rooms (
     topic      TEXT,
     channel    TEXT NOT NULL DEFAULT 'chat',  -- chat | voice | video | ar | vr
     status     TEXT NOT NULL DEFAULT 'active',
+    -- The governor's release. 0 is the standing default: ten unprompted
+    -- turns apiece, then the room waits for a person. 1 only after the
+    -- person said so in words ("no limit", "run in the background") —
+    -- "on the user's choice and dime" — and any pause word puts it back.
+    free_run   INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL
 );
+
+-- The room's half of a permission.
+--
+-- A profile's owner decides what it can EVER do — its connectors, its hand
+-- grants. That is not enough on its own, because a profile in a room is very
+-- often somebody else's: a starter outsourced from another account, or a
+-- specialist invited in by a person who does not own it. The owner's grant
+-- says *this profile may drive a browser*; it does not say *for you, now, in
+-- here*.
+--
+-- So a reach needs both keys turned: the owner granted it AND this room
+-- allowed it. Each is withdrawable alone, and a reach checks both when it
+-- opens rather than trusting a decision made earlier.
+--
+-- Keyed on the connector id or the grant id rather than on a provider or a
+-- surface, so revoking and remaking the same connection does not inherit the
+-- old yes. Absent means no: a box nobody ticked is a row that does not exist,
+-- which is the honest default for a permission and means a newly connected
+-- app arrives switched off.
+CREATE TABLE IF NOT EXISTS room_allowances (
+    id          TEXT PRIMARY KEY,
+    room_id     TEXT NOT NULL REFERENCES rooms(id),
+    profile_id  TEXT NOT NULL REFERENCES profiles(id),
+    kind        TEXT NOT NULL,   -- app | skill
+    key         TEXT NOT NULL,   -- the connector's id, or the grant's
+    allowed     INTEGER NOT NULL DEFAULT 0,
+    -- Who turned it. "Who let it do that" has to have a name in it.
+    decided_by  TEXT NOT NULL,
+    decided_at  TEXT NOT NULL,
+    UNIQUE (room_id, profile_id, kind, key)
+);
+
+CREATE INDEX IF NOT EXISTS idx_room_allowances_room
+    ON room_allowances (room_id);
 
 CREATE TABLE IF NOT EXISTS room_participants (
     room_id TEXT NOT NULL REFERENCES rooms(id),
     kind    TEXT NOT NULL,   -- user | profile
     ref_id  TEXT NOT NULL,
+    -- A person's seat sitting out: the room stops waiting on them and
+    -- the profiles keep their own rotation. Off until they tap it, and
+    -- off again the moment they sit back in.
+    sitting_out INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (room_id, ref_id)
 );
 
@@ -146,6 +199,13 @@ CREATE TABLE IF NOT EXISTS room_messages (
     -- mid-sentence. NULL is the ordinary case: it played out, or nobody was
     -- listening to it aloud at all.
     heard       TEXT,
+    -- Who this turn was aimed at — a seat's display name, parsed from the
+    -- speaker's own words (a profile's `[to: Ada]` marker, or a person
+    -- naming a seat). NULL is a turn for the whole room. The rotation in
+    -- qrme/society.py reads it to hand the next turn to the seat it was
+    -- for, which is what makes eight seats a conversation instead of
+    -- eight simultaneous answers.
+    aimed_at    TEXT,
     created_at  TEXT NOT NULL
 );
 
@@ -1100,6 +1160,105 @@ CREATE TABLE IF NOT EXISTS avatar_motion (
     updated_at TEXT NOT NULL
 );
 
+-- The standing direction for this profile's rendered scenes: how they should
+-- look, in the owner's own words, carried from one render to the next.
+--
+-- A scene rendered from the reply alone gets whatever the model imagines,
+-- which is a different room every time and usually a dark one. Somebody who
+-- says "it is too dark, let's have this on the beach" is not asking for one
+-- beach — they are telling the camera where this profile lives, and the next
+-- render has to know it too.
+--
+--     asked     what should this scene look like
+--     mattered  what should every scene after it look like
+--
+-- Free text rather than a set of dials on purpose: the vocabulary of a shot
+-- is not a form. It is amended by the model from what the person said (see
+-- `filming.amend`) rather than appended to, so twenty corrections stay one
+-- readable paragraph instead of becoming a transcript of every complaint.
+CREATE TABLE IF NOT EXISTS scene_direction (
+    profile_id TEXT PRIMARY KEY REFERENCES profiles(id),
+    direction  TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+-- Which road this profile's presence takes, and what it has spent today.
+--
+-- Stored rather than asked per turn, because auto-render has to know
+-- without being told: a reply arrives and something must decide, before
+-- anybody looks at a screen, whether that reply becomes footage.
+--
+--     asked     does this person want video
+--     mattered  do they want it for EVERY reply, at a few dollars each
+--
+-- `daily_seconds` is the ceiling that makes the answer safe to be yes. A
+-- room left on the video road with no cap spends until the card declines,
+-- and the person who set it was choosing a look rather than a budget.
+CREATE TABLE IF NOT EXISTS presence_road (
+    profile_id    TEXT PRIMARY KEY REFERENCES profiles(id),
+    road          TEXT NOT NULL,      -- photo | avatar | video
+    daily_seconds INTEGER NOT NULL,   -- of finished footage, per day
+    -- Which video service renders this profile's footage. NULL means "the
+    -- one the deployment named", which is what every existing row means
+    -- and why this is nullable rather than defaulted: a row written before
+    -- anybody could choose has not chosen, and saying so is different from
+    -- claiming it picked whatever the environment happened to hold that
+    -- day. The endpoint and the key stay deployment-wide -- the aggregator
+    -- this speaks to takes the model name in the body (`filming.render`),
+    -- so choosing a provider costs no new credential.
+    provider      TEXT,
+    updated_at    TEXT NOT NULL
+);
+
+-- One render, from the moment it was asked for to the moment it arrived.
+--
+-- Auto-render cannot hold a request open for four minutes, so the turn
+-- starts a render and moves on; this is what a screen polls. `seconds` is
+-- the finished length, written when the job STARTS rather than when it
+-- finishes, because the ceiling has to count what is in flight — two
+-- turns in quick succession would otherwise both pass a cap that neither
+-- had spent yet.
+CREATE TABLE IF NOT EXISTS scene_render (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    passage    TEXT NOT NULL,
+    seconds    INTEGER NOT NULL,
+    job        TEXT,               -- the service's own id, while pending
+    video_url  TEXT,
+    status     TEXT NOT NULL,      -- pending | done | failed
+    detail     TEXT,               -- why, when failed
+    created_at TEXT NOT NULL,
+    settled_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_scene_render_profile
+    ON scene_render(profile_id, created_at DESC);
+
+-- Every change asked of the scene direction, and what it did.
+--
+-- The direction itself is one row that gets overwritten, which is right for
+-- a standing setting and wrong for an account of one. An owner who has
+-- amended five times cannot see what they asked, cannot tell which request
+-- caused the thing they now dislike, and cannot go back one step — the
+-- direction says where they ended up and nothing about how.
+--
+--     asked     what does the scene look like now
+--     mattered  what did they ask for, and what did it do
+--
+-- Append-only by construction: nothing updates a row here. `was` and
+-- `became` are both kept so a reversal is a fact on the row rather than a
+-- diff somebody has to compute against the row above.
+CREATE TABLE IF NOT EXISTS scene_direction_log (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    asked      TEXT,             -- their words; NULL when set outright
+    was        TEXT NOT NULL,
+    became     TEXT NOT NULL,
+    surface    TEXT,             -- window | fullscreen | NULL if unsaid
+    created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_scene_log_profile
+    ON scene_direction_log(profile_id, created_at DESC);
+
 -- What kind of thing the avatar asset is, when the asset itself cannot say.
 -- `presentation.kind_of` reads the kind off the string — a `.glb` is a model,
 -- a `.mp4` is a video — which covers every asset that carries an extension.
@@ -1633,6 +1792,61 @@ CREATE TABLE IF NOT EXISTS post_videos (
     url        TEXT NOT NULL,
     title      TEXT,
     created_at TEXT NOT NULL
+);
+
+-- Raise (docs/raise.md): the fourth kind's own tables. The character
+-- row is derived state — stage, counters, switches — beside an
+-- APPEND-ONLY growth record: rows in growth_record are written and
+-- never updated or deleted, which is what makes the Album a life and
+-- not a document. "The original life is never overwritten."
+CREATE TABLE IF NOT EXISTS raised_characters (
+    profile_id         TEXT PRIMARY KEY REFERENCES profiles(id),
+    guardian_id        TEXT NOT NULL,   -- the interactor raising them
+    stage              TEXT NOT NULL,   -- embryo|child|adolescent|young_adult|adult
+    started_stage      TEXT NOT NULL,   -- where the guardian ENTERED the timeline
+    preset             TEXT NOT NULL,   -- the door chosen at creation
+    switches           TEXT NOT NULL,   -- the bundle, reopenable
+    temperament        TEXT NOT NULL,   -- the seed the raising drifts
+    growth_points      INTEGER NOT NULL DEFAULT 0,
+    turns_together     INTEGER NOT NULL DEFAULT 0,
+    words_taught       INTEGER NOT NULL DEFAULT 0,
+    lessons_passed     INTEGER NOT NULL DEFAULT 0,
+    questions_answered INTEGER NOT NULL DEFAULT 0,
+    -- The three time controls (build-order step three): the life's own
+    -- calendar, where the guardian currently stands on it (NULL = the
+    -- present), and — on a branched life — whose day it grew from.
+    sim_day            INTEGER NOT NULL DEFAULT 1,
+    visiting_day       INTEGER,
+    branch_of          TEXT,
+    created_at         TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS growth_record (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    kind       TEXT NOT NULL,   -- began|word|lesson|answer|stage_door|switch
+                                --  |away_day|saved_question|branched
+    note       TEXT NOT NULL,
+    -- The day of the life this entry landed on. NULL on rows written
+    -- before the calendar existed; read as day 1.
+    sim_day    INTEGER,
+    at         TEXT NOT NULL
+);
+
+-- A viewing: what the platform's own eyes and ears made of one recording
+-- (qrme/watching.py). `subject` is the direct URL or media id watched;
+-- one row per subject, because a room of eight profiles must not watch
+-- the same video eight times on the owner's dime. `heard` is the ears'
+-- words, `seen` the seeing door's account of the pictures — each empty
+-- when that half of the machinery was absent, never invented.
+CREATE TABLE IF NOT EXISTS viewings (
+    id               TEXT NOT NULL,
+    subject          TEXT PRIMARY KEY,
+    heard            TEXT NOT NULL DEFAULT '',
+    seen             TEXT NOT NULL DEFAULT '',
+    duration_seconds REAL,
+    language         TEXT,
+    watched_at       INTEGER NOT NULL
 );
 
 -- One row per attempted "Sign in with ..." (qrme/oauth.py). result holds the
@@ -2739,6 +2953,112 @@ CREATE TABLE IF NOT EXISTS inbox_events (
     created_at  TEXT NOT NULL,
     seen_at     TEXT
 );
+
+-- ===================================================================
+-- The hands (qrme/hands.py). A profile could already see and speak; these
+-- four tables are what it takes for one to ACT on a screen — and three of
+-- the four exist to bound that rather than to enable it.
+--
+-- The authority a hand moves under. Never implicit, never inherited from a
+-- conversation, never widened by anything read off a screen. `places` is a
+-- JSON list of NAMED apps or hosts and the module refuses "*" outright,
+-- because a grant that names everything is the absence of a grant wearing
+-- its clothes.
+CREATE TABLE IF NOT EXISTS hand_grants (
+    id          TEXT PRIMARY KEY,
+    profile_id  TEXT NOT NULL REFERENCES profiles(id),
+    granted_by  TEXT NOT NULL,        -- the account that said yes
+    surface     TEXT NOT NULL,        -- hands.SURFACES
+    places      TEXT NOT NULL,        -- JSON list of named places, never "*"
+    verbs       TEXT NOT NULL,        -- JSON subset of hands.VERBS
+    steps       INTEGER NOT NULL,     -- step budget for the whole grant
+    watched     INTEGER NOT NULL DEFAULT 1,   -- 1 = only while somebody watches
+    door        TEXT NOT NULL,        -- picked | told — how it was granted
+    said        TEXT,                 -- the words themselves, when `told`
+    expires_at  TEXT NOT NULL,
+    revoked_at  TEXT,
+    created_at  TEXT NOT NULL
+);
+
+-- One session of a profile having hands on a surface. `mode` is the whole
+-- difference between watching somebody work and doing the work: `watching`
+-- is eyes only and cannot spend a step, `acting` moves.
+CREATE TABLE IF NOT EXISTS reaches (
+    id          TEXT PRIMARY KEY,
+    profile_id  TEXT NOT NULL REFERENCES profiles(id),
+    grant_id    TEXT NOT NULL REFERENCES hand_grants(id),
+    surface     TEXT NOT NULL,
+    platform    TEXT NOT NULL,        -- hands.PLATFORMS
+    errand      TEXT NOT NULL,        -- what it was asked to do, in words
+    mode        TEXT NOT NULL,        -- watching | acting
+    state       TEXT NOT NULL,        -- open | asking | done | stopped
+    why         TEXT,                 -- why it stopped, in plain words
+    handed_to   TEXT REFERENCES profiles(id),  -- who holds it now, if handed
+    routine_id  TEXT,                 -- the routine being learned or replayed
+    steps_used  INTEGER NOT NULL DEFAULT 0,
+    opened_at   TEXT NOT NULL,
+    closed_at   TEXT
+);
+
+-- Append-only. Nothing in the package updates or deletes a row here, and
+-- `n` is unique per reach so a step cannot be quietly rewritten by a second
+-- insert. `saw` keeps what the eyes reported at the moment the hand decided,
+-- which is the only way a person reading this afterwards can tell whether
+-- the move was reasonable on the evidence it actually had.
+CREATE TABLE IF NOT EXISTS hand_actions (
+    id         TEXT PRIMARY KEY,
+    reach_id   TEXT NOT NULL REFERENCES reaches(id),
+    profile_id TEXT NOT NULL REFERENCES profiles(id),  -- who moved
+    n          INTEGER NOT NULL,      -- step number within the reach
+    verb       TEXT NOT NULL,
+    target     TEXT,                  -- what it aimed at, in words
+    detail     TEXT,                  -- JSON argument, secrets never in it
+    saw        TEXT,                  -- what the eyes reported before deciding
+    outcome    TEXT NOT NULL,         -- done | refused | failed
+    note       TEXT,
+    at         TEXT NOT NULL,
+    UNIQUE (reach_id, n)
+);
+
+-- What the machine reported back about a step it was handed.
+--
+-- `hand_actions.outcome` is written where the move is *permitted*, which is
+-- the server, and the server cannot see a cursor. So `done` there has only
+-- ever meant "chosen and allowed" — a dry run and a live one left identical
+-- records, and a click that missed left one saying it landed. A permission
+-- trail that cannot tell a rehearsal from the real thing is not a trail.
+--
+-- Its own table because `hand_actions` is append-only and stays that way:
+-- the machine's report is a second fact about a step, arriving later from
+-- somewhere else, not a correction to the first.
+CREATE TABLE IF NOT EXISTS hand_landings (
+    id       TEXT PRIMARY KEY,
+    reach_id TEXT NOT NULL REFERENCES reaches(id),
+    n        INTEGER NOT NULL,      -- the step in hand_actions this is about
+    landed   TEXT NOT NULL,         -- landed | missed | rehearsed
+    note     TEXT,
+    at       TEXT NOT NULL,
+    UNIQUE (reach_id, n)
+);
+
+-- A thing it can do again: learned by watching somebody do it (`shown`) or
+-- by being told the steps in words (`told`). One table for both, because a
+-- routine dictated over the phone and a routine demonstrated on screen are
+-- the same object and the product should not have two of them.
+CREATE TABLE IF NOT EXISTS routines (
+    id         TEXT PRIMARY KEY,
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    name       TEXT NOT NULL,
+    surface    TEXT NOT NULL,
+    learned    TEXT NOT NULL,         -- shown | told
+    steps      TEXT NOT NULL,         -- JSON list of {verb, target, detail}
+    runs       INTEGER NOT NULL DEFAULT 0,
+    last_run   TEXT,
+    created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_actions_reach ON hand_actions (reach_id, n);
+CREATE INDEX IF NOT EXISTS idx_landings_reach ON hand_landings (reach_id, n);
+CREATE INDEX IF NOT EXISTS idx_reaches_profile ON reaches (profile_id);
 """
 
 _local = threading.local()
@@ -2771,6 +3091,14 @@ def db_path() -> str:
 #: considered migration with a backup, not in a startup path that runs on
 #: every connection.
 _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
+    # What field this profile works in — "healthcare", "mental_health" —
+    # so a seat in a room can say what somebody is there for under their
+    # name. It was only ever in the starter table in `seed.py`, which is
+    # code and not data: no route could read it, so every screen that
+    # wanted to say "Healthcare" under "Dr. Amara Osei" had to invent it
+    # or leave it out. Nullable, because a profile that has not said is a
+    # profile that has not said.
+    ("profiles", "industry", "TEXT"),
     ("briefcase_items", "unread_why", "TEXT"),
     ("briefcase_items", "full_chars", "INTEGER"),
     # What a memory landed under, and — when the arrangement is platform
@@ -2860,6 +3188,36 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # The face's registry row, beside the rendered asset it produced —
     # so a takedown can find every profile a retired row was backing.
     ("profiles", "avatar_ref", "TEXT"),
+    # The wardrobe's guest switch. Default 1 — the owner's deliberate act
+    # is closing the wardrobe, not opening it — matching the fresh-schema
+    # default above so an upgraded database behaves like a new one.
+    ("profiles", "guest_styling", "INTEGER NOT NULL DEFAULT 1"),
+    # The room society (qrme/society.py): who a turn was for, and whether
+    # the person lifted the ten-turn governor in words.
+    ("room_messages", "aimed_at", "TEXT"),
+    ("rooms", "free_run", "INTEGER NOT NULL DEFAULT 0"),
+    # The sit-out: a person's seat steps out of the room's waiting so the
+    # profiles keep their own rotation, and steps back in on a tap. Per
+    # SEAT rather than per room — one person sitting out is not everybody
+    # sitting out, and the room waits again the moment one of them sits
+    # back in.
+    ("room_participants", "sitting_out", "INTEGER NOT NULL DEFAULT 0"),
+    # The three time controls (docs/raise.md, build-order step three).
+    # `sim_day` is the life's own calendar — day 1 is the day the guardian
+    # entered; fast-forward moves it and nothing else does. `visiting_day`
+    # set means the guardian stands on an earlier day (NULL = the present).
+    # `branch_of` names the life this one was branched from, so the copy
+    # can always say what it is. growth_record.sim_day stamps each entry
+    # with the day it landed on; rows from before the calendar read as
+    # day 1, which is honest — they all landed before time had hands.
+    ("raised_characters", "sim_day", "INTEGER NOT NULL DEFAULT 1"),
+    ("raised_characters", "visiting_day", "INTEGER"),
+    ("raised_characters", "branch_of", "TEXT"),
+    ("growth_record", "sim_day", "INTEGER"),
+    # Which video service renders this profile. NULL = the deployment's
+    # own choice, which is what every row written before the picker
+    # worked means.
+    ("presence_road", "provider", "TEXT"),
 )
 
 

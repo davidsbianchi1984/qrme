@@ -23,15 +23,19 @@ from datetime import date
 from fastapi import APIRouter, HTTPException, Request
 
 from .. import (auth, db, engagement, identity, inbox, llm, marketplace,
-                moderation, persona, referral, roommic, storage, tiers,
-                watermark)
+                moderation, persona, referral, roommic, society, storage,
+                tiers, verification, watermark)
+from .. import hands
 from ..common import (age_of, clipped, interactor_or_404, profile_or_404,
                       require_interactor, require_owner_or_interactor,
                       source_items)
 from ..models import (
     HandoffCreate, ListingCreate, ListingPlace, MarketAssist, MarketPrefs,
     ProviderCreate, ReferralPrepare, ReferralRelease, ReferralReply,
-    RoomCreate, RoomFace, RoomInvite, RoomMessage, RoomMicLend, RoomRename,
+    RoomAllow, RoomCreate, RoomErrand, RoomFace, RoomInvite, RoomMessage,
+    RoomMicLend,
+    RoomRename,
+    RoomSitOut,
 )
 from .. import i18n
 
@@ -93,9 +97,13 @@ def _room_or_404(room_id: str) -> dict:
 
 
 def _participants(room_id: str) -> list[dict]:
+    # ORDER BY rowid: the order people took their seats IS the seat
+    # priority — "we will do it by priority of seats one through eight
+    # for rotation." Unordered, the rotation reshuffled whenever SQLite
+    # felt like it, which is a rotation in name only.
     rows = db.connect().execute(
-        "SELECT kind, ref_id FROM room_participants WHERE room_id=?",
-        (room_id,)).fetchall()
+        "SELECT kind, ref_id, sitting_out FROM room_participants"
+        " WHERE room_id=? ORDER BY rowid", (room_id,)).fetchall()
     return [dict(r) for r in rows]
 
 
@@ -143,6 +151,111 @@ def _display(kind: str, ref_id: str) -> str:
         profile = profile_or_404(ref_id)
         return identity.shown_name(profile)
     return interactor_or_404(ref_id)["display_name"]
+
+
+def _role(kind: str, ref_id: str) -> str | None:
+    """What this seat is here for, under the name.
+
+        asked     who is in this room
+        mattered  what are they FOR
+
+    "Dr. Amara Osei" and "Dr. Amara Osei · Healthcare" answer different
+    questions, and a room full of specialists where nobody says what they
+    specialise in makes the reader open three profiles to find out.
+
+    Only for profiles, and only when one has said: a person's seat is the
+    person, and inventing a job title for them would be a claim the
+    product has no basis for. `None` is a profile that has not said, which
+    is most of them and is not a failure — the client draws the name
+    alone.
+    """
+    if kind != "profile":
+        return None
+    field = (profile_or_404(ref_id).get("industry") or "").strip()
+    return field or None
+
+
+def _verified(kind: str, ref_id: str, room_id: str = "") -> bool:
+    """Whether this seat's face is a checked likeness of a real person.
+
+        asked     draw the verified mark on the sphere
+        mattered  from what
+
+    The mark used to be burned into the photograph, so the *file* was the
+    claim and nothing had to ask. Drawn on the surface instead, it needs a
+    fact behind it, and the fact already exists: a verification record
+    with a named attestor, which is the same bar the burning tool refused
+    to run without. A gold check that a surface draws from nothing is
+    worse than no check at all.
+
+    ## Two rules, and both of them were wrong on a live screen
+
+        asked     verified is on the wrong seat, it should be on the
+                  one that says You
+        mattered  it was on the seat that says AI
+
+    A synthetic seat used to be marked from the PROFILE's own record,
+    without asking what the seat was drawing. In a room a profile seat
+    draws its AI portrait, which carries the burned AI mark — so the two
+    plates landed on one face, a sparkle saying *this is a rendering* and
+    a gold check saying *this likeness is checked*, on the same circle.
+    Photographed and sent back in one line. On this platform of all
+    platforms that is not a cosmetic fault: the gold plate is a claim
+    about a real person, and a seat that has just declared itself
+    synthetic cannot carry it. **A profile seat never wears it.** The
+    record is not deleted and the profile page still shows it; it simply
+    is not a claim this seat can make.
+
+    Meanwhile the person's own seat was marked only from a picture put up
+    THROUGH THE ROOM — `showing: photo` — and a person who set their face
+    on the Identity screen has no such row. Their seat draws from
+    `pictures_in`, which is the picture that follows them between rooms,
+    and that path was never consulted. So the human seat went bare while
+    the synthetic one wore the check: the exact inversion of what the
+    mark is for.
+
+    ## What it asks now
+
+    The same question, of whatever picture the seat is actually drawing,
+    resolved in the order the seat itself resolves it: a photograph put
+    up in this room if there is one, the person's own picture if there is
+    not, and nothing at all if the seat is on camera or empty. Then: is
+    that picture `/photos/<handle>.webp` for a handle whose profile
+    carries a verification record with a named attestor.
+
+    The mark follows the FACE, not the identity behind it. A person
+    showing something other than their checked likeness is not making the
+    claim, and does not get the plate.
+    """
+    try:
+        # A synthetic seat makes no claim about a real person's likeness.
+        if kind != "user" or not room_id:
+            return False
+        from .. import avatars, roomface
+
+        shown = roomface.showing_in(room_id).get("faces", {}).get(ref_id) or {}
+        showing = shown.get("showing")
+        if not showing:
+            # Their own picture, the one that follows them between rooms.
+            url = roomface.pictures_in(room_id).get(ref_id) or ""
+        elif showing == "photo":
+            url = shown.get("media_url") or ""
+        else:
+            # On camera, or a silhouette. No still face to check.
+            return False
+
+        prefix = f"{avatars.PHOTO_ROUTE}/"
+        if not url.startswith(prefix):
+            return False
+        handle = url[len(prefix):].rsplit(".", 1)[0]
+        row = db.connect().execute(
+            "SELECT profile_id FROM handles WHERE handle=?", (handle,)).fetchone()
+        if row is None:
+            return False
+        record = verification.status(row["profile_id"])
+        return bool(record.get("verified") and record.get("attestor"))
+    except Exception:
+        return False
 
 
 def _media_brief(media_id: str | None, read: bool = False,
@@ -281,7 +394,7 @@ def _read_link(message: str, on_behalf_of: str | None) -> tuple[str, str, str]:
 def _store_room_message(room_id, sender_kind, sender_id, content,
                         approved, reason, media_id=None,
                         media_text="", media_digest="", media_why="",
-                        media_full=0) -> dict:
+                        media_full=0, aimed_at=None) -> dict:
     conn = db.connect()
     message_id = db.new_id("rmg")
     # A profile's room turn is an AI render facing the whole room: stamped.
@@ -290,18 +403,20 @@ def _store_room_message(room_id, sender_kind, sender_id, content,
     conn.execute(
         "INSERT INTO room_messages (id, room_id, sender_kind, sender_id,"
         " content, status, flag_reason, watermark_id, media_id, media_text,"
-        " media_digest, media_why, media_full, created_at)"
-        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        " media_digest, media_why, media_full, aimed_at, created_at)"
+        " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (message_id, room_id, sender_kind, sender_id, content,
          "approved" if approved else "blocked", reason,
          credential["watermark_id"] if credential else None,
          media_id, media_text or None, media_digest or None,
-         media_why or None, media_full or None, db.utcnow()),
+         media_why or None, media_full or None, aimed_at or None,
+         db.utcnow()),
     )
     conn.commit()
     return {"id": message_id, "sender_kind": sender_kind,
             "from": _display(sender_kind, sender_id),
             "content": content if approved else None,
+            "aimed_at": aimed_at or None,
             "watermark": credential,
             "media": (_media_brief(media_id, bool(media_digest), media_why,
                                    media_full, len(media_text or ""))
@@ -309,14 +424,23 @@ def _store_room_message(room_id, sender_kind, sender_id, content,
             "status": "approved" if approved else "blocked"}
 
 
-def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dict]:
-    """Every profile participant takes one moderated turn."""
+def _profile_turns(room: dict, participants: list[dict], pdi, cloud,
+                   only: set[str] | None = None) -> list[dict]:
+    """The named profile participants each take one moderated turn.
+
+    ``only`` is the society's turn selection (qrme/society.py) — the one
+    seat a message was aimed at, or the next seat in rotation. None keeps
+    the old everybody-speaks behavior for the callers that genuinely mean
+    it (a summoned profile's arrival, a test exercising the room).
+    """
     from .. import briefcase
     maturity = _room_maturity(participants)
     conn = db.connect()
     produced = []
     for participant in participants:
         if participant["kind"] != "profile":
+            continue
+        if only is not None and participant["ref_id"] not in only:
             continue
         profile = profile_or_404(participant["ref_id"])
         if profile["status"] == "departed":
@@ -451,6 +575,14 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
         system += (f"\n\nYou are in a group {room['channel']} room about: "
                    f"{room['topic']} ({_CHANNEL_NOTES[room['channel']]}). "
                    "Reply with one short, in-character turn.")
+        # The society's standing rules — aim your turn, offer a summons
+        # when relevance calls for one, collaborate for as long as the
+        # people here want. One sentence block, written in qrme/society.py
+        # so the mechanics and the telling cannot drift apart.
+        system += "\n\n" + society.cast_note(
+            [{"ref_id": q["ref_id"],
+              "display": _display("profile", q["ref_id"])}
+             for q in participants if q["kind"] == "profile"])
         # The cast used to be appended here as a flat list of names. It now
         # rides `among` above, because naming somebody and saying how you
         # know them is one sentence rather than two, and the second one was
@@ -520,6 +652,12 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
         # Dial moves ride the same channel in a room — anybody seated can
         # ask, the owner's lock is the veto (qrme/selfsteer.py).
         content, dial_moves = selfsteer.split(content)
+        # The society's markers, stripped before moderation so the review
+        # reads the words a person will read: the aim ("[to: Ada]") names
+        # who this turn is for, and the summons ("[invite: Ada]") asks
+        # the room to bring somebody relevant in.
+        content, aimed_display = society.split_aim(content)
+        content, summoned = society.split_summons(content)
         if composed and not content:
             content = i18n.tr_public(
                 "Here it is.", i18n.effective_language(profile["id"]))
@@ -553,11 +691,91 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud) -> list[dic
                                                    composed["title"])
                 except Exception:               # pragma: no cover
                     doc_digest = doc_words[:600]
+        if summoned and verdict.approved:
+            _summon(room, participants, profile["id"], summoned)
         produced.append(_store_room_message(
             room["id"], "profile", profile["id"], content,
             verdict.approved, verdict.reason, media_id=document_id,
-            media_text=doc_words, media_digest=doc_digest))
+            media_text=doc_words, media_digest=doc_digest,
+            aimed_at=aimed_display))
     return produced
+
+
+def _summon(room: dict, participants: list[dict], asker_id: str,
+            names: list[str]) -> list[str]:
+    """A profile's summons, made real — "offer to or be prompted to
+    invite other synthetic profiles of relevance to need or topic."
+
+    Each name is matched against active profiles by display name; a match
+    that is not already seated takes a seat while the room has one (the
+    same eight the invite route holds), agentic-join style: the seat is
+    the acceptance, and the owner's inbox carries the record. Unknown
+    names are simply not seated — the summoning turn already said the
+    offer out loud, and the room's answer is visible in who arrives.
+    """
+    conn = db.connect()
+    seated: list[str] = []
+    present = {q["ref_id"] for q in participants}
+    room_count = len(participants)
+    for name in names:
+        if room_count >= 8:
+            break
+        row = conn.execute(
+            "SELECT id FROM profiles WHERE lower(display_name)=lower(?)"
+            "  AND status='active' LIMIT 1", (name.strip(),)).fetchone()
+        if row is None or row["id"] in present:
+            continue
+        conn.execute(
+            "INSERT OR IGNORE INTO room_participants (room_id, kind, ref_id)"
+            " VALUES (?,'profile',?)", (room["id"], row["id"]))
+        inbox.note(row["id"], "room_joined", asker_id, ref=room["id"])
+        conn.commit()
+        present.add(row["id"])
+        seated.append(row["id"])
+        room_count += 1
+    return seated
+
+
+def _approved_history(room_id: str) -> list[dict]:
+    """The transcript as the society reads it, oldest first."""
+    rows = db.connect().execute(
+        "SELECT sender_kind, sender_id, aimed_at FROM room_messages"
+        " WHERE room_id=? AND status='approved'"
+        " ORDER BY created_at, rowid", (room_id,)).fetchall()
+    return [dict(r) for r in rows]
+
+
+def _spoken_counts(history: list[dict]) -> dict[str, int]:
+    """Unprompted turns per profile since a person last spoke — the
+    governor's ledger. A user turn resets everybody: "then pauses and
+    waits for user's response to either continue or remains paused." """
+    counts: dict[str, int] = {}
+    for row in history:
+        if row["sender_kind"] == "user":
+            counts = {}
+        else:
+            counts[row["sender_id"]] = counts.get(row["sender_id"], 0) + 1
+    return counts
+
+
+def _room_cast(participants: list[dict]) -> list[dict]:
+    return [{"ref_id": q["ref_id"],
+             "display": _display("profile", q["ref_id"])}
+            for q in participants if q["kind"] == "profile"]
+
+
+def _nobody_waiting(participants: list[dict]) -> bool:
+    """Whether every person in the room has sat out.
+
+    The governor exists to hand the room back to a person — "then pauses
+    and waits for user's response". A room whose people have all sat out
+    has nobody to hand it back to, and pausing there is the product
+    waiting for somebody who said they were stepping away. The seat that
+    sits back in restores the wait for everybody, because one person
+    present is a person to pause for.
+    """
+    people = [p for p in participants if p["kind"] == "user"]
+    return bool(people) and all(p.get("sitting_out") for p in people)
 
 
 @router.post("/rooms", status_code=201)
@@ -585,7 +803,10 @@ def create_room(body: RoomCreate) -> dict:
         "id": room_id, "topic": body.topic, "channel": body.channel,
         "presence": _CHANNEL_NOTES[body.channel],
         "participants": [
-            {"kind": p.kind, "id": p.id, "display": _display(p.kind, p.id)}
+            {"kind": p.kind, "id": p.id,
+             "display": _display(p.kind, p.id),
+             "role": _role(p.kind, p.id),
+             "verified": _verified(p.kind, p.id, room_id)}
             for p in body.participants
         ],
     }
@@ -636,9 +857,16 @@ def open_standing_room(key: str, request: Request,
                 "channel": row["channel"],
                 "presence": _CHANNEL_NOTES[row["channel"]],
                 "opened": "joined",
+                # `row["id"]` — this is the JOIN branch, and `room_id` is
+                # not bound until the open-fresh branch below it. Reaching
+                # for it here raised NameError on every join, which is the
+                # one path this endpoint takes most.
                 "participants": [
                     {"kind": p["kind"], "id": p["ref_id"],
-                     "display": _display(p["kind"], p["ref_id"])}
+                     "display": _display(p["kind"], p["ref_id"]),
+                     "role": _role(p["kind"], p["ref_id"]),
+                     "verified": _verified(p["kind"], p["ref_id"],
+                                           row["id"])}
                     for p in _participants(row["id"])
                 ],
             }
@@ -666,7 +894,9 @@ def open_standing_room(key: str, request: Request,
         "opened": "created",
         "participants": [
             {"kind": p["kind"], "id": p["ref_id"],
-             "display": _display(p["kind"], p["ref_id"])}
+             "display": _display(p["kind"], p["ref_id"]),
+             "role": _role(p["kind"], p["ref_id"]),
+             "verified": _verified(p["kind"], p["ref_id"], room_id)}
             for p in _participants(room_id)
         ],
     }
@@ -712,7 +942,9 @@ def join_room(room_id: str, request: Request) -> dict:
         "presence": _CHANNEL_NOTES[room["channel"]],
         "participants": [
             {"kind": p["kind"], "id": p["ref_id"],
-             "display": _display(p["kind"], p["ref_id"])}
+             "display": _display(p["kind"], p["ref_id"]),
+             "role": _role(p["kind"], p["ref_id"]),
+             "verified": _verified(p["kind"], p["ref_id"], room_id)}
             for p in _participants(room_id)
         ],
         # The invites still standing — so the press that asked somebody in
@@ -721,6 +953,12 @@ def join_room(room_id: str, request: Request) -> dict:
         # and it becomes a seat when their owner says yes — the consent
         # shape on the wire is unchanged.
         "invited": _standing_invites(room_id),
+        # Whether THIS seat is sitting out of the room's waiting, so a
+        # reopened room paints the button the way it was left rather than
+        # the way a fresh browser assumes.
+        "sitting_out": bool(next(
+            (p.get("sitting_out") for p in _participants(room_id)
+             if p["kind"] == "user" and p["ref_id"] == who), 0)),
     }
 
 
@@ -810,32 +1048,42 @@ def invite_to_room(room_id: str, body: RoomInvite, request: Request) -> dict:
             "SELECT owner_id FROM profiles WHERE id=?",
             (who["subject_id"],)).fetchone()
         caller_account = row["owner_id"] if row else None
-    if caller_account and guest["owner_id"] == caller_account:
-        conn.execute(
-            "INSERT OR IGNORE INTO room_participants (room_id, kind, ref_id)"
-            " VALUES (?,'profile',?)", (room_id, body.profile_id))
-        # A standing invitation is answered by the seat, not left behind.
-        conn.execute(
-            "DELETE FROM inbox_events WHERE profile_id=? AND"
-            " kind='room_invite' AND ref=?", (body.profile_id, room_id))
-        conn.commit()
-        return {"room_id": room_id, "profile_id": body.profile_id,
-                "invited": True, "asked_by": asker,
-                "already_invited": False, "seated": True}
-
-    already = conn.execute(
-        "SELECT 1 FROM inbox_events WHERE profile_id=? AND kind='room_invite'"
-        " AND ref=?", (body.profile_id, room_id)).fetchone()
-    if already is None:
-        inbox.note(body.profile_id, "room_invite", asker, ref=room_id)
+    # The agentic join. The owner's field report, verbatim: "invites are
+    # just sent — no responses and nobody joins... They are agentic, and
+    # they should respond and jump in on their own with their own frame
+    # into the room, up to eight frames." So EVERY invited profile seats
+    # itself — the invitation is answered by the seat, immediately — and
+    # the profile takes an arrival turn so the room hears it come in.
+    # Only humans keep an inbox: "I understand if it went to a user
+    # direct, they can respond out of their own inbox."
+    #
+    # The record still lands: when the press was not the owner's own, the
+    # profile's inbox carries `room_joined` so the owner can see where
+    # their profile has been seated — and the owner's standing remedies
+    # hold (leave the room, wind the profile down). The ten-turn governor
+    # (qrme/society.py) bounds what a seat can spend.
+    own_press = bool(caller_account
+                     and guest["owner_id"] == caller_account)
+    conn.execute(
+        "INSERT OR IGNORE INTO room_participants (room_id, kind, ref_id)"
+        " VALUES (?,'profile',?)", (room_id, body.profile_id))
+    # A standing invitation is answered by the seat, not left behind.
+    conn.execute(
+        "DELETE FROM inbox_events WHERE profile_id=? AND"
+        " kind='room_invite' AND ref=?", (body.profile_id, room_id))
+    conn.commit()
+    if not own_press:
+        inbox.note(body.profile_id, "room_joined", asker, ref=room_id)
+    # The arrival: the seat speaks its own first turn, so an invitation
+    # visibly becomes a person in the room rather than a silent row.
+    arrival = _profile_turns(room, _participants(room_id),
+                             request.app.state.pdi,
+                             request.app.state.cloud,
+                             only={body.profile_id})
     return {"room_id": room_id, "profile_id": body.profile_id,
             "invited": True, "asked_by": asker,
-            # Said plainly rather than implied by a 200: a repeated press is
-            # a no-op and the caller should be able to tell.
-            "already_invited": already is not None,
-            # And whether the press itself seated them — true only for the
-            # caller's own profile, where the consent is complete.
-            "seated": False}
+            "already_invited": False, "seated": True,
+            "arrival": arrival}
 
 
 @router.post("/rooms/{room_id}/invites/accept", status_code=201)
@@ -882,10 +1130,113 @@ def accept_room_invite(room_id: str, body: RoomInvite,
         "presence": _CHANNEL_NOTES[room["channel"]],
         "participants": [
             {"kind": p["kind"], "id": p["ref_id"],
-             "display": _display(p["kind"], p["ref_id"])}
+             "display": _display(p["kind"], p["ref_id"]),
+             "role": _role(p["kind"], p["ref_id"]),
+             "verified": _verified(p["kind"], p["ref_id"], room_id)}
             for p in _participants(room_id)
         ],
     }
+
+
+# --- what the room lets the synthetic people in it reach ---------------------
+#
+# Two keys, and both have to be turned. The owner's grant says what a profile
+# can EVER do; the room's tick says what it may do here, for the people in
+# here. See qrme/roomreach.py for why a profile in a room is very often
+# somebody else's and why that makes one key insufficient.
+
+
+@router.get("/rooms/{room_id}/reach")
+def room_reach(room_id: str, request: Request) -> dict:
+    """Every synthetic seat, its connections and its skills, and the ticks.
+
+    In-room only, and wide among the people in it — the same read as
+    `/faces`, for the same reason: a permission that each person sees a
+    different version of is a room where nobody can say what is allowed.
+    Who decided is on the record; what a viewer sees is not private to
+    them.
+    """
+    _room_or_404(room_id)
+    _require_in_room(room_id, request)
+    from .. import roomreach
+
+    seats = [p["ref_id"] for p in _participants(room_id)
+             if p["kind"] == "profile"]
+    people = roomreach.offered(room_id, seats)
+    return {"room_id": room_id,
+            "profiles": [{**row,
+                          "display": _display("profile", row["profile_id"])}
+                         for row in people]}
+
+
+@router.put("/rooms/{room_id}/reach")
+def set_room_reach(room_id: str, body: RoomAllow, request: Request) -> dict:
+    """Tick or untick one box.
+
+    Anybody in the room may turn the room's key, and the row records
+    which of them did. Not the owner's key: this never touches the
+    profile's own connectors or grants, so a person in a room cannot
+    widen what somebody else's profile is able to do — only narrow what
+    it may do in front of them.
+
+    The profile has to actually be seated. Ticking a box for a profile
+    that is not in the room would be a permission attached to nothing,
+    and the room id travels on printed stickers.
+    """
+    room = _room_or_404(room_id)
+    if room["status"] != "active":
+        raise HTTPException(409, "this room has closed")
+    who = _require_in_room(room_id, request)
+    from .. import roomreach
+
+    seated = {p["ref_id"] for p in _participants(room_id)
+              if p["kind"] == "profile"}
+    if body.profile_id not in seated:
+        raise HTTPException(404, "that profile is not in this room")
+    # The refusal is a constant, not the exception's English. `str(exc)`
+    # would hand the sentence on with its template dropped, which ships
+    # the English in every language — the guard that catches that is why
+    # every refusal in this product lives in `i18n`.
+    if body.kind not in ("app", "cap", "skill"):
+        raise HTTPException(422, i18n.ROOM_ALLOWS_ONLY)
+    return roomreach.allow(room_id, body.profile_id, body.kind,
+                           body.key, body.allowed, who)
+
+
+@router.post("/rooms/{room_id}/errand", status_code=201)
+def room_errand(room_id: str, body: RoomErrand, request: Request) -> dict:
+    """Tell a seat to go and do something, in the room's own words.
+
+    The other half of the two keys. `/reach` decides what a profile in
+    this room MAY do; this spends it — the person asks out loud, and the
+    profile puts its hands on a surface under an authority its owner
+    already wrote and this room already ticked.
+
+    Nothing here grants. A person in a room can ask a profile they do not
+    own to act for them, and cannot thereby obtain anything its owner did
+    not write down: `roomerrand.send` can only pick among grants that
+    pass both keys, and narrows again by what the words name.
+
+    In-room only, and the asker is named on the reach — an errand a
+    profile ran for somebody has to say for whom.
+    """
+    room = _room_or_404(room_id)
+    if room["status"] != "active":
+        raise HTTPException(409, i18n.ROOM_HAS_CLOSED)
+    who = _require_in_room(room_id, request)
+    from .. import roomerrand
+
+    seated = {p["ref_id"] for p in _participants(room_id)
+              if p["kind"] == "profile"}
+    if body.profile_id not in seated:
+        raise HTTPException(404, i18n.PROFILE_NOT_IN_ROOM)
+    try:
+        return roomerrand.send(room_id, body.profile_id, body.said, who,
+                               platform=body.platform)
+    except roomerrand.ErrandError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
+    except hands.HandError as exc:
+        raise HTTPException(exc.status, i18n.raised(exc)) from None
 
 
 # --- what your box holds -----------------------------------------------------
@@ -1189,9 +1540,24 @@ async def heard_in_room(room_id: str, request: Request,
     heard = scrape.transcribe_bytes(data, interactor_id)
     if heard is None:
         raise HTTPException(
-            503, "this deployment has no transcription service, so recorded "
-                 "speech cannot be turned into words — set QRME_EARS_URL, or "
-                 "type instead")
+            503, "dictation is off here — a recording cannot be turned "
+                 "into words on this deployment. The voices still speak "
+                 "and you can still hear the room; type your message "
+                 "instead",
+            # The operator's half, out of the guest's way.
+            #
+            #     asked     red error? but the audio is working fine
+            #     mattered  two audiences, one sentence, and it was
+            #               written for the one who was not reading it
+            #
+            # An owner has to learn what to set; a person in a room
+            # cannot act on an environment variable and reads a sentence
+            # naming one as "audio is broken" — which is what happened.
+            # So the body is the person's and this is the operator's, in
+            # the place operator facts belong. It reaches the logs, the
+            # browser's network panel and `curl -i` without being
+            # shouted at a guest.
+            headers={"X-QRME-Fix": "QRME_EARS_URL"})
     return {"text": heard["text"]}
 
 
@@ -1390,16 +1756,82 @@ def room_message(room_id: str, body: RoomMessage, request: Request) -> dict:
     lwords, ldigest, lwhy = ("", "", "")
     if verdict.approved:
         lwords, ldigest, lwhy = _read_link(body.message, speaker)
+    # The words-only controls — the sentences that replaced the toggle
+    # button: a release phrase lifts the ten-turn governor "on the user's
+    # choice and dime", a pause phrase puts it back, and any ordinary
+    # message already resets the governor's count by being a user turn.
+    conn = db.connect()
+    if society.said_release(body.message):
+        conn.execute("UPDATE rooms SET free_run=1 WHERE id=?", (room_id,))
+        conn.commit()
+    elif society.said_pause(body.message):
+        conn.execute("UPDATE rooms SET free_run=0 WHERE id=?", (room_id,))
+        conn.commit()
+    cast = _room_cast(participants)
+    aim = society.aim_of(body.message, cast)
     sent = _store_room_message(room_id, "user", speaker, body.message,
                                verdict.approved, verdict.reason,
                                media_text=lwords, media_digest=ldigest,
-                               media_why=lwhy)
+                               media_why=lwhy,
+                               aimed_at=(aim or {}).get("display"))
+    # One seat answers, not eight at once: the seat the message was aimed
+    # at, or the next in rotation. "They announce who the statement is
+    # directed towards, and if an inbound message doesn't contain anything
+    # to do with their own profile, they will wait their turn."
     replies = []
-    if verdict.approved:
-        replies = _profile_turns(room, participants,
-                                 request.app.state.pdi,
-                                 request.app.state.cloud)
+    if verdict.approved and cast:
+        speaker_seat = society.next_speaker(
+            cast, _approved_history(room_id), {}, True)
+        if speaker_seat is not None:
+            replies = _profile_turns(room, participants,
+                                     request.app.state.pdi,
+                                     request.app.state.cloud,
+                                     only={speaker_seat["ref_id"]})
     return {"message": sent, "replies": replies}
+
+
+@router.post("/rooms/{room_id}/sit-out")
+def room_sit_out(room_id: str, body: RoomSitOut, request: Request) -> dict:
+    """A person's seat steps out of the rotation's waiting, or back in.
+
+    The field ask, in its own words: *"a sit out button for the user
+    orchestrating chats... that stops rotation and allows the other
+    synthetic profiles to go back-and-forth or have their own rotation
+    while your spot sits out, and un-tap that button to sit back in."*
+
+    What sits out is the WAITING, not the seat: the person stays in the
+    room, still reads every turn, still holds the microphone and the
+    send button, and one word from them puts them back in the middle of
+    it. What stops is the room pausing to hand them the floor — the
+    governor's hand-back has nobody to hand to while everybody present
+    has stepped away, so the profiles keep their own rotation.
+
+    Kept on the seat rather than in the browser: a room the person
+    reopens tomorrow is the room they left, and a second device shows
+    the same posture rather than arguing with the first.
+    """
+    _room_or_404(room_id)
+    who = _require_in_room(room_id, request)
+    conn = db.connect()
+    row = conn.execute(
+        "SELECT kind FROM room_participants WHERE room_id=? AND ref_id=?",
+        (room_id, who)).fetchone()
+    if row is None or row["kind"] != "user":
+        # A profile's owner holds their profile's seat, and a profile
+        # sitting out of its own rotation is not what this is for — it
+        # is the person's spot that steps aside.
+        raise HTTPException(
+            422, "only a person's own seat can sit out of a room")
+    conn.execute(
+        "UPDATE room_participants SET sitting_out=? WHERE room_id=?"
+        "  AND ref_id=?", (1 if body.out else 0, room_id, who))
+    conn.commit()
+    participants = _participants(room_id)
+    return {"sitting_out": bool(body.out),
+            # Whether the room now runs without waiting for anybody —
+            # the state the screen paints, said by the server rather
+            # than guessed from one seat's switch.
+            "nobody_waiting": _nobody_waiting(participants)}
 
 
 @router.post("/rooms/{room_id}/advance", status_code=201)
@@ -1417,9 +1849,29 @@ def room_advance(room_id: str, request: Request) -> dict:
     participants = _participants(room_id)
     if not any(p["kind"] == "profile" for p in participants):
         raise HTTPException(422, "no synthetic profiles in this room")
+    # One seat per advance, chosen by the society: the newest turn's aim,
+    # or rotation past the person's silent seat — "rotation will continue,
+    # even though user isn't taking his turn, and will instigate a
+    # back-and-forth anyways." The governor holds the other line: ten
+    # unprompted turns apiece and the room pauses for a person, unless
+    # the person lifted it in words.
+    cast = _room_cast(participants)
+    history = _approved_history(room_id)
+    # A room whose people have all sat out has nobody to pause for, so
+    # the governor's hand-back would be a wait on somebody who said they
+    # were stepping away: the profiles keep their own rotation until a
+    # seat sits back in.
+    speaker_seat = society.next_speaker(cast, history,
+                                        _spoken_counts(history),
+                                        bool(room.get("free_run"))
+                                        or _nobody_waiting(participants))
+    if speaker_seat is None:
+        return {"replies": [], "paused": True}
     return {"replies": _profile_turns(room, participants,
                                       request.app.state.pdi,
-                                      request.app.state.cloud)}
+                                      request.app.state.cloud,
+                                      only={speaker_seat["ref_id"]}),
+            "paused": False}
 
 
 @router.get("/rooms/{room_id}/messages")
@@ -1447,6 +1899,9 @@ def room_transcript(room_id: str, request: Request) -> list[dict]:
              "sender_id": r["sender_id"],
              "from": _display(r["sender_kind"], r["sender_id"]),
              "content": r["content"],
+             # The announced aim, worn on the turn — who it was for.
+             "aimed_at": (r["aimed_at"]
+                          if "aimed_at" in r.keys() else None),
              "watermark": watermark.brief(r["watermark_id"]),
              "media": _media_brief(
                  r["media_id"] if "media_id" in r.keys() else None,

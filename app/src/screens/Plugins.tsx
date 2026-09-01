@@ -230,7 +230,7 @@ export function Plugins({ onPlans }: { onPlans: () => void }) {
     );
   }
 
-  const ready = (board?.providers ?? []).flatMap((p) =>
+  const ready = (board?.app_providers ?? []).flatMap((p) =>
     p.apps.filter((a) => a.needs_first === "nothing")
       .map((a) => ({ provider: p.provider, ...a })));
 
@@ -380,7 +380,7 @@ export function Plugins({ onPlans }: { onPlans: () => void }) {
         </div>
       )}
 
-      {(board?.providers ?? []).map((p) => {
+      {(board?.app_providers ?? []).map((p) => {
         const rows = p.apps.filter(
           (a) => matches(a.label, a.app, a.capabilities));
         if (rows.length === 0) return null;

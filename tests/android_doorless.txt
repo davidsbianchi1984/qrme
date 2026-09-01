@@ -40,3 +40,172 @@ POST /accounts/{account_id}/avatars
 POST /profiles/{profile_id}/avatar/claim
 POST /profiles/{profile_id}/avatar/painted
 DELETE /avatars/registry/{registry_id}
+# GET /rooms/xr-platforms — the XR shelf is a discovery card the desktop
+# Rooms screen draws; the shells ARE two of the platforms it lists, so a
+# phone reading its own row adds nothing yet. Reachable when the native
+# rooms screens grow the card.
+GET /rooms/xr-platforms
+# POST /avatars/library/pull — the operator's one-button shelf fill; an
+# operator holds the signup key at a desk, not on a phone. Console-only,
+# like the library stock door above it.
+POST /avatars/library/pull
+
+# POST /watch-parties/{party_id}/watch — have the party's video watched by
+# the platform's own eyes and ears (qrme/watching.py). The web console
+# holds this door on the party's context panel — the panel that shows
+# what a profile in the room is told. This shell draws no context panel
+# yet, and a watch button with no panel to land its viewing on would be
+# a binding with no caller — the exact failure unused_native_bindings.txt
+# was written to catch. The row leaves this backlog when the shell grows
+# the panel.
+POST /watch-parties/{party_id}/watch
+
+# The Raise doors (docs/raise.md, rounds one and two). The web console
+# holds all nine on the Raise tab — creation, the character, the Album,
+# the teach box, the switches, and the three time controls (visit,
+# fast-forward, branch). This shell has no Raise surface yet, and bindings
+# with no screen to live on are the exact failure
+# unused_native_bindings.txt was written to catch. The rows leave this
+# backlog when the shell grows the tab (build-order step 7 is "three
+# shells").
+GET /raise/doors
+POST /raise
+GET /raise/{profile_id}
+GET /raise/{profile_id}/album
+POST /raise/{profile_id}/teach
+PATCH /raise/{profile_id}/switches
+
+# The forge (docker/forge, qrme/avatarforge.py): a photograph becomes a
+# 3-D face on this deployment's own hardware. The web console holds the
+# door on Identity — pick a framing, choose a picture, wear the head it
+# builds. This shell has no forge surface yet, and a binding with no
+# screen to live on is the exact failure unused_native_bindings.txt was
+# written to catch. The rows leave this backlog when the shell grows the
+# upload and a renderer that can draw a `.glb`.
+GET /avatars/forge
+POST /profiles/{profile_id}/avatar/forge
+
+# The sit-out: a person's seat steps out of the room's waiting so the
+# profiles keep their own rotation. The console draws it on the person's
+# own frame in a room; these shells do not carry the room's seat frames
+# yet, so there is nothing for the button to sit on.
+POST /rooms/{room_id}/sit-out
+POST /raise/{profile_id}/visit
+POST /raise/{profile_id}/forward
+POST /raise/{profile_id}/branch
+
+# --- the hands (0.98.0 / qrme/hands.py) -------------------------------------
+#
+# Fourteen routes, and this shell reaches none of them. The reason is one
+# thing, and it is not scheduling.
+#
+# A hand needs a motor: something that can actually move a cursor, press a
+# control and type into a field on the surface in front of it. None of these
+# three shells has one, and what it would take differs per platform in a way
+# that matters:
+#
+#   iOS      there is no motor to build. No third-party process may operate
+#            another app's interface — no public API, no entitlement to
+#            request, no build that survives review. `hands.DRIVABLE` omits
+#            `ios` for this reason and `open_reach` refuses `acting` there
+#            with the reason written out. On an iPhone the profile watches
+#            and says where to press, which is a real feature and a smaller
+#            one, and this backlog is where that is admitted rather than
+#            being discovered by somebody whose phone did nothing.
+#   Android  an AccessibilityService — a separate app component, with its own
+#            Play policy review for exactly this class of use.
+#   Windows  a desktop automation service running beside the shell.
+#
+#     asked     can this client reach the route
+#     mattered  can this client do the thing the route records
+#
+# Binding the fourteen calls now would take them off this list and build
+# nothing — the precise failure `unused_native_bindings.txt` exists to catch,
+# and the same reasoning as the `/rooms/{room_id}/heard` row above. The web
+# console has the whole surface today; these rows stand until a motor does.
+DELETE /profiles/{profile_id}/hands/grants/{grant_id}
+GET /hands/vocabulary
+GET /profiles/{profile_id}/hands/grants
+GET /profiles/{profile_id}/hands/reaches/{reach_id}
+GET /profiles/{profile_id}/hands/routines
+POST /profiles/{profile_id}/hands/grants
+POST /profiles/{profile_id}/hands/reaches
+POST /profiles/{profile_id}/hands/reaches/{reach_id}/act
+POST /profiles/{profile_id}/hands/reaches/{reach_id}/hand-over
+POST /profiles/{profile_id}/hands/reaches/{reach_id}/stop
+POST /profiles/{profile_id}/hands/routines
+POST /profiles/{profile_id}/hands/routines/from-reach
+POST /profiles/{profile_id}/hands/routines/{routine_id}/replay
+POST /profiles/{profile_id}/hands/told
+
+# POST /profiles/{profile_id}/avatar/speaking — the photograph, measured
+# so its mouth can move. The web console builds and draws it; these three
+# do not, for the same reason they do not reach `/avatar/forge` above:
+# the drawing takes a mesh laid over the picture with the picture as its
+# own texture, and none of these shells has that renderer. The still
+# portrait they already draw is exactly what a face without a
+# measurement shows, so nothing here is missing — it simply does not
+# move yet.
+POST /profiles/{profile_id}/avatar/speaking
+
+# POST /profiles/{profile_id}/hands/reaches/{reach_id}/next — one frame
+# in, one bounded move out. On the same row as the thirteen hand routes
+# above and for the same reason: a hand needs a motor, and none of these
+# three shells has one. The web console reaches it by describing the
+# screen in words; the machine that can photograph a screen and then act
+# on it is `companion/hands.py`, which runs on the person's own desk.
+POST /profiles/{profile_id}/hands/reaches/{reach_id}/next
+
+# The video road (qrme/filming.py) — ten doors the console has and these
+# three shells do not.
+#
+# Recorded rather than built, and the reason is that a door here would be
+# a button that spends money on a surface with nothing to show the result
+# on. The road is not one route: it is a picker, a daily ceiling in
+# seconds, a standing direction written in prose, a poller that has to
+# survive the app going to the background, and a video player. Binding
+# the ten routes without those is the failure
+# unused_native_bindings.txt exists to catch — a shell that can START a
+# render it cannot show, cap, or cancel.
+#
+#     asked     can this client reach the route
+#     mattered  can this client do the thing the route is for
+#
+# The console carries all ten today. When a shell grows the player and
+# the poller, these ten come off together — not one at a time, because a
+# render started on a phone that cannot display it is worse than one
+# nobody could start.
+GET /video/doors
+POST /video/render
+GET /video/render/{render_id}
+GET /video/latest/{profile_id}
+GET /video/road/{profile_id}
+POST /video/road/{profile_id}
+GET /video/direction/{profile_id}
+POST /video/direction/{profile_id}
+DELETE /video/direction/{profile_id}
+GET /video/direction/{profile_id}/log
+
+# The room's permission window. The console draws it — every synthetic seat,
+# its connections and its skills, with a box beside each — and no shell does
+# yet. A binding with no screen behind it would take these two routes off this
+# very backlog while building nothing, which is what this file exists to stop.
+GET /rooms/{room_id}/reach
+PUT /rooms/{room_id}/reach
+POST /rooms/{room_id}/errand
+
+# GET /avatars/convert — and the POST below it. The conversion turns a
+# MetaPerson FBX export into the .glb the console loads, and the export is a
+# ZIP a person downloads from a website in a browser. That is where the file
+# lands and that is where the box for it is. A shell door would need a
+# document picker wired to the avatar screen and a multi-megabyte body pushed
+# up from a phone, for a file the phone did not download — so this is the one
+# road on this backlog that is here because of where the FILE is rather than
+# because of what the shell can do.
+#
+# It is not impossible and it is not refused: a person who has the zip in
+# Files on a phone has a real case, and the day this shell grows a document
+# picker these two rows come off together. Until then the console has the
+# door and this says so.
+GET /avatars/convert
+POST /profiles/{profile_id}/avatar/convert

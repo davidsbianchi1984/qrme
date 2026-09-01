@@ -77,7 +77,7 @@ export function Refusal({ error, onPlans, variant = "card" }: {
   // the API refuses with, the same string in every language, and the button
   // is console chrome and lives in `l10n.ts` with the rest of it.
   return (
-    <div className="card error">
+    <div className="card error" data-screen="161">
       <h4>{gate.needs.toUpperCase()} — {gate.capability}</h4>
       <p className="small">{gate.message}</p>
       {onPlans && (

@@ -515,7 +515,7 @@ def seed() -> dict:
             area=industry, provider_name=PUBLISHER, business=True))
         created.append({"pack_id": pack_id, "industry": industry,
                         "audience": "profile", "title": title,
-                        "items": len(items)})
+                        "items_count": len(items)})
     for domain, (title, price, tasks) in ROBOT_PACKS.items():
         exists = conn.execute(
             "SELECT id FROM knowledge_packs WHERE industry=? AND publisher=?"
@@ -545,7 +545,7 @@ def seed() -> dict:
             area=domain, provider_name=PUBLISHER, business=True))
         created.append({"pack_id": pack_id, "industry": domain,
                         "audience": "robot", "title": title,
-                        "items": len(tasks)})
+                        "items_count": len(tasks)})
     industry, title, price, items = RATED_PACK
     exists = conn.execute(
         "SELECT id FROM knowledge_packs WHERE industry=? AND publisher=?"
@@ -572,7 +572,7 @@ def seed() -> dict:
         # only through the age-gated /packs catalog.
         created.append({"pack_id": pack_id, "industry": industry,
                         "audience": "profile", "rated": True,
-                        "title": title, "items": len(items)})
+                        "title": title, "items_count": len(items)})
     return {"created": len(created), "skipped": len(skipped),
             "industries": len(STARTER_PACKS) + len(ROBOT_PACKS) + 1,
             "packs": created}

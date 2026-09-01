@@ -49,6 +49,24 @@ def test_one_voice_at_a_time():
         "second voice over the first")
 
 
+def test_the_ear_reopens_when_the_room_falls_quiet():
+    """A turn that arrives while a voice is playing hits the queue's lock
+    and is dropped — and the lock is a ref, so releasing it re-runs
+    nothing. The field report: an invited profile's first words, on
+    screen and never heard, audible only once somebody ELSE spoke and
+    re-fired the effect. The queue must look again the moment it
+    finishes, so the dropped turn's silence lasts one voice, not until
+    the next message."""
+    assert "setEarTick" in INSIDE, (
+        "the speak queue no longer re-opens the ear when it finishes — "
+        "turns that arrive mid-playback stay silent until the next one")
+    # The tick is the queue telling ITSELF the air is clear: it must be
+    # bumped at the end of the run and listened to by the effect.
+    assert "earTick]" in INSIDE.replace(" ", "").replace("\n", ""), (
+        "earTick is bumped but the effect does not depend on it — the "
+        "re-look never happens")
+
+
 def test_a_withheld_autoplay_is_not_mistaken_for_a_reply():
     """A refused play must not read as a reply that was heard.
 

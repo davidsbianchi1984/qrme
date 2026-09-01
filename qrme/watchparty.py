@@ -8,18 +8,24 @@ different from everyone else's: **synthetic profiles can be in the room.**
 That last part is where the honesty problem is, and it is worth being exact
 about rather than hand-waving past.
 
-**A profile has not seen the video.** It cannot. Nothing here fetches the
-video, nothing transcribes it, and a profile that said *"the bit at four
-minutes was great"* would be fabricating — the most ordinary-looking lie this
-product could tell, and the one nobody would think to check. So
-:func:`prompt_context` hands the profile only what actually exists on this
-side: the title the poster typed, the platform, where the party has got to, and
-what the humans in the room have said. And it states the limit in the prompt,
-in the second person, so the model is told rather than merely starved:
+**A profile has seen exactly what was watched, and nothing more.** By
+default that is nothing: a profile that said *"the bit at four minutes was
+great"* about a video nobody fetched would be fabricating — the most
+ordinary-looking lie this product could tell, and the one nobody would
+think to check. So :func:`prompt_context` hands the profile only what
+actually exists on this side — the title the poster typed, the platform,
+where the party has got to, what the humans in the room have said — and
+states the limit in the prompt, in the second person, so the model is told
+rather than merely starved.
 
-    you have not watched this and cannot see it; talk about what people are
-    saying, and if somebody asks what you thought of a moment, say you have
-    not seen it
+Since the watching (:mod:`qrme.watching`, the owner's *"let's make our
+own"*), a member can have a direct video link actually watched: the ears
+transcribe it, the seeing door describes its frames, and the context then
+carries the viewing with an instruction that says precisely which senses
+were used — :data:`SIGHT` when the frames were described, :data:`HEARING`
+when only the soundtrack was heard, :data:`BLINDNESS` otherwise. Platform
+pages that hand over a player rather than the recording cannot be watched,
+and the refusal says so.
 
 Starving a model of context and hoping is not a safeguard. Telling it the
 truth about its own position is.
@@ -42,7 +48,7 @@ runs strict, the same rule rooms already use.
 
 from __future__ import annotations
 
-from . import avatars, db, embeds, i18n, moderation, sharing
+from . import avatars, db, embeds, i18n, moderation, sharing, watching
 
 MAX_PARTY = 50
 MAX_LINE = 600
@@ -59,6 +65,23 @@ BLINDNESS = (
     "others in the room are saying and about what the video is titled. If "
     "somebody asks what you thought of a moment in it, say you have not seen "
     "it rather than inventing one."
+)
+
+# The blindness lifts in steps, and each step says exactly what it is.
+# When a member has the video watched (qrme/watching.py), the ears' words
+# and the seeing door's account travel in the context, and the profile is
+# told what it actually holds — never more.
+HEARING = (
+    "you have heard this video's soundtrack: the words said in it are in "
+    "`watching.heard`. You have not seen its pictures. Talk about what was "
+    "said and what the room is saying; if somebody asks about a purely "
+    "visual moment, say you heard it rather than saw it."
+)
+SIGHT = (
+    "you have watched this video: `watching.seen` is an account of what is "
+    "on its screen and `watching.heard` is the words said in it. Talk about "
+    "both like somebody who watched it — and when a detail is in neither, "
+    "say you did not catch that part rather than inventing it."
 )
 
 
@@ -405,22 +428,32 @@ def prompt_context(party_id: str, limit: int = 20) -> dict:
         raise PartyError("no such watch party")
     video = embeds.facade(row["post_id"]) or {}
     lines = chat(party_id, limit=limit)
+    # The viewing, if a member had the video watched. Read, never made
+    # here — a context fetch must not start a download, and a party whose
+    # video was never watched keeps the blindness sentence it always had.
+    viewing = (watching.viewing_of(video["url"]) if video.get("url")
+               else None) or {}
+    heard = (viewing.get("heard") or "").strip()
+    seen = (viewing.get("seen") or "").strip()
     return {
         "watching": {
             "title": video.get("title"),
             "platform": video.get("platform_name"),
-            # Named for what it is. This is not a description of the video,
-            # because nothing on this side has one.
-            "description_available": False,
-            "transcript_available": False,
+            # Named for what they are, and true in every state: a
+            # description exists only once the seeing door wrote one, a
+            # transcript only once the ears heard one.
+            "description_available": bool(seen),
+            "transcript_available": bool(heard),
+            "heard": heard,
+            "seen": seen,
         },
         "position_s": row["position_s"],
         "playing": bool(row["playing"]),
         "recent": [{"who": ln["display_name"] or ln["member_id"],
                     "said": ln["body"], "at": ln["position_s"]}
                    for ln in lines[-limit:]],
-        "you_have_not_seen_it": True,
-        "instruction": BLINDNESS,
+        "you_have_not_seen_it": not seen,
+        "instruction": SIGHT if seen else HEARING if heard else BLINDNESS,
     }
 
 

@@ -86,7 +86,7 @@ private struct EarningsSection: View {
                             Text(L10n.fill("nmg.payout.done", state.language,
                                            ["id": receipt.payout_id,
                                             "total": money(receipt.total_amount, s.currency),
-                                            "n": "\(receipt.entries)"]))
+                                            "n": "\(receipt.entries_count)"]))
                                 .font(.caption).foregroundStyle(Theme.green)
                         }
                     } else {
@@ -325,7 +325,7 @@ private struct SummonSection: View {
 
     private func cards(_ r: SummonResult) -> [SummonCard] {
         if let one = r.profile { return [one] }
-        return r.profiles ?? []
+        return r.summoned ?? []
     }
 
     private func load() async {

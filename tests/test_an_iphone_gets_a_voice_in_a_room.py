@@ -50,19 +50,39 @@ def room(client):
 
 def test_a_deployment_with_no_ears_says_so(client, room):
     """Silence would be read as "it didn't hear me" by somebody who has just
-    spoken into their phone. The true answer — that this deployment has
-    nowhere to send the audio — is one an owner can act on and a guest
-    cannot guess."""
+    spoken into their phone. So the refusal speaks — but to whom?
+
+        asked     red error? but the audio is working fine
+        mattered  two audiences were sharing one sentence
+
+    It used to read "this deployment has no transcription service ... set
+    QRME_EARS_URL", shown in red down the side of a room where the voices
+    were playing perfectly. A person in a room cannot set an environment
+    variable, and a sentence about a missing audio service reads as the
+    whole audio path being down — which is exactly how it was reported.
+
+    Dictation and playback are separate doors and only one is shut, so the
+    body says that, in words the person can act on. The operator's half
+    rides a header, which is where operator facts belong.
+    """
     user, rid, mine = room
     r = client.post(f"/rooms/{rid}/heard",
                     params={"interactor_id": user}, content=AUDIO, headers=mine)
     assert r.status_code == 503, r.text
     said = r.json()["detail"]
-    assert "QRME_EARS_URL" in said, (
-        "the refusal does not name what is missing, so the owner cannot fix it")
-    assert "type instead" in said, (
-        "the refusal does not say what still works — a person who cannot "
+    assert "dictation" in said.lower(), (
+        "the refusal does not name the one thing that is off")
+    assert "still" in said.lower(), (
+        "the refusal does not say what still works — the report was that "
+        "this read as the whole audio path failing, and it was not")
+    assert "type your message" in said, (
+        "the refusal does not say what to do instead — a person who cannot "
         "speak in a room can still write in it")
+    assert "QRME_EARS_URL" not in said, (
+        "an environment variable is not an instruction a guest can follow")
+    assert r.headers.get("X-QRME-Fix") == "QRME_EARS_URL", (
+        "the operator's half went missing — an owner still has to learn "
+        "what to set, just not in the guest's sentence")
 
 
 def test_the_words_come_back(client, room, monkeypatch):

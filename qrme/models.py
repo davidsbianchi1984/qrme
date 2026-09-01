@@ -7,7 +7,12 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-ProfileKind = Literal["self", "other_person", "fictional", "hybrid"]
+# "raised" is the fourth kind (docs/raise.md): a developmental
+# character grown through interaction. It has its OWN creation door
+# (POST /raise) — the ordinary profile door refuses it, because a
+# raised life needs a stage, a preset and a guardian from birth.
+ProfileKind = Literal["self", "other_person", "fictional", "hybrid",
+                      "raised"]
 InteractionScope = Literal["reactive", "proactive"]
 ModerationMode = Literal["auto", "manual"]
 RelationshipType = Literal[
@@ -31,6 +36,26 @@ class Verification(BaseModel):
 
     birthdate: date
     guardian_consent: bool = False
+
+
+class RaiseCreate(BaseModel):
+    """The fourth kind's own creation door (docs/raise.md). Fresh wire
+    vocabulary — stage, preset, temperament — no collisions with the
+    ordinary profile door, by the one-name-one-type guard from day one."""
+
+    owner_id: str
+    display_name: str
+    #: Where the guardian ENTERS the timeline — any stage.
+    stage: str = "child"
+    #: One of the four doors: storybook | caretaker | full_trail | sandbox.
+    #: Every one is only a bundle of switches, reopenable later.
+    preset: str = "storybook"
+    #: The seed the raising drifts: warm_reserved / bold_careful /
+    #: silly_serious, each -100..100. Absent axes start at 0.
+    temperament: dict[str, int] = Field(default_factory=dict)
+    verification: Verification
+    terms_consent: bool = False
+    language: str | None = None
 
 
 class Consent(BaseModel):
@@ -97,6 +122,11 @@ class ProfileUpdate(BaseModel):
     aging_enabled: bool | None = None
     successor_owner: str | None = None
     cloud_contribution: bool | None = None
+    # May the people this profile talks with restyle its avatar — the
+    # wardrobe's guest switch. On by default; the owner's deliberate act
+    # is closing it. The paint door itself still holds the deepfake line
+    # (fictional faces only), whoever is prompting.
+    guest_styling: bool | None = None
     proactive_min_interval_hours: int | None = None   # anti-spam rate cap
     # What kind of thing this profile is.
     #
@@ -122,6 +152,19 @@ class ProfileUpdate(BaseModel):
     # on the prompt. Stored since the first migration with no way to set it
     # after creation.
     appearance: str | None = None
+    # What this profile is FOR, under its name — "Healthcare" beside
+    # "Dr. Amara Osei", which is what a room's seats read to say what a
+    # roomful of specialists specialises in.
+    #
+    #     asked     who is in this room
+    #     mattered  what are they for
+    #
+    # It arrived as a seeded column with no door: written once from the
+    # starter's own pack and unchangeable after, which is the same defect
+    # `kind` and `appearance` each had before them. A profile that changes
+    # what it is for has no way to say so, and the seats go on announcing
+    # the old answer.
+    industry: str | None = None
 
 
 class ProfileOut(BaseModel):
@@ -147,13 +190,22 @@ class ProfileOut(BaseModel):
     purpose: Purpose | None
     maturity: Maturity
     cloud_contribution: bool
+    # Public on purpose: a visitor standing in front of the wardrobe needs
+    # to know whether it opens for them before they start typing.
+    guest_styling: bool
     status: str                        # active | restricted | departed | terminated
     licensed_from: str | None = None   # source profile if a licensed derivative
     created_at: str
 
 
 class InteractorCreate(BaseModel):
-    display_name: str
+    # Optional, because a caller who does not know somebody's name should
+    # say so rather than invent one. The console used to send the word its
+    # own surface uses for the reader's seat — "You" — which then became
+    # that person's name for everybody else in the room. What gets stored
+    # when this is absent is `accounts.a_person_name`'s answer, in one
+    # place, for both doors that make a person.
+    display_name: str | None = None
     birthdate: date | None = None
 
 
@@ -321,6 +373,17 @@ class RoomParticipant(BaseModel):
     id: str
 
 
+class RoomSitOut(BaseModel):
+    """A person's seat stepping out of the room's waiting, or back in.
+
+    One boolean, because it is one button: tapped is out, tapped again is
+    in. `out` on the wire rather than `sitting_out` — the seat's column
+    carries the state, the request carries the act.
+    """
+
+    out: bool = True
+
+
 class RoomInvite(BaseModel):
     """Who is being asked into a room, or who is answering.
 
@@ -341,6 +404,34 @@ class RoomRename(BaseModel):
 
     interactor_id: str
     topic: str
+
+
+class RoomErrand(BaseModel):
+    """Words in a room, sent to one synthetic seat as an errand.
+
+    `platform` is where the hands land — the same vocabulary a reach
+    already takes. It defaults rather than being asked for, because the
+    person saying "check my calendar" is not choosing an operating
+    system.
+    """
+
+    profile_id: str
+    said: str
+    platform: str = "web"
+
+
+class RoomAllow(BaseModel):
+    """One box, ticked or unticked, on one synthetic seat.
+
+    `allowed` is required and never inferred from the call. A door where
+    sending the row means yes cannot express no without a second door,
+    and "untick this" is the half of a permission that has to work.
+    """
+
+    profile_id: str
+    kind: str                      # app | skill
+    key: str                       # the connector's id, or the grant's
+    allowed: bool
 
 
 class RoomFace(BaseModel):
@@ -914,6 +1005,11 @@ class ChatResponse(BaseModel):
     # across every embodiment/modality, so a client can prove personality
     # continuity when a relationship moves from voice → text → hologram.
     persona_signature: str | None = None
+    # The turn as footage, when this profile takes the video road. Started
+    # here and NOT waited for — a render is minutes and a reply is not —
+    # so what rides back is a row to poll rather than a video. None on the
+    # photo and avatar roads, and when no service is configured.
+    scene: dict | None = None
     embodiment: str | None = None      # the embodiment this turn came through
     # Echo of the environmental context the reply adapted to (spec clause 1);
     # None when the request carried none.

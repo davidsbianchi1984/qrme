@@ -259,6 +259,309 @@ _PUBLIC: dict[str, dict[str, str]] = {
         "hi": "कोई पेंटिंग सेवा कॉन्फ़िगर नहीं है — इस परिनियोजन में इमेज कुंजी नहीं है",
         "ar": "لا توجد خدمة رسم مهيأة — لا يملك هذا النشر مفتاح صور",
     },
+    ("a life starts at one of its own stages — embryo, child, "
+     "adolescent, young adult or adult"): {
+        "es": "una vida comienza en una de sus propias etapas — embrión, infancia, adolescencia, juventud o adultez",
+        "fr": "une vie commence à l'une de ses propres étapes — embryon, enfance, adolescence, jeune adulte ou adulte",
+        "de": "ein Leben beginnt in einer seiner eigenen Stufen — Embryo, Kind, Jugend, junger Erwachsener oder Erwachsener",
+        "pt": "uma vida começa numa das suas próprias fases — embrião, infância, adolescência, jovem adulto ou adulto",
+        "it": "una vita comincia in una delle sue fasi — embrione, infanzia, adolescenza, giovane adulto o adulto",
+        "ja": "命はその段階のいずれかから始まります — 胚・子ども・思春期・青年・成人",
+        "zh": "生命从它自身的阶段之一开始——胚胎、儿童、青春期、青年或成年",
+        "hi": "जीवन अपनी ही अवस्थाओं में से किसी एक से शुरू होता है — भ्रूण, बचपन, किशोरावस्था, युवा या वयस्क",
+        "ar": "تبدأ الحياة في إحدى مراحلها — جنين، طفولة، مراهقة، شابّ بالغ أو بالغ",
+    },
+    ("the four doors at creation are storybook, caretaker, "
+     "full trail and sandbox — each just a bundle of switches "
+     "you can reopen later"): {
+        "es": "las cuatro puertas al crear son cuento, cuidador, sendero completo y arenero — cada una es solo un manojo de interruptores que puedes reabrir después",
+        "fr": "les quatre portes à la création sont conte, gardien, piste complète et bac à sable — chacune n'est qu'un faisceau d'interrupteurs que vous pouvez rouvrir plus tard",
+        "de": "die vier Türen bei der Erstellung sind Märchenbuch, Fürsorge, ganze Reise und Sandkasten — jede nur ein Bündel Schalter, das du später wieder öffnen kannst",
+        "pt": "as quatro portas na criação são conto, cuidador, trilha completa e caixa de areia — cada uma é só um feixe de interruptores que pode reabrir depois",
+        "it": "le quattro porte alla creazione sono fiaba, custode, sentiero completo e sabbiera — ognuna è solo un fascio di interruttori che puoi riaprire dopo",
+        "ja": "作成時の4つの扉は「絵本」「世話」「フルトレイル」「サンドボックス」— どれも後から開き直せるスイッチの束にすぎません",
+        "zh": "创建时的四扇门是故事书、照料者、完整旅途和沙盒——每一扇都只是一束以后可以重新打开的开关",
+        "hi": "रचना के चार द्वार हैं — कहानी, देखभाल, पूरी राह और सैंडबॉक्स — हर एक बस स्विचों का गुच्छा है जिसे आप बाद में फिर खोल सकते हैं",
+        "ar": "الأبواب الأربعة عند الإنشاء هي الحكاية والرعاية والدرب الكامل وصندوق الرمل — كل منها مجرد حزمة مفاتيح يمكنك إعادة فتحها لاحقًا",
+    },
+    ("the temperament seed has three axes — warm/reserved, "
+     "bold/careful, silly/serious"): {
+        "es": "la semilla de temperamento tiene tres ejes — cálido/reservado, audaz/prudente, juguetón/serio",
+        "fr": "la graine de tempérament a trois axes — chaleureux/réservé, audacieux/prudent, espiègle/sérieux",
+        "de": "der Temperament-Keim hat drei Achsen — warm/zurückhaltend, kühn/vorsichtig, albern/ernst",
+        "pt": "a semente de temperamento tem três eixos — caloroso/reservado, ousado/cauteloso, brincalhão/sério",
+        "it": "il seme del temperamento ha tre assi — caloroso/riservato, audace/prudente, giocoso/serio",
+        "ja": "気質の種には3つの軸があります — あたたかい/控えめ、大胆/慎重、おどけ/まじめ",
+        "zh": "性情种子有三条轴——热情/内敛、大胆/谨慎、俏皮/严肃",
+        "hi": "स्वभाव-बीज के तीन अक्ष हैं — गर्म/संकोची, साहसी/सावधान, चंचल/गंभीर",
+        "ar": "لبذرة الطبع ثلاثة محاور — دافئ/متحفظ، جريء/حذر، مرح/جاد",
+    },
+    "no raised character stands behind this profile": {
+        "es": "detrás de este perfil no hay un personaje criado",
+        "fr": "aucun personnage élevé ne se tient derrière ce profil",
+        "de": "hinter diesem Profil steht keine aufgezogene Figur",
+        "pt": "não há personagem criado por trás deste perfil",
+        "it": "dietro questo profilo non c'è un personaggio cresciuto",
+        "ja": "このプロフィールの背後に育てられたキャラクターはいません",
+        "zh": "这个形象背后没有养成角色",
+        "hi": "इस प्रोफ़ाइल के पीछे कोई पाला हुआ पात्र नहीं है",
+        "ar": "لا تقف شخصية مربّاة خلف هذا الملف",
+    },
+    "only this character's guardian raises it": {
+        "es": "solo quien lo cría puede criar a este personaje",
+        "fr": "seul son gardien élève ce personnage",
+        "de": "nur wer diese Figur großzieht, zieht sie groß",
+        "pt": "só quem o cria pode criar este personagem",
+        "it": "solo chi lo cresce può crescere questo personaggio",
+        "ja": "このキャラクターを育てられるのは保護者だけです",
+        "zh": "只有这个角色的监护人能养育它",
+        "hi": "इस पात्र को केवल उसका संरक्षक ही पाल सकता है",
+        "ar": "لا يربي هذه الشخصية إلا وليّها",
+    },
+    "a lesson teaches something — say what": {
+        "es": "una lección enseña algo — di qué",
+        "fr": "une leçon enseigne quelque chose — dites quoi",
+        "de": "eine Lektion lehrt etwas — sag was",
+        "pt": "uma lição ensina algo — diga o quê",
+        "it": "una lezione insegna qualcosa — di' cosa",
+        "ja": "レッスンは何かを教えるものです — 何を教えるか言ってください",
+        "zh": "一堂课总要教点什么——说出是什么",
+        "hi": "पाठ कुछ सिखाता है — बताइए क्या",
+        "ar": "الدرس يعلّم شيئًا — قل ماذا",
+    },
+    ("a teaching is a word, a lesson, or an answer to one of "
+     "their questions"): {
+        "es": "una enseñanza es una palabra, una lección o la respuesta a una de sus preguntas",
+        "fr": "un enseignement est un mot, une leçon, ou la réponse à l'une de leurs questions",
+        "de": "eine Unterweisung ist ein Wort, eine Lektion oder die Antwort auf eine ihrer Fragen",
+        "pt": "um ensino é uma palavra, uma lição ou a resposta a uma das perguntas deles",
+        "it": "un insegnamento è una parola, una lezione o la risposta a una delle loro domande",
+        "ja": "教えとは、ことば・レッスン・相手の質問への答えのいずれかです",
+        "zh": "一次教导是一个词、一堂课，或对他们问题的一个回答",
+        "hi": "शिक्षा एक शब्द, एक पाठ, या उनके किसी प्रश्न का उत्तर है",
+        "ar": "التعليم كلمة أو درس أو إجابة عن أحد أسئلتهم",
+    },
+    "that is not one of this character's switches": {
+        "es": "ese no es uno de los interruptores de este personaje",
+        "fr": "ce n'est pas l'un des interrupteurs de ce personnage",
+        "de": "das ist keiner der Schalter dieser Figur",
+        "pt": "esse não é um dos interruptores deste personagem",
+        "it": "quello non è uno degli interruttori di questo personaggio",
+        "ja": "それはこのキャラクターのスイッチではありません",
+        "zh": "那不是这个角色的开关之一",
+        "hi": "वह इस पात्र के स्विचों में से नहीं है",
+        "ar": "ذلك ليس من مفاتيح هذه الشخصية",
+    },
+    ("a character raised from a childhood is family forever "
+     "— that door never converts"): {
+        "es": "un personaje criado desde la infancia es familia para siempre — esa puerta nunca se convierte",
+        "fr": "un personnage élevé depuis l'enfance est de la famille pour toujours — cette porte ne se convertit jamais",
+        "de": "eine von Kindheit an aufgezogene Figur ist für immer Familie — diese Tür wandelt sich nie",
+        "pt": "um personagem criado desde a infância é família para sempre — essa porta nunca se converte",
+        "it": "un personaggio cresciuto dall'infanzia è famiglia per sempre — quella porta non si converte mai",
+        "ja": "子ども時代から育てたキャラクターは永遠に家族です。その扉が変わることはありません",
+        "zh": "从童年养大的角色永远是家人——那扇门永不转变",
+        "hi": "बचपन से पाला गया पात्र हमेशा के लिए परिवार है — वह द्वार कभी नहीं बदलता",
+        "ar": "الشخصية المربّاة منذ الطفولة عائلة إلى الأبد — ذلك الباب لا يتحول أبدًا",
+    },
+    ("raised characters are created via POST /raise, with a "
+     "stage, a preset and a temperament seed"): {
+        "es": "los personajes criados se crean vía POST /raise, con una etapa, un preajuste y una semilla de temperamento",
+        "fr": "les personnages élevés se créent via POST /raise, avec une étape, un préréglage et une graine de tempérament",
+        "de": "aufgezogene Figuren werden über POST /raise erstellt — mit Stufe, Voreinstellung und Temperament-Keim",
+        "pt": "personagens criados nascem via POST /raise, com uma fase, uma predefinição e uma semente de temperamento",
+        "it": "i personaggi cresciuti si creano via POST /raise, con una fase, un preset e un seme di temperamento",
+        "ja": "育成キャラクターは POST /raise で作成します — 段階・プリセット・気質の種を添えて",
+        "zh": "养成角色通过 POST /raise 创建——带上阶段、预设和性情种子",
+        "hi": "पाले हुए पात्र POST /raise से बनते हैं — अवस्था, प्रीसेट और स्वभाव-बीज के साथ",
+        "ar": "تُنشأ الشخصيات المربّاة عبر POST /raise — بمرحلة وإعداد مسبق وبذرة طبع",
+    },
+    ("with this on, neglect can end this life — the record survives; "
+     "the character doesn't"): {
+        "es": "con esto activado, el descuido puede acabar con esta vida — el registro sobrevive; el personaje no",
+        "fr": "avec ceci activé, la négligence peut mettre fin à cette vie — le registre survit ; le personnage non",
+        "de": "ist dies an, kann Vernachlässigung dieses Leben beenden — die Aufzeichnung überlebt; die Figur nicht",
+        "pt": "com isto ligado, o descuido pode acabar com esta vida — o registo sobrevive; o personagem não",
+        "it": "con questo attivo, la trascuratezza può porre fine a questa vita — il registro sopravvive; il personaggio no",
+        "ja": "これをオンにすると、放置がこの命を終わらせることがあります。記録は残り、キャラクターは残りません",
+        "zh": "开启后，疏忽可能终结这条生命——记录会留下；角色不会",
+        "hi": "इसे चालू करने पर उपेक्षा इस जीवन को समाप्त कर सकती है — अभिलेख बचेगा; पात्र नहीं",
+        "ar": "مع تشغيل هذا، قد يُنهي الإهمال هذه الحياة — يبقى السجل؛ ولا تبقى الشخصية",
+    },
+    ("this timeline is sealed — the full trail is lived "
+     "forward only"): {
+        "es": "esta línea de tiempo está sellada — la senda completa se vive solo hacia adelante",
+        "fr": "cette ligne du temps est scellée — la piste complète ne se vit que vers l'avant",
+        "de": "diese Zeitlinie ist versiegelt — der volle Pfad wird nur vorwärts gelebt",
+        "pt": "esta linha do tempo está selada — a trilha completa vive-se só para a frente",
+        "it": "questa linea del tempo è sigillata — il sentiero completo si vive solo in avanti",
+        "ja": "このタイムラインは封印されています — フルトレイルは前にしか進めません",
+        "zh": "这条时间线已封存——完整旅途只能向前活",
+        "hi": "यह समयरेखा सील है — पूरी राह केवल आगे की ओर जी जाती है",
+        "ar": "هذا الخط الزمني مختوم — الدرب الكامل يُعاش إلى الأمام فقط",
+    },
+    "a visit steps back to a day this life has lived": {
+        "es": "una visita vuelve a un día que esta vida ya vivió",
+        "fr": "une visite revient à un jour que cette vie a vécu",
+        "de": "ein Besuch geht zu einem Tag zurück, den dieses Leben gelebt hat",
+        "pt": "uma visita volta a um dia que esta vida já viveu",
+        "it": "una visita torna a un giorno che questa vita ha vissuto",
+        "ja": "訪問は、この命がすでに生きた日にだけ戻れます",
+        "zh": "探访只能回到这条生命已经活过的一天",
+        "hi": "मुलाक़ात उसी दिन लौटती है जो इस जीवन ने जिया है",
+        "ar": "الزيارة تعود إلى يومٍ عاشته هذه الحياة",
+    },
+    ("teaching happens in the present — come back from the "
+     "visit, or branch the day to raise it differently"): {
+        "es": "se enseña en el presente — vuelve de la visita, o ramifica el día para criarlo distinto",
+        "fr": "on enseigne au présent — reviens de la visite, ou crée une branche du jour pour l'élever autrement",
+        "de": "gelehrt wird in der Gegenwart — komm vom Besuch zurück oder zweige den Tag ab, um anders großzuziehen",
+        "pt": "ensina-se no presente — volta da visita, ou ramifica o dia para criar diferente",
+        "it": "si insegna nel presente — torna dalla visita, o crea un ramo del giorno per crescerlo diversamente",
+        "ja": "教えるのは現在です — 訪問から戻るか、その日を分岐させて別の育て方をしてください",
+        "zh": "教导发生在现在——从探访回来，或从那天分支、换种方式养育",
+        "hi": "शिक्षा वर्तमान में होती है — मुलाक़ात से लौटो, या उस दिन से शाखा बनाकर अलग ढंग से पालो",
+        "ar": "التعليم يحدث في الحاضر — عُد من الزيارة، أو افرع اليوم لتربّي بشكل مختلف",
+    },
+    "time moves in the present — come back from the visit first": {
+        "es": "el tiempo avanza en el presente — vuelve primero de la visita",
+        "fr": "le temps avance au présent — reviens d'abord de la visite",
+        "de": "die Zeit bewegt sich in der Gegenwart — komm erst vom Besuch zurück",
+        "pt": "o tempo move-se no presente — volta primeiro da visita",
+        "it": "il tempo si muove nel presente — prima torna dalla visita",
+        "ja": "時間は現在で進みます — まず訪問から戻ってください",
+        "zh": "时间在现在流动——先从探访回来",
+        "hi": "समय वर्तमान में चलता है — पहले मुलाक़ात से लौटो",
+        "ar": "الزمن يمضي في الحاضر — عُد من الزيارة أولًا",
+    },
+    "a fast-forward is at least one day": {
+        "es": "un avance rápido es de al menos un día",
+        "fr": "une avance rapide dure au moins un jour",
+        "de": "ein Vorspulen dauert mindestens einen Tag",
+        "pt": "um avanço rápido é de pelo menos um dia",
+        "it": "un avanzamento rapido è di almeno un giorno",
+        "ja": "早送りは少なくとも1日です",
+        "zh": "快进至少要一天",
+        "hi": "फ़ास्ट-फ़ॉरवर्ड कम से कम एक दिन का होता है",
+        "ar": "التقديم السريع يوم واحد على الأقل",
+    },
+    ("a fast-forward lives at most thirty days at a time — the "
+     "sandbox door has no cap"): {
+        "es": "un avance rápido vive como mucho treinta días por vez — la puerta de la caja de arena no tiene tope",
+        "fr": "une avance rapide vit au plus trente jours à la fois — la porte bac à sable n'a pas de plafond",
+        "de": "ein Vorspulen lebt höchstens dreißig Tage auf einmal — die Sandkasten-Tür hat keine Grenze",
+        "pt": "um avanço rápido vive no máximo trinta dias de cada vez — a porta da caixa de areia não tem limite",
+        "it": "un avanzamento rapido vive al massimo trenta giorni per volta — la porta sabbiera non ha tetto",
+        "ja": "早送りは一度に最大30日です — サンドボックスの扉に上限はありません",
+        "zh": "快进一次最多活三十天——沙盒之门没有上限",
+        "hi": "फ़ास्ट-फ़ॉरवर्ड एक बार में अधिकतम तीस दिन जीता है — सैंडबॉक्स द्वार की कोई सीमा नहीं",
+        "ar": "التقديم السريع يعيش ثلاثين يومًا كحدّ أقصى في المرة — باب صندوق الرمل بلا سقف",
+    },
+    ("branching needs the unlocked time controls — the sandbox "
+     "door, or reopen the switches"): {
+        "es": "ramificar requiere los controles de tiempo desbloqueados — la puerta de la caja de arena, o reabre los interruptores",
+        "fr": "créer une branche demande les contrôles du temps déverrouillés — la porte bac à sable, ou rouvre les interrupteurs",
+        "de": "Abzweigen braucht die entsperrten Zeitregler — die Sandkasten-Tür, oder öffne die Schalter neu",
+        "pt": "ramificar precisa dos controlos de tempo desbloqueados — a porta da caixa de areia, ou reabre os interruptores",
+        "it": "creare un ramo richiede i controlli del tempo sbloccati — la porta sabbiera, o riapri gli interruttori",
+        "ja": "分岐には解放された時間コントロールが必要です — サンドボックスの扉か、スイッチを開き直してください",
+        "zh": "分支需要解锁的时间控制——走沙盒之门，或重新打开开关",
+        "hi": "शाखा बनाने के लिए अनलॉक्ड समय-नियंत्रण चाहिए — सैंडबॉक्स द्वार, या स्विच फिर खोलो",
+        "ar": "التفريع يحتاج ضوابط زمن مفتوحة — باب صندوق الرمل، أو أعد فتح المفاتيح",
+    },
+    ("that platform hands over a player, not the recording — only "
+     "a direct video or audio link can be watched"): {
+        "es": "esa plataforma entrega un reproductor, no la grabación — solo se puede ver un enlace directo de vídeo o audio",
+        "fr": "cette plateforme fournit un lecteur, pas l'enregistrement — seul un lien direct vidéo ou audio peut être visionné",
+        "de": "diese Plattform liefert einen Player, nicht die Aufnahme — nur ein direkter Video- oder Audiolink kann angeschaut werden",
+        "pt": "essa plataforma entrega um reprodutor, não a gravação — só um link direto de vídeo ou áudio pode ser assistido",
+        "it": "quella piattaforma consegna un lettore, non la registrazione — solo un link diretto video o audio può essere guardato",
+        "ja": "そのプラットフォームが渡すのはプレーヤーであり録画ではありません。視聴できるのは動画か音声への直接リンクだけです",
+        "zh": "该平台提供的是播放器而不是录像——只能观看直接的视频或音频链接",
+        "hi": "वह प्लेटफ़ॉर्म प्लेयर देता है, रिकॉर्डिंग नहीं — केवल सीधा वीडियो या ऑडियो लिंक ही देखा जा सकता है",
+        "ar": "تلك المنصة تسلّم مشغّلًا لا التسجيل — لا يمكن مشاهدة إلا رابط فيديو أو صوت مباشر",
+    },
+    ("the deployment's ears are not answering — the recording "
+     "stays held, not watched"): {
+        "es": "los oídos del despliegue no responden — la grabación queda guardada, no vista",
+        "fr": "les oreilles du déploiement ne répondent pas — l'enregistrement reste conservé, pas visionné",
+        "de": "die Ohren der Installation antworten nicht — die Aufnahme bleibt verwahrt, nicht angeschaut",
+        "pt": "os ouvidos da instalação não respondem — a gravação fica guardada, não assistida",
+        "it": "le orecchie dell'installazione non rispondono — la registrazione resta custodita, non guardata",
+        "ja": "この環境の耳が応答しません。録画は保管されたままで、視聴はされていません",
+        "zh": "此部署的耳朵没有应答——录像仅被保存，未被观看",
+        "hi": "इस परिनियोजन के कान जवाब नहीं दे रहे — रिकॉर्डिंग रखी रहती है, देखी नहीं जाती",
+        "ar": "آذان هذا النشر لا تجيب — يبقى التسجيل محفوظًا، غير مُشاهَد",
+    },
+    "the model is not valid base64": {
+        "es": "el modelo no es base64 v\u00e1lido",
+        "fr": "le mod\u00e8le n'est pas du base64 valide",
+        "de": "das Modell ist kein g\u00fcltiges Base64",
+        "pt": "o modelo n\u00e3o \u00e9 base64 v\u00e1lido",
+        "it": "il modello non \u00e8 base64 valido",
+        "ja": "\u30e2\u30c7\u30eb\u304c\u6709\u52b9\u306a base64 \u3067\u306f\u3042\u308a\u307e\u305b\u3093",
+        "zh": "\u8fd9\u4e2a\u6a21\u578b\u4e0d\u662f\u6709\u6548\u7684 base64",
+        "hi": "\u092f\u0939 \u092e\u0949\u0921\u0932 \u0935\u0948\u0927 base64 \u0928\u0939\u0940\u0902 \u0939\u0948",
+        "ar": "\u0627\u0644\u0646\u0645\u0648\u0630\u062c \u0644\u064a\u0633 base64 \u0635\u0627\u0644\u062d\u064b\u0627",
+    },
+    "the shown picture is not valid base64": {
+        "es": "la imagen mostrada no es base64 válido",
+        "fr": "l'image montrée n'est pas du base64 valide",
+        "de": "das gezeigte Bild ist kein gültiges Base64",
+        "pt": "a imagem mostrada não é base64 válido",
+        "it": "l'immagine mostrata non è base64 valido",
+        "ja": "見せられた画像は有効な base64 ではありません",
+        "zh": "所展示的图片不是有效的 base64",
+        "hi": "दिखाई गई तस्वीर मान्य base64 नहीं है",
+        "ar": "الصورة المعروضة ليست base64 صالحًا",
+    },
+    ("the eyes read JPEG, PNG and WebP pictures — this file "
+     "is none of them"): {
+        "es": "los ojos leen imágenes JPEG, PNG y WebP — este archivo no es ninguna de ellas",
+        "fr": "les yeux lisent les images JPEG, PNG et WebP — ce fichier n'en est aucune",
+        "de": "die Augen lesen JPEG-, PNG- und WebP-Bilder — diese Datei ist keines davon",
+        "pt": "os olhos leem imagens JPEG, PNG e WebP — este arquivo não é nenhuma delas",
+        "it": "gli occhi leggono immagini JPEG, PNG e WebP — questo file non è nessuna di esse",
+        "ja": "目が読めるのは JPEG・PNG・WebP の画像です。このファイルはどれでもありません",
+        "zh": "眼睛能读取 JPEG、PNG 和 WebP 图片——这个文件都不是",
+        "hi": "आँखें JPEG, PNG और WebP चित्र पढ़ती हैं — यह फ़ाइल इनमें से कोई नहीं है",
+        "ar": "العيون تقرأ صور JPEG وPNG وWebP — هذا الملف ليس أيًا منها",
+    },
+    ("this deployment's seeing door is closed — no vision "
+     "key is configured"): {
+        "es": "la puerta de la vista de este despliegue está cerrada — no hay clave de visión configurada",
+        "fr": "la porte de la vue de ce déploiement est fermée — aucune clé de vision n'est configurée",
+        "de": "die Seh-Tür dieser Installation ist geschlossen — kein Sichtschlüssel ist eingerichtet",
+        "pt": "a porta da visão desta instalação está fechada — nenhuma chave de visão está configurada",
+        "it": "la porta della vista di questa installazione è chiusa — nessuna chiave di visione è configurata",
+        "ja": "この環境の視覚の扉は閉じています。視覚キーが設定されていません",
+        "zh": "此部署的视觉之门已关闭——未配置视觉密钥",
+        "hi": "इस परिनियोजन का देखने का द्वार बंद है — कोई विज़न कुंजी कॉन्फ़िगर नहीं है",
+        "ar": "باب الرؤية في هذا النشر مغلق — لا يوجد مفتاح رؤية مهيأ",
+    },
+    "this party has no video link to watch": {
+        "es": "esta reunión no tiene enlace de vídeo que ver",
+        "fr": "cette séance n'a pas de lien vidéo à visionner",
+        "de": "diese Runde hat keinen Videolink zum Anschauen",
+        "pt": "esta sessão não tem link de vídeo para assistir",
+        "it": "questa riunione non ha un link video da guardare",
+        "ja": "このパーティーには視聴する動画リンクがありません",
+        "zh": "这个聚会没有可观看的视频链接",
+        "hi": "इस पार्टी में देखने के लिए कोई वीडियो लिंक नहीं है",
+        "ar": "لا يوجد في هذا التجمّع رابط فيديو للمشاهدة",
+    },
+    ("the owner keeps this wardrobe closed — only they can "
+     "restyle this avatar"): {
+        "es": "la persona propietaria mantiene este vestuario cerrado — solo ella puede cambiar el estilo de este avatar",
+        "fr": "la personne propriétaire garde ce vestiaire fermé — elle seule peut changer le style de cet avatar",
+        "de": "wer dieses Profil besitzt, hält die Garderobe geschlossen — nur diese Person kann den Stil dieses Avatars ändern",
+        "pt": "quem é dono do perfil mantém este guarda-roupa fechado — só essa pessoa pode mudar o estilo deste avatar",
+        "it": "chi possiede il profilo tiene chiuso questo guardaroba — solo quella persona può cambiare lo stile di questo avatar",
+        "ja": "所有者がこのワードローブを閉じています。所有者だけがこのアバターのスタイルを変えられます",
+        "zh": "所有者已关闭这个衣橱——只有所有者能改变这个头像的造型",
+        "hi": "मालिक ने यह वार्डरोब बंद रखा है — केवल वही इस अवतार का रूप बदल सकता है",
+        "ar": "المالك يُبقي خزانة الملابس هذه مغلقة — وحده يمكنه تغيير مظهر هذا الأفاتار",
+    },
     ("they have not asked to hear from this profile first — "
      "unprompted reach goes only to people whose door is open"): {
         "es": "no han pedido oír primero de este perfil — el contacto no solicitado solo llega a quienes tienen la puerta abierta",
@@ -1104,6 +1407,9 @@ APP_NOT_SIGNED_IN = ("{label} is installed and has not been signed in to yet, so
 APP_NEEDS_KEY = ("{label} needs a key this deployment has not been given, so it cannot reach the service. Whoever runs this deployment adds it.")
 MODE_MUST_BE = "mode must be one of {choices}"
 UNKNOWN_LANGUAGE = "unknown language {got}"
+SCENE_SHAPE = "say how the scene is framed — {choices}"
+SCENE_TOO_LONG = ("{seconds} seconds is longer than this door renders — {max} is the ceiling on one scene")
+RENDER_GAVE_UP = ("the render did not finish within {minutes} minutes — it may still be running at {provider}, and the job is {job}")
 NO_SUCH_FACE = "no such face {got}; one of {choices}"
 FACE_NOT_CARRIED = "{got} is not one of the faces this dock carries"
 MAIL_SERVER_REFUSED = "the mail server refused it: {detail}"
@@ -1111,6 +1417,10 @@ UNKNOWN_CONNECTOR = "unknown connector: {provider}/{app}"
 APP_DOES_NOT_OFFER = "{app} does not offer: {capabilities}"
 NO_COLLECT_SUPPORT = "{app} does not support collecting context"
 CANNOT_RUN_ONBOARD_LLM = "{label} cannot run an onboard LLM"
+ROOM_ALLOWS_ONLY = ("a room allows an app, one of its capabilities, or a "
+                    "skill — nothing else")
+ROOM_HAS_CLOSED = "this room has closed"
+PROFILE_NOT_IN_ROOM = "that profile is not in this room"
 
 #: Every template this module offers. Derived from the table below rather than
 #: repeated, so a template with no translations is impossible by construction.
@@ -1154,6 +1464,7 @@ TEMPLATES = (MUST_BE_ONE_OF, SAY_CEILING, ENGINE_REFUSED,
              APP_NOT_SIGNED_IN, APP_NEEDS_KEY, MODE_MUST_BE,
              UNKNOWN_LANGUAGE, NO_SUCH_FACE, FACE_NOT_CARRIED,
              MAIL_SERVER_REFUSED, UNKNOWN_CONNECTOR, APP_DOES_NOT_OFFER,
+             ROOM_ALLOWS_ONLY,
              NO_COLLECT_SUPPORT, CANNOT_RUN_ONBOARD_LLM)
 
 _TEMPLATES: dict[str, dict[str, str]] = {
@@ -2500,6 +2811,17 @@ _TEMPLATES: dict[str, dict[str, str]] = {
         'hi': '{app} यह प्रदान नहीं करता: {capabilities}',
         'ar': '{app} لا يقدم: {capabilities}',
     },
+    ROOM_ALLOWS_ONLY: {
+        'es': 'una sala permite una aplicación, una de sus capacidades o una habilidad: nada más',
+        'fr': "une salle autorise une application, l'une de ses capacités ou une compétence — rien d'autre",
+        'de': 'ein Raum erlaubt eine App, eine ihrer Fähigkeiten oder eine Fertigkeit — sonst nichts',
+        'pt': 'uma sala permite uma aplicação, uma das suas capacidades ou uma competência — nada mais',
+        'it': 'una stanza consente un\'app, una delle sue capacità o un\'abilità: nient\'altro',
+        'ja': '部屋が許可できるのはアプリ、その機能のひとつ、またはスキルだけです',
+        'zh': '房间只能允许一个应用、它的某项能力，或一项技能——别无其他',
+        'hi': 'एक कमरा किसी ऐप, उसकी किसी क्षमता, या किसी कौशल की अनुमति देता है — और कुछ नहीं',
+        'ar': 'تسمح الغرفة بتطبيق، أو بإحدى قدراته، أو بمهارة — لا شيء غير ذلك',
+    },
     NO_COLLECT_SUPPORT: {
         'es': '{app} no admite recopilar contexto',
         'fr': '{app} ne prend pas en charge la collecte de contexte',
@@ -2807,6 +3129,221 @@ _PUBLIC.update(_PRIVILEGE_SENTENCES)
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    # The forge's refusals (qrme/avatarforge.py) and the sit-out's one.
+    # Every road out of the forge answers in words a person can act on —
+    # a photograph with no face is theirs to fix by sending a clearer
+    # one — so the words have to exist in the language they read.
+    # The standing direction's own refusals. The two about the model
+    # both end the same way on purpose — "the direction is unchanged",
+    # "the scene is unchanged rather than blank" — because the thing a
+    # person fears when a correction fails is that they have lost the
+    # five they made before it.
+    # The road's own two. A ceiling is a number somebody typed, so the
+    # refusal has to reach them in the language they typed it in; a
+    # render that is not there is the answer to a poll, and a poller
+    # reading English on a Japanese console cannot tell a missing row
+    # from a broken screen.
+    "a ceiling below zero is not a ceiling": {
+        'es': "un techo por debajo de cero no es un techo",
+        'fr': "un plafond en dessous de zéro n'est pas un plafond",
+        'de': "eine Obergrenze unter null ist keine Obergrenze",
+        'pt': "um tecto abaixo de zero não é um tecto",
+        'it': "un tetto sotto lo zero non è un tetto",
+        'ja': "ゼロを下回る上限は上限ではありません",
+        'zh': "低于零的上限不是上限",
+        'hi': "शून्य से कम की सीमा कोई सीमा नहीं है",
+        'ar': "سقف دون الصفر ليس سقفًا",
+    },
+    "no such render": {
+        'es': "no existe esa representación",
+        'fr': "ce rendu n'existe pas",
+        'de': "dieses Rendering gibt es nicht",
+        'pt': "não existe essa representação",
+        'it': "questo rendering non esiste",
+        'ja': "その描き出しはありません",
+        'zh': "没有这个渲染",
+        'hi': "ऐसा कोई रेंडर नहीं है",
+        'ar': "لا يوجد هذا التصيير",
+    },
+    "say how the scene should look, or clear it": {
+        'es': "di cómo debe verse la escena, o bórrala",
+        'fr': "dites de quoi la scène doit avoir l'air, ou effacez-la",
+        'de': "sag, wie die Szene aussehen soll, oder lösch sie",
+        'pt': "diga como a cena deve ficar, ou limpe-a",
+        'it': "di' come deve apparire la scena, o cancellala",
+        'ja': "シーンをどう見せたいか言うか、消してください",
+        'zh': "说明场景该是什么样子，或者清空它",
+        'hi': "बताइए दृश्य कैसा दिखना चाहिए, या इसे मिटा दीजिए",
+        'ar': "قل كيف ينبغي أن يبدو المشهد، أو امسحه",
+    },
+    "say what you would like changed about the scene": {
+        'es': "di qué te gustaría cambiar de la escena",
+        'fr': "dites ce que vous aimeriez changer dans la scène",
+        'de': "sag, was du an der Szene ändern möchtest",
+        'pt': "diga o que gostaria de mudar na cena",
+        'it': "di' che cosa vorresti cambiare della scena",
+        'ja': "シーンのどこを変えたいか教えてください",
+        'zh': "说说这个场景你想改什么",
+        'hi': "बताइए दृश्य में आप क्या बदलना चाहेंगे",
+        'ar': "قل ما تودّ تغييره في المشهد",
+    },
+    "the model that keeps the scene direction could not be reached — the direction is unchanged": {
+        'es': "no se pudo contactar con el modelo que mantiene la dirección de escena; la dirección no ha cambiado",
+        'fr': "le modèle qui tient la direction de scène n'a pas pu être joint — la direction est inchangée",
+        'de': "das Modell, das die Szenenanweisung führt, war nicht erreichbar — die Anweisung ist unverändert",
+        'pt': "não foi possível contactar o modelo que mantém a direção de cena — a direção está inalterada",
+        'it': "il modello che tiene la direzione di scena non è raggiungibile — la direzione è invariata",
+        'ja': "シーンの指示を保つモデルに到達できませんでした。指示はそのままです",
+        'zh': "联系不上维护场景指示的模型 — 指示未改动",
+        'hi': "दृश्य-निर्देश रखने वाले मॉडल तक नहीं पहुँचा जा सका — निर्देश अपरिवर्तित है",
+        'ar': "تعذّر الوصول إلى النموذج الذي يحفظ توجيه المشهد — التوجيه دون تغيير",
+    },
+    "the model answered with an empty direction — the scene is unchanged rather than blank": {
+        'es': "el modelo respondió con una dirección vacía; la escena queda sin cambios en lugar de en blanco",
+        'fr': "le modèle a répondu par une direction vide — la scène reste inchangée plutôt que vide",
+        'de': "das Modell antwortete mit einer leeren Anweisung — die Szene bleibt unverändert statt leer",
+        'pt': "o modelo respondeu com uma direção vazia — a cena fica inalterada em vez de em branco",
+        'it': "il modello ha risposto con una direzione vuota — la scena resta invariata anziché vuota",
+        'ja': "モデルが空の指示を返しました。シーンは空白ではなくそのままです",
+        'zh': "模型返回了空的指示 — 场景保持原样，而不是被清空",
+        'hi': "मॉडल ने खाली निर्देश लौटाया — दृश्य खाली होने के बजाय अपरिवर्तित है",
+        'ar': "أجاب النموذج بتوجيه فارغ — يبقى المشهد كما هو بدل أن يُفرَّغ",
+    },
+    # The video road's refusals (qrme/filming.py). A person who asked for a
+    # scene and got a wall is owed the reason in their own language, the
+    # same as every other road out of this platform.
+    "say what the scene is before asking for it": {
+        'es': "di cuál es la escena antes de pedirla",
+        'fr': "dites quelle est la scène avant de la demander",
+        'de': "sag, was die Szene ist, bevor du sie anforderst",
+        'pt': "diga qual é a cena antes de a pedir",
+        'it': "di' qual è la scena prima di chiederla",
+        'ja': "シーンを頼む前に、どんなシーンか教えてください",
+        'zh': "先说明是什么场景，再来请求它",
+        'hi': "दृश्य माँगने से पहले बताइए कि दृश्य क्या है",
+        'ar': "قل ما هو المشهد قبل أن تطلبه",
+    },
+    "a scene shorter than a second is a still": {
+        'es': "una escena de menos de un segundo es una imagen fija",
+        'fr': "une scène de moins d'une seconde est une image fixe",
+        'de': "eine Szene unter einer Sekunde ist ein Standbild",
+        'pt': "uma cena com menos de um segundo é uma imagem fixa",
+        'it': "una scena più corta di un secondo è un fermo immagine",
+        'ja': "1 秒に満たないシーンは静止画です",
+        'zh': "短于一秒的场景就是一张静止画",
+        'hi': "एक सेकंड से छोटा दृश्य एक स्थिर चित्र है",
+        'ar': "المشهد الأقصر من ثانية صورة ثابتة",
+    },
+    "the video service could not be reached from here": {
+        'es': "no se pudo contactar con el servicio de vídeo desde aquí",
+        'fr': "le service vidéo n'a pas pu être joint d'ici",
+        'de': "der Videodienst war von hier aus nicht erreichbar",
+        'pt': "não foi possível contactar o serviço de vídeo a partir daqui",
+        'it': "il servizio video non è raggiungibile da qui",
+        'ja': "ここから動画サービスに到達できませんでした",
+        'zh': "从这里联系不上视频服务",
+        'hi': "यहाँ से वीडियो सेवा तक नहीं पहुँचा जा सका",
+        'ar': "تعذّر الوصول إلى خدمة الفيديو من هنا",
+    },
+    "the video service answered without a render or a job to follow — nothing here can be shown or waited for": {
+        'es': "el servicio de vídeo respondió sin una representación ni un trabajo que seguir — aquí no hay nada que mostrar ni que esperar",
+        'fr': "le service vidéo a répondu sans rendu ni tâche à suivre — il n'y a rien ici à montrer ni à attendre",
+        'de': "der Videodienst antwortete ohne Render und ohne Auftrag zum Verfolgen — hier gibt es nichts zu zeigen und nichts zu erwarten",
+        'pt': "o serviço de vídeo respondeu sem uma representação nem um trabalho a seguir — não há aqui nada para mostrar nem para esperar",
+        'it': "il servizio video ha risposto senza un rendering né un lavoro da seguire — qui non c'è nulla da mostrare né da attendere",
+        'ja': "動画サービスは、描き出しも追跡できるジョブも返しませんでした。ここには見せるものも待つものもありません",
+        'zh': "视频服务既没有返回成片，也没有可跟踪的任务——这里没有可显示、也没有可等待的东西",
+        'hi': "वीडियो सेवा ने न कोई रेंडर लौटाया न कोई कार्य जिसका पीछा किया जा सके — यहाँ दिखाने या प्रतीक्षा करने को कुछ नहीं है",
+        'ar': "أجابت خدمة الفيديو بلا تصيير ولا مهمة نتابعها — لا شيء هنا يُعرض ولا يُنتظر",
+    },
+    "this deployment has no avatar forge configured — the door exists, the machinery does not": {
+        'es': "esta instalación no tiene forja de avatares configurada — la puerta existe, la maquinaria no",
+        'fr': "ce déploiement n'a pas de forge d'avatars configurée — la porte existe, la machinerie non",
+        'de': "diese Installation hat keine Avatar-Schmiede konfiguriert — die Tür gibt es, die Maschinerie nicht",
+        'pt': "esta instalação não tem forja de avatares configurada — a porta existe, a maquinaria não",
+        'it': "questa installazione non ha una fucina di avatar configurata — la porta esiste, il macchinario no",
+        'ja': "この配備にはアバターの鍛冶場が設定されていません。扉はあり、機械はありません",
+        'zh': "此部署未配置头像锻造——门在，机器不在",
+        'hi': "इस परिनियोजन में अवतार-भट्ठी विन्यस्त नहीं है — द्वार है, मशीनरी नहीं",
+        'ar': "لا توجد مسبكة أفاتار مهيأة في هذا النشر — الباب موجود والآلة لا",
+    },
+    "say how the photo is framed — just the face, the upper torso, or the full body": {
+        'es': "di cómo está encuadrada la foto — solo el rostro, el torso superior o el cuerpo entero",
+        'fr': "dites comment la photo est cadrée — le visage seul, le buste ou le corps entier",
+        'de': "sag, wie das Foto gerahmt ist — nur das Gesicht, der Oberkörper oder der ganze Körper",
+        'pt': "diga como a foto está enquadrada — só o rosto, o tronco superior ou o corpo inteiro",
+        'it': "di' come è inquadrata la foto — solo il volto, il busto o il corpo intero",
+        'ja': "写真の写り方を教えてください — 顔だけ、上半身、全身のいずれか",
+        'zh': "说明照片的取景——只有脸、上半身，还是全身",
+        'hi': "बताइए फ़ोटो का फ़्रेम क्या है — सिर्फ़ चेहरा, ऊपरी धड़, या पूरा शरीर",
+        'ar': "قل كيف أُطِّرت الصورة — الوجه فقط أم الجذع العلوي أم الجسم كامل",
+    },
+    "that photograph is larger than the forge takes — twelve megabytes is the ceiling": {
+        'es': "esa fotografía es mayor de lo que acepta la forja — doce megabytes es el techo",
+        'fr': "cette photographie dépasse ce que la forge accepte — douze mégaoctets est le plafond",
+        'de': "dieses Foto ist größer, als die Schmiede annimmt — zwölf Megabyte sind die Grenze",
+        'pt': "essa fotografia é maior do que a forja aceita — doze megabytes é o tecto",
+        'it': "quella fotografia è più grande di quanto la fucina accetti — dodici megabyte è il tetto",
+        'ja': "その写真は鍛冶場が受け取れる大きさを超えています — 上限は12メガバイトです",
+        'zh': "这张照片超过锻造能接受的大小——上限是十二兆字节",
+        'hi': "वह फ़ोटो भट्ठी की सीमा से बड़ी है — बारह मेगाबाइट अधिकतम है",
+        'ar': "تلك الصورة أكبر مما تقبله المسبكة — اثنا عشر ميغابايت هي السقف",
+    },
+    "the forge could not be reached from here": {
+        'es': "no se pudo contactar con la forja desde aquí",
+        'fr': "la forge n'a pas pu être jointe d'ici",
+        'de': "die Schmiede war von hier aus nicht erreichbar",
+        'pt': "não foi possível contactar a forja a partir daqui",
+        'it': "la fucina non è raggiungibile da qui",
+        'ja': "ここから鍛冶場に届きませんでした",
+        'zh': "从这里联系不到锻造",
+        'hi': "यहाँ से भट्ठी तक नहीं पहुँचा जा सका",
+        'ar': "تعذّر الوصول إلى المسبكة من هنا",
+    },
+    "the forge answered with something this end cannot read": {
+        'es': "la forja respondió con algo que este extremo no puede leer",
+        'fr': "la forge a répondu quelque chose que ce côté ne peut pas lire",
+        'de': "die Schmiede antwortete mit etwas, das diese Seite nicht lesen kann",
+        'pt': "a forja respondeu com algo que este lado não consegue ler",
+        'it': "la fucina ha risposto con qualcosa che questo lato non sa leggere",
+        'ja': "鍛冶場は、こちらでは読めないもので返してきました",
+        'zh': "锻造返回了这一端读不懂的内容",
+        'hi': "भट्ठी ने ऐसा कुछ लौटाया जिसे यह छोर पढ़ नहीं सकता",
+        'ar': "ردّت المسبكة بشيء لا يستطيع هذا الطرف قراءته",
+    },
+    "the forge answered with an empty face": {
+        'es': "la forja respondió con un rostro vacío",
+        'fr': "la forge a répondu par un visage vide",
+        'de': "die Schmiede antwortete mit einem leeren Gesicht",
+        'pt': "a forja respondeu com um rosto vazio",
+        'it': "la fucina ha risposto con un volto vuoto",
+        'ja': "鍛冶場は空の顔を返してきました",
+        'zh': "锻造返回了一张空的脸",
+        'hi': "भट्ठी ने खाली चेहरा लौटाया",
+        'ar': "ردّت المسبكة بوجه فارغ",
+    },
+    "only a person's own seat can sit out of a room": {
+        'es': "solo el asiento de una persona puede quedarse fuera de una sala",
+        'fr': "seul le siège d'une personne peut se mettre en retrait d'un salon",
+        'de': "nur der Sitz einer Person kann in einem Raum aussetzen",
+        'pt': "só o lugar de uma pessoa pode ficar de fora de uma sala",
+        'it': "solo il posto di una persona può restare fuori da una stanza",
+        'ja': "部屋の順番待ちから外れられるのは、人の席だけです",
+        'zh': "只有人的座位可以退出房间的等待",
+        'hi': "कमरे से बाहर केवल किसी व्यक्ति की अपनी सीट बैठ सकती है",
+        'ar': "لا يمكن أن يجلس جانبًا إلا مقعد الشخص نفسه",
+    },
+    "only elevenlabs is wired for pulling": {
+        'es': "solo elevenlabs está conectado para el llenado automático",
+        'fr': "seul elevenlabs est branché pour le remplissage automatique",
+        'de': "nur elevenlabs ist für das automatische Befüllen angebunden",
+        'pt': "só o elevenlabs está ligado para o preenchimento automático",
+        'it': "solo elevenlabs è collegato per il riempimento automatico",
+        'ja': "自動取り込みに接続されているのはelevenlabsだけです",
+        'zh': "只有 elevenlabs 接入了自动拉取",
+        'hi': "स्वचालित खिंचाव के लिए केवल elevenlabs जुड़ा है",
+        'ar': "elevenlabs وحده موصول للسحب التلقائي",
+    },
     "a pane with no faces is the helper button on its own — set the state to 'handle' instead": {
         'es': "un panel sin caras es el botón de ayuda a solas: pon el estado en 'handle'",
         'fr': "un panneau sans visages n'est que le bouton d'assistance : mettez plutôt l'état à 'handle'",
@@ -3775,6 +4312,28 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'hi': 'ऐसा कोई गेम सत्र नहीं है',
         'ar': 'لا توجد جلسة اللعب هذه',
     },
+    'the forge answered with nothing to move': {
+        'es': 'la fragua respondió sin nada que mover',
+        'fr': "la forge a répondu sans rien à faire bouger",
+        'de': 'die Schmiede antwortete ohne etwas Bewegliches',
+        'pt': 'a forja respondeu sem nada para mover',
+        'it': 'la fucina ha risposto senza nulla da muovere',
+        'ja': '動かせるものが何も返ってきませんでした',
+        'zh': '锻造返回的内容里没有可以动的东西',
+        'hi': 'फोर्ज ने ऐसा कुछ नहीं लौटाया जिसे हिलाया जा सके',
+        'ar': 'ردّت المسبكة بلا شيء يمكن تحريكه',
+    },
+    'no such reach': {
+        'es': 'no existe esa sesión de control',
+        'fr': "cette prise en main n'existe pas",
+        'de': 'diesen Zugriff gibt es nicht',
+        'pt': 'essa sessão de controlo não existe',
+        'it': 'questa sessione di controllo non esiste',
+        'ja': 'その操作セッションはありません',
+        'zh': '没有这个操作会话',
+        'hi': 'ऐसा कोई नियंत्रण सत्र नहीं है',
+        'ar': 'لا توجد هذه الجلسة',
+    },
     'no such room': {
         'es': 'no existe esa sala',
         'fr': "cette salle n'existe pas",
@@ -3996,32 +4555,54 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'ar': 'لا يوجد صوت',
     },
 
-    'this deployment has no transcription service, so recorded speech cannot '
-    'be turned into words — set QRME_EARS_URL, or type instead': {
-        'es': 'esta instalación no tiene servicio de transcripción, así que el '
-              'audio grabado no puede convertirse en palabras: define '
-              'QRME_EARS_URL, o escribe en su lugar',
-        'fr': "ce déploiement n'a pas de service de transcription, la parole "
-              'enregistrée ne peut donc pas devenir du texte — définissez '
-              'QRME_EARS_URL, ou écrivez à la place',
-        'de': 'diese Installation hat keinen Transkriptionsdienst, aufgenommene '
-              'Sprache kann also nicht zu Worten werden — setze QRME_EARS_URL, '
-              'oder tippe stattdessen',
-        'pt': 'esta instalação não tem serviço de transcrição, por isso a fala '
-              'gravada não pode virar palavras — define QRME_EARS_URL, ou '
-              'escreve em vez disso',
-        'it': 'questa installazione non ha un servizio di trascrizione, quindi '
-              'il parlato registrato non può diventare parole: imposta '
-              'QRME_EARS_URL, oppure scrivi',
-        'ja': 'この導入には文字起こしサービスがないため、録音した音声を言葉に'
-              'できません。QRME_EARS_URL を設定するか、入力してください',
-        'zh': '此部署没有转写服务，因此无法把录音变成文字 — 请设置 '
-              'QRME_EARS_URL，或改为打字',
-        'hi': 'इस परिनियोजन में प्रतिलेखन सेवा नहीं है, इसलिए रिकॉर्ड की गई '
-              'बोली शब्दों में नहीं बदल सकती — QRME_EARS_URL सेट करें, या '
-              'टाइप करें',
-        'ar': 'لا تملك هذه النسخة خدمة تفريغ، لذا لا يمكن تحويل الكلام المسجَّل '
-              'إلى نص — اضبط QRME_EARS_URL، أو اكتب بدلًا من ذلك',
+    # Named for the ONE thing that is off, and it says what still works.
+    #
+    #     asked     red error? but the audio is working fine
+    #     mattered  "no transcription service" reads as "audio is broken"
+    #
+    # It was a sentence about a missing service and an environment
+    # variable, shown in red down the side of a room where the voices were
+    # playing perfectly — so it read as the whole audio path failing, and
+    # the person reporting it was right to read it that way. Dictation and
+    # playback are two different doors, and only one of them is shut.
+    #
+    # The variable name came out. This is shown to somebody in a room who
+    # cannot set an environment variable on a server; the operator learns
+    # what to set from the deployment docs and the logs, which are written
+    # for them. Telling a person to edit a container is not an instruction,
+    # it is a shrug in their direction.
+    'dictation is off here — a recording cannot be turned into words on '
+    'this deployment. The voices still speak and you can still hear the '
+    'room; type your message instead': {
+        'es': 'el dictado está desactivado aquí: en esta instalación una '
+              'grabación no puede convertirse en palabras. Las voces siguen '
+              'hablando y puedes seguir oyendo la sala; escribe tu mensaje '
+              'en su lugar',
+        'fr': "la dictée est désactivée ici : sur ce déploiement, un "
+              'enregistrement ne peut pas devenir du texte. Les voix parlent '
+              'toujours et tu entends toujours la salle ; écris ton message '
+              'à la place',
+        'de': 'das Diktat ist hier aus — auf dieser Installation kann eine '
+              'Aufnahme nicht zu Worten werden. Die Stimmen sprechen weiter '
+              'und du hörst den Raum weiterhin; tippe deine Nachricht '
+              'stattdessen',
+        'pt': 'o ditado está desligado aqui: nesta instalação uma gravação '
+              'não pode virar palavras. As vozes continuam a falar e ainda '
+              'ouves a sala; escreve a tua mensagem em vez disso',
+        'it': "la dettatura è spenta qui: su questa installazione una "
+              'registrazione non può diventare parole. Le voci parlano '
+              'ancora e senti ancora la stanza; scrivi il tuo messaggio',
+        'ja': 'ここでは音声入力が使えません。この配備では録音を言葉に'
+              '変えられません。声はこれまでどおり話し、部屋の音も聞こえます。'
+              '代わりに入力してください',
+        'zh': '此处语音输入已关闭：本部署无法把录音变成文字。声音照常播放，'
+              '你也仍能听到房间；请改为打字',
+        'hi': 'यहाँ श्रुतलेखन बंद है — इस परिनियोजन पर रिकॉर्डिंग शब्दों में '
+              'नहीं बदल सकती। आवाज़ें अब भी बोलती हैं और तुम कमरा सुन सकते '
+              'हो; इसके बजाय टाइप करो',
+        'ar': 'الإملاء الصوتي متوقف هنا — لا يمكن تحويل تسجيل إلى نص على هذا '
+              'النشر. الأصوات ما زالت تتكلم ويمكنك سماع الغرفة؛ اكتب رسالتك '
+              'بدلًا من ذلك',
     },
 
     "a room's name is the words in it": {
@@ -6919,6 +7500,61 @@ _REFUSALS: dict[str, dict[str, str]] = {
         'hi': 'आपकी तस्वीर एक तस्वीर है — JPEG, PNG, GIF या WebP।',
         'ar': 'صورتك صورة — JPEG أو PNG أو GIF أو WebP.',
     },
+    'a room allows an app, one of its capabilities, or a skill — nothing else': {
+        'es': 'una sala permite una aplicación, una de sus capacidades o una habilidad: nada más.',
+        'fr': "une salle autorise une application, l'une de ses capacités ou une compétence — rien d'autre.",
+        'de': 'ein Raum erlaubt eine App, eine ihrer Fähigkeiten oder eine Fertigkeit — sonst nichts.',
+        'pt': 'uma sala permite uma aplicação, uma das suas capacidades ou uma competência — nada mais.',
+        'it': "una stanza consente un'app, una delle sue capacità o un'abilità: nient'altro.",
+        'ja': '部屋が許可できるのはアプリ、その機能のひとつ、またはスキルだけです。',
+        'zh': '房间只能允许一个应用、它的某项能力，或一项技能——别无其他。',
+        'hi': 'एक कमरा किसी ऐप, उसकी किसी क्षमता, या किसी कौशल की अनुमति देता है — और कुछ नहीं।',
+        'ar': 'تسمح الغرفة بتطبيق، أو بإحدى قدراته، أو بمهارة — لا شيء غير ذلك.',
+    },
+    'that profile is not in this room': {
+        'es': 'ese perfil no está en esta sala.',
+        'fr': "ce profil n'est pas dans cette salle.",
+        'de': 'dieses Profil ist nicht in diesem Raum.',
+        'pt': 'esse perfil não está nesta sala.',
+        'it': 'quel profilo non è in questa stanza.',
+        'ja': 'そのプロフィールはこの部屋にいません。',
+        'zh': '该档案不在这个房间里。',
+        'hi': 'वह प्रोफ़ाइल इस कमरे में नहीं है।',
+        'ar': 'هذا الملف ليس في هذه الغرفة.',
+    },
+    'nothing was said': {
+        'es': 'no se dijo nada.',
+        'fr': "rien n'a été dit.",
+        'de': 'es wurde nichts gesagt.',
+        'pt': 'não foi dito nada.',
+        'it': 'non è stato detto nulla.',
+        'ja': '何も言われていません。',
+        'zh': '什么也没说。',
+        'hi': 'कुछ कहा ही नहीं गया।',
+        'ar': 'لم يُقل شيء.',
+    },
+    'its owner has not given this profile hands — nobody in this room can grant that, and until they do there is nothing here to allow': {
+        'es': 'su propietario no le ha dado manos a este perfil: nadie en esta sala puede concederlo, y hasta que lo haga no hay nada aquí que permitir.',
+        'fr': "son propriétaire n'a pas donné de mains à ce profil — personne dans cette salle ne peut l'accorder, et tant que ce n'est pas fait il n'y a rien à autoriser ici.",
+        'de': 'der Besitzer hat diesem Profil keine Hände gegeben — das kann niemand in diesem Raum gewähren, und bis dahin gibt es hier nichts zu erlauben.',
+        'pt': 'o proprietário não deu mãos a este perfil — ninguém nesta sala pode conceder isso, e até que o faça não há aqui nada para permitir.',
+        'it': 'il proprietario non ha dato mani a questo profilo: nessuno in questa stanza può concederlo, e finché non lo fa qui non c\'è nulla da consentire.',
+        'ja': '所有者はこのプロフィールに手を与えていません。この部屋の誰にもそれは与えられず、与えられるまで許可できるものはありません。',
+        'zh': '它的所有者尚未赋予这个档案双手——这个房间里没有人能授予，在那之前这里没有什么可以允许的。',
+        'hi': 'इसके स्वामी ने इस प्रोफ़ाइल को हाथ नहीं दिए हैं — इस कमरे में कोई भी वह नहीं दे सकता, और तब तक यहाँ अनुमति देने को कुछ नहीं है।',
+        'ar': 'لم يمنح مالكه هذا الملف يدين — لا أحد في هذه الغرفة يستطيع منح ذلك، وحتى يفعل لا يوجد هنا ما يُسمح به.',
+    },
+    'this room has not allowed any of what its owner granted — tick a skill on this seat first, and the box is on this screen': {
+        'es': 'esta sala no ha permitido nada de lo que concedió su propietario: marca primero una habilidad en este asiento, y la casilla está en esta pantalla.',
+        'fr': "cette salle n'a autorisé rien de ce que son propriétaire a accordé — cochez d'abord une compétence sur ce siège, la case est sur cet écran.",
+        'de': 'dieser Raum hat nichts von dem erlaubt, was der Besitzer gewährt hat — hake zuerst eine Fähigkeit auf diesem Platz an, das Kästchen ist auf diesem Bildschirm.',
+        'pt': 'esta sala não permitiu nada do que o proprietário concedeu — marca primeiro uma competência neste lugar, e a caixa está neste ecrã.',
+        'it': 'questa stanza non ha consentito nulla di ciò che il proprietario ha concesso: spunta prima un\'abilità su questo posto, e la casella è su questo schermo.',
+        'ja': 'この部屋は所有者が与えたもののどれも許可していません。まずこの席のスキルにチェックを入れてください。その項目はこの画面にあります。',
+        'zh': '这个房间还没有允许其所有者授予的任何东西——请先在这个座位上勾选一项技能，选项就在这个屏幕上。',
+        'hi': 'इस कमरे ने उसके स्वामी द्वारा दी गई किसी भी चीज़ की अनुमति नहीं दी है — पहले इस सीट पर कोई कौशल टिक कीजिए, वह बॉक्स इसी स्क्रीन पर है।',
+        'ar': 'لم تسمح هذه الغرفة بأيّ ممّا منحه مالكه — ضع علامة على مهارة في هذا المقعد أولًا، والمربّع على هذه الشاشة.',
+    },
     'this room has closed': {
         'es': 'esta sala ha cerrado.',
         'fr': 'cette salle a fermé.',
@@ -7732,6 +8368,55 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     "registry_id": {"en": "Which face", "es": "Qué rostro", "fr": "Quel visage", "de": "Welches Gesicht", "pt": "Qual rosto", "it": "Quale volto", "ja": "どの顔", "zh": "哪张面孔", "hi": "कौन-सा चेहरा", "ar": "أي وجه"},
     "direction": {"en": "Your own direction", "es": "Tu propia indicación", "fr": "Votre propre direction", "de": "Deine eigene Richtung", "pt": "A sua própria indicação", "it": "La tua indicazione", "ja": "あなたの指示", "zh": "你的指示", "hi": "आपका अपना निर्देश", "ar": "توجيهك الخاص"},
     "because": {"en": "Why it is being withdrawn", "es": "Por qué se retira", "fr": "Pourquoi il est retiré", "de": "Warum es zurückgezogen wird", "pt": "Porque está a ser retirado", "it": "Perché viene ritirato", "ja": "取り下げる理由", "zh": "撤回的原因", "hi": "इसे क्यों हटाया जा रहा है", "ar": "سبب سحبه"},
+    # The wardrobe's guest switch and the import form's provider id —
+    # worded as the stage's card and the deck's box ask them.
+    "guest_styling": {"en": "Visitors may restyle the avatar", "es": "Las visitas pueden cambiar el estilo del avatar", "fr": "Les visiteurs peuvent changer le style de l'avatar", "de": "Besucher dürfen den Avatar umstylen", "pt": "As visitas podem mudar o estilo do avatar", "it": "Chi visita può cambiare lo stile dell'avatar", "ja": "訪問者がアバターのスタイルを変えられる", "zh": "访客可以改变头像造型", "hi": "आने वाले अवतार का रूप बदल सकते हैं", "ar": "يمكن للزوّار تغيير مظهر الأفاتار"},
+    "provider_asset_id": {"en": "The provider's own ID for this avatar", "es": "El ID del avatar en su proveedor", "fr": "L'ID de l'avatar chez le fournisseur", "de": "Die ID des Avatars beim Anbieter", "pt": "O ID do avatar no provedor", "it": "L'ID dell'avatar presso il provider", "ja": "プロバイダ側のアバターID", "zh": "服务商侧的头像 ID", "hi": "प्रदाता के यहाँ अवतार की ID", "ar": "معرّف الأفاتار لدى المزوّد"},
+    "stage": {"en": "The life stage they start at", "es": "La etapa de vida en la que empiezan", "fr": "L'étape de vie où ils commencent", "de": "Die Lebensstufe, in der sie beginnen", "pt": "A fase de vida em que começam", "it": "La fase di vita in cui iniziano", "ja": "始まりのライフステージ", "zh": "起始的生命阶段", "hi": "जिस जीवन-अवस्था से वे शुरू करते हैं", "ar": "مرحلة الحياة التي يبدؤون عندها"},
+    "preset": {"en": "The door you choose at creation", "es": "La puerta que eliges al crear", "fr": "La porte choisie à la création", "de": "Die Tür, die du bei der Erstellung wählst", "pt": "A porta que escolhe na criação", "it": "La porta che scegli alla creazione", "ja": "作成時に選ぶ扉", "zh": "创建时选择的门", "hi": "रचना के समय चुना गया द्वार", "ar": "الباب الذي تختاره عند الإنشاء"},
+    # The three time controls' two form fields (qrme/routers/raising.py),
+    # worded as the time bar asks them.
+    "sim_day": {"en": "The day of this life", "es": "El día de esta vida", "fr": "Le jour de cette vie", "de": "Der Tag dieses Lebens", "pt": "O dia desta vida", "it": "Il giorno di questa vita", "ja": "この命の日", "zh": "这段生命的日子", "hi": "इस जीवन का दिन", "ar": "يوم هذه الحياة"},
+    # `days` matches the siblings' shared vocabulary verbatim — the
+    # cross-product guard holds one label per field name, and JIM's
+    # forms already taught this one.
+    # The video road's five form fields (qrme/routers/avatars.py), worded
+    # exactly as Identity asks them — the console's own `idn.road`,
+    # `idn.road.cap`, `idn.video.passage`, `idn.video.shape` and the
+    # "Change it" box, so the refusal and the form agree by construction.
+    "road": {"en": "How this renders", "es": "Cómo se representa", "fr": "Comment ceci s'affiche", "de": "Wie das dargestellt wird", "pt": "Como isto é representado", "it": "Come viene reso", "ja": "どう表示するか", "zh": "如何呈现", "hi": "यह कैसे प्रस्तुत होता है", "ar": "كيف يُعرض هذا"},
+    "daily_seconds": {"en": "Seconds of video a day", "es": "Segundos de vídeo al día", "fr": "Secondes de vidéo par jour", "de": "Sekunden Video pro Tag", "pt": "Segundos de vídeo por dia", "it": "Secondi di video al giorno", "ja": "1 日あたりの動画の秒数", "zh": "每天的视频秒数", "hi": "प्रतिदिन वीडियो के सेकंड", "ar": "ثوانٍ من الفيديو في اليوم"},
+    "prompt": {"en": "What is being rendered", "es": "Qué se va a representar", "fr": "Ce qui est rendu", "de": "Was gerendert wird", "pt": "O que vai ser representado", "it": "Che cosa viene reso", "ja": "何を描き出すか", "zh": "要渲染的内容", "hi": "क्या रेंडर किया जा रहा है", "ar": "ما الذي يجري تصييره"},
+    "shape": {"en": "Shape", "es": "Formato", "fr": "Format", "de": "Format", "pt": "Formato", "it": "Formato", "ja": "画面の形", "zh": "画面比例", "hi": "आकार", "ar": "الشكل"},
+    "asked": {"en": "What you want changed", "es": "Qué quieres cambiar", "fr": "Ce que vous voulez changer", "de": "Was du geändert haben willst", "pt": "O que queres mudar", "it": "Che cosa vuoi cambiare", "ja": "変えてほしいこと", "zh": "你想改什么", "hi": "आप क्या बदलवाना चाहते हैं", "ar": "ما تريد تغييره"},
+    # The forge's two form fields and the sit-out's one.
+    "photo": {"en": "The photograph", "es": "La fotografía", "fr": "La photographie", "de": "Das Foto", "pt": "A fotografia", "it": "La fotografia", "ja": "写真", "zh": "照片", "hi": "फ़ोटो", "ar": "الصورة"},
+    "shot": {"en": "How the photo is framed", "es": "Cómo está encuadrada la foto", "fr": "Le cadrage de la photo", "de": "Wie das Foto gerahmt ist", "pt": "Como a foto está enquadrada", "it": "Come è inquadrata la foto", "ja": "写真の写り方", "zh": "照片的取景", "hi": "फ़ोटो का फ़्रेम", "ar": "كيف أُطِّرت الصورة"},
+    "out": {"en": "Sitting out", "es": "Quedarse fuera", "fr": "En retrait", "de": "Aussetzen", "pt": "Ficar de fora", "it": "Restare fuori", "ja": "抜けている", "zh": "暂时退出", "hi": "बाहर बैठे हैं", "ar": "جالس جانبًا"},
+    "errand": {"en": "What it should do", "es": "Qué debe hacer", "fr": "Ce qu'il doit faire", "de": "Was es tun soll", "pt": "O que deve fazer", "it": "Cosa deve fare", "ja": "してほしいこと", "zh": "它该做什么", "hi": "इसे क्या करना है", "ar": "ما ينبغي أن يفعله"},
+    "grant_id": {"en": "Which permission", "es": "Qué permiso", "fr": "Quelle permission", "de": "Welche Erlaubnis", "pt": "Que permissão", "it": "Quale permesso", "ja": "どの許可", "zh": "用哪个许可", "hi": "कौन-सी अनुमति", "ar": "أي إذن"},
+    "learned": {"en": "How it was learned", "es": "Cómo se aprendió", "fr": "Comment il a été appris", "de": "Wie es gelernt wurde", "pt": "Como foi aprendido", "it": "Come è stato imparato", "ja": "どう覚えたか", "zh": "是怎么学会的", "hi": "यह कैसे सीखा गया", "ar": "كيف تعلَّمه"},
+    "reach_id": {"en": "Which session", "es": "Qué sesión", "fr": "Quelle session", "de": "Welche Sitzung", "pt": "Que sessão", "it": "Quale sessione", "ja": "どのセッション", "zh": "哪一次会话", "hi": "कौन-सा सत्र", "ar": "أي جلسة"},
+    "saw": {"en": "What the eyes read on the screen", "es": "Lo que los ojos leyeron en la pantalla", "fr": "Ce que les yeux ont lu à l'écran", "de": "Was die Augen auf dem Bildschirm lasen", "pt": "O que os olhos leram no ecrã", "it": "Cosa hanno letto gli occhi sullo schermo", "ja": "目が画面から読み取った内容", "zh": "眼睛在屏幕上读到的内容", "hi": "आँखों ने स्क्रीन पर क्या पढ़ा", "ar": "ما قرأته العينان على الشاشة"},
+    "steps": {"en": "Steps", "es": "Pasos", "fr": "Étapes", "de": "Schritte", "pt": "Passos", "it": "Passi", "ja": "手数", "zh": "步数", "hi": "चरण", "ar": "خطوات"},
+    "to_profile_id": {"en": "Who it is handed to", "es": "A quién se le entrega", "fr": "À qui c'est confié", "de": "Wem es übergeben wird", "pt": "A quem é entregue", "it": "A chi viene passato", "ja": "誰に渡すか", "zh": "交给谁", "hi": "किसे सौंपा जा रहा है", "ar": "إلى مَن يُسلَّم"},
+    "verb": {"en": "The move", "es": "El movimiento", "fr": "Le geste", "de": "Die Bewegung", "pt": "O movimento", "it": "La mossa", "ja": "動作", "zh": "动作", "hi": "चाल", "ar": "الحركة"},
+    "watched": {"en": "Only while somebody is watching", "es": "Solo mientras alguien mira", "fr": "Seulement pendant que quelqu'un regarde", "de": "Nur solange jemand zusieht", "pt": "Apenas enquanto alguém observa", "it": "Solo mentre qualcuno guarda", "ja": "誰かが見ている間だけ", "zh": "仅在有人看着时", "hi": "केवल जब कोई देख रहा हो", "ar": "فقط بينما يراقب أحد"},
+    "why": {"en": "Why it stopped", "es": "Por qué se detuvo", "fr": "Pourquoi il s'est arrêté", "de": "Warum es aufgehört hat", "pt": "Porque parou", "it": "Perché si è fermato", "ja": "止まった理由", "zh": "为何停下", "hi": "यह क्यों रुका", "ar": "لماذا توقّف"},
+    "about_step": {"en": "The step this is a report about", "es": "El paso del que se informa", "fr": "L'étape dont il s'agit", "de": "Der Schritt, um den es geht", "pt": "O passo de que se trata", "it": "Il passo di cui si riferisce", "ja": "報告の対象となる手順", "zh": "此报告所指的步骤", "hi": "वह चरण जिसकी यह रिपोर्ट है", "ar": "الخطوة التي يتعلق بها هذا التقرير"},
+    "landed": {"en": "What became of that step on the machine", "es": "Qué fue de ese paso en la máquina", "fr": "Ce qu'est devenue cette étape sur la machine", "de": "Was aus diesem Schritt auf der Maschine wurde", "pt": "O que aconteceu a esse passo na máquina", "it": "Che ne è stato di quel passo sulla macchina", "ja": "その手順がマシン上でどうなったか", "zh": "该步骤在那台机器上的结果", "hi": "मशीन पर उस चरण का क्या हुआ", "ar": "ما آل إليه ذلك الإجراء على الآلة"},
+    "landed_note": {"en": "Why it did not happen", "es": "Por qué no ocurrió", "fr": "Pourquoi cela n'a pas eu lieu", "de": "Warum es nicht passiert ist", "pt": "Porque não aconteceu", "it": "Perché non è successo", "ja": "実行されなかった理由", "zh": "未能发生的原因", "hi": "यह क्यों नहीं हुआ", "ar": "لماذا لم يحدث"},
+"in_words": {"en": "The permission, in your own words", "es": "El permiso, con tus propias palabras", "fr": "La permission, avec vos propres mots", "de": "Die Erlaubnis, in deinen eigenen Worten", "pt": "A permissão, nas suas próprias palavras", "it": "Il permesso, con parole tue", "ja": "許可を、あなた自身の言葉で", "zh": "用你自己的话说出这个许可", "hi": "अनुमति, आपके अपने शब्दों में", "ar": "الإذن، بكلماتك أنت"},
+"detail": {"en": "The move's argument", "es": "El argumento del movimiento", "fr": "L'argument du geste", "de": "Das Argument der Bewegung", "pt": "O argumento do movimento", "it": "L'argomento della mossa", "ja": "動作の引数", "zh": "该动作的参数", "hi": "चाल का तर्क", "ar": "معطى الحركة"},
+    "frame": {"en": "The picture of the screen", "es": "La imagen de la pantalla", "fr": "L'image de l'écran", "de": "Das Bild vom Bildschirm", "pt": "A imagem do ecrã", "it": "L'immagine dello schermo", "ja": "画面の画像", "zh": "屏幕的图像", "hi": "स्क्रीन की तस्वीर", "ar": "صورة الشاشة"},
+    "places": {"en": "Apps or sites", "es": "Aplicaciones o sitios", "fr": "Applications ou sites", "de": "Apps oder Seiten", "pt": "Aplicações ou sites", "it": "App o siti", "ja": "アプリまたはサイト", "zh": "应用或网站", "hi": "ऐप या साइट", "ar": "تطبيقات أو مواقع"},
+    "verbs": {"en": "The moves it may make", "es": "Los movimientos que puede hacer", "fr": "Les gestes qu'il peut faire", "de": "Die Bewegungen, die es machen darf", "pt": "Os movimentos que pode fazer", "it": "Le mosse che può fare", "ja": "許される動作", "zh": "它可以做的动作", "hi": "जो चालें यह चल सकता है", "ar": "الحركات المسموح بها"},
+    "days": {"en": "Days", "es": "Días", "fr": "Jours", "de": "Tage", "pt": "Dias", "it": "Giorni", "ja": "日数", "zh": "天数", "hi": "दिन", "ar": "الأيام"},
+    "temperament": {"en": "The temperament seed the raising drifts", "es": "La semilla de temperamento que la crianza va moviendo", "fr": "La graine de tempérament que l'éducation fait dériver", "de": "Der Temperament-Keim, den das Aufziehen verschiebt", "pt": "A semente de temperamento que a criação vai movendo", "it": "Il seme del temperamento che la crescita sposta", "ja": "育てるうちに変わっていく気質の種", "zh": "养育会带动漂移的性情种子", "hi": "स्वभाव-बीज जिसे परवरिश बदलती है", "ar": "بذرة الطبع التي تحرّكها التربية"},
+    "teaching": {"en": "What kind of teaching this is", "es": "Qué tipo de enseñanza es", "fr": "Quel type d'enseignement c'est", "de": "Welche Art Unterweisung das ist", "pt": "Que tipo de ensino é", "it": "Che tipo di insegnamento è", "ja": "どの種類の教えか", "zh": "这是哪种教导", "hi": "यह किस प्रकार की शिक्षा है", "ar": "أي نوع من التعليم هذا"},
+    "what": {"en": "What is being taught", "es": "Qué se enseña", "fr": "Ce qui est enseigné", "de": "Was gelehrt wird", "pt": "O que está sendo ensinado", "it": "Cosa viene insegnato", "ja": "何を教えるか", "zh": "教的是什么", "hi": "क्या सिखाया जा रहा है", "ar": "ما الذي يُعلَّم"},
+    "changes": {"en": "The switches being rewired", "es": "Los interruptores que se reconfiguran", "fr": "Les interrupteurs recâblés", "de": "Die Schalter, die neu verdrahtet werden", "pt": "Os interruptores a reconfigurar", "it": "Gli interruttori da ricablare", "ja": "つなぎ替えるスイッチ", "zh": "正在改接的开关", "hi": "जो स्विच बदले जा रहे हैं", "ar": "المفاتيح التي يُعاد توصيلها"},
+    "shown": {"en": "The picture being shown for this turn", "es": "La imagen que se muestra en este turno", "fr": "L'image montrée pour ce tour", "de": "Das für diesen Zug gezeigte Bild", "pt": "A imagem mostrada nesta vez", "it": "L'immagine mostrata per questo turno", "ja": "このターンで見せる画像", "zh": "本轮展示的图片", "hi": "इस बारी में दिखाई जा रही तस्वीर", "ar": "الصورة المعروضة لهذا الدور"},
     # `consented` and `number` in the SIBLINGS' exact words — the shared
     # field vocabulary is one voice across the estate, and JIM had both
     # first.
@@ -7848,6 +8533,12 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     'plan': {'en': 'Plan', 'es': 'Plan', 'fr': 'Formule', 'de': 'Tarif', 'pt': 'Plano', 'it': 'Piano', 'ja': 'プラン', 'zh': '方案', 'hi': 'योजना', 'ar': 'الخطة'},
     'note': {'en': 'Note', 'es': 'Nota', 'fr': 'Note', 'de': 'Notiz', 'pt': 'Nota', 'it': 'Nota', 'ja': 'メモ', 'zh': '备注', 'hi': 'टिप्पणी', 'ar': 'ملاحظة'},
     'objector_ref': {'en': 'Proof reference', 'es': 'Referencia de prueba', 'fr': 'Référence de preuve', 'de': 'Nachweisreferenz', 'pt': 'Referência de prova', 'it': 'Riferimento di prova', 'ja': '証明の参照番号', 'zh': '证明参考号', 'hi': 'प्रमाण संदर्भ', 'ar': 'مرجع الإثبات'},
+    # The room's permission window: which box, and which way it was
+    # turned. `key` is the connector's id or the grant's, never a
+    # provider's name — so the label says what a person is choosing
+    # rather than repeating the field's spelling.
+    'key': {'en': 'What it may reach', 'es': 'A qué puede acceder', 'fr': 'Ce qu\'il peut atteindre', 'de': 'Worauf es zugreifen darf', 'pt': 'A que pode aceder', 'it': 'A cosa può accedere', 'ja': '手を伸ばせるもの', 'zh': '可触及的内容', 'hi': 'यह किस तक पहुँच सकता है', 'ar': 'ما يمكنه الوصول إليه'},
+    'allowed': {'en': 'Allowed', 'es': 'Permitido', 'fr': 'Autorisé', 'de': 'Erlaubt', 'pt': 'Permitido', 'it': 'Consentito', 'ja': '許可', 'zh': '已允许', 'hi': 'अनुमत', 'ar': 'مسموح'},
     'profile_id': {'en': 'Profile id', 'es': 'Id del perfil', 'fr': 'Identifiant du profil', 'de': 'Profil-ID', 'pt': 'Id do perfil', 'it': 'Id del profilo', 'ja': 'プロフィールID', 'zh': '资料 id', 'hi': 'प्रोफ़ाइल आईडी', 'ar': 'معرّف الملف'},
     'price': {'en': 'Price', 'es': 'Precio', 'fr': 'Prix', 'de': 'Preis', 'pt': 'Preço', 'it': 'Prezzo', 'ja': '価格', 'zh': '价格', 'hi': 'मूल्य', 'ar': 'السعر'},
     'currency': {'en': 'Currency', 'es': 'Moneda', 'fr': 'Devise', 'de': 'Währung', 'pt': 'Moeda', 'it': 'Valuta', 'ja': '通貨', 'zh': '货币', 'hi': 'मुद्रा', 'ar': 'العملة'},

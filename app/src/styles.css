@@ -133,7 +133,25 @@ button.linkish { background: none; border: 0; color: var(--brand); font-weight: 
 /* The profile's actual portrait, same footprint as the orb it replaces. */
 .hero-face { width: 76px; height: 76px; border-radius: 50%; object-fit: cover;
   border: 1px solid var(--line); flex-shrink: 0; }
-.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+/* `minmax(0, 1fr)`, not `1fr`, and two columns on a phone.
+
+   `1fr` is `minmax(auto, 1fr)`: the `auto` floor is the track's own
+   content, so a track never shrinks below the widest thing in it and four
+   of them plus the gaps came to more than a 430px screen. The Home
+   screen's tiles drew 41px past the right edge — the same defect that
+   drew the sign-in card wider than the phone it was on, in the same
+   product family, found the same way.
+
+       asked     are the columns allowed to share the width
+       mattered  are they allowed to be narrower than their contents
+
+   Four numbers across a phone is also just four numbers too many; two
+   rows of two is the same information, readable. */
+.tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+         gap: 12px; }
+@media (max-width: 560px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 .tile, .card, .persona-card {
   background: linear-gradient(160deg, var(--card), var(--card2));
   border: 1px solid var(--line); border-radius: 14px; padding: 16px;
@@ -446,7 +464,7 @@ button.danger { background: rgba(224,104,122,0.14) !important; color: var(--red)
 .voice-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
 button.mic { background: rgba(255,255,255,0.06); border: 1px solid var(--line);
   border-radius: 999px; padding: 10px 16px; font-weight: 600; color: var(--txt); }
-button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red, #f85149); }
+button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--green, #7bc47f); }
 
 /* An honest amber: the reply arrived, but not from who the user picked.
    Distinct from .error (red) — nothing failed to deliver; it degraded. */
@@ -500,9 +518,26 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .wl-count { font-size: 15px; font-weight: 800; width: 20px; text-align: right; }
 .wl-label { font-size: 11px; color: var(--muted); }
 .wl-foot { font-size: 10px; color: var(--muted); margin-top: 2px; }
-.wl-dot { position: fixed; left: 22px; bottom: 22px; width: 46px; height: 46px;
-  border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0,0,0,.45); z-index: 40; }
+/* Two elements, and the reason is a phone.
+
+   The dot is a button, and the phone block sets `button { min-height: 44px }`
+   so every control is a real tap target. `min-height` beats `height`, so the
+   22px dot this widget shrinks to on a phone rendered 22 wide and 44 tall —
+   a coloured ellipse, in answer to a field report asking for a smaller
+   circle. The declared width and height both said 22 and the guard next
+   door read them and passed; nothing here could see the rectangle.
+
+       asked     how big is the dot declared
+       mattered  how big is the dot drawn
+
+   So the button is the tap target and carries no paint, and `.wl-dot-face`
+   is the circle. */
+.wl-dot { position: fixed; left: 22px; bottom: 22px; z-index: 40;
+  width: 46px; height: 46px; padding: 0; border: 0; background: none;
+  display: grid; place-items: center; cursor: pointer; }
+.wl-dot-face { width: 46px; height: 46px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.25);
+  box-shadow: 0 8px 24px rgba(0,0,0,.45); }
 
 /* The version-mismatch banner — visible on every screen until the older
    backend is out of the way. Red on purpose: nothing else in the app may
@@ -611,6 +646,30 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    audio room has tiles at all. Green, not the brand purple: the screen it is
    drawn from uses #7bc47f, and it is the tile ground, the border and a ring
    round the face together, because one of the three alone is a hint. */
+/* The sit-out, on your own tile's left corner.
+ *
+ * It had no rule at all, so it drew as a bare glyph box in the corner of
+ * a photograph and read as a media control: "the play and pause button
+ * above my profile photo, it was supposed to be sit in and sit out." A
+ * word cannot be mistaken for a transport button, and the word is the
+ * action about to happen — "Sit out" while you are seated, "Sit in"
+ * while you are not.
+ *
+ * `lit` when you are out, because sitting out is the state somebody
+ * needs to be able to see across the room at a glance, not the default. */
+.rs-sitout {
+  position: absolute; top: 8px; left: 8px; z-index: 5;
+  padding: 4px 10px; border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(5,7,15,0.72); color: var(--text, #e8eaf6);
+  font-size: 10.5px; font-weight: 700; line-height: 1.2;
+  letter-spacing: .01em; cursor: pointer; white-space: nowrap;
+}
+.rs-sitout:hover { border-color: rgba(255,255,255,0.35); }
+.rs-sitout.out {
+  background: rgba(123,196,127,0.9); color: #0d1a0f;
+  border-color: rgba(123,196,127,0.95);
+}
 .rs-tile.talking { background: rgba(123,196,127,0.14);
   border: 2px solid rgba(123,196,127,0.85); padding: 11px 7px; }
 .rs-tile.talking .rs-face, .rs-tile.talking .rs-photo,
@@ -704,6 +763,14 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   border-radius: 0 0 16px 16px;
   background: linear-gradient(transparent 0, rgba(5, 3, 15, 0.88) 22px); }
 
+.rs-gear { position: absolute; bottom: 8px; right: 8px; z-index: 4;
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--line, #3a3a55);
+  background: color-mix(in srgb, var(--bg, #14142a) 72%, transparent);
+  color: var(--txt, #eee); font-size: 16px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; }
+.rs-gear:hover { background: var(--bg2, #22224a); }
 .rs-hint { position: absolute; top: 8px; right: 8px; z-index: 3;
   font-size: 8px; letter-spacing: .04em; color: #efecff; opacity: .75;
   background: rgba(5,3,15,0.45); border-radius: 7px; padding: 2px 6px; }
@@ -762,10 +829,13 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   .watch-lights .wl-label, .watch-lights .wl-name { font-size: 10px; }
   .wl-dot {
     left: 12px; bottom: calc(14px + env(safe-area-inset-bottom));
-    /* A field report showed the minimized light as a solid green disc
-       parked over whatever the screen was trying to say. On a phone it
-       shrinks to a true dot and loses the heavy shadow — still pressable,
-       no longer furniture. */
+    width: 44px; height: 44px;
+  }
+  /* A field report showed the minimized light as a solid disc parked over
+     whatever the screen was trying to say. On a phone the face shrinks to a
+     true dot and loses the heavy shadow — still pressable, because the
+     button around it keeps the whole 44px, no longer furniture. */
+  .wl-dot-face {
     width: 22px; height: 22px; opacity: 0.75;
     box-shadow: 0 2px 8px rgba(0,0,0,.35);
   }
@@ -849,7 +919,8 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 
 /* The lights' unreachable state: the same dot, unlit. Gray on purpose —
    the three live colors all mean "the backend answered". */
-.wl-dot-off { background: #3a3654; border-color: rgba(255,255,255,0.35); }
+.wl-dot-off .wl-dot-face { background: #3a3654;
+  border-color: rgba(255,255,255,0.35); }
 
 /* When the device asks for reduced motion, nothing here moves. The
    accessibility statement says so, which makes this rule the sentence's
@@ -1131,21 +1202,31 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .talk-rail-label { font-size: 10px; font-weight: 600; max-width: 60px;
                    text-align: center; overflow: hidden;
                    text-overflow: ellipsis; white-space: nowrap; }
+/* Everything the bare `.talk-panel` gets, in one place and before the
+   `@media (max-height: 600px)` block below.
+   
+   These four lines used to live two rules apart: `max-height: 60vh` here,
+   and a second `.talk-panel { max-height: 60vh; max-width: 420px; ... }`
+   nine hundred lines further down. Same selector, same specificity, and a
+   media query adds none — so the *later* base rule won, and the short-screen
+   override between them never once applied. On a handheld held sideways the
+   panel stayed capped at 60vh of a 400px viewport, which is why all four
+   rail buttons opened something that looked like half a window.
+   
+       asked     is there a rule that gives the panel the room
+       mattered  is it the rule the browser uses
+   
+   A card, not a wall: it caps well under the viewport, scrolls inside
+   itself, and — the field report's exact words — never "grabs the
+   background of the chat room", which is what the containment is for. */
 .talk-panel { max-height: 60vh; min-height: 180px; flex: none;
-              overflow-y: auto; width: min(96vw, 720px);
+              overflow-y: auto; overscroll-behavior: contain;
+              width: min(96vw, 720px); max-width: 420px;
               text-align: left; }
 /* A short landscape screen — the handheld — gets the panel by taking the
    room from the face, which the owner offered by name: "you can make the
    photo a lot smaller if you need room". One line of dials is not a
    panel. */
-@media (max-height: 600px) {
-  .talk-overlay { gap: 8px; padding: 12px 24px; }
-  .talk-face { width: min(20vh, 100px); height: min(20vh, 100px); }
-  .talk-torso { max-height: 22vh; }
-  .talk-name { font-size: 15px; }
-  .waveform { height: 22px; margin: 0; }
-  .talk-panel { max-height: none; flex: 1 1 auto; min-height: 140px; }
-}
 /* Why the robot voice is standing in — the server's refusal sentence,
    small and dismissible, beside the conversation it explains. */
 .voice-note { display: flex; align-items: center; gap: 8px;
@@ -1170,8 +1251,16 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    phone media rule that lays the overlay's rail flat, so the column
    holds at every width; the opened panel swings out to the left of the
    column rather than into it. */
+/* Centred on the right edge and NOT scrollable.
+ *
+ * It was pinned below the dial (`top: 50% + 84px`) with an internal
+ * `overflow-y: auto`, which meant the column had only the lower half of
+ * the screen to sit in and scrolled inside itself when it did not fit —
+ * so the buttons moved under the finger. Centring gives the column the
+ * whole height to use, and five buttons at this size fit every phone
+ * without a scrollbar. */
 .chat-rail-dock .talk-rail { position: fixed; right: 6px;
-                             top: calc(50% + 84px); transform: none;
+                             top: 50%; transform: translateY(-50%);
                              flex-direction: column; z-index: 84; }
 /* Compact in the dock — the field report circled four boxes and could
    not see all four: at the overlay's size the column's tail slid under
@@ -1181,10 +1270,10 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .chat-rail-dock .talk-rail-btn { min-width: 52px; padding: 5px 4px;
                                  font-size: 15px; border-radius: 11px; }
 .chat-rail-dock .talk-rail-label { font-size: 8.5px; max-width: 50px; }
-.chat-rail-dock .talk-rail { max-height: calc(50vh - 100px);
-                             overflow-y: auto; }
+.chat-rail-dock .talk-rail { max-height: calc(100vh - 120px);
+                             overflow: visible; }
 .chat-rail-dock .talk-panel { position: fixed; right: 76px; top: 50%;
-                              transform: translateY(-50%); z-index: 86;
+                              transform: translateY(-50%); z-index: 94;
                               width: min(86vw, 560px); }
 .chat-head-face { width: 52px; height: 52px; border-radius: 50%;
                   object-fit: cover; border: 2px solid var(--line);
@@ -1229,6 +1318,36 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    and would animate on a dead microphone. */
 .waveform { display: flex; align-items: center; justify-content: center;
             gap: 3px; height: 34px; margin: 2px 0 4px; }
+
+/* Declared here, below every base rule it overrides, and not beside the
+   thing it is about.
+
+   A media query adds no specificity: this block and the plain rules it
+   narrows are all `(0, 1, 0)`, so between them the browser takes the one
+   written later. Placed next to `.talk-overlay` — where a reader would
+   look for it — it sat above `.waveform` and above the panel's own base
+   rule, and the two declarations that mattered most on a short screen were
+   the two that never ran.
+
+       asked     is the override written
+       mattered  is the override reachable
+
+   `test_a_media_query_adds_no_specificity.py` now fails on any block put
+   back where it reads better and works worse. */
+@media (max-height: 600px) {
+  .talk-overlay { gap: 8px; padding: 12px 24px; }
+  .talk-face { width: min(20vh, 100px); height: min(20vh, 100px); }
+  .talk-torso { max-height: 22vh; }
+  .talk-name { font-size: 15px; }
+  .waveform { height: 22px; margin: 0; }
+  .talk-panel { max-height: none; flex: 1 1 auto; min-height: 140px; }
+  /* The overlay's panel is a flex child and can be told to take the room.
+     The docked one is `position: fixed` and centred on the viewport, where
+     `max-height: none` is not "as tall as there is room for" but "as tall
+     as the content", running off both ends at once. It gets the viewport
+     as its bound instead, and keeps scrolling inside itself. */
+  .chat-rail-dock .talk-panel { max-height: calc(100vh - 24px); }
+}
 .wf-bar { width: 3px; height: 100%; border-radius: 2px;
           background: var(--accent); transform: scaleY(0.08);
           transform-origin: center;
@@ -1337,7 +1456,19 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 
 /* The room stage — AR passthrough or the VR turntable. One fixed layer
    over everything, left by its own button; nothing behind it unmounts. */
-.room-stage { position: fixed; inset: 0; z-index: 80; overflow: hidden;
+/* Above the room's own chrome, because it covers the room.
+ *
+ *     asked     fix the top of the stage
+ *     mattered  the room's close button sat ON the stage's own
+ *
+ * The stage stood at 80 and `.room-out` — the room's ✕ — at 90, so the
+ * button for leaving the ROOM drew on top of a full-screen overlay and
+ * clipped the button for leaving the STAGE. Two exits, overlapping, one
+ * of them wrong for where you were standing.
+ *
+ * At 100 the stage covers the room completely, chrome included, and the
+ * only way out of it is its own — which is what a modal is. */
+.room-stage { position: fixed; inset: 0; z-index: 100; overflow: hidden;
   background: radial-gradient(90% 70% at 50% 20%, #101b30 0%, #070b15 70%);
   touch-action: none; cursor: grab; }
 .room-stage:active { cursor: grabbing; }
@@ -1461,8 +1592,23 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
   color: #fff; border-radius: 50%; width: 26px; height: 26px;
   line-height: 1; cursor: pointer; flex: none; }
 .rs-chatbtn:disabled { opacity: 0.4; cursor: default; }
-/* On the stage the strip sits above the leave button's row. */
-.room-stage .rs-chatstrip { left: 12px; right: 12px; bottom: 64px; }
+/* On the stage the strip sits above the leave button's row.
+ *
+ *     asked     fix the top of the stage
+ *     mattered  the strip was AT the top
+ *
+ * Two faults in one line. It set three offsets and no `position`, so on
+ * the stage — where the seats are absolutely positioned on the turntable
+ * and the strip is the only child left in flow — the offsets did nothing
+ * and it landed at the top of the screen, across the transcript. And it
+ * was written against the bare class, which the flat participant card
+ * also wears, so scoping it correctly matters as much as positioning it:
+ * in the card the strip IS a normal flex child at the bottom, and must
+ * stay one.
+ *
+ * `:not(.card)` is the immersive stage and nothing else. */
+.room-stage:not(.card) .rs-chatstrip {
+  position: absolute; left: 12px; right: 12px; bottom: 64px; }
 
 /* What a voice room wears instead of the chat strip: one control that
    listens, and a line naming who is speaking. Centred rather than
@@ -1485,7 +1631,11 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    the way the tiles do — the same green that means "this one is talking",
    so one colour carries one meaning across the room. */
 .rs-talk.live { background: rgba(123, 196, 127, 0.9); color: #08122a; }
-.room-stage .rs-voicebar { left: 12px; right: 12px; bottom: 64px; }
+/* The voice room's own bar, scoped the same way and for the same
+   reason — it already carries `position: absolute` from its base rule,
+   so only the collision with the card needed fixing. */
+.room-stage:not(.card) .rs-voicebar {
+  left: 12px; right: 12px; bottom: 64px; }
 
 /* A shared attachment in the transcript: the picture itself, the video
    playable, a file as a plain named link — sized to stay a turn in a
@@ -1516,9 +1666,17 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
  * it is the console stopping pretending the room is a document.
  */
 .app.in-room { grid-template-columns: 1fr; }
-.app.in-room .sidebar,
-.app.in-room .menu-fab,
-.app.in-room .menu-scrim { display: none; }
+/* In a room the drawer is away, not gone.
+ *
+ *     asked     hide the menus in a room
+ *     mattered  can you still get to them
+ *
+ * All three were hidden outright — the drawer, the button that opens it
+ * and the scrim that closes it — so a room was a place with the rest of
+ * the app painted over. The drawer stands down until it is opened; the
+ * button and the scrim stay, because they are how it opens and how it
+ * shuts. */
+.app.in-room .sidebar:not(.open) { display: none; }
 .app.in-room .content { padding: 0; overflow: hidden; }
 
 /* A room is a card on the page, not a takeover of the window.
@@ -1574,7 +1732,25 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
  *
  * `order` rather than moving the JSX: the same component draws the
  * roomless state, where the reading order is right as written. */
-.screen.room-place > .room-stage { order: -1;
+/* `.card.room-stage`, not `.room-stage`.
+ *
+ *     asked     the AR and VR roads should open the stage
+ *     mattered  the stage was being flattened by the CARD's rule
+ *
+ * Two different things wear the class `room-stage`: the flat
+ * participant card, which every line of this rule is about — the strip,
+ * the gutter, the seat tiles — and the immersive stage, which is a
+ * `position: fixed` overlay covering the screen.
+ *
+ * Written bare, this selector caught both, and `position: relative` beat
+ * the stage's own `fixed` on specificity. So the stage laid out in flow
+ * as a 402x170 strip inside a 430x932 screen, with the room showing
+ * through it. Photographed from a phone and reported as "the VR room is
+ * broken", which it was.
+ *
+ * Naming the card here costs nothing — the card is the only thing this
+ * rule ever meant — and the stage gets its own rule back. */
+.screen.room-place > .card.room-stage { order: -1;
   display: flex; flex-direction: column; margin: 0;
   /* The strip lives BELOW the faces, not over them.
    *
@@ -1588,7 +1764,7 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    * itself, so the scene — `flex: 1` — shrinks by exactly what the strip
    * occupies and the tiles can never sit under it. */
   position: relative; }
-.screen.room-place > .room-stage > .room-scene {
+.screen.room-place > .card.room-stage > .room-scene {
   position: static; padding-bottom: 0; }
 /* In a room the strip is a normal flex child at the bottom of the stage,
    not an overlay.
@@ -1603,8 +1779,17 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
  * frames". Static, it takes the room it actually needs and the scene
  * (flex: 1) shrinks by exactly that much, so they cannot overlap however
  * either one grows later. */
-.screen.room-place .rs-chatstrip,
-.screen.room-place .rs-voicebar {
+/* The CARD's strip, named as such.
+ *
+ * Every line below is about the room card's flex column — static so the
+ * scene shrinks by exactly the strip's height and the two can never
+ * overlap. Written against `.screen.room-place` alone it also caught the
+ * immersive stage, which is a different object that happens to share a
+ * class, and it pinned the stage's composer to the top of the screen
+ * across the transcript. Third rule in this file to make that mistake;
+ * naming the card is the fix in all three. */
+.screen.room-place > .card.room-stage .rs-chatstrip,
+.screen.room-place > .card.room-stage .rs-voicebar {
   position: static; left: auto; right: auto; bottom: auto;
   flex: 0 0 auto; padding: 0 2px;
   /* Out from under the loudness rail. The rail is fixed to the
@@ -1680,12 +1865,6 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
  * height rather than width on purpose: it is the shortness that makes a
  * column wrong, and a short window on a computer wants the same thing.
  */
-@media (max-height: 560px) {
-  .room-out { top: 8px; right: 10px; width: 28px; height: 28px;
-    font-size: 13px; }
-  .rs-strip { padding: 2px 0 0; gap: 6px; }
-  .rs-round { width: 30px; height: 30px; font-size: 13px; }
-}
 
 /* ---- press and hold ------------------------------------------------------
  *
@@ -1775,6 +1954,28 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 }
 .rs-round:hover:not(:disabled) { transform: translateY(-1px); }
 .rs-round:disabled { opacity: .45; cursor: default; }
+
+/* Declared here, below every base rule it overrides, and not beside the
+   thing it is about.
+
+   A media query adds no specificity: this block and the plain rules it
+   narrows are all `(0, 1, 0)`, so between them the browser takes the one
+   written later. Placed next to `.talk-overlay` — where a reader would
+   look for it — it sat above `.waveform` and above the panel's own base
+   rule, and the two declarations that mattered most on a short screen were
+   the two that never ran.
+
+       asked     is the override written
+       mattered  is the override reachable
+
+   `test_a_media_query_adds_no_specificity.py` now fails on any block put
+   back where it reads better and works worse. */
+@media (max-height: 560px) {
+  .room-out { top: 8px; right: 10px; width: 28px; height: 28px;
+    font-size: 13px; }
+  .rs-strip { padding: 2px 0 0; gap: 6px; }
+  .rs-round { width: 30px; height: 30px; font-size: 13px; }
+}
 /* A strip button that says its job in words — for the one whose glyph
    nobody could read. Same height and rim as its round neighbours, wide
    enough for its sentence. */
@@ -2022,9 +2223,17 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
    panel (86) so the panel itself stays tappable. The red close is the
    exit a person can see, top corner of the panel, red because the field
    asked for "a little red at the top". */
-.talk-panel-scrim { position: fixed; inset: 0; z-index: 85;
+/* Above the room's chrome.
+ *
+ * 85/86 put the panel under the corner counter (90) and under the
+ * full-screen ask (88), so a menu opened from the rail came up with a
+ * layer across it — visible, unreadable, and untappable at the overlap.
+ * A panel somebody deliberately opened outranks passive chrome; the
+ * version guard (100) still outranks everything, which is the one thing
+ * that should. */
+.talk-panel-scrim { position: fixed; inset: 0; z-index: 93;
                     background: transparent; }
-.talk-panel { position: relative; z-index: 86; }
+.talk-panel { position: relative; z-index: 94; }
 .talk-panel-close { position: absolute; top: 8px; right: 8px;
                     width: 26px; height: 26px; border-radius: 50%;
                     border: 0; cursor: pointer; line-height: 1;
@@ -2040,3 +2249,2768 @@ button.mic.listening { background: rgba(248,81,73,0.18); border-color: var(--red
 .rs-waiting { opacity: 0.45; display: flex; flex-direction: column;
               align-items: center; justify-content: center; gap: 6px;
               border-style: dashed; }
+
+/* The room asking for a hand — iOS opens no microphone a touch didn't
+   carry, so the first touch anywhere is the grant and this chip says so. */
+.ear-tap {
+  position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+  z-index: 30; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--panel); color: var(--txt); padding: 8px 16px;
+  font-size: 0.85rem; box-shadow: 0 4px 18px rgba(0,0,0,.35);
+  animation: ear-tap-pulse 1.6s ease-in-out infinite;
+}
+@keyframes ear-tap-pulse {
+  0%, 100% { opacity: .85; } 50% { opacity: 1; }
+}
+/* The take in progress, living where the text bar was. */
+.dict-strip { align-items: center; gap: 10px; }
+.dict-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: #f85149; flex: none;
+  animation: dict-dot-pulse 1.2s ease-in-out infinite;
+  transition: transform 90ms linear;
+}
+@keyframes dict-dot-pulse {
+  0%, 100% { opacity: 1; } 50% { opacity: 0.45; }
+}
+.dict-wave {
+  flex: 1; height: 28px; min-width: 0;
+}
+.dict-wave polyline {
+  stroke: var(--accent, #7b5cff);
+}
+.dict-stop { font-size: 1.05rem; }
+
+/* All four buttons in frame: the dock pins to the chat's visible corner
+   and never flows below the fold. */
+.chat-rail-dock {
+  position: sticky; bottom: 8px; align-self: flex-end;
+  max-height: 70vh; overflow: visible;
+}
+/* Name the room and lend it your microphone, on the room's own row —
+   the two things you set before walking in. */
+.rms-before { display: inline-flex; gap: 6px; align-items: center;
+              min-width: 0; }
+.rms-before input { min-width: 0; width: min(220px, 45vw); }
+/* The motor's command line, ready to copy. Monospaced and selectable —
+   it is meant to leave this screen and land in a terminal. */
+.hnd-motor { margin-top: 10px; }
+.hnd-cmd {
+  width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px; line-height: 1.5; resize: vertical;
+}
+/* The token, when somebody deliberately unfolds it. `code` has none of
+   the textarea's box, and a credential run together with the prose
+   around it is a credential half-copied. */
+.hnd-token { margin-top: 8px; }
+.hnd-token code.hnd-cmd {
+  display: block; margin-top: 4px; padding: 6px 8px;
+  border: 1px solid var(--line); border-radius: 6px;
+  word-break: break-all; user-select: all;
+}
+.rail-ask-row { display: flex; gap: 8px; margin-top: 8px; }
+.rail-ask-row input { flex: 1; min-width: 0; }
+
+/* The full-screen face: the background-photo takeover, worn by an avatar.
+   92 because the takeover is a takeover — the field call: "once clicked
+   into the avatar screen... the old screen must not be visible anymore."
+   The room's own chrome tops out at 88 and the footsteps at 90; only the
+   version guard (100) still outranks the stage. */
+.avatar-stage {
+  position: fixed; inset: 0; z-index: 92; background: #05070f;
+  display: flex; align-items: center; justify-content: center;
+}
+/* And while the stage is up, the room's chrome leaves the screen rather
+   than waiting dimly under it: panels, docks, cards, seats, strips. In
+   an AR/VR room only the environment (the passthrough, the turntable
+   floor) stays, showing through the clear stage behind the figure. The
+   wardrobe card is the stage's own and stays. */
+.staging .card:not(.wardrobe),
+.staging .talk-overlay,
+.staging .talk-panel,
+.staging .talk-panel-scrim,
+.staging .chat-rail-dock,
+.staging .room-dock-picker,
+.staging .walk-strip,
+.staging .stage-seat,
+.staging .stage-note,
+.staging .stage-leave {
+  display: none;
+}
+.stage-face { width: 100%; height: 100%; object-fit: cover; }
+.stage-empty { color: var(--muted, #8b90a8); padding: 24px; }
+.stage-mark {
+  position: absolute; top: 14px; left: 14px; z-index: 62;
+  background: rgba(5,7,15,0.65); color: #fff; border-radius: 999px;
+  padding: 4px 10px; font-size: 0.8rem;
+}
+.stage-close {
+  position: absolute; top: 12px; right: 12px; z-index: 62;
+  width: 40px; height: 40px; border-radius: 50%; border: 0;
+  /* Red, like the panels' close — "only the avatar screen with the red
+     X to back out of it." The one visible exit wears the exit color. */
+  background: rgb(224, 85, 85); color: #fff; font-weight: 700;
+}
+/* In an AR or VR room the scene stays visible behind the figure — the
+   avatar stands in the environment instead of on a black card. */
+.avatar-stage.clear { background: rgba(5,7,15,0.35); }
+/* A whole figure is shown whole; only a face-crop fills the frame. */
+.stage-face.standing { object-fit: contain; }
+/* The rail of hidden windows down the right edge — prompt, wardrobe,
+   body — the same posture as the room's panel column. */
+.stage-rail {
+  position: absolute; bottom: 18px; right: 16px; z-index: 62;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.stage-rail button {
+  width: 46px; height: 46px; border-radius: 50%;
+  border: 1px solid var(--line); background: rgba(5,7,15,0.65);
+  font-size: 1.2rem;
+}
+.stage-rail button.lit { border-color: var(--accent, #7b7bff); }
+.ward-switch {
+  display: flex; align-items: center; gap: 8px; margin-top: 10px;
+  font-size: 0.85rem; color: var(--muted, #8b90a8);
+}
+/* The second ring on a seat or a chat header: the avatar beside the
+   portrait, tappable into the full-screen stage. */
+.rs-avring {
+  position: absolute; right: 8px; bottom: 30px; z-index: 4;
+  width: 34px; height: 34px; border-radius: 50%; padding: 0;
+  border: 2px solid var(--accent, #7b7bff);
+  background: rgba(5,7,15,0.65); color: #fff; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.rs-avring img { width: 100%; height: 100%; object-fit: cover; }
+.chat-head-ring { position: static; flex: 0 0 auto; }
+/* The twin circles on a profile seat: "an entire profile photo circle,
+   but for avatar" — two whole 72px faces side by side, the portrait and
+   the figure, each its own door. The avatar's wears the accent ring so
+   the two read as different doors, not a double exposure. */
+.rs-pair {
+  display: flex; gap: 8px; align-items: flex-start; justify-content: center;
+  max-width: 100%;
+}
+/* The word under the second circle — "it must say avatar under the
+   photo". Tops aligned above so the first circle stays put while its
+   neighbor wears the caption. */
+/* Full width of the circle it sits under, and centred there. It had
+   `text-align: center` and no width, so it centred whatever box the text
+   happened to make rather than the circle above it — which on the phone
+   put the word visibly off to one side. */
+.rs-cap {
+  display: block; width: 100%; margin-top: 2px; font-size: 10px;
+  line-height: 1.2; color: var(--muted, #8b90a8); text-align: center;
+}
+/* What the paperclip asks first. A short column above the composer,
+   because the answer is one press and a list that has to be scrolled is
+   a worse question than the file dialog it replaced. */
+.rs-attach {
+  display: flex; flex-direction: column; gap: 4px;
+  margin: 0 8px 6px; padding: 6px;
+  background: var(--card, #171a2b); border: 1px solid var(--line, #2a2f45);
+  border-radius: 12px;
+}
+.rs-attach button {
+  text-align: left; padding: 10px 12px; font-size: 14px;
+  background: none; border: none; border-radius: 8px;
+  color: var(--text, #e8eaf6); cursor: pointer;
+}
+.rs-attach button:hover { background: var(--line, #2a2f45); }
+.rs-attach .rs-attach-x { text-align: center; color: var(--muted, #8b90a8); }
+.rs-circle-btn {
+  background: none; border: none; padding: 0; cursor: pointer;
+  border-radius: 50%; display: block; flex: 0 1 72px; min-width: 0;
+  text-align: center;
+}
+/* The tile floor is 128px and two full 72px circles want 154px, so on the
+   narrowest phones both shrink together — still whole circles, never one
+   circle and a crumb. */
+.rs-pair .rs-photo { width: 100%; height: auto; aspect-ratio: 1 / 1; }
+.rs-avatar2 { border: 2px solid var(--accent, #7b7bff); }
+/* The portrait taken to the screen — the photo big and nothing else,
+   under the stage (z-59 beneath its 60) so opening the avatar from a
+   seat never fights the lightbox for the front. */
+/* The portrait, filling the frame.
+ *
+ * It was a boxed picture at 92vw/92vh on a 0.92 scrim, so the room stayed
+ * visible around and behind it — the field's words: "I don't want it to
+ * bring up that whole background that's in the back behind the photo."
+ * Opaque ground, and the picture covers the frame the way a background
+ * image does, centred and cropped rather than letterboxed. */
+.face-light {
+  position: fixed; inset: 0; z-index: 59; background: #05070f;
+  display: flex; align-items: center; justify-content: center;
+}
+.face-light img {
+  width: 100%; height: 100%; object-fit: cover; object-position: center;
+  border-radius: 0;
+}
+/* Both doors, on the picture. A full-screen portrait with no way across
+   to the avatar is a dead end, which is the one thing a pair of circles
+   exists to avoid. */
+.face-light-rail {
+  position: absolute; bottom: 22px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 8px; z-index: 2;
+}
+.face-light-rail button {
+  padding: 8px 16px; border-radius: 999px;
+  border: 1px solid var(--line); background: rgba(5,7,15,0.72);
+  color: var(--text, #e8eaf6); font-size: 13px; cursor: pointer;
+}
+.face-light-rail button.lit {
+  border-color: var(--accent, #7b7bff); opacity: 1; cursor: default;
+}
+/* The wardrobe card: sized like a card, scrolls inside itself, never
+   hands the wheel to the face behind it. */
+.wardrobe {
+  position: absolute; bottom: 76px; right: 16px; z-index: 62;
+  width: min(400px, calc(100vw - 32px)); max-height: 55vh;
+  overflow-y: auto; overscroll-behavior: contain;
+}
+/* The road that is open when the prompt bar is not: a photograph, the
+   only way a real likeness has ever been allowed to arrive. */
+.ward-import { display: flex; flex-direction: column; gap: 8px;
+               margin-top: 10px; }
+.ward-prompt { display: flex; gap: 8px; margin: 8px 0; }
+.ward-prompt input { flex: 1; min-width: 0; }
+.ward-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.skin-ring {
+  border: none; background: none; padding: 0; cursor: pointer;
+  border-radius: 12px; display: block;
+}
+/* The deployment's default faces: a grid of tappable portraits. */
+.shelf-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.shelf-face {
+  position: relative; width: 72px; height: 72px; padding: 0;
+  border-radius: 14px; overflow: hidden; border: 1px solid var(--line);
+  background: rgba(5,7,15,0.4); cursor: pointer;
+}
+.shelf-face img { width: 100%; height: 100%; object-fit: cover; }
+.shelf-mark {
+  position: absolute; top: 3px; left: 4px; font-size: 0.65rem;
+  color: #fff; text-shadow: 0 0 4px rgba(0,0,0,0.8);
+}
+
+/* The 3-D head standing in a seat's second circle. It is a canvas rather
+   than an image, so it needs the circle's shape said explicitly — an
+   <img> got that from `.rs-photo` alone. */
+.rs-head { border-radius: 50%; overflow: hidden; aspect-ratio: 1 / 1; }
+
+/* --- the three roads, and the number that is shown rather than set ----
+   The picker sits one question above the framing choice on Identity:
+   framing is about the photograph going in, this is about which road the
+   presence takes on the way out. Stacked rather than side by side —
+   three roads with a sentence each do not fit across a phone, and the
+   sentence is the part that makes the choice obvious. */
+.roads { display: grid; gap: 8px; margin: 0 0 6px; }
+.road {
+  background: var(--card2); border: 1px solid var(--line);
+  border-radius: 11px; padding: 11px 10px; text-align: left;
+  color: var(--t2); font: inherit;
+  transition: border-color .15s, background .15s, color .15s;
+}
+.road:hover { border-color: var(--t3); }
+.road .road-name { display: block; font-size: 13.5px; font-weight: 600;
+  color: var(--txt); }
+.road .road-note { display: block; font-size: 11px; margin-top: 3px;
+  line-height: 1.35; }
+.road.lit {
+  background: linear-gradient(180deg, #2a2160, #221a4e);
+  border-color: var(--brand); color: var(--brand2);
+}
+.road.lit .road-name { color: #fff; }
+
+/* What the lit road opens, and it has to LOOK opened.
+ *
+ *     asked     it should pop up below the buttons so we don't have to
+ *               scroll even further past avatar
+ *     mattered  it already was below them, and read as the next section
+ *               of the page instead of as this button's contents
+ *
+ * The video block and the forge sat in the flow as plain headings, so a
+ * screen that had just grown by six hundred pixels looked the same as a
+ * screen somebody had scrolled — and the panel was reported as showing
+ * "for a split second" and going away. It never went anywhere; it opened
+ * out of sight.
+ *
+ * Its own ground and a notch pointing back at the row, so the eye lands
+ * on something that is visibly attached to what was pressed rather than
+ * on a heading that could belong to anything. `chooseRoad` scrolls it
+ * into view; this is what it arrives at. */
+.road-drawer {
+  position: relative;
+  margin: 12px 0 6px;
+  padding: 14px 13px 4px;
+  border: 1px solid var(--brand);
+  border-radius: 12px;
+  background: linear-gradient(180deg,
+              rgba(42, 33, 96, .34), rgba(34, 26, 78, .12) 120px,
+              transparent 240px);
+  scroll-margin-top: 12px;
+}
+/* The notch: a small square of the drawer's own edge, turned, sitting on
+   the seam so the panel reads as hanging off the row above it. */
+.road-drawer::before {
+  content: ""; position: absolute; top: -6px; left: 26px;
+  width: 10px; height: 10px; transform: rotate(45deg);
+  background: #2a2160;
+  border-left: 1px solid var(--brand);
+  border-top: 1px solid var(--brand);
+}
+/* The first heading inside sits against the top edge rather than adding
+   a second gap on top of the drawer's own padding. */
+.road-drawer > h4:first-of-type { margin-top: 0; }
+
+/* The quote. Amber because it is a cost being disclosed, not an error and
+   not a success — the person is being told what this will take before
+   they spend it. */
+.video-quote {
+  margin: 11px 0 0; padding: 10px 12px; border-radius: 10px;
+  background: rgba(123,196,127,.08); border: 1px solid rgba(123,196,127,.3);
+  font-size: 12px; line-height: 1.5;
+}
+.video-quote.long {
+  background: rgba(255,184,77,.09); border-color: rgba(255,184,77,.34);
+}
+.video-quote p { margin: 0; }
+.video-quote p + p { margin-top: 4px; }
+/* Over the ceiling. Said in the accent that means "read this", because a
+   passage that needs a second scene is a decision, not a warning. */
+.video-quote-over { color: var(--amber); font-weight: 600; }
+
+/* The standing direction, shown as the prose it is. Bordered rather than
+   boxed like a field, because it is not one — it is what the camera was
+   last told, and the control that changes it is the line underneath. */
+.scene-direction {
+  margin: 8px 0 10px; padding: 9px 12px; border-radius: 10px;
+  background: var(--card2); border: 1px solid var(--line);
+  border-left: 3px solid var(--brand); color: var(--t2);
+  font-size: 12.5px; line-height: 1.55; font-style: italic;
+}
+
+/* The account of what was asked. Folded away because it is a record
+   rather than a control, and open it reads as a list of sentences the
+   owner wrote — which is what it is. */
+.scene-log { margin: 0 0 12px; }
+.scene-log summary { font-size: 12px; color: var(--t2); cursor: pointer; }
+.scene-log ul { margin: 8px 0 0; padding-left: 17px; }
+.scene-log li { font-size: 12px; line-height: 1.55; color: var(--t2);
+  margin-bottom: 4px; }
+.scene-log li em { font-style: normal; font-size: 10.5px; }
+
+/* The reply as footage, inside the bubble it belongs to.
+ *
+ * Four states and only one of them is a video, so the other three are
+ * lines of type rather than an empty frame — a blank space cannot tell a
+ * render in progress from one that failed, or from a ceiling the owner
+ * set themselves. The accent says which: green while it is being made,
+ * amber for the ceiling, muted for a failure, because a failed render is
+ * not an error in the answer above it. */
+.bubble-scene {
+  margin-top: 9px; padding: 8px 11px; border-radius: 10px;
+  font-size: 11.5px; line-height: 1.5; color: var(--t2);
+  background: var(--card2); border: 1px solid var(--line);
+}
+.bubble-scene.making {
+  border-color: rgba(123,196,127,.34); background: rgba(123,196,127,.08);
+}
+.bubble-scene.capped {
+  border-color: rgba(255,184,77,.34); background: rgba(255,184,77,.09);
+}
+.bubble-scene.done { padding: 0; overflow: hidden; position: relative;
+  background: #000; }
+.bubble-scene.done video { width: 100%; display: block; }
+/* Marked on the surface as well as in the file. `asset_is_marked` decides
+   by path and the stored file carries the badge, but somebody watching a
+   video in a chat bubble reads the caption under it, not the URL. */
+.bubble-scene-ai {
+  position: absolute; left: 8px; bottom: 8px; font-size: 8.5px;
+  font-weight: 800; letter-spacing: .06em; color: #9fd8e8;
+  background: rgba(8,6,16,.72); border-radius: 6px; padding: 2px 7px;
+}
+.bubble-scene em { font-style: normal; }
+
+/* ── The stage, running in a frame ────────────────────────────────────
+ *
+ * The same component at a different size. The owner's ask, twice over:
+ * the avatar runs "inside of windows like these", and "if they don't
+ * wanna go full screen, you'll still have to add those four buttons that
+ * allow you to change the wardrobe or body". So the rail, the wardrobe
+ * and the body controls are not stripped here — they are the reason this
+ * mode exists rather than a smaller second component. */
+.avatar-stage.inline {
+  position: relative; inset: auto; z-index: auto; width: 100%;
+  aspect-ratio: 4 / 3; max-height: 46vh; border-radius: 12px;
+  overflow: hidden; border: 1px solid var(--line); background: #0b0820;
+}
+/* The rail keeps its four, smaller — it is the same rail.
+ *
+ *     asked     the expand button is hidden behind the pencil button
+ *     mattered  both are pinned to the same right edge, and only one of
+ *               them was told where to stop
+ *
+ * `.stage-grow` sits at `top: 8px; right: 8px` and is 8..38px down that
+ * edge. The rail is anchored at the BOTTOM of the same edge and grows
+ * upward as buttons are added, so its top button climbed into those
+ * thirty pixels and parked under the expand — which is not a z-order
+ * problem to be argued with, it is two things given the same address.
+ *
+ * A ceiling, so the rail cannot reach it: `top: 44px` is six clear
+ * pixels below where the expand ends, and `justify-content: flex-end`
+ * keeps the stack sitting on the bottom the way it did. If a fifth
+ * button is ever added the rail runs out of room and scrolls rather
+ * than climbing over the expand again. */
+.avatar-stage.inline .stage-rail {
+  top: 44px; bottom: 10px; right: 8px; gap: 6px;
+  justify-content: flex-end; overflow-y: auto;
+}
+/* `min-height` and not just `height`, on all three below.
+ *
+ * The phone lane carries `button { min-height: 44px }` — the touch-target
+ * floor — and a `min-height` beats a smaller `height` no matter how
+ * specific the selector setting it is. Measured: these came back 44px
+ * tall with `height: 28px` sitting right there in the rule, which is why
+ * the rail was 207px of buttons on a 263px frame. `button.chip` already
+ * had to learn this three hundred lines up.
+ *
+ * These four are glyphs inside a frame, not the frame's own actions, and
+ * they sit far enough apart that 28px is still a target you hit. */
+.avatar-stage.inline .stage-rail button { width: 28px; height: 28px;
+  min-height: 28px; font-size: 13px; flex: 0 0 auto; padding: 0; }
+/* And the expand comes down to the same size, so the corner reads as one
+   set of controls rather than one large button and three small ones. */
+.avatar-stage.inline .stage-grow { width: 28px; height: 28px;
+  min-height: 28px; font-size: 13px; }
+/* The three framing words, smaller. They are a choice you make once and
+   then stop looking at, and at full size they were the loudest thing on
+   the bottom edge of the frame. */
+.avatar-stage.inline .stage-shots { left: 8px; bottom: 8px; gap: 4px; }
+.avatar-stage.inline .stage-shots button {
+  padding: 2px 7px; font-size: 9px; min-height: 22px;
+}
+/* The wardrobe opens over the frame rather than beside the screen. */
+.avatar-stage.inline .wardrobe {
+  bottom: 48px; right: 8px; left: 8px; width: auto; max-height: 70%;
+}
+.avatar-stage.inline .stage-mark { top: 8px; left: 8px; font-size: 0.65rem;
+  padding: 2px 7px; }
+/* A window fills the screen; a screen closes. Different actions, so
+   different glyphs and different corners — the expand sits where the
+   video's does, and the red X belongs only to the takeover. */
+.stage-grow {
+  position: absolute; top: 8px; right: 8px; z-index: 62;
+  width: 30px; height: 30px; border-radius: 8px; padding: 0;
+  background: rgba(8,6,16,.72); border: 1px solid rgba(255,255,255,.22);
+  color: #fff; font-size: 14px; line-height: 1; cursor: pointer;
+}
+/* Face, upper torso, full body — the forge's own three words. */
+.stage-shots {
+  position: absolute; left: 8px; bottom: 10px; z-index: 62;
+  display: flex; gap: 5px; flex-wrap: wrap;
+}
+.stage-shots button {
+  background: rgba(8,6,16,.72); border: 1px solid rgba(255,255,255,.22);
+  color: #e7e3f6; border-radius: 999px; padding: 3px 9px; font-size: 10px;
+  cursor: pointer;
+}
+.stage-shots button.lit {
+  border-color: var(--brand); color: #fff;
+  background: linear-gradient(180deg, var(--brand2), var(--brand));
+}
+
+/* ---- The rail and the stage ---------------------------------------------
+ *
+ *     asked     can every seat show its format
+ *     mattered  can you SEE the one that matters
+ *
+ * The room was a grid, and every seat carried its own box: its own film,
+ * its own avatar, its own controls. That reads as a wall of small windows
+ * and it gets worse with every person who walks in — at eight seats there
+ * was nothing on the screen big enough to look at, which is the shape of
+ * the complaint.
+ *
+ * A room does not work that way. You look at whoever is talking, and you
+ * keep half an eye on who else is there. So: one frame, holding the turn,
+ * and a rail of faces beside it. The rail is still the same `.room-scene`
+ * grid with the same 179px tiles — nothing about a seat changed. It just
+ * stopped being the only thing on the screen. */
+
+/* The format switch, and the sentence under it. Wrapping, because three
+   formats plus three framings plus a sentence do not fit a phone's width
+   and a control that runs off the edge is a control nobody presses. */
+.rs-formats {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  margin: 0 0 10px;
+}
+.rs-format {
+  background: rgba(255,255,255,.05); border: 1px solid var(--line);
+  color: var(--t2); border-radius: 999px; padding: 5px 13px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: border-color .18s, background .18s, color .18s;
+}
+.rs-format:hover { color: var(--txt); border-color: var(--brand); }
+.rs-format.lit {
+  border-color: var(--brand); color: #fff;
+  background: linear-gradient(180deg, var(--brand2), var(--brand));
+}
+.rs-format.small { padding: 3px 10px; font-size: 11px; }
+/* The framings sit apart from the formats — they are a choice INSIDE the
+   avatar format, not a fourth format. A hairline says so without a word. */
+.rs-framing {
+  display: flex; gap: 5px; flex-wrap: wrap;
+  padding-left: 8px; margin-left: 2px;
+  border-left: 1px solid var(--line);
+}
+/* "this is your screen." It takes its own line whenever there is room for
+   one, because a note wedged between two buttons reads as a label for the
+   button beside it. */
+.rs-formats-note { flex: 1 1 100%; margin: 0; }
+
+/* The frame that holds the turn. */
+.room-focus {
+  display: flex; flex-direction: column; min-height: 0;
+  background: rgba(10,7,26,.72); border: 1px solid var(--line);
+  border-radius: 18px; overflow: hidden;
+  transition: border-color .2s, box-shadow .2s;
+}
+/* Green, and the same green the tile wears — the light follows the voice,
+   and it has to be the SAME light in both places or the rail and the frame
+   look like they are reporting on two different rooms. */
+.room-focus.talking {
+  border-color: var(--green);
+  box-shadow: 0 0 0 1px var(--green), 0 0 22px rgba(123,196,127,.22);
+}
+.rf-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 9px 13px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.rf-who { font-weight: 700; font-size: 14px; color: var(--txt); }
+.rf-sub { margin: 1px 0 0; }
+.rf-ai {
+  flex: 0 0 auto; font-size: 10px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; color: var(--brand2);
+  background: rgba(123,92,255,.14); border: 1px solid rgba(123,92,255,.35);
+  border-radius: 999px; padding: 2px 8px;
+}
+/* Whatever the format put in the frame gets the whole frame. */
+.room-focus > :not(.rf-head) { flex: 1 1 auto; min-height: 0; }
+
+/* The photograph road: the still, big, and nothing else. An audio turn has
+   no second thing to show, and a small circle floated in a large dark box
+   is a frame apologising for being empty. */
+.rf-voice {
+  display: flex; flex-direction: column; gap: 8px;
+  align-items: center; justify-content: center;
+  background: rgba(0,0,0,.35); aspect-ratio: 4 / 3; overflow: hidden;
+}
+/* A circle on a dark ground, not a photograph stretched to the corners.
+   Full-bleed was tried: the AI mark burned into the picture's own pixels
+   scaled up with it and arrived the size of a poster. */
+.rf-orb {
+  width: min(42%, 210px); aspect-ratio: 1 / 1; border-radius: 50%;
+  overflow: hidden; display: grid; place-items: center;
+  background: rgba(255,255,255,.05);
+  border: 2px solid rgba(255,255,255,.16);
+}
+.room-focus.talking .rf-orb {
+  border-color: var(--green);
+  box-shadow: 0 0 18px rgba(123,196,127,.35);
+}
+.rf-orb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rf-none { font-size: 64px; opacity: .3; line-height: 1; }
+
+/* Windows: the rail down the left, the frame taking the rest.
+ *
+ * 250px because that is two 128px tiles and the 10px gutter the scene grid
+ * was already drawing — the rail is not a new size, it is the size the
+ * seats already were, in two columns instead of six. */
+@media (min-width: 720px) {
+  .screen.room-place > .card.room-stage {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    align-content: start;
+    gap: 0 12px;
+  }
+  /* Everything that is not the rail or the frame runs the full width:
+     the switch above, the strip below, the way into the headset. */
+  .screen.room-place > .card.room-stage > * { grid-column: 1 / -1; }
+  .screen.room-place > .card.room-stage > .rs-chatstrip,
+  .screen.room-place > .card.room-stage > .rs-voicebar {
+    grid-row: 3; margin-top: 10px;
+  }
+}
+
+/* Phones: the frame first, the rail under it as a row you push sideways.
+ *
+ * `order` and not a second markup path — the same component draws both, and
+ * a phone that gets its own JSX is a phone that gets its own bugs. */
+@media (max-width: 719px) {
+  /* The frame comes first on a phone — and the line across the top
+     comes before IT.
+   *
+   *     asked     put the frame above the seats on a phone
+   *     mattered  above the seats, not above everything
+   *
+   * `order: -1` lifted the frame over every sibling in the card,
+   * including the room's own header, so the room name painted across the
+   * framing chips: visible, enabled, and refusing every press because
+   * the heading was on top of them. Measured, not guessed —
+   * `elementFromPoint` at the middle of the chip came back `.rs-roomname`.
+   *
+   * The bar is ordered ahead of it rather than the frame being ordered
+   * back, so the seats stay below both. */
+  .screen.room-place > .card.room-stage > .rs-bar { order: -2; }
+  /* Who is here first, then what this turn looks like.
+   *
+   *     asked     the user and profile frames go at the top, and the
+   *               avatar or video below them
+   *     mattered  the frame is in the markup FIRST, so ordering it back
+   *               is not enough — the seats have to be ordered forward
+   *
+   * `.room-focus` used to carry `order: -1`, which put the figure above
+   * everything and left the seats under it. The room is the people in
+   * it; the figure is what one of them is doing this turn, and it reads
+   * that way round. The bar stays ahead of both at -2. */
+  .screen.room-place > .card.room-stage > .room-scene { order: -1; }
+  /* The rail is the same rail here. It used to be a sideways strip of
+     118px tiles — a second layout for the same list, which is how the
+     tile rules written for the rail landed on a grid that was never
+     going to hold them: portraits over their own boxes, roles floating
+     across neighbours, nothing lining up with anything. One rail, both
+     widths, and only the numbers change. */
+  .screen.room-place > .card.room-stage > .room-scene { margin-top: 0; }
+  /* And the figure sits under them rather than over them. */
+  .screen.room-place > .card.room-stage > .room-focus { margin-top: 10px; }
+  /* Who gets the height, when there is not enough for both.
+   *
+   *     asked     the box that says "this turn, as a figure" only half
+   *               shows, and the expandable button can't be reached
+   *     mattered  the card is a fixed-height column that HIDES its
+   *               overflow, so anything squeezed out is not scrolled to
+   *               — it is gone
+   *
+   * Measured on the phone lane: `.card.room-stage` is 860px tall with
+   * `overflow: hidden`, and `.room-scene` takes `flex: 1 1 auto` and
+   * eats 502 of it (its own scrollHeight 542, so the rail was already
+   * scrolling inside itself). The figure card got the remainder and its
+   * bottom — the framing chips and the lower half of the rail — fell
+   * outside a box with nowhere to scroll.
+   *
+   * So the seats take a bounded share and scroll inside it, which they
+   * were doing anyway; the figure takes its own height and is never
+   * shrunk; and the card scrolls if the two still do not fit, because a
+   * control you cannot reach is worse than a scrollbar. */
+  .screen.room-place > .card.room-stage { overflow-y: auto; }
+  .screen.room-place > .card.room-stage > .room-scene {
+    flex: 0 1 auto; max-height: 46%;
+  }
+  .screen.room-place > .card.room-stage > .room-focus { flex: 0 0 auto; }
+  /* The seat's own size is set further down the file — see the note by
+     the 128px block, which has to come AFTER the plain rules it
+     overrides because a media query adds no specificity. */
+}
+
+/* While the frame is full-screen, the room stops painting underneath it.
+ *
+ *     asked     does the frame cover the room
+ *     mattered  does the ROOM know it is covered
+ *
+ * A takeover the room paints through is not a takeover: the card's own
+ * border and ground kept drawing round the edges of a full-screen film,
+ * and the light on a talking tile still glowed through it. */
+.rs-behind-film {
+  background: transparent; border-color: transparent; box-shadow: none;
+}
+.rs-behind-film > :not(.room-focus) { visibility: hidden; }
+
+/* ---- The rail tile: one face, and the roads beside it -------------------
+ *
+ *     asked     can a seat reach its avatar and its film
+ *     mattered  can it do that in a 250px rail
+ *
+ * The tile drew two equal captioned circles — "Audio" and "Avatar" — side
+ * by side. That was right at full width and fell apart the moment the
+ * seats became a rail: two circles, two captions and a name inside a
+ * quarter of the old width, so the second caption clipped to "Avata" and
+ * the tile read as a mistake. Photographed on a phone and sent back with
+ * four words: "I don't like the way it looks."
+ *
+ * A person is ONE face. The formats are things you can DO with them, and
+ * things you can do belong beside the face rather than competing with it
+ * for the middle of the tile.
+ */
+.rs-circle-btn.rs-solo { flex: 0 0 auto; width: 84px; max-width: 78%; }
+.rs-circle-btn.rs-solo .rs-photo {
+  width: 100%; height: auto; aspect-ratio: 1 / 1;
+  border-radius: 50%; object-fit: cover; display: block;
+}
+
+/* The two roads, BESIDE the face — not under it, not over it.
+ *
+ * Held against the drawing that settled it: the portrait keeps the left
+ * of the tile and the two glyphs stack down its right, level with it.
+ * Name and role run underneath, across the whole tile. Nothing is
+ * captioned, because a glyph that needs a word under it is the wrong
+ * glyph.
+ *
+ * Absolute rather than a grid column: the tile has a dozen conditional
+ * children — badges, hints, camera controls, the sit-out — and turning
+ * it into a grid would scatter every one of them. Taking these two out
+ * of the flow changes nothing else, and a tile with roads and a tile
+ * without them stay the same height, so the rail is a rail and not a
+ * staircase.
+ */
+/* `.rs-tile >` is not decoration. `.rs-tile > *:not(.rs-behind)` further
+   up pins every direct child to `position: relative`, and at (0,2,0) it
+   out-specifies a bare `.rs-side` however far down the file it sits — so
+   the roads stayed in the flow, stacked under the name, and the first
+   render of this looked nothing like the drawing. Matching its
+   specificity and coming later is what actually moves them. */
+.rs-tile > .rs-side {
+  position: absolute; top: 14px; right: 9px; z-index: 3;
+  display: flex; flex-direction: column; gap: 7px;
+}
+/* Bare glyphs. "Not so dark" — so no box, no border, no panel-coloured
+   ground for them to disappear into. The picture IS the button, drawn
+   big enough to press with a thumb and to read at a glance. */
+/* Four roads up and down, in the lane that already held two.
+ *
+ *     asked     VR and AR become a glyph next to video and avatar,
+ *               straight up and down
+ *     mattered  nothing else may move
+ *
+ * The tile reserves a lane (`padding-right`) for this column and places
+ * it from the tile's own middle. Both stay exactly as they were — the
+ * only thing that gives is the size of a glyph, because four at 48 need
+ * 213px of a 203px tile and four at 32 need 149. */
+.rs-tile > .rs-side > .rs-road {
+  width: 32px; height: 32px; padding: 0; border-radius: 10px;
+  display: grid; place-items: center;
+  font-size: 23px; line-height: 1; cursor: pointer;
+  background: none; border: none;
+  transition: transform .12s;
+}
+/* AR and VR are letters in a ring. A ring rather than a filled pill:
+   the two roads above them are bare glyphs on the tile's own ground, and
+   a solid shape between them would read as the only real button of the
+   four. */
+.rs-tile > .rs-side > .rs-road > .rs-tag {
+  display: grid; place-items: center;
+  width: 84%; height: 84%; box-sizing: border-box;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  font-size: 10px; font-weight: 800; letter-spacing: .2px;
+  line-height: 1; font-family: inherit;
+}
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile
+  > .rs-side > .rs-road > .rs-tag { font-size: 12px; }
+.rs-tile > .rs-side > .rs-road:hover {
+  transform: translateY(-1px) scale(1.08);
+}
+/* Pressed means "this seat is in the frame, in this format", and it
+   stays lit until pressed again — a control that lights for a moment and
+   goes out has not told you what is on screen. A ring, not a fill: the
+   glyph has to keep its own colours to stay legible. */
+.rs-tile > .rs-side > .rs-road.lit {
+  background: rgba(123,92,255,.22);
+  box-shadow: 0 0 0 2px var(--brand2), 0 3px 12px rgba(123,92,255,.45);
+}
+@media (max-width: 719px) {
+  /* On the phone the rail is a row of narrow tiles, so the roads tuck in
+     and the face keeps the middle. */
+  .rs-tile > .rs-side > .rs-road {
+    width: 28px; height: 28px; font-size: 20px;
+    min-height: 28px; border-radius: 9px; }
+  /* No `width: 58px` on the portrait here.
+   *
+   *     asked     does the phone need smaller faces
+   *     mattered  smaller than WHAT
+   *
+   * It was written when the phone drew a sideways strip of 118px tiles,
+   * where 58px was the whole tile. The strip is gone and the rule
+   * outlived it — so on a phone a profile's face came out a third the
+   * size of the person's own face and of the empty seat's silhouette,
+   * in boxes that are all exactly the same size. Circled in red on a
+   * screenshot, and rightly.
+   *
+   * The box does not change with the width, so the face in it does not
+   * either. */
+}
+
+/* ---- The empty seat, and what a seat says about itself ------------------- */
+
+/* The role, under the name. Small and quiet: the name is who, this is
+   what for, and a room of specialists where nobody says what they
+   specialise in makes the reader open three profiles to find out. */
+.rs-role {
+  display: block; font-size: 11px; line-height: 1.3;
+  color: var(--t3); margin-top: 1px;
+}
+/* The field sits under the name, not adrift between it and the glyphs.
+   The seats carry a 5px gap between everything in them, which reads as
+   an even column of four unrelated things; the name and what somebody
+   is here FOR are one thing, and they are spaced like it. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-role {
+  margin-top: -3px;
+  /* Two lines' worth, whether the field needs two or one.
+   *
+   *     asked     bring the glyphs on the first three seats down to
+   *               match the fourth, so there is room for two lines
+   *     mattered  a row of seats where the glyphs sit at four different
+   *               heights reads as four different components
+   *
+   * "Mental health" wraps and "Technology" does not, so the roads under
+   * them landed at different heights across one row. The field keeps
+   * room for two lines either way — 2.6em is two lines at the 1.3
+   * line-height it is set in — so every seat's glyphs sit on the same
+   * line and a longer field pushes nothing. */
+  min-height: 2.6em;
+}
+.rs-tile.talking .rs-role { color: var(--t2); }
+
+/* The empty chair.
+ *
+ *     asked     who is in this room
+ *     mattered  how does anybody ELSE get in
+ *
+ * A blank silhouette wearing a plus, drawn as a SEAT rather than as a
+ * button somewhere else on the screen — because "who else could be here"
+ * is asked while looking at who is, and the answer belongs in the same
+ * column of faces. Not a bare +: an empty chair reads as an empty chair,
+ * and a floating plus reads as a control for whatever it happens to be
+ * sitting next to.
+ *
+ * Dashed, because a seat nobody is in should not look like a seat
+ * somebody is in. */
+.rs-empty {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px; justify-content: center; text-align: center;
+  background: rgba(255,255,255,.02);
+  border: 1px dashed rgba(255,255,255,.20);
+  border-radius: 16px; padding: 12px 8px; position: relative;
+  color: var(--t2); cursor: pointer;
+  transition: border-color .18s, background .18s, color .18s;
+}
+.rs-empty:hover {
+  border-color: var(--brand2); color: var(--txt);
+  background: rgba(123,92,255,.09);
+}
+.rs-blank {
+  position: relative; width: 84px; height: 84px; max-width: 62%;
+  display: grid; place-items: center;
+  border-radius: 50%; background: rgba(255,255,255,.05);
+  border: 1px dashed rgba(255,255,255,.22);
+}
+.rs-blank-face { font-size: 38px; line-height: 1; filter: grayscale(1);
+  opacity: .55; }
+/* The plus rides ON the silhouette rather than beside it, so the two read
+   as one idea — an empty person, and the way to fill them in. */
+.rs-blank-plus {
+  position: absolute; right: -2px; bottom: -2px;
+  width: 26px; height: 26px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 17px; font-weight: 700; line-height: 1; color: #fff;
+  background: linear-gradient(180deg, var(--brand2), var(--brand));
+  border: 2px solid var(--card);
+}
+.rs-empty .rs-name { color: inherit; }
+@media (max-width: 719px) {
+  .rs-blank { width: 58px; height: 58px; }
+  .rs-blank-face { font-size: 27px; }
+  .rs-blank-plus { width: 20px; height: 20px; font-size: 13px; }
+}
+
+/* ---- The rail, finished --------------------------------------------------
+ *
+ * Three corrections held against the drawing, each one a thing the rail
+ * got wrong on the way here.
+ */
+
+/* Round, not rounded. The portrait carries `border-radius: 50%` from its
+   base rule, and the rail's own sizing rule was more specific — so the
+   faces came back as rounded squares. */
+.screen.room-place > .card.room-stage > .room-scene
+  > .rs-tile > .rs-circle-btn.rs-solo .rs-photo {
+  border-radius: 50%;
+}
+
+/* Your own seat is a seat like the others.
+ *
+ *     asked     what is on my own tile
+ *     mattered  does my tile still LOOK like a tile
+ *
+ * The own-seat tile carries a sit-out button, a settings gear, a leave
+ * cross and the camera controls. In a wide grid of 179px squares there
+ * was room for all of it. In a rail box that shrinks with the room there
+ * is not, and it spilled over the neighbours — so in the rail those
+ * controls stand down.
+ *
+ * They are not deleted and they have not moved house: the room's own
+ * strip along the bottom carries the camera, the microphone and the way
+ * out, which is where a person reaches for them anyway. What the tile
+ * keeps is what every other tile has — a face, a name, and what they are
+ * here for. */
+.screen.room-place > .card.room-stage > .room-scene .rs-sitout,
+.screen.room-place > .card.room-stage > .room-scene .rs-controls,
+.screen.room-place > .card.room-stage > .room-scene .rs-hint,
+.screen.room-place > .card.room-stage > .room-scene .rs-worn,
+/* The old avatar ring, too. It was the door to the figure back when a
+   seat had no other one; the two roads beside the face are that door
+   now, and leaving both drew an empty rounded box around the role. */
+.screen.room-place > .card.room-stage > .room-scene .rs-avring {
+  display: none;
+}
+
+/* And the gear goes back off the seat.
+ *
+ *     asked     there's a settings button showing up on my photo
+ *     mattered  it was insurance against a gesture that now works
+ *
+ * It was put back one release ago for a real reason: the double tap and
+ * the long press were BOTH dead on iOS, so this was the only remaining
+ * way to reach the camera, the background and the mask from a phone —
+ * "a control nobody can see is a control nobody has".
+ *
+ * That reason is spent. Both gestures were fixed and are driven by a
+ * touch pointer in the tests: two taps open the panel, two more close
+ * it, a hold opens it. A third door earns its place on the tile only
+ * while the first two are shut, and it does not get to sit on somebody's
+ * face for a fault that no longer exists. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-gear {
+  display: none;
+}
+
+/* And the browser stops taking the press away.
+ *
+ * `touch-action: manipulation` turns off double-tap-to-zoom, which is
+ * what Safari was spending the second tap on, and the callout rules stop
+ * a long press on the photograph raising iOS's own copy-and-save sheet —
+ * which cancelled the pointer stream before the 550ms hold could fire.
+ * Between them the two gestures the seat is documented to have both
+ * reach the handler. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile.rs-camtile {
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ---- The rail's cards, at every width ----------------------------------
+ *
+ * Lifted out of the desktop-only block. They were written for the rail
+ * and applied only above 720px, while a phone kept a sideways strip of
+ * 118px tiles — so on a phone the absolute glyph column, the percentage
+ * portrait and the shrink-to-fit boxes all landed on a layout none of
+ * them were written for. Photographed and sent back: "everything's not
+ * aligned."
+ *
+ * One rail. Only the numbers change with the width.
+ */
+/* ONE column, not two.
+ *
+ *     asked     how many faces fit across the rail
+ *     mattered  does a whole tile fit across the rail
+ *
+ * Two columns of a 250px rail is a 119px tile, and a 84px face beside
+ * two 28px controls does not fit in 119px — so the roads climbed onto
+ * the portrait. Read off the drawing that settled the tile: the faces
+ * are stacked, each one full rail width, the picture on the left and
+ * its two roads level with it on the right. A rail is a list of who is
+ * here. It was never supposed to be a small grid. */
+.screen.room-place > .card.room-stage > .room-scene {
+  grid-column: 1; grid-row: 2;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start; overflow-y: auto; min-height: 0;
+  margin: 0;
+}
+/* And the tile is as tall as what is in it. The 179px floor was set
+   when a tile was a cell in a grid of equal squares; in a rail it just
+   leaves a hole under every name. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile,
+.screen.room-place > .card.room-stage > .room-scene > .rs-empty {
+  /* `grid-auto-rows: 1fr` on the scene made every row an equal share of
+     the rail's height, which in a two-row grid is half the rail per
+     tile whatever is in it — hence the acre of empty ground under each
+     name. `auto` lets a tile be as tall as its own contents. */
+  min-height: 0;
+  /* And a lane for the roads. They are out of the flow, so without this
+     the portrait centres under them and the glyphs sit on the picture. */
+  padding-right: 44px;
+}
+/* Three standard boxes, and they shrink at the fourth.
+ *
+ *     asked     how many faces does the rail hold
+ *     mattered  what happens at the fourth
+ *
+ * The rule, in the owner's words: "standard framing size is three, so
+ * you'll always have two occupied, the third could be just a plus
+ * button... anything after three, the boxes start to shrink."
+ *
+ * Flex rather than grid rows, because that is exactly what `flex: 1 1
+ * 0` with a `max-height` says: share the rail equally, and never grow
+ * past the standard box. One, two or three boxes sit at 164px and the
+ * rail simply has room under them; the fourth pushes every box down
+ * together, so eight seats still fit the same rail with no scrollbar
+ * and no seat off the bottom. */
+.screen.room-place > .card.room-stage > .room-scene {
+  grid-column: 1; grid-row: 2;
+}
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile,
+.screen.room-place > .card.room-stage > .room-scene > .rs-empty {
+  /* One size, and it does not change.
+   *
+   *     asked     what happens when a fourth person arrives
+   *     mattered  what happens to the three already there
+   *
+   * The boxes shrank to fit, which turned three people into three
+   * different sizes of person the moment a fourth walked in — and took
+   * the faces down past the point of being faces: "you can't even see
+   * the faces any more." The size in the drawing was right to begin
+   * with. A box is a box now; the fourth sits below the third at the
+   * same size and the rail scrolls.
+   *
+   * Everything sits on the box's own centre line — the face, the name,
+   * the field, and on the empty seat the silhouette with its plus. That
+   * is the horizontal centre line only: down the box the contents pack
+   * from the top, because the marks are drawn a fixed distance down the
+   * tile and centring moves the face they are drawn over. */
+  flex: 0 0 auto; height: 172px; overflow: hidden;
+  display: flex; flex-direction: column; gap: 3px;
+  align-items: center; justify-content: flex-start; text-align: center;
+  padding: 10px 8px;
+}
+/* A face at the size a face is looked at.
+ *
+ * It was a percentage of the box, which tracked the box down as it
+ * shrank and left two people as dots. The box holds still now, so the
+ * circle can simply be the size it ought to be. */
+.screen.room-place > .card.room-stage > .room-scene
+  > .rs-tile > .rs-circle-btn.rs-solo,
+.screen.room-place > .card.room-stage > .room-scene
+  > .rs-empty > .rs-blank {
+  flex: 0 0 auto; width: 112px; height: 112px;
+  max-width: none; min-height: 0; aspect-ratio: 1 / 1;
+}
+.screen.room-place > .card.room-stage > .room-scene
+  > .rs-tile > .rs-circle-btn.rs-solo .rs-photo {
+  width: 100%; height: 100%;
+}
+/* The name and the role never shrink — they are the two things the
+   rail exists to say. */
+.screen.room-place > .card.room-stage > .room-scene .rs-name,
+.screen.room-place > .card.room-stage > .room-scene .rs-role {
+  flex: 0 0 auto;
+}
+
+/* Where the height goes, on a phone.
+ *
+ *     asked     shrink the composer, kill the empty bands above and
+ *               below it, and let me see three seats without scrolling
+ *     mattered  every band was somebody's fix, so none of them could
+ *               simply be deleted
+ *
+ * Measured in the room rather than guessed at. The card is a fixed 860px
+ * flex column and the four bands inside it were taking:
+ *
+ *     bar        26   seats 194   figure 329   strip 209   dead 63
+ *
+ * The seats got the least of anything and showed one and a half rows of
+ * faces, which is the report: two frames and a third with the plus,
+ * without scrolling.
+ *
+ * The empty band above the composer is `.rs-chatlog`, and it is empty on
+ * purpose — `flex: 0 0 135px` is a FIXED reserve so the strip below it
+ * does not travel down the page as the conversation grows. That was its
+ * own field report ("the buttons at the bottom I have circled disappear
+ * mid conversation"), so the band cannot be removed, only made smaller:
+ * three rows of reserve instead of five. The strip still never moves.
+ *
+ * The dead 63px at the bottom was the card's leftover, and leftover is
+ * exactly what the seats wanted. `flex: 1 1 auto` with a floor of two
+ * rows hands it to them instead of leaving it blank. */
+@media (max-width: 719px) {
+  /* Two rows of seats, floored, and the leftover on top of that. 128px
+     a tile plus the 8px gap. */
+  .screen.room-place > .card.room-stage > .room-scene {
+    /* The seats take the slack and give it back — no floor.
+     *
+     *     asked     the type bar and send button are cut off at the
+     *               bottom, at four people and at two
+     *     mattered  a floor under the seats is a ceiling over the
+     *               composer
+     *
+     * `min-height: 280px` here meant the rail could not shrink, so once
+     * the bar, the frame and the strip wanted more than the card had,
+     * the only thing left to give was the bottom of the card — and the
+     * bottom of the card is where you type. The composer is the one
+     * control that must always be reachable; the seats already scroll
+     * inside themselves, so they are the right thing to yield.
+     *
+     * `flex: 1 1 auto` with a basis of content: the rail sizes to its
+     * tiles, grows into whatever the frame gives back, and shrinks
+     * first when the room is tight. */
+    flex: 1 1 auto; min-height: 0; max-height: none;
+  }
+  /* And the composer never shrinks or scrolls away. It is `flex: 0 0
+     auto` already; this says so where the reason lives. */
+  .screen.room-place > .card.room-stage > .rs-chatstrip {
+    flex: 0 0 auto;
+  }
+  /* The frame gives some back too, and its rule lives further down the
+     file with the other `.avatar-stage.inline` sizing — a media query
+     adds no specificity, so it has to come AFTER the plain rule it
+     overrides, not here. */
+  /* Three rows of reserve, not five. 54px back, and the strip is still
+     nailed in place. */
+  .screen.room-place .rs-chatlog { flex: 0 0 81px; height: 81px; }
+  /* The composer and its row of five, smaller. */
+  .screen.room-place .rs-chatpill { padding: 2px 6px; }
+  .screen.room-place .rs-chatpill input { font-size: 16px; }
+  .screen.room-place .rs-strip { padding: 2px 0 0; gap: 6px; }
+  .screen.room-place .rs-round {
+    width: 30px; height: 30px; min-height: 30px; font-size: 13px;
+  }
+}
+
+/* Smaller boxes on a phone.
+ *
+ *     asked     these look way too big of the user frames
+ *     mattered  where the smaller number has to be WRITTEN
+ *
+ * This lived up in the phone block with the ordering rules, which is
+ * where it belongs by subject and the wrong place by cascade: a media
+ * query adds no specificity, and the 172px and 112px above are the same
+ * selectors later in the file, so they won on source order and the seats
+ * never shrank. The guard in `test_a_media_query_adds_no_specificity`
+ * caught it; the screenshot did not, because the rail's own height cap
+ * made the seats look smaller anyway.
+ *
+ * So it sits here, after the rules it overrides. A seat on a phone is a
+ * face and a name, and 172px of box around a 112px face spends a third
+ * of the screen saying so. The marks follow the face down on their own,
+ * because they are fractions of `--face`. */
+@media (max-width: 719px) {
+  .screen.room-place > .card.room-stage > .room-scene > .rs-tile,
+  .screen.room-place > .card.room-stage > .room-scene > .rs-empty {
+    height: 128px; padding: 8px 6px; padding-right: 40px;
+  }
+  .screen.room-place > .card.room-stage > .room-scene
+    > .rs-tile > .rs-circle-btn.rs-solo,
+  .screen.room-place > .card.room-stage > .room-scene
+    > .rs-empty > .rs-blank {
+    width: 84px; height: 84px;
+  }
+}
+.screen.room-place > .card.room-stage > .room-focus {
+  grid-column: 2; grid-row: 2; min-height: 0;
+}
+
+/* The AI mark, back in its corner.
+ *
+ * `.rs-ai` declares `position: absolute; top: 8px; left: 8px` — and
+ * `.rs-tile > *:not(.rs-behind)` pins every direct child to `relative`
+ * at (0,2,0), so on a shrunk card the mark sat in the flow under the
+ * role and was clipped in half. The third rule in this file to lose to
+ * that selector, and the last: matching its shape is what makes an
+ * absolute child of a tile actually absolute. */
+.rs-tile > .rs-ai {
+  position: absolute; top: 7px; left: 7px; z-index: 3;
+}
+/* Round, and round on every road into the tile. The profile seats draw
+   their portrait through `.rs-circle-btn`, a person's own draws it
+   directly, and only one of the two was coming out a circle. */
+.screen.room-place > .card.room-stage > .room-scene .rs-photo,
+.screen.room-place > .card.room-stage > .room-scene .rs-face {
+  border-radius: 50%;
+}
+
+/* The AI mark, back in its corner.
+ *
+ * `.rs-ai` declares `position: absolute; top: 8px; left: 8px` — and
+ * `.rs-tile > *:not(.rs-behind)` pins every direct child to `relative`
+ * at (0,2,0), so the mark sat in the flow under the role and was clipped
+ * by the box. The third rule here to lose to that selector, and the
+ * last: matching its shape is what makes an absolute child of a tile
+ * actually absolute. */
+.rs-tile > .rs-ai { position: absolute; top: 7px; left: 7px; z-index: 3; }
+
+/* Round, and round by every road into the tile. Profile seats draw their
+   portrait through `.rs-circle-btn`, a person's own draws it directly,
+   and only one of the two was coming out a circle. */
+.screen.room-place > .card.room-stage > .room-scene .rs-photo,
+.screen.room-place > .card.room-stage > .room-scene .rs-face {
+  border-radius: 50%;
+}
+
+/* Everything in a box sits on the box's own centre line — the face, the
+   name, the field, and on the empty seat the silhouette and its plus.
+   Said plainly because it was not true: the silhouette carried its plus
+   off to one side and the text under it lined up with neither. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile,
+.screen.room-place > .card.room-stage > .room-scene > .rs-empty {
+  display: flex; flex-direction: column;
+  align-items: center;
+  /* From the top, not from the middle.
+   *
+   *     asked     the AI badge draws twice on the starter portraits
+   *     mattered  the badge is placed a fixed distance down the TILE
+   *
+   * `--face-top` is one number for every seat, so it is only right if
+   * every seat's face starts at the same height. Centred, it does not:
+   * a grid stretches the tiles in a row to the tallest of them, and the
+   * leftover is split above and below whatever is inside. A seat whose
+   * field wraps to two lines has less leftover than one whose does not,
+   * so its face rides up — measured at 9px on two seats and 16.1 on two
+   * others in the same row, which put the drawn mark up to seven pixels
+   * above the one burned into the file and showed both.
+   *
+   * Pinned to the top, the face begins at the border plus the padding on
+   * every seat in every row, which is a number the marks can be written
+   * against. */
+  justify-content: flex-start;
+  text-align: center; gap: 5px;
+}
+.rs-empty .rs-blank { margin: 0 auto; }
+
+/* The AI mark, back in its corner.
+ *
+ * `.rs-ai` declares `position: absolute; top: 8px; left: 8px` — and
+ * `.rs-tile > *:not(.rs-behind)` pins every direct child to `relative`
+ * at (0,2,0), so the mark sat in the flow under the field and was
+ * clipped by the box. The third rule in this file to lose to that
+ * selector, and the last: matching its shape is what makes an absolute
+ * child of a tile actually absolute. */
+.rs-tile > .rs-ai { position: absolute; top: 7px; left: 7px; z-index: 3; }
+
+/* Round, by every road into the tile. A profile seat draws its portrait
+   through `.rs-circle-btn`, a person's own draws it directly, and only
+   one of the two was coming out a circle. */
+.screen.room-place > .card.room-stage > .room-scene .rs-photo,
+.screen.room-place > .card.room-stage > .room-scene .rs-face {
+  border-radius: 50%;
+}
+
+/* Everything in a box sits on the box's own centre line: the face, the
+   name, the field, and on the empty seat the silhouette with its plus.
+   Said out loud because it was not true — the silhouette carried its
+   plus off to one side and the words under it lined up with neither. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile,
+.screen.room-place > .card.room-stage > .room-scene > .rs-empty {
+  display: flex; flex-direction: column;
+  align-items: center;
+  /* From the top, not from the middle.
+   *
+   *     asked     the AI badge draws twice on the starter portraits
+   *     mattered  the badge is placed a fixed distance down the TILE
+   *
+   * `--face-top` is one number for every seat, so it is only right if
+   * every seat's face starts at the same height. Centred, it does not:
+   * a grid stretches the tiles in a row to the tallest of them, and the
+   * leftover is split above and below whatever is inside. A seat whose
+   * field wraps to two lines has less leftover than one whose does not,
+   * so its face rides up — measured at 9px on two seats and 16.1 on two
+   * others in the same row, which put the drawn mark up to seven pixels
+   * above the one burned into the file and showed both.
+   *
+   * Pinned to the top, the face begins at the border plus the padding on
+   * every seat in every row, which is a number the marks can be written
+   * against. */
+  justify-content: flex-start;
+  text-align: center; gap: 5px;
+}
+.rs-empty .rs-blank { margin: 0 auto; }
+
+/* The AI mark, back in its corner.
+ *
+ * `.rs-ai` declares `position: absolute; top: 8px; left: 8px` — and
+ * `.rs-tile > *:not(.rs-behind)` pins every direct child to `relative`
+ * at (0,2,0), so the mark sat in the flow under the field and was
+ * clipped by the box. The third rule in this file to lose to that
+ * selector, and the last: matching its shape is what makes an absolute
+ * child of a tile actually absolute. */
+.rs-tile > .rs-ai { position: absolute; top: 7px; left: 7px; z-index: 3; }
+
+/* Round, by every road into the tile. A profile seat draws its portrait
+   through `.rs-circle-btn`, a person's own draws it directly, and only
+   one of the two was coming out a circle. */
+.screen.room-place > .card.room-stage > .room-scene .rs-photo,
+.screen.room-place > .card.room-stage > .room-scene .rs-face {
+  border-radius: 50%;
+}
+
+/* Everything in a box sits on the box's own centre line: the face, the
+   name, the field, and on the empty seat the silhouette with its plus.
+   Said out loud because it was not true — the silhouette carried its
+   plus off to one side and the words under it lined up with neither. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile,
+.screen.room-place > .card.room-stage > .room-scene > .rs-empty {
+  display: flex; flex-direction: column;
+  align-items: center;
+  /* From the top, not from the middle.
+   *
+   *     asked     the AI badge draws twice on the starter portraits
+   *     mattered  the badge is placed a fixed distance down the TILE
+   *
+   * `--face-top` is one number for every seat, so it is only right if
+   * every seat's face starts at the same height. Centred, it does not:
+   * a grid stretches the tiles in a row to the tallest of them, and the
+   * leftover is split above and below whatever is inside. A seat whose
+   * field wraps to two lines has less leftover than one whose does not,
+   * so its face rides up — measured at 9px on two seats and 16.1 on two
+   * others in the same row, which put the drawn mark up to seven pixels
+   * above the one burned into the file and showed both.
+   *
+   * Pinned to the top, the face begins at the border plus the padding on
+   * every seat in every row, which is a number the marks can be written
+   * against. */
+  justify-content: flex-start;
+  text-align: center; gap: 5px;
+}
+.rs-empty .rs-blank { margin: 0 auto; }
+
+/* ---- Last corrections against the drawing ------------------------------- */
+
+/* The two roads sit BESIDE the face, not against the far wall.
+ *
+ *     asked     where do the roads go
+ *     mattered  how far from the face
+ *
+ * Pinned to the tile's right edge they were fine while the box was wide
+ * and the portrait large. On a narrower box with a smaller portrait the
+ * same rule left a gulf of empty ground between the face and its own two
+ * controls: "look how far off the buttons are to the right — it should
+ * be pretty close to the profile photo."
+ *
+ * So they are placed off the CENTRE now, which is where the portrait
+ * is, rather than off an edge that moves independently of it. Half the
+ * portrait plus a small gap: they land against the circle at any box
+ * width, and the face keeps the middle by being nudged the same distance
+ * the other way. */
+/* A lane for the roads, not a nudge on the face.
+ *
+ *     asked     move the photo left
+ *     mattered  move what is UNDER it left too
+ *
+ * The face was shifted with a negative margin, which moved the face and
+ * nothing else: the name and the field stayed centred on the box, so the
+ * three of them no longer sat on one line. Held up zoomed in — "the
+ * centering of the name and profession is not under the profile photo
+ * directly like it should be."
+ *
+ * A lane on the right does the same job honestly. The column's own
+ * centre moves left by half the lane, and everything in the column —
+ * face, name, field — moves with it, because they were always centred on
+ * the same thing. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile {
+  padding-right: 76px;
+}
+.rs-tile > .rs-side {
+  top: 50%; right: 9px; left: auto;
+  transform: translateY(-50%);
+}
+.screen.room-place > .card.room-stage > .room-scene
+  > .rs-tile > .rs-circle-btn.rs-solo {
+  margin-left: 0;
+}
+
+/* The AI mark, back in its corner. `.rs-ai` declares its own
+   `position: absolute`, and `.rs-tile > *:not(.rs-behind)` pins every
+   direct child to `relative` at (0,2,0) — so the mark sat in the flow
+   under the field and was clipped by the box. The third rule in this
+   file to lose to that selector, and the last. */
+.rs-tile > .rs-ai { position: absolute; top: 7px; left: 7px; z-index: 3; }
+
+/* Round, by every road into the tile. A profile seat draws its portrait
+   through `.rs-circle-btn`, a person's own draws it directly, and only
+   one of the two was coming out a circle. */
+.screen.room-place > .card.room-stage > .room-scene .rs-photo,
+.screen.room-place > .card.room-stage > .room-scene .rs-face {
+  border-radius: 50%;
+}
+
+/* The portrait is a picture, not a button that happens to hold one.
+ *
+ * `.card button:not(.primary)` paints a bordered, rounded-rectangle
+ * ground on every button inside a card, at (0,3,0). So a circular photo
+ * arrived sitting inside a visible rounded square, and the seat read as
+ * a badge rather than a face. The second control in this rail to lose to
+ * that same selector. */
+.screen.room-place > .card.room-stage > .room-scene .rs-circle-btn {
+  background: none; border: none; padding: 0; border-radius: 50%;
+}
+/* The mic-off dot, off the rail. It is a status mark for a seat that is
+   not speaking, and on a box this size it read as a control somebody had
+   left switched on — a red circle under a person's own name. The room's
+   own strip along the bottom already says whether your microphone is
+   open, and says it where the microphone is. */
+.screen.room-place > .card.room-stage > .room-scene .rs-mark {
+  display: none;
+}
+
+/* ---- The line across the top of the room ---------------------------------
+ *
+ *     asked     where does a person choose the format
+ *     mattered  where does a person LOOK to know it
+ *
+ * There were three chips, three more chips and a sentence stacked above
+ * the rail. Four rows of furniture on top of a room, and the drawing
+ * this is held against has none of it: one line, and a pill on the right
+ * saying what you are looking at.
+ *
+ * The pill reports; it does not switch. The switch is the two glyphs on
+ * each seat — "show me THEM, like this" is one press about one person,
+ * where three chips were a mode change about nobody.
+ */
+.rs-bar {
+  display: flex; align-items: center; gap: 8px;
+  margin: 0 0 12px; min-height: 26px;
+}
+.rs-live {
+  width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto;
+  background: var(--green); box-shadow: 0 0 8px rgba(123,196,127,.7);
+}
+.rs-roomname { font-size: 16px; color: var(--txt); }
+.rs-count { font-size: 15px; color: var(--t2); }
+/* Pushed to the far right by the gap the name and count leave behind. */
+.rs-mode {
+  margin-left: auto; flex: 0 0 auto;
+  font-size: 12px; color: var(--t2);
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 5px 13px; white-space: nowrap;
+}
+@media (max-width: 719px) {
+  .rs-bar { flex-wrap: wrap; gap: 6px; }
+  .rs-roomname { font-size: 15px; }
+  .rs-count { font-size: 13px; }
+  .rs-mode { font-size: 11px; padding: 4px 10px; }
+}
+
+/* ---- The drawing's own marks --------------------------------------------- */
+
+/* SPEAKING, on the seat whose voice is in the air. The card already
+   wears the green ring; the word is for a reader who cannot take meaning
+   from a colour, and for a glance that has not settled yet. */
+.rs-saying {
+  position: absolute; top: 7px; right: 7px; z-index: 3;
+  font-size: 9px; font-weight: 800; letter-spacing: .07em;
+  text-transform: uppercase; color: #0f2a12;
+  background: var(--green); border-radius: 999px; padding: 2px 8px;
+}
+/* The seat's own mark, as a mark rather than a label: the sparkle and
+   two letters, in the brand's purple like every other synthetic badge on
+   the platform. It was a small teal chip that read as a status light. */
+.rs-tile > .rs-ai {
+  font-size: 9px; letter-spacing: .06em;
+  color: var(--brand2); background: rgba(123,92,255,.16);
+  border: 1px solid rgba(123,92,255,.38); padding: 2px 7px;
+  border-radius: 999px;
+}
+.rs-tile > .rs-ai::before { content: "\2726\00a0"; }
+
+/* The frame's picture sits in a box of its own — the format's name at
+   the top left, the way to full screen at the bottom right. The header
+   above says what this is; the box is the thing itself. */
+.rf-voice { position: relative; }
+.rf-kind {
+  position: absolute; top: 10px; left: 12px; z-index: 2;
+  font-size: 10px; font-weight: 800; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--t2);
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 7px; padding: 3px 9px;
+}
+.rf-voice > .rf-grow {
+  position: absolute; right: 12px; bottom: 12px; z-index: 2;
+  width: 34px; height: 34px; padding: 0; border-radius: 10px;
+  display: grid; place-items: center; cursor: pointer;
+  font-size: 15px; line-height: 1; color: #fff;
+  background: rgba(8,6,16,.72);
+  border: 1px solid rgba(255,255,255,.22);
+}
+.rf-voice > .rf-grow:hover { border-color: rgba(255,255,255,.5); }
+
+/* The reading under the face is the room's own green, not the brand
+   purple — it is the same light the speaking seat wears, and two colours
+   for one fact reads as two facts. */
+.rf-voice .wf-bar { background: var(--green); }
+
+/* ---- A room takes the window -------------------------------------------
+ *
+ *     asked     where does the strip sit
+ *     mattered  is the strip on the SCREEN
+ *
+ * The room went back to being a card on the page after a field report
+ * about stretched tiles, and that reversal was right about the tiles and
+ * wrong about the window: the seats, the frame and the transcript
+ * together are taller than a phone, so the microphone and the text bar
+ * fell off the bottom. "I don't see the microphone or text bar."
+ *
+ * The tiles cannot stretch any more — they are a fixed 172px and the
+ * rail scrolls — so the objection that reversed this does not apply. The
+ * room takes the window, the rail and the frame share what is left after
+ * the line at the top and the composer at the bottom, and the composer
+ * is on the screen because it is pinned there rather than pushed there.
+ */
+.app.in-room .content > .screen.room-place {
+  height: 100dvh; max-width: none; margin: 0;
+  padding: 12px 14px; gap: 8px; overflow: hidden;
+}
+.app.in-room .screen.room-place > .card.room-stage {
+  flex: 1 1 auto; min-height: 0; margin: 0;
+}
+/* The transcript and the composer keep their own height and never give
+   it up — they are the two things that fell off. */
+.app.in-room .screen.room-place > .card:not(.room-stage) {
+  flex: 0 0 auto; margin: 0;
+}
+.app.in-room .screen.room-place .rs-chatstrip,
+.app.in-room .screen.room-place .rs-voicebar {
+  flex: 0 0 auto;
+}
+/* And the frame stops being a fixed 4:3 box in a window it now owns:
+   it fills whatever the rail's column gives it. */
+.app.in-room .rf-voice { aspect-ratio: auto; flex: 1 1 auto; min-height: 0; }
+
+/* ---- A room takes the window, and keeps one way out --------------------
+ *
+ *     asked     where does the strip sit
+ *     mattered  is the strip ON THE SCREEN
+ *
+ * The room went back to being a card on the page after a field report
+ * about stretched tiles. That reversal was right about the tiles and
+ * wrong about the window: the seats, the frame, the transcript and the
+ * composer together are taller than a phone, so the microphone and the
+ * text bar fell off the bottom — "I don't see the microphone or text
+ * bar."
+ *
+ * The tiles cannot stretch any more: they are a fixed 172px and the rail
+ * scrolls past four. So the objection that reversed this no longer
+ * applies, and the room can have the window.
+ *
+ * The stage takes what is left over, which pushes the transcript and the
+ * composer to the bottom of the screen where there was always room for
+ * them.
+ */
+.app.in-room .content > .screen.room-place {
+  height: 100dvh; max-width: none; margin: 0;
+  padding: 12px 14px 14px; gap: 10px; overflow: hidden;
+}
+.app.in-room .screen.room-place > .card.room-stage {
+  flex: 1 1 auto; min-height: 0; margin: 0;
+}
+/* The transcript and the composer keep their own height and never give
+   it up — they are the two things that fell off the bottom. */
+.app.in-room .screen.room-place > .card:not(.room-stage),
+.app.in-room .screen.room-place .rs-chatstrip,
+.app.in-room .screen.room-place .rs-voicebar {
+  flex: 0 0 auto; margin: 0;
+}
+/* And the room stops reserving a floor for something that is no longer
+   hovering over it.
+ *
+ *     asked     remove the gaps
+ *     mattered  the biggest one was a reservation for a strip that had
+ *               already stopped needing it
+ *
+ * On the flat page `.rs-chatstrip` is `position: absolute; bottom: 6px`,
+ * riding over the scene, and `.card:has(> .room-scene)` keeps 62px of
+ * padding underneath so it covers nothing. In the room the rule above
+ * puts the strip back into the flow as a flex item — and the reserve
+ * stayed, holding 63px of nothing at the bottom of the card. Measured
+ * twice, before and after the bands were rebalanced, and it was the same
+ * 63 both times, which is what gave it away: everything else moved and
+ * that did not. */
+.app.in-room .screen.room-place > .card.room-stage:has(> .room-scene) {
+  padding-bottom: 10px;
+}
+/* The frame stops being a fixed 4:3 box in a window it now owns. */
+.app.in-room .rf-voice { aspect-ratio: auto; flex: 1 1 auto; min-height: 0; }
+
+/* The way back to everything else.
+ *
+ * `.app.in-room` hid the drawer AND the button that opens it, which is
+ * right about the drawer and wrong about the button: a full-screen place
+ * with no way to the rest of the app is a room with the door painted
+ * over. It sits at the very top left, where a menu button belongs and
+ * where nothing else in a room is. */
+.app.in-room .menu-fab {
+  display: grid; place-items: center;
+  position: fixed; top: 12px; left: 12px; z-index: 90;
+}
+
+/* ---- Audio: the seats have the whole room ------------------------------
+ *
+ *     asked     what goes in the frame
+ *     mattered  is there anything to put in it
+ *
+ * On the audio road the frame held a photograph the rail was already
+ * showing, blown up, beside a waveform: the same face twice on one
+ * screen, with half the width spent on the repeat. Crossed out on a
+ * screenshot — "we don't even need this box over here on the right for
+ * audio" — and the frame does not render there any more.
+ *
+ * So the seats stop being a rail and become the room: a grid of the same
+ * 172px boxes, as many across as the width allows, up to the eight the
+ * table seats. Nothing about a box changes. It just stops being a column
+ * beside something else.
+ */
+.screen.room-place > .card.room-stage.rs-allseats {
+  display: flex; flex-direction: column;
+}
+/* Four across, two down.
+ *
+ *     asked     how do eight seats lay out
+ *     mattered  in what SHAPE
+ *
+ * `auto-fill` put as many as fitted on a row, which is a different shape
+ * at every window width and no shape at all to design against. The
+ * owner's structure instead: "when you have three or more it's gonna be
+ * two rows of four." Eight seats, four across, two rows — which is the
+ * table this room seats, drawn as the table it is.
+ *
+ * Two on a phone, because four 172px boxes do not fit across 430px and a
+ * row that does not fit is not a row. */
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene {
+  display: grid; flex: 1 1 auto; min-height: 0; overflow-y: auto;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-content: start; gap: 10px; margin: 0;
+}
+@media (max-width: 719px) {
+  .screen.room-place > .card.room-stage.rs-allseats > .room-scene {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/* The roads stay where they are on a wider box: a fixed distance from
+   the centre, so the face keeps the middle at any column width. */
+.screen.room-place > .card.room-stage.rs-allseats
+  > .room-scene > .rs-tile,
+.screen.room-place > .card.room-stage.rs-allseats
+  > .room-scene > .rs-empty {
+  width: auto;
+}
+
+/* The frame's own controls are reachable.
+ *
+ *     asked     draw the face, upper torso and full body chips
+ *     mattered  can a thumb actually land on them
+ *
+ * The inline stage paints its chips at `z-index: 62` inside itself, and
+ * the room card painted over them: on a phone the three framings were
+ * visible, enabled, and refused every press — "the card intercepts
+ * pointer events". A control you can see and cannot press is worse than
+ * one that is missing, because the person keeps trying.
+ *
+ * The frame becomes its own stacking context so everything the stage
+ * puts inside it stays above the card it sits in. */
+.room-focus { position: relative; z-index: 2; }
+
+/* A frame cannot be squeezed to nothing.
+ *
+ *     asked     let the frame take what is left
+ *     mattered  what if nothing is left
+ *
+ * `.room-focus > :not(.rf-head)` gives the stage `flex: 1 1 auto` with
+ * `min-height: 0`, which is right in a column that has room and wrong in
+ * one that does not: on a phone, with the seats and the transcript and
+ * the composer all asking, the inline stage was allotted TWO PIXELS.
+ * Measured, not guessed. The figure was gone and the framing chips —
+ * absolutely positioned inside a box with no height — floated up over
+ * the seats, where they could be seen and not pressed.
+ *
+ * A floor, so the frame is always a frame. Below it the card scrolls,
+ * which is the honest outcome when a screen genuinely has no room. */
+/* The floor is the contents, not a number.
+ *
+ *     asked     the expandable button only half shows, and the chips are
+ *               cut in half by the bottom of the box
+ *     mattered  a typed floor becomes a CEILING the moment the header
+ *               wraps
+ *
+ * This was `min-height: 260px` on a phone. The stage below the header
+ * carries its own `min-height: 200px`, and a flex item's min-height wins
+ * over shrinking — so once "Their face in three dimensions, mouth on the
+ * voice" wrapped to two lines, the header took ~90px, the stage insisted
+ * on 200, and 290px of content sat inside a 260px box. The overflow was
+ * the bottom of the stage: the framing chips at `bottom: 10px` and the
+ * lower half of the rail, outside the card and clipped.
+ *
+ * `min-content` on a flex column IS the sum of the items' own minimums —
+ * header plus stage, whatever the header turns out to be. It is the same
+ * floor the number was trying to name, and it cannot be outgrown. */
+.room-focus { min-height: min-content; }
+.avatar-stage.inline { min-height: 220px; }
+@media (max-width: 719px) {
+  /* The frame gives some back so the seats can hold three — asked for
+     directly: "if we have to shrink the video player, let's do that
+     because I wanna be able to see two frames and a 3rd with a blank
+     avatar with the plus". */
+  .avatar-stage.inline {
+    /* A `max-height` in pixels, because `aspect-ratio: 4/3` is what
+       actually sets this box: at a 350px-wide card it wanted 263px and
+       sailed under a 32vh cap without touching it. Measured, not
+       assumed — the min-height was never the binding constraint. */
+    min-height: 148px; max-height: 200px;
+  }
+}
+.app.in-room .screen.room-place > .card.room-stage { overflow-y: auto; }
+
+/* SPEAKING, actually in the corner.
+ *
+ * `.rs-tile > *:not(.rs-behind)` pins every direct child to
+ * `position: relative` at (0,2,0), so the pill sat in the flow and
+ * landed on the person's own name. The fourth rule in this file to lose
+ * to that selector. */
+.rs-tile > .rs-saying {
+  position: absolute; top: 7px; right: 7px; z-index: 4;
+}
+
+/* Room for the menu button.
+ *
+ * It is fixed at the window's top-left, and the room's own line starts
+ * at the card's left edge — so the button sat on top of the room's name.
+ * The line starts clear of it. */
+.app.in-room .rs-bar { padding-left: 46px; padding-right: 44px; }
+
+/* The seats scroll as a whole, in whole rows.
+ *
+ * The grid was clipped mid-box: eight seats in two rows inside a column
+ * that had been given less height than two rows need, with the second
+ * row sliced through the middle of a face. A grid that cannot show a row
+ * shows the rows it can and scrolls to the rest — it does not cut one in
+ * half. */
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene {
+  padding-bottom: 4px;
+}
+.app.in-room .screen.room-place > .card.room-stage.rs-allseats {
+  overflow: hidden;
+}
+
+/* The seats take the room they need, and the card scrolls.
+ *
+ *     asked     four across, two rows
+ *     mattered  two WHOLE rows
+ *
+ * The grid was `flex: 1 1 auto` with its own scrollbar, so it was handed
+ * whatever the column had spare — about a row and a fifth — and the
+ * second row came out sliced through the middle of a face, with dead
+ * ground underneath where the frame used to be. A row of faces is either
+ * on the screen or it is not; half a face is neither.
+ *
+ * The grid sizes to its own rows now and the card scrolls if the window
+ * is too short, which is the honest place for the scrollbar: the room
+ * has more in it than fits, not the seats. */
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene {
+  flex: 0 0 auto; overflow: visible;
+}
+.app.in-room .screen.room-place > .card.room-stage.rs-allseats {
+  overflow-y: auto;
+}
+
+/* The seats scroll; the composer does not.
+ *
+ *     asked     let the room scroll when it is too tall
+ *     mattered  the microphone must never be the thing that scrolls away
+ *
+ * Letting the whole card scroll fixed the sliced row and cost the text
+ * bar, which is the one thing that was already reported missing. Only
+ * the seats scroll now: the card holds still, the grid takes what is
+ * left after the line at the top and the strip at the bottom, and the
+ * strip is always the last thing on the screen. */
+.app.in-room .screen.room-place > .card.room-stage.rs-allseats {
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.app.in-room .screen.room-place > .card.room-stage.rs-allseats
+  > .room-scene {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto;
+}
+.app.in-room .screen.room-place > .card.room-stage.rs-allseats
+  > .rs-chatstrip,
+.app.in-room .screen.room-place > .card.room-stage.rs-allseats
+  > .rs-voicebar {
+  flex: 0 0 auto; margin-top: 8px;
+}
+
+/* The strip's own log is a glance, not the record.
+ *
+ *     asked     show the seats and the composer
+ *     mattered  what is taking the height they need
+ *
+ * The strip carries a copy of the transcript, and directly under the
+ * room sits "What has been said" carrying the same lines again — so the
+ * same four turns were on the screen twice while the second row of seats
+ * had a face sliced through the middle to make room for the repeat.
+ *
+ * The strip keeps a few lines, because a room you are standing in should
+ * show the last thing said without scrolling anywhere. The record stays
+ * where the record lives. */
+/* The strip's log fills the room left under the seats.
+ *
+ * It was capped at 116px to stop it crowding out the second row of
+ * faces. With the duplicate transcript card gone the seats have their
+ * two rows and there is a good stretch of empty ground below the
+ * composer — "there's plenty of room, you can show a few more rows of
+ * chat." So the log takes it: as many turns as fit, and it scrolls past
+ * that.
+ *
+ * The composer does not move. It is pinned below the log, which is what
+ * made it visible in the first place. */
+.app.in-room .rs-chatlog {
+  max-height: none; flex: 1 1 auto; min-height: 0; overflow-y: auto;
+}
+.app.in-room .screen.room-place > .card.room-stage.rs-allseats
+  > .rs-chatstrip,
+.app.in-room .screen.room-place > .card.room-stage.rs-allseats
+  > .rs-voicebar {
+  flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column;
+}
+/* And the seats stop stretching, so the height they were absorbing goes
+   to the conversation instead. No gaps: the rows are the size of a box
+   and they sit against each other. */
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene {
+  flex: 0 0 auto; grid-auto-rows: 172px; align-content: start;
+}
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene > .rs-tile,
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene > .rs-empty {
+  height: 172px; min-height: 172px;
+}
+
+/* The record gets a share of the window, not the run of it.
+ *
+ * Measured rather than guessed: the room card came out 562px tall, the
+ * seats needed 358 for their two rows and the strip took 215 — so the
+ * second row was always going to be sliced, whatever the seats did with
+ * the height they were handed. The card below was taking the difference.
+ *
+ * It is the transcript. It scrolls by nature and it is not what somebody
+ * standing in a room is looking at, so it takes a third of the window
+ * and scrolls the rest, and the room keeps the two thirds it needs to be
+ * a room. */
+.app.in-room .screen.room-place > .card:not(.room-stage) {
+  /* Out of the room's way, not out of the page.
+   *
+   *     asked     show two rows of four
+   *     mattered  what is standing in their way
+   *
+   * Capping it to a third of the window moved the seats thirteen pixels
+   * — measured — because the transcript card was not the only thing
+   * taking the height, it was taking MOST of it, and a third of a
+   * window is still most of what two rows of seats need. So it was
+   * hidden, and the seats got their two rows.
+   *
+   * Hidden is more than was asked for, though: "you could bring the
+   * purple box back up, but you'll probably have to scroll to get back
+   * to it — not much of it will show at the bottom of the page." The
+   * room takes the window; the record starts where the window ends and
+   * is reached by scrolling, which is where a record belongs. */
+  display: block;
+}
+
+/* The speaking seat wears an outline, and says nothing.
+ *
+ *     asked     mark whoever is talking
+ *     mattered  mark them without moving anything
+ *
+ * A green "SPEAKING" pill was added to the corner and a green wash to
+ * the card. Both were wrong: the word pushed the photo and the name off
+ * the line every other card sits on, so the lit seat read as taller than
+ * its neighbours, and a filled card is a different colour of card rather
+ * than the same card, lit. The owner's own words: "a green outline
+ * around the frame, not a completely green shaded frame."
+ *
+ * So: no word and no fill — every seat keeps exactly the same geometry
+ * whether it is speaking or not. Two things change and both are lines:
+ * the frame around the box, and a ring around the face inside it.
+ * "Whoever's talking, not just the outline in green — at once their
+ * profile photo outlined in green as well." */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile.talking {
+  background: rgba(16,12,40,0.72);
+  border: 2px solid var(--green);
+  box-shadow: 0 0 0 1px rgba(123,196,127,.35),
+              0 0 22px rgba(123,196,127,.22);
+}
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile.talking
+  .rs-face,
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile.talking
+  .rs-photo {
+  box-shadow: 0 0 0 3px var(--green);
+}
+
+/* Every face is the same size, by whichever road it arrives.
+ *
+ * A profile seat draws its portrait through `.rs-circle-btn`; a person's
+ * own draws `.rs-face`/`.rs-photo` directly; the empty chair draws a
+ * silhouette. Only the first was sized, so four identical boxes carried
+ * three different faces — "all the profile photos are different sizes."
+ * One number, every road. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-face,
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-photo,
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-live,
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-oncam {
+  width: 96px; height: 96px; flex: 0 0 auto;
+}
+
+/* Rows are as tall as a box, not as tall as a share.
+ *
+ * `.room-scene` carries `grid-auto-rows: 1fr` from when it was a grid of
+ * equal cells, so two rows in a 523px column became two 261px rows with
+ * a 172px box sitting at the top of each — the seats correct, the space
+ * between them a canyon. The box has a size; the row is that size. */
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene {
+  grid-auto-rows: max-content;
+}
+
+/* Rows are as tall as a box; the chat sits at the bottom.
+ *
+ *     asked     open up room for the second row of four
+ *     mattered  where does the room come from
+ *
+ * `.room-scene` carries `grid-auto-rows: 1fr` from when it was a grid of
+ * equal cells, so two rows in a 523px column became two 261px rows with
+ * a 172px box at the top of each — the seats right, the space between
+ * them a canyon, and the second row pushed off the bottom. A box has a
+ * size; the row is that size.
+ *
+ * What the seats do not use goes to the bottom of the card, and the
+ * chat and the composer go with it. */
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene {
+  grid-auto-rows: max-content;
+}
+.app.in-room .screen.room-place > .card.room-stage.rs-allseats
+  > .rs-chatstrip,
+.app.in-room .screen.room-place > .card.room-stage.rs-allseats
+  > .rs-voicebar {
+  margin-top: auto;
+}
+
+/* No canyon between the rows. The boxes grow instead.
+ *
+ *     asked     open up room for the second row of four
+ *     mattered  where the leftover height goes
+ *
+ * Two rows in a 523px column with a fixed 172px box left ninety pixels
+ * of nothing under each row — the seats correct, the space between them
+ * a gap nobody asked for. Shrinking the rows to the box would have left
+ * the same gap at the bottom instead.
+ *
+ * "No gaps between the frames, and enlarge them if you must." So the
+ * rows share the column and the boxes fill their rows: same four across,
+ * same two down, and the height that was going nowhere goes into the
+ * faces. 172px stays as the floor, which is the size everything else was
+ * drawn against. */
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene {
+  grid-auto-rows: minmax(172px, 1fr);
+  align-content: stretch;
+}
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene > .rs-tile,
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene > .rs-empty {
+  height: auto; min-height: 172px; align-self: stretch;
+}
+
+/* Eight boxes sharing their lines.
+ *
+ *     asked     two rows of four, no gaps
+ *     mattered  what separates one seat from the next
+ *
+ * The seats were separate cards with ten pixels of room between them,
+ * which reads as eight things that happen to be near each other. "No
+ * gaps between them, have them share a frame line" — so the gap becomes
+ * a hairline: the grid paints the line and the cells sit one pixel
+ * apart, which is a table of seats rather than a scatter of cards.
+ *
+ * Corners go with the gaps. A rounded box needs air around it to read as
+ * a box; against its neighbour it reads as a mistake. */
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene {
+  gap: 1px; background: var(--line); padding: 1px;
+  border-radius: 14px; overflow: hidden;
+}
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene > .rs-tile,
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene > .rs-empty {
+  border-radius: 0; border: none;
+  background: rgba(16,12,40,0.72);
+}
+/* The lit seat keeps its green, drawn inside the cell so it does not
+   push its neighbours around. */
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene
+  > .rs-tile.talking {
+  border: none;
+  box-shadow: inset 0 0 0 2px var(--green),
+              inset 0 0 22px rgba(123,196,127,.18);
+}
+
+/* A put-up picture is a face like any other face here.
+ *
+ * `showing: photo` draws full-bleed on purpose — in the old grid a
+ * picture was meant to take the tile the way a live camera does. In a
+ * table of eight seats that makes one cell a photograph and seven cells
+ * portraits, which is the one thing this row was rebuilt to stop. Same
+ * circle, same size, same place. */
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene
+  > .rs-tile > .rs-photo.rs-fullbleed {
+  position: static; width: 96px; height: 96px;
+  border-radius: 50%; object-fit: cover; flex: 0 0 auto;
+}
+
+/* ---- The seats, held against the drawing one more time ------------------- */
+
+/* Divided, not welded.
+ *
+ *     asked     two rows of four with no gaps
+ *     mattered  what "no gap" costs
+ *
+ * The seats were pushed together onto a shared hairline, which is a
+ * table — and read as one: "maybe not share a wall, it looks too sharp.
+ * I don't think sharing the frames — divider is best. There should be a
+ * small gap and rounded corners."
+ *
+ * So a small gap and a real corner on every box. The lit seat changes
+ * colour of border, never its width, so nothing on the row moves when
+ * somebody starts speaking. */
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene {
+  gap: 8px; background: none; padding: 0 0 4px; border-radius: 0;
+  overflow: visible;
+}
+.app.in-room .screen.room-place > .card.room-stage.rs-allseats
+  > .room-scene {
+  overflow-y: auto;
+}
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene > .rs-tile,
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene > .rs-empty {
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(16,12,40,0.72);
+}
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene
+  > .rs-tile.talking {
+  border: 1px solid var(--green);
+  box-shadow: 0 0 0 1px var(--green), 0 0 22px rgba(123,196,127,.22);
+}
+
+/* The glyphs come in beside the face, and both grow.
+ *
+ *     asked     scoot the glyphs over
+ *     mattered  what the space they were wasting is FOR
+ *
+ * The two roads were pinned to the right wall of the box, a good sixty
+ * pixels clear of the portrait, so every seat carried a canyon down its
+ * middle and had to be that wide to hold it. "If you scoot the glyphs
+ * over you could make the boxes not so wide, and then you can expand
+ * them larger — the profile photos will get larger, and the glyphs will
+ * get larger."
+ *
+ * They are placed from the CENTRE now, not from the wall: the face and
+ * the two roads are one block, centred together, with eight pixels
+ * between them at any column width. What the canyon was holding goes
+ * into the face (120px) and into the glyphs (56px), which is what was
+ * asked for both times they were mentioned. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile {
+  padding-right: 64px;
+}
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-side {
+  left: calc(50% + 36px); right: auto;
+}
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile
+  > .rs-side > .rs-road {
+  width: 40px; height: 40px; font-size: 28px;
+}
+
+/* One face, one number, whichever road it arrives by.
+ *
+ *     asked     make the profile photos larger
+ *     mattered  they were not the same size to begin with
+ *
+ * A profile seat draws its portrait inside `.rs-circle-btn`, so it was
+ * caught by the 112px rule; a person's own photo is a direct child of
+ * the tile, so it was caught by the 96px one. Sixteen pixels apart, on
+ * two boxes side by side — visible in the screenshot as the owner's own
+ * face being the smallest one in the room. One number now, and it is
+ * the larger one. */
+.screen.room-place > .card.room-stage > .room-scene
+  > .rs-tile > .rs-circle-btn.rs-solo,
+.screen.room-place > .card.room-stage > .room-scene
+  > .rs-empty > .rs-blank,
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-face,
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-photo,
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-live,
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-oncam,
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene
+  > .rs-tile > .rs-photo.rs-fullbleed {
+  width: 120px; height: 120px; flex: 0 0 auto;
+}
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene {
+  grid-auto-rows: minmax(190px, 1fr);
+}
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene > .rs-tile,
+.screen.room-place > .card.room-stage.rs-allseats > .room-scene > .rs-empty {
+  min-height: 190px;
+}
+@media (max-width: 719px) {
+  /* Two across instead of four, so the same block is drawn a size down
+     rather than squeezed.
+
+     The lane and the roads' offset are NOT set here. They were, and the
+     later round that widened both — sixteen pixels between the sphere
+     and the glyphs instead of eight — wrote the desktop numbers on the
+     same selectors further down the file. A media query adds no
+     specificity, so those two declarations were overruled on source
+     order alone and the phone quietly drew the desktop lane. They live
+     in that round's own media block now, which comes after it. */
+  .screen.room-place > .card.room-stage > .room-scene > .rs-tile
+    > .rs-side > .rs-road {
+    width: 32px; height: 32px; font-size: 22px; min-height: 32px;
+  }
+  .screen.room-place > .card.room-stage > .room-scene
+    > .rs-tile > .rs-circle-btn.rs-solo,
+  .screen.room-place > .card.room-stage > .room-scene
+    > .rs-empty > .rs-blank,
+  .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-face,
+  .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-photo,
+  .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-live,
+  .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-oncam,
+  .screen.room-place > .card.room-stage.rs-allseats > .room-scene
+    > .rs-tile > .rs-photo.rs-fullbleed {
+    width: 104px; height: 104px;
+  }
+  .screen.room-place > .card.room-stage.rs-allseats > .room-scene {
+    grid-auto-rows: minmax(174px, 1fr);
+  }
+  .screen.room-place > .card.room-stage.rs-allseats > .room-scene > .rs-tile,
+  .screen.room-place > .card.room-stage.rs-allseats > .room-scene
+    > .rs-empty {
+    min-height: 174px;
+  }
+}
+
+/* The room is the window; the record is the next screenful down.
+ *
+ *     asked     bring the purple box back
+ *     mattered  without giving it any of the room's height
+ *
+ * The screen was locked to the window with `overflow: hidden`, which is
+ * what made hiding the transcript the only way to fit two rows of
+ * seats. The room keeps a whole window either way — it just stops being
+ * the only thing on the page. A strip of the record shows under it, and
+ * scrolling reaches the rest. */
+.app.in-room .content { overflow-y: auto; overflow-x: hidden; height: 100dvh; }
+.app.in-room .content > .screen.room-place {
+  height: auto; min-height: 100dvh; overflow: visible;
+}
+.app.in-room .screen.room-place > .card.room-stage {
+  flex: 0 0 auto; height: calc(100dvh - 72px);
+}
+
+/* A scrollbar on the right, because there is now a page to scroll.
+ *
+ *     asked     add an entire page scrollbar so the purple box below can
+ *               be revealed at full size
+ *     mattered  a scroll nobody can see is a scroll nobody takes
+ *
+ * The room owns the window and the record starts below it — but with the
+ * seats fitting and nothing overflowing on screen, the only sign that
+ * anything is down there was the strip of card peeking under the fold.
+ * Drawn in red down the right-hand edge of the room: a track, the full
+ * height of the window, so the record announces itself.
+ *
+ * Wide and painted rather than the platform's auto-hiding overlay, which
+ * is invisible until you are already scrolling — which is exactly the
+ * moment it is no longer needed. */
+/* Measured, not assumed. `clientWidth` equal to `offsetWidth` is the
+ * element saying in numbers that no bar was laid out, and it said that
+ * through two attempts: the browser here draws overlay scrollbars, which
+ * reserve nothing and appear only while a scroll is already happening —
+ * which is exactly when they are no longer needed.
+ *
+ * `scrollbar-gutter: stable` is what reserves the lane whether or not a
+ * bar is in it, and `scrollbar-color` is what makes the bar solid rather
+ * than an overlay. The pseudo-elements stay for engines that prefer
+ * them; a browser applies one road or the other, never both. */
+.app.in-room .content {
+  scrollbar-gutter: stable;
+  scrollbar-width: auto;
+  scrollbar-color: var(--brand2, #7b5cff) rgba(12, 9, 32, 0.85);
+}
+.app.in-room .content::-webkit-scrollbar { width: 12px; }
+.app.in-room .content::-webkit-scrollbar-track {
+  background: rgba(12, 9, 32, 0.85);
+}
+.app.in-room .content::-webkit-scrollbar-thumb {
+  background: var(--brand2, #7b5cff);
+  border-radius: 999px;
+  border: 3px solid rgba(12, 9, 32, 0.85);
+}
+.app.in-room .content::-webkit-scrollbar-thumb:hover {
+  background: #9b82ff;
+}
+/* And the record is drawn at the size it actually is, rather than
+   squeezed into the strip that was showing under the fold. */
+.app.in-room .screen.room-place > .card:not(.room-stage) {
+  flex: 0 0 auto; max-height: none; overflow: visible;
+}
+
+/* The sphere and the helper are the outermost layer, everywhere.
+ *
+ *     asked     they always need to be on the outermost layer
+ *     mattered  neither of them was ever ON a layer
+ *
+ * `.help-fab` declares `position: fixed` and no `z-index` at all, so it
+ * paints at the bottom of the positioned stack and every card with a
+ * layer of its own goes over it — visible in the room as the "?" cut in
+ * half by the record card underneath. The green sphere is `.wl-dot`, the
+ * watch light, and it had `z-index: 40` — above the page and below the
+ * card, so the record clipped its bottom third. Measured: the dot sits
+ * at y 832–878 and the record card starts at y 850. The orb carried the
+ * same 40.
+ *
+ * Both are the same kind of thing: a control fixed to the window that
+ * has to be pressable whatever is on screen, including the panels each
+ * one opens. So they go above everything — the orb one step under the
+ * helper, because the helper's own panel opens over the orb. */
+/* Above the cards, and still under the drawer.
+ *
+ * The first pass put these at 120 and 130, which fixed the clipping and
+ * broke the guard that exists because of an earlier field report: "It
+ * seems to be blocking the PDI menus." The navigation is a drawer now,
+ * not a band, so a pinned widget cannot sit beside it — only over it —
+ * and every one of them has to stay below the drawer's 60.
+ *
+ * So the range between a card and the drawer, which is the whole of what
+ * was needed: a card with a layer of its own beat `auto`, and any
+ * positive number beats a card. The orb and the light sit one step under
+ * the helper, because the helper's panel opens over both. */
+.agent-orb { z-index: 48; }
+.watch-lights, .wl-dot { z-index: 48; }
+.help-fab, .help-panel { z-index: 50; }
+
+/* Room to breathe, in both directions.
+ *
+ *     asked     the names and professions can scoot down a little, they
+ *               are too close to the photos — and scooch the glyphs over,
+ *               they are a little close to the profile sphere
+ *     mattered  the same eight pixels, twice
+ *
+ * The face, the two roads and the caption were packed to the same tight
+ * gap, so the block read as one lump rather than a face with things
+ * around it. Sixteen pixels between the sphere and the roads, ten under
+ * the sphere before the name — and the lane widens with them, because
+ * the block is centred as a whole and a wider block needs a wider lane
+ * to stay centred. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile {
+  padding-right: 72px;
+}
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-side {
+  left: calc(50% + 40px);
+}
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-name,
+.screen.room-place > .card.room-stage > .room-scene > .rs-empty > .rs-name {
+  margin-top: 10px;
+}
+@media (max-width: 719px) {
+  .screen.room-place > .card.room-stage > .room-scene > .rs-tile {
+    padding-right: 60px;
+  }
+  .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-side {
+    left: calc(50% + 34px);
+  }
+  .screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-name,
+  .screen.room-place > .card.room-stage > .room-scene > .rs-empty > .rs-name {
+    margin-top: 8px;
+  }
+}
+
+/* The two marks, drawn over the ones the photographs already carry.
+ *
+ *     asked     use the original photos and add a black glyph, same size
+ *               same colour, on the outermost layer rendering on top of
+ *               the profile photo
+ *     mattered  the photograph is the thing; the mark is not
+ *
+ * The first attempt took the marks OFF the images — reproduced each
+ * marking tool's geometry as a mask and reconstructed what was under it.
+ * That was the wrong repair. An inpaint over a region that size is a
+ * guess, and it showed: mirrored hair against a scalp that no longer
+ * meets itself, visible at the top right of every face whose hair
+ * reached the corner. A photograph edited to remove a label is a damaged
+ * photograph, and the label was never the problem.
+ *
+ * The problem was only that a circle crops the corner of a square. So
+ * the originals come back untouched, and the mark is drawn again on the
+ * outermost layer — the same box, in the same place, in the same
+ * colours — where nothing clips it. It covers the burned one exactly and
+ * completes the half the circle was cutting off.
+ *
+ * Every number below is measured from the two marking tools rather than
+ * eyeballed, as a fraction of the image, so the overlay lands on the burn
+ * at any face size:
+ *
+ *     AI        left 56.2500%  top  3.5156%  w 40.2344%  h 18.9453%
+ *     VERIFIED  left 29.6875%  top 81.4453%  w 66.7969%  h 15.0391%
+ *
+ * At the room's 120px face, with the portrait's left edge at
+ * `50% - 96px` (its centre sits 36px left of the tile's middle, and its
+ * radius is 60), that resolves to the values here. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-ai,
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-real {
+  position: absolute;
+  transform: none;
+  z-index: 6;
+  pointer-events: none;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+/* The dark pill, in the burn's own colours: plate rgba(9,7,24,205/255),
+   sparkle and letters at rgba(255,255,255,235/255). */
+/* Three variables, and every number below falls out of them.
+ *
+ *     asked     the badge does not cover the ones cropped differently
+ *     mattered  the badge's size was typed, and the face's was typed
+ *               somewhere else
+ *
+ * The geometry was written out in pixels three times over — once for the
+ * 120px face, once for the 104px phone face, once for the 72px rail —
+ * and the face's own size lives in a different rule again. Four numbers
+ * that have to agree, kept in four places, is a drift waiting to happen,
+ * and it had already happened: the rail rule sets a 112px face while the
+ * marks below it were still solving for 104.
+ *
+ * So the face declares `--face` and where its top-left corner sits, and
+ * the marks are the measured fractions of it. Checked against every
+ * value this replaces: at 120/`50% - 96px`/12px the AI plate resolves to
+ * left `50% - 28.5px`, top 16.2, 48.3 x 22.7, font 13.8 — the numbers
+ * that were there. Same for the phone's 104 and the rail's 72. Nothing
+ * moves; it just cannot come apart again. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile {
+  --face: 120px;
+  /* Both offsets read off the live page at 1280 wide, not derived from
+     the padding: the 96 and the 12 were arithmetic on a lane the tile
+     stopped keeping, and measured against the face's own box the plate
+     came back four pixels left and two pixels high of the burn on every
+     seat. The face's left edge sits at `50% - 92px` and its top at the
+     tile's own 10px of padding. */
+  --face-left: calc(50% - 92px);
+  --face-top: 10px;
+}
+/* The measured box is a FLOOR, not a cage.
+ *
+ *     asked     the word VERIFIED is not centred inside its badge
+ *     mattered  it was centred, and the badge was too small for it
+ *
+ * A plate pinned to exactly the burn's width fits the burning tool's
+ * font, not the reader's. Measured in this browser the gold plate has
+ * 37.4px of box for 30.5px of text — three and a half pixels of air
+ * each side, comfortably centred. On an iPhone the same string is set
+ * in SF, which is wider at that size, so it grew past both rounded ends
+ * and read as text falling out of its badge.
+ *
+ * Chasing the font would be chasing every font. So the measurement
+ * becomes `min-width` and `min-height` and the box takes whatever its
+ * own text needs on top of that. It can only ever be BIGGER than the
+ * burn, which is the direction that still covers it, and the text is
+ * centred in a box that has room for it on every platform. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-ai {
+  left: calc(var(--face-left) + var(--face) * 0.562500);
+  top: calc(var(--face-top) + var(--face) * 0.035156);
+  width: auto;
+  min-width: calc(var(--face) * 0.402344);
+  height: auto;
+  min-height: calc(var(--face) * 0.189453);
+  font-size: calc(var(--face) * 0.115234);
+  font-weight: 700; letter-spacing: 0;
+  color: rgba(255, 255, 255, .92);
+  background: rgba(9, 7, 24, .804);
+  border: none;
+  padding: 0 calc(var(--face) * 0.02);
+  border-radius: calc(var(--face) * 0.094727);
+}
+/* The gold plate: ground rgba(24,18,4,214/255), a two-pixel gold edge,
+   tick and letters in the lighter gold. */
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile > .rs-real {
+  left: calc(var(--face-left) + var(--face) * 0.296875);
+  top: calc(var(--face-top) + var(--face) * 0.814453);
+  /* A floor, for the reason written over the AI plate above. */
+  width: auto;
+  min-width: calc(var(--face) * 0.667969);
+  height: auto;
+  min-height: calc(var(--face) * 0.150391);
+  font-size: calc(var(--face) * 0.085938);
+  font-weight: 700; letter-spacing: 0;
+  color: #f7d87a;
+  background: rgba(24, 18, 4, .839);
+  border: 2px solid #d4a83a;
+  padding: 0 calc(var(--face) * 0.02);
+  border-radius: calc(var(--face) * 0.075195);
+}
+.screen.room-place > .card.room-stage > .room-scene > .rs-tile
+  > .rs-real::before { content: "\2713\00a0"; }
+
+/* Your own seat's marks are the same marks.
+ *
+ *     asked     isn't the verified supposed to be on top of the
+ *               outermost profile photo circle
+ *     mattered  it was, and this rule was the reason it was not
+ *
+ * There used to be a tile in here with no circle in it. A picture you
+ * put up drew full-bleed — edge to edge, the way the live camera does —
+ * so the marks, which are fractions of the sphere a face is drawn in,
+ * had nothing to be fractions OF, and were sent to the tile's own corner
+ * instead. That was right at the time.
+ *
+ * It is not a full-bleed tile any more, in either layout. The all-seats
+ * grid makes a put-up photograph the same circle as every portrait
+ * beside it — "one cell a photograph and seven cells portraits" is the
+ * thing that row was rebuilt to stop — and the rail does the same at 56.
+ * So the sphere is there, the fractions resolve, and the corner
+ * treatment was the only thing still moving the gold plate off it: the
+ * VERIFIED chip measured at 1.46 of the face's height down the tile,
+ * which is below the name, below the glyphs, and nowhere near the
+ * circle it belongs on.
+ *
+ * Nothing replaces it. The seat now falls through to the geometry every
+ * other seat uses, which is the point. */
+
+@media (max-width: 719px) {
+  /* The phone's face is 104px, and the marks are fractions of it.
+   *
+   *     asked     the AI badge doubles on the starter portraits
+   *     mattered  `--face` said 84 while the face was 104
+   *
+   * This block used to say 84, which was an estimate, and the rule that
+   * actually sizes the circle on a phone says 104 a few hundred lines
+   * up. So the plate came out at .325 of the face where the burn is at
+   * .4023 — small, high, and beside the mark it was supposed to cover.
+   *
+   * Every number here is now read off the live page rather than reasoned
+   * about: with the old values the plate measured .5986/-.0391 of a
+   * 104px face, which puts the face's own left edge at `50% - 79px` and
+   * its top at 17px down the tile. Those are the two offsets, and the
+   * size is the size the face actually is.
+   *
+   * The 79 is not 52 (half of 104) because the tile keeps a lane on the
+   * right for the two road glyphs, so the circle sits left of centre. */
+  .screen.room-place > .card.room-stage > .room-scene > .rs-tile {
+    --face: 104px;
+    --face-left: calc(50% - 79px);
+    /* 8, and it is the padding above the face — see the rail's own note.
+       The 17 was read off a page whose tiles centred their contents, so
+       it described one seat's accident rather than the layout. */
+    --face-top: 8px;
+  }
+}
+.rr-who { margin: 10px 0 0; }
+.rr-name {
+  margin: 0 0 2px; font-size: 13px; font-weight: 800; color: #efecff;
+}
+.rr-kind {
+  margin: 6px 0 2px; text-transform: uppercase;
+  letter-spacing: .07em; font-size: 10px;
+}
+.rr-box {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 0; font-size: 12.5px; color: var(--t2);
+  cursor: pointer;
+}
+.rr-box input {
+  flex: 0 0 auto; width: 16px; height: 16px; cursor: pointer;
+  accent-color: var(--brand2, #7b5cff);
+}
+/* A box that cannot be ticked yet says so by looking like it. */
+.rr-box input:disabled { cursor: not-allowed; opacity: .5; }
+.rr-box input:disabled ~ .rr-label { opacity: .6; }
+/* The label takes only its own width, and the row ends where the words
+   end. `flex: 1 1 auto` pushed the reason a box is greyed out to the far
+   side of a 1200px card, a foot away from the box it explains. */
+.rr-label { flex: 0 1 auto; min-width: 0; }
+.rr-note { flex: 0 1 auto; min-width: 0; }
+
+/* The seat rows, and the catalog under one of them.
+ *
+ *     asked     list all eight upfront — or just the two if there are
+ *               two — and only let me open one at a time, with all the
+ *               connections and all the skills in it
+ *     mattered  103 connectors is a wall unless only one wall is up
+ *
+ * The row is the whole seat: a name you can open, a tally of how much is
+ * wired up, and the add-friend button. Everything else is behind it. */
+.rr-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0 2px; border-top: 1px solid var(--line);
+}
+.rr-who:first-of-type .rr-head { border-top: none; }
+.rr-head .rr-name {
+  flex: 1 1 auto; min-width: 0; text-align: left;
+  background: none; border: none; padding: 0; cursor: pointer;
+  font: inherit; font-size: 13px; font-weight: 800; color: #efecff;
+}
+.rr-tally { font-weight: 500; }
+.rr-friend { flex: 0 0 auto; }
+/* The open seat's own scroll, so the catalog never pushes the seats
+   below it off the bottom of the window. */
+.rr-body { max-height: 420px; overflow-y: auto; padding: 2px 0 8px; }
+.rr-provider {
+  margin: 8px 0 2px; font-size: 11px; font-weight: 700;
+  color: var(--t2); letter-spacing: .03em;
+}
+.rr-app { margin-left: 2px; }
+/* A capability is a narrower yes inside the app's yes — "read the mail"
+   as opposed to "send it" — so it is indented under the box it narrows
+   and only appears once that box is on. */
+.rr-cap { margin-left: 26px; font-size: 11.5px; }
+/* The word "skills" where the skills actually are — under the
+   connection they belong to, not once at the top of the panel. */
+.rr-caps {
+  margin: 2px 0 2px 26px; text-transform: uppercase;
+  letter-spacing: .07em; font-size: 9.5px;
+}
+/* The press per turn, on the strip's own line. Small and inline: it is
+   one turn's sound, not a control for the room. */
+.rs-hear {
+  background: none; border: none; padding: 0 0 0 6px;
+  font-size: 11px; line-height: 1; cursor: pointer;
+  opacity: .75; vertical-align: baseline;
+}
+.rs-hear:hover { opacity: 1; }
+.rs-hear:disabled { cursor: not-allowed; opacity: .35; }
+/* Say it, on the seat you just gave permission to. One line: the box and
+   the press, sitting above the lists that decided what it may reach. */
+.rr-say { display: flex; gap: 8px; align-items: center; padding: 4px 0 6px; }
+.rr-say input {
+  flex: 1 1 auto; min-width: 0;
+  padding: 6px 10px; font-size: 12.5px;
+  color: var(--text, #e8eaf6); background: rgba(5,7,15,0.6);
+  border: 1px solid var(--line); border-radius: 999px;
+}
+.rr-say button { flex: 0 0 auto; }
+.rr-sent { margin: 0 0 6px; }
+
+/* ---- The frame is the point of an avatar room -------------------------- */
+
+/* A box that can hold a whole figure.
+ *
+ *     asked     this turn as a figure should be its normal size, one that
+ *               can contain an entire video or avatar — and you cannot
+ *               reach the expand button, only half of it shows
+ *     mattered  which row of the card was taking the height
+ *
+ * Measured rather than guessed. The stage card is a GRID here, not the
+ * flex column the audio format turned it into, and its three rows came
+ * out `38px 476px 234px` inside an 828px card: the heading, the rail and
+ * frame, and the strip. The frame was handed 476 of 828 because its row
+ * is auto-sized and the strip's log had grown to 234 — so the figure was
+ * drawn into two-thirds of the space it needed and the controls under it
+ * fell past the card's edge.
+ *
+ * The middle row takes what is left now, which is what `1fr` is for, and
+ * the log goes back to being a glance. The audio format is untouched: it
+ * has no frame, its seats are the screen, and there the log SHOULD have
+ * the leftover. */
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats) {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  .rs-chatlog {
+  max-height: 96px; flex: 0 0 auto;
+}
+
+/* The rail beside it is a rail, not a column that scrolls forever.
+ *
+ * Nine seats stacked in a 250px column came to 1446px of scrollHeight in
+ * a 476px box — a scrollbar down the left of the room, and seven faces
+ * you have to drag to see. Two across, and the tiles shrink to suit:
+ * a rail is meant to be glanceable beside the frame, and the frame is
+ * what somebody is looking at. */
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene {
+  /* Four across, two rows — the table, in the owner's words: "it always
+     in order gets filled from top left scrolling right two rows of four".
+     Eight seats is the cap `join_room` enforces, so four by two IS the
+     room, and nobody has to scroll to see who is in it.
+
+     `grid-auto-flow` is the default row order, which is already left to
+     right and top to bottom; it is named here because that ordering is
+     now a stated rule rather than a happy accident. */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-flow: row;
+  grid-auto-rows: min-content;
+  align-content: start;
+  gap: 6px;
+}
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile,
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-empty {
+  min-height: 0; height: auto; padding: 8px 6px;
+}
+/* A rail's face is smaller than a room's face, and its roads go with it.
+   The seat still says who it is; it is just not the thing being looked
+   at. */
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-circle-btn.rs-solo,
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-empty > .rs-blank,
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-face,
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-photo,
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-live,
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-oncam,
+/* A put-up picture is sized here too. It draws through `.rs-fullbleed`,
+   which the audio round pinned to 120px — so on the rail one seat kept a
+   room-sized face while the rest were 72, and the gold plate burned into
+   that photograph showed clipped underneath an overlay measured for a
+   different size. */
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-photo.rs-fullbleed {
+  /* 56 with the rest — same number as `--face`, which is what keeps the
+     marks landing on the burn. */
+  width: 56px; height: 56px;
+}
+
+/* Your own seat is a seat, not a viewport.
+ *
+ *     asked     the extra boxes look wrong, and this one is broken
+ *     mattered  full-bleed was designed for a tile four times this wide
+ *
+ * `.rs-camtile` bleeds the picture to the tile's edges, absolutely
+ * positions the name over the bottom-left of it, and lets the marks sit
+ * where a large rectangle put them. At four across — about 93px a tile —
+ * that came out as a square photo jammed into the corner with the name
+ * lying across it and VERIFIED adrift underneath.
+ *
+ * In the rail it becomes what every other seat is: one circle, the name
+ * under it. The full-bleed treatment is still right where it was written
+ * for, which is the big single-seat stage, and this only overrides the
+ * rail. */
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile.rs-camtile > .rs-photo.rs-fullbleed,
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile.rs-camtile > .rs-live.rs-fullbleed {
+  position: static; inset: auto;
+  width: 56px; height: 56px;
+  border-radius: 50%; object-fit: cover; flex: 0 0 auto;
+}
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile.rs-camtile > .rs-name {
+  position: static; background: none; padding: 0; border-radius: 0;
+}
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile {
+  /* No side lane any more — the roads sit under the name, in the flow.
+     See `.rs-side` below. */
+  padding-right: 6px;
+}
+/* The two roads stay on the rail, because they are the chooser.
+ *
+ *     asked     the glyphs are missing, avatar and video
+ *     mattered  the rule that hid them assumed the format was already
+ *               chosen by the time you got here
+ *
+ * They were hidden on the reasoning that "the rail only exists once a
+ * format is chosen". That is no longer true and should not have been:
+ * every room opens in audio now and the person picks per seat, so these
+ * two glyphs ARE the picking. Hidden, the room offered no way into
+ * avatar or video at all — the format could only be inherited from
+ * whatever this browser was last left in.
+ *
+ * The marks keep their own note below: a mark is drawn wherever the face
+ * is, at whatever size the face is, and the overlay scales with it or
+ * the burn shows through clipped underneath. */
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-side {
+  /* Under the face, not beside it. Four across leaves a tile about 93px
+     wide on a phone, and a side lane in that is a column of buttons with
+     a portrait squeezed against it. So the two roads come out of the
+     absolute lane and sit in the tile's own flow, centred, below the
+     name — which also means they cannot land on the picture however
+     narrow the tile gets. */
+  position: static; flex-direction: row; justify-content: center;
+  gap: 4px; margin-top: 4px;
+  display: flex;
+  /* And the lift comes off with the lane.
+   *
+   *     asked     get the profession off the top of the head of the
+   *               avatar and the movie camera
+   *     mattered  the row was PAINTED thirteen pixels above where it
+   *               was laid out
+   *
+   * `.rs-side` was an absolutely positioned lane pinned to the tile's
+   * middle, and it centred itself the usual way — `top: 50%` with
+   * `transform: translateY(-50%)`. Coming into the flow took the `top`
+   * and the `position` with it and left the transform behind, so the
+   * browser laid the row out cleanly under the field and then drew it
+   * thirteen pixels higher. Measured: laid out at 115px down the tile,
+   * painted at 102. On a seat whose field is one short word — "You" —
+   * the lit glyph landed on the word.
+   *
+   * A row in the flow does not need to be moved. */
+  transform: none;
+}
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-side > .rs-road {
+  width: 26px; height: 26px; min-height: 26px; font-size: 15px;
+  border-radius: 8px;
+}
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile {
+  /* 56, not 72 — four across a phone leaves about 93px a tile, and the
+     marks follow because they are fractions of this one number. */
+  --face: 56px;
+  /* 36, not 39. The 39 was derived from the tile keeping "only a 6px
+     lane"; measured against the face's own box the AI plate came back at
+     left .5208 of the face where the burn is at .5625 — three pixels
+     left, every time, on all four seats. Read off `getBoundingClientRect`
+     rather than recomputed from the padding, because the padding is what
+     was wrong. */
+  --face-left: calc(50% - 28px);
+  /* 8: the padding above the face, which is what `top` on an absolutely
+     positioned child is measured from — the padding box, not the border
+     box. Now that the tile packs from the top, that is the same 8 on
+     every seat, lit or not, in this layout and in the other one. The 6
+     it replaces was measured back when the tile centred its contents, on
+     one seat, and was wrong on the rest by however much their field
+     wrapped. */
+  --face-top: 8px;
+}
+/* The gold edge is the one thing that is not a fraction — a two-pixel
+   border on a 72px face is a band across the plate rather than an edge
+   on it. */
+.app.in-room .screen.room-place > .card.room-stage:not(.rs-allseats)
+  > .room-scene > .rs-tile > .rs-real {
+  border-width: 1px;
+}
+
+/* The way out is not under the visitor counter.
+ *
+ *     asked     the footsteps button might be blocking the little red X
+ *     mattered  they are seven pixels apart and it is on the higher layer
+ *
+ * Measured: the chip sits at y 6–23 and the ✕ at y 30–62, both against
+ * the right edge, both the same width, and the chip stacks at 90 to the
+ * door's 85. They do not literally overlap, which is why this survived a
+ * guard — but a door with a counter resting on it, on the layer above,
+ * is a door people report as blocked, and they are right to.
+ *
+ * A room owns the window, so the count of who holds an account here is
+ * not something the room needs. It stands down, like the drawer and the
+ * side dock, and the corner belongs to the way out. */
+.app.in-room .footsteps { display: none; }
+
+/* The side dock stands down inside a room.
+ *
+ * Re-stated here because it was written once and lost: the rule lived in
+ * the round that gave the room the window, and came back as fifty pixels
+ * of every label — "me...", "h...", "Dr.", "Chef" — down the right-hand
+ * edge, pinned behind the room card. `.talk-rail` and
+ * `.room-dock-picker` are both fixed children of it, so hiding the dock
+ * takes both.
+ *
+ * It is a way of moving BETWEEN rooms, which is not what somebody
+ * standing in one is doing, and the menu already holds it. */
+.app.in-room .chat-rail-dock { display: none; }

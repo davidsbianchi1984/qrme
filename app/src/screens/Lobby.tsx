@@ -150,7 +150,7 @@ export function Lobby({ onPlans }: { onPlans: () => void }) {
                   ? tr("lby.seat.one", lang) : tr("lby.seats", lang),
               })}
             </p>
-            {lobby.members.map((m) => (
+            {lobby.seats.map((m) => (
               <div key={m.member_id}>
                 <p className="small">
                   {fill(tr("lby.member", lang), {

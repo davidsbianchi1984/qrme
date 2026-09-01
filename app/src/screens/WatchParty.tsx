@@ -51,6 +51,10 @@ export function WatchParty({ onPlans, start }: {
   const [note, setNote] = useState<string | null>(null);
   const [open, setOpen] = useState<PublicParty[]>([]);
   const [announceTo, setAnnounceTo] = useState("");
+  // The watching in flight. A download plus a transcription plus a
+  // description takes real seconds; the chip says so instead of going
+  // quiet.
+  const [watchBusy, setWatchBusy] = useState(false);
 
   // The browse door: the parties whose hosts chose to be found. The id
   // stays the private door — these cards join without ever showing one.
@@ -87,6 +91,15 @@ export function WatchParty({ onPlans, start }: {
     api.watchPartyContext(party.id, token).then(setCtx)
       .catch(() => setCtx(null));
   }, [party, token]);
+
+  async function watchIt() {
+    if (!party) return;
+    setError(null); setNote(null); setWatchBusy(true);
+    try {
+      await api.watchPartyWatch(party.id, token);
+      setCtx(await api.watchPartyContext(party.id, token));
+    } catch (e) { fail(e); } finally { setWatchBusy(false); }
+  }
 
   async function post() {
     if (!party) return;
@@ -373,6 +386,29 @@ export function WatchParty({ onPlans, start }: {
               {/* Verbatim. The claim and the object are the same thing, so
                   this cannot go stale while still looking honest. */}
               <p className="muted small"><em>{ctx.instruction}</em></p>
+              {/* The watching — "let's make our own": the platform's own
+                  eyes and ears on the video, once, for every profile in
+                  the room. Works on direct video links; a platform page
+                  hands over a player, and the refusal says so. */}
+              {!ctx.watching.seen && (
+                <button className="chip" disabled={watchBusy}
+                        onClick={watchIt}>
+                  {watchBusy ? tr("wp.watching", lang)
+                             : tr("wp.watch", lang)}
+                </button>
+              )}
+              {ctx.watching.seen && (
+                <>
+                  <h4>{tr("wp.seen", lang)}</h4>
+                  <p className="small">{ctx.watching.seen}</p>
+                </>
+              )}
+              {ctx.watching.heard && (
+                <>
+                  <h4>{tr("wp.heard", lang)}</h4>
+                  <p className="muted small">{ctx.watching.heard}</p>
+                </>
+              )}
             </div>
           )}
         </>

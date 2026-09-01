@@ -1,0 +1,66 @@
+# status: backlog — 17 rows
+#
+# Gallery screens the camera cannot yet photograph, and why each one.
+#
+# The gallery has three kinds of screen. A *page* is what a nav tab opens.
+# A *state* is something the census numbers separately — `Chat 6,45,83`,
+# `Feed 189,190,191` — because a component draws more than one thing a
+# person meets. A *page that is not a tab* is reached by a press.
+#
+#     asked     can the camera reach every tab
+#     mattered  can it reach everything the gallery numbers
+#
+# This round found sixteen nav tabs the shoot list had simply never named
+# — not a decision, an omission: the list was typed once and every tab
+# added since went into the nav and not into it. Those sixteen, plus four
+# card-states and two signed-out pages, are photographs now.
+#
+# These eighteen are what is left. The number never goes up.
+
+# --- states behind a live session --------------------------------------
+199  Waveform · what it is doing
+     The strip renders under Chat's `presence`, which exists while a voice
+     room is actually carrying somebody's voice. The browser this camera
+     drives has no second participant and no microphone behind it, so what
+     it would capture is an absent element, and the camera refused.
+161  Refusal · not on this plan
+     Renders only when a capability gate refuses — `<Refusal error={...}>`
+     with an error in hand. Reaching it means driving the console into a
+     refusal on purpose, which is a recipe that asks for something the
+     seeded account may not have.
+
+# --- states whose owning element is not yet marked ----------------------
+131  Plans · what pro adds        (Plans owns 130,131; 130 is the tab)
+70   Desk · desk beacons          (Desk owns 69,70; 69 is the tab)
+190  Feed · what plays            (Feed owns 189,190,191)
+191  Feed · rooms and desks
+45   Chat · immersive chat        (Chat owns 6,45,83)
+83   Chat · chat
+194  WatchParty · the vastscape   (WatchParty owns 155,194,195)
+195  WatchParty · vastscape held
+205  AvatarStage · avatar stage
+197  Briefcase · their homepage   (Briefcase owns 6,197)
+     Each is a real card in a shipped component. Marking one means finding
+     the element that draws *that* number rather than its sibling, and a
+     marker on the wrong card photographs the sibling under this number —
+     which is the failure the marker convention exists to prevent. They
+     are listed rather than guessed.
+
+# --- pages that are not tabs, with no recipe yet ------------------------
+204  Circle · your circle
+     In the `Tab` union and not in the nav, reached from a press on Home —
+     `[data-go="circle"]`, the "see all" beside the friends tile. The
+     recipe exists and the button is not on the page for the harness's
+     seeded account, which holds no friends, so the tile that carries it
+     does not draw. Reaching it means seeding a friend first. (Its sibling
+     173 came off this list the same day: the press that opens it is on
+     Identity, which needs nothing seeded.)
+184  Public · without an account
+     The page a stranger lands on with no session at all. A signed-out
+     recipe, but not the onboarding one — it is a different route.
+01   Onboarding · welcome
+47   Onboarding · all set
+42   Onboarding · verify identity
+     Three steps of the sign-up flow. 39 and 41 are photographs now
+     because they are the two the front door opens on; these three are
+     further in, behind a form that has to be filled and submitted.

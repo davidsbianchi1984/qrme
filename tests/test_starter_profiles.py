@@ -59,7 +59,7 @@ def test_starters_are_summonable_by_handle_and_tag(client):
     assert r["profile"]["chat"]                        # reachable
 
     r = client.get("/summon", params={"ref": "#healthcare"}).json()
-    assert any(p["display_name"] == "Dr. Amara Osei" for p in r["profiles"])
+    assert any(p["display_name"] == "Dr. Amara Osei" for p in r["summoned"])
 
 
 def test_mental_health_trio_is_summonable_for_the_jim_tandem(client):

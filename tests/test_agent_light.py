@@ -26,7 +26,11 @@ def test_every_status_the_workflow_writes_has_a_light():
     """The mapping is keyed on what `workflows.py` actually stores. If a status
     is added there and not here, this fails rather than the screen guessing."""
     import re
-    src = open("qrme/workflows.py").read()
+    # From the repo root by way of this file, not the invoker's cwd — a
+    # battery launched from anywhere reads the same source.
+    import pathlib
+    src = (pathlib.Path(__file__).resolve().parents[1]
+           / "qrme" / "workflows.py").read_text()
     written = set(re.findall(r'status="([a-z_]+)"', src))
     written |= {"running"}                     # the literal in the INSERT
     written |= set(re.findall(r'status = "([a-z_]+)"', src))

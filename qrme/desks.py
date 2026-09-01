@@ -368,7 +368,7 @@ def feed(desk_id: str) -> dict:
         # frame is a photograph of a real room; marking it would be a false
         # statement about both.
         "ai": False,
-        "watermark": None,
+        "watermark_line": None,
     }
 
 

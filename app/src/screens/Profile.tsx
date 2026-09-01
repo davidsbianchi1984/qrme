@@ -2,10 +2,11 @@ import { useEffect, useState, type ReactNode } from "react";
 import { api, getBase, type ChatMessage, type Homepage,
          type MediaUpload,
          type PageFriend, type Profile as ProfileRow, type ProfilePage,
-         type WallPost } from "../api";
+         type SceneRender, type WallPost } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Briefcase } from "../Briefcase";
 import { Refusal } from "../Refusal";
+import { SceneFilm } from "../SceneFilm";
 import { useSession } from "../store";
 
 // Somebody else's homepage — the place you land when you press their face.
@@ -78,6 +79,12 @@ export function Profile({ profileId, onBack, onPlans, onVisit, onInside }: {
   const [pane, setPane] = useState<Pane>("wall");
   const [said, setSaid] = useState("");
   const [reply, setReply] = useState<ChatMessage | null>(null);
+  // The turn's footage, when this profile's road is video. A render
+  // started here spends the same daily ceiling as one started in the
+  // conversation, so it is shown here too — otherwise somebody says one
+  // thing on a profile page, watches nothing happen, and finds seconds
+  // gone from a limit they set.
+  const [scene, setScene] = useState<SceneRender | null>(null);
   const [note, setNote] = useState<ReactNode>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
@@ -87,6 +94,7 @@ export function Profile({ profileId, onBack, onPlans, onVisit, onInside }: {
   useEffect(() => {
     setWho(null); setPage(null); setHome(null); setPosts([]); setFriends([]);
     setMedia([]); setPane("wall"); setReply(null); setNote(null);
+    setScene(null);
     setError(null);
     // Their name, from the public profile row. The page carries no name and
     // the homepage carries one — but a homepage kept private answers 404, and
@@ -129,6 +137,7 @@ export function Profile({ profileId, onBack, onPlans, onVisit, onInside }: {
       const answer = await api.chat(profileId,
         { interactor_id: session.interactorId, message: said.trim() });
       setReply(answer.profile_message);
+      setScene(answer.scene ?? null);
       setSaid("");
     } catch (e) { setError(e); }
     finally { setBusy(false); }
@@ -224,7 +233,7 @@ export function Profile({ profileId, onBack, onPlans, onVisit, onInside }: {
           sanitised in storage rather than here — a renderer never sees raw
           markup, so no renderer can forget to clean it. */}
       <div className="card pp-hero"
-           style={{ borderColor: accent, background: page?.theme?.bg }}>
+           style={{ borderColor: accent, background: page?.page_theme?.bg }}>
         <h3 style={{ color: accent }}>
           {home?.headline || page?.tagline || name}
         </h3>
@@ -313,6 +322,7 @@ export function Profile({ profileId, onBack, onPlans, onVisit, onInside }: {
                 : tr("prf.notyetfriends", lang)}
           </p>
           {reply && <p className="small pp-reply">{reply.content}</p>}
+          {scene && <SceneFilm scene={scene} lang={lang} />}
 
           {/* The briefcase, which is the same component the own-profile
               conversation uses. It shipped here and only here, so a person

@@ -18,7 +18,7 @@ def _profile(client, name="Rex", persona="A hype-loving co-op gamer."):
 
 def test_glasses_are_in_the_catalog_with_capture_and_render(client):
     cat = client.get("/connectors/catalog").json()
-    glasses = next(p for p in cat["providers"] if p["provider"] == "glasses")
+    glasses = next(p for p in cat["app_providers"] if p["provider"] == "glasses")
     assert glasses["label"] == "Smart Glasses"
     apps = {a["app"] for a in glasses["apps"]}
     assert {"rayban_meta", "meta_display", "google_androidxr"} <= apps
@@ -61,7 +61,7 @@ def test_connect_capture_and_render_through_glasses(client):
 
 def test_gaming_platforms_in_catalog(client):
     cat = client.get("/connectors/catalog").json()
-    gaming = next(p for p in cat["providers"] if p["provider"] == "gaming")
+    gaming = next(p for p in cat["app_providers"] if p["provider"] == "gaming")
     apps = {a["app"] for a in gaming["apps"]}
     assert {"playstation", "xbox", "nintendo", "steam", "pc"} <= apps
 

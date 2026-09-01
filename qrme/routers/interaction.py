@@ -10,9 +10,9 @@ from datetime import date
 from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
-from .. import (adaptation, auth, briefcase, companion, contacts, db, opendoor,
-                engagement, i18n,
-                llm, moderation, offline, persona, referral, remembrance,
+from .. import (accounts, adaptation, auth, briefcase, companion, contacts,
+                db, engagement, filming, i18n, llm, moderation, offline,
+                opendoor, persona, referral, remembrance,
                 roles, scrape, voiceprint, watermark)
 from ..common import (require_may_publish, 
     age_of, anonymized_exchange, biometric_domain, biometrics_recovered,
@@ -108,12 +108,20 @@ def create_interactor(body: InteractorCreate) -> dict:
     conn.execute(
         "INSERT INTO interactors (id, display_name, birthdate, created_at)"
         " VALUES (?,?,?,?)",
-        (interactor_id, body.display_name,
+        # A pronoun is not a name, whoever is asking. See
+        # `accounts.a_person_name`: this door accepted whatever a client
+        # sent, and a console screen sent the word the surface uses for
+        # the reader's own seat.
+        (interactor_id, accounts.a_person_name(body.display_name),
          body.birthdate.isoformat() if body.birthdate else None, db.utcnow()),
     )
     conn.commit()
     token = auth.issue("interactor", interactor_id)
-    return {"id": interactor_id, "display_name": body.display_name,
+    # The name that was STORED, not the one that was asked for. They differ
+    # exactly when the asked-for one was not a name, and a caller that is
+    # told its own input back has no way to find that out.
+    return {"id": interactor_id,
+            "display_name": accounts.a_person_name(body.display_name),
             "token": token}
 
 
@@ -335,6 +343,15 @@ def set_relationship(profile_id: str, interactor_id: str,
     profile_or_404(profile_id)
     require_owner(profile_id, request)
     interactor_or_404(interactor_id)
+    # The law (docs/raise.md): romantic roles exist ONLY for raised
+    # characters STARTED at an adult stage. "A character raised from a
+    # child stage is family forever — that door never converts."
+    if body.relationship_type == "romantic_partner":
+        from .. import raising
+        if not raising.may_be_romantic(profile_id):
+            raise HTTPException(403, i18n.raised(RuntimeError(
+                "a character raised from a childhood is family forever "
+                "— that door never converts")))
     conn = db.connect()
     conn.execute(
         "INSERT INTO relationships (id, profile_id, interactor_id,"
@@ -748,6 +765,12 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
                       engagement.get(profile_id, body.interactor_id),
                       biometrics=body.biometrics)
 
+    # A turn together IS the raising — docs/raise.md: milestones accrue
+    # from showing up, and stage doors are earned, never aged into. A
+    # no-op for the three ordinary kinds.
+    from .. import raising
+    raising.turn_taken(profile_id)
+
     # True only when the vault actually ranked the pair's seals and
     # answered from them — said, never assumed.
     inner = getattr(provider, "_primary", provider)
@@ -755,7 +778,20 @@ def chat(profile_id: str, body: ChatRequest, request: Request) -> ChatResponse:
     chat_provenance = content_provenance(speaking_profile, sources, status,
                                          flag_reason)
     chat_provenance["grounded_in_vault"] = grounded
+    # The turn as footage, when that is the road this profile takes.
+    #
+    # Started after the reply is settled and never waited for: a render is
+    # minutes, a reply is not, and the person is already reading. Only an
+    # approved reply is rendered — footage of something moderation held
+    # back would be the held thing, in a more persuasive form.
+    #
+    #     asked     should this reply become video
+    #     mattered  should THIS reply become video
+    scene = (filming.auto_render(profile_id, reply)
+             if status == "approved" else None)
+
     return ChatResponse(
+        scene=scene,
         provenance=chat_provenance,
         interactor_message=message_out(rows[interactor_msg_id]),
         profile_message=message_out(rows[profile_msg_id]),
@@ -1010,7 +1046,7 @@ def give_feedback(profile_id: str, interactor_id: str, body: Feedback,
     # at the gateway; the exact payload is logged locally so the owner can
     # always see precisely what left.
     cloud = request.app.state.cloud
-    result["contributed"] = False
+    result["cloud_contributed"] = False
     if (body.rating == "up" and profile["cloud_contribution"]
             and cloud is not None):
         exchange = anonymized_exchange(profile, profile_id, interactor_id)
@@ -1024,8 +1060,8 @@ def give_feedback(profile_id: str, interactor_id: str, body: Feedback,
                 "purpose": profile["purpose"],
                 "exchange": exchange,
             }
-            result["contributed"] = cloud.contribute(payload)
-            if result["contributed"]:
+            result["cloud_contributed"] = cloud.contribute(payload)
+            if result["cloud_contributed"]:
                 conn = db.connect()
                 conn.execute(
                     "INSERT INTO contribution_log (ref, profile_id, payload,"
@@ -1104,7 +1140,7 @@ def open_rehearsal(profile_id: str, body: RehearsalOpen,
         (rehearsal_id, profile_id, body.interactor_id, scenario,
          db.utcnow()))
     conn.commit()
-    return {"id": rehearsal_id, "scenario": scenario, "turns": 0,
+    return {"id": rehearsal_id, "scenario": scenario, "turns_count": 0,
             "remembered": False}
 
 
@@ -1142,7 +1178,7 @@ def rehearse(profile_id: str, rehearsal_id: str, body: RehearsalSay,
                  (json.dumps(transcript), rehearsal_id))
     conn.commit()
     return {"id": rehearsal_id, "reply": reply,
-            "turns": len(transcript) // 2, "remembered": False}
+            "turns_count": len(transcript) // 2, "remembered": False}
 
 
 @router.delete("/profiles/{profile_id}/rehearsal/{rehearsal_id}")
@@ -1157,7 +1193,7 @@ def close_rehearsal(profile_id: str, rehearsal_id: str,
     conn = db.connect()
     conn.execute("DELETE FROM rehearsals WHERE id=?", (rehearsal_id,))
     conn.commit()
-    return {"id": rehearsal_id, "turns": turns, "erased": True}
+    return {"id": rehearsal_id, "turns_count": turns, "erased": True}
 
 
 # -- Persistent memory management (PRD 6.4) ----------------------------------
@@ -1182,7 +1218,7 @@ def list_memories(profile_id: str, request: Request) -> list[dict]:
         "interactor_id": r["interactor_id"],
         "interactor_name": r["display_name"] or "someone unnamed",
         "profile_name": profile["display_name"],
-        "turns": r["turns"],
+        "turns_count": r["turns"],
         "last_at": r["last_at"],
     } for r in rows]
 
@@ -1780,7 +1816,22 @@ async def heard(interactor_id: str, request: Request) -> dict:
     words = scrape.transcribe_bytes(data, interactor_id)
     if words is None:
         raise HTTPException(
-            503, "this deployment has no transcription service, so recorded "
-                 "speech cannot be turned into words — set QRME_EARS_URL, or "
-                 "type instead")
+            503, "dictation is off here — a recording cannot be turned "
+                 "into words on this deployment. The voices still speak "
+                 "and you can still hear the room; type your message "
+                 "instead",
+            # The operator's half, out of the guest's way.
+            #
+            #     asked     red error? but the audio is working fine
+            #     mattered  two audiences, one sentence, and it was
+            #               written for the one who was not reading it
+            #
+            # An owner has to learn what to set; a person in a room
+            # cannot act on an environment variable and reads a sentence
+            # naming one as "audio is broken" — which is what happened.
+            # So the body is the person's and this is the operator's, in
+            # the place operator facts belong. It reaches the logs, the
+            # browser's network panel and `curl -i` without being
+            # shouted at a guest.
+            headers={"X-QRME-Fix": "QRME_EARS_URL"})
     return {"text": words["text"]}

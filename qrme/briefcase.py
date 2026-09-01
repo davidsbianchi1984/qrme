@@ -81,7 +81,7 @@ import zipfile
 import zlib
 from io import BytesIO
 
-from . import common, db, i18n, llm, media, offline, scrape
+from . import common, db, i18n, llm, media, offline, scrape, watching
 
 #: Kinds a person can hand over. ``photo`` and ``video`` are stored for what
 #: the person says about them; the rest carry text this deployment can read.
@@ -997,9 +997,10 @@ def why_unread(data: bytes, kind: str, was_read: bool) -> str | None:
     and there is no way back from a sentence to the fact it states.
 
     Only PDFs get one. A photograph and a video are not failures of this
-    reader — this deployment has ears and no eyes, which the prompt block
-    already says in its own words — and dressing them up as diagnoses would
-    bury the one case where the reason is actionable.
+    reader — on a stack without the seeing door they are held and said so,
+    which the prompt block already says in its own words — and dressing
+    them up as diagnoses would bury the one case where the reason is
+    actionable.
     """
     if was_read or kind != "document" or data[:4] != b"%PDF":
         return None
@@ -1012,10 +1013,12 @@ def read_file(data: bytes, name: str | None,
     """``(kind, text, read)`` for one upload.
 
     ``read`` is false when this deployment holds the bytes and cannot turn
-    them into words — a photograph, a scanned PDF, a recording on a stack
-    without ears. The item is still worth importing; the prompt block
-    simply says so. With ears deployed a video reads as the words said in
-    it, the same account a watched recording gets.
+    them into words — a photograph on a stack without the seeing door, a
+    scanned PDF, a recording on a stack without ears. The item is still
+    worth importing; the prompt block simply says so. With ears deployed a
+    video reads as the words said in it, and with the seeing door open
+    the account of what its frames show rides along — the same viewing a
+    watched recording gets.
     """
     # A voice memo, by its own magic bytes — checked before `media._sniff`
     # because that reader refuses audio outright ("unrecognized file"),
@@ -1031,16 +1034,30 @@ def read_file(data: bytes, name: str | None,
         return "recording", "", False
     kind, ext = media._sniff(data, name)
     if kind == "image":
+        # This answered `held, not read` unconditionally for years, and
+        # the comment two branches down said why: "these are ears, not
+        # eyes." The eyes exist now (qrme/watching.py) — a shared photo
+        # is read, and a screenshot is read FOR its text, which is how a
+        # phone that cannot hand a live screen to a web page hands its
+        # screen over anyway. A deployment that cannot see keeps the old
+        # honest posture.
+        seen = watching.see_picture(data)
+        if seen:
+            return "photo", _clean(seen), True
         return "photo", "", False
     if kind == "video":
-        # The ears turn a handed-over recording into the words said in it
-        # (a voice memo's .m4a sniffs as video too — same ftyp box). No
-        # ears keeps the old posture: held, said so, never invented. The
-        # picture in the frames stays undescribed either way — these are
-        # ears, not eyes.
-        heard = scrape.transcribe_bytes(data, on_behalf_of)
-        if heard is not None:
-            return "video", _clean(heard["text"]), True
+        # The whole viewing — the ears' words AND the eyes' account of
+        # the frames (a voice memo's .m4a sniffs as video too — same
+        # ftyp box, and it simply has no frames). Either half can be
+        # absent; both absent keeps the old posture: held, said so,
+        # never invented.
+        heard, seen = watching.observe_bytes(data, on_behalf_of)
+        if heard or seen:
+            words = _clean(heard)
+            if seen:
+                words = (words + "\n\nWhat is on screen: "
+                         + _clean(seen)).strip()
+            return "video", words, True
         return "video", "", False
     if data[:4] == b"%PDF":
         # Empty is the honest answer for a scan, and now also for a PDF this

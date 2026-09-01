@@ -163,7 +163,7 @@ struct PeopleSection: View {
                                     .font(.caption2).disabled(busy)
                             }
                         }
-                        ForEach(pool.profiles, id: \.profile_id) { p in
+                        ForEach(pool.found, id: \.profile_id) { p in
                             HStack {
                                 Button(p.display_name) { visiting = p.profile_id }
                                     .font(.caption).foregroundStyle(Theme.txt)

@@ -207,7 +207,7 @@ struct ObjectionSection: View {
                     run {
                         let a = try await ApiClient.shared.objectionAudit(
                             objectionId: objectionId, token: state.token!)
-                        events = a.events ?? []
+                        events = a.audit_events ?? []
                     }
                 }
                 Button(L10n.t("object.withdraw", state.language)) {

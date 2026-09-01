@@ -260,7 +260,7 @@ def front_page(profile_id: str, viewer_id: str | None = None) -> dict | None:
         "verification": verification.status(profile_id),
         "skills": skills,
         "experience": experience(profile_id),
-        "rating": rating(profile_id),
+        "rating_summary": rating(profile_id),
         "reviews": reviews(profile_id, viewer_id)[:5],
         "talked_with": stats["people"] if stats else 0,
         "interactions": stats["talks"] if stats else 0,

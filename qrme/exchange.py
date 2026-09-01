@@ -310,7 +310,7 @@ def channel(exchange_id: str) -> dict:
                 "unsigned": missing}
     return {
         "open": True,
-        "items": _items(exchange_id),
+        "deal_items": _items(exchange_id),
         "fingerprint": fingerprint(exchange_id),
         # Said here rather than left to a client to infer: an open channel is
         # permission to offer these items, not permission to place them.
@@ -399,7 +399,7 @@ def get(exchange_id: str) -> dict:
         "excludes": json.loads(row["excludes"] or "[]"),
         "fee": row["fee"], "fee_note": "simulated — no funds move",
         "state": row["state"], "created_at": row["created_at"],
-        "items": items,
+        "deal_items": items,
         "runs_on_your_machine": [i["name"] for i in items if i["runs"]],
         "runs_warning": RUNS_WARNING if any(i["runs"] for i in items) else None,
         "fingerprint": fingerprint(exchange_id),
