@@ -1509,6 +1509,23 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25);
   border-radius: 999px; padding: 9px 16px; }
 
+/* The film chip on an AR seat: small, under the card, one glyph. */
+.stage-film-chip { margin-top: 4px; width: 30px; height: 30px;
+  min-height: 30px; padding: 0; border-radius: 9px; font-size: 15px;
+  background: rgba(10,12,16,0.6); border: 1px solid rgba(255,255,255,0.25);
+  line-height: 1; }
+
+/* The footage, floating where you stand: centred, clear of the strip. */
+.stage-film { position: absolute; left: 50%; top: 40%;
+  transform: translate(-50%, -50%); width: min(78vw, 420px); z-index: 2; }
+
+/* The places, one swatch each, above the strip on the left. */
+.stage-places { position: absolute; left: 12px; bottom: 132px;
+  display: flex; flex-direction: column; gap: 8px; }
+.stage-place { width: 26px; height: 26px; min-height: 26px; padding: 0;
+  border-radius: 50%; border: 2px solid rgba(255,255,255,0.35); }
+.stage-place.lit { border-color: #fff; }
+
 /* The device list, in the settings-page shape: a rounded group of rows,
    one hairline between neighbours, the status word on the right. */
 .dev-list { border: 1px solid var(--line); border-radius: 12px;

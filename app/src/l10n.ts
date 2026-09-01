@@ -9792,6 +9792,24 @@ const CHROME: Table = {
   "ins.leave": {
     en: "Leave the room", es: "Salir de la sala", fr: "Quitter la salle", de: "Raum verlassen", pt: "Sair da sala", it: "Esci dalla stanza", ja: "部屋を出る", zh: "离开房间", hi: "कमरे से बाहर जाएँ", ar: "غادر الغرفة",
   },
+  "ins.stage.place": {
+    en: "Where you stand", es: "Dónde estás", fr: "Où vous êtes", de: "Wo du stehst", pt: "Onde você está", it: "Dove ti trovi", ja: "立つ場所", zh: "你站的地方", hi: "आप कहाँ खड़े हैं", ar: "حيث تقف",
+  },
+  "ins.place.studio": {
+    en: "Studio", es: "Estudio", fr: "Studio", de: "Studio", pt: "Estúdio", it: "Studio", ja: "スタジオ", zh: "摄影棚", hi: "स्टूडियो", ar: "الاستوديو",
+  },
+  "ins.place.dusk": {
+    en: "Dusk", es: "Anochecer", fr: "Crépuscule", de: "Dämmerung", pt: "Anoitecer", it: "Crepuscolo", ja: "夕暮れ", zh: "黄昏", hi: "गोधूलि", ar: "الغسق",
+  },
+  "ins.place.forest": {
+    en: "Forest", es: "Bosque", fr: "Forêt", de: "Wald", pt: "Floresta", it: "Foresta", ja: "森", zh: "森林", hi: "जंगल", ar: "الغابة",
+  },
+  "ins.place.shore": {
+    en: "Shore", es: "Orilla", fr: "Rivage", de: "Ufer", pt: "Litoral", it: "Riva", ja: "海辺", zh: "海边", hi: "किनारा", ar: "الشاطئ",
+  },
+  "ins.place.void": {
+    en: "The dark", es: "La oscuridad", fr: "Le noir", de: "Das Dunkel", pt: "O escuro", it: "Il buio", ja: "闇", zh: "黑暗", hi: "अंधकार", ar: "العتمة",
+  },
   "ins.stage.headset": {
     en: "On your headset", es: "En tu visor", fr: "Sur votre casque", de: "Auf deinem Headset", pt: "No seu visor", it: "Sul tuo visore", ja: "ヘッドセットで", zh: "在你的头显上", hi: "आपके हेडसेट पर", ar: "على نظارتك",
   },

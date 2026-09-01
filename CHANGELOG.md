@@ -33,6 +33,30 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   watch may hold, asserted against the permission model rather than the
   picker's sentence.
 
+- **The figures stand in the room.** A seat with a body — the same
+  `.glb` the avatar road opens — stands at its place in the headset,
+  scaled to height and facing the middle, with the face card up only
+  until the body arrives. On the flat stage, pressing a seat that has a
+  figure opens it full over the AR passthrough — the avatar in the
+  user's own real environment. One resolver names the model for every
+  rendering, as one names the photograph.
+
+- **A place of your choosing, in VR.** The stage grows five
+  surroundings — studio, dusk, forest, shore, the dark — drawn by this
+  product's own scene code from one palette table, painted as the flat
+  stage's backdrop and built as the headset's sky, fog and ground. The
+  choice is per-viewer and browser-only, like the format: two people in
+  one room can stand in different places while hearing the same
+  conversation. AR gets no picker on purpose — its surroundings are the
+  room the person is actually in. No Steam and no store is required for
+  any of it: a PC headset reaches this through its browser, with
+  SteamVR as plumbing the person never sees.
+
+- **The replies as footage, watched where you stand.** Every profile
+  seat in the AR stage carries a small film chip; pressing it floats
+  that seat's rendered reply — the video road's own footage, through
+  the same SeatFilm player the flat page uses — over the passthrough.
+
 ## [2.9.7] - 2026-09-01
 
 ### Added

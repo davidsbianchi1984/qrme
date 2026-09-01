@@ -94,6 +94,42 @@ def test_the_headset_stage_keeps_the_flat_stages_promise():
         assert verb not in src, f"{verb!r} appears in the headset stage"
 
 
+def test_the_figure_and_the_surroundings_are_decided_once():
+    """Three renderings can show a seat's body — the flat stage, the
+    staged overlay, the headset — and one resolver names the `.glb` for
+    all of them, as `stagePhoto` does for the photograph. The chosen
+    surroundings are one palette table read by both stages, so "Dusk" on
+    a phone and "Dusk" in a visor are the same dusk."""
+    assert "const stageModel = (" in INSIDE
+    assert "model: stageModel(s)" in INSIDE, (
+        "the headset's figures are not fed by the shared resolver")
+    assert 'from "./stagePlace"' in XR and "PALETTES[opts.place]" in XR
+    assert "PALETTES[place]" in INSIDE, (
+        "the flat stage stopped painting the chosen place")
+
+
+def test_ar_keeps_the_actual_room():
+    """The place picker is VR's alone. AR's surroundings are the room the
+    person is standing in — offering to swap those out would be offering
+    to draw over reality, which is a different product."""
+    assert 'format === "vr" && (\n            <div className="stage-places"'         .replace("\n", "\n") or True
+    i = INSIDE.index('className="stage-places"')
+    gate = INSIDE.rindex("format === ", 0, i)
+    assert INSIDE[gate:gate + 17] == 'format === "vr" &', (
+        "the place picker is no longer gated to VR")
+
+
+def test_the_reply_footage_floats_in_the_same_player():
+    """The film chip on an AR seat opens the same SeatFilm the flat page
+    uses — one player, one set of rules about what footage exists and
+    whose money renders it. A second player would be a second set."""
+    assert 'className="stage-film-chip"' in INSIDE
+    i = INSIDE.index('className="stage-film"')
+    panel = INSIDE[i:i + 600]
+    assert "SeatFilm" in panel, (
+        "the stage's footage panel grew its own player")
+
+
 def test_the_door_is_translated_like_everything_else():
     L10N = (REPO / "app/src/l10n.ts").read_text(encoding="utf-8")
     assert '"ins.stage.headset"' in L10N

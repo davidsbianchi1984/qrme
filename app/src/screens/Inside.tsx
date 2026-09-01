@@ -9,6 +9,8 @@ import { field } from "../fields";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { seatAngle, RING_RADIUS_CSS } from "../stageRing";
 import { headsetDoor, enterHeadset } from "../xrStage";
+import { PLACES, PALETTES, stagePlace, setStagePlace,
+         type StagePlace } from "../stagePlace";
 import { Refusal } from "../Refusal";
 import { SeatFilm } from "../SeatFilm";
 import { DEFAULT_FORMAT, setRoomFormat,
@@ -313,6 +315,12 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
   // seats sit on a turntable this angle turns.
   const [yaw, setYaw] = useState(0);
   const dragFrom = useRef<{ x: number; yaw: number } | null>(null);
+  // The surroundings this viewer stands in — VR only, theirs alone,
+  // remembered by the browser the way the format is. AR's surroundings
+  // are the actual room and are not a choice anybody makes here.
+  const [place, setPlace] = useState<StagePlace>(() => stagePlace());
+  // Whose footage is floating in the AR stage, if anybody's.
+  const [stageFilm, setStageFilm] = useState<string | null>(null);
   // AR passthrough — the device's world-facing camera as the stage floor.
   // Deliberately separate from the room-face camera machinery: this stream
   // renders your surroundings to you and only you, shares no fact with the
@@ -1186,6 +1194,16 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
         : getBase() + (aiFaces[s.id].asset as string);
     }
     return null;
+  };
+
+  // The seat's figure — the `.glb` the avatar road opens — resolved
+  // beside the photo for the same reason the photo is: one answer for
+  // the flat stage, the staged overlay and the headset alike.
+  const stageModel = (s: { kind: string; id: string }): string | null => {
+    const row = s.kind === "user" && s.id === me ? myFace : aiFaces[s.id];
+    const model = (row as { model?: string } | null)?.model;
+    if (!model) return null;
+    return model.startsWith("http") ? model : getBase() + model;
   };
 
   const stageFace = (s: { kind: string; id: string; display: string }) => {
@@ -3772,6 +3790,12 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
         // drag turns. Both are rendered here and only here — no pixels of
         // yours and no room of anybody else's crosses the wire for this.
         <div className={"room-stage" + (format === "vr" ? " vr" : "")}
+             style={format === "vr" ? {
+               background: `linear-gradient(${PALETTES[place].sky} 0%,`
+                 + ` ${PALETTES[place].horizon} 62%,`
+                 + ` ${PALETTES[place].ground} 62.5%,`
+                 + ` ${PALETTES[place].ground} 100%)`,
+             } : undefined}
              role="dialog" aria-label={tr("ins.stage.title", lang)}
              onPointerDown={(e) => {
                dragFrom.current = { x: e.clientX, yaw };
@@ -3810,7 +3834,11 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                          + ` translateZ(${-RING_RADIUS_CSS}px)` }}>
                     <div className={"stage-seat"
                                     + (isTalking(s) ? " talking" : "")}
-                         style={{ transform: `rotateY(${-(a + yaw)}deg)` }}>
+                         style={{ transform: `rotateY(${-(a + yaw)}deg)` }}
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           if (stageModel(s)) setStaged(s.id);
+                         }}>
                       {stageFace(s)}
                       <span className="rs-name">{s.display}</span>
                       {s.kind !== "user" && (
@@ -3836,7 +3864,11 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                 <div key={s.id}
                      className={"stage-seat ar"
                                 + (isTalking(s) ? " talking" : "")}
-                     style={{ left: `${left}%`, top: `${top}%` }}>
+                     style={{ left: `${left}%`, top: `${top}%` }}
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       if (stageModel(s)) setStaged(s.id);
+                     }}>
                   {stageFace(s)}
                   <span className="rs-name">{s.display}</span>
                   {s.kind !== "user" && (
@@ -3844,9 +3876,55 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                       {tr("ins.seat.aimark", lang)}
                     </span>
                   )}
+                  {/* The reply as footage, watched where you stand — the
+                      film the video road renders, floating over the
+                      passthrough rather than back on the flat page. */}
+                  {s.kind !== "user" && (
+                    <button type="button" className="stage-film-chip"
+                            aria-label={tr("ins.format.video", lang)}
+                            title={tr("ins.format.video", lang)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setStageFilm(stageFilm === s.id ? null : s.id);
+                            }}>
+                      {"\u{1F3A5}"}
+                    </button>
+                  )}
                 </div>
               );
             })
+          )}
+          {/* The chosen footage, floating in the room you are standing
+              in. The same SeatFilm the flat page uses — one player, one
+              set of rules about what footage exists. */}
+          {format === "ar" && stageFilm && (() => {
+            const seat = seats.find((x) => x.id === stageFilm);
+            return seat ? (
+              <div className="stage-film">
+                <SeatFilm profileId={seat.id} display={seat.display}
+                          talking={isTalking(seat)} lang={lang}
+                          onFull={setFilmFull} />
+              </div>
+            ) : null;
+          })()}
+          {/* Where you stand is yours to choose — in VR. One chip per
+              place; AR's place is the room you are actually in. */}
+          {format === "vr" && (
+            <div className="stage-places" role="group"
+                 aria-label={tr("ins.stage.place", lang)}>
+              {PLACES.map((pl) => (
+                <button key={pl} type="button"
+                        className={"stage-place" + (pl === place ? " lit" : "")}
+                        aria-pressed={pl === place}
+                        style={{ background: PALETTES[pl].horizon }}
+                        title={tr(`ins.place.${pl}`, lang)}
+                        aria-label={tr(`ins.place.${pl}`, lang)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPlace(pl); setStagePlace(pl);
+                        }} />
+              ))}
+            </div>
           )}
           {/* The conversation rides the stage, so stepping in is not
               stepping out of it — the same strip the flat scene wears,
@@ -3869,8 +3947,10 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                         seats: seats.map((s) => ({
                           id: s.id, display: s.display,
                           photo: stagePhoto(s),
+                          model: stageModel(s),
                           ai: s.kind !== "user",
                         })),
+                        place,
                         isTalking: (id) => {
                           const seat = seats.find((x) => x.id === id);
                           return seat ? isTalking(seat) : false;

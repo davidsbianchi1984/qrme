@@ -18,13 +18,19 @@
  * file for capture vocabulary the same way the pairing model is read.
  */
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { RING_RADIUS_XR, RING_HEIGHT_XR, seatAngle } from "./stageRing";
+import { PALETTES, type StagePlace } from "./stagePlace";
 
 export type XrSeat = {
   id: string;
   display: string;
   /** Same URL the flat stage's face shows, resolved by the same rules. */
   photo: string | null;
+  /** The seat's figure — the same `.glb` the avatar road opens, where
+   *  the profile has one. A seat with a body stands; the rest keep the
+   *  face card. */
+  model: string | null;
   /** Wears the AI mark — drawn on the label, as on every other seat. */
   ai: boolean;
 };
@@ -80,6 +86,9 @@ function initials(seat: XrSeat): THREE.CanvasTexture {
 export async function enterHeadset(opts: {
   mode: XrMode;
   seats: XrSeat[];
+  /** The surroundings this viewer chose — VR only; AR's surroundings
+   *  are the actual room, composited by the device. */
+  place: StagePlace;
   /** Read each frame so the green ring follows the voice being heard. */
   isTalking: (id: string) => boolean;
   onEnd: () => void;
@@ -91,16 +100,27 @@ export async function enterHeadset(opts: {
   renderer.xr.enabled = true;
   const scene = new THREE.Scene();
   if (opts.mode === "immersive-vr") {
-    scene.background = new THREE.Color(0x0b0d12);
+    // The chosen surroundings: sky overhead, a fog that falls to the
+    // horizon band, ground underfoot. Drawn from the palette, so every
+    // place is this product's own scene code — nothing downloaded,
+    // nothing from a store.
+    const pal = PALETTES[opts.place];
+    scene.background = new THREE.Color(pal.sky);
+    scene.fog = new THREE.Fog(new THREE.Color(pal.horizon).getHex(), 6, 30);
     const floor = new THREE.Mesh(
-      new THREE.CircleGeometry(RING_RADIUS_XR + 1.2, 48),
-      new THREE.MeshBasicMaterial({ color: 0x151a24 }));
+      new THREE.CircleGeometry(RING_RADIUS_XR + 8, 48),
+      new THREE.MeshBasicMaterial({ color: pal.ground }));
     floor.rotation.x = -Math.PI / 2;
     scene.add(floor);
+    // Figures need light; sprites and the unlit floor ignore it.
+    scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+  } else {
+    scene.add(new THREE.AmbientLight(0xffffff, 0.9));
   }
   const camera = new THREE.PerspectiveCamera();
 
   const rings: { id: string; ring: THREE.Sprite }[] = [];
+  const cards = new Map<string, THREE.Sprite>();
   const loader = new THREE.TextureLoader();
   const n = opts.seats.length;
   opts.seats.forEach((seat, i) => {
@@ -109,11 +129,30 @@ export async function enterHeadset(opts: {
     const x = Math.sin(a) * RING_RADIUS_XR;
     const z = -Math.cos(a) * RING_RADIUS_XR;
 
+    if (seat.model) {
+      // The figure itself, standing at its seat and facing the middle —
+      // the same `.glb` the avatar road opens, so the person you see in
+      // the visor is the person the flat screen shows. The face card
+      // stays up while it loads and comes down when the body arrives.
+      new GLTFLoader().load(seat.model, (loaded) => {
+        const body = loaded.scene;
+        const box = new THREE.Box3().setFromObject(body);
+        const h = Math.max(box.max.y - box.min.y, 0.01);
+        const s = 1.65 / h;
+        body.scale.setScalar(s);
+        body.position.set(x, -box.min.y * s, z);
+        body.rotation.y = Math.PI + (a);
+        scene.add(body);
+        const card = cards.get(seat.id);
+        if (card) card.visible = false;
+      });
+    }
     const tex = seat.photo ? loader.load(seat.photo) : initials(seat);
     const face = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex }));
     face.position.set(x, RING_HEIGHT_XR, z);
     face.scale.set(0.55, 0.55, 1);
     scene.add(face);
+    cards.set(seat.id, face);
 
     const tag = new THREE.Sprite(new THREE.SpriteMaterial({
       map: label(seat), transparent: true }));
