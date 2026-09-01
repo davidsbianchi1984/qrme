@@ -210,3 +210,17 @@ POST /rooms/{room_id}/errand
 # door and this says so.
 GET /avatars/convert
 POST /profiles/{profile_id}/avatar/convert
+
+# The Company Builder's seven doors (2.9.9) — the web console is the
+# builder's first client. Founding a company, drafting seats, editing a
+# model-written interview and signing it is a screenful of forms; this
+# shell gets that screen when the builder reaches the phones, and a
+# binding with no screen behind it would take these off the backlog
+# while building nothing.
+GET /companies
+GET /companies/{company_id}
+POST /companies
+POST /companies/{company_id}/seats
+POST /companies/{company_id}/seats/{seat_id}/hire
+POST /companies/{company_id}/seats/{seat_id}/interview
+POST /companies/{company_id}/seats/{seat_id}/retire

@@ -917,7 +917,7 @@ const CHROME: Table = {
     en: "{n} seats", es: "{n} puestos", fr: "{n} postes", de: "{n} Stellen", pt: "{n} lugares", it: "{n} posti", ja: "{n}席", zh: "{n} 个席位", hi: "{n} सीटें", ar: "{n} مقاعد",
   },
   "com.found.go": {
-    en: "Found it", es: "Fundarla", fr: "La fonder", de: "Gründen", pt: "Fundá-la", it: "Fondala", ja: "設立する", zh: "创立", hi: "बनाएँ", ar: "أسّسها",
+    en: "Found it", es: "Fundarla", fr: "La fonder", de: "Gründen", pt: "Fundá-la", it: "Fondala", ja: "設立する", zh: "创建", hi: "स्थापित करें", ar: "أسِّسها",
   },
   "com.back": {
     en: "← All companies", es: "← Todas las empresas", fr: "← Toutes les entreprises", de: "← Alle Unternehmen", pt: "← Todas as empresas", it: "← Tutte le aziende", ja: "← すべての会社", zh: "← 全部公司", hi: "← सभी कंपनियाँ", ar: "← كل الشركات",
