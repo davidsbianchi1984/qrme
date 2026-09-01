@@ -973,6 +973,60 @@ const CHROME: Table = {
   "com.retire": {
     en: "Retire the seat", es: "Retirar el puesto", fr: "Retirer le poste", de: "Stelle auflösen", pt: "Retirar o lugar", it: "Ritira il posto", ja: "席を廃止", zh: "撤销席位", hi: "सीट हटाएँ", ar: "ألغِ المقعد",
   },
+  "com.file": {
+    en: "The employee file", es: "El expediente del empleado", fr: "Le dossier de l'employé", de: "Die Personalakte", pt: "A ficha do funcionário", it: "La scheda del dipendente", ja: "社員ファイル", zh: "员工档案", hi: "कर्मचारी फ़ाइल", ar: "ملف الموظف",
+  },
+  "com.file.close": {
+    en: "Close the file", es: "Cerrar el expediente", fr: "Fermer le dossier", de: "Die Akte schließen", pt: "Fechar a ficha", it: "Chiudi la scheda", ja: "ファイルを閉じる", zh: "关闭档案", hi: "फ़ाइल बंद करें", ar: "أغلق الملف",
+  },
+  "com.work.title": {
+    en: "Where they work", es: "Dónde trabajan", fr: "Où ils travaillent", de: "Wo sie arbeiten", pt: "Onde trabalham", it: "Dove lavorano", ja: "働く場所", zh: "工作地点", hi: "वे कहाँ काम करते हैं", ar: "أين يعملون",
+  },
+  "com.work.none": {
+    en: "No body yet — this employee lives on this screen.", es: "Aún sin cuerpo: este empleado vive en esta pantalla.", fr: "Pas encore de corps — cet employé vit sur cet écran.", de: "Noch kein Körper — diese Fachkraft lebt auf diesem Bildschirm.", pt: "Ainda sem corpo — este funcionário vive neste ecrã.", it: "Ancora nessun corpo — questo dipendente vive su questo schermo.", ja: "まだ身体はありません — この社員はこの画面の中にいます。", zh: "还没有身体——这位员工住在这块屏幕里。", hi: "अभी कोई शरीर नहीं — यह कर्मचारी इसी स्क्रीन पर रहता है।", ar: "لا جسد بعد — هذا الموظف يعيش على هذه الشاشة.",
+  },
+  "com.work.shelf": {
+    en: "Give them a body — every American model:", es: "Dales un cuerpo: todos los modelos americanos:", fr: "Donnez-leur un corps — tous les modèles américains :", de: "Gib ihnen einen Körper — jedes amerikanische Modell:", pt: "Dê-lhes um corpo — todos os modelos americanos:", it: "Dagli un corpo — tutti i modelli americani:", ja: "身体を与える — アメリカの全モデル:", zh: "给他们一个身体——所有美国型号：", hi: "उन्हें एक शरीर दें — हर अमेरिकी मॉडल:", ar: "امنحهم جسداً — كل الطرازات الأمريكية:",
+  },
+  "com.work.bind": {
+    en: "Bind", es: "Vincular", fr: "Lier", de: "Verbinden", pt: "Vincular", it: "Collega", ja: "接続", zh: "绑定", hi: "जोड़ें", ar: "اربط",
+  },
+  "com.work.screen": {
+    en: "Put on this screen", es: "Poner en pantalla", fr: "Mettre à l'écran", de: "Auf den Bildschirm", pt: "Pôr no ecrã", it: "Metti sullo schermo", ja: "画面に配置", zh: "放到屏幕上", hi: "स्क्रीन पर लगाएँ", ar: "ضعه على الشاشة",
+  },
+  "com.work.screen.label": {
+    en: "Name the screen (lobby panel…)", es: "Nombra la pantalla (panel del vestíbulo…)", fr: "Nommez l'écran (panneau du hall…)", de: "Den Bildschirm benennen (Empfangstafel …)", pt: "Dê nome ao ecrã (painel da entrada…)", it: "Dai un nome allo schermo (pannello della hall…)", ja: "画面に名前を（ロビーのパネルなど）", zh: "给屏幕命名（大堂面板…）", hi: "स्क्रीन का नाम रखें (लॉबी पैनल…)", ar: "سمِّ الشاشة (لوحة البهو…)",
+  },
+  "com.work.pair": {
+    en: "Open on a nearby device — same Wi-Fi, scan the code.", es: "Ábrelo en un dispositivo cercano: misma Wi-Fi, escanea el código.", fr: "Ouvrez sur un appareil proche — même Wi-Fi, scannez le code.", de: "Auf einem Gerät in der Nähe öffnen — gleiches WLAN, Code scannen.", pt: "Abra num dispositivo próximo — mesmo Wi-Fi, leia o código.", it: "Apri su un dispositivo vicino — stesso Wi-Fi, scansiona il codice.", ja: "近くのデバイスで開く — 同じWi-Fiでコードをスキャン。", zh: "在附近设备上打开——同一Wi-Fi，扫码即可。", hi: "पास के डिवाइस पर खोलें — वही Wi-Fi, कोड स्कैन करें।", ar: "افتحه على جهاز قريب — نفس الشبكة، امسح الرمز.",
+  },
+  "com.hand.title": {
+    en: "Hand them out", es: "Entrégalos", fr: "Distribuez-les", de: "Weitergeben", pt: "Entregue-os", it: "Consegnali", ja: "手渡す", zh: "交给别人", hi: "उन्हें सौंपें", ar: "سلّمهم",
+  },
+  "com.hand.mint": {
+    en: "Make a handoff code", es: "Crear un código de entrega", fr: "Créer un code de remise", de: "Einen Übergabecode erzeugen", pt: "Criar um código de entrega", it: "Crea un codice di consegna", ja: "受け渡しコードを作成", zh: "生成交接码", hi: "हैंडऑफ़ कोड बनाएँ", ar: "أنشئ رمز تسليم",
+  },
+  "com.hand.download": {
+    en: "Download their file", es: "Descargar su ficha", fr: "Télécharger leur dossier", de: "Die Akte herunterladen", pt: "Transferir a ficha", it: "Scarica la scheda", ja: "ファイルをダウンロード", zh: "下载档案", hi: "फ़ाइल डाउनलोड करें", ar: "نزّل الملف",
+  },
+  "com.hand.code": {
+    en: "The code", es: "El código", fr: "Le code", de: "Der Code", pt: "O código", it: "Il codice", ja: "コード", zh: "代码", hi: "कोड", ar: "الرمز",
+  },
+  "com.hand.link": {
+    en: "The link", es: "El enlace", fr: "Le lien", de: "Der Link", pt: "O link", it: "Il link", ja: "リンク", zh: "链接", hi: "लिंक", ar: "الرابط",
+  },
+  "com.hand.note": {
+    en: "One use, ten minutes — scan or type it on the other device. The founder's key never rides along.", es: "Un solo uso, diez minutos: escanéalo o escríbelo en el otro dispositivo. La llave del fundador nunca viaja.", fr: "Un seul usage, dix minutes — scannez-le ou tapez-le sur l'autre appareil. La clé du fondateur ne voyage jamais.", de: "Einmal gültig, zehn Minuten — auf dem anderen Gerät scannen oder eintippen. Der Schlüssel der Gründung reist nie mit.", pt: "Um único uso, dez minutos — leia ou digite no outro dispositivo. A chave do fundador nunca viaja junto.", it: "Un solo uso, dieci minuti — scansiona o digita sull'altro dispositivo. La chiave del fondatore non viaggia mai.", ja: "一回限り・10分間 — もう一方のデバイスでスキャンか入力を。創業者の鍵は決して同行しません。", zh: "一次有效，十分钟——在另一台设备上扫码或输入。创始人的密钥绝不随行。", hi: "एक बार, दस मिनट — दूसरे डिवाइस पर स्कैन करें या टाइप करें। संस्थापक की कुंजी कभी साथ नहीं जाती।", ar: "استخدام واحد، عشر دقائق — امسحه أو اكتبه على الجهاز الآخر. مفتاح المؤسس لا يسافر أبداً.",
+  },
+  "com.avail.shipping": {
+    en: "Shipping", es: "Disponible", fr: "Disponible", de: "Lieferbar", pt: "Disponível", it: "Disponibile", ja: "出荷中", zh: "现货", hi: "उपलब्ध", ar: "متوفر",
+  },
+  "com.avail.preorder": {
+    en: "Preorder", es: "Reserva", fr: "Précommande", de: "Vorbestellbar", pt: "Pré-venda", it: "Preordine", ja: "予約受付", zh: "预订", hi: "प्री-ऑर्डर", ar: "طلب مسبق",
+  },
+  "com.avail.announced": {
+    en: "Announced", es: "Anunciado", fr: "Annoncé", de: "Angekündigt", pt: "Anunciado", it: "Annunciato", ja: "発表のみ", zh: "已发布", hi: "घोषित", ar: "مُعلن",
+  },
   "nav.companies": {
     en: "Companies", es: "Empresas", fr: "Entreprises", de: "Unternehmen",
     pt: "Empresas", it: "Aziende", ja: "会社", zh: "公司",

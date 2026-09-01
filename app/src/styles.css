@@ -5047,3 +5047,19 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   margin-top: 10px; }
 .com-q { display: flex; flex-direction: column; gap: 4px; }
 .com-q textarea { min-height: 56px; }
+
+/* The employee file: the two sections that make a hired employee a thing
+   in the world — bodies and screens, then the handoff. */
+.com-file { border-top: 1px dashed rgba(255, 255, 255, 0.15);
+  margin-top: 10px; padding-top: 10px; }
+.com-file h4 { margin: 8px 0 4px; }
+.com-shelf { display: flex; flex-wrap: wrap; gap: 6px;
+  align-items: center; }
+.com-avail { font-size: 11px; padding: 0 6px; border-radius: 8px;
+  opacity: 0.9; }
+.com-avail.shipping { color: #7bc47f; }
+.com-avail.preorder { color: #d9b45b; }
+.com-avail.announced { opacity: 0.5; }
+.com-handoff { display: flex; gap: 10px; align-items: flex-start; }
+.com-handoff code { word-break: break-all; }
+.com-qr { width: 96px; height: 96px; background: #fff; border-radius: 6px; }

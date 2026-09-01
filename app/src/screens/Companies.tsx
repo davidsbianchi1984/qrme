@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { accountApi, api, Company, CompanySeat, InterviewQ } from "../api";
+import { accountApi, api, Company, CompanySeat, Display, Embodiment,
+         getBase, InterviewQ, RobotCatalogue } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
@@ -60,6 +61,21 @@ export function Companies({ onOpenProfile }: {
     seatId: string; rows: { question: string; answer: string }[];
   } | null>(null);
 
+  // The employee file, in place. Which hired seat's file is open; the
+  // minted keys that open that employee's own doors (one per profile,
+  // fetched on first use); and what those doors answered.
+  const [fileFor, setFileFor] = useState<string | null>(null);
+  const [keys, setKeys] = useState<Record<string, string>>({});
+  const [forms, setForms] = useState<Embodiment[]>([]);
+  const [screens, setScreens] = useState<Display[]>([]);
+  const [shelf, setShelf] = useState<RobotCatalogue | null>(null);
+  const [kinds, setKinds] = useState<{ kind: string; means: string }[]>([]);
+  const [screenKind, setScreenKind] = useState("");
+  const [screenLabel, setScreenLabel] = useState("");
+  const [handoff, setHandoff] = useState<{
+    ticket: string; url: string; qr_svg: string; expires_at: string;
+  } | null>(null);
+
   const refresh = async () => {
     setList(await api.companies(token));
     if (open) {
@@ -75,6 +91,34 @@ export function Companies({ onOpenProfile }: {
     try { await fn(); await refresh(); }
     catch (e) { setError(e instanceof Error ? e.message : String(e)); }
     finally { setBusy(false); }
+  };
+
+  // The employee's own doors — bodies, screens, the handoff — take that
+  // profile's owner key, not the founder's session. The account mints one
+  // on demand; minting is additive, so every key already out there stands.
+  const employeeKey = async (profileId: string): Promise<string> => {
+    if (keys[profileId]) return keys[profileId];
+    const minted = await accountApi.mintOwnerToken(
+      session.accountId!, profileId, session.accountToken!);
+    setKeys((k) => ({ ...k, [profileId]: minted.owner_token }));
+    return minted.owner_token;
+  };
+
+  const loadFile = async (profileId: string) => {
+    const key = await employeeKey(profileId);
+    const [bodies, myScreens, catalogue, vocab] = await Promise.all([
+      api.embodiments(profileId, key),
+      api.myDisplays(profileId, key),
+      api.robotCatalogue(),
+      api.displayCatalog(),
+    ]);
+    setForms(bodies);
+    setScreens(myScreens.displays.filter((d) => d.live));
+    setShelf(catalogue);
+    setKinds(vocab.kinds.map((k) => ({ kind: k.kind, means: k.means })));
+    if (vocab.kinds.length) {
+      setScreenKind((prev) => prev || vocab.kinds[0].kind);
+    }
   };
 
   return (
@@ -243,6 +287,162 @@ export function Companies({ onOpenProfile }: {
                         onClick={() => onOpenProfile?.(s.profile_id!)}>
                   {tr("com.oversee", lang)}
                 </button>
+              )}
+
+              {/* The employee file, in place: where they work and how to
+                  hand them out — no other menu involved, because the
+                  founder is standing here in front of the seat. */}
+              {s.status === "hired" && s.profile_id && fileFor !== s.id && (
+                <button className="muted small" disabled={busy}
+                        onClick={act(async () => {
+                          await loadFile(s.profile_id!);
+                          setHandoff(null);
+                          setFileFor(s.id);
+                        })}>
+                  {tr("com.file", lang)}
+                </button>
+              )}
+              {fileFor === s.id && s.profile_id && (
+                <div className="com-file">
+                  <h4>{tr("com.work.title", lang)}</h4>
+                  {forms.length === 0 && screens.length === 0 && (
+                    <p className="muted small">{tr("com.work.none", lang)}</p>
+                  )}
+                  {forms.map((f) => (
+                    <div key={f.name} className="row">
+                      <b>{f.name}</b>
+                      <span className="muted small">{f.kind}</span>
+                    </div>
+                  ))}
+                  {screens.map((d) => (
+                    <div key={d.id} className="row">
+                      <b>{d.label}</b>
+                      <span className="muted small">{d.kind}</span>
+                    </div>
+                  ))}
+
+                  {/* The robot shelf, the whole catalogue in place. An
+                      announced body renders un-bindable rather than
+                      hidden — see qrme/robotics.py on why hiding a
+                      published machine would be the worse lie. */}
+                  <p className="muted small">{tr("com.work.shelf", lang)}</p>
+                  {shelf && Object.entries(shelf.by_maker).map(
+                    ([maker, models]) => (
+                    <div key={maker} className="com-shelf">
+                      <span className="muted small">{maker}</span>
+                      {models.map((m) => (
+                        <span key={m.model} className="row">
+                          <b>{m.label}</b>
+                          <span className={"com-avail " + m.availability}>
+                            {tr(`com.avail.${m.availability}`, lang)}
+                          </span>
+                          <button className="muted small"
+                                  disabled={busy || !m.bindable}
+                                  onClick={act(async () => {
+                                    const key =
+                                      await employeeKey(s.profile_id!);
+                                    await api.bindRobot(s.profile_id!,
+                                      { model: m.model, name: m.label },
+                                      key);
+                                    await loadFile(s.profile_id!);
+                                  })}>
+                            {tr("com.work.bind", lang)}
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  ))}
+
+                  <div className="row">
+                    <select value={screenKind}
+                            onChange={(e) => setScreenKind(e.target.value)}>
+                      {kinds.map((k) => (
+                        <option key={k.kind} value={k.kind}>{k.kind}</option>
+                      ))}
+                    </select>
+                    <input value={screenLabel}
+                           onChange={(e) => setScreenLabel(e.target.value)}
+                           placeholder={tr("com.work.screen.label", lang)}
+                           style={{ flex: 1 }} />
+                    <button className="muted small"
+                            disabled={busy || !screenLabel.trim()}
+                            onClick={act(async () => {
+                              const key = await employeeKey(s.profile_id!);
+                              await api.placeDisplay(s.profile_id!,
+                                { kind: screenKind,
+                                  label: screenLabel.trim() }, key);
+                              setScreenLabel("");
+                              await loadFile(s.profile_id!);
+                            })}>
+                      {tr("com.work.screen", lang)}
+                    </button>
+                  </div>
+
+                  {/* The nearby-device road: the studio's own address as
+                      a code a camera can read — same network, no store. */}
+                  <div className="row">
+                    <img className="com-qr" alt=""
+                         src={getBase() + "/pair/qr.svg"} />
+                    <span className="muted small">
+                      {tr("com.work.pair", lang)}
+                    </span>
+                  </div>
+
+                  {/* Hand them out: the employee as a thing you can give
+                      somebody — a code to type, a code to scan, a link, a
+                      file. The handoff ticket is the whole authority; the
+                      founder's key never rides in any of them. */}
+                  <h4>{tr("com.hand.title", lang)}</h4>
+                  <div className="row">
+                    <button className="muted small" disabled={busy}
+                            onClick={act(async () => {
+                              const key = await employeeKey(s.profile_id!);
+                              setHandoff(await api.exportTicket(
+                                s.profile_id!, key));
+                            })}>
+                      {tr("com.hand.mint", lang)}
+                    </button>
+                    <button className="muted small" disabled={busy}
+                            onClick={act(async () => {
+                              const key = await employeeKey(s.profile_id!);
+                              const bundle = await api.exportProfile(
+                                s.profile_id!, key);
+                              const blob = new Blob(
+                                [JSON.stringify(bundle, null, 2)],
+                                { type: "application/json" });
+                              const a = document.createElement("a");
+                              a.href = URL.createObjectURL(blob);
+                              a.download = `${s.title}.qrme.json`;
+                              a.click();
+                              URL.revokeObjectURL(a.href);
+                            })}>
+                      {tr("com.hand.download", lang)}
+                    </button>
+                  </div>
+                  {handoff && (
+                    <div className="com-handoff">
+                      <img className="com-qr" alt=""
+                           src={getBase() + handoff.qr_svg} />
+                      <div>
+                        <p className="small">
+                          <b>{tr("com.hand.code", lang)}</b>{" "}
+                          <code>{handoff.ticket}</code>
+                        </p>
+                        <p className="small">
+                          <b>{tr("com.hand.link", lang)}</b>{" "}
+                          <code>{getBase() + handoff.url}</code>
+                        </p>
+                        <p className="muted small">
+                          {tr("com.hand.note", lang)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  <button className="muted small"
+                          onClick={() => setFileFor(null)}>
+                    {tr("com.file.close", lang)}
+                  </button>
+                </div>
               )}
 
               {/* Bring your own: the founder's existing or blended
