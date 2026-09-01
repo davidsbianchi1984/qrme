@@ -353,3 +353,65 @@ def retire(company: dict, seat_id: str) -> dict:
                  (seat["id"],))
     conn.commit()
     return {"seat_id": seat["id"], "status": "retired"}
+
+
+def publish(company: dict, tagline: str | None = None) -> dict:
+    """Open for business: the company enters the marketplace inside the
+    app.
+
+        asked     users can enter their business into the digital
+                  marketplace QRME offers
+        mattered  a company that works only for its founder is a
+                  rehearsal; the marketplace is the audience
+
+    The storefront rides the shop rails that already exist — one shop,
+    anchored on the first hire (the front desk), named for the company,
+    tagged with its industry so Discover files it where people browse.
+    Each department with hired staff becomes a service offering whose
+    blurb names who answers, at no listed price: what a company charges
+    is the founder's later decision on the offering, not a founding
+    fee invented here. Publishing twice is an edit, like the shop rail
+    it stands on; closing the storefront is `unpublish`, and the company
+    keeps working privately either way.
+    """
+    from . import shops
+    hired = [s for s in seats(company["id"])
+             if s["status"] == "hired" and s["profile_id"]]
+    if not hired:
+        raise CompanyError("a company with nobody hired cannot open for "
+                           "business")
+    front = hired[0]["profile_id"]
+    shop = shops.open_shop(front, company["name"],
+                           tagline or company["industry"],
+                           company["industry"][:60])
+    standing = {o["title"] for o in shop.get("offerings", [])}
+    by_dept: dict[str, list[str]] = {}
+    for s in hired:
+        who = (s["charter"] or [{}])[0].get("answer", s["title"])             if isinstance(s["charter"], list) else s["title"]
+        by_dept.setdefault(s["department"], []).append(who)
+    for dept, names in by_dept.items():
+        if dept in standing:
+            continue
+        shops.add_offering(shop["id"], "service", dept,
+                           "Ask for " + ", ".join(names[:3]), 0.0)
+    conn = db.connect()
+    conn.execute("UPDATE companies SET shop_id=? WHERE id=?",
+                 (shop["id"], company["id"]))
+    conn.commit()
+    return shops.shop(shop["id"])
+
+
+def unpublish(company: dict) -> dict:
+    """The storefront comes down; the company keeps working. A status
+    flip on the shop rail — listings only show what is open — so
+    republishing later is the same edit it always was."""
+    if not company.get("shop_id"):
+        raise CompanyError("this company is not in the marketplace")
+    conn = db.connect()
+    conn.execute("UPDATE shops SET status='closed' WHERE id=?",
+                 (company["shop_id"],))
+    conn.execute("UPDATE companies SET shop_id=NULL WHERE id=?",
+                 (company["id"],))
+    conn.commit()
+    return {"company_id": company["id"], "storefront": "closed"}
+

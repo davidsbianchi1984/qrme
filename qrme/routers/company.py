@@ -135,6 +135,31 @@ def hire(company_id: str, seat_id: str, body: SeatHire,
         _fail(exc)
 
 
+class CompanyPublish(BaseModel):
+    tagline: str | None = Field(
+        default=None, max_length=300,
+        description="What the storefront says this company does.")
+
+
+@router.post("/companies/{company_id}/publish", status_code=201)
+def publish(company_id: str, body: CompanyPublish, request: Request) -> dict:
+    """Open for business — see qrme/company.py for what a storefront is."""
+    row = _company_or_404(company_id, request)
+    try:
+        return companies.publish(row, body.tagline)
+    except companies.CompanyError as exc:
+        _fail(exc)
+
+
+@router.post("/companies/{company_id}/unpublish")
+def unpublish(company_id: str, request: Request) -> dict:
+    row = _company_or_404(company_id, request)
+    try:
+        return companies.unpublish(row)
+    except companies.CompanyError as exc:
+        _fail(exc)
+
+
 @router.post("/companies/{company_id}/seats/{seat_id}/retire")
 def retire(company_id: str, seat_id: str, request: Request) -> dict:
     row = _company_or_404(company_id, request)

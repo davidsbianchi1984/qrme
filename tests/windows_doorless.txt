@@ -224,3 +224,7 @@ POST /companies/{company_id}/seats
 POST /companies/{company_id}/seats/{seat_id}/hire
 POST /companies/{company_id}/seats/{seat_id}/interview
 POST /companies/{company_id}/seats/{seat_id}/retire
+# Open for business (2.9.10): the storefront doors, console-first for the
+# same reason the builder's seven above are.
+POST /companies/{company_id}/publish
+POST /companies/{company_id}/unpublish

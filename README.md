@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v2.9.9** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v2.9.10** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -480,6 +480,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **2.9.10** | **Open for business** — a staffed company enters the in-app marketplace with one press: a storefront on the existing shop rails, named for the company, tagged with its industry, each staffed department a service offering naming who answers. Nobody hired, no storefront — the refusal speaks ten languages. Closing takes the sign down and dissolves nothing; republishing is an edit; strangers get 404. |
 | **2.9.9** | **The Company Builder** — found a digital company in any industry, open seats for any title on Earth, and hire one interview at a time: the platform writes each role's interview at the founder's own questionnaire's caliber, and signing it is the hire — profile under your account, charter in the persona and source material, colleagues connected, seat filled in the org. Licensed and physical duties are assisted, never performed. Oversight is ownership: every employee answers to the owner doors that already exist, organised under the company folder. |
 | **2.9.8** | **The screens render** — the stage offers "On your headset" wherever the browser can answer for one, and opens the same room as a WebXR session in the headset's own browser — no Steam and no store required, SteamVR is plumbing a PC headset's browser drives itself. The figures stand in it: a seat with a body stands at its place in the visor, and pressing a seat on the flat AR stage opens its avatar over your own real environment. VR gets five surroundings of your choosing; AR keeps the actual room and gains film chips that float each seat's rendered reply over the passthrough. One ring module, one photo resolver, one model resolver and one palette table keep every rendering the same room, and a band pairs with every face a watch may hold. |
 | **2.9.7** | **Every worn thing in America can be added** — the pairing menu grows from nine kinds to twenty: VR headsets, AR glasses, ankle monitors, chest straps, health patches, hearing aids, headbands, insoles, alert buttons, smart clothing, and audio earrings. Each kind declared its microphone and its screen the day it landed, and a short American-market catalogue per kind rides the picker as suggestions — an unlisted device pairs exactly as well. Amara's full-body still joins the portraits with the phone's buttons off her sneakers. |

@@ -6,6 +6,26 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.10] - 2026-09-01
+
+### Added
+
+- **Open for business.** A founded, staffed company enters the digital
+  marketplace inside the app with one press. The storefront rides the
+  shop rails that already exist — anchored on the front-desk hire,
+  named for the company, tagged with its industry so Discover files it
+  where people browse — and each department with hired staff becomes a
+  service offering whose blurb names who answers. What a company
+  charges is the founder's later decision on the offering, not a
+  founding fee invented here. A company with nobody hired cannot open
+  for business, and the refusal says so in ten languages.
+
+  Closing the storefront is a status flip on the same rail: listings
+  hide it, the company keeps working privately, and republishing later
+  is the edit it always was. Strangers' publishes answer 404 — the
+  company folder's boundary is the account's, at the marketplace door
+  as everywhere else.
+
 ## [2.9.9] - 2026-09-01
 
 ### Added
@@ -17356,7 +17376,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.9...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.10...HEAD
+[2.9.10]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.9...app-v2.9.10
 [2.9.9]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.8...app-v2.9.9
 [2.9.8]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.7...app-v2.9.8
 [2.9.7]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.6...app-v2.9.7

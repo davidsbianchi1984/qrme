@@ -38,6 +38,9 @@ export function Companies({ onOpenProfile }: {
   const [industry, setIndustry] = useState("");
   const [headcount, setHeadcount] = useState(5);
 
+  // Open for business.
+  const [tagline, setTagline] = useState("");
+
   // Drafting a seat.
   const [title, setTitle] = useState("");
   const [department, setDepartment] = useState("");
@@ -118,6 +121,44 @@ export function Companies({ onOpenProfile }: {
             {tr("com.back", lang)}
           </button>
           <h3>{open.name}</h3>
+
+          {/* The marketplace door. Publishing is an edit on the shop
+              rail, so the button is safe to press again; closing takes
+              the sign down and dissolves nothing. */}
+          <div className="row">
+            {!open.shop_id && (
+              <>
+                <input value={tagline}
+                       onChange={(e) => setTagline(e.target.value)}
+                       placeholder={tr("com.tagline", lang)}
+                       style={{ flex: 1 }} />
+                <button disabled={busy ||
+                          !seats.some((s) => s.status === "hired")}
+                        onClick={act(async () => {
+                          await api.publishCompany(open.id,
+                            { tagline: tagline.trim() || null }, token);
+                          setOpen({ ...open, shop_id: "pending" });
+                          setTagline("");
+                        })}>
+                  {tr("com.publish", lang)}
+                </button>
+              </>
+            )}
+            {open.shop_id && (
+              <>
+                <span className="com-status hired">
+                  {tr("com.published", lang)}
+                </span>
+                <button className="muted small" disabled={busy}
+                        onClick={act(async () => {
+                          await api.unpublishCompany(open.id, token);
+                          setOpen({ ...open, shop_id: null });
+                        })}>
+                  {tr("com.unpublish", lang)}
+                </button>
+              </>
+            )}
+          </div>
 
           <div className="row">
             <input value={title} onChange={(e) => setTitle(e.target.value)}

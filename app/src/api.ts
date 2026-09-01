@@ -6290,6 +6290,13 @@ export const api = {
     req<{ seat_id: string; profile_id: string; display_name: string }>(
       `/companies/${companyId}/seats/${seatId}/hire`,
       { method: "POST", body, token }),
+  publishCompany: (companyId: string, body: { tagline?: string | null },
+                   token: string) =>
+    req<{ id: string; name: string }>(
+      `/companies/${companyId}/publish`, { method: "POST", body, token }),
+  unpublishCompany: (companyId: string, token: string) =>
+    req<{ company_id: string; storefront: string }>(
+      `/companies/${companyId}/unpublish`, { method: "POST", token }),
   retireSeat: (companyId: string, seatId: string, token: string) =>
     req<{ seat_id: string; status: string }>(
       `/companies/${companyId}/seats/${seatId}/retire`,

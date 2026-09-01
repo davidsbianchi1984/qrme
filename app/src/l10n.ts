@@ -898,6 +898,18 @@ const CHROME: Table = {
     pt: "Campanhas", it: "Campagne", ja: "キャンペーン", zh: "筹款活动",
     hi: "अभियान", ar: "الحملات",
   },
+  "com.publish": {
+    en: "Open for business", es: "Abrir al público", fr: "Ouvrir au public", de: "Eröffnen", pt: "Abrir ao público", it: "Apri al pubblico", ja: "開業する", zh: "开业", hi: "कारोबार शुरू करें", ar: "افتح للجمهور",
+  },
+  "com.unpublish": {
+    en: "Close the storefront", es: "Cerrar el escaparate", fr: "Fermer la vitrine", de: "Das Schaufenster schließen", pt: "Fechar a montra", it: "Chiudi la vetrina", ja: "店を閉じる", zh: "关闭店面", hi: "स्टोरफ़्रंट बंद करें", ar: "أغلق الواجهة",
+  },
+  "com.published": {
+    en: "In the marketplace", es: "En el mercado", fr: "Sur la place de marché", de: "Auf dem Marktplatz", pt: "No mercado", it: "Sul mercato", ja: "マーケット掲載中", zh: "已在市场中", hi: "बाज़ार में", ar: "في السوق",
+  },
+  "com.tagline": {
+    en: "What the storefront says you do", es: "Lo que dice el escaparate que hacéis", fr: "Ce que la vitrine dit de vous", de: "Was das Schaufenster über euch sagt", pt: "O que a montra diz que fazem", it: "Cosa dice la vetrina di voi", ja: "店先に掲げるひとこと", zh: "店面上的一句话", hi: "स्टोरफ़्रंट पर आपके काम की एक पंक्ति", ar: "ما تقوله الواجهة عن عملكم",
+  },
   "com.title": {
     en: "Companies", es: "Empresas", fr: "Entreprises", de: "Unternehmen", pt: "Empresas", it: "Aziende", ja: "会社", zh: "公司", hi: "कंपनियाँ", ar: "الشركات",
   },
