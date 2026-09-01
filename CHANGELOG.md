@@ -6,6 +6,28 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.13] - 2026-09-01
+
+### Added
+
+- **The stores room.** `stores/` holds the three storefront counters on
+  the road to 3.0.0 — Meta Horizon as a packaged PWA over the live
+  console, Steam and Viveport as thin launchers over the Windows shell
+  — with one shared listing (description, screenshots, an honest
+  content-rating sheet), per-counter READMEs naming the owner's steps
+  once the developer accounts clear, credentials and app IDs
+  deliberately absent from the repo, and a guard that holds every
+  shelf's version equal to `app/package.json` and every screenshot the
+  listing names to a file that exists.
+- **The record the attorneys can stand on.** The README now defines the
+  Company Builder feature by feature — founding, seats, the study, the
+  dynamic interview, the hire, the plan, bring-your-own, open for
+  business, per-employee oversight, and the employee file's two sides —
+  and the stage's three renderings of the one room, each stated plainly
+  enough to be checked against the code and found true or false, with
+  photographs of the running console standing beside the behaviours
+  they show.
+
 ## [2.9.12] - 2026-09-01
 
 ### Added
@@ -17429,7 +17451,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.12...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.13...HEAD
+[2.9.13]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.12...app-v2.9.13
 [2.9.12]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.11...app-v2.9.12
 [2.9.11]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.10...app-v2.9.11
 [2.9.10]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.9...app-v2.9.10
