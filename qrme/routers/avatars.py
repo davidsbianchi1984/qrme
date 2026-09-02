@@ -141,15 +141,39 @@ class Road(BaseModel):
 
 
 @router.get("/video/road/{profile_id}")
-def video_road(profile_id: str) -> dict:
-    """Which road this profile takes, its ceiling, and what is left today."""
+def video_road(profile_id: str, request: Request) -> dict:
+    """Which road this profile takes, its ceiling, and what is left today.
+
+    Owner-only, and not for tidiness: the answer carries the daily
+    ceiling, the seconds spent, and the render service — a profile's
+    money posture, which is nobody's read but its owner's. The sibling
+    POST guards the same thing because it *sets* it; this guards it
+    because it *shows* it, and a spend a stranger can read is a spend a
+    stranger is halfway to steering.
+    """
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
     return {**filming.road_of(profile_id), **filming.budget(profile_id),
             "roads": list(filming.ROADS),
             "providers": [p for p in filming.PROVIDERS if p != "none"]}
 
 
 @router.post("/video/road/{profile_id}")
-def video_set_road(profile_id: str, body: Road) -> dict:
+def video_set_road(profile_id: str, body: Road, request: Request) -> dict:
+    """Choose the road, the ceiling that makes video safe, and the service.
+
+    Owner-only. This door sets what a profile's presence *costs* — the
+    video road spends real money per turn, capped by the daily ceiling
+    set right here — and points it at a render provider. It shipped
+    taking neither a token nor a ``Request``, so anybody holding a
+    profile id (they ride on printed stickers) could put a profile on
+    the video road, lift its ceiling to the hour, or repoint its
+    provider, and spend its owner's budget by doing so. Every other
+    mutation in this router calls ``require_owner``; this one now does
+    too.
+    """
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
     try:
         filming.set_road(profile_id, body.road, body.daily_seconds,
                          film_provider=body.provider)

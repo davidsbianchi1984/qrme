@@ -5191,24 +5191,29 @@ export const api = {
    *  auto-render reads it on a turn nobody is looking at a screen for:
    *  a choice held in a component is a choice the chat endpoint cannot
    *  see. `left` is the number that makes picking video safe to pick. */
-  videoRoad: (profileId: string) =>
+  videoRoad: (profileId: string, token: string) =>
     req<{ road: string; daily_seconds: number; set: boolean;
           provider: string; provider_set: boolean;
           spent: number; left: number; roads: string[];
           providers: string[] }>(
-      `/video/road/${profileId}`),
+      `/video/road/${profileId}`, { token }),
   /** Choose the road, and the ceiling that goes with it. The ceiling is
    *  sent with the road rather than on its own screen: somebody turning
    *  video on is exactly the person who needs to see what it will cost
-   *  them per day, and a limit set later is a limit set after the bill. */
-  videoSetRoad: (profileId: string, road: string,
+   *  them per day, and a limit set later is a limit set after the bill.
+   *
+   *  Owner-gated: this sets what a profile's presence costs, so the
+   *  owner token rides it. The door refuses without it — a profile id
+   *  travels on printed stickers, and a spend nobody signs is a spend
+   *  anybody could start. */
+  videoSetRoad: (profileId: string, token: string, road: string,
                  dailySeconds?: number, provider?: string) =>
     req<{ road: string; daily_seconds: number; set: boolean;
           provider: string; provider_set: boolean;
           spent: number; left: number; roads: string[];
           providers: string[] }>(
       `/video/road/${profileId}`,
-      { method: "POST",
+      { method: "POST", token,
         body: { road, daily_seconds: dailySeconds, provider } }),
   /** The most recent render for this profile, however it ended.
    *

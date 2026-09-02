@@ -447,7 +447,7 @@ export function Identity({ onPlans, onPassing }: {
     if (me) {
       // The stored road, so the picker opens on what the chat endpoint
       // will actually do rather than on this component's default.
-      api.videoRoad(me).then((r) => {
+      api.videoRoad(me, token).then((r) => {
         setRoad(r.road as "photo" | "avatar" | "video");
         setBudget(r);
         setCapDraft(String(r.daily_seconds));
@@ -481,14 +481,14 @@ export function Identity({ onPlans, onPassing }: {
     });
     if (!me) return;
     try {
-      const got = await api.videoSetRoad(me, key);
+      const got = await api.videoSetRoad(me, token, key);
       setRoad(got.road as "photo" | "avatar" | "video");
       setBudget(got);
       setCapDraft(String(got.daily_seconds));
       setFilmPick(got.provider);
     } catch (e) {
       fail(e);
-      api.videoRoad(me).then((r) => {
+      api.videoRoad(me, token).then((r) => {
         setRoad(r.road as "photo" | "avatar" | "video");
         setBudget(r);
         setFilmPick(r.provider);
@@ -504,7 +504,7 @@ export function Identity({ onPlans, onPassing }: {
     const seconds = Number(capDraft);
     if (!Number.isFinite(seconds) || seconds < 0) return;
     try {
-      const got = await api.videoSetRoad(me, road, Math.round(seconds));
+      const got = await api.videoSetRoad(me, token, road, Math.round(seconds));
       setBudget(got);
       setCapDraft(String(got.daily_seconds));
       setFilmPick(got.provider);
@@ -525,7 +525,7 @@ export function Identity({ onPlans, onPassing }: {
   async function chooseFilmProvider(key: string) {
     if (!me) return;
     try {
-      const got = await api.videoSetRoad(me, road, undefined, key);
+      const got = await api.videoSetRoad(me, token, road, undefined, key);
       setBudget(got);
       setFilmPick(got.provider);
     } catch (e) {
