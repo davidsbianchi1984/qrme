@@ -6,6 +6,34 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-09-02
+
+### Added
+
+- **The walkthrough: every road driven, and photographed driven.** The
+  ROADMAP's gate for this number is a person, not a checklist — someone
+  who has never seen this code picks any road on the map and drives it
+  to the end without finding a wall. `tools/walkthrough.py` is that
+  person made repeatable: it builds the console, starts the backend,
+  and drives thirty steps over real doors — a profile born and given a
+  persona, a chat answered, the voices and the avatar market and the
+  forge, the video doors and a direction edited through the purple
+  box's own road, an XR room opened and spoken in, the watch payload,
+  the connector catalogue, a company founded through interview to hire
+  to publish to the export ticket, a wearable paired and handed a
+  guardian and verified, the shops — counting an honest refusal as a
+  pass and a silent dead end as a wall. Thirty steps, zero walls. Six
+  photographs of the driven console land in `docs/walkthrough/`.
+
+### Changed
+
+- **3.0.0 means what the ROADMAP said it had to mean.** Every avenue
+  functions properly inside the apps — not new roads, the ones already
+  drawn, all of them, working. Store distribution is out of the gate by
+  the owner's recorded decision: the counters stand ready in `stores/`,
+  and shipping to them is a funded follow-up, not a condition of the
+  tag.
+
 ## [2.9.17] - 2026-09-02
 
 ### Added
@@ -17564,7 +17592,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.17...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.0...HEAD
+[3.0.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.17...app-v3.0.0
 [2.9.17]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.16...app-v2.9.17
 [2.9.16]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.15...app-v2.9.16
 [2.9.15]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.14...app-v2.9.15
