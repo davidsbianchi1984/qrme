@@ -22,7 +22,7 @@ from .. import (auth, avatarforge, avatarreg, avatars, filming, media,
                 portraitist,
                 presentation, skins)
 from ..common import profile_or_404, require_owner
-from .. import i18n
+from .. import i18n, loadouts
 
 router = APIRouter()
 
@@ -155,7 +155,10 @@ def video_road(profile_id: str, request: Request) -> dict:
     require_owner(profile_id, request)
     return {**filming.road_of(profile_id), **filming.budget(profile_id),
             "roads": list(filming.ROADS),
-            "providers": [p for p in filming.PROVIDERS if p != "none"]}
+            # The menu for this profile's region, not the whole shelf —
+            # the picker on Identity draws these, and a tile it draws is
+            # a tile the set below accepts.
+            "providers": loadouts.video_providers_for(profile_id)}
 
 
 @router.post("/video/road/{profile_id}")
@@ -174,6 +177,14 @@ def video_set_road(profile_id: str, body: Road, request: Request) -> dict:
     """
     profile_or_404(profile_id)
     require_owner(profile_id, request)
+    # The shelf is what this platform can send to; the menu is what THIS
+    # profile's region is offered from it (qrme/loadouts.py). A house off
+    # the menu is refused with the menu, not with the shelf.
+    if not loadouts.video_allowed(profile_id, body.provider):
+        raise HTTPException(
+            422, i18n.fill(i18n.MUST_BE_ONE_OF, field="provider",
+                           choices=", ".join(
+                               loadouts.video_providers_for(profile_id))))
     try:
         filming.set_road(profile_id, body.road, body.daily_seconds,
                          film_provider=body.provider)
@@ -182,7 +193,7 @@ def video_set_road(profile_id: str, body: Road, request: Request) -> dict:
                             detail=i18n.raised(exc)) from None
     return {**filming.road_of(profile_id), **filming.budget(profile_id),
             "roads": list(filming.ROADS),
-            "providers": [p for p in filming.PROVIDERS if p != "none"]}
+            "providers": loadouts.video_providers_for(profile_id)}
 
 
 @router.get("/video/latest/{profile_id}")

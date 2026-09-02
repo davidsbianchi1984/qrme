@@ -151,9 +151,19 @@ def _consume_code(email: str, code: str, purpose: str) -> None:
     conn.commit()
 
 
-def signup(email: str, password: str, display_name: str | None = None) -> dict:
-    """Create an unverified account and email its verification code."""
+def signup(email: str, password: str, display_name: str | None = None,
+           region: str | None = None) -> dict:
+    """Create an unverified account and email its verification code.
+
+    ``region`` is where the person is signing up from — the fact the model
+    menu is a loadout for (qrme/loadouts.py). Chosen here, once, and
+    editable later; never inferred from an address."""
+    from . import loadouts
     email = _normalize(email)
+    region = (region or "").strip().lower() or None
+    if region is not None and region not in loadouts.REGIONS:
+        raise AccountError(
+            422, "that is not a region this product offers a menu for")
     if len(password) < 8:
         raise AccountError(422, "password must be at least 8 characters")
     conn = db.connect()
@@ -191,9 +201,9 @@ def signup(email: str, password: str, display_name: str | None = None) -> dict:
     account_id = db.new_id("acc")
     conn.execute(
         "INSERT INTO accounts (id, email, password_hash, salt, display_name,"
-        " created_at) VALUES (?,?,?,?,?,?)",
+        " region, created_at) VALUES (?,?,?,?,?,?,?)",
         (account_id, email, _hash_password(password, salt), salt,
-         (display_name or "").strip() or None, db.utcnow()),
+         (display_name or "").strip() or None, region, db.utcnow()),
     )
     conn.commit()
     # No mail transport means no inbox can ever be proven — and on a local

@@ -14,7 +14,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
-from .. import accounts, auth, mailer
+from .. import accounts, auth, i18n, loadouts, mailer
 
 router = APIRouter()
 
@@ -23,6 +23,14 @@ class Signup(BaseModel):
     email: str
     password: str
     display_name: str | None = None
+    #: Where the person is signing up from — one of `loadouts.REGIONS`.
+    #: The model menu (and the video menu) is the loadout for it. Left
+    #: out, the account stands on the default and can say later.
+    region: str | None = None
+
+
+class RegionChoice(BaseModel):
+    region: str
 
 
 class SignIn(BaseModel):
@@ -79,7 +87,8 @@ def signup(body: Signup) -> dict:
     (``smtp``, or ``console`` — printed to the server terminal when no mail
     is configured), never the code."""
     try:
-        return accounts.signup(body.email, body.password, body.display_name)
+        return accounts.signup(body.email, body.password, body.display_name,
+                               body.region)
     except accounts.AccountError as exc:
         raise HTTPException(exc.status, exc.detail)
 
@@ -205,6 +214,23 @@ def mint_owner_token(account_id: str, profile_id: str,
         return accounts.owner_token_for(account_id, profile_id)
     except accounts.AccountError as exc:
         raise HTTPException(exc.status, exc.detail)
+
+
+@router.put("/accounts/{account_id}/region")
+def set_account_region(account_id: str, body: RegionChoice,
+                       request: Request) -> dict:
+    """Where this account is from, as the account itself says it.
+
+    The account's own token. The answer carries the loadout the region
+    buys — the model tiles every profile this account holds will be
+    offered — so the Settings screen can redraw the menu without a
+    second round trip.
+    """
+    auth.require(request, "account", account_id)
+    try:
+        return loadouts.set_region(account_id, body.region)
+    except ValueError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 # ---- where this deployment sends mail through ---------------------------

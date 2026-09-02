@@ -19,7 +19,7 @@ import logging
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
-from .. import i18n, llm
+from .. import i18n, llm, loadouts
 from ..common import require_may_publish, profile_or_404, require_owner
 
 router = APIRouter()
@@ -99,10 +99,28 @@ def translate_text(profile_id: str, body: TranslateRequest,
 
 
 @router.get("/models")
-def list_models() -> dict:
-    """Every provider the platform knows about, with whether it is configured
-    in this deployment (has credentials) so a UI can enable/disable choices."""
-    return {"providers": llm.available(), "default": llm.default_name()}
+def list_models(profile_id: str | None = None) -> dict:
+    """The model menu.
+
+    Bare, every provider the platform knows about, with whether it is
+    configured here (has credentials) so a UI can enable or disable choices.
+    With ``profile_id``, the menu *that profile* is offered: its owner's
+    region's loadout (qrme/loadouts.py) — home providers first, then a
+    curated few popular foreign — each row carrying its origin so a screen
+    can say where a model is from. The kitchen next door
+    (``PUT /profiles/{id}/model``) accepts exactly this menu, which is what
+    lets the offered-then-refused guard read it.
+    """
+    if profile_id:
+        profile_or_404(profile_id)
+        region = loadouts.region_of(profile_id)
+        return {"providers": loadouts.offered(profile_id),
+                "default": llm.default_name(), "region": region,
+                "policy": loadouts.policy(),
+                "video_providers": loadouts.video_providers_for(profile_id)}
+    return {"providers": llm.available(), "default": llm.default_name(),
+            "region": None, "policy": loadouts.policy(),
+            "video_providers": []}
 
 
 @router.get("/profiles/{profile_id}/model")
@@ -127,6 +145,13 @@ def set_profile_model(profile_id: str, body: ModelChoice, request: Request) -> d
         raise HTTPException(
             422, i18n.fill(i18n.MUST_BE_ONE_OF, field="provider",
                                  choices=", ".join(llm.CHOICES)))
+    # A provider off this profile's regional loadout is a real name the
+    # menu did not offer — refused with the menu it was offered instead.
+    if not loadouts.allowed(profile_id, body.provider):
+        raise HTTPException(
+            422, i18n.fill(i18n.MUST_BE_ONE_OF, field="provider",
+                           choices=", ".join(
+                               ["auto", *loadouts.providers_for(profile_id)])))
     try:
         llm.set_choice(profile_id, body.provider)
     except ValueError as exc:  # defensive: CHOICES already validated above

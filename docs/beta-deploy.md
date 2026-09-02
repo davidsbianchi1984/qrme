@@ -114,6 +114,14 @@ QRME_FILM_PROVIDER=
 QRME_FILM_URL=
 QRME_FILM_KEY=
 
+# --- optional: the model menu's policy lever ----------------------------
+# The menu a person is offered is the loadout for the region they chose
+# at sign-up — home providers first, then a few popular foreign ones.
+# `american` tapers the American-region menu to American, local and
+# self-supplied providers, and binds no other region. Leave blank for
+# `all`, the beta posture.
+QRME_MODEL_POLICY=
+
 # --- optional: somewhere else to point the hands ------------------------
 # The hands decide their next move with the model the profile chose on
 # the Settings screen, and a provider may decline to work a screen at
@@ -125,6 +133,19 @@ OPENAI_API_KEY=
 GEMINI_API_KEY=
 XAI_API_KEY=
 DEEPSEEK_API_KEY=
+# The wider menu (3.0.3): American houses, and the popular foreign ones
+# each region leads with. Same rule — a key puts the tile on; empty
+# leaves it there and unconfigured.
+LLAMA_API_KEY=
+GROQ_API_KEY=
+TOGETHER_API_KEY=
+FIREWORKS_API_KEY=
+NVIDIA_API_KEY=
+MISTRAL_API_KEY=
+DASHSCOPE_API_KEY=
+MOONSHOT_API_KEY=
+ZHIPU_API_KEY=
+COHERE_API_KEY=
 
 # --- optional: the vault's real voice (section 8) ------------------------
 # Empty means PDI's resident answers with its honest stub and QRME's

@@ -96,10 +96,10 @@ DOORS: tuple[Door, ...] = (
     Door("Wall", "Wall tab",
          "the wall — posts and video on a profile",
          ("wall", "post", "my posts", "video wall")),
-    Door("Corner", "My Space tab",
+    Door("Corner", "My Corner tab",
          "your public page and your messages; what you edit here is exactly "
          "what a visitor sees",
-         ("my space", "my page", "my corner", "what visitors see")),
+         ("my corner", "my page", "what visitors see")),
     Door("Friends", "Friends tab",
          "friends, and the inbox",
          ("friend", "inbox", "message someone", "contacts")),

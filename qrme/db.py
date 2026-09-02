@@ -2119,9 +2119,43 @@ CREATE TABLE IF NOT EXISTS accounts (
     password_hash TEXT NOT NULL,
     salt          TEXT NOT NULL,
     display_name  TEXT,
+    region        TEXT,                   -- chosen at sign-up; the model
+                                          -- menu is the loadout for it
     verified_at   TEXT,
     created_at    TEXT NOT NULL
 );
+
+-- The moderated mailbox (qrme/mailbox.py): a profile's email correspondence,
+-- answered in its profession and held at the send. A thread is one
+-- correspondent on one profile; every outbound message is a draft first
+-- and only a person's approval moves it to sent (or staged, when no mail
+-- transport is wired — composed and held, never dropped, never claimed
+-- sent).
+CREATE TABLE IF NOT EXISTS mail_threads (
+    id            TEXT PRIMARY KEY,
+    profile_id    TEXT NOT NULL REFERENCES profiles(id),
+    correspondent TEXT NOT NULL,          -- the other party's address
+    subject       TEXT NOT NULL,
+    status        TEXT NOT NULL DEFAULT 'open',
+    created_at    TEXT NOT NULL,
+    updated_at    TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS mail_messages (
+    id         TEXT PRIMARY KEY,
+    thread_id  TEXT NOT NULL REFERENCES mail_threads(id),
+    profile_id TEXT NOT NULL REFERENCES profiles(id),
+    direction  TEXT NOT NULL,             -- inbound | outbound
+    state      TEXT NOT NULL,             -- received | draft | sent | staged | discarded
+    from_addr  TEXT NOT NULL DEFAULT '',
+    to_addr    TEXT NOT NULL DEFAULT '',
+    subject    TEXT NOT NULL,
+    body       TEXT NOT NULL,
+    note       TEXT NOT NULL DEFAULT '',  -- why it is held, or how it left
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_mail_messages_thread
+    ON mail_messages(thread_id, created_at);
 
 -- Where this deployment sends mail through. One row, set from the app's
 -- own settings screen so an operator never has to touch environment
@@ -3218,6 +3252,10 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # own choice, which is what every row written before the picker
     # worked means.
     ("presence_road", "provider", "TEXT"),
+    # Where the account holder signed up from (qrme/loadouts.py). NULL is
+    # every account made before there was a menu per region; it stands on
+    # the default until its holder says otherwise on Settings.
+    ("accounts", "region", "TEXT"),
 )
 
 

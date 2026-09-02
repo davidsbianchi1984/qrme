@@ -310,9 +310,18 @@ function ModelPanel({ onPlans }: { onPlans: () => void }) {
   const [effective, setEffective] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
+  // The region the menu is a loadout for, and the video houses it buys.
+  // Both come back with the menu, so one read draws all three.
+  const [region, setRegion] = useState<string>("");
+  const [videoHouses, setVideoHouses] = useState<string[]>([]);
+  const REGIONS = ["us", "ca", "eu", "uk", "cn", "in", "jp", "kr", "br", "au", "other"];
 
   function load() {
-    accountApi.listModels().then((m) => setProviders(m.providers)).catch(() => setProviders([]));
+    accountApi.listModels(session.profileId || undefined).then((m) => {
+      setProviders(m.providers);
+      setRegion(m.region || "");
+      setVideoHouses(m.video_providers || []);
+    }).catch(() => setProviders([]));
     if (session.profileId) {
       accountApi.getProfileModel(session.profileId)
         .then((c) => { setChosen(c.provider); setEffective(c.effective); })
@@ -331,12 +340,46 @@ function ModelPanel({ onPlans }: { onPlans: () => void }) {
     finally { setBusy(false); }
   }
 
+  /** Where this account is from. The menu is the loadout for it, so the
+   *  tiles redraw from the answer rather than from a second read. */
+  async function chooseRegion(code: string) {
+    if (!session.accountId || !session.accountToken) return;
+    setBusy(true); setError(null);
+    try {
+      await accountApi.setRegion(session.accountId, code, session.accountToken);
+      load();
+    } catch (e) { setError(e); }
+    finally { setBusy(false); }
+  }
+
   return (
     <div className="card">
       <h3>{tr("set.model", lang)}</h3>
       <p className="muted small">{tr("set.model.lead", lang)}</p>
+      {session.accountId && (
+        <label>{tr("set.region", lang)}
+          <select value={region || "us"} disabled={busy}
+                  onChange={(e) => void chooseRegion(e.target.value)}>
+            {REGIONS.map((code) => (
+              <option key={code} value={code}>{tr(`region.${code}`, lang)}</option>
+            ))}
+          </select>
+        </label>
+      )}
+      {session.accountId && <p className="muted small">{tr("set.region.sub", lang)}</p>}
       <ProviderTiles providers={providers} chosen={chosen}
-                     effective={effective} onPick={pick} busy={busy} />
+                     effective={effective} onPick={pick} busy={busy}
+                     autoLabel={tr("set.model.auto", lang)}
+                     needsKey={tr("set.model.needskey", lang)} />
+      {videoHouses.length > 0 && (<>
+        <h4>{tr("set.video", lang)}</h4>
+        <p className="muted small">{tr("set.video.sub", lang)}</p>
+        <div className="row" style={{ flexWrap: "wrap", gap: 6 }}>
+          {videoHouses.map((h) => (
+            <span key={h} className="tag">{h}</span>
+          ))}
+        </div>
+      </>)}
       {/* The truth about what will actually answer. The silent case was the
           bad one: Automatic quietly resolving to the stub while the screen
           full of logos implied a real model was on. */}

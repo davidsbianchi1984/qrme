@@ -98,6 +98,10 @@ PROVIDERS = (
     "happyhorse",   # Alibaba ATH. Arrived April 2026 near the top.
     "kling",        # Kuaishou. 3.0 does 4K/60, and a cheaper Turbo.
     "ltx",          # Lightricks. 2.3 is 22B, 4K/50 with stereo.
+    "higgsfield",   # Higgsfield AI. Asked for by name; camera-motion
+                    # presets are the thing it is known for.
+    "hailuo",       # MiniMax. Hailuo 02 — cheap, quick, popular abroad.
+    "vidu",         # Shengshu. Vidu Q1 — reference-to-video is its edge.
 )
 
 #: The one this platform picks when an operator has not.

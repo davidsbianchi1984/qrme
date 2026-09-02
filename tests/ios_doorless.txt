@@ -241,3 +241,18 @@ PUT /profiles/{profile_id}/wearables/{name}/guardian
 # Bluetooth session; a second native pairing stack would be a
 # second thing to keep honest.
 POST /profiles/{profile_id}/wearables/{name}/verified
+
+# The moderated mailbox (qrme/mailbox.py, 3.0.3) and the region menu
+# (qrme/loadouts.py). The console carries the review desk in the corner
+# and the profile's own doors beside it; the shells wait on a screen —
+# a binding with no caller would take these off the backlog while building
+# nothing, which is the failure unused_native_bindings.txt was written to
+# catch. Recorded rather than pretended.
+PUT /accounts/{account_id}/region
+GET /accounts/{account_id}/mail
+POST /accounts/{account_id}/mail/{draft_id}/moderate
+GET /profiles/{profile_id}/mail
+POST /profiles/{profile_id}/mail/receive
+POST /profiles/{profile_id}/mail/compose
+POST /profiles/{profile_id}/mail/{message_id}/draft
+POST /profiles/{profile_id}/mail/{draft_id}/moderate

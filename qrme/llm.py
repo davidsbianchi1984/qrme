@@ -181,6 +181,24 @@ _GROK_MODEL = os.environ.get("QRME_GROK_MODEL", "grok-2-latest")
 _PPLX_MODEL = os.environ.get("QRME_PERPLEXITY_MODEL", "sonar")
 _GEMINI_MODEL = os.environ.get("QRME_GEMINI_MODEL", "gemini-2.0-flash")
 _DEEPSEEK_MODEL = os.environ.get("QRME_DEEPSEEK_MODEL", "deepseek-chat")
+# The wider menu (3.0.3). Every one of these speaks the OpenAI dialect, so
+# the one adapter covers them; the base and the key name are the whole of
+# what differs. Model ids are somebody else's strings and they rename them,
+# which is why each is an env dial.
+_META_MODEL = os.environ.get("QRME_META_MODEL", "Llama-4-Maverick-17B-128E-Instruct-FP8")
+_AZURE_BASE = os.environ.get("QRME_AZURE_OPENAI_URL", "")
+_AZURE_MODEL = os.environ.get("QRME_AZURE_OPENAI_MODEL", "gpt-4o")
+_BEDROCK_BASE = os.environ.get("QRME_BEDROCK_URL", "")
+_BEDROCK_MODEL = os.environ.get("QRME_BEDROCK_MODEL", "anthropic.claude-sonnet-4-20250514-v1:0")
+_GROQ_MODEL = os.environ.get("QRME_GROQ_MODEL", "llama-3.3-70b-versatile")
+_TOGETHER_MODEL = os.environ.get("QRME_TOGETHER_MODEL", "meta-llama/Llama-3.3-70B-Instruct-Turbo")
+_FIREWORKS_MODEL = os.environ.get("QRME_FIREWORKS_MODEL", "accounts/fireworks/models/llama-v3p3-70b-instruct")
+_NVIDIA_MODEL = os.environ.get("QRME_NVIDIA_MODEL", "meta/llama-3.3-70b-instruct")
+_MISTRAL_MODEL = os.environ.get("QRME_MISTRAL_MODEL", "mistral-large-latest")
+_QWEN_MODEL = os.environ.get("QRME_QWEN_MODEL", "qwen-plus")
+_MOONSHOT_MODEL = os.environ.get("QRME_MOONSHOT_MODEL", "kimi-k2-0711-preview")
+_ZHIPU_MODEL = os.environ.get("QRME_ZHIPU_MODEL", "glm-4.5")
+_COHERE_MODEL = os.environ.get("QRME_COHERE_MODEL", "command-a-03-2025")
 # The founder's own algorithm, or anything speaking the OpenAI dialect:
 # point QRME_CUSTOM_LLM_URL at it and it becomes a first-class provider
 # tile — configuration, so the day the algorithm exists no release is
@@ -487,6 +505,7 @@ class FallbackProvider:
 # environment variables that, if any is set, count the provider as configured.
 _REGISTRY: dict[str, dict] = {
     "stub": {
+        "origin": "local",
         "label": "Deterministic stub (offline)",
         "kind": "stub",
         "network": False,
@@ -494,6 +513,7 @@ _REGISTRY: dict[str, dict] = {
         "model": "stub",
     },
     "anthropic": {
+        "origin": "US",
         "label": "Claude (Anthropic)",
         "kind": "anthropic",
         "network": True,
@@ -501,6 +521,7 @@ _REGISTRY: dict[str, dict] = {
         "model": MODEL,
     },
     "openai": {
+        "origin": "US",
         "label": "ChatGPT (OpenAI)",
         "kind": "openai",
         "network": True,
@@ -509,6 +530,7 @@ _REGISTRY: dict[str, dict] = {
         "model": _OPENAI_MODEL,
     },
     "grok": {
+        "origin": "US",
         "label": "Grok (xAI)",
         "kind": "openai",
         "network": True,
@@ -517,6 +539,7 @@ _REGISTRY: dict[str, dict] = {
         "model": _GROK_MODEL,
     },
     "perplexity": {
+        "origin": "US",
         "label": "Perplexity",
         "kind": "openai",
         "network": True,
@@ -525,6 +548,7 @@ _REGISTRY: dict[str, dict] = {
         "model": _PPLX_MODEL,
     },
     "gemini": {
+        "origin": "US",
         "label": "Gemini (Google)",
         "kind": "gemini",
         "network": True,
@@ -532,6 +556,7 @@ _REGISTRY: dict[str, dict] = {
         "model": _GEMINI_MODEL,
     },
     "deepseek": {
+        "origin": "CN",
         "label": "DeepSeek",
         "kind": "openai",
         "network": True,
@@ -539,9 +564,51 @@ _REGISTRY: dict[str, dict] = {
         "base": "https://api.deepseek.com/v1",
         "model": _DEEPSEEK_MODEL,
     },
+    # -- the wider menu (3.0.3): American ------------------------------------
+    "meta": {"origin": "US", "label": "Llama (Meta)", "kind": "openai",
+             "network": True, "env": ["LLAMA_API_KEY", "META_API_KEY"],
+             "base": "https://api.llama.com/compat/v1", "model": _META_MODEL},
+    "azure": {"origin": "US", "label": "Azure OpenAI (Microsoft)", "kind": "openai",
+              "network": True, "env": ["AZURE_OPENAI_API_KEY"],
+              "base": _AZURE_BASE, "model": _AZURE_MODEL, "needs_base": True},
+    "bedrock": {"origin": "US", "label": "Bedrock (Amazon)", "kind": "openai",
+                "network": True, "env": ["AWS_BEARER_TOKEN_BEDROCK"],
+                "base": _BEDROCK_BASE, "model": _BEDROCK_MODEL, "needs_base": True},
+    "groq": {"origin": "US", "label": "Groq", "kind": "openai", "network": True,
+             "env": ["GROQ_API_KEY"], "base": "https://api.groq.com/openai/v1",
+             "model": _GROQ_MODEL},
+    "together": {"origin": "US", "label": "Together AI", "kind": "openai",
+                 "network": True, "env": ["TOGETHER_API_KEY"],
+                 "base": "https://api.together.xyz/v1", "model": _TOGETHER_MODEL},
+    "fireworks": {"origin": "US", "label": "Fireworks AI", "kind": "openai",
+                  "network": True, "env": ["FIREWORKS_API_KEY"],
+                  "base": "https://api.fireworks.ai/inference/v1",
+                  "model": _FIREWORKS_MODEL},
+    "nvidia": {"origin": "US", "label": "NVIDIA NIM", "kind": "openai",
+               "network": True, "env": ["NVIDIA_API_KEY"],
+               "base": "https://integrate.api.nvidia.com/v1", "model": _NVIDIA_MODEL},
+    # -- and the popular foreign ones, each region's own first ---------------
+    "mistral": {"origin": "FR", "label": "Mistral", "kind": "openai",
+                "network": True, "env": ["MISTRAL_API_KEY"],
+                "base": "https://api.mistral.ai/v1", "model": _MISTRAL_MODEL},
+    "qwen": {"origin": "CN", "label": "Qwen (Alibaba)", "kind": "openai",
+             "network": True, "env": ["DASHSCOPE_API_KEY", "QWEN_API_KEY"],
+             "base": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+             "model": _QWEN_MODEL},
+    "moonshot": {"origin": "CN", "label": "Kimi (Moonshot)", "kind": "openai",
+                 "network": True, "env": ["MOONSHOT_API_KEY", "KIMI_API_KEY"],
+                 "base": "https://api.moonshot.ai/v1", "model": _MOONSHOT_MODEL},
+    "zhipu": {"origin": "CN", "label": "GLM (Zhipu)", "kind": "openai",
+              "network": True, "env": ["ZHIPU_API_KEY", "ZAI_API_KEY"],
+              "base": "https://api.z.ai/api/paas/v4", "model": _ZHIPU_MODEL},
+    "cohere": {"origin": "CA", "label": "Cohere", "kind": "openai",
+               "network": True, "env": ["COHERE_API_KEY", "CO_API_KEY"],
+               "base": "https://api.cohere.ai/compatibility/v1",
+               "model": _COHERE_MODEL},
     # See _CUSTOM_BASE above: any OpenAI-dialect endpoint, the founder's
     # own algorithm first among them. Configured once the URL is set.
     "custom": {
+        "origin": "any",
         "label": _CUSTOM_LABEL,
         "kind": "openai",
         "network": True,
@@ -554,6 +621,7 @@ _REGISTRY: dict[str, dict] = {
     # deepseek-r1:1.5b on the user's own machine — free, no key, nothing
     # leaves the host. The daemon running IS the configuration.
     "ollama": {
+        "origin": "local",
         "label": "Local (Ollama)",
         "kind": "openai",
         "network": False,
@@ -562,6 +630,7 @@ _REGISTRY: dict[str, dict] = {
         "model": _OLLAMA_MODEL,
     },
     "vault": {
+        "origin": "local",
         "label": "The vault's local model (PDI resident)",
         "kind": "vault",
         "network": True,
@@ -646,9 +715,17 @@ def available() -> list[dict]:
             "network": spec["network"],
             "model": spec["model"],
             "configured": is_configured(name),
+            "origin": spec.get("origin", "any"),
         }
         for name, spec in _REGISTRY.items()
     ]
+
+
+def origin_of(name: str) -> str:
+    """Where a provider is from — a country code, or `local` for the ones that
+    never leave the machine and `any` for a user-supplied endpoint. The fact
+    the region loadouts (qrme/loadouts.py) offer or withhold on."""
+    return _REGISTRY.get(name, {}).get("origin", "any")
 
 
 def default_name() -> str:

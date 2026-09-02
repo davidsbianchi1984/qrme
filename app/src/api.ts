@@ -84,7 +84,8 @@ export const oauthApi = {
 };
 
 export const accountApi = {
-  signup: (body: { email: string; password: string; display_name?: string }) =>
+  signup: (body: { email: string; password: string; display_name?: string;
+                   region?: string }) =>
     req<{ account_id: string; email: string; verified: boolean; code_delivery?: string;
           verification: "local" | "email";
           // Present when verification is "local" (no mail transport — the
@@ -130,9 +131,31 @@ export const accountApi = {
       `/accounts/${accountId}/profiles/${profileId}/owner-token`,
       { method: "POST", body: {}, token }),
   // Which model answers, as a picker rather than a config file.
-  listModels: () =>
+  // With a profile, the menu THAT profile is offered — its owner's region's
+  // loadout, home providers first, each row saying where it is from — and
+  // the video houses the same region buys. Bare, the whole registry.
+  listModels: (profileId?: string) =>
     req<{ providers: { name: string; label: string; configured: boolean;
-                       model: string; network: boolean }[]; default: string }>("/models"),
+                       model: string; network: boolean; origin: string }[];
+          default: string; region: string | null; policy: string;
+          video_providers: string[] }>(
+      profileId ? `/models?profile_id=${encodeURIComponent(profileId)}` : "/models"),
+  /** Where this account is from. The answer carries the loadout the
+   *  region buys, so the tiles redraw without a second round trip. */
+  setRegion: (accountId: string, region: string, token: string) =>
+    req<{ account_id: string; region: string; providers: string[] }>(
+      `/accounts/${accountId}/region`, { method: "PUT", body: { region }, token }),
+  /** The operator's review desk: every mailbox this account is answerable
+   *  for — its own profiles and its companies' seats — with what is held. */
+  mailDesk: (accountId: string, token: string) =>
+    req<{ account_id: string; held: number; outbound_transport: string;
+          profiles: MailDeskProfile[] }>(`/accounts/${accountId}/mail`, { token }),
+  /** Decide on a held draft from the desk, whichever held profile it is on. */
+  mailDeskModerate: (accountId: string, draftId: string,
+                     body: { action: "approve" | "edit" | "discard"; edited?: string },
+                     token: string) =>
+    req<{ status: string; message: MailMessage }>(
+      `/accounts/${accountId}/mail/${draftId}/moderate`, { method: "POST", body, token }),
   getProfileModel: (pid: string) =>
     req<{ provider: string; effective: string }>(`/profiles/${pid}/model`),
   setProfileModel: (pid: string, provider: string, token: string) =>
@@ -1250,6 +1273,30 @@ export interface WallComment {
   id: string; body: string; author_id?: string; status?: string;
   created_at?: string;
 }
+// The moderated mailbox (qrme/mailbox.py): a profile's own correspondence,
+// worked by the profile and reviewed from the operator's corner.
+export interface MailMessage {
+  id: string; direction: string; state: string; from_addr: string;
+  to_addr: string; subject: string; body: string; note: string;
+  created_at: string;
+}
+export interface MailThread {
+  id: string; correspondent: string; subject: string; status: string;
+  updated_at: string; held_drafts: number; messages: MailMessage[];
+}
+export interface MailPosture {
+  built: boolean; self_operated: boolean; held_for_owner: boolean;
+  moderation_mode: string; skills: string[];
+  connections: { id: string; provider: string; app: string; label: string;
+                 authorized: boolean }[];
+  inbox_attached: boolean; outbound_transport: string; outbound_ready: boolean;
+  inbound_ready: boolean; moderated: boolean; note: string;
+}
+export interface MailDeskProfile {
+  profile_id: string; display_name: string; via: string; held: number;
+  threads: MailThread[]; posture: MailPosture;
+}
+
 export interface Profile {
   id: string;
   display_name: string;
@@ -5191,6 +5238,32 @@ export const api = {
    *  auto-render reads it on a turn nobody is looking at a screen for:
    *  a choice held in a component is a choice the chat endpoint cannot
    *  see. `left` is the number that makes picking video safe to pick. */
+  /** This profile's mailbox: who works it, and every thread on it. */
+  profileMail: (profileId: string, token: string) =>
+    req<{ posture: MailPosture; threads: MailThread[] }>(
+      `/profiles/${profileId}/mail`, { token }),
+  /** Hand an inbound message to the profile. It reads, drafts in its
+   *  profession, screens, and — in auto mode — answers on its own. */
+  mailReceive: (profileId: string, body: { from_addr: string; subject?: string; body: string },
+                token: string) =>
+    req<{ thread_id: string; message: MailMessage; reply: MailMessage | null;
+          answered_on_its_own: boolean }>(
+      `/profiles/${profileId}/mail/receive`, { method: "POST", body, token }),
+  /** Ask the profile to originate a message. Held for approval. */
+  mailCompose: (profileId: string, body: { to: string; subject?: string; objective: string },
+                token: string) =>
+    req<{ thread_id: string; draft: MailMessage }>(
+      `/profiles/${profileId}/mail/compose`, { method: "POST", body, token }),
+  /** Have the profile draft (or redraft) a reply. Held — never sends. */
+  mailDraft: (profileId: string, messageId: string, token: string) =>
+    req<{ thread_id: string; draft: MailMessage }>(
+      `/profiles/${profileId}/mail/${messageId}/draft`, { method: "POST", body: {}, token }),
+  /** The owner's decision on a held draft. */
+  mailModerate: (profileId: string, draftId: string,
+                 body: { action: "approve" | "edit" | "discard"; edited?: string },
+                 token: string) =>
+    req<{ status: string; message: MailMessage }>(
+      `/profiles/${profileId}/mail/${draftId}/moderate`, { method: "POST", body, token }),
   videoRoad: (profileId: string, token: string) =>
     req<{ road: string; daily_seconds: number; set: boolean;
           provider: string; provider_set: boolean;

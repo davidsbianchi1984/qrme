@@ -1156,10 +1156,175 @@ const CHROME: Table = {
     en: "answered an invitation itself and took a seat in a room", es: "respondió sola a una invitación y tomó asiento en una sala", fr: "a répondu seule à une invitation et a pris place dans une salle", de: "hat eine Einladung selbst angenommen und in einem Raum Platz genommen", pt: "respondeu sozinho a um convite e tomou assento numa sala", it: "ha risposto da solo a un invito e ha preso posto in una stanza", ja: "が招待に自ら応じて部屋の席につきました", zh: "自行应邀并在房间就座", hi: "ने निमंत्रण का स्वयं उत्तर देकर कमरे में सीट ले ली", ar: "لبّى الدعوة بنفسه وأخذ مقعدًا في غرفة",
   },
   "nav.corner": {
-    en: "My Space", es: "Mi espacio", fr: "Mon espace", de: "Mein Bereich", pt: "O meu espaço", it: "Il mio spazio", ja: "マイスペース", zh: "我的空间", hi: "मेरा स्पेस", ar: "مساحتي",
+    en: "My Corner", es: "Mi rincón", fr: "Mon coin", de: "Meine Ecke", pt: "O meu cantinho", it: "Il mio angolo", ja: "マイコーナー", zh: "我的角落", hi: "मेरा कोना", ar: "ركني",
+  },
+  "nav.corner.of": {
+    en: "{name}'s corner", es: "El rincón de {name}", fr: "Le coin de {name}", de: "Ecke von {name}", pt: "O cantinho de {name}", it: "L'angolo di {name}", ja: "{name}のコーナー", zh: "{name}的角落", hi: "{name} का कोना", ar: "ركن {name}",
+  },
+  "set.video": {
+    en: "Video models for your region", es: "Modelos de vídeo para tu región", fr: "Modèles vidéo pour votre région", de: "Videomodelle für deine Region", pt: "Modelos de vídeo para a tua região", it: "Modelli video per la tua regione", ja: "お住まいの地域の動画モデル", zh: "你所在地区的视频模型", hi: "आपके क्षेत्र के वीडियो मॉडल", ar: "نماذج الفيديو لمنطقتك",
+  },
+  "set.video.sub": {
+    en: "The same regional loadout, for generating video — used by the synthetic profiles.", es: "El mismo conjunto regional, para generar vídeo — lo usan los perfiles sintéticos.", fr: "La même sélection régionale, pour générer de la vidéo — utilisée par les profils synthétiques.", de: "Dieselbe regionale Auswahl, für Videoerzeugung — genutzt von den synthetischen Profilen.", pt: "A mesma seleção regional, para gerar vídeo — usada pelos perfis sintéticos.", it: "La stessa selezione regionale, per generare video — usata dai profili sintetici.", ja: "動画生成向けの同じ地域別構成 — 合成プロフィールが使用します。", zh: "同样的地区配置，用于生成视频 — 由合成档案使用。", hi: "वीडियो बनाने के लिए वही क्षेत्रीय सेट — सिंथेटिक प्रोफ़ाइल इसे उपयोग करती हैं।", ar: "التشكيلة الإقليمية نفسها لتوليد الفيديو — تستخدمها الملفات الاصطناعية.",
+  },
+  "set.region": {
+    en: "Your region", es: "Tu región", fr: "Votre région", de: "Deine Region", pt: "A tua região", it: "La tua regione", ja: "あなたの地域", zh: "你的地区", hi: "आपका क्षेत्र", ar: "منطقتك",
+  },
+  "set.region.sub": {
+    en: "Where you signed up from. Your model menu is the loadout for your region — home providers first, then a few popular ones from elsewhere.", es: "Desde dónde te registraste. Tu menú de modelos es el conjunto de tu región: primero los proveedores locales, luego algunos populares de otros lugares.", fr: "D'où vous vous êtes inscrit. Votre menu de modèles est la sélection de votre région — les fournisseurs locaux d'abord, puis quelques-uns populaires d'ailleurs.", de: "Von wo du dich registriert hast. Dein Modellmenü ist die Auswahl für deine Region — heimische Anbieter zuerst, dann ein paar beliebte von anderswo.", pt: "De onde te registaste. O teu menu de modelos é a seleção da tua região — fornecedores locais primeiro, depois alguns populares de outros lugares.", it: "Da dove ti sei registrato. Il tuo menu di modelli è la selezione della tua regione — prima i fornitori di casa, poi alcuni popolari da altrove.", ja: "登録した場所です。モデルのメニューは地域ごとの構成で、まず自国のプロバイダー、次に他地域の人気のものが並びます。", zh: "你注册时所在的地区。你的模型菜单是该地区的配置 — 本地提供商优先，然后是一些其他地区的热门选项。", hi: "आपने कहाँ से साइन अप किया। आपका मॉडल मेन्यू आपके क्षेत्र का सेट है — पहले घरेलू प्रदाता, फिर कहीं और के कुछ लोकप्रिय।", ar: "من أين سجّلت. قائمة النماذج لديك هي تشكيلة منطقتك — المزوّدون المحليون أولًا، ثم بعض المشهورين من أماكن أخرى.",
+  },
+  "region.us": {
+    en: "United States", es: "Estados Unidos", fr: "États-Unis", de: "Vereinigte Staaten", pt: "Estados Unidos", it: "Stati Uniti", ja: "アメリカ合衆国", zh: "美国", hi: "संयुक्त राज्य", ar: "الولايات المتحدة",
+  },
+  "region.ca": {
+    en: "Canada", es: "Canadá", fr: "Canada", de: "Kanada", pt: "Canadá", it: "Canada", ja: "カナダ", zh: "加拿大", hi: "कनाडा", ar: "كندا",
+  },
+  "region.eu": {
+    en: "European Union", es: "Unión Europea", fr: "Union européenne", de: "Europäische Union", pt: "União Europeia", it: "Unione Europea", ja: "欧州連合", zh: "欧盟", hi: "यूरोपीय संघ", ar: "الاتحاد الأوروبي",
+  },
+  "region.uk": {
+    en: "United Kingdom", es: "Reino Unido", fr: "Royaume-Uni", de: "Vereinigtes Königreich", pt: "Reino Unido", it: "Regno Unito", ja: "イギリス", zh: "英国", hi: "यूनाइटेड किंगडम", ar: "المملكة المتحدة",
+  },
+  "region.cn": {
+    en: "China", es: "China", fr: "Chine", de: "China", pt: "China", it: "Cina", ja: "中国", zh: "中国", hi: "चीन", ar: "الصين",
+  },
+  "region.in": {
+    en: "India", es: "India", fr: "Inde", de: "Indien", pt: "Índia", it: "India", ja: "インド", zh: "印度", hi: "भारत", ar: "الهند",
+  },
+  "region.jp": {
+    en: "Japan", es: "Japón", fr: "Japon", de: "Japan", pt: "Japão", it: "Giappone", ja: "日本", zh: "日本", hi: "जापान", ar: "اليابان",
+  },
+  "region.kr": {
+    en: "South Korea", es: "Corea del Sur", fr: "Corée du Sud", de: "Südkorea", pt: "Coreia do Sul", it: "Corea del Sud", ja: "韓国", zh: "韩国", hi: "दक्षिण कोरिया", ar: "كوريا الجنوبية",
+  },
+  "region.br": {
+    en: "Brazil", es: "Brasil", fr: "Brésil", de: "Brasilien", pt: "Brasil", it: "Brasile", ja: "ブラジル", zh: "巴西", hi: "ब्राज़ील", ar: "البرازيل",
+  },
+  "region.au": {
+    en: "Australia", es: "Australia", fr: "Australie", de: "Australien", pt: "Austrália", it: "Australia", ja: "オーストラリア", zh: "澳大利亚", hi: "ऑस्ट्रेलिया", ar: "أستراليا",
+  },
+  "region.other": {
+    en: "Elsewhere", es: "Otro lugar", fr: "Ailleurs", de: "Anderswo", pt: "Outro lugar", it: "Altrove", ja: "その他の地域", zh: "其他地区", hi: "अन्य", ar: "مكان آخر",
+  },
+  "set.model.auto": {
+    en: "Automatic", es: "Automático", fr: "Automatique", de: "Automatisch", pt: "Automático", it: "Automatico", ja: "自動", zh: "自动", hi: "स्वचालित", ar: "تلقائي",
+  },
+  "set.model.needskey": {
+    en: "needs a key — add one above", es: "necesita una clave — añade una arriba", fr: "nécessite une clé — ajoutez-en une ci-dessus", de: "braucht einen Schlüssel — oben eintragen", pt: "precisa de uma chave — adiciona uma acima", it: "serve una chiave — aggiungila sopra", ja: "キーが必要です — 上で追加してください", zh: "需要密钥 — 请在上方添加", hi: "कुंजी चाहिए — ऊपर जोड़ें", ar: "يحتاج إلى مفتاح — أضف واحدًا أعلاه",
+  },
+  "mail.receive": {
+    en: "A message came in", es: "Llegó un mensaje", fr: "Un message est arrivé", de: "Eine Nachricht ist eingegangen", pt: "Chegou uma mensagem", it: "È arrivato un messaggio", ja: "メッセージが届きました", zh: "收到一封邮件", hi: "एक संदेश आया", ar: "وصلت رسالة",
+  },
+  "mail.receive.from": {
+    en: "From (email address)", es: "De (dirección de correo)", fr: "De (adresse e-mail)", de: "Von (E-Mail-Adresse)", pt: "De (endereço de e-mail)", it: "Da (indirizzo email)", ja: "差出人（メールアドレス）", zh: "发件人（电子邮箱）", hi: "भेजने वाला (ईमेल पता)", ar: "من (عنوان البريد)",
+  },
+  "mail.receive.subject": {
+    en: "Subject", es: "Asunto", fr: "Objet", de: "Betreff", pt: "Assunto", it: "Oggetto", ja: "件名", zh: "主题", hi: "विषय", ar: "الموضوع",
+  },
+  "mail.receive.body": {
+    en: "What they wrote", es: "Lo que escribieron", fr: "Ce qu'ils ont écrit", de: "Was sie geschrieben haben", pt: "O que escreveram", it: "Cosa hanno scritto", ja: "相手が書いた内容", zh: "对方写的内容", hi: "उन्होंने क्या लिखा", ar: "ما كتبوه",
+  },
+  "mail.receive.go": {
+    en: "Take it in", es: "Recibirlo", fr: "Le prendre en compte", de: "Aufnehmen", pt: "Receber", it: "Acquisiscilo", ja: "取り込む", zh: "接收", hi: "इसे लें", ar: "استلمها",
+  },
+  "mail.compose": {
+    en: "Write to someone", es: "Escribir a alguien", fr: "Écrire à quelqu'un", de: "An jemanden schreiben", pt: "Escrever a alguém", it: "Scrivi a qualcuno", ja: "誰かに書く", zh: "写信给某人", hi: "किसी को लिखें", ar: "اكتب إلى شخص",
+  },
+  "mail.compose.to": {
+    en: "To (email address)", es: "Para (dirección de correo)", fr: "À (adresse e-mail)", de: "An (E-Mail-Adresse)", pt: "Para (endereço de e-mail)", it: "A (indirizzo email)", ja: "宛先（メールアドレス）", zh: "收件人（电子邮箱）", hi: "किसे (ईमेल पता)", ar: "إلى (عنوان البريد)",
+  },
+  "mail.compose.subject": {
+    en: "Subject", es: "Asunto", fr: "Objet", de: "Betreff", pt: "Assunto", it: "Oggetto", ja: "件名", zh: "主题", hi: "विषय", ar: "الموضوع",
+  },
+  "mail.compose.objective": {
+    en: "What the message should accomplish", es: "Qué debe lograr el mensaje", fr: "Ce que le message doit accomplir", de: "Was die Nachricht erreichen soll", pt: "O que a mensagem deve alcançar", it: "Cosa deve ottenere il messaggio", ja: "このメッセージで達成したいこと", zh: "这封邮件要达成什么", hi: "संदेश से क्या हासिल होना चाहिए", ar: "ما ينبغي أن تحققه الرسالة",
+  },
+  "mail.none": {
+    en: "No correspondence yet.", es: "Aún no hay correspondencia.", fr: "Aucune correspondance pour l'instant.", de: "Noch keine Korrespondenz.", pt: "Ainda não há correspondência.", it: "Ancora nessuna corrispondenza.", ja: "まだやり取りはありません。", zh: "暂无往来信件。", hi: "अभी तक कोई पत्राचार नहीं।", ar: "لا مراسلات بعد.",
+  },
+  "mail.held": {
+    en: "{n} held for you", es: "{n} retenidos para ti", fr: "{n} en attente de vous", de: "{n} für dich zurückgehalten", pt: "{n} retidos para ti", it: "{n} in attesa di te", ja: "承認待ち{n}件", zh: "{n} 项待你处理", hi: "{n} आपके लिए रुके", ar: "{n} بانتظارك",
+  },
+  "mail.edit.aria": {
+    en: "Edit the reply before approving", es: "Editar la respuesta antes de aprobar", fr: "Modifier la réponse avant approbation", de: "Antwort vor der Freigabe bearbeiten", pt: "Editar a resposta antes de aprovar", it: "Modifica la risposta prima di approvare", ja: "承認する前に返信を編集", zh: "批准前编辑回复", hi: "स्वीकृति से पहले उत्तर संपादित करें", ar: "عدّل الرد قبل الموافقة",
+  },
+  "mail.approve": {
+    en: "Approve & send", es: "Aprobar y enviar", fr: "Approuver et envoyer", de: "Freigeben & senden", pt: "Aprovar e enviar", it: "Approva e invia", ja: "承認して送信", zh: "批准并发送", hi: "स्वीकृत करें और भेजें", ar: "الموافقة والإرسال",
+  },
+  "mail.saveedit": {
+    en: "Save edit", es: "Guardar cambios", fr: "Enregistrer", de: "Änderung speichern", pt: "Guardar edição", it: "Salva modifica", ja: "編集を保存", zh: "保存编辑", hi: "संपादन सहेजें", ar: "حفظ التعديل",
+  },
+  "mail.discard": {
+    en: "Discard", es: "Descartar", fr: "Rejeter", de: "Verwerfen", pt: "Descartar", it: "Scarta", ja: "破棄", zh: "丢弃", hi: "हटाएँ", ar: "تجاهل",
+  },
+  "mail.draftreply": {
+    en: "Draft a reply", es: "Redactar respuesta", fr: "Rédiger une réponse", de: "Antwort entwerfen", pt: "Redigir resposta", it: "Scrivi una risposta", ja: "返信を下書き", zh: "起草回复", hi: "उत्तर का मसौदा", ar: "صياغة رد",
+  },
+  "mail.dir.inbound": {
+    en: "In", es: "Entrada", fr: "Reçu", de: "Ein", pt: "Entrada", it: "In arrivo", ja: "受信", zh: "收", hi: "आया", ar: "وارد",
+  },
+  "mail.dir.outbound": {
+    en: "Out", es: "Salida", fr: "Envoyé", de: "Aus", pt: "Saída", it: "In uscita", ja: "送信", zh: "发", hi: "गया", ar: "صادر",
+  },
+  "mail.state.received": {
+    en: "Received", es: "Recibido", fr: "Reçu", de: "Empfangen", pt: "Recebido", it: "Ricevuto", ja: "受信済み", zh: "已收到", hi: "प्राप्त", ar: "مستلَم",
+  },
+  "mail.state.draft": {
+    en: "Draft — held for you", es: "Borrador — retenido para ti", fr: "Brouillon — en attente de vous", de: "Entwurf — für dich zurückgehalten", pt: "Rascunho — retido para ti", it: "Bozza — in attesa di te", ja: "下書き — 承認待ち", zh: "草稿 — 待你处理", hi: "मसौदा — आपके लिए रुका", ar: "مسودة — بانتظارك",
+  },
+  "mail.state.sent": {
+    en: "Sent", es: "Enviado", fr: "Envoyé", de: "Gesendet", pt: "Enviado", it: "Inviato", ja: "送信済み", zh: "已发送", hi: "भेजा गया", ar: "أُرسِل",
+  },
+  "mail.state.staged": {
+    en: "Approved · held (no mail server)", es: "Aprobado · retenido (sin servidor de correo)", fr: "Approuvé · retenu (pas de serveur de messagerie)", de: "Freigegeben · zurückgehalten (kein Mailserver)", pt: "Aprovado · retido (sem servidor de correio)", it: "Approvato · trattenuto (nessun server di posta)", ja: "承認済み・保留（メールサーバーなし）", zh: "已批准 · 保留（无邮件服务器）", hi: "स्वीकृत · रुका (कोई मेल सर्वर नहीं)", ar: "معتمد · محتجَز (لا خادم بريد)",
+  },
+  "mail.state.discarded": {
+    en: "Discarded", es: "Descartado", fr: "Rejeté", de: "Verworfen", pt: "Descartado", it: "Scartato", ja: "破棄済み", zh: "已丢弃", hi: "हटाया गया", ar: "مُتجاهَل",
+  },
+  "mail.desk": {
+    en: "Mailboxes", es: "Buzones", fr: "Boîtes aux lettres", de: "Postfächer", pt: "Caixas de correio", it: "Caselle di posta", ja: "メールボックス", zh: "邮箱", hi: "मेलबॉक्स", ar: "صناديق البريد",
+  },
+  "mail.desk.pitch": {
+    en: "Every profile you hold has its own mailbox and works it itself — reading, drafting in its profession, replying. What is held for you is here.", es: "Cada perfil que tienes posee su propio buzón y lo gestiona por sí mismo: lee, redacta en su profesión, responde. Lo que se retiene para ti está aquí.", fr: "Chaque profil que vous détenez a sa propre boîte aux lettres et la gère lui-même — il lit, rédige dans son métier, répond. Ce qui vous est réservé est ici.", de: "Jedes Profil, das du hältst, hat ein eigenes Postfach und bearbeitet es selbst — es liest, entwirft in seinem Beruf, antwortet. Was für dich zurückgehalten wird, steht hier.", pt: "Cada perfil que tens possui a sua própria caixa de correio e trata dela sozinho — lê, redige na sua profissão, responde. O que fica retido para ti está aqui.", it: "Ogni profilo che possiedi ha la propria casella di posta e la gestisce da sé — legge, scrive nella sua professione, risponde. Ciò che è trattenuto per te è qui.", ja: "あなたが保有する各プロフィールには専用のメールボックスがあり、自分で読み・職業として下書きし・返信します。あなたの承認待ちのものはここに並びます。", zh: "你持有的每个形象都有自己的邮箱并自行处理：阅读、以其职业身份起草、回复。为你保留的内容在这里。", hi: "आपके हर प्रोफ़ाइल का अपना मेलबॉक्स है और वह उसे खुद संभालता है — पढ़ना, अपने पेशे में मसौदा बनाना, जवाब देना। जो आपके लिए रोका गया है वह यहाँ है।", ar: "لكل ملف تحتفظ به صندوق بريده الخاص ويتولاه بنفسه — يقرأ ويصوغ بصفته المهنية ويرد. ما احتُجز لك موجود هنا.",
+  },
+  "mail.desk.signin": {
+    en: "Sign in to see the mailboxes of the profiles you hold.", es: "Inicia sesión para ver los buzones de los perfiles que tienes.", fr: "Connectez-vous pour voir les boîtes aux lettres des profils que vous détenez.", de: "Melde dich an, um die Postfächer deiner Profile zu sehen.", pt: "Inicie sessão para ver as caixas de correio dos perfis que tem.", it: "Accedi per vedere le caselle di posta dei profili che possiedi.", ja: "保有するプロフィールのメールボックスを見るにはサインインしてください。", zh: "请登录以查看你持有的形象的邮箱。", hi: "अपने प्रोफ़ाइलों के मेलबॉक्स देखने के लिए साइन इन करें।", ar: "سجّل الدخول لعرض صناديق بريد الملفات التي تحتفظ بها.",
+  },
+  "mail.desk.none": {
+    en: "No profiles yet — make one and it gets a mailbox.", es: "Aún no hay perfiles: crea uno y tendrá un buzón.", fr: "Aucun profil pour l'instant — créez-en un et il aura une boîte aux lettres.", de: "Noch keine Profile — lege eines an und es bekommt ein Postfach.", pt: "Ainda não há perfis — cria um e ele recebe uma caixa de correio.", it: "Ancora nessun profilo — creane uno e avrà una casella di posta.", ja: "まだプロフィールがありません — 作成するとメールボックスが付きます。", zh: "还没有形象 — 创建一个，它就会有邮箱。", hi: "अभी कोई प्रोफ़ाइल नहीं — एक बनाएँ और उसे मेलबॉक्स मिलेगा।", ar: "لا ملفات بعد — أنشئ واحدًا وسيحصل على صندوق بريد.",
+  },
+  "mail.self": {
+    en: "Answers on its own", es: "Responde por sí mismo", fr: "Répond tout seul", de: "Antwortet selbst", pt: "Responde sozinho", it: "Risponde da sé", ja: "自分で返信します", zh: "自行回复", hi: "खुद जवाब देता है", ar: "يجيب بنفسه",
+  },
+  "mail.heldmode": {
+    en: "Replies held for you", es: "Respuestas retenidas para ti", fr: "Réponses retenues pour vous", de: "Antworten für dich zurückgehalten", pt: "Respostas retidas para ti", it: "Risposte trattenute per te", ja: "返信はあなたの承認待ち", zh: "回复为你保留", hi: "उत्तर आपके लिए रोके गए", ar: "الردود محتجَزة لك",
+  },
+  "mail.inbox.attached": {
+    en: "Inbox attached", es: "Buzón conectado", fr: "Boîte de réception reliée", de: "Posteingang verbunden", pt: "Caixa de entrada ligada", it: "Casella collegata", ja: "受信箱を接続済み", zh: "已连接收件箱", hi: "इनबॉक्स जुड़ा है", ar: "صندوق الوارد موصول",
+  },
+  "mail.inbox.none": {
+    en: "No inbox connected — attach Gmail, Outlook or Mail on Plug-ins and the profile works that one.", es: "Sin buzón conectado: conecta Gmail, Outlook o Mail en Plug-ins y el perfil lo gestionará.", fr: "Aucune boîte de réception reliée — ajoutez Gmail, Outlook ou Mail dans les Plug-ins et le profil s'en occupera.", de: "Kein Posteingang verbunden — verbinde Gmail, Outlook oder Mail unter Plug-ins, und das Profil bearbeitet ihn.", pt: "Nenhuma caixa de entrada ligada — liga o Gmail, o Outlook ou o Mail em Plug-ins e o perfil trata dela.", it: "Nessuna casella collegata — collega Gmail, Outlook o Mail nei Plug-in e il profilo la gestirà.", ja: "受信箱が未接続です — プラグインで Gmail・Outlook・Mail を接続すると、プロフィールがそれを扱います。", zh: "未连接收件箱 — 在插件中连接 Gmail、Outlook 或 Mail，形象即可处理它。", hi: "कोई इनबॉक्स जुड़ा नहीं — प्लग-इन में Gmail, Outlook या Mail जोड़ें और प्रोफ़ाइल उसे संभालेगा।", ar: "لا صندوق وارد موصول — أضف Gmail أو Outlook أو Mail في الإضافات وسيتولاه الملف.",
+  },
+  "mail.posture.staged": {
+    en: "No mail server is configured, so a reply that would send is composed and held rather than sent — set one up on Settings.", es: "No hay servidor de correo configurado, así que una respuesta que se enviaría se redacta y se retiene en vez de enviarse — configúralo en Ajustes.", fr: "Aucun serveur de messagerie n'est configuré, donc une réponse qui partirait est rédigée et retenue plutôt qu'envoyée — configurez-en un dans les Réglages.", de: "Es ist kein Mailserver konfiguriert, daher wird eine Antwort, die gesendet würde, verfasst und zurückgehalten statt gesendet — richte einen in den Einstellungen ein.", pt: "Nenhum servidor de correio está configurado, por isso uma resposta que seria enviada é redigida e retida em vez de enviada — configura um nas Definições.", it: "Nessun server di posta è configurato, quindi una risposta che partirebbe viene composta e trattenuta invece di essere inviata — impostane uno nelle Impostazioni.", ja: "メールサーバーが設定されていないため、送信されるはずの返信は作成して保留されます — 設定で用意してください。", zh: "尚未配置邮件服务器，因此本应发出的回复会被撰写并保留而非发送 — 请在“设置”中配置。", hi: "कोई मेल सर्वर कॉन्फ़िगर नहीं है, इसलिए भेजा जाने वाला उत्तर भेजने के बजाय तैयार करके रोका जाता है — इसे सेटिंग्स में सेट करें।", ar: "لا يوجد خادم بريد مُعَدّ، لذا يُصاغ الرد الذي كان سيُرسَل ويُحتجَز بدل إرساله — أعدّ واحدًا في الإعدادات.",
+  },
+  "mail.compose.go.profile": {
+    en: "Have the profile draft it", es: "Que el perfil lo redacte", fr: "Faire rédiger par le profil", de: "Vom Profil entwerfen lassen", pt: "Deixar o perfil redigir", it: "Fai redigere al profilo", ja: "プロフィールに下書きさせる", zh: "让形象起草", hi: "प्रोफ़ाइल से मसौदा बनवाएँ", ar: "دع الملف يصوغها",
+  },
+  "mail.answered": {
+    en: "The profile answered on its own.", es: "El perfil respondió por sí mismo.", fr: "Le profil a répondu tout seul.", de: "Das Profil hat selbst geantwortet.", pt: "O perfil respondeu sozinho.", it: "Il profilo ha risposto da sé.", ja: "プロフィールが自分で返信しました。", zh: "形象已自行回复。", hi: "प्रोफ़ाइल ने खुद जवाब दिया।", ar: "أجاب الملف بنفسه.",
+  },
+  "mail.heldnote": {
+    en: "Held: {why}", es: "Retenido: {why}", fr: "Retenu : {why}", de: "Zurückgehalten: {why}", pt: "Retido: {why}", it: "Trattenuto: {why}", ja: "保留: {why}", zh: "已保留：{why}", hi: "रोका गया: {why}", ar: "محتجَز: {why}",
+  },
+  "onb.region": {
+    en: "Where you are signing up from", es: "Desde dónde te registras", fr: "D'où vous vous inscrivez", de: "Von wo du dich registrierst", pt: "De onde te estás a registar", it: "Da dove ti stai registrando", ja: "登録している地域", zh: "你注册时所在的地区", hi: "आप कहाँ से साइन अप कर रहे हैं", ar: "من أين تسجّل",
+  },
+  "onb.region.hint": {
+    en: "The models and video services you are offered are the set for your region. You can change it later on Settings.", es: "Los modelos y servicios de vídeo que se te ofrecen son el conjunto de tu región. Puedes cambiarlo después en Ajustes.", fr: "Les modèles et services vidéo proposés sont la sélection de votre région. Vous pourrez la changer plus tard dans les Réglages.", de: "Die angebotenen Modelle und Videodienste sind die Auswahl für deine Region. Du kannst sie später in den Einstellungen ändern.", pt: "Os modelos e serviços de vídeo oferecidos são a seleção da tua região. Podes mudá-la depois nas Definições.", it: "I modelli e i servizi video offerti sono la selezione della tua regione. Puoi cambiarla in seguito nelle Impostazioni.", ja: "提供されるモデルと動画サービスは、あなたの地域向けの構成です。あとで設定から変更できます。", zh: "向你提供的模型和视频服务是你所在地区的配置。之后可在“设置”中更改。", hi: "आपको दिए गए मॉडल और वीडियो सेवाएँ आपके क्षेत्र का सेट हैं। इसे बाद में सेटिंग्स में बदल सकते हैं।", ar: "النماذج وخدمات الفيديو المعروضة عليك هي تشكيلة منطقتك. يمكنك تغييرها لاحقًا في الإعدادات.",
   },
   "corner.title": {
-    en: "My Space", es: "Mi espacio", fr: "Mon espace", de: "Mein Bereich", pt: "O meu espaço", it: "Il mio spazio", ja: "マイスペース", zh: "我的空间", hi: "मेरा स्पेस", ar: "مساحتي",
+    en: "My Corner", es: "Mi rincón", fr: "Mon coin", de: "Meine Ecke", pt: "O meu cantinho", it: "Il mio angolo", ja: "マイコーナー", zh: "我的角落", hi: "मेरा कोना", ar: "ركني",
   },
   "corner.sub": {
     en: "Your public page and your messages. What you edit here is exactly what a visitor sees.", es: "Tu página pública y tus mensajes. Lo que editas aquí es exactamente lo que ve un visitante.", fr: "Votre page publique et vos messages. Ce que vous modifiez ici est exactement ce qu'un visiteur voit.", de: "Deine öffentliche Seite und deine Nachrichten. Was du hier bearbeitest, sieht ein Besucher genau so.", pt: "A tua página pública e as tuas mensagens. O que editas aqui é exatamente o que um visitante vê.", it: "La tua pagina pubblica e i tuoi messaggi. Ciò che modifichi qui è esattamente ciò che vede un visitatore.", ja: "あなたの公開ページとメッセージ。ここで編集した内容が、訪問者に見えるそのままの姿です。", zh: "你的公开主页和你的消息。你在这里编辑的，就是访客看到的样子。", hi: "आपका सार्वजनिक पेज और आपके संदेश। आप यहाँ जो संपादित करते हैं, आगंतुक ठीक वही देखता है।", ar: "صفحتك العلنية ورسائلك. ما تحرّره هنا هو بالضبط ما يراه الزائر.",

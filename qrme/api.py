@@ -42,6 +42,7 @@ from .routers import (accounts as account_routes,
                       gamelobby, gaming,
                       governance,
                       identity, inbox as inbox_routes,
+                      mailbox as mailbox_routes,
                       inquiries as inquiry_routes,
                       intelligence, interaction, licensing, models,
                       mypeople as mypeople_routes,
@@ -73,7 +74,7 @@ def create_app(pdi_client: PDIClient | None = None,
     # cannot be added to the product and forgotten at one of its routes,
     # because no route opts in. See qrme/tiers.py for the table and for why
     # browsing stays open.
-    app = FastAPI(title="QRME", version="3.0.2",
+    app = FastAPI(title="QRME", version="3.0.3",
                   dependencies=[Depends(tiers.gate)])
 
     @app.get("/terms")
@@ -167,6 +168,7 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(friends.router)
     app.include_router(identity.router)
     app.include_router(inbox_routes.router)
+    app.include_router(mailbox_routes.router)
     app.include_router(placemic.router)
     app.include_router(overlay_routes.router)
     app.include_router(gamelobby.router)

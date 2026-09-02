@@ -74,6 +74,9 @@ MODELS = {
     "happyhorse": "fal-ai/wan/v2.2-a14b/text-to-video",
     "kling": "fal-ai/kling-video/v2/master/text-to-video",
     "ltx": "fal-ai/ltx-video-13b-distilled",
+    "higgsfield": "fal-ai/higgsfield/dop/text-to-video",
+    "hailuo": "fal-ai/minimax/hailuo-02/pro/text-to-video",
+    "vidu": "fal-ai/vidu/q1/text-to-video",
 }
 
 #: What each shape is called on the wire. Named for what a person would

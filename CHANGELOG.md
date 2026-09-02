@@ -6,6 +6,63 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.0.3] - 2026-09-02
+
+### Added
+
+- **The model menu is a loadout per region.** Where a person signs up
+  from is a fact on the account (`Signup.region`, editable through
+  `PUT /accounts/{id}/region` and on Settings), and the tiles a profile
+  is offered are the loadout for its owner's region (`qrme/loadouts.py`):
+  home providers first, then a curated few popular foreign ones for that
+  market. A US account sees the American houses plus DeepSeek, Mistral,
+  Qwen and Kimi; a Chinese account leads with Qwen, DeepSeek, Kimi and GLM
+  and still offers the American ones; Europe leads with Mistral. The
+  registry is widened from ten providers to twenty-two — Llama, Azure
+  OpenAI, Bedrock, Groq, Together, Fireworks and NVIDIA NIM on the
+  American side; Mistral, Qwen, Kimi, GLM and Cohere from elsewhere —
+  every row naming its home, and `GET /models?profile_id=` answers with
+  the profile's own menu, each row carrying its origin. A provider off the
+  loadout is refused with the menu it was offered. One lever,
+  `QRME_MODEL_POLICY=american`, tapers the *American-region* menu to
+  American, local and self-supplied providers and binds no other region —
+  the change a government might one day ask for, made in one line and
+  affecting only the accounts it would apply to. Default is `all`, the
+  beta posture.
+- **The video shelf is the same shape.** Higgsfield, Hailuo and Vidu join
+  the shelf and the film adapter; the picker on Identity draws the
+  region's video menu rather than the whole shelf (`GET /video/road/{id}`
+  answers with the menu), and `POST /video/road/{id}` refuses a house off
+  it with the menu. The American lever tapers this menu too.
+- **Every synthetic profile has its own mailbox, and works it itself.**
+  Lifted from JIM-mini's coach mailbox with the role turned into the
+  profession (`qrme/mailbox.py`). A profile reads what comes in, drafts the
+  reply in its profession through the same persona prompt every surface
+  speaks from, screens it through the same `moderation.review` a chat turn
+  passes, and — in `auto` moderation mode — answers on its own: sent over
+  SMTP when one is wired, *staged* (composed and held, never dropped, never
+  claimed sent) when none is. In `manual` mode the reply is held for the
+  owner; a flagged reply is held whatever the mode. The inbox it works is
+  the Gmail, Outlook or Mail connector attached on Plug-ins, named in the
+  posture; the wire that delivers a new message in on its own is the
+  wiring step, said as `inbound_ready: false`. The operator reviews from
+  their own corner: `GET /accounts/{id}/mail` is the desk over every
+  mailbox the account is answerable for — its own profiles and its
+  companies' seats — and `POST /accounts/{id}/mail/{draft}/moderate`
+  approves, edits or discards from there. Seven doors, all on the console.
+
+### Changed
+
+- **The provider tiles wear no company's mark.** Every provider is drawn
+  the same way — a generic monogram of its own initial in one accent,
+  the public name beside it, the origin code after — because the marks
+  belong to the companies and a menu that borrowed them would be wearing
+  somebody else's badge.
+- **My Space is My Corner.** The tab and the heading read like somebody
+  else's trademark; they are *My Corner* now, and *Dana's corner* once a
+  profile is signed in — the shells already called it *Your corner*. The
+  product map's cue follows.
+
 ## [3.0.2] - 2026-09-02
 
 ### Security
@@ -17654,7 +17711,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.2...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.3...HEAD
+[3.0.3]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.2...app-v3.0.3
 [3.0.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.1...app-v3.0.2
 [3.0.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.0...app-v3.0.1
 [3.0.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.17...app-v3.0.0

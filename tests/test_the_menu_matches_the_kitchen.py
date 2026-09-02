@@ -127,7 +127,11 @@ def test_every_provider_on_the_menu_can_be_chosen(client, profile_id):
     owner can set the choice before pasting the key. A refusal here would make
     the provider tiles unusable until a key existed.
     """
-    providers = client.get("/models").json()["providers"]
+    # The menu THIS profile is offered — its region's loadout — rather than
+    # the whole registry: the kitchen refuses a provider off the loadout on
+    # purpose, and a guard reading the wider list would call that a defect.
+    providers = client.get("/models", params={"profile_id": profile_id}
+                           ).json()["providers"]
     _check(
         "provider", [(p["name"], p["model"]) for p in providers],
         lambda pair: client.put(f"/profiles/{profile_id}/model",

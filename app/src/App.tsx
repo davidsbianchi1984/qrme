@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "./api";
-import { t, visitorLang } from "./l10n";
+import { fill, t, visitorLang } from "./l10n";
 import { useSession } from "./store";
 import { Onboarding } from "./screens/Onboarding";
 import { Public, type Pane as PublicPane } from "./screens/Public";
@@ -96,7 +96,7 @@ const NAV: { id: Tab; label: string; icon: string; art?: string;
   { id: "discover", label: "Discover", icon: "🛍", group: "community" },
   { id: "market", label: "Marketplace", icon: "🏷", group: "community" },
   { id: "shop", label: "Shops", icon: "🛒", group: "community" },
-  { id: "corner", label: "My Space", icon: "🏠", group: "profile" },
+  { id: "corner", label: "My Corner", icon: "🏠", group: "profile" },
   { id: "wall", label: "Wall", icon: "🧱", group: "profile" },
   { id: "friends", label: "Friends", icon: "👥", group: "community" },
   { id: "rooms", label: "Rooms", icon: "🎧", group: "community" },
@@ -158,6 +158,10 @@ const NAV_GROUPS = ["community", "profile", "create", "business",
 
 export function App() {
   const { session, signOut } = useSession();
+  // The corner is named for whoever it belongs to: the active profile's
+  // page and messages read "Dana's corner", and only before a profile is
+  // signed in does the tab fall back to the plain label.
+  const cornerName = session.profile?.display_name;
   const [tab, setTab] = useState<Tab>("home");
 
   // Pressing walk lands on the front page.
@@ -333,7 +337,9 @@ export function App() {
               <span className={"nav-icon" + (n.art ? " nav-art" : "")}>
                 {n.art ? <img src={n.art} alt="" /> : n.icon}
               </span>
-              {t(`nav.${n.id}`, lang)}
+              {n.id === "corner" && cornerName
+                ? fill(t("nav.corner.of", lang), { name: cornerName })
+                : t(`nav.${n.id}`, lang)}
             </button>
           ))}
           {NAV_GROUPS.map((g) => (
@@ -358,7 +364,9 @@ export function App() {
                     <span className={"nav-icon" + (n.art ? " nav-art" : "")}>
                       {n.art ? <img src={n.art} alt="" /> : n.icon}
                     </span>
-                    {t(`nav.${n.id}`, lang)}
+                    {n.id === "corner" && cornerName
+                ? fill(t("nav.corner.of", lang), { name: cornerName })
+                : t(`nav.${n.id}`, lang)}
                   </button>
                 ))}
             </div>

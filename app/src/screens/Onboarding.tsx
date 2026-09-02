@@ -43,6 +43,10 @@ function AccountGate() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  // Where the person is signing up from: the model menu (and the video
+  // menu) is the loadout for it, and it can be changed later on Settings.
+  const [region, setRegion] = useState("us");
+  const REGIONS = ["us", "ca", "eu", "uk", "cn", "in", "jp", "kr", "br", "au", "other"];
   const [code, setCode] = useState("");
   const [delivery, setDelivery] = useState<string | null>(null);
   // Whether this deployment requires an invite key to create an account —
@@ -141,7 +145,7 @@ function AccountGate() {
   const signup = async () => {
     setBusy(true); setError(null); setNotice(null);
     try {
-      const r = await accountApi.signup({ email: email.trim(), password, display_name: name.trim() || undefined });
+      const r = await accountApi.signup({ email: email.trim(), password, display_name: name.trim() || undefined, region });
       if (r.verification === "local" && r.account_token) {
         // No mail transport on this deployment (the desktop install): the
         // machine owner is trusted, the account is already active.
@@ -206,6 +210,14 @@ function AccountGate() {
         {confirm && !passwordsMatch && (
           <div className="error">{tr("onb.password.mismatch", visitorLang())}</div>
         )}
+        <label>{tr("onb.region", visitorLang())}
+          <select value={region} onChange={(e) => setRegion(e.target.value)}>
+            {REGIONS.map((code) => (
+              <option key={code} value={code}>{tr(`region.${code}`, visitorLang())}</option>
+            ))}
+          </select>
+        </label>
+        <p className="field-hint">{tr("onb.region.hint", visitorLang())}</p>
         {needsInvite && (<>
           <label>{tr("onb.invite", visitorLang())}
             <input value={inviteKey}

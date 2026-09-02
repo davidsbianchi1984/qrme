@@ -231,6 +231,8 @@ services:
       # operator names another here. The URL points at the adapter above
       # rather than at a vendor, so swapping houses is one container.
       QRME_FILM_PROVIDER: ${QRME_FILM_PROVIDER:-}
+      # The region menu's one lever (qrme/loadouts.py): blank is `all`.
+      QRME_MODEL_POLICY: ${QRME_MODEL_POLICY:-}
       QRME_FILM_URL: ${QRME_FILM_URL:-http://film:8700}
       # Present so `filming.keyed()` is true — the real credential is the
       # adapter's FAL_KEY and never enters this container.
@@ -255,6 +257,16 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       XAI_API_KEY: ${XAI_API_KEY:-}
       DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      LLAMA_API_KEY: ${LLAMA_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      TOGETHER_API_KEY: ${TOGETHER_API_KEY:-}
+      FIREWORKS_API_KEY: ${FIREWORKS_API_KEY:-}
+      NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:-}
+      MOONSHOT_API_KEY: ${MOONSHOT_API_KEY:-}
+      ZHIPU_API_KEY: ${ZHIPU_API_KEY:-}
+      COHERE_API_KEY: ${COHERE_API_KEY:-}
     volumes:
       - shared:/shared
       - qrme-data:/data

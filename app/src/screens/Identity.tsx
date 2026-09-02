@@ -79,7 +79,8 @@ export function Identity({ onPlans, onPassing }: {
   // page somebody finds after the bill.
   const [road, setRoad] = useState<"photo" | "avatar" | "video">("photo");
   const [budget, setBudget] = useState<
-    { daily_seconds: number; spent: number; left: number } | null>(null);
+    { daily_seconds: number; spent: number; left: number;
+      providers?: string[] } | null>(null);
   const [capDraft, setCapDraft] = useState("");
   // Which company renders this profile. Held here rather than read off
   // `film` because that is the DEPLOYMENT's choice: once an owner picks,
@@ -1050,8 +1051,11 @@ export function Identity({ onPlans, onPassing }: {
 
             <h4>{tr("idn.video.service", lang)}</h4>
             <p className="muted small">{tr("idn.video.service.sub", lang)}</p>
+            {/* The menu THIS profile's region is offered (the road's own
+                answer), not the whole shelf the deployment can send to:
+                a tile drawn here is a tile the set accepts. */}
             <SkinTiles
-              sources={(film?.providers || [])
+              sources={(budget?.providers || film?.providers || [])
                 .map((k) => ({ key: k, name: k, how: "" }))}
               chosen={filmPick}
               onPick={(key) => void chooseFilmProvider(key)} />

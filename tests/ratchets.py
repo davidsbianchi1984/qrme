@@ -803,6 +803,15 @@ def _degrading_wrappers() -> int:
     return len(_degrading_wrappers())
 
 
+def _real_providers() -> int:
+    """Registry rows with a home country — the menu the region loadouts
+    curate from. Local and self-supplied rows are offered everywhere and
+    are not what "at least eight providers" was asking about."""
+    from qrme import llm
+    return sum(1 for spec in llm._REGISTRY.values()
+               if spec.get("origin") not in ("local", "any"))
+
+
 def _wheel_declared() -> int:
     from .test_the_image_holds_what_the_wheel_declares import _declared
     return len(_declared())
@@ -1034,6 +1043,8 @@ RATCHETS: tuple[Ratchet, ...] = (
             "the items in the thinnest starter pack"),
     Ratchet("degrading.wrappers", 2, _degrading_wrappers,
             "the wrappers that degrade quietly, as the walk finds them"),
+    Ratchet("llm.real_providers", 12, _real_providers,
+            "the providers on the model menu with a home country"),
     Ratchet("wheel.declared", 2, _wheel_declared,
             "the variables the deploy wheel declares"),
     Ratchet("console.players", 2, _console_players,
