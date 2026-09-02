@@ -6,6 +6,29 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.16] - 2026-09-02
+
+### Added
+
+- **The wearable tells the guardian.** Every kind of worn device now
+  declares what it can sense — heart rate, steps, sleep, temperature,
+  respiration, falls, gait — as a ledger, not a lookup: sensing or
+  empty, every kind decides. A sensing device's settings row takes the
+  deposit address the owner's JIM-mini guardian minted, and the
+  readings travel from the device's own app straight to that address:
+  this platform stores only where the owner chose to send them, holds
+  no reading at any point (a test greps the module to prove no door
+  accepts a value), and refuses the setting by name — in ten languages
+  — on a device that senses nothing a guardian could watch.
+
+### Changed
+
+- **The gallery is current, and the record shows only the product.**
+  The camera walked every tab; six screens had changed since their last
+  sitting and were re-shot, and the two surfaces it cannot reach said
+  so by name. The README's one section whose images were compositions
+  rather than screenshots is gone whole.
+
 ## [2.9.15] - 2026-09-02
 
 ### Added
@@ -17521,7 +17544,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.15...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.16...HEAD
+[2.9.16]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.15...app-v2.9.16
 [2.9.15]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.14...app-v2.9.15
 [2.9.14]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.13...app-v2.9.14
 [2.9.13]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.12...app-v2.9.13
