@@ -541,6 +541,31 @@ Android XR.
 Nothing on the stage records: the headset session carries no capture
 vocabulary at all, which a test greps the source to prove.
 
+## The console, driven
+
+Every picture below was photographed while `tools/walkthrough.py` drove
+the 3.0.0 release gate: a live backend, a profile born during the run,
+and whatever the drive put on screen still on it. Nothing here is
+staged — the chat shows the answer the profile actually gave, the room
+holds the message the harness actually spoke, and the company on the
+books is the one it founded. Re-take the set with
+`python3 tools/walkthrough.py`.
+
+<table>
+<tr>
+<td align="center" width="50%"><a href="docs/walkthrough/01-chat.png"><img src="docs/walkthrough/01-chat.png" width="460" alt="Chat — the profile answers"></a><br><sub>Chat — the profile answers</sub></td>
+<td align="center" width="50%"><a href="docs/walkthrough/02-rooms.png"><img src="docs/walkthrough/02-rooms.png" width="460" alt="Rooms — spoken in, not just opened"></a><br><sub>Rooms — spoken in, not just opened</sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><a href="docs/walkthrough/03-companies.png"><img src="docs/walkthrough/03-companies.png" width="460" alt="Companies — founded, staffed, published"></a><br><sub>Companies — founded, staffed, published</sub></td>
+<td align="center" width="50%"><a href="docs/walkthrough/04-assist.png"><img src="docs/walkthrough/04-assist.png" width="460" alt="Assist — the wearable paired and verified"></a><br><sub>Assist — the wearable paired and verified</sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><a href="docs/walkthrough/05-market.png"><img src="docs/walkthrough/05-market.png" width="460" alt="Market — the avatar shelf"></a><br><sub>Market — the avatar shelf</sub></td>
+<td align="center" width="50%"><a href="docs/walkthrough/06-shop.png"><img src="docs/walkthrough/06-shop.png" width="460" alt="Shop — the storefront"></a><br><sub>Shop — the storefront</sub></td>
+</tr>
+</table>
+
 ## Release history
 
 <details>
