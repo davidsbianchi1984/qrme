@@ -315,6 +315,43 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
   // seats sit on a turntable this angle turns.
   const [yaw, setYaw] = useState(0);
   const dragFrom = useRef<{ x: number; yaw: number } | null>(null);
+  // The AR stage's eye: a brief "shown" state after a frame is shared.
+  const [eyeShown, setEyeShown] = useState(false);
+
+  // "Since the users have cameras, and synthetic profiles have eyes,
+  // they will be able to notice and understand things in their
+  // environment" — the owner's words, and the composition that honors
+  // them without a new door: one press draws the current passthrough
+  // frame and hands it to the room through the share the room already
+  // has. qrme/viewfinder.py draws the line this deliberately stays on
+  // the right side of — "a photograph is one framed moment somebody
+  // chose; a live camera is whatever happens to be behind it." One
+  // press, one frame, one share on the record, read on the way in by
+  // the same eyes every shared photo gets; nothing watches between
+  // presses.
+  const showThemWhatISee = async () => {
+    const v = pass.current;
+    if (!v || v.videoWidth === 0) return;
+    const scale = Math.min(1, 1280 / v.videoWidth);
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(v.videoWidth * scale);
+    canvas.height = Math.round(v.videoHeight * scale);
+    canvas.getContext("2d")!.drawImage(v, 0, 0, canvas.width,
+                                       canvas.height);
+    const blob: Blob | null = await new Promise((resolve) =>
+      canvas.toBlob(resolve, "image/jpeg", 0.85));
+    if (!blob) return;
+    const file = new File([blob], "what-i-see.jpg",
+                          { type: "image/jpeg" });
+    try {
+      await api.shareInRoom(open, me, file, token,
+                            tr("ins.stage.eyes.caption", lang));
+      api.roomMessages(open, token).then(setTranscript)
+        .catch(() => { /* the poll will carry it */ });
+      setEyeShown(true);
+      window.setTimeout(() => setEyeShown(false), 2500);
+    } catch { /* a failed share shows nothing and claims nothing */ }
+  };
   // The surroundings this viewer stands in — VR only, theirs alone,
   // remembered by the browser the way the format is. AR's surroundings
   // are the actual room and are not a choice anybody makes here.
@@ -3816,6 +3853,16 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
           )}
           {format === "ar" && passDenied && (
             <p className="stage-note">{tr("ins.stage.denied", lang)}</p>
+          )}
+          {format === "ar" && !passDenied && (
+            <button type="button" className="stage-eye"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      void showThemWhatISee();
+                    }}>
+              {eyeShown ? tr("ins.stage.eyes.done", lang)
+                        : tr("ins.stage.eyes", lang)}
+            </button>
           )}
           {format === "vr" && (
             <div className="stage-floor" aria-hidden="true" />

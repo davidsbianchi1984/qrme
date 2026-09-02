@@ -134,3 +134,21 @@ def test_the_door_is_translated_like_everything_else():
     L10N = (REPO / "app/src/l10n.ts").read_text(encoding="utf-8")
     assert '"ins.stage.headset"' in L10N
     assert 'tr("ins.stage.headset", lang)' in INSIDE
+
+
+def test_the_ar_eye_is_a_chosen_moment_not_a_camera():
+    """The AR stage's eye shares one framed moment through the room's own
+    share door — the photograph class :mod:`qrme.viewfinder` separates
+    from a live camera, and this stays on the chosen-moment side of the
+    line. Held two ways: the frame leaves through `shareInRoom` and
+    nothing else, and no timer drives the eye — nothing watches between
+    presses."""
+    assert "showThemWhatISee" in INSIDE
+    handler = INSIDE[INSIDE.index("const showThemWhatISee"):]
+    handler = handler[:handler.index("};") + 2]
+    assert "shareInRoom" in handler, (
+        "the eye no longer leaves through the room's share door")
+    for word in ("setInterval", "requestAnimationFrame", "MediaRecorder"):
+        assert word not in handler, (
+            f"{word!r} in the eye's handler — a driven eye is a camera, "
+            "and the viewfinder module owns cameras")

@@ -9959,6 +9959,15 @@ const CHROME: Table = {
   "ins.stage.vrnote": {
     en: "A room rendered on this device. Drag to look around.", es: "Una sala renderizada en este dispositivo. Arrastra para mirar alrededor.", fr: "Une salle rendue sur cet appareil. Faites glisser pour regarder autour.", de: "Ein auf diesem Gerät gerenderter Raum. Zieh, um dich umzusehen.", pt: "Uma sala renderizada neste dispositivo. Arraste para olhar em volta.", it: "Una stanza renderizzata su questo dispositivo. Trascina per guardarti intorno.", ja: "この端末上で描画された部屋です。ドラッグして見回せます。", zh: "在这台设备上渲染的房间。拖动即可环顾四周。", hi: "इस डिवाइस पर रेंडर किया गया कमरा। चारों ओर देखने के लिए खींचें।", ar: "غرفة مُصيَّرة على هذا الجهاز. اسحب لتنظر حولك.",
   },
+  "ins.stage.eyes": {
+    en: "Show them what you see", es: "Muéstrales lo que ves", fr: "Montrez-leur ce que vous voyez", de: "Zeig ihnen, was du siehst", pt: "Mostre-lhes o que vê", it: "Mostra loro ciò che vedi", ja: "見えているものを見せる", zh: "把你看到的给他们看", hi: "जो दिख रहा है उन्हें दिखाएँ", ar: "أرِهم ما تراه",
+  },
+  "ins.stage.eyes.done": {
+    en: "Shown", es: "Mostrado", fr: "Montré", de: "Gezeigt", pt: "Mostrado", it: "Mostrato", ja: "見せました", zh: "已展示", hi: "दिखा दिया", ar: "تم العرض",
+  },
+  "ins.stage.eyes.caption": {
+    en: "What the camera sees, where I stand.", es: "Lo que ve la cámara, donde estoy.", fr: "Ce que voit la caméra, là où je suis.", de: "Was die Kamera sieht, wo ich stehe.", pt: "O que a câmara vê, onde estou.", it: "Ciò che vede la fotocamera, dove sono.", ja: "カメラに見えているもの、私のいる場所から。", zh: "相机所见，就在我站的地方。", hi: "कैमरा जो देख रहा है, जहाँ मैं खड़ा हूँ।", ar: "ما تراه الكاميرا من حيث أقف.",
+  },
   "ins.stage.denied": {
     en: "The camera was refused, so the stage has a plain backdrop — the room still works.", es: "La cámara fue rechazada, así que el escenario tiene un fondo liso: la sala sigue funcionando.", fr: "La caméra a été refusée, la scène a donc un fond uni — la salle fonctionne toujours.", de: "Die Kamera wurde verweigert, die Bühne hat daher einen schlichten Hintergrund — der Raum funktioniert weiter.", pt: "A câmara foi recusada, por isso o palco tem um fundo simples — a sala continua a funcionar.", it: "La fotocamera è stata rifiutata, quindi il palco ha uno sfondo semplice: la stanza funziona comunque.", ja: "カメラが拒否されたため、ステージは無地の背景になっています — 部屋はそのまま使えます。", zh: "相机被拒绝了，所以舞台只有素色背景——房间照常可用。", hi: "कैमरे की अनुमति नहीं मिली, इसलिए मंच की पृष्ठभूमि सादी है — कमरा फिर भी चलता है।", ar: "رُفضت الكاميرا، لذا خلفية المسرح سادة — لكن الغرفة تعمل كما هي.",
   },
