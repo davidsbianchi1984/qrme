@@ -74,7 +74,7 @@ whole loop: your words become tracked work.
 | **The Studio and its agent** | A personal agent that edits your page, writes widgets, posts and searches the web on your word — acting only through published tools, each behind the same doors a person uses, with every act on the record. |
 | **The workforce** | Role-specific agents that answer for their own trade: specialist profiles JIM-mini reaches through the tandem, organizational desks, delegation with both sides' consent, and succession that survives its owner. |
 | **The Company Builder** | A founder starts a digital company in any industry, opens seats, and fills each one with a synthetic profile trained for that position through a dynamically composed interview — the platform studies the occupation first, predicts the roster a fully functioning storefront needs, seats the founder's own or blended profiles, publishes the staffed company into the marketplace, and opens each employee's file in place: embodiment on one side, hand-out on the other. |
-| **Wearables and screened devices** | Twenty kinds of worn device pair over Bluetooth — watches, bands, rings, pendants, glasses, headsets, earbuds including the ones worn as earrings, hearing aids, ankle monitors — against a published catalogue of models sold in America; devices with screens render the app's faces, and the rest pair as reach without powers. |
+| **Wearables and screened devices** | Twenty kinds of worn device pair over Bluetooth — watches, bands, rings, pendants, glasses, headsets, earbuds including the ones worn as earrings, hearing aids, ankle monitors — against a published catalogue of models sold in America; devices with screens render the app's faces, and the rest pair as reach without powers. Every kind declares what it can sense, and a sensing device can send its readings to the owner's health guardian: the platform stores only the destination address, and no reading ever touches it. |
 | **The stage — AR and VR** | The same room rendered three ways: flat on any browser, overlaid on the person's real environment in AR with each reply's footage floating beside its seat, or entered as a WebXR session in a headset's own browser with the figures standing in a surrounding of the person's choosing — no store required, and the headset road is offered only where the browser can answer for one. |
 | **Memory in the vault** | What a pair builds together seals to the PDI vault — shown to its people, curatable, and forgettable down to the vectors. |
 | **The platform's eyes** | Shared pictures and screenshots are read (a screenshot is the phone's way of handing over its screen), shared videos are heard and their frames described, a watch party's direct video can be watched once for the whole room, and a screen can be shown to a room or the agent one frame at a time — every claimed sight a real one, made by the deployment's own ears-and-eyes sidecar. |
@@ -199,85 +199,11 @@ face here. Frames from the footage, not stills posed for the page.
   </tr>
 </table>
 
-### One exchange, two turns, four screens
-
-**These are compositions, not captures.** They are drawn from real assets
-— the portraits this repository ships and frames from the footage above —
-and they show a surface that is built at the module and route level and
-not yet on screen. The distinction is the one
-`tests/superseded_drawings.txt` exists to keep: a drawing standing in for
-a screen is honest until it is quiet about being a drawing.
-
-The same consultation, one turn each. The green ring moves with whoever
-the turn belongs to — their seat and their frame, so the eye joins the
-two — and the scene moves with them, because the standing direction
-belongs to the speaker rather than to the room. He asks from a walled
-garden after dark; she answers from a hospital ward at shift change.
-Neither pressed play.
-
-**His turn**
-
-<table>
-  <tr>
-    <td align="center" width="62%"><img src="docs/scenes/turn-david-desktop.png" alt="David's turn, desktop"><br><sub>Windows &amp; desktop</sub></td>
-    <td align="center" width="38%"><img src="docs/scenes/turn-david-phone.png" alt="David's turn, phone"><br><sub>Phone</sub></td>
-  </tr>
-</table>
-
-**Her reply**
-
-<table>
-  <tr>
-    <td align="center" width="62%"><img src="docs/scenes/turn-amara-desktop.png" alt="Amara's turn, desktop"><br><sub>Windows &amp; desktop</sub></td>
-    <td align="center" width="38%"><img src="docs/scenes/turn-amara-phone.png" alt="Amara's turn, phone"><br><sub>Phone</sub></td>
-  </tr>
-</table>
-
-On a phone the seats become a strip across the top and the stage takes the
-full width. A rail of faces down the side would leave the footage too
-narrow to read a face in, which defeats the point of rendering one.
-
-Underneath the frame sits the standing direction in the owner's own words,
-and the line that changes it. On roads 1 and 2 that line is not greyed out
-— it is gone, because a control that cannot do anything is worse than no
-control at all.
-
-The AI mark rides every seat and the footage both. On a face it is drawn on
-top of the profile photo sphere, in the corner, on the outermost layer — it
-used to be burned into the pixels, and every surface here draws a face as a
-circle, so a mark in the corner of a square shipped cut in half. The rule and
-what it costs are in `docs/media-provenance.md`.
-
-### Filling the screen, and leaving it
-
-The frame carries an expand in its bottom-right corner. Not video
-furniture — a still and a 3-D head are both worth filling a screen with,
-so it is on every road.
-
-Full screen the direction stays legible along the bottom **and so does the
-line that changes it**: this is where somebody is actually looking at the
-scene, so it is the likeliest place they will want to say "not like that",
-and leaving the prompt behind on the small frame would mean shrinking the
-thing in order to fix it. Whatever they ask here is the same standing
-direction the windowed frame reads — there are not two of them to keep in
-step — and `scene_direction_log` records which view it was asked from.
-
-Leaving is a red X, top right, and it is the only red control on the
-surface because it is the only one that ends something rather than
-changing it.
-
-<table>
-  <tr>
-    <td align="center" width="50%"><img src="docs/scenes/full-david.png" alt="David's scene, full screen"><br><sub>His scene, full screen</sub></td>
-    <td align="center" width="50%"><img src="docs/scenes/full-amara.png" alt="Amara's scene, full screen"><br><sub>Hers</sub></td>
-  </tr>
-</table>
-
 ## The screens you'll meet
 
 The majority of what a person actually encounters, with what each screen
-does — drawn at phone scale, and the same screens serve the web console
-on a computer and the installed app. The Android tellings live beside
+does — shown at phone scale; the same screens serve the web console on a
+computer and the installed app. The Android tellings live beside
 these in `docs/screens/android/`, the watch has its own gallery below,
 and the complete tour of all 207 is in [docs/gallery.md](docs/gallery.md).
 
@@ -396,6 +322,15 @@ earbuds or glasses — and says which faces it may show.
 </tr>
 </table>
 
+**A sensing device can report to the owner's health guardian.** Every
+kind of wearable declares what it can sense — heart rate, steps, sleep,
+temperature, respiration, falls, gait — and a device that senses
+something can be pointed at the deposit address the owner's JIM-mini
+guardian provides. Readings travel from the device's own app directly
+to the guardian; this platform stores only the destination the owner
+chose, holds no reading at any point, and refuses the setting outright
+on a device that senses nothing.
+
 **Paired at sign-up, not found in a settings page.** The agent lights and the
 watch faces are worth having on day one, so the device step is part of joining.
 
@@ -478,10 +413,8 @@ The full desktop, mobile and portrait galleries live in
 ## The Company Builder, feature by feature
 
 A founder starts a digital company and staffs it one employee at a time.
-Every step below is a shipped behaviour of the running product, exercised
-by the test suite, and photographed from the console itself (screen 210 —
-the photograph, like every photograph in `docs/screens/`, is taken by
-`tools/shoot_screens.py` from the live app, and outranks any drawing).
+Every step below is a shipped behaviour of the running product, shown in
+the screenshots beside it.
 
 <table>
   <tr>
@@ -603,8 +536,8 @@ Android XR.
   </tr>
 </table>
 
-Nothing on the stage records: the headset session carries no capture
-vocabulary at all, which a test greps the source to prove.
+Nothing on the stage records — the headset session contains no
+capture capability of any kind.
 
 ## Release history
 
@@ -1050,12 +983,6 @@ and your colleagues to reach from anywhere:
 
 Talking to a profile stays public either way; the key gates creating an
 account on your deployment, not using one.
-
-Beyond self-hosting, the [`stores/`](stores/README.md) room holds the
-three storefront counters — Meta Horizon as a packaged PWA, Steam and
-Viveport as thin launchers over the Windows shell — with one shared
-[listing](stores/listing.md) and a guard that keeps every shelf's
-version equal to the app's.
 
 The `Dockerfile` packages the studio and the API into one image so a hosted
 instance serves both from the same origin, exactly like the phone flow does:
