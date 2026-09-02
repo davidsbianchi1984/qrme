@@ -1485,7 +1485,8 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   -webkit-mask-image: radial-gradient(closest-side, #000 30%, transparent 75%); }
 .stage-turn { position: absolute; left: 50%; top: 46%;
   transform-style: preserve-3d; }
-.stage-anchor { position: absolute; transform-style: preserve-3d; }
+.stage-anchor { position: absolute; transform-style: preserve-3d;
+  transition: opacity 0.25s; }
 .stage-seat { display: flex; flex-direction: column; align-items: center;
   gap: 6px; width: 128px; margin-left: -64px; padding: 12px 8px;
   background: rgba(10,16,28,0.55); border: 1px solid rgba(255,255,255,0.14);
@@ -1497,7 +1498,7 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .stage-line { position: absolute; left: 50%; bottom: 76px;
   transform: translateX(-50%); max-width: 80%; margin: 0; padding: 8px 14px;
   background: rgba(10,16,28,0.72); border-radius: 12px; font-size: 13px; }
-.stage-note { position: absolute; left: 50%; bottom: 44px;
+.stage-note { position: absolute; left: 50%; top: 58px;
   transform: translateX(-50%); max-width: 86%; margin: 0; font-size: 11px;
   opacity: 0.75; text-align: center; }
 .stage-leave { position: absolute; top: 14px; right: 14px;

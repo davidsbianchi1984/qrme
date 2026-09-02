@@ -3827,11 +3827,23 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                 // so it faces the viewer from wherever the turntable stops —
                 // a billboard, which is what a face is for.
                 const a = seatAngle(i, seats.length);
+                // Where the seat stands relative to the look direction,
+                // in (-180, 180]: 0 is straight ahead across the ring.
+                // Past ~112 degrees the CSS camera is inside the card —
+                // the rotate-then-push puts it nearer than the
+                // perspective plane, and it renders enormous and half
+                // off-screen. A seat you have turned your back on fades
+                // out instead: the room stays a circle you look around,
+                // never a card that lunges.
+                const rel = ((((a + yaw) % 360) + 540) % 360) - 180;
+                const behind = Math.abs(rel) > 112;
                 return (
                   <div key={s.id} className="stage-anchor"
                        style={{ transform:
                          `rotateY(${a + yaw}deg)`
-                         + ` translateZ(${-RING_RADIUS_CSS}px)` }}>
+                         + ` translateZ(${-RING_RADIUS_CSS}px)`,
+                         opacity: behind ? 0 : 1,
+                         pointerEvents: behind ? "none" : undefined }}>
                     <div className={"stage-seat"
                                     + (isTalking(s) ? " talking" : "")}
                          style={{ transform: `rotateY(${-(a + yaw)}deg)` }}
