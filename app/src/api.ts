@@ -650,6 +650,13 @@ export type Wearable = {
   id: string; name: string; kind: string;
   transport: string;
   faces: string[];
+  /** What this kind can feel — a guardian's vocabulary. Empty means the
+   *  device senses nothing a guardian could watch. */
+  senses: string[];
+  /** Where its readings go, when the owner pointed them somewhere: the
+   *  deposit address their guardian minted. The readings travel from
+   *  the device's own app to that address; QRME never holds one. */
+  guardian: string | null;
   paired_at: string;
   /** Set once unpaired. The row survives — a device that was on somebody's
    *  wrist is a fact about the past, not a row to delete. */
@@ -6323,6 +6330,11 @@ export const api = {
     req<Wearable>(`/profiles/${profileId}/wearables`,
       { method: "POST", body, token }),
   // Keyed by **name**, not id — the id is in the row and the route is not.
+  wearableGuardian: (profileId: string, name: string,
+                     dripUrl: string | null, token: string) =>
+    req<Wearable>(
+      `/profiles/${profileId}/wearables/${encodeURIComponent(name)}/guardian`,
+      { method: "PUT", body: { drip_url: dripUrl }, token }),
   unpairWearable: (profileId: string, name: string, token: string) =>
     req<Wearable>(
       `/profiles/${profileId}/wearables/${encodeURIComponent(name)}`,

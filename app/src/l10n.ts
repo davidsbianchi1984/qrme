@@ -3556,6 +3556,18 @@ const CHROME: Table = {
   "asst.worn.revoked": {
     en: "include ones you have unpaired — the row stays, with the date", es: "incluir los que has desemparejado — la fila permanece, con la fecha", fr: "inclure ceux que vous avez désappairés — la ligne reste, avec la date", de: "auch entkoppelte zeigen — die Zeile bleibt, mit Datum", pt: "incluir os que desemparelhou — a linha fica, com a data", it: "includi quelli disaccoppiati — la riga resta, con la data", ja: "解除したものも表示 — 行は日付と共に残ります", zh: "包括已取消配对的 — 记录保留，附日期", hi: "अलग किए गए भी दिखाएँ — पंक्ति तिथि सहित रहती है", ar: "تضمين ما ألغيت إقرانه — يبقى الصف مع التاريخ",
   },
+  "asst.worn.feels": {
+    en: "Feels: {senses}", es: "Percibe: {senses}", fr: "Perçoit : {senses}", de: "Spürt: {senses}", pt: "Sente: {senses}", it: "Percepisce: {senses}", ja: "感知: {senses}", zh: "感知：{senses}", hi: "महसूस करता है: {senses}", ar: "يستشعر: {senses}",
+  },
+  "asst.worn.guardian.ph": {
+    en: "Guardian address for its readings (from JIM-mini)", es: "Dirección del guardián para sus lecturas (de JIM-mini)", fr: "Adresse du gardien pour ses relevés (depuis JIM-mini)", de: "Wächter-Adresse für die Messwerte (aus JIM-mini)", pt: "Endereço do guardião para as leituras (do JIM-mini)", it: "Indirizzo del guardiano per le letture (da JIM-mini)", ja: "測定値の送り先（JIM-miniの見守りアドレス）", zh: "读数的守护者地址（来自 JIM-mini）", hi: "रीडिंग के लिए अभिभावक पता (JIM-mini से)", ar: "عنوان الوصيّ لقراءاته (من JIM-mini)",
+  },
+  "asst.worn.guardian.on": {
+    en: "Readings go to the guardian — QRME never holds one.", es: "Las lecturas van al guardián: QRME nunca guarda ninguna.", fr: "Les relevés vont au gardien — QRME n'en conserve aucun.", de: "Messwerte gehen an den Wächter — QRME behält keinen.", pt: "As leituras vão para o guardião — o QRME nunca guarda nenhuma.", it: "Le letture vanno al guardiano — QRME non ne conserva nessuna.", ja: "測定値は見守り先に送られます — QRMEは一切保持しません。", zh: "读数发送给守护者——QRME 绝不保存。", hi: "रीडिंग अभिभावक के पास जाती हैं — QRME कभी नहीं रखता।", ar: "تذهب القراءات إلى الوصيّ — لا يحتفظ QRME بأي منها.",
+  },
+  "asst.worn.guardian.off": {
+    en: "The road is down — nothing is sent.", es: "La vía está cerrada: no se envía nada.", fr: "La voie est fermée — rien n'est envoyé.", de: "Der Weg ist zu — nichts wird gesendet.", pt: "O caminho está fechado — nada é enviado.", it: "La via è chiusa — non viene inviato nulla.", ja: "送信経路は閉じました — 何も送られません。", zh: "通道已关闭——不再发送任何内容。", hi: "रास्ता बंद है — कुछ नहीं भेजा जाता।", ar: "الطريق مغلق — لا يُرسل شيء.",
+  },
   "asst.worn.none": {
     en: "Nothing paired.", es: "Nada emparejado.", fr: "Rien d'appairé.", de: "Nichts gekoppelt.", pt: "Nada emparelhado.", it: "Niente di accoppiato.", ja: "ペアリングなし。", zh: "未配对任何设备。", hi: "कुछ नहीं जुड़ा।", ar: "لا شيء مقترن.",
   },

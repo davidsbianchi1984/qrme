@@ -1332,6 +1332,8 @@ PARTY_LIMIT = "{max} is the limit for one party"
 MANIFEST_ITEMS_LIMIT = ("{max} items is the limit — a manifest nobody reads is not consent")
 OPEN_GRANTS_LIMIT = "{max} open grants is the limit in one place"
 PAIRED_DEVICES_LIMIT = "{max} paired devices is the limit — unpair one"
+SENSES_NOTHING_FOR_A_GUARDIAN = ("this device senses nothing a guardian could watch")
+GUARDIAN_ADDRESS_IS_A_URL = ("the guardian address is a web address — it starts with http or https")
 SCREENS_LIMIT = "{max} screens is the limit — take one down first"
 SYNTH_MEMBERS_LIMIT = ("{max} synthetic members is the limit. Past that a lobby has stopped being people playing with help and become an operation being run, whatever any single line says")
 RATING_RANGE = "rating is {lo}–{hi}"
@@ -1437,6 +1439,7 @@ TEMPLATES = (MUST_BE_ONE_OF, SAY_CEILING, ENGINE_REFUSED,
              ABOUT_CEILING, ITEM_NAME_CEILING, ORG_DEPARTMENTS_MAX,
              MARKUP_CEILING, WORK_DESCRIPTION_CEILING, PARTY_LIMIT,
              MANIFEST_ITEMS_LIMIT, OPEN_GRANTS_LIMIT, PAIRED_DEVICES_LIMIT,
+             SENSES_NOTHING_FOR_A_GUARDIAN, GUARDIAN_ADDRESS_IS_A_URL,
              SCREENS_LIMIT, SYNTH_MEMBERS_LIMIT, RATING_RANGE, ROOM_MIC_LONG,
              ROOM_MIC_SHORT, POINTED_MIC_LONG, POINTED_MIC_SHORT,
              OPEN_ROOM_MIC, NO_SUCH_THING, CANNOT_SUBSCRIBE_TO,
@@ -1919,6 +1922,28 @@ _TEMPLATES: dict[str, dict[str, str]] = {
         'zh': '同一处开放授权的上限是 {max} 个',
         'hi': 'एक जगह {max} खुली अनुमतियाँ ही सीमा है',
         'ar': '{max} من التصاريح المفتوحة هو الحدّ في مكان واحد',
+    },
+    SENSES_NOTHING_FOR_A_GUARDIAN: {
+        'es': 'este dispositivo no percibe nada que un guardián pueda vigilar',
+        'fr': "cet appareil ne perçoit rien qu'un gardien puisse surveiller",
+        'de': 'dieses Gerät spürt nichts, worauf ein Wächter achten könnte',
+        'pt': 'este dispositivo não sente nada que um guardião possa vigiar',
+        'it': 'questo dispositivo non percepisce nulla che un guardiano possa sorvegliare',
+        'ja': 'このデバイスには、見守りが監視できるものを感じ取るセンサーがありません',
+        'zh': '这个设备感知不到任何守护者可以看护的内容',
+        'hi': 'यह डिवाइस ऐसा कुछ महसूस नहीं करता जिस पर कोई अभिभावक नज़र रख सके',
+        'ar': 'هذا الجهاز لا يستشعر شيئاً يمكن لوصيّ مراقبته',
+    },
+    GUARDIAN_ADDRESS_IS_A_URL: {
+        'es': 'la dirección del guardián es una dirección web: empieza con http o https',
+        'fr': "l'adresse du gardien est une adresse web — elle commence par http ou https",
+        'de': 'die Wächter-Adresse ist eine Web-Adresse — sie beginnt mit http oder https',
+        'pt': 'o endereço do guardião é um endereço web — começa com http ou https',
+        'it': "l'indirizzo del guardiano è un indirizzo web — inizia con http o https",
+        'ja': '見守り先のアドレスはウェブアドレスです — http か https で始まります',
+        'zh': '守护者地址是一个网址——以 http 或 https 开头',
+        'hi': 'अभिभावक का पता एक वेब पता है — यह http या https से शुरू होता है',
+        'ar': 'عنوان الوصيّ هو عنوان ويب — يبدأ بـ http أو https',
     },
     PAIRED_DEVICES_LIMIT: {
         'es': '{max} dispositivos emparejados es el límite — desempareja uno',

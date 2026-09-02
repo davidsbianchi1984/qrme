@@ -111,6 +111,40 @@ SCREENS: dict[str, str] = {
     "ar_glasses": "the room's stage, laid over where you stand",
 }
 
+# What each kind can feel. A fact about the kind, like SCREENS — every
+# kind appears, sensing or empty, because "not decided" and "senses
+# nothing" are different claims and only one of them is this table's
+# job. The words are a guardian's vocabulary on purpose: these are the
+# readings JIM-mini's drip channel takes, and the whole point of saying
+# them here is that a paired device can be pointed at a guardian.
+#
+# QRME never receives a reading. A reading is a medical fact, and the
+# product built for medical facts is the sibling next door — so the road
+# stored below is an ADDRESS, the readings travel device-to-guardian,
+# and this platform holds only where the owner chose to send them.
+SENSES: dict[str, tuple[str, ...]] = {
+    "watch": ("heart_rate", "steps", "oxygen"),
+    "band": ("heart_rate", "steps", "sleep"),
+    "ring": ("heart_rate", "sleep", "temperature"),
+    "earbuds": ("heart_rate",),
+    "headset": (),
+    "lapel_mic": (),
+    "clip_on_mic": (),
+    "glasses": (),
+    "pendant": ("fall",),
+    "vr_headset": (),
+    "ar_glasses": (),
+    "hearing_aids": ("steps", "fall"),
+    "chest_strap": ("heart_rate", "respiration"),
+    "health_patch": ("heart_rate", "temperature"),
+    "headband": ("sleep",),
+    "ankle_monitor": ("steps", "gait"),
+    "insoles": ("steps", "gait"),
+    "alert_button": ("fall",),
+    "smart_clothing": ("heart_rate", "respiration"),
+    "earrings": (),
+}
+
 # What people actually own, by kind — the American-market names offered as
 # suggestions when a device is being named. Suggestions and nothing else:
 # pairing stores the name the owner typed, and an unlisted device pairs
@@ -260,6 +294,41 @@ def pair(profile_id: str, name: str, kind: str,
     return device(profile_id, name)
 
 
+def set_guardian(profile_id: str, name: str,
+                 drip_url: str | None) -> dict:
+    """Point a sensing device's readings at the owner's guardian.
+
+        asked     the rings, straps and patches that report — tied into
+                  the guardian's rate-emergency
+        mattered  QRME must never become the second place health data
+                  lives; the guardian product already exists, one door
+                  over, with a baseline and a ladder behind it
+
+    ``drip_url`` is the per-user deposit address JIM-mini's wrist
+    channel mints — a URL-bearer credential, stored for its owner to
+    read back and never logged. The readings themselves travel from the
+    device's own app or a phone automation straight to that address;
+    nothing here relays them, which is what makes storing the address
+    safe. Passing None (or blank) takes the road back down.
+    """
+    row = device(profile_id, name)
+    text = (drip_url or "").strip()
+    if text and not SENSES.get(row["kind"], ()):
+        raise WearableError(i18n.SENSES_NOTHING_FOR_A_GUARDIAN)
+    if text and not text.startswith(("http://", "https://")):
+        raise WearableError(i18n.GUARDIAN_ADDRESS_IS_A_URL)
+    conn = db.connect()
+    try:
+        conn.execute("ALTER TABLE wearables ADD COLUMN guardian TEXT")
+    except Exception:
+        pass
+    conn.execute(
+        "UPDATE wearables SET guardian=? WHERE profile_id=? AND name=?",
+        (text or None, profile_id, name))
+    conn.commit()
+    return device(profile_id, name)
+
+
 def unpair(profile_id: str, name: str) -> dict:
     """Revoke a pairing. The row survives — see the module note."""
     conn = db.connect()
@@ -280,9 +349,12 @@ def device(profile_id: str, name: str) -> dict:
         (profile_id, name)).fetchone()
     if row is None:
         return {}
+    keys = row.keys()
     return {"id": row["id"], "name": row["name"], "kind": row["kind"],
             "transport": row["transport"],
             "faces": json.loads(row["faces"]),
+            "senses": list(SENSES.get(row["kind"], ())),
+            "guardian": row["guardian"] if "guardian" in keys else None,
             "paired_at": row["paired_at"], "revoked_at": row["revoked_at"],
             "paired": row["revoked_at"] is None}
 

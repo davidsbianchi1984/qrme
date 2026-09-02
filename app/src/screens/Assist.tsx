@@ -313,6 +313,32 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
                     : <> · {tr("asst.worn.unpaired", lang)}</>}
                 </p>
               )}
+              {/* The guardian road, only where there is something to
+                  send: what the kind can feel, and the deposit address
+                  the owner's guardian minted for it. The readings go
+                  device-to-guardian; this stores the address and never
+                  a value. */}
+              {detail === w.id && w.paired && w.senses.length > 0 && (
+                <div className="row">
+                  <span className="muted small">
+                    {fill(tr("asst.worn.feels", lang),
+                          { senses: w.senses.join(", ") })}
+                  </span>
+                  <input defaultValue={w.guardian ?? ""}
+                         placeholder={tr("asst.worn.guardian.ph", lang)}
+                         aria-label={tr("asst.worn.guardian.ph", lang)}
+                         style={{ flex: 1 }}
+                         onBlur={(e) => {
+                           const v = e.target.value.trim();
+                           if (v === (w.guardian ?? "")) return;
+                           void act(() =>
+                             api.wearableGuardian(me, w.name,
+                                                  v || null, token),
+                             v ? tr("asst.worn.guardian.on", lang)
+                               : tr("asst.worn.guardian.off", lang))();
+                         }} />
+                </div>
+              )}
             </div>
           ))}
         </div>

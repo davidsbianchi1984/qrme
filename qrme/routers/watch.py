@@ -20,7 +20,7 @@ from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import db, robotics, steering, wearables, workflows
+from .. import db, i18n, robotics, steering, wearables, workflows
 from ..common import profile_or_404, require_owner
 from .interaction import approve_message, reject_message
 from .robots import RobotCommand, command_robot
@@ -71,6 +71,33 @@ def pair_wearable(profile_id: str, body: WearablePair,
     require_owner(profile_id, request)
     try:
         return wearables.pair(profile_id, body.name, body.kind, body.faces)
+    except wearables.WearableError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
+
+
+class GuardianRoad(BaseModel):
+    drip_url: str | None = Field(
+        default=None, max_length=300,
+        description="Where this device's readings go — the deposit "
+                    "address the owner's guardian minted. Blank takes "
+                    "the road back down.")
+
+
+@router.put("/profiles/{profile_id}/wearables/{name}/guardian")
+def wearable_guardian(profile_id: str, name: str, body: GuardianRoad,
+                      request: Request) -> dict:
+    """Point a sensing device's readings at the owner's guardian.
+
+    Owner-only, like pairing. The readings never pass through here —
+    the device's own app carries them to the address directly; this
+    stores where the owner chose to send them, and nothing else.
+    """
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    if not wearables.device(profile_id, name):
+        raise HTTPException(404, "no such device — pair it first")
+    try:
+        return wearables.set_guardian(profile_id, name, body.drip_url)
     except wearables.WearableError as exc:
         raise HTTPException(422, i18n.raised(exc)) from None
 

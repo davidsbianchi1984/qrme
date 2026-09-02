@@ -230,3 +230,8 @@ POST /companies/{company_id}/unpublish
 # like the builder's doors above.
 POST /companies/{company_id}/plan
 POST /companies/{company_id}/seats/{seat_id}/assign
+
+# The guardian road is set once, from the settings row where the
+# device was paired — console-first, like the rest of the pairing
+# rail; the shells render the same console.
+PUT /profiles/{profile_id}/wearables/{name}/guardian
