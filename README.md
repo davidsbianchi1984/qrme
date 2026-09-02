@@ -202,8 +202,8 @@ face here. Frames from the footage, not stills posed for the page.
 ## The screens you'll meet
 
 The majority of what a person actually encounters, with what each screen
-does — shown at phone scale; the same screens serve the web console on a
-computer and the installed app. The Android tellings live beside
+does — drawn at phone scale, and the same screens serve the web console
+on a computer and the installed app. The Android tellings live beside
 these in `docs/screens/android/`, the watch has its own gallery below,
 and the complete tour of all 207 is in [docs/gallery.md](docs/gallery.md).
 
@@ -413,8 +413,10 @@ The full desktop, mobile and portrait galleries live in
 ## The Company Builder, feature by feature
 
 A founder starts a digital company and staffs it one employee at a time.
-Every step below is a shipped behaviour of the running product, shown in
-the screenshots beside it.
+Every step below is a shipped behaviour of the running product, exercised
+by the test suite, and photographed from the console itself (screen 210 —
+the photograph, like every photograph in `docs/screens/`, is taken by
+`tools/shoot_screens.py` from the live app, and outranks any drawing).
 
 <table>
   <tr>
@@ -536,8 +538,8 @@ Android XR.
   </tr>
 </table>
 
-Nothing on the stage records — the headset session contains no
-capture capability of any kind.
+Nothing on the stage records: the headset session carries no capture
+vocabulary at all, which a test greps the source to prove.
 
 ## Release history
 
@@ -983,6 +985,12 @@ and your colleagues to reach from anywhere:
 
 Talking to a profile stays public either way; the key gates creating an
 account on your deployment, not using one.
+
+Beyond self-hosting, the [`stores/`](stores/README.md) room holds the
+three storefront counters — Meta Horizon as a packaged PWA, Steam and
+Viveport as thin launchers over the Windows shell — with one shared
+[listing](stores/listing.md) and a guard that keeps every shelf's
+version equal to the app's.
 
 The `Dockerfile` packages the studio and the API into one image so a hosted
 instance serves both from the same origin, exactly like the phone flow does:
