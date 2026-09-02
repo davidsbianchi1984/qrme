@@ -6,6 +6,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.14] - 2026-09-02
+
+### Fixed
+
+- **No seat lunges.** On the VR stage, a seat whose angle plus yaw
+  neared 180° crossed the CSS camera plane — the rotate-then-push
+  landed it nearer than the 640px perspective, enormous and clipped
+  half off-screen. A seat you have turned your back on (past 112°) now
+  fades out with a quarter-second transition; the ring geometry is
+  untouched, so the flat stage and the headset still agree.
+- **The hint clears the strip.** The stage's drag/AR note sat at
+  bottom 44px, inside the band the chat strip owns from 64px up, and
+  the two overlapped on every phone. The note now lives in the top
+  band under the two corner pills — the one strip of the stage nothing
+  else occupies, and where the eyes land first.
+
 ## [2.9.13] - 2026-09-01
 
 ### Added
@@ -17451,7 +17467,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.13...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.14...HEAD
+[2.9.14]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.13...app-v2.9.14
 [2.9.13]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.12...app-v2.9.13
 [2.9.12]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.11...app-v2.9.12
 [2.9.11]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.10...app-v2.9.11
