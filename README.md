@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v2.9.14** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v2.9.15** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -614,6 +614,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **2.9.15** | **The AR stage grows eyes, and the room answers three field reports** — one pill on the AR stage shares the current passthrough frame into the room through the share door the room already has, read on the way in so the next reply grounds on what the camera actually saw; one press, one frame, one share on the record, never a stream — a guard holds the eye to the chosen-moment side of the viewfinder's line. And three phone reports fixed at their roots: the invitation overlay rises above every layer a room draws; the glyph rail stays a vertical road that scrolls instead of wrapping sideways off frame; and the film frame wears its paint — a wide black 16:9 whether footage exists yet or not, keyed on the newest turn so arriving footage shows. |
 | **2.9.14** | **The stage holds its shape** — a seat whose angle plus yaw neared 180° crossed the CSS camera plane and rendered enormous and half off-screen; past 112° it now fades out with a quarter-second breath, so the room stays a circle you look around, never a card that lunges. And the drag hint moves from the band the chat strip owns to the top strip under the two corner pills — the one part of the stage nothing else occupies. |
 | **2.9.13** | **The stores room, and the record the attorneys can stand on** — `stores/` holds the three storefront counters for the road to 3.0.0: Meta Horizon as a packaged PWA over the live console, Steam and Viveport as thin launchers over the Windows shell, one shared listing with its screenshots, per-counter owner steps, credentials and app IDs deliberately absent, and a guard holding every shelf's version equal to the app's. The README gains the feature-by-feature record of the Company Builder and the stage, photographed from the running console. |
 | **2.9.12** | **The employee file** — every hired seat opens in place: “Where they work” lists the employee’s bodies and screens and offers the whole American robot shelf right there (shipping, preorder and announced told apart honestly — announced stays un-bindable rather than hidden), puts them on a fixed screen, and shows the nearby-device code; “Hand them out” gives a per-employee handoff — a QR code, a code to type, a link, a downloadable file — carried by a single-use ten-minute ticket, never the founder’s key. Not one new door: the builder composes rails that already stood. |

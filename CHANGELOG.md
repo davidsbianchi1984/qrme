@@ -6,6 +6,41 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.15] - 2026-09-02
+
+### Added
+
+- **The AR stage grows eyes.** "Show them what you see": one pill on the
+  AR stage draws the current passthrough frame and hands it to the room
+  through the share door the room already has, where it is read on the
+  way in — so the next reply grounds on what the camera actually saw,
+  and the share stands in the transcript where everyone present can see
+  what was shown. One press, one frame, one share on the record — the
+  chosen-moment side of the line `qrme/viewfinder.py` drew, and a new
+  guard holds it there: the frame leaves through the room's share and
+  nothing else, and no timer drives the eye.
+
+### Fixed
+
+- **The invitation rises above the room.** The add-somebody overlay
+  opened behind the frames on iOS — the depth defect its own comment
+  block already survived once happened again one layer up when the
+  dock's panel arrived after the last fix. The scrim clears everything
+  a room draws now, and the comment carries both rounds.
+- **The glyph rail stays a vertical road.** The phone media query's
+  `flex-wrap: wrap` turned an overgrown column sideways past two seats
+  and marched it off frame. Nowrap holds the direction; the rail
+  shrinks into its own scroll, with a dvh ceiling because iOS's vh
+  includes browser chrome the rail cannot use.
+- **The film frame wears its paint.** SeatFilm shipped classed and
+  unstyled — the purple focus card held a bare sentence where a wide
+  black frame belonged. The frame is 16:9 and black whether footage
+  exists yet or not, the waiting note sits inside it, the full-screen X
+  is red and is the only red thing there — and the frame re-asks for
+  footage when the profile's newest turn changes, so a reply that
+  arrives with footage shows instead of standing behind yesterday's
+  film. It still never commissions a render.
+
 ## [2.9.14] - 2026-09-02
 
 ### Fixed
@@ -17467,7 +17502,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.14...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.15...HEAD
+[2.9.15]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.14...app-v2.9.15
 [2.9.14]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.13...app-v2.9.14
 [2.9.13]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.12...app-v2.9.13
 [2.9.12]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.11...app-v2.9.12
