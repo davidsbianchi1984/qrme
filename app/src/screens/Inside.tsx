@@ -301,6 +301,43 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
   const stageOwner = (framedSeat: string | null) =>
     framedSeat === session.profileId ? session.ownerToken || null
       : (framedSeat && framedSeat === dockedProfile && dockOwner) || null;
+  // The owner token for ANY seat this session owns — the self profile, or
+  // one whose owner capability was minted for the panels above. Used by
+  // the video glyph to turn a seat's presence road on, which is a spend
+  // and therefore an owner-only act.
+  const ownerFor = (pid: string): string | null =>
+    pid === session.profileId ? (session.ownerToken || null)
+      : (mintedOwner[pid] || null);
+  // Pressing 🎥 on a seat you own commissions its turns as footage — David's
+  // call: "when the video glyph is selected... video render." It does that
+  // by setting the profile's presence road to video, the same road the
+  // Identity screen sets, so `auto_render` on the next turn actually spends
+  // and draws. Two rules keep it honest:
+  //   • Only a seat you OWN. Looking at somebody else's profile must never
+  //     spend their money — SeatFilm has never commissioned, and the glyph
+  //     on a seat you do not own stays viewer-only.
+  //   • A peek is not a commitment. The road the seat was on before the
+  //     press is remembered here and restored when the glyph is unpressed
+  //     or the room is left, so turning video on to look and off again does
+  //     not leave a profile quietly rendering — and never clobbers an
+  //     `avatar` road somebody chose on purpose.
+  const roadBefore = useRef<Record<string, string>>({});
+  const filmOwnSeat = (pid: string, on: boolean) => {
+    const token = ownerFor(pid);
+    if (!token) return;              // not yours — viewer-only, no spend
+    if (on) {
+      api.videoRoad(pid, token).then((r) => {
+        if (r.road === "video") return;   // already rendering; leave it
+        roadBefore.current[pid] = r.road;
+        return api.videoSetRoad(pid, token, "video");
+      }).catch(() => undefined);
+    } else {
+      const prior = roadBefore.current[pid];
+      if (prior === undefined) return;     // we never turned it on
+      delete roadBefore.current[pid];
+      api.videoSetRoad(pid, token, prior).catch(() => undefined);
+    }
+  };
   const [scene, setScene] = useState<RoomFaces | null>(null);
   // The room's own channel, read off the join answer. `chat`, `voice` and
   // `video` present flat; `ar` and `vr` are the two the homepage sells as
@@ -3459,9 +3496,15 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                               if (framed === s.id && format === "video") {
                                 setFramed(null);
                                 setFormat("audio"); setRoomFormat("audio");
+                                // Turning the glyph off restores the road
+                                // this seat was on before the peek.
+                                filmOwnSeat(s.id, false);
                               } else {
                                 setFramed(s.id);
                                 setFormat("video"); setRoomFormat("video");
+                                // Your own seat starts rendering; a seat you
+                                // do not own stays viewer-only inside here.
+                                filmOwnSeat(s.id, true);
                               }
                             }}
                             onDoubleClick={(e) => e.stopPropagation()}
