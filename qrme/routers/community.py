@@ -22,9 +22,9 @@ from datetime import date
 
 from fastapi import APIRouter, HTTPException, Request
 
-from .. import (auth, db, engagement, identity, inbox, llm, marketplace,
-                moderation, persona, referral, roommic, society, storage,
-                tiers, verification, watermark)
+from .. import (auth, db, engagement, filming, identity, inbox, llm,
+                marketplace, moderation, persona, referral, roommic,
+                society, storage, tiers, verification, watermark)
 from .. import hands
 from ..common import (age_of, clipped, interactor_or_404, profile_or_404,
                       require_interactor, require_owner_or_interactor,
@@ -425,13 +425,23 @@ def _store_room_message(room_id, sender_kind, sender_id, content,
 
 
 def _profile_turns(room: dict, participants: list[dict], pdi, cloud,
-                   only: set[str] | None = None) -> list[dict]:
+                   only: set[str] | None = None,
+                   unprompted: bool = False) -> list[dict]:
     """The named profile participants each take one moderated turn.
 
     ``only`` is the society's turn selection (qrme/society.py) — the one
     seat a message was aimed at, or the next seat in rotation. None keeps
     the old everybody-speaks behavior for the callers that genuinely mean
     it (a summoned profile's arrival, a test exercising the room).
+
+    ``unprompted`` marks the rotation's own turns — nobody just spoke,
+    the room is advancing itself. A person who asked something is owed
+    an answer even when every model is down, so the direct-reply path
+    keeps the stub's honest apology. The rotation is not owed a turn:
+    a seat with no model behind it posting "still no model answered"
+    into the transcript, over and over, above lines a person typed
+    later, is the field report this flag closes — the seat waits
+    instead, and speaks when a model is back.
     """
     from .. import briefcase
     maturity = _room_maturity(participants)
@@ -638,6 +648,16 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud,
             if carried:
                 system += "\n\n" + carried
         content = llm.get_provider(cloud=cloud).generate(system, turns)
+        # A rotation turn that got no model is not a turn — see the
+        # docstring. Only the DEGRADE case: a deployment whose only
+        # voice is the stub keeps advancing (a profile-only room runs
+        # on that), but a room with a real model behind it that failed
+        # for one request has an outage, not something to say, and the
+        # apology it would post reads back forever. Read off the same
+        # record the study's author line uses.
+        answered = llm.answered_by()
+        if unprompted and answered and answered[0] == llm.LOCAL_FALLBACK:
+            continue
         # A room turn may hand a document over as well as say something.
         # The guidance has ridden every room prompt since the composing
         # round — build_system_prompt appends it unconditionally — but the
@@ -698,6 +718,16 @@ def _profile_turns(room: dict, participants: list[dict], pdi, cloud,
             verdict.approved, verdict.reason, media_id=document_id,
             media_text=doc_words, media_digest=doc_digest,
             aimed_at=aimed_display))
+        # The turn as footage, when that is the road this profile takes.
+        # The chat door has done this since the road existed; the room
+        # door never made the call, so a room's video frame could only
+        # ever say "no footage for this turn yet" — which is exactly
+        # what the field photographed. Same ceremony as the chat door:
+        # after the reply is settled, never waited for, approved turns
+        # only, and auto_render itself holds the road, ceiling and
+        # configured gates.
+        if verdict.approved and content:
+            filming.auto_render(profile["id"], content)
     return produced
 
 
@@ -1870,7 +1900,8 @@ def room_advance(room_id: str, request: Request) -> dict:
     return {"replies": _profile_turns(room, participants,
                                       request.app.state.pdi,
                                       request.app.state.cloud,
-                                      only={speaker_seat["ref_id"]}),
+                                      only={speaker_seat["ref_id"]},
+                                      unprompted=True),
             "paused": False}
 
 

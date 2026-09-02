@@ -542,7 +542,7 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 /* The version-mismatch banner — visible on every screen until the older
    backend is out of the way. Red on purpose: nothing else in the app may
    look like it. */
-.version-guard { position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+.version-guard { position: fixed; top: 0; left: 0; right: 0; z-index: 106;
   display: flex; align-items: center; gap: 12px; padding: 10px 16px;
   background: #3a1220; border-bottom: 2px solid #e0687a; color: #ffd9e0;
   font-size: 13px; line-height: 1.4; }
@@ -1984,9 +1984,16 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
    * dock's panel (94) and the talk-panel scrim (93) arrived after this
    * comment was written, and 88 put the invitation behind the frames.
    * Field report, on iOS: "the overlay shows up behind the frames
-   * overlay and can't be seen." 96 clears everything a room draws; the
-   * version guard (100) keeps outranking a modal by design. */
-  position: fixed; inset: 0; z-index: 96;
+   * overlay and can't be seen." 96 cleared everything a room drew —
+   * until the room became a takeover: `.room-stage` pins the whole
+   * card at 100, so the invitation went under the room ITSELF this
+   * time, flowing beneath the footage box instead of covering it.
+   * Field report, same phone: "the box that contains the profiles is
+   * not pinned below the video generation box." 104 clears the room's
+   * own takeover; the version guard moves to 106 because it keeps
+   * outranking a modal by design, and that design survives the ladder
+   * growing another rung. */
+  position: fixed; inset: 0; z-index: 104;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 14px;
   background: rgba(6, 4, 18, 0.78); backdrop-filter: blur(9px);

@@ -6,7 +6,7 @@
 "AppBuild"
 {
 	"AppID" "<STEAM_APP_ID>"
-	"Desc" "QRME Studios 3.0.0"
+	"Desc" "QRME Studios 3.0.1"
 	"ContentRoot" "content"
 	"BuildOutput" "output"
 	"SetLive" "beta"

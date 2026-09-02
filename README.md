@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v3.0.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v3.0.1** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -574,6 +574,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **3.0.1** | **The room films its turns, and the ladder holds** — three field reports from one phone, closed on their own evidence. The room's video frame could only ever say "no footage yet", because ordering a render was the chat door's habit and never the room's: an approved room turn now orders footage on the same ceremony, gated by the seat's own road and ceiling. A one-request model outage stopped posting its apology into the rotation as a turn — a person who asked is still answered, honestly, but the rotation waits. And the invite panel stopped sliding under the room: the room takeover sat on the same z-rung as its own modal and the version guard both, so the scrim now clears the room and the guard clears the scrim — which also means the "two versions are answering" banner can never again be buried by the very screen it is trying to warn. |
 | **3.0.0** | **Every avenue functions properly inside the apps** — the celebration release the ROADMAP reserved. The gate was never a checklist: a person who has never seen this code picks any road on the map — chat, voice, avatar, video, AR, VR, the watch, a profile acting through its own connections — and drives it to the end without finding a wall. `tools/walkthrough.py` drives all of them over real doors and finds zero walls, leaving six photographs of the driven console in `docs/walkthrough/`. Store distribution ships as a funded follow-up, by the owner's recorded decision — the tag waited on the roads, not on a fee. |
 | **2.9.17** | **The connection is real** — pairing a wearable stops being a typed claim: one press opens the console's own Bluetooth session beside the device, and whatever it advertised for itself lands on the pairing as its voucher — verified and unverified told apart on the same screen, a re-pair taking the old voucher off with the claim it vouched for, and a browser without a radio saying so instead of pretending. The ROADMAP records the owner's call: store distribution is a funded follow-up, and 3.0.0 does not wait on a fee. |
 | **2.9.16** | **The wearable tells the guardian** — every kind of worn device declares what it can sense (a ledger, not a lookup: sensing or empty, every kind decides), and a sensing device's settings row takes the deposit address the owner's JIM-mini guardian minted. Readings travel from the device's own app straight to the guardian; this platform stores only where the owner chose to send them, holds no reading at any point — a test greps the module to prove no door accepts a value — and refuses the setting by name on a device that senses nothing. The gallery is re-photographed current, and the record drops the one section whose images were compositions rather than screenshots. |

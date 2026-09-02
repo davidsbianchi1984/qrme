@@ -6,6 +6,39 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.0.1] - 2026-09-02
+
+### Fixed
+
+- **The room films its turns.** The room's video format promised "this
+  turn, as footage" and delivered a black frame forever, because
+  `filming.auto_render` was called from exactly one place — the
+  one-on-one chat door — and the room stored its turns without ever
+  ordering a frame. An approved room turn now orders footage on the
+  same ceremony as chat: after the reply is settled, never waited for,
+  with the road, daily ceiling and configured gates all still held by
+  `auto_render` itself.
+- **The rotation waits out an outage instead of apologising into the
+  record.** A one-request model failure degraded to the local fallback,
+  and the rotation posted the fallback's "still without a model"
+  apology as a real turn — quoting a minutes-old line, above the words
+  a person had just typed. An unprompted turn that got no model is now
+  no turn: the seat waits, and speaks when a model is back. A person
+  who asked is still owed an answer even mid-outage, so the
+  direct-reply path keeps the honest apology — and a deployment whose
+  only voice is the stub keeps its rotation, because a profile-only
+  room runs on that.
+- **The invite panel stopped sliding under the room, and the version
+  guard can no longer be buried.** The room takeover pins the whole
+  card at z 100 — the same rung its own invite scrim (96) sat below
+  and the same rung the version guard sat on. The scrim now clears the
+  room at 104 and the guard clears the scrim at 106, keeping the
+  outranking the guard's design promises. That second half matters
+  beyond the invitation: a phone holding a stale bundle after a deploy
+  is exactly when the "two versions of QRME are answering" banner must
+  be visible, and it was being painted over by the very room it was
+  trying to warn.
+
 ## [3.0.0] - 2026-09-02
 
 ### Added
@@ -17592,7 +17625,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.0...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.1...HEAD
+[3.0.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.0...app-v3.0.1
 [3.0.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.17...app-v3.0.0
 [2.9.17]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.16...app-v2.9.17
 [2.9.16]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.15...app-v2.9.16
