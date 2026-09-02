@@ -5144,7 +5144,8 @@ export const api = {
           providers: string[]; max_seconds: number; min_seconds: number;
           words_per_minute: number; length_is_derived: boolean;
           seconds_per_second: number; give_up_after: number;
-          shapes: string[]; marked: boolean }>("/video/doors"),
+          shapes: string[]; marked: boolean;
+          served_through: string | null }>("/video/doors"),
   /** Render a passage as video. Length is NOT sent: the backend derives
    *  it from the passage, because a dial makes the video fit the setting
    *  instead of the content. Defaults to not waiting — a render is
@@ -5158,7 +5159,7 @@ export const api = {
    *  standing direction rather than appending, and answers with `was` so
    *  a screen can show what it replaced. */
   videoDirect: (profileId: string, asked: string,
-                surface: "window" | "fullscreen" = "window") =>
+                surface: "window" | "fullscreen" | "room" = "window") =>
     req<{ direction: string; was: string; asked: string }>(
       `/video/direction/${profileId}`,
       { method: "POST", body: { asked, surface } }),

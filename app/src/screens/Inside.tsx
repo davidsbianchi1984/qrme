@@ -318,6 +318,14 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
   // The AR stage's eye: a brief "shown" state after a frame is shared.
   const [eyeShown, setEyeShown] = useState(false);
 
+  // The purple box's edit bar: what the person asked of the on-stage
+  // profile's scenes, and a brief "carried" state once it is applied.
+  // The direction is per profile and standing — it attaches to that
+  // profile's next submission and every one after, in chats and rooms
+  // alike, until amended again.
+  const [directAsk, setDirectAsk] = useState("");
+  const [directed, setDirected] = useState(false);
+
   // "Since the users have cameras, and synthetic profiles have eyes,
   // they will be able to notice and understand things in their
   // environment" — the owner's words, and the composition that honors
@@ -3039,10 +3047,48 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
               </div>
 
               {format === "video" && (
-                <SeatFilm profileId={onStage.id} display={onStage.display}
-                          talking={isTalking(onStage)} lang={lang}
-                          turn={lastTurnOf(onStage.id)}
-                          onFull={setFilmFull} />
+                <>
+                  <SeatFilm profileId={onStage.id} display={onStage.display}
+                            talking={isTalking(onStage)} lang={lang}
+                            turn={lastTurnOf(onStage.id)}
+                            onFull={setFilmFull} />
+                  {/* The scene takes direction where it is watched. The
+                      same standing direction the Identity screen holds —
+                      one row, one door — reachable from the frame, so
+                      "it's too dark, put them at the counter" lands on
+                      the next render instead of waiting for a settings
+                      trip. */}
+                  {onStage.kind !== "user" && (
+                    <div className="rf-direct">
+                      <input value={directAsk}
+                             onChange={(e) => setDirectAsk(e.target.value)}
+                             placeholder={tr("ins.film.direct", lang)}
+                             aria-label={tr("ins.film.direct", lang)} />
+                      <button type="button"
+                              disabled={!directAsk.trim()}
+                              onClick={() => {
+                                const asked = directAsk.trim();
+                                setDirectAsk("");
+                                api.videoDirect(onStage.id, asked, "room")
+                                  .then(() => {
+                                    setDirected(true);
+                                    window.setTimeout(
+                                      () => setDirected(false), 2600);
+                                  })
+                                  .catch((e) => setError(
+                                    e instanceof Error ? e.message
+                                                       : String(e)));
+                              }}>
+                        {tr("ins.film.direct.go", lang)}
+                      </button>
+                    </div>
+                  )}
+                  {directed && (
+                    <p className="muted small">
+                      {tr("ins.film.directed", lang)}
+                    </p>
+                  )}
+                </>
               )}
 
               {format === "avatar" && (

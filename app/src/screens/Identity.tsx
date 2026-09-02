@@ -1058,6 +1058,16 @@ export function Identity({ onPlans, onPassing }: {
             {!film?.configured && (
               <p className="muted small">{tr("idn.video.service.shut", lang)}</p>
             )}
+            {/* The field question was "why is fal.ai not the default" —
+                because it is the road, not a row: one aggregator serves
+                every model on this shelf. Read from the adapter's own
+                health, so the sentence is true of THIS deployment. */}
+            {film?.served_through && (
+              <p className="muted small">
+                {fill(tr("idn.video.through", lang),
+                      { host: film.served_through })}
+              </p>
+            )}
 
             {/* The standing direction, above the passage because it is
                 the frame the passage sits inside — and because somebody

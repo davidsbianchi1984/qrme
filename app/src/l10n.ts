@@ -9959,6 +9959,18 @@ const CHROME: Table = {
   "ins.stage.vrnote": {
     en: "A room rendered on this device. Drag to look around.", es: "Una sala renderizada en este dispositivo. Arrastra para mirar alrededor.", fr: "Une salle rendue sur cet appareil. Faites glisser pour regarder autour.", de: "Ein auf diesem Gerät gerenderter Raum. Zieh, um dich umzusehen.", pt: "Uma sala renderizada neste dispositivo. Arraste para olhar em volta.", it: "Una stanza renderizzata su questo dispositivo. Trascina per guardarti intorno.", ja: "この端末上で描画された部屋です。ドラッグして見回せます。", zh: "在这台设备上渲染的房间。拖动即可环顾四周。", hi: "इस डिवाइस पर रेंडर किया गया कमरा। चारों ओर देखने के लिए खींचें।", ar: "غرفة مُصيَّرة على هذا الجهاز. اسحب لتنظر حولك.",
   },
+  "ins.film.direct": {
+    en: "Change how their scenes look — it carries to the next render", es: "Cambia cómo se ven sus escenas: se aplica al próximo render", fr: "Changez l'allure de leurs scènes — appliqué au prochain rendu", de: "Ändere, wie die Szenen aussehen — gilt ab dem nächsten Render", pt: "Mude como as cenas aparecem — vale para o próximo render", it: "Cambia l'aspetto delle sue scene — vale dal prossimo render", ja: "シーンの見た目を変える — 次のレンダリングから反映", zh: "改变其场景的样子——下次渲染生效", hi: "दृश्य कैसे दिखें बदलें — अगली रेंडर से लागू", ar: "غيّر مظهر مشاهدهم — يسري على العرض القادم",
+  },
+  "ins.film.direct.go": {
+    en: "Apply", es: "Aplicar", fr: "Appliquer", de: "Anwenden", pt: "Aplicar", it: "Applica", ja: "適用", zh: "应用", hi: "लागू करें", ar: "طبّق",
+  },
+  "ins.film.directed": {
+    en: "Carried — the next render follows it.", es: "Guardado: el próximo render lo seguirá.", fr: "Retenu — le prochain rendu le suivra.", de: "Übernommen — der nächste Render folgt dem.", pt: "Guardado — o próximo render vai segui-lo.", it: "Recepito — il prossimo render lo seguirà.", ja: "反映されました — 次のレンダリングから適用。", zh: "已保存——下次渲染将遵循。", hi: "दर्ज हो गया — अगली रेंडर इसी के अनुसार होगी।", ar: "حُفظ — العرض القادم سيتبعه.",
+  },
+  "idn.video.through": {
+    en: "Every model on this shelf renders through {host} — the name you pick is the model it runs.", es: "Todos los modelos de esta lista se generan a través de {host}: el nombre que eliges es el modelo que ejecuta.", fr: "Chaque modèle de cette liste est rendu via {host} — le nom choisi est le modèle exécuté.", de: "Jedes Modell auf dieser Liste rendert über {host} — der gewählte Name ist das Modell, das dort läuft.", pt: "Todos os modelos desta lista são gerados através de {host} — o nome que escolhe é o modelo executado.", it: "Ogni modello di questo elenco viene generato tramite {host} — il nome scelto è il modello eseguito.", ja: "この一覧のモデルはすべて{host}経由でレンダリングされます — 選んだ名前が実行されるモデルです。", zh: "此列表中的所有模型都通过{host}渲染——你选的名字就是它运行的模型。", hi: "इस सूची का हर मॉडल {host} के ज़रिए रेंडर होता है — चुना गया नाम ही चलने वाला मॉडल है।", ar: "كل نموذج في هذه القائمة يُعرض عبر {host} — الاسم الذي تختاره هو النموذج الذي يعمل.",
+  },
   "ins.stage.eyes": {
     en: "Show them what you see", es: "Muéstrales lo que ves", fr: "Montrez-leur ce que vous voyez", de: "Zeig ihnen, was du siehst", pt: "Mostre-lhes o que vê", it: "Mostra loro ciò che vedi", ja: "見えているものを見せる", zh: "把你看到的给他们看", hi: "जो दिख रहा है उन्हें दिखाएँ", ar: "أرِهم ما تراه",
   },

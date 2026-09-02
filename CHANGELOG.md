@@ -20,6 +20,25 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   guard holds it there: the frame leaves through the room's share and
   nothing else, and no timer drives the eye.
 
+- **The scene knows its professional.** Before an owner writes a
+  standing direction, a profile now carries a composed one: the hired
+  seat's title says the trade — dressed as one, in that trade's own
+  workplace — and the persona's opening says who is standing there, so
+  a render comes back the way it naturally would from a real
+  professional in that profession. Assembled from what the platform
+  already holds, never invented; an owner's written direction still
+  beats it, and forgetting a written one returns to the sheet rather
+  than to a stranger's wide shot. And the purple box grows the edit
+  bar: what a person asks of the scenes from inside the room lands on
+  the same one row and door the Identity screen holds, carrying to
+  that profile's next submission and every one after, in chats and
+  rooms alike.
+- **The shelf says which road it is on.** The rendering-service picker
+  names models; the road under all of them is one aggregator, read from
+  the film adapter's own health and said on the screen — the field
+  question was "why is fal.ai not the default", and the answer is that
+  it is the road, not a row.
+
 ### Fixed
 
 - **The invitation rises above the room.** The add-somebody overlay

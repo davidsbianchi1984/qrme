@@ -209,8 +209,10 @@ class Direction(BaseModel):
 def video_direction(profile_id: str) -> dict:
     """How this profile's scenes are shot, and what it would be if the
     owner started over."""
+    # `default` is what starting over returns to — the profile's own
+    # composed sheet, not the stranger's wide shot.
     return {"direction": filming.direction_of(profile_id),
-            "default": filming.DEFAULT_DIRECTION,
+            "default": filming.composed_direction(profile_id),
             "max_length": filming.MAX_DIRECTION}
 
 

@@ -1558,6 +1558,11 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .rs-film-who { position: absolute; left: 14px; bottom: 12px;
   font-size: 12px; opacity: 0.8; color: #fff; }
 
+/* The scene's edit bar, inside the purple box under the frame. */
+.rf-direct { display: flex; gap: 8px; margin-top: 8px; }
+.rf-direct input { flex: 1; min-width: 0; }
+.rf-direct button { flex: none; }
+
 /* The film chip on an AR seat: small, under the card, one glyph. */
 .stage-film-chip { margin-top: 4px; width: 30px; height: 30px;
   min-height: 30px; padding: 0; border-radius: 9px; font-size: 15px;

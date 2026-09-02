@@ -264,6 +264,41 @@ def estimate(seconds: int) -> dict:
     }
 
 
+#: A one-minute memory for :func:`served_through` — the settings screen
+#: reads doors() on every paint, and a health probe per paint would make
+#: the picker the load.
+_SERVED: dict = {"at": 0.0, "host": None}
+
+
+def served_through() -> str | None:
+    """The queue host the film adapter submits every model to.
+
+    The shelf names models; the road under all of them is one aggregator
+    (fal.ai on the box this was built for), and a person reading a picker
+    full of model names deserves to know that — the field question was
+    "why is fal.ai not the default", and the honest answer is that it is
+    the road, not a row. Read from the adapter's own /health rather than
+    written here, so an operator who points FILM_QUEUE_URL elsewhere is
+    reported truthfully; absent when nothing answers."""
+    import json as _json
+    import time
+    import urllib.request
+    from urllib.parse import urlparse
+    if time.monotonic() - _SERVED["at"] < 60:
+        return _SERVED["host"]
+    host = None
+    url = endpoint()
+    if url:
+        try:
+            with urllib.request.urlopen(url + "/health", timeout=2) as r:
+                queue = _json.loads(r.read().decode("utf-8")).get("queue")
+            host = urlparse(queue).hostname if queue else None
+        except Exception:
+            host = None
+    _SERVED.update(at=time.monotonic(), host=host)
+    return host
+
+
 def doors() -> dict:
     """What this deployment offers, said before anybody writes a prompt.
 
@@ -274,6 +309,8 @@ def doors() -> dict:
         "provider": provider(),
         "configured": configured(),
         "why": why_not(),
+        # The road under every row on the shelf, by its own name.
+        "served_through": served_through(),
         "providers": [p for p in PROVIDERS if p != "none"],
         # Length is derived from the passage, not chosen — see
         # `length_for`. These are reported so a screen can SHOW the number
@@ -454,18 +491,67 @@ DEFAULT_DIRECTION = (
 MAX_DIRECTION = 600
 
 
+def composed_direction(profile_id: str) -> str:
+    """The direction a profile carries before its owner writes one.
+
+        asked     the video should come back the way it naturally would
+                  from a real professional in that profession — the
+                  look, the outfit, the trade, composed by the platform
+        mattered  a generic wide shot renders a stranger; the profile
+                  already knows who it is, and the prompt was not asking
+
+    Assembled from what the platform already holds, never invented: the
+    hired seat's title says the trade (and the trade implies the dress
+    and the workplace), and the persona's own opening says who is
+    standing there. An owner's written direction still beats this — see
+    :func:`direction_of` — and forgetting a written one returns here
+    rather than to a stranger.
+    """
+    from . import db
+    conn = db.connect()
+    row = conn.execute("SELECT persona FROM profiles WHERE id=?",
+                       (profile_id,)).fetchone()
+    if row is None:
+        return DEFAULT_DIRECTION
+    # The seats table is made by the company module the first time a
+    # company is founded; on a box where none ever was, no trade — not
+    # an error.
+    import sqlite3
+    try:
+        seat = conn.execute(
+            "SELECT title FROM company_seats WHERE profile_id=?"
+            " AND status='hired'", (profile_id,)).fetchone()
+    except sqlite3.OperationalError:
+        seat = None
+    trade = seat["title"].strip() if seat and seat["title"] else None
+    look = " ".join((row["persona"] or "").split())[:220]
+    parts = []
+    if trade:
+        parts.append(
+            f"A {trade} speaking to camera the way a real {trade} does "
+            f"at work — dressed as one, in a {trade}'s own workplace.")
+    else:
+        parts.append(
+            "The speaker addresses the camera naturally, dressed for "
+            "what they do, in their own setting.")
+    if look:
+        parts.append(f"Who they are: {look}")
+    parts.append("A cinematic medium shot, lit naturally.")
+    return " ".join(parts)[:MAX_DIRECTION]
+
+
 def direction_of(profile_id: str) -> str:
     """How this profile's scenes are shot, in the owner's own words.
 
-    The default until somebody says otherwise, and then whatever they
-    said — carried from one render to the next, which is the whole point
-    of it being stored rather than typed each time.
+    The composed sheet until somebody says otherwise, and then whatever
+    they said — carried from one render to the next, which is the whole
+    point of it being stored rather than typed each time.
     """
     from . import db
     row = db.connect().execute(
         "SELECT direction FROM scene_direction WHERE profile_id=?",
         (profile_id,)).fetchone()
-    return row["direction"] if row else DEFAULT_DIRECTION
+    return row["direction"] if row else composed_direction(profile_id)
 
 
 def set_direction(profile_id: str, direction: str, *,
