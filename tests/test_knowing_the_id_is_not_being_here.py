@@ -271,8 +271,14 @@ def test_the_screen_sends_the_interactor_token_not_the_owners():
     # own friends list rather than anything the room says. That door is
     # gated on `require_owner`, so it takes the owner's token by
     # construction — and it is not a room-speaking door.
+    # Fourth exception, the video glyph: pressing 🎥 on a seat you OWN puts
+    # that profile on the video road so its turns render, which spends the
+    # owner's money and is therefore the owner's act. `ownerFor` returns
+    # the token only for a profile this session owns (the self profile's,
+    # or one minted for the panels), and `filmOwnSeat` hands it to the
+    # `/video/road` door alone — owner-gated, and never room-speaking.
     #
-    # All three shapes quoted exactly, per the loose-guard lesson.
+    # Every shape quoted exactly, per the loose-guard lesson.
     for ln in lines:
         assert ("acceptRoomInvite" in ln
                 or "if (session.ownerToken" in ln
@@ -280,9 +286,11 @@ def test_the_screen_sends_the_interactor_token_not_the_owners():
                 or "const befriendAs = session.ownerToken" in ln
                 or "framedSeat === session.profileId ? session.ownerToken" in ln
                 or "api.addFriend(mine, profileId, befriendAs)" in ln
-                or "ownerToken={dockOwner}" in ln), (
+                or "ownerToken={dockOwner}" in ln
+                or "pid === session.profileId ? (session.ownerToken || null)" in ln), (
             "the owner token reaches something other than the accept "
-            f"door, the panels dock or the friends door:\n    {ln.strip()}")
+            f"door, the panels dock, the friends door or the video road:"
+            f"\n    {ln.strip()}")
 
 
 def test_the_screen_says_the_microphone_is_seen_by_everyone():
