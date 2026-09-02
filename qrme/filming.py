@@ -290,6 +290,11 @@ def served_through() -> str | None:
     url = endpoint()
     if url:
         try:
+            # A probe is still a way out of this host, and every way out
+            # consults offline mode — the exact lesson _ask carries about
+            # the poll that thought it was too small to count.
+            from . import offline
+            offline.allow(url, "the video service", None)
             with urllib.request.urlopen(url + "/health", timeout=2) as r:
                 queue = _json.loads(r.read().decode("utf-8")).get("queue")
             host = urlparse(queue).hostname if queue else None
