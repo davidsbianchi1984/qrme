@@ -32,9 +32,17 @@ import { playable, useRenderRow } from "./sceneRender";
  * their screen with a video needs the way out to be the thing they see
  * first, not a control they have to hunt for along an edge.
  */
-export function SeatFilm({ profileId, display, talking, lang, onFull }: {
+export function SeatFilm({ profileId, display, talking, lang, onFull,
+                           turn }: {
   profileId: string;
   display: string;
+  /** The id of this profile's newest turn in the transcript. Footage is
+   *  fetched once per profile — a render outlives the page — but a NEW
+   *  turn can carry new footage, and a frame keyed only on the profile
+   *  showed the room yesterday's film while today's finished rendering.
+   *  Field report: "I'm not seeing any videos render when a chat is
+   *  coming my way." The turn id re-asks; it still never commissions. */
+  turn?: string | null;
   /** Whether this is the turn the room is on. The frame wears the same
    *  green the seat does, so the eye joins the person to their footage. */
   talking: boolean;
@@ -58,7 +66,7 @@ export function SeatFilm({ profileId, display, talking, lang, onFull }: {
       .then((r) => { if (live) setScene(r.scene); })
       .catch(() => undefined);
     return () => { live = false; };
-  }, [profileId]);
+  }, [profileId, turn]);
 
   useEffect(() => { onFull?.(full); }, [full]);
 

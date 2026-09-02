@@ -1270,8 +1270,16 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .chat-rail-dock .talk-rail-btn { min-width: 52px; padding: 5px 4px;
                                  font-size: 15px; border-radius: 11px; }
 .chat-rail-dock .talk-rail-label { font-size: 8.5px; max-width: 50px; }
+/* A vertical road, whatever the count. The phone media query below
+   adds `flex-wrap: wrap` to the base rail, and a wrapping COLUMN that
+   outgrows its max-height wraps sideways — with enough seated it read
+   as a horizontal row marching off frame. Field report: "I need it to
+   stay a vertical road." Nowrap holds the direction; the rail shrinks
+   into its own scroll before anything leaves the screen; dvh because
+   iOS's vh includes the browser chrome the rail cannot use. */
 .chat-rail-dock .talk-rail { max-height: calc(100vh - 120px);
-                             overflow: visible; }
+                             max-height: calc(100dvh - 120px);
+                             flex-wrap: nowrap; overflow-y: auto; }
 .chat-rail-dock .talk-panel { position: fixed; right: 76px; top: 50%;
                               transform: translateY(-50%); z-index: 94;
                               width: min(86vw, 560px); }
@@ -1514,6 +1522,41 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   transform: translateX(-50%);
   background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25);
   border-radius: 999px; padding: 9px 16px; }
+
+/* The film, painted. SeatFilm shipped classed and unstyled — the
+   window-without-paint defect again: the purple focus card held a bare
+   sentence where the field report expected "the wide frame expandable
+   screen of a video, rendered in black waiting". The frame is the wide
+   black 16:9 whether footage exists yet or not; the note waits inside
+   it; the X on the full screen is red and is the only red thing there,
+   per the component's own words. */
+.rs-film { position: relative; width: 100%; aspect-ratio: 16 / 9;
+  background: #000; border-radius: 12px; overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.14); }
+.rs-film.talking { border-color: rgba(123,196,127,0.8); }
+.rs-film video { width: 100%; height: 100%; object-fit: contain;
+  display: block; background: #000; }
+.rs-film-empty { display: flex; align-items: center;
+  justify-content: center; }
+.rs-film-note { font-size: 12px; opacity: 0.75; text-align: center;
+  padding: 0 16px; }
+.rs-film-ai { position: absolute; top: 8px; left: 8px; font-size: 10px;
+  padding: 2px 8px; border-radius: 999px; background: rgba(13,10,32,0.72);
+  border: 1px solid var(--line); }
+.rs-film-grow { position: absolute; right: 8px; bottom: 8px;
+  width: 34px; height: 34px; border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(13,10,32,0.62); color: #fff; }
+.rs-film-over { position: fixed; inset: 0; z-index: 110;
+  background: #000; display: flex; align-items: center;
+  justify-content: center; }
+.rs-film-over video { width: 100%; height: 100%; object-fit: contain; }
+.rs-film-x { position: absolute; top: 14px; right: 14px; width: 40px;
+  height: 40px; border-radius: 50%; border: 2px solid #e5484d;
+  background: rgba(0,0,0,0.55); color: #e5484d; font-size: 16px;
+  font-weight: 700; }
+.rs-film-who { position: absolute; left: 14px; bottom: 12px;
+  font-size: 12px; opacity: 0.8; color: #fff; }
 
 /* The film chip on an AR seat: small, under the card, one glyph. */
 .stage-film-chip { margin-top: 4px; width: 30px; height: 30px;
@@ -1932,10 +1975,13 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
    * full-bleed desktop room: on the handheld the 👤+ press opened the
    * invite panel beneath the stage and "nothing happened". The phone's
    * flowed layout has no stage, which is why the same press worked
-   * there and the defect hid. 88 also clears the loudness rail (85);
-   * the footsteps (90) and version guard (100) keep outranking a modal
-   * by design. */
-  position: fixed; inset: 0; z-index: 88;
+   * there and the defect hid. Then it happened AGAIN one layer up: the
+   * dock's panel (94) and the talk-panel scrim (93) arrived after this
+   * comment was written, and 88 put the invitation behind the frames.
+   * Field report, on iOS: "the overlay shows up behind the frames
+   * overlay and can't be seen." 96 clears everything a room draws; the
+   * version guard (100) keeps outranking a modal by design. */
+  position: fixed; inset: 0; z-index: 96;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 14px;
   background: rgba(6, 4, 18, 0.78); backdrop-filter: blur(9px);

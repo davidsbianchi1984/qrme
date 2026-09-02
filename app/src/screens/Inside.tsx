@@ -1295,6 +1295,18 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
   // square until the reading catches up.
   const lastSaid = transcript.length > 0
     ? transcript[transcript.length - 1] : null;
+
+  // This profile's newest turn, so a film frame can notice a fresh reply
+  // and ask whether footage came with it.
+  const lastTurnOf = (profileId: string): string | null => {
+    for (let i = transcript.length - 1; i >= 0; i--) {
+      const m = transcript[i];
+      if (m.sender_kind === "profile" && m.sender_id === profileId) {
+        return m.id;
+      }
+    }
+    return null;
+  };
   const isTalking = (s: { kind: string; id: string }) =>
     voicing !== null
       ? (voicing.kind === "user") === (s.kind === "user")
@@ -3029,6 +3041,7 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
               {format === "video" && (
                 <SeatFilm profileId={onStage.id} display={onStage.display}
                           talking={isTalking(onStage)} lang={lang}
+                          turn={lastTurnOf(onStage.id)}
                           onFull={setFilmFull} />
               )}
 
@@ -3962,6 +3975,7 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
               <div className="stage-film">
                 <SeatFilm profileId={seat.id} display={seat.display}
                           talking={isTalking(seat)} lang={lang}
+                          turn={lastTurnOf(seat.id)}
                           onFull={setFilmFull} />
               </div>
             ) : null;
