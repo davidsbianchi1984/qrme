@@ -114,7 +114,8 @@ def main() -> int:
         s, a = call("GET", "/avatars/forge")
         d.step("avatar", f"the forge says its state ({s})", s == 200)
 
-        # 4 · Video — doors honest, and the direction takes an edit.
+        # 4 · Video — doors honest, the direction takes an edit, and the
+        # render road is set through its owner-gated door.
         s, doors = call("GET", "/video/doors")
         honest = s == 200 and ("configured" in doors)
         d.step("video", f"the film doors answer ({s}, configured="
@@ -123,6 +124,18 @@ def main() -> int:
                     {"asked": "warmer light, behind the counter",
                      "surface": "walkthrough"})
         d.step("video", f"the direction takes an edit ({s})", s == 200)
+        # The road door spends money, so it takes the owner's token — a
+        # stranger is turned away, the owner gets through. Both halves
+        # driven: the refusal is the proof the gate is real.
+        s, _ = call("POST", f"/video/road/{pal}",
+                    {"road": "video", "daily_seconds": 60})
+        d.step("video", f"the road door refuses a tokenless caller ({s})",
+               s in (401, 403))
+        s, road = call("POST", f"/video/road/{pal}",
+                       {"road": "video", "daily_seconds": 60},
+                       token=pal_token)
+        d.step("video", f"the owner sets the video road ({s})",
+               s == 200 and road.get("road") == "video")
 
         # 5+6 · The stage's platform shelf, and a room to stand it on.
         s, x = call("GET", "/rooms/xr-platforms")
@@ -140,6 +153,14 @@ def main() -> int:
                         {"sender_id": actor,
                          "message": "Anyone here?"}, actor_token)
             d.step("rooms", f"a said line lands ({s})", s in (200, 201))
+            # The turn was taken on a profile now on the video road, so the
+            # footage door is asked what it holds. On a deployment with a
+            # render service the row is pending; on this one there is none,
+            # and that is the honest answer, not a wall — the road was set,
+            # the turn was taken, and the door reports the truth of both.
+            s, latest = call("GET", f"/video/latest/{pal}")
+            d.step("video", f"the footage door answers honestly ({s})",
+                   s == 200 and "scene" in (latest or {}))
 
         # 7 · The watch
         s, w = call("GET", f"/profiles/{me}/watch", token=own)
