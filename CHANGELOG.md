@@ -6,6 +6,35 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.0.2] - 2026-09-02
+
+### Security
+
+- **The video road door is owner-only.** `POST /video/road/{id}` — which
+  puts a profile on the video road, sets the daily seconds ceiling that
+  caps its spend, and points it at a render provider — shipped taking
+  neither a token nor a request, authorizing nobody. A profile id rides
+  on printed stickers and in beacons, so anyone holding one could put
+  somebody else's profile on the video road, raise its ceiling, or
+  repoint its provider, and spend that owner's budget. It now calls
+  `require_owner`, and the matching GET is gated the same way because it
+  hands back the ceiling, the spend, and the service — a profile's money
+  posture, its owner's to read alone.
+
+### Fixed
+
+- **The video glyph on your own seat commissions the render.** A profile
+  only films when its owner has put it on the video road, and a fresh
+  profile stands on the photo road — so the purple box stayed black,
+  because the room's glyph only changed how a viewer looked at a seat,
+  never the road that spends. Pressing the glyph on a seat you own now
+  sets that profile's road to video, so its next room turn renders
+  through fal.ai. Your own seats only — looking at another profile still
+  never spends its money — and the road the seat was on before the press
+  is restored when the glyph is turned off, so a peek never leaves a
+  profile quietly rendering or overwrites an avatar road chosen on
+  purpose.
+
 ## [3.0.1] - 2026-09-02
 
 ### Fixed
@@ -17625,7 +17654,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.2...HEAD
+[3.0.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.1...app-v3.0.2
 [3.0.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.0...app-v3.0.1
 [3.0.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.17...app-v3.0.0
 [2.9.17]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.16...app-v2.9.17
