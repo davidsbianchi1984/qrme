@@ -6,6 +6,26 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.9.17] - 2026-09-02
+
+### Added
+
+- **The connection is real.** Pairing a wearable stops being a typed
+  claim. On a paired device's settings row, one press opens the
+  console's own Bluetooth session beside the device — the radio is in
+  the person's hand, which is where proof can actually happen — and
+  whatever the device advertised for itself lands on the pairing as
+  its voucher: `verified_at`, `verified_as`, told apart from a typed
+  name on the same screen. A re-pair rewrites the claim, so the old
+  voucher comes off with it; a browser without a radio (iOS) says so
+  in a sentence instead of pretending; and the two refusals the new
+  road can give are translated in ten languages, with `device_name`
+  labelled in the sibling's own words rather than written again.
+- **The 3.0.0 gate says what the owner decided.** Store distribution
+  moves out of the release gate to a funded follow-up: the counters
+  stand ready in `stores/`, and the final tag waits on the roads
+  inside the app, not on a developer fee.
+
 ## [2.9.16] - 2026-09-02
 
 ### Added
@@ -17544,7 +17564,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.16...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.17...HEAD
+[2.9.17]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.16...app-v2.9.17
 [2.9.16]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.15...app-v2.9.16
 [2.9.15]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.14...app-v2.9.15
 [2.9.14]: https://github.com/davidsbianchi1984/qrme/compare/app-v2.9.13...app-v2.9.14

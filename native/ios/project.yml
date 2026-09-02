@@ -15,8 +15,8 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: app.qrme.studio
-        MARKETING_VERSION: "2.9.16"
-        CURRENT_PROJECT_VERSION: "2009016"
+        MARKETING_VERSION: "2.9.17"
+        CURRENT_PROJECT_VERSION: "2009017"
         SWIFT_VERSION: "5.9"
         TARGETED_DEVICE_FAMILY: "1,2"
     # A generated Info.plist and an `info:` block are mutually exclusive:
