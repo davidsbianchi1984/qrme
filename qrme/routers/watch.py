@@ -95,7 +95,7 @@ def wearable_guardian(profile_id: str, name: str, body: GuardianRoad,
     profile_or_404(profile_id)
     require_owner(profile_id, request)
     if not wearables.device(profile_id, name):
-        raise HTTPException(404, "no such device — pair it first")
+        raise HTTPException(404, i18n.NO_SUCH_DEVICE_PAIR_FIRST)
     try:
         return wearables.set_guardian(profile_id, name, body.drip_url)
     except wearables.WearableError as exc:

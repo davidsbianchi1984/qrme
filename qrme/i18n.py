@@ -1334,6 +1334,7 @@ OPEN_GRANTS_LIMIT = "{max} open grants is the limit in one place"
 PAIRED_DEVICES_LIMIT = "{max} paired devices is the limit — unpair one"
 SENSES_NOTHING_FOR_A_GUARDIAN = ("this device senses nothing a guardian could watch")
 GUARDIAN_ADDRESS_IS_A_URL = ("the guardian address is a web address — it starts with http or https")
+NO_SUCH_DEVICE_PAIR_FIRST = "no such device — pair it first"
 SCREENS_LIMIT = "{max} screens is the limit — take one down first"
 SYNTH_MEMBERS_LIMIT = ("{max} synthetic members is the limit. Past that a lobby has stopped being people playing with help and become an operation being run, whatever any single line says")
 RATING_RANGE = "rating is {lo}–{hi}"
@@ -1440,6 +1441,7 @@ TEMPLATES = (MUST_BE_ONE_OF, SAY_CEILING, ENGINE_REFUSED,
              MARKUP_CEILING, WORK_DESCRIPTION_CEILING, PARTY_LIMIT,
              MANIFEST_ITEMS_LIMIT, OPEN_GRANTS_LIMIT, PAIRED_DEVICES_LIMIT,
              SENSES_NOTHING_FOR_A_GUARDIAN, GUARDIAN_ADDRESS_IS_A_URL,
+             NO_SUCH_DEVICE_PAIR_FIRST,
              SCREENS_LIMIT, SYNTH_MEMBERS_LIMIT, RATING_RANGE, ROOM_MIC_LONG,
              ROOM_MIC_SHORT, POINTED_MIC_LONG, POINTED_MIC_SHORT,
              OPEN_ROOM_MIC, NO_SUCH_THING, CANNOT_SUBSCRIBE_TO,
@@ -1922,6 +1924,17 @@ _TEMPLATES: dict[str, dict[str, str]] = {
         'zh': '同一处开放授权的上限是 {max} 个',
         'hi': 'एक जगह {max} खुली अनुमतियाँ ही सीमा है',
         'ar': '{max} من التصاريح المفتوحة هو الحدّ في مكان واحد',
+    },
+    NO_SUCH_DEVICE_PAIR_FIRST: {
+        'es': 'no existe ese dispositivo — empareja uno primero',
+        'fr': "cet appareil n'existe pas — appairez-le d'abord",
+        'de': 'kein solches Gerät — kopple zuerst eines',
+        'pt': 'não existe esse dispositivo — emparelhe um primeiro',
+        'it': 'nessun dispositivo con quel nome — associane prima uno',
+        'ja': 'そのデバイスはありません — まずペアリングしてください',
+        'zh': '没有这个设备——请先配对',
+        'hi': 'ऐसा कोई डिवाइस नहीं — पहले युग्मित करें',
+        'ar': 'لا يوجد جهاز بهذا الاسم — اقرنه أولاً',
     },
     SENSES_NOTHING_FOR_A_GUARDIAN: {
         'es': 'este dispositivo no percibe nada que un guardián pueda vigilar',
@@ -8432,6 +8445,7 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     # The Company Builder's two form fields (qrme/routers/company.py),
     # worded as the founding card asks them.
     "department": {"en": "Which department", "es": "Qué departamento", "fr": "Quel département", "de": "Welche Abteilung", "pt": "Qual departamento", "it": "Quale reparto", "ja": "どの部門", "zh": "哪个部门", "hi": "कौन-सा विभाग", "ar": "أي قسم"},
+    "drip_url": {"en": "Where readings go", "es": "Adónde van las lecturas", "fr": "Où vont les relevés", "de": "Wohin die Messwerte gehen", "pt": "Para onde vão as leituras", "it": "Dove vanno le letture", "ja": "測定値の送り先", "zh": "读数的去向", "hi": "रीडिंग कहाँ जाती हैं", "ar": "إلى أين تذهب القراءات"},
     "headcount": {"en": "How many seats", "es": "Cuántos puestos", "fr": "Combien de postes", "de": "Wie viele Stellen", "pt": "Quantos lugares", "it": "Quanti posti", "ja": "何席か", "zh": "多少个席位", "hi": "कितनी सीटें", "ar": "كم مقعدًا"},
     # The open door's two fields (qrme/routers/interaction.py).
     "hear_first": {"en": "Hear from them first", "es": "Escúchalos primero", "fr": "Les entendre en premier", "de": "Zuerst von ihnen hören", "pt": "Ouvi-los primeiro", "it": "Sentirli per primi", "ja": "先に連絡をもらう", "zh": "让它先联系你", "hi": "पहले उनसे सुनें", "ar": "اسمع منهم أولًا"},
