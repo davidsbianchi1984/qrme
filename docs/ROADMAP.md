@@ -88,7 +88,11 @@ The watch is its own avenue and it has the same three parts.
 
 - **A list of American makers to pick from**, on the screen, by name.
 - **An actual connection to that watch**, established and verifiable —
-  not a picker that stores a string.
+  not a picker that stores a string. *Closed in 2.9.17: the console's
+  own Bluetooth session reaches the device on a press, and what it
+  advertised for itself lands on the pairing as its voucher —
+  `verified_at`, `verified_as`, told apart from a typed name on the
+  same screen.*
 - **The screens render on the wrist.** Every screen built for JIM-mini
   and for QRME, drawn on watches and wearables, at watch size. The
   console already has 36 working watch faces; that is the paint, and
@@ -183,6 +187,14 @@ registry*, never typed in.
 ## 3.0.0
 
 Every avenue functions properly inside the apps.
+
+**Store distribution is not in this gate.** Decided by the owner on
+2 September 2026: the Steam and Meta Horizon shelves wait on developer
+fees, and 3.0.0 does not wait on them. The counters stand ready in
+`stores/` — accounts created, packaging scripted, one shared listing —
+and shipping to them is a funded follow-up, not a condition of the tag.
+The test below is about roads inside the app, and a storefront is not
+one of them.
 
 The test is a person, not a checklist: someone who has never seen this
 code opens the app, picks any road on the map — chat, voice, avatar,

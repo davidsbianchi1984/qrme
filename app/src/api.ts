@@ -657,6 +657,11 @@ export type Wearable = {
    *  deposit address their guardian minted. The readings travel from
    *  the device's own app to that address; QRME never holds one. */
   guardian: string | null;
+  /** When the console's own radio reached this device, and the name it
+   *  advertised for itself. Absent until something answers: a pairing
+   *  with a verified_at is one a device vouched for. */
+  verified_at: string | null;
+  verified_as: string | null;
   paired_at: string;
   /** Set once unpaired. The row survives — a device that was on somebody's
    *  wrist is a fact about the past, not a row to delete. */
@@ -6330,6 +6335,12 @@ export const api = {
     req<Wearable>(`/profiles/${profileId}/wearables`,
       { method: "POST", body, token }),
   // Keyed by **name**, not id — the id is in the row and the route is not.
+  verifyWearable: (profileId: string, name: string,
+                   body: { device_name: string; battery?: number | null },
+                   token: string) =>
+    req<Wearable>(
+      `/profiles/${profileId}/wearables/${encodeURIComponent(name)}/verified`,
+      { method: "POST", body, token }),
   wearableGuardian: (profileId: string, name: string,
                      dripUrl: string | null, token: string) =>
     req<Wearable>(

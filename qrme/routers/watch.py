@@ -75,12 +75,42 @@ def pair_wearable(profile_id: str, body: WearablePair,
         raise HTTPException(422, i18n.raised(exc)) from None
 
 
+class VerifiedIn(BaseModel):
+    device_name: str = Field(min_length=1, max_length=120,
+                             description="The name the device advertised "
+                                         "for itself over Bluetooth.")
+    battery: int | None = Field(default=None, ge=0, le=100,
+                                description="The battery level it "
+                                            "answered with, if it did.")
+
+
 class GuardianRoad(BaseModel):
     drip_url: str | None = Field(
         default=None, max_length=300,
         description="Where this device's readings go — the deposit "
                     "address the owner's guardian minted. Blank takes "
                     "the road back down.")
+
+
+@router.post("/profiles/{profile_id}/wearables/{name}/verified")
+def wearable_verified(profile_id: str, name: str, body: VerifiedIn,
+                      request: Request) -> dict:
+    """The console's radio reached the device; record what it reported.
+
+    Owner-only. The proof happened in the person's hand — a Bluetooth
+    session only the browser beside the device can open — so the record
+    is what that session reported and when, which is what "established
+    and verifiable" can honestly mean from a server across the internet.
+    """
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    if not wearables.device(profile_id, name):
+        raise HTTPException(404, i18n.NO_SUCH_DEVICE_PAIR_FIRST)
+    try:
+        return wearables.verify(profile_id, name, body.device_name,
+                                body.battery)
+    except wearables.WearableError as exc:
+        raise HTTPException(422, i18n.raised(exc)) from None
 
 
 @router.put("/profiles/{profile_id}/wearables/{name}/guardian")

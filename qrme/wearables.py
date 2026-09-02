@@ -286,10 +286,57 @@ def pair(profile_id: str, name: str, kind: str,
             (db.new_id("wbl"), profile_id, name, kind, json.dumps(chosen),
              db.utcnow()))
     else:
-        conn.execute(
-            "UPDATE wearables SET kind=?, faces=?, paired_at=?,"
-            " revoked_at=NULL WHERE id=?",
-            (kind, json.dumps(chosen), db.utcnow(), existing["id"]))
+        # A re-pair rewrites the claim, so the verification that vouched
+        # for the previous claim comes off with it — where the column
+        # exists; a database that never verified has nothing to reset.
+        try:
+            conn.execute(
+                "UPDATE wearables SET kind=?, faces=?, paired_at=?,"
+                " revoked_at=NULL, verified_at=NULL, verified_as=NULL"
+                " WHERE id=?",
+                (kind, json.dumps(chosen), db.utcnow(), existing["id"]))
+        except Exception:
+            conn.execute(
+                "UPDATE wearables SET kind=?, faces=?, paired_at=?,"
+                " revoked_at=NULL WHERE id=?",
+                (kind, json.dumps(chosen), db.utcnow(), existing["id"]))
+    conn.commit()
+    return device(profile_id, name)
+
+
+def verify(profile_id: str, name: str, advertised: str,
+           battery: int | None = None) -> dict:
+    """Record that the console's own radio reached this device.
+
+        asked     an actual connection to that watch, established and
+                  verifiable — not a picker that stores a string
+        mattered  the difference between owning a device and having
+                  typed its name
+
+    The radio is in the person's hand, not on this server, so what can
+    honestly be recorded here is what the browser's Bluetooth session
+    reported and when: the name the device advertised for itself, the
+    battery it answered with, and the moment it did. A row with a
+    ``verified_at`` is a pairing something answered for; a row without
+    one is still just a name somebody chose.
+    """
+    row = device(profile_id, name)
+    text = (advertised or "").strip()[:120]
+    if not text:
+        raise WearableError(i18n.DEVICE_ADVERTISED_NO_NAME)
+    if battery is not None and not (0 <= battery <= 100):
+        raise WearableError(i18n.BATTERY_READING_RANGE)
+    conn = db.connect()
+    for column in ("verified_at TEXT", "verified_as TEXT",
+                   "verified_battery INTEGER"):
+        try:
+            conn.execute(f"ALTER TABLE wearables ADD COLUMN {column}")
+        except Exception:
+            pass
+    conn.execute(
+        "UPDATE wearables SET verified_at=?, verified_as=?,"
+        " verified_battery=? WHERE profile_id=? AND name=?",
+        (db.utcnow(), text, battery, profile_id, name))
     conn.commit()
     return device(profile_id, name)
 
@@ -355,6 +402,10 @@ def device(profile_id: str, name: str) -> dict:
             "faces": json.loads(row["faces"]),
             "senses": list(SENSES.get(row["kind"], ())),
             "guardian": row["guardian"] if "guardian" in keys else None,
+            "verified_at": (row["verified_at"]
+                            if "verified_at" in keys else None),
+            "verified_as": (row["verified_as"]
+                            if "verified_as" in keys else None),
             "paired_at": row["paired_at"], "revoked_at": row["revoked_at"],
             "paired": row["revoked_at"] is None}
 

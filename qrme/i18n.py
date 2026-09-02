@@ -1335,6 +1335,8 @@ PAIRED_DEVICES_LIMIT = "{max} paired devices is the limit — unpair one"
 SENSES_NOTHING_FOR_A_GUARDIAN = ("this device senses nothing a guardian could watch")
 GUARDIAN_ADDRESS_IS_A_URL = ("the guardian address is a web address — it starts with http or https")
 NO_SUCH_DEVICE_PAIR_FIRST = "no such device — pair it first"
+DEVICE_ADVERTISED_NO_NAME = ("the device did not advertise a name — connect again")
+BATTERY_READING_RANGE = "a battery reading is 0-100"
 SCREENS_LIMIT = "{max} screens is the limit — take one down first"
 SYNTH_MEMBERS_LIMIT = ("{max} synthetic members is the limit. Past that a lobby has stopped being people playing with help and become an operation being run, whatever any single line says")
 RATING_RANGE = "rating is {lo}–{hi}"
@@ -1441,7 +1443,8 @@ TEMPLATES = (MUST_BE_ONE_OF, SAY_CEILING, ENGINE_REFUSED,
              MARKUP_CEILING, WORK_DESCRIPTION_CEILING, PARTY_LIMIT,
              MANIFEST_ITEMS_LIMIT, OPEN_GRANTS_LIMIT, PAIRED_DEVICES_LIMIT,
              SENSES_NOTHING_FOR_A_GUARDIAN, GUARDIAN_ADDRESS_IS_A_URL,
-             NO_SUCH_DEVICE_PAIR_FIRST,
+             NO_SUCH_DEVICE_PAIR_FIRST, DEVICE_ADVERTISED_NO_NAME,
+             BATTERY_READING_RANGE,
              SCREENS_LIMIT, SYNTH_MEMBERS_LIMIT, RATING_RANGE, ROOM_MIC_LONG,
              ROOM_MIC_SHORT, POINTED_MIC_LONG, POINTED_MIC_SHORT,
              OPEN_ROOM_MIC, NO_SUCH_THING, CANNOT_SUBSCRIBE_TO,
@@ -1924,6 +1927,28 @@ _TEMPLATES: dict[str, dict[str, str]] = {
         'zh': '同一处开放授权的上限是 {max} 个',
         'hi': 'एक जगह {max} खुली अनुमतियाँ ही सीमा है',
         'ar': '{max} من التصاريح المفتوحة هو الحدّ في مكان واحد',
+    },
+    DEVICE_ADVERTISED_NO_NAME: {
+        'es': 'el dispositivo no anunció ningún nombre — conéctalo de nuevo',
+        'fr': "l'appareil n'a annoncé aucun nom — reconnectez-le",
+        'de': 'das Gerät hat keinen Namen gemeldet — verbinde es erneut',
+        'pt': 'o dispositivo não anunciou nenhum nome — ligue-o de novo',
+        'it': 'il dispositivo non ha annunciato alcun nome — ricollegalo',
+        'ja': 'デバイスが名前を通知しませんでした — もう一度接続してください',
+        'zh': '设备没有广播名称——请重新连接',
+        'hi': 'डिवाइस ने कोई नाम प्रसारित नहीं किया — फिर से जोड़ें',
+        'ar': 'لم يُعلن الجهاز عن اسم — أعد الاتصال',
+    },
+    BATTERY_READING_RANGE: {
+        'es': 'una lectura de batería es 0-100',
+        'fr': 'un niveau de batterie est de 0-100',
+        'de': 'ein Batteriewert liegt bei 0-100',
+        'pt': 'uma leitura de bateria é 0-100',
+        'it': 'una lettura della batteria è 0-100',
+        'ja': 'バッテリー値は0〜100です',
+        'zh': '电量读数范围为 0-100',
+        'hi': 'बैटरी रीडिंग 0-100 होती है',
+        'ar': 'قراءة البطارية من 0 إلى 100',
     },
     NO_SUCH_DEVICE_PAIR_FIRST: {
         'es': 'no existe ese dispositivo — empareja uno primero',
@@ -8445,6 +8470,8 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     # The Company Builder's two form fields (qrme/routers/company.py),
     # worded as the founding card asks them.
     "department": {"en": "Which department", "es": "Qué departamento", "fr": "Quel département", "de": "Welche Abteilung", "pt": "Qual departamento", "it": "Quale reparto", "ja": "どの部門", "zh": "哪个部门", "hi": "कौन-सा विभाग", "ar": "أي قسم"},
+    "device_name": {"en": "Device name", "es": "Nombre del dispositivo", "fr": "Nom de l\u2019appareil", "de": "Gerätename", "pt": "Nome do dispositivo", "it": "Nome del dispositivo", "ja": "デバイス名", "zh": "设备名称", "hi": "डिवाइस का नाम", "ar": "اسم الجهاز"},
+    "battery": {"en": "Battery", "es": "Batería", "fr": "Batterie", "de": "Batterie", "pt": "Bateria", "it": "Batteria", "ja": "バッテリー", "zh": "电量", "hi": "बैटरी", "ar": "البطارية"},
     "drip_url": {"en": "Where readings go", "es": "Adónde van las lecturas", "fr": "Où vont les relevés", "de": "Wohin die Messwerte gehen", "pt": "Para onde vão as leituras", "it": "Dove vanno le letture", "ja": "測定値の送り先", "zh": "读数的去向", "hi": "रीडिंग कहाँ जाती हैं", "ar": "إلى أين تذهب القراءات"},
     "headcount": {"en": "How many seats", "es": "Cuántos puestos", "fr": "Combien de postes", "de": "Wie viele Stellen", "pt": "Quantos lugares", "it": "Quanti posti", "ja": "何席か", "zh": "多少个席位", "hi": "कितनी सीटें", "ar": "كم مقعدًا"},
     # The open door's two fields (qrme/routers/interaction.py).

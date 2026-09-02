@@ -313,6 +313,42 @@ export function Assist({ onPlans }: { onPlans: () => void }) {
                     : <> · {tr("asst.worn.unpaired", lang)}</>}
                 </p>
               )}
+              {/* The connection, made real. The radio is in this
+                  machine, so the proof happens here: a Bluetooth
+                  session the person opens with a press, and whatever
+                  the device advertises for itself lands on the
+                  pairing as its voucher. Where the browser has no
+                  radio (iOS), the button is a sentence instead —
+                  saying so beats pretending. */}
+              {detail === w.id && w.paired && (
+                <p className="muted small">
+                  {w.verified_at
+                    ? fill(tr("asst.worn.verified", lang),
+                           { name: w.verified_as || w.name })
+                    : ("bluetooth" in navigator)
+                      ? <button className="chip" disabled={busy}
+                                onClick={act(async () => {
+                                  const nav = navigator as Navigator & {
+                                    bluetooth: {
+                                      requestDevice(o: object):
+                                        Promise<{ name?: string }>;
+                                    };
+                                  };
+                                  const dev = await nav.bluetooth
+                                    .requestDevice({
+                                      acceptAllDevices: true,
+                                      optionalServices:
+                                        ["battery_service"],
+                                    });
+                                  await api.verifyWearable(me, w.name,
+                                    { device_name: dev.name || w.name },
+                                    token);
+                                }, tr("asst.worn.vouched", lang))}>
+                          {tr("asst.worn.verify", lang)}
+                        </button>
+                      : tr("asst.worn.verify.nobt", lang)}
+                </p>
+              )}
               {/* The guardian road, only where there is something to
                   send: what the kind can feel, and the deposit address
                   the owner's guardian minted for it. The readings go

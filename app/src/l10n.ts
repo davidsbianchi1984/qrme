@@ -3556,6 +3556,18 @@ const CHROME: Table = {
   "asst.worn.revoked": {
     en: "include ones you have unpaired — the row stays, with the date", es: "incluir los que has desemparejado — la fila permanece, con la fecha", fr: "inclure ceux que vous avez désappairés — la ligne reste, avec la date", de: "auch entkoppelte zeigen — die Zeile bleibt, mit Datum", pt: "incluir os que desemparelhou — a linha fica, com a data", it: "includi quelli disaccoppiati — la riga resta, con la data", ja: "解除したものも表示 — 行は日付と共に残ります", zh: "包括已取消配对的 — 记录保留，附日期", hi: "अलग किए गए भी दिखाएँ — पंक्ति तिथि सहित रहती है", ar: "تضمين ما ألغيت إقرانه — يبقى الصف مع التاريخ",
   },
+  "asst.worn.verify": {
+    en: "Connect over Bluetooth to verify", es: "Conéctalo por Bluetooth para verificarlo", fr: "Connectez-le en Bluetooth pour le vérifier", de: "Per Bluetooth verbinden und bestätigen", pt: "Ligue por Bluetooth para verificar", it: "Collegalo via Bluetooth per verificarlo", ja: "Bluetoothで接続して確認", zh: "通过蓝牙连接以验证", hi: "सत्यापित करने के लिए ब्लूटूथ से जोड़ें", ar: "اتصل عبر البلوتوث للتحقق",
+  },
+  "asst.worn.verified": {
+    en: "Verified — it answered as {name}.", es: "Verificado: respondió como {name}.", fr: "Vérifié — il a répondu sous le nom {name}.", de: "Bestätigt — es hat sich als {name} gemeldet.", pt: "Verificado — respondeu como {name}.", it: "Verificato — ha risposto come {name}.", ja: "確認済み — {name} として応答しました。", zh: "已验证——它以 {name} 应答。", hi: "सत्यापित — इसने {name} के रूप में जवाब दिया।", ar: "تم التحقق — أجاب باسم {name}.",
+  },
+  "asst.worn.vouched": {
+    en: "The device answered — the pairing is verified.", es: "El dispositivo respondió: el emparejamiento está verificado.", fr: "L'appareil a répondu — l'appairage est vérifié.", de: "Das Gerät hat geantwortet — die Kopplung ist bestätigt.", pt: "O dispositivo respondeu — o emparelhamento está verificado.", it: "Il dispositivo ha risposto — l'associazione è verificata.", ja: "デバイスが応答しました — ペアリングを確認しました。", zh: "设备已应答——配对已验证。", hi: "डिवाइस ने जवाब दिया — युग्मन सत्यापित है।", ar: "أجاب الجهاز — تم التحقق من الاقتران.",
+  },
+  "asst.worn.verify.nobt": {
+    en: "This browser cannot reach Bluetooth — verify from Chrome or Edge on a computer or Android device.", es: "Este navegador no puede usar Bluetooth: verifica desde Chrome o Edge en un ordenador o Android.", fr: "Ce navigateur n'a pas accès au Bluetooth — vérifiez depuis Chrome ou Edge sur ordinateur ou Android.", de: "Dieser Browser erreicht kein Bluetooth — bestätige über Chrome oder Edge am Computer oder Android-Gerät.", pt: "Este navegador não acede ao Bluetooth — verifique no Chrome ou Edge num computador ou Android.", it: "Questo browser non raggiunge il Bluetooth — verifica da Chrome o Edge su computer o Android.", ja: "このブラウザはBluetoothに接続できません — パソコンかAndroidのChrome/Edgeで確認してください。", zh: "此浏览器无法使用蓝牙——请在电脑或安卓设备的 Chrome/Edge 中验证。", hi: "यह ब्राउज़र ब्लूटूथ तक नहीं पहुँच सकता — कंप्यूटर या Android पर Chrome/Edge से सत्यापित करें।", ar: "هذا المتصفح لا يصل إلى البلوتوث — تحقق من كروم أو إيدج على حاسوب أو جهاز أندرويد.",
+  },
   "asst.worn.feels": {
     en: "Feels: {senses}", es: "Percibe: {senses}", fr: "Perçoit : {senses}", de: "Spürt: {senses}", pt: "Sente: {senses}", it: "Percepisce: {senses}", ja: "感知: {senses}", zh: "感知：{senses}", hi: "महसूस करता है: {senses}", ar: "يستشعر: {senses}",
   },
