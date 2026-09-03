@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v3.1.0** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v3.1.1** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -647,6 +647,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **3.1.1** | **No functional changes to QRME — cut with the siblings.** JIM-mini's image gained what its box runs; the three products keep one number. |
 | **3.1.0** | **The assistant's box opens on the hosted cloud, and one number across the three** — Docker's default seccomp and AppArmor profiles refused the namespaces JIM's coding assistant raises to try a drafted edit; two profiles widen exactly those calls for the jim service only, the compose file names them, an idempotent script loads the AppArmor half into the host's kernel before every deploy, and a guard holds the profiles to the defaults plus those calls. |
 | **3.0.6** | **The voice door answers** — the number's voice webhook and status callback land on two inbound doors under the same locks as every leg. A call that comes in is handed to JIM with who is calling; when JIM matches the caller to a reach-out, the leg's own doors carry the conversation from there, and the status callback finds the leg by the house's reference. `/standing` reports the two URLs to point the number at and, for Twilio, whether it is pointed there. |
 | **3.0.5** | **The voice door** — the phone line JIM 3.0.8 rings its emergency contacts on, as a sidecar in the compose stack, the same shape as the camera and the ears. It holds the phone house's credential, speaks one small protocol to JIM, turns the house's webhooks into JIM's own call-id doors, and composes no prose of its own — every spoken sentence rides JIM's line envelope. Five houses behind one interface, each verifying its own webhook signature and the per-call signature before a word is spoken. Caddy publishes only the house-facing doors under `/voice`; the door JIM places calls through is not on the internet. The 911 send stays held shut in JIM's source whatever is set here. |
