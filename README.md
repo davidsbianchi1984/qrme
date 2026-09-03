@@ -284,9 +284,8 @@ play: the footage is the reply.
     <td align="center" width="33%"><a href="docs/scenes/room-rehearsal-phone.jpg"><img src="docs/scenes/room-rehearsal-phone.jpg" alt="The rehearsal room on a phone, the founder's reply rendered as footage"></a><br><sub><b>The rehearsal room</b> · phone<br>the founder's own persona rendered into a garden; the redirection typed, not yet sent</sub></td>
   </tr>
   <tr>
-    <td align="center" width="33%"><a href="docs/scenes/room-consultation-tall.jpg"><img src="docs/scenes/room-consultation-tall.jpg" alt="The consultation room, the founder's seat rendering while a colleague answers"></a><br><sub><b>The consultation room</b> · a second turn<br>one seat rendering while another profile answers in text — the two roads at once</sub></td>
-    <td align="center" width="33%"><a href="docs/scenes/film-pane-osei.jpg"><img src="docs/scenes/film-pane-osei.jpg" alt="The film pane, Dr Amara Osei's footage full screen"></a><br><sub><b>The film pane</b> · Dr. Amara Osei<br>the footage full screen, the direction line and the redirection control with it</sub></td>
-    <td align="center" width="33%"><a href="docs/scenes/film-pane-bianchi.jpg"><img src="docs/scenes/film-pane-bianchi.jpg" alt="The film pane, David Bianchi's footage full screen"></a><br><sub><b>The film pane</b> · David Bianchi<br>the same face, a different room, from the same pipeline</sub></td>
+    <td align="center" width="50%"><a href="docs/scenes/film-pane-osei.jpg"><img src="docs/scenes/film-pane-osei.jpg" alt="The film pane, Dr Amara Osei's footage full screen"></a><br><sub><b>The film pane</b> · Dr. Amara Osei<br>the footage full screen, the direction line and the redirection control with it</sub></td>
+    <td align="center" width="50%"><a href="docs/scenes/film-pane-bianchi.jpg"><img src="docs/scenes/film-pane-bianchi.jpg" alt="The film pane, David Bianchi's footage full screen"></a><br><sub><b>The film pane</b> · David Bianchi<br>the same face, a different room, from the same pipeline</sub></td>
   </tr>
 </table>
 
