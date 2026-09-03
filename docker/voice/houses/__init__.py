@@ -145,6 +145,9 @@ class Event:
     seconds: int = 0
     vendor_ref: str | None = None
     detail: str = ""
+    #: On a call that came in: who is calling, and which number they rang.
+    caller: str | None = None
+    called: str | None = None
 
 
 #: The one HTTP function a row is handed: ``(method, url, *, headers,
@@ -296,6 +299,12 @@ class House:
         """One cheap authenticated round trip: ``(word, detail)`` with the
         word one of ready | refused | house_unreachable."""
         raise NotImplementedError
+
+    def inbound_pointed(self, voice_url: str) -> bool | None:
+        """Whether the From number is pointed at the inbound door. None —
+        the default — means this house cannot be asked, and the runbook's
+        curl is the proof."""
+        return None
 
     # -- shared readings of a house's answer ---------------------------------
 

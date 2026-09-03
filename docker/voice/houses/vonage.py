@@ -178,7 +178,9 @@ class Vonage(House):
                      answered_by=answered_by,
                      seconds=as_int(body.get("duration")),
                      vendor_ref=str(body.get("uuid") or "") or None,
-                     detail=detail)
+                     detail=detail,
+                     caller=str(body.get("from") or "") or None,
+                     called=str(body.get("to") or "") or None)
 
     def render(self, line: dict, urls: dict, counters: dict) -> Response:
         act = action_urls(urls, counters)

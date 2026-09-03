@@ -17,6 +17,7 @@ voicemail.
 from __future__ import annotations
 
 import hmac
+import json
 import urllib.parse
 
 from fastapi import Response
@@ -128,7 +129,8 @@ class Twilio(House):
                      speech=f.get("SpeechResult"), status=status,
                      answered_by=answered_by,
                      seconds=as_int(f.get("CallDuration")),
-                     vendor_ref=f.get("CallSid"), detail=detail)
+                     vendor_ref=f.get("CallSid"), detail=detail,
+                     caller=f.get("From"), called=f.get("To"))
 
     # -- render ---------------------------------------------------------------
 
@@ -176,4 +178,26 @@ class Twilio(House):
         except Unreachable as exc:
             return "house_unreachable", f"the house could not be reached: {exc}"
         return self.standing_word(status, text)
+
+    def inbound_pointed(self, voice_url: str) -> bool | None:
+        """Whether the From number's voice URL at the house is this door —
+        asked of the house, so the posture never assumes it. None when the
+        house does not answer the question."""
+        try:
+            status, text = self.http(
+                "GET", f"{self.base}/Accounts/{self.cfg.account}/"
+                       f"IncomingPhoneNumbers.json?PhoneNumber="
+                       f"{urllib.parse.quote(self.cfg.from_)}",
+                headers=self._headers(), timeout=3)
+        except Unreachable:
+            return None
+        if status != 200:
+            return None
+        try:
+            rows = json.loads(text).get("incoming_phone_numbers") or []
+        except ValueError:
+            return None
+        if not rows:
+            return None
+        return (rows[0].get("voice_url") or "").strip() == voice_url
 

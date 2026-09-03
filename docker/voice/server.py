@@ -479,6 +479,22 @@ def standing(request: Request, force: str = "", provider: str = "") -> dict:
     word, detail, at = _probe("house", house_probe, forced)
     out["checked_at"] = at
     out["authenticated"] = word == "ready"
+    # The number's own doors (3.0.10): where the house must point it for a
+    # call back to reach JIM, and — when the house can be asked — whether it
+    # is pointed there. Two static capabilities over the word "inbound",
+    # the same shape as a leg's, because a number has no call id yet.
+    if cfg.public_url and cfg.secret:
+        sig = _sig(cfg.secret, "inbound")
+        voice_url = f"{cfg.public_url}/{house}/inbound?sig={sig}"
+        status_url = f"{cfg.public_url}/{house}/inbound/status?sig={sig}"
+        pointed = None
+        if word == "ready":
+            pointed = _probe(f"pointed:{voice_url}",
+                             lambda: row.inbound_pointed(voice_url), forced)
+        out["inbound"] = {"voice_url": voice_url, "status_url": status_url,
+                          "pointed": pointed}
+    else:
+        out["inbound"] = None
     if word != "ready":
         fix = (detail if word in ("refused", "house_unreachable")
                else None)
@@ -777,6 +793,55 @@ def _speech(row: House, ev: Event, call_id: str, first: int, silence: int,
                       "then": "gather_speech"}, silence=1, turn=turn)
     return _hangup(row, call_id, cached.get("close") or "",
                    cached.get("language"))
+
+
+@app.post("/voice/{house}/inbound")
+async def inbound(house: str, request: Request) -> Response:
+    """A call came in on the From number. Both locks as on any leg — the
+    capability here is over the word "inbound", since a number has no call
+    id yet — then JIM decides whether the caller is a contact the cascade
+    rang, and answers the line to speak or the one sentence to say."""
+    row, ev = await _admit(house, "inbound", request)
+    return await run_in_threadpool(_inbound, row, ev)
+
+
+def _inbound(row: House, ev: Event) -> Response:
+    status, body = _ask("POST", "/reachout/line/inbound", {
+        "caller": ev.caller or "", "called": ev.called or "",
+        "house": row.name, "vendor_ref": ev.vendor_ref or ""})
+    line = _line_from(status, body)
+    if line is None:
+        # JIM refused or could not be reached: nothing to speak from, and no
+        # sentence of this door's own. The line just ends.
+        return _hangup(row, "inbound")
+    call = body.get("call") if isinstance(body.get("call"), dict) else None
+    if body.get("matched") and call and call.get("id"):
+        call_id = str(call["id"])
+        _remember(call_id, line)
+        # The leg's own doors from here: the speech legs carry its call id.
+        if line["then"] == "speak_first":
+            return _play(row, call_id, line, first=1, turn=0)
+        return _play(row, call_id, line, silence=0, turn=0)
+    return _play(row, "inbound", line)
+
+
+@app.post("/voice/{house}/inbound/status")
+async def inbound_status(house: str, request: Request) -> Response:
+    """The number's status callback — one URL for every call that came in,
+    so the leg is found by the house's own reference."""
+    row, ev = await _admit(house, "inbound", request)
+    return await run_in_threadpool(_inbound_status, row, ev)
+
+
+def _inbound_status(row: House, ev: Event) -> Response:
+    if ev.status is None or not ev.vendor_ref:
+        return Response(status_code=204)
+    status, _ = _ask("POST", "/reachout/line/inbound/status", {
+        "house": row.name, "vendor_ref": ev.vendor_ref, "event": ev.status,
+        "seconds": int(ev.seconds or 0), "detail": ev.detail})
+    if not status or status >= 500:
+        return Response(status_code=502)
+    return Response(status_code=204)
 
 
 @app.post("/voice/{house}/{call_id}/status")

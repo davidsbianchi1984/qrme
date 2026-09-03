@@ -121,7 +121,8 @@ class Plivo(House):
         return Event(kind=kind, digit=f.get("Digits"), speech=f.get("Speech"),
                      status=status, answered_by=answered_by,
                      seconds=as_int(f.get("Duration")),
-                     vendor_ref=f.get("CallUUID"), detail=detail)
+                     vendor_ref=f.get("CallUUID"), detail=detail,
+                     caller=f.get("From"), called=f.get("To"))
 
     def render(self, line: dict, urls: dict, counters: dict) -> Response:
         act = action_urls(urls, counters)
