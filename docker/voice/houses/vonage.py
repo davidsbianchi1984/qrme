@@ -97,7 +97,7 @@ class Vonage(House):
         status, text = self.http(
             "POST", f"{self.base}/v1/calls",
             headers=self._headers("application/json"),
-            body=json.dumps(body).encode(), timeout=10)
+            body=json.dumps(body).encode())
         got = json_body(text)
         words = " ".join(str(x) for x in (
             got.get("title") or got.get("error_title"),

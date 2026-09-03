@@ -529,7 +529,7 @@ def calls(body: CallOrder, request: Request) -> dict:
     cfg = _config()
     _require_bearer(cfg, request)
     to = normalize(body.to)
-    if is_emergency(to):
+    if is_emergency(body.to) or is_emergency(to):
         raise HTTPException(422, "this door does not ring emergency numbers")
     house = _house_name(cfg)
     asked = (body.provider or house).strip().lower()
@@ -606,18 +606,20 @@ async def _admit(house: str, call_id: str,
     cfg = _config()
     if house not in HOUSES:
         raise HTTPException(404, "no such house")
-    declared = request.headers.get("content-length") or "0"
-    if not declared.isdigit() or int(declared) > MAX_BODY:
-        raise HTTPException(413, "too large for a webhook")
-    raw = await request.body()
-    if len(raw) > MAX_BODY:
-        raise HTTPException(413, "too large for a webhook")
+    # The per-call capability first — it needs only the query — so a forged
+    # request is refused before a byte of its body is buffered.
     given = request.query_params.get("sig", "")
     if not cfg.secret or not given or not hmac.compare_digest(
             given.encode(), _sig(cfg.secret, call_id).encode()):
         log.warning("refused %s %s: the call capability did not match",
                     house, request.url.path)
         raise Forbidden()
+    declared = request.headers.get("content-length") or "0"
+    if not declared.isdigit() or int(declared) > MAX_BODY:
+        raise HTTPException(413, "too large for a webhook")
+    raw = await request.body()
+    if len(raw) > MAX_BODY:
+        raise HTTPException(413, "too large for a webhook")
     row = HOUSES[house](cfg, _house_http)
     headers = {k.lower(): v for k, v in request.headers.items()}
     if not row.verify(_signed_url(cfg, request), headers, raw):

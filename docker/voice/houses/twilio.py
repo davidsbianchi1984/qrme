@@ -74,7 +74,7 @@ class Twilio(House):
         status, text = self.http(
             "POST", f"{self.base}/Accounts/{self.cfg.account}/Calls.json",
             headers=self._headers("application/x-www-form-urlencoded"),
-            body=urllib.parse.urlencode(fields).encode(), timeout=10)
+            body=urllib.parse.urlencode(fields).encode())
         return self._placed(status, text)
 
     def _placed(self, status: int, text: str) -> str:

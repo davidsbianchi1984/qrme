@@ -54,7 +54,7 @@ class Telnyx(Twilio):
         status, text = self.http(
             "POST", f"{self.base}/v2/texml/calls/{self.cfg.house_ref}",
             headers=self._headers("application/json"),
-            body=json.dumps(body).encode(), timeout=10)
+            body=json.dumps(body).encode())
         got = json_body(text)
         data = got.get("data") if isinstance(got.get("data"), dict) else {}
         if status in (400, 422):

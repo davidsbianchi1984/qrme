@@ -71,7 +71,7 @@ class Plivo(House):
         status, text = self.http(
             "POST", f"{self.base}/v1/Account/{self.cfg.account}/Call/",
             headers=self._headers("application/json"),
-            body=json.dumps(body).encode(), timeout=8)
+            body=json.dumps(body).encode())
         got = json_body(text)
         if status == 400:
             raise Refused(str(got.get("error") or text[:400]))
