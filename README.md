@@ -391,6 +391,43 @@ and the full tour is in [docs/gallery.md](docs/gallery.md).
   </tr>
 </table>
 
+## The agent, the profile, its connections and its permissions
+
+The four questions an examiner asks of a synthetic profile — what runs it,
+who it is, what it is connected to, and what it is allowed to do — each on
+its own screen, photographed from the running console. Screens taller than
+a phone carry a link to their parts, where every row reads at full size.
+
+<table>
+  <tr>
+    <td align="center" width="25%"><a href="docs/screens/200-agent.png"><img src="docs/screens/200-agent.png" width="165" alt="The synthetic agent"></a><br><sub><b>200</b> · The synthetic agent<br>it builds your page and your widgets on your word<br><a href="docs/gallery.md#long-screens-in-parts">3 parts</a></sub></td>
+    <td align="center" width="25%"><a href="docs/screens/05-home.png"><img src="docs/screens/05-home.png" width="165" alt="Profile home"></a><br><sub><b>05</b> · Profile home<br>memory, engagement and moderation, counted<br><a href="docs/gallery.md#long-screens-in-parts">2 parts</a></sub></td>
+    <td align="center" width="25%"><a href="docs/screens/197-their-homepage.png"><img src="docs/screens/197-their-homepage.png" width="165" alt="Their homepage"></a><br><sub><b>197</b> · Their homepage<br>a face pressed anywhere opens the person<br><a href="docs/gallery.md#long-screens-in-parts">2 parts</a></sub></td>
+    <td align="center" width="25%"><a href="docs/screens/204-your-circle.png"><img src="docs/screens/204-your-circle.png" width="165" alt="Your circle"></a><br><sub><b>204</b> · Your circle<br>the founder pins, then everyone you added<br><a href="docs/gallery.md#long-screens-in-parts">10 parts</a></sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center" width="25%"><a href="docs/screens/156-identity.png"><img src="docs/screens/156-identity.png" width="165" alt="Identity"></a><br><sub><b>156</b> · Identity<br>who a profile is, and the avatar deck it dresses in<br><a href="docs/gallery.md#long-screens-in-parts">10 parts</a></sub></td>
+    <td align="center" width="25%"><a href="docs/screens/08-relationships.png"><img src="docs/screens/08-relationships.png" width="165" alt="Relationships"></a><br><sub><b>08</b> · Relationships<br>how it treats each person it has met</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/201-plugins.png"><img src="docs/screens/201-plugins.png" width="165" alt="Connections"></a><br><sub><b>201</b> · Connections<br>the connector catalogue, each one revocable<br><a href="docs/gallery.md#long-screens-in-parts">10 parts</a></sub></td>
+    <td align="center" width="25%"><a href="docs/screens/202-allowed.png"><img src="docs/screens/202-allowed.png" width="165" alt="What it may do"></a><br><sub><b>202</b> · What it may do<br>every power off until somebody says yes<br><a href="docs/gallery.md#long-screens-in-parts">2 parts</a></sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center" width="25%"><a href="docs/screens/207-hands.png"><img src="docs/screens/207-hands.png" width="165" alt="Hands"></a><br><sub><b>207</b> · Hands<br>what it may work, for how long, what it will never type<br><a href="docs/gallery.md#long-screens-in-parts">3 parts</a></sub></td>
+    <td align="center" width="25%"><a href="docs/screens/208-capabilities.png"><img src="docs/screens/208-capabilities.png" width="165" alt="Capabilities"></a><br><sub><b>208</b> · Capabilities<br>every faculty, what it rests on, where it is withdrawn<br><a href="docs/gallery.md#long-screens-in-parts">3 parts</a></sub></td>
+    <td align="center" width="25%"><a href="docs/screens/44-avatar-studio.png"><img src="docs/screens/44-avatar-studio.png" width="165" alt="Avatar studio"></a><br><sub><b>44</b> · Avatar studio<br>the face, aged and dressed as you choose</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/147-voice.png"><img src="docs/screens/147-voice.png" width="165" alt="Voice"></a><br><sub><b>147</b> · Voice<br>cloned by consent, watermarked every utterance</sub></td>
+  </tr>
+</table>
+
+Nothing above is a mock-up. Every one is `tools/shoot_screens.py` driving
+the live console against a live backend, on a 430×932 phone viewport.
+
 **On every screen**
 
 <table>
