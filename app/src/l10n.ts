@@ -1074,7 +1074,7 @@ const CHROME: Table = {
     en: "Move the tabs up or down", es: "Mueve las pestañas arriba o abajo", fr: "Déplacer les onglets vers le haut ou le bas", de: "Die Reiter nach oben oder unten schieben", pt: "Mover as abas para cima ou para baixo", it: "Sposta le schede in su o in giù", ja: "タブを上下に動かす", zh: "上下移动标签", hi: "टैब ऊपर या नीचे खिसकाएँ", ar: "حرّك علامات التبويب لأعلى أو لأسفل",
   },
   "dock.help": {
-    en: "Help", es: "Ayuda", fr: "Aide", de: "Hilfe", pt: "Ajuda", it: "Aiuto", ja: "ヘルプ", zh: "帮助", hi: "सहायता", ar: "مساعدة",
+    en: "Help", es: "Ayuda", fr: "Aide", de: "Hilfe", pt: "Ajuda", it: "Aiuto", ja: "ヘルプ", zh: "帮助", hi: "सहायता", ar: "المساعدة",
   },
   "dock.lights": {
     en: "Agents", es: "Agentes", fr: "Agents", de: "Agenten", pt: "Agentes", it: "Agenti", ja: "エージェント", zh: "代理", hi: "एजेंट", ar: "الوكلاء",

@@ -792,6 +792,18 @@ LESSONS: tuple[dict, ...] = (
          screens=(210,),
          try_it="Found a bakery, open a counter seat, and sign your first "
                 "hire."),
+    dict(key="dock", chapter="Working", title="The edge dock",
+         what="Two tabs on the right edge of every screen, movable up or "
+              "down by the grip above them. The stoplight is your agents: "
+              "its edge wears the worst light, and pressing it opens the "
+              "round watch face — three lights, three counts, the approval "
+              "line. Press a row of the face and it names who stands under "
+              "that light, so you can see which agent is working, waiting "
+              "on you or stopped without leaving the screen. The question "
+              "mark is help, with no persona and no memory of you.",
+         screens=(211,),
+         try_it="Press the stoplight, then press the 'working' row; drag "
+                "the grip to move the tabs out of the way."),
     dict(key="ecosystem", chapter="Working", title="Departments that coordinate",
          what="An organization gives each department its own role agent — "
               "your profiles, staffed to desks. Ask them to coordinate on a "

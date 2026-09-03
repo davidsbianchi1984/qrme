@@ -124,8 +124,14 @@ def test_the_feed_never_reads_source_material_or_memories(client):
 
 
 def test_a_friends_post_outranks_a_strangers(client):
+    """The stranger is made here rather than taken from the starter
+    collection: the whole collection is installed as standing friends on
+    every profile now, so no starter is a stranger to anybody."""
     pid = _handles(client)
-    me, friend, stranger = pid("david_bianchi"), pid("marcus_bell"), pid("dr_amara_osei")
+    me, friend = pid("david_bianchi"), pid("marcus_bell")
+    stranger = make_profile(client, display_name="A Stranger")["id"]
+    friends.unfriend(me, stranger) if stranger in [
+        f["profile_id"] for f in friends.friends_of(me)] else None
     wall.publish(stranger, "A stranger writes something.")
     wall.publish(friend, "A friend writes something.")
     friends.befriend(me, friend)
@@ -165,7 +171,10 @@ def test_popularity_contributes_but_does_not_decide(client):
     """A capped signal. Uncapped, one heavily-liked stranger's post outranks
     every friend you have, which is the failure mode people complain about."""
     pid = _handles(client)
-    me, friend, stranger = pid("david_bianchi"), pid("marcus_bell"), pid("dr_amara_osei")
+    me, friend = pid("david_bianchi"), pid("marcus_bell")
+    # A stranger made here, not a starter — the starters are everybody's
+    # standing friends now.
+    stranger = make_profile(client, display_name="A Stranger")["id"]
     friends.befriend(me, friend)
     wall.publish(friend, "Quiet but yours.")
     loud = wall.publish(stranger, "Very popular.")
