@@ -17,7 +17,9 @@ COPY houses/ houses/
 # same as every other container in the stack; and the access log is off,
 # because every vendor webhook URL carries the per-call signature and a log
 # line is not where a capability belongs.
-RUN useradd --system --no-create-home --uid 10001 voice
+# Debian ships a `voice` group already (gid 22), so the user joins nogroup
+# rather than asking useradd to mint a group of the same name.
+RUN useradd --system --no-create-home --no-user-group --gid nogroup --uid 10001 voice
 USER voice
 EXPOSE 8800
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
