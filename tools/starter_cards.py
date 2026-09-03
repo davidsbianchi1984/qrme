@@ -36,7 +36,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-BUBBLES = ROOT / "docs" / "portraits" / "bubbles"
+# The photo portraits the seed serves, not the older hologram bubbles —
+# the cards are the profiles as the console draws them.
+BUBBLES = ROOT / "qrme" / "assets" / "portraits"
 OUT = ROOT / "docs" / "portraits" / "cards"
 
 sys.path.insert(0, str(ROOT / "tools"))
