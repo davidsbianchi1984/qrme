@@ -784,7 +784,7 @@ export function Identity({ onPlans, onPassing }: {
         </div>
       )}
 
-      <div className="card">
+      <div className="card" data-screen="44">
         <h3>{tr("idn.bubble", lang)}</h3>
         {avatar && (
           <>

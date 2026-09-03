@@ -733,7 +733,7 @@ Android XR.
 <table>
   <tr>
     <td align="center" width="33%"><a href="docs/screens/175-inside.png"><img src="docs/screens/175-inside.png" width="220" alt="Inside a room"></a><br><sub><b>175</b> · Inside<br>the flat room: nine seats, files, voices</sub></td>
-    <td align="center" width="33%"><a href="docs/screens/209-the-reply-as-footage.png"><img src="docs/screens/209-the-reply-as-footage.png" width="220" alt="The reply as footage"></a><br><sub><b>209</b> · The reply as footage<br>the rendered turn AR floats beside its seat</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/209-the-reply-as-footage.png"><img src="docs/screens/209-the-reply-as-footage.png" width="220" alt="The reply as footage"></a><br><sub><b>209</b> · The reply as footage<br>the founder's own rendered frame, over the console's rendering bar — the badge burned into every download</sub></td>
     <td align="center" width="33%"><a href="docs/screens/21-rooms.png"><img src="docs/screens/21-rooms.png" width="220" alt="Rooms"></a><br><sub><b>21</b> · Rooms<br>the doors in, including the XR shelf</sub></td>
   </tr>
 </table>

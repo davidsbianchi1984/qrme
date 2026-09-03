@@ -142,6 +142,17 @@ def seed(db_path: str) -> dict:
         conn.execute("UPDATE profiles SET avatar=? WHERE id=?",
                      (founder["avatar"], profile_id))
         conn.commit()
+    # And the same profile's bound voice, so the chat is photographed
+    # without the "no spoken voice bound" notice — a bound voice is the
+    # state a finished profile is in, and the notice is the state of one
+    # that is not finished yet.
+    conn.execute(
+        "INSERT OR REPLACE INTO profile_voices"
+        " (profile_id, provider, voice_id, label, bound_at)"
+        " SELECT ?, v.provider, v.voice_id, v.label, v.bound_at"
+        "   FROM profile_voices v JOIN handles h ON h.profile_id = v.profile_id"
+        "  WHERE h.handle = 'david_bianchi_ai'", (profile_id,))
+    conn.commit()
 
     return {"accountId": account,
             "accountToken": auth.issue("account", account),
@@ -209,9 +220,112 @@ def converse(session: dict) -> None:
               {"interactor_id": me["id"],
                "message": "What do you actually remember about me, and "
                           "where is it kept?"}, me["token"])
+        # More conversations, so the memory vault is photographed with a
+        # shelf of rows rather than one — a person reading the screen
+        # should see what a vault looks like once it has been used.
+        for name, line in (("Marcus Bell", "Walk me through the fee-only model again."),
+                           ("Priya Raman", "Which of my services should be split first?"),
+                           ("Dr. Amara Osei", "What did we say about the follow-up?"),
+                           ("Elena Vasquez", "Can you plan the next lesson with me?"),
+                           ("Ken Nakamura", "Remind me what we settled on for the shop hours.")):
+            other = _door("/interactors", {"display_name": name})
+            _door(f"/profiles/{session['profileId']}/chat",
+                  {"interactor_id": other["id"], "message": line}, other["token"])
     except Exception as exc:  # noqa: BLE001 — an empty chat is still the chat
         print(f"  ? no conversation seeded ({type(exc).__name__}); "
               "the chat is photographed empty")
+
+
+def furnish(session: dict) -> None:
+    """A company founded and staffed, and a shop opened, through the
+    product's own doors — so the company, organization and shop screens
+    are photographed with rows on them rather than empty forms. Nothing
+    here is drawn: every row is one the product wrote."""
+    token = session["ownerToken"]
+    pid = session["profileId"]
+    try:
+        co = _door("/companies", {"name": "Bianchi & Sons Bakery",
+                                  "industry": "bakery", "headcount": 4}, token)
+        for title, dept, name, duties in (
+                ("Counter clerk", "Front of house", "June Okafor",
+                 "Take orders, box pastries, ring up sales, keep the case stocked."),
+                ("Head baker", "Kitchen", "Tomas Ferreira",
+                 "Bake the morning bread, plan the week's specials, order flour."),
+                ("Bookkeeper", "Back office", "Priya Raman",
+                 "Reconcile the till, pay suppliers, file the quarter.")):
+            seat = _door(f"/companies/{co['id']}/seats",
+                         {"title": title, "department": dept}, token)
+            _door(f"/companies/{co['id']}/seats/{seat['id']}/hire",
+                  {"answers": [{"question": "Full name:", "answer": name},
+                               {"question": "Duties:", "answer": duties},
+                               {"question": "Decides alone vs escalates:",
+                                "answer": "Decides the day's small calls; "
+                                          "escalates money and complaints."}]},
+                  token)
+        session["companyId"] = co["id"]
+    except Exception as exc:  # noqa: BLE001 — an empty company is still the screen
+        print(f"  ? no company founded ({type(exc).__name__})")
+    try:
+        shop = _door("/shops", {"profile_id": pid, "name": "Bianchi & Sons",
+                                "blurb": "Bread at seven, pastries till they run out.",
+                                "tag": "bakery"}, token)
+        _door(f"/shops/{shop['id']}/offerings",
+              {"kind": "goods", "title": "Sourdough loaf", "price": 9.0}, token)
+        _door(f"/shops/{shop['id']}/offerings",
+              {"kind": "goods", "title": "Almond croissant", "price": 4.5}, token)
+    except Exception as exc:  # noqa: BLE001
+        print(f"  ? no shop opened ({type(exc).__name__})")
+
+
+#: A screen taller than this many phone heights is also photographed in
+#: parts, one phone height each, so a reader on GitHub — where a tall
+#: capture is scaled to a thumbnail — can read every part at full size.
+#: The full-page capture stays; the parts stand beside it.
+PARTS_ABOVE = 1.5
+LONG_BEGIN = "<!-- long-screens:begin -->"
+LONG_END = "<!-- long-screens:end -->"
+
+
+def parts(page, number: str, stem: str) -> list[str]:
+    """Photograph a tall page in phone-height parts, returning the names."""
+    height = page.evaluate("document.documentElement.scrollHeight")
+    vh = VIEWPORT["height"]
+    if height <= vh * PARTS_ABOVE:
+        return []
+    names = []
+    count = -(-height // vh)
+    for i in range(count):
+        page.evaluate(f"window.scrollTo(0, {i * vh})")
+        page.wait_for_timeout(250)
+        name = f"{number}-{stem}-part{i + 1}.png"
+        page.screenshot(path=str(OUT / name))
+        names.append(name)
+    page.evaluate("window.scrollTo(0, 0)")
+    return names
+
+
+def write_long_gallery() -> None:
+    """The parts, listed in docs/gallery.md between two markers — written
+    from what is on disk, so a part the camera wrote is always shown
+    somewhere and the gallery guards keep holding."""
+    gallery = REPO / "docs" / "gallery.md"
+    text = gallery.read_text(encoding="utf-8")
+    if LONG_BEGIN not in text:
+        text = text.rstrip("\n") + f"\n\n## Long screens, in parts\n\nScreens taller than a phone, photographed a phone height at a time so every part reads at full size. The whole-page capture of each is in the tour above.\n\n{LONG_BEGIN}\n{LONG_END}\n"
+    groups: dict[str, list[str]] = {}
+    for f in sorted(OUT.glob("*-part*.png")):
+        key = f.name.rsplit("-part", 1)[0]
+        groups.setdefault(key, []).append(f.name)
+    rows = []
+    for key, files in groups.items():
+        number = key.split("-", 1)[0]
+        cells = "".join(
+            f'<td align="center" width="{100 // len(files)}%" valign="top"><a href="screens/{n}"><img src="screens/{n}" width="180" alt="{key} part {i + 1}"></a><br><sub>part {i + 1} of {len(files)}</sub></td>'
+            for i, n in enumerate(files))
+        rows.append(f"<b>{number}</b> · {key.split('-', 1)[1].replace('-', ' ')}\n\n<table>\n  <tr>{cells}</tr>\n</table>\n")
+    body = LONG_BEGIN + "\n" + "\n".join(rows) + "\n" + LONG_END
+    text = re.sub(re.escape(LONG_BEGIN) + ".*?" + re.escape(LONG_END), lambda m: body, text, flags=re.S)
+    gallery.write_text(text, encoding="utf-8")
 
 
 def open_tab(page, tab: str) -> bool:
@@ -450,7 +564,10 @@ ELEMENTS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
     # where a reply is read, and it is photographed as a card because the
     # four states it has are the whole surface — three of them have no
     # video in them, and those are the ones worth showing.
-    ("209", "the-reply-as-footage", "chat", ()),
+    # 209 is not on this list on purpose: the card on disk is the owner's
+    # own frame of the reply as footage, stood over the console's
+    # rendering bar. This host has no film service, so the camera can only
+    # ever photograph the bar; a recipe here would overwrite the frame.
 )
 
 
@@ -630,6 +747,7 @@ def main(shots: list[tuple[str, str, str]]) -> None:
     try:
         session = seed("/tmp/shots.db")
         converse(session)
+        furnish(session)
         with sync_playwright() as play:
             browser = play.chromium.launch(
                 executable_path="/opt/pw-browsers/chromium")
@@ -720,6 +838,8 @@ def main(shots: list[tuple[str, str, str]]) -> None:
                 target = OUT / f"{number}-{stem}.png"
                 page.screenshot(path=str(target), full_page=True)
                 print(f"  {target.name}")
+                for part in parts(page, number, stem):
+                    print(f"  {part}")
                 for offender in past_the_edge(page):
                     print(f"      past the right edge: {offender}")
 
@@ -734,6 +854,8 @@ def main(shots: list[tuple[str, str, str]]) -> None:
                 target = OUT / f"{number}-{stem}.png"
                 page.screenshot(path=str(target), full_page=True)
                 print(f"  {target.name}")
+                for part in parts(page, number, stem):
+                    print(f"  {part}")
 
             # The cards. Same refusal as the pages: a recipe whose element
             # is not on the page writes nothing and says so.
@@ -752,6 +874,7 @@ def main(shots: list[tuple[str, str, str]]) -> None:
                 print(f"  {target.name}")
 
             browser.close()
+            write_long_gallery()
     finally:
         proc.terminate()
 
