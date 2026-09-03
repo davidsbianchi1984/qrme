@@ -6,6 +6,49 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.1.4] - 2026-09-03
+
+### Fixed
+
+- **A screenshot was only the first screenful.** The console is a
+  fixed-height shell whose content column scrolls, so a full-page capture
+  measured one phone height whatever the screen actually held — Home was
+  losing nine hundred pixels including a whole card, and Identity,
+  Connections and Your circle were each losing ten screenfuls. The camera
+  unrolls the column before the shutter, so a capture is the whole screen;
+  screens taller than the glass are also sliced a phone height at a time
+  (163 slices), listed in a gallery section written from what is on disk.
+  The count guard learns that a slice is not a screen and holds the slices
+  to their own rule; the gallery-tables floor follows the new sections up.
+- **The camera's own profile had no face and no voice.** It wears the
+  founder's portrait and bound voice now, so a seat in a room, a chat
+  header and the front page show a face rather than initials, and the
+  chat is photographed without the "no spoken voice bound" notice.
+- **Screen 44 marked the wrong card** — the video-company picker rather
+  than the avatar studio it is named for.
+
+### Changed
+
+- **The drawings wear the photographs.** Forty-five hologram portraits in
+  the older drawings are the starters' own photographs now, matched by the
+  names printed beside them; the starter cards in the README are rebuilt
+  from the same set. Screens 194 (the vastscape) and 32 (moderation) are
+  redrawn in the console's design, with the starters' portraits filling
+  their circles.
+- **Screen 209** stands the founder's own rendered frame over the
+  console's rendering bar.
+- **The camera furnishes what it photographs**: a shelf of conversations
+  in the memory vault, a company founded and staffed three seats deep, a
+  shop opened with two offerings — so those screens are photographed with
+  rows on them rather than empty forms.
+
+### Documentation
+
+- **The agent, the profile, its connections and its permissions** gathered
+  into one README section: the four questions an examiner asks of a
+  synthetic profile, each on its own photographed screen, with a link to
+  the parts where a screen runs long.
+
 ## [3.1.3] - 2026-09-03
 
 ### Added
@@ -17928,7 +17971,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.3...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.4...HEAD
+[3.1.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.3...app-v3.1.4
 [3.1.3]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.2...app-v3.1.3
 [3.1.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.1...app-v3.1.2
 [3.1.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.0...app-v3.1.1

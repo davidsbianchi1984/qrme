@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v3.1.3** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v3.1.4** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -811,6 +811,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **3.1.4** | **A screenshot is the whole screen** — the console's content column is unrolled before the shutter, so a capture is no longer the first phone-height of its screen; 163 phone-height slices stand beside the whole pictures. The camera's profile wears the founder's face and voice; forty-five holograms in the older drawings become the starters' photographs; 194 and 32 are redrawn; the memory vault, the company and the shop are furnished before they are photographed; and the README gathers the agent, the profile, its connections and its permissions |
 | **3.1.3** | **The AI badge is the outermost layer, and a download is burned** — the badge on rendered footage rides over the player and the full-screen takeover, the player's own full-screen and download are off, and `GET /media/{id}/download` burns the badge into the pixels of synthetic media (never into an authentic upload; refused where footage cannot be burned); the starter collection stands in the README as the console draws it; every highlight names its problem, implementation, numbers and test |
 | **3.1.2** | **The edge dock, and the whole starter pack as friends** — the help box and the agent lights are tabs on the right edge, the lights a stoplight opening to the round watch face that names which agent is working, waiting or stopped; the stack moved up or down by its grip (screen 211); the footsteps count is gone, since everyone with an account shows in Discover; every profile gets the starter collection as standing friends after the founder pins; the onboarding card fits a phone, the avatar stage says "no avatar yet" instead of blowing up the empty frame, seat names wrap; six drawings replaced by captures, and the mechanisms on file set out for examination |
 | **3.1.1** | **No functional changes to QRME — cut with the siblings.** JIM-mini's image gained what its box runs; the three products keep one number. |
