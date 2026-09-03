@@ -121,4 +121,4 @@ def test_the_deploy_page_runs_the_installer_before_every_up():
     install = next(i for i, ln in enumerate(lines) if "jim-box-install.sh" in ln)
     up = next(i for i, ln in enumerate(lines) if "up -d --build" in ln)
     assert install < up, "the installer runs after the up; a container named for a profile the kernel does not hold will not start"
-    assert "### The assistant's box (3.0.7)" in text
+    assert "### The assistant's box (3.1.0)" in text

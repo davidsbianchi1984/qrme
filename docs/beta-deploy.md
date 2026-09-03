@@ -326,7 +326,7 @@ sidecar then reports `pointed: true` on its own; the other houses answer
 the phone you used as the emergency contact within a day of the test
 reach-out, and hear where things stand.
 
-### The assistant's box (3.0.7)
+### The assistant's box (3.1.0)
 
 JIM's coding assistant tries a drafted edit inside four kernel-held walls
 before oversight reads it (`jim/workroom.py` in the JIM-mini repository),

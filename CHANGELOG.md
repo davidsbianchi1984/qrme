@@ -6,7 +6,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [3.0.7] - 2026-09-03
+## [3.1.0] - 2026-09-03
+
+### Changed
+
+- **One number across the three.** QRME, JIM-mini and PDI are cut
+  together at 3.1.0, so a box carrying the three products carries one
+  version.
 
 ### Added
 
@@ -17822,8 +17828,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.7...HEAD
-[3.0.7]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.6...app-v3.0.7
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.0...HEAD
+[3.1.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.6...app-v3.1.0
 [3.0.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.5...app-v3.0.6
 [3.0.5]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.4...app-v3.0.5
 [3.0.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.3...app-v3.0.4
