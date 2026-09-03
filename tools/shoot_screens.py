@@ -274,7 +274,7 @@ ACCOUNT_ONLY = "account-only"
 #: exists on the screen being asked for and nowhere on the way to it, so a
 #: recipe that lands somewhere else writes nothing and says so — a wrong
 #: screen filed under a right number is worse than a gap.
-INSIDE: tuple[tuple[str, str, str, tuple[str, ...], str], ...] = (
+INSIDE: tuple[tuple[str, str, str, tuple, str], ...] = (
     ("39", "sign-in", SIGNED_OUT, (), ".tabs .tab.active"),
     ("41", "log-in", SIGNED_OUT, (".tabs .tab:nth-child(2)",),
      ".tabs .tab:nth-child(2).active"),
@@ -288,8 +288,12 @@ INSIDE: tuple[tuple[str, str, str, tuple[str, ...], str], ...] = (
     # not yet made, and the form that makes one.
     ("02", "create-profile", ACCOUNT_ONLY, ("text=Or make another one",),
      "input[type=date]"),
-    # The chat with a conversation in it — see `converse`.
-    ("83", "chat", "chat", (), ".bubble"),
+    # The chat with a conversation in it: a question typed and sent the
+    # way a person sends one, so the screen holds the exchange it drew.
+    ("83", "chat", "chat",
+     (('input[placeholder="Type a message…"]',
+       "What do you actually remember about me, and where is it kept?"),
+      ".chat-send"), ".bubble"),
     # A friend's face on Home is the door to their homepage.
     ("197", "their-homepage", "home", ('[data-go="visit"]',),
      '[data-screen="197"]'),
@@ -338,11 +342,19 @@ def open_inside(page, session, start, presses, proof) -> bool:
         tuck_the_widgets(page)
     page.wait_for_timeout(900)
     for press in presses:
-        target = page.query_selector(press)
+        # A press is a selector to click, or a (selector, text) pair to
+        # type into — the chat is photographed with a conversation in it
+        # by typing one the way a person does, because the screen keeps
+        # its messages in memory and draws nothing it did not see sent.
+        selector, text = press if isinstance(press, tuple) else (press, None)
+        target = page.query_selector(selector)
         if target is None:
-            print(f"  ? nothing matched {press}")
+            print(f"  ? nothing matched {selector}")
             return False
-        target.evaluate("el => el.click()")
+        if text is None:
+            target.evaluate("el => el.click()")
+        else:
+            target.fill(text)
         page.wait_for_timeout(900)
     return page.query_selector(proof) is not None
 

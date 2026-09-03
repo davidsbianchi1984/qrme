@@ -228,7 +228,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 <tr>
 <td align="center" width="25%"><a href="screens/81-lend-a-microphone.svg"><img src="screens/81-lend-a-microphone.svg" width="210" alt="Lend a Microphone"></a><br><sub><b>81</b> · Lend a Microphone</sub></td>
 <td align="center" width="25%"><a href="screens/82-agents.svg"><img src="screens/82-agents.svg" width="210" alt="Agents"></a><br><sub><b>82</b> · Agents</sub></td>
-<td align="center" width="25%"><a href="screens/83-chat.svg"><img src="screens/83-chat.svg" width="210" alt="Chat with the agent overlay"></a><br><sub><b>83</b> · Chat · overlay</sub></td>
+<td align="center" width="25%"><a href="screens/83-chat.png"><img src="screens/83-chat.png" width="210" alt="Chat with the agent overlay"></a><br><sub><b>83</b> · Chat · overlay</sub></td>
 <td align="center" width="25%"><a href="screens/84-friends.png"><img src="screens/84-friends.png" width="210" alt="Friends"></a><br><sub><b>84</b> · Friends</sub></td>
 </tr>
 <tr>

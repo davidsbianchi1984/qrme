@@ -320,7 +320,7 @@ and the full tour is in [docs/gallery.md](docs/gallery.md).
 
 <table>
   <tr>
-    <td align="center" width="25%"><a href="docs/screens/83-chat.svg"><img src="docs/screens/83-chat.svg" width="165" alt="Chat"></a><br><sub><b>83</b> · Chat<br>type or talk; it hears, answers and remembers</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/83-chat.png"><img src="docs/screens/83-chat.png" width="165" alt="Chat"></a><br><sub><b>83</b> · Chat<br>type or talk; it hears, answers and remembers — photographed with the offline stub answering, and the reply rendering as footage</sub></td>
     <td align="center" width="25%"><a href="docs/screens/198-beside-the-face.png"><img src="docs/screens/198-beside-the-face.png" width="165" alt="The talk face"></a><br><sub><b>198</b> · The talk face<br>hands-free voice, with the four panels beside it</sub></td>
     <td align="center" width="25%"><a href="docs/screens/175-inside.png"><img src="docs/screens/175-inside.png" width="165" alt="Inside a room"></a><br><sub><b>175</b> · Inside a room<br>you and up to eight, files and links read aloud</sub></td>
     <td align="center" width="25%"><a href="docs/screens/200-agent.png"><img src="docs/screens/200-agent.png" width="165" alt="Agent"></a><br><sub><b>200</b> · Agent<br>builds your page and widgets on your word</sub></td>

@@ -2834,7 +2834,7 @@ The same three colours, on all three sizes of glass:
   <tr>
     <td align="center" width="18%" valign="bottom"><a href="watch/01-agents.svg"><img src="watch/01-agents.svg" width="150" alt="Watch — agent lights, counts only"></a><br><sub><b>watch</b> · three lights, three counts, no names</sub></td>
     <td align="center" width="26%" valign="bottom"><a href="screens/82-agents.svg"><img src="screens/82-agents.svg" width="200" alt="Mobile — agent groups"></a><br><sub><b>mobile 82</b> · one tappable group per light</sub></td>
-    <td align="center" width="26%" valign="bottom"><a href="screens/83-chat.svg"><img src="screens/83-chat.svg" width="200" alt="Mobile — the overlay follows you"></a><br><sub><b>mobile 83</b> · the overlay, mid-conversation</sub></td>
+    <td align="center" width="26%" valign="bottom"><a href="screens/83-chat.png"><img src="screens/83-chat.png" width="200" alt="Mobile — the overlay follows you"></a><br><sub><b>mobile 83</b> · the overlay, mid-conversation</sub></td>
     <td align="center" width="30%" valign="bottom"><a href="desktop/01-home.svg"><img src="desktop/01-home.svg" width="300" alt="Desktop — the overlay on every view"></a><br><sub><b>desktop 01</b> · bottom-right, on every view</sub></td>
   </tr>
 </table>
