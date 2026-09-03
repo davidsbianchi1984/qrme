@@ -1067,8 +1067,11 @@ RATCHETS: tuple[Ratchet, ...] = (
             "the siblings the thinnest autonomous root imports"),
     Ratchet("ratchet.files", 20, _ratchet_files,
             "the ratchet records this suite keeps"),
-    Ratchet("gallery.tables", 15, _gallery_tables,
-            "the gallery tables the README carries"),
+    Ratchet("gallery.tables", 24, _gallery_tables,
+            "the gallery tables the README carries. It was fifteen until "
+            "the round that photographs a screen whole: a screen taller "
+            "than the glass is also sliced a phone height at a time, and "
+            "each long screen's slices are a table of their own"),
     Ratchet("route.verbs_min", 4, _verbs_min,
             "the distinct verbs the thinnest-reading shell reports"),
     Ratchet("readme.files", 7, _readme_files,
