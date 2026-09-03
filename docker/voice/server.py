@@ -485,8 +485,8 @@ def standing(request: Request, force: str = "", provider: str = "") -> dict:
     # the same shape as a leg's, because a number has no call id yet.
     if cfg.public_url and cfg.secret:
         sig = _sig(cfg.secret, "inbound")
-        voice_url = f"{cfg.public_url}/{house}/inbound?sig={sig}"
-        status_url = f"{cfg.public_url}/{house}/inbound/status?sig={sig}"
+        voice_url = f"{cfg.public_url}/{cfg.provider}/inbound?sig={sig}"
+        status_url = f"{cfg.public_url}/{cfg.provider}/inbound/status?sig={sig}"
         pointed = None
         if word == "ready":
             pointed = _probe(f"pointed:{voice_url}",

@@ -1493,8 +1493,16 @@ def test_standing_with_a_house_that_answers_is_ready(voice, door, monkeypatch):
     assert probe.body["event"] in voice.houses.TERMINAL
     [ping] = house.sent("/ping")
     assert ping.url == f"{PUB}/ping" and ping.timeout == 3.0
-    [auth] = house.sent("/Accounts/")
+    [auth] = [x for x in house.sent("/Accounts/")
+              if "IncomingPhoneNumbers" not in x.url]
     assert auth.timeout == 3.0 and auth.headers["Authorization"]
+    # The number's doors, and — asked of the house, which here has no
+    # number on record — whether it is pointed there: cannot say.
+    inbound = body["inbound"]
+    sig = voice._sig(SECRET, "inbound")
+    assert inbound == {"voice_url": f"{PUB}/twilio/inbound?sig={sig}",
+                       "status_url": f"{PUB}/twilio/inbound/status?sig={sig}",
+                       "pointed": None}
 
 
 def test_standing_needs_the_bearer(voice, door, monkeypatch):
@@ -1623,12 +1631,16 @@ def test_two_reads_within_a_minute_make_one_house_call(voice, door,
     first = door.get("/standing", headers=bearer()).json()
     second = door.get("/standing", headers=bearer()).json()
     assert first["word"] == second["word"] == "ready"
-    assert len(house.sent("/Accounts/")) == 1
+    account = lambda: [x for x in house.sent("/Accounts/")
+                       if "IncomingPhoneNumbers" not in x.url]
+    assert len(account()) == 1
     assert len(house.sent("/ping")) == 1
+    assert len(house.sent("IncomingPhoneNumbers")) == 1   # the pointing question, once
     assert len(jim.calls) == 1
     forced = door.get("/standing?force=1", headers=bearer()).json()
     assert forced["word"] == "ready"
-    assert len(house.sent("/Accounts/")) == 2
+    assert len(account()) == 2
+    assert len(house.sent("IncomingPhoneNumbers")) == 2
     assert len(jim.calls) == 2
 
 
@@ -1705,3 +1717,127 @@ def test_the_vendor_doors_do_their_blocking_work_off_the_event_loop(voice):
         assert not asyncio.iscoroutinefunction(worker)
         src = inspect.getsource(door_fn)
         assert "run_in_threadpool" in src and "_ask(" not in src
+
+
+# --------------------------------------------------------------------------- #
+# 9. the line answers (3.0.6)
+# --------------------------------------------------------------------------- #
+
+LINE_BACK = {"say": "This is JIM for Ada. Rosa, you are calling back about a "
+                    "fall with no answer. I will tell you where things stand, "
+                    "and you can ask me anything.",
+             "then": "speak_first", "language": "en", "again": None,
+             "close": None, "trouble": TROUBLE}
+LINE_STRANGER = {"say": "This is a guardian line that cannot take calls. If "
+                        "this is an emergency, please call your local "
+                        "emergency number. Goodbye.",
+                 "then": "hangup", "language": "en", "again": None,
+                 "close": None, "trouble": TROUBLE}
+
+
+def inbound_post(door, voice, params, *, tail="", sig=None, token=TOKEN):
+    """A webhook on the number itself — no call id yet, so the capability
+    is over the word "inbound"."""
+    sig = sig if sig is not None else voice._sig(SECRET, "inbound")
+    path = f"/twilio/inbound{tail}"
+    signed_url = f"{PUB}{path}?sig={sig}"
+    hdrs = {"Content-Type": "application/x-www-form-urlencoded",
+            "X-Twilio-Signature": sign_twilio(signed_url, params, token)}
+    return door.post(f"/voice{path}?sig={sig}",
+                     content=urllib.parse.urlencode(params), headers=hdrs)
+
+
+RING_BACK = {"CallSid": "CAin1", "CallStatus": "ringing",
+             "From": "+15551110000", "To": "+15550009999"}
+
+
+def test_a_contact_calling_back_is_handed_to_jim_and_the_line_speaks_first(voice, door, monkeypatch):
+    jim = FakeJim(inbound=lambda body: (200, {"matched": True, "call": {"id": CALL},
+                                             "reachout_id": "rch_1",
+                                             "line": LINE_BACK}))
+    monkeypatch.setattr(voice, "_jim", jim)
+    got = inbound_post(door, voice, RING_BACK)
+    root = twiml(got)
+    [asked] = jim.calls
+    assert asked.method == "POST" and asked.path == "/reachout/line/inbound"
+    assert asked.body == {"caller": "+15551110000", "called": "+15550009999",
+                          "house": "twilio", "vendor_ref": "CAin1"}
+    assert asked.bearer == f"Bearer {SECRET}"
+    assert root.find("Say").text == LINE_BACK["say"]
+    redirect = root.find("Redirect").text
+    # From here the leg's own doors carry the conversation, under its call id.
+    assert f"/twilio/{CALL}/speech?" in redirect and "first=1" in redirect
+    assert f"sig={voice._sig(SECRET, CALL)}" in redirect
+    assert root.find("Hangup") is None
+
+
+def test_a_stranger_hears_the_one_sentence_and_the_line_ends(voice, door, monkeypatch):
+    jim = FakeJim(inbound=lambda body: (200, {"matched": False, "call": None,
+                                             "line": LINE_STRANGER}))
+    monkeypatch.setattr(voice, "_jim", jim)
+    root = twiml(inbound_post(door, voice, {**RING_BACK, "From": "+15559990000"}))
+    assert root.find("Say").text == LINE_STRANGER["say"]
+    assert root.find("Hangup") is not None and root.find("Redirect") is None
+
+
+def test_with_jim_unreachable_the_line_just_ends(voice, door, monkeypatch):
+    jim = FakeJim(inbound=lambda body: (0, {}))
+    monkeypatch.setattr(voice, "_jim", jim)
+    root = twiml(inbound_post(door, voice, RING_BACK))
+    assert root.find("Say") is None and root.find("Hangup") is not None
+
+
+def test_the_inbound_door_takes_both_locks(voice, door, monkeypatch):
+    jim = FakeJim(inbound=lambda body: (200, {"matched": False, "call": None,
+                                             "line": LINE_STRANGER}))
+    monkeypatch.setattr(voice, "_jim", jim)
+    # A leg's capability is not the number's.
+    wrong = inbound_post(door, voice, RING_BACK, sig=voice._sig(SECRET, CALL))
+    assert wrong.status_code == 403 and wrong.content == b""
+    forged = inbound_post(door, voice, RING_BACK, token="not-the-token")
+    assert forged.status_code == 403 and forged.content == b""
+    assert jim.calls == []
+
+
+def test_the_numbers_status_callback_finds_the_leg_by_the_houses_reference(voice, door, monkeypatch):
+    jim = FakeJim(status=lambda body: (200, {"decided": "reached"}))
+    monkeypatch.setattr(voice, "_jim", jim)
+    got = inbound_post(door, voice, {"CallSid": "CAin1", "CallStatus": "completed",
+                                     "CallDuration": "30", "From": "+15551110000",
+                                     "To": "+15550009999"}, tail="/status")
+    assert got.status_code == 204
+    [asked] = jim.calls
+    assert asked.path == "/reachout/line/inbound/status"
+    assert asked.body == {"house": "twilio", "vendor_ref": "CAin1",
+                          "event": "completed", "seconds": 30,
+                          "detail": "CallStatus=completed"}
+    # A word JIM did not hear is a 502, so the house retries into an idempotent door.
+    jim = FakeJim(status=lambda body: (0, {}))
+    monkeypatch.setattr(voice, "_jim", jim)
+    got = inbound_post(door, voice, {"CallSid": "CAin2", "CallStatus": "completed"},
+                       tail="/status")
+    assert got.status_code == 502
+    # A ringing is not the end of anything.
+    jim = FakeJim()
+    monkeypatch.setattr(voice, "_jim", jim)
+    got = inbound_post(door, voice, {"CallSid": "CAin3", "CallStatus": "ringing"},
+                       tail="/status")
+    assert got.status_code == 204 and jim.calls == []
+
+
+def test_standing_asks_the_house_whether_the_number_is_pointed_here(voice, door, monkeypatch):
+    sig = voice._sig(SECRET, "inbound")
+    voice_url = f"{PUB}/twilio/inbound?sig={sig}"
+    for pointed_at, want in ((voice_url, True), ("https://elsewhere.test/answer", False)):
+        house = _ready_house()
+        house.script = {"IncomingPhoneNumbers": (200, {"incoming_phone_numbers": [
+                            {"phone_number": ENV["VOICE_FROM"], "voice_url": pointed_at}]}),
+                        **house.script}
+        monkeypatch.setattr(voice, "_house_http", house)
+        monkeypatch.setattr(voice, "_jim", FakeJim())
+        voice._PROBES.clear()
+        body = door.get("/standing", headers=bearer()).json()
+        assert body["word"] == "ready", body
+        assert body["inbound"]["pointed"] is want, pointed_at
+        [asked] = house.sent("IncomingPhoneNumbers")
+        assert "PhoneNumber=" in asked.url and asked.headers["Authorization"]

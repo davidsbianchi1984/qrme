@@ -308,6 +308,24 @@ for the reason the Windows lines in § 7 are written out: an elided command is
 a described command, and the part an ellipsis swallows here is the flag
 without which it does not run.
 
+### The line answers (3.0.6)
+
+A contact JIM rang who rings the number back reaches the conversation
+about that reach-out; anyone else hears one fixed sentence. For that, the
+number at the house must be pointed at the sidecar's two inbound doors. Ask
+the sidecar where:
+
+```bash
+docker compose -f docker/beta-compose.yml --env-file .env exec voice python -c "import json,urllib.request,os; r=urllib.request.Request('http://127.0.0.1:8800/standing', headers={'Authorization': 'Bearer '+os.environ['VOICE_SECRET']}); print(json.dumps(json.load(urllib.request.urlopen(r)).get('inbound'), indent=2))"
+```
+
+Paste `voice_url` into the number's **voice webhook** (POST) and
+`status_url` into its **status callback** at the house. For Twilio the
+sidecar then reports `pointed: true` on its own; the other houses answer
+`null`, and the proof is the runbook's call back: ring your own number from
+the phone you used as the emergency contact within a day of the test
+reach-out, and hear where things stand.
+
 ## 5. Check it from somewhere else
 
 From your own machine, not the host — that is the path a tester takes.

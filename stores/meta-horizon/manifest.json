@@ -1,8 +1,8 @@
 {
   "packageId": "com.qrme.studio",
   "name": "QRME Studios",
-  "versionName": "3.0.5",
-  "versionCode": 3000005,
+  "versionName": "3.0.6",
+  "versionCode": 3000006,
   "startUrl": "https://sntheticprofiles.com/",
   "webManifestUrl": "https://sntheticprofiles.com/manifest.webmanifest",
   "display": "standalone",

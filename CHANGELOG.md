@@ -6,6 +6,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.0.6] - 2026-09-03
+
+### Added
+
+- **The voice door answers.** Two doors under the static inbound
+  capability — `POST /voice/{house}/inbound` for the number's voice
+  webhook and `/inbound/status` for its status callback — both behind
+  the house's signature as every leg is. A call that comes in is handed
+  to JIM (`/reachout/line/inbound`) with who is calling and which number
+  they rang; JIM's line comes back and, when JIM matched the caller to a
+  reach-out, the leg's own doors carry the conversation from there. The
+  status callback finds the leg by the house's reference. Every house's
+  parse now carries the caller. `GET /standing` reports the two URLs to
+  point the number at and, for Twilio — which can be asked — whether the
+  number is pointed there; the other houses answer null. The deploy page
+  says where to paste them and how to prove it with a call back.
+
 ## [3.0.5] - 2026-09-03
 
 ### Added
@@ -17784,7 +17801,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.5...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.6...HEAD
+[3.0.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.5...app-v3.0.6
 [3.0.5]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.4...app-v3.0.5
 [3.0.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.3...app-v3.0.4
 [3.0.3]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.2...app-v3.0.3
