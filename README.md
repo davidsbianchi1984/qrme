@@ -262,13 +262,31 @@ published end date is worse than a shelf one row shorter.
 
 ### Real output
 
-Two scenes this platform rendered, each of a profile that already had a
-face here. Frames from the footage, not stills posed for the page.
+Video generation, photographed in the running console rather than posed
+for the page. Every turn a profile speaks can be rendered into footage by
+the video model on the account's regional loadout — Seedance here, named
+on the room's own badge. The pipeline is the product's: the scene
+direction is derived from the reply and printed under the frame in the
+words the model was given; the person redirects the scene in their own
+words and the next render takes the redirection; the render's state is
+carried on the card exactly as the room sees it — the seat marked
+*rendering* while the model works, the frame marked *now playing* when
+the footage lands, the reply's length in words and seconds beside it. The
+film pane opens the same footage full screen with the same direction line
+and the same control. What is rendered is the profile that already has a
+face on this platform, in a place the reply put it, and nobody pressed
+play: the footage is the reply.
 
 <table>
   <tr>
-    <td align="center" width="50%"><img src="docs/scenes/dr_amara_osei.jpg" alt="Dr Amara Osei, rendered"><br><sub><b>Dr. Amara Osei</b> · healthcare<br>the starter portrait, rendered into a place</sub></td>
-    <td align="center" width="50%"><img src="docs/scenes/david_bianchi_ai.jpg" alt="David Bianchi, rendered"><br><sub><b>David Bianchi</b> · the founder's own persona<br>same face, a different room</sub></td>
+    <td align="center" width="33%"><a href="docs/scenes/room-consultation-desk.jpg"><img src="docs/scenes/room-consultation-desk.jpg" alt="The consultation room at desk width, the reply rendered as footage"></a><br><sub><b>The consultation room</b> · desk<br>three present, the physician's reply rendered into a ward; the seat marked rendering, the frame now playing</sub></td>
+    <td align="center" width="33%"><a href="docs/scenes/room-consultation-phone.jpg"><img src="docs/scenes/room-consultation-phone.jpg" alt="The consultation room on a phone, the reply rendered as footage"></a><br><sub><b>The consultation room</b> · phone<br>the same turn at phone width: 62 words, 25 seconds, the direction line under the frame</sub></td>
+    <td align="center" width="33%"><a href="docs/scenes/room-rehearsal-phone.jpg"><img src="docs/scenes/room-rehearsal-phone.jpg" alt="The rehearsal room on a phone, the founder's reply rendered as footage"></a><br><sub><b>The rehearsal room</b> · phone<br>the founder's own persona rendered into a garden; the redirection typed, not yet sent</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/scenes/room-consultation-tall.jpg"><img src="docs/scenes/room-consultation-tall.jpg" alt="The consultation room, the founder's seat rendering while a colleague answers"></a><br><sub><b>The consultation room</b> · a second turn<br>one seat rendering while another profile answers in text — the two roads at once</sub></td>
+    <td align="center" width="33%"><a href="docs/scenes/film-pane-osei.jpg"><img src="docs/scenes/film-pane-osei.jpg" alt="The film pane, Dr Amara Osei's footage full screen"></a><br><sub><b>The film pane</b> · Dr. Amara Osei<br>the footage full screen, the direction line and the redirection control with it</sub></td>
+    <td align="center" width="33%"><a href="docs/scenes/film-pane-bianchi.jpg"><img src="docs/scenes/film-pane-bianchi.jpg" alt="The film pane, David Bianchi's footage full screen"></a><br><sub><b>The film pane</b> · David Bianchi<br>the same face, a different room, from the same pipeline</sub></td>
   </tr>
 </table>
 
