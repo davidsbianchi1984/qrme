@@ -262,20 +262,22 @@ published end date is worse than a shelf one row shorter.
 
 ### Real output
 
-Video generation, photographed in the running console rather than posed
-for the page. Every turn a profile speaks can be rendered into footage by
-the video model on the account's regional loadout — Seedance here, named
-on the room's own badge. The pipeline is the product's: the scene
-direction is derived from the reply and printed under the frame in the
-words the model was given; the person redirects the scene in their own
-words and the next render takes the redirection; the render's state is
-carried on the card exactly as the room sees it — the seat marked
-*rendering* while the model works, the frame marked *now playing* when
-the footage lands, the reply's length in words and seconds beside it. The
-film pane opens the same footage full screen with the same direction line
-and the same control. What is rendered is the profile that already has a
-face on this platform, in a place the reply put it, and nobody pressed
-play: the footage is the reply.
+Footage this platform rendered, shown in the room the console draws
+around a rendered turn. The frames are the video model's own output for
+two profiles that already had a face here — Seedance, on the account's
+regional loadout, named on the badge — and nothing in them is posed: the
+scene direction printed under each frame is what the model was given, the
+profile is the one the platform holds, the place is where the reply put
+it. The room around the frame is the console's design for the
+*reply-as-footage* card, composed here at desk and phone widths so the
+whole mechanism reads in one picture: the seat marked *rendering* while
+the model works, the frame marked *now playing* when the footage lands,
+the reply's length in words and seconds, the person's redirection typed
+in their own words and taken by the next render, and the film pane that
+opens the same footage full screen with the same direction line. The
+card as the running console draws it is screen 209 below; the pipeline
+behind it is `qrme/filming.py`, and the sidecar that
+runs the model is `docker/film`.
 
 <table>
   <tr>
