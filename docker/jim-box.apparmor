@@ -42,7 +42,7 @@ profile jim-box flags=(attach_disconnected,mediate_deleted) {
   # crun may send signals to container processes (for "docker stop" when used with crun OCI runtime).
   signal (receive) peer=crun,
   # Container processes may send signals amongst themselves.
-  signal (send,receive) peer=jim-box,
+  signal (send,receive) peer="jim-box",
 
   # The assistant's box: the user namespace, and the mounts inside it.
   userns,
@@ -67,5 +67,5 @@ profile jim-box flags=(attach_disconnected,mediate_deleted) {
 
   # allow processes within the container to trace each other,
   # provided all other LSM and yama setting allow it.
-  ptrace (trace,tracedby,read,readby) peer=jim-box,
+  ptrace (trace,tracedby,read,readby) peer="jim-box",
 }

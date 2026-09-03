@@ -91,8 +91,8 @@ def test_the_apparmor_profile_is_dockers_default_plus_the_box_and_nothing_more()
     for kept in ("deny @{PROC}/sysrq-trigger rwklx,", "deny @{PROC}/kcore rwklx,",
                  "deny /sys/firmware/** rwklx,", "deny /sys/kernel/security/** rwklx,",
                  "deny network alg,", "deny network vsock,",
-                 "ptrace (trace,tracedby,read,readby) peer=jim-box,",
-                 "signal (send,receive) peer=jim-box,"):
+                 "ptrace (trace,tracedby,read,readby) peer=\"jim-box\",",
+                 "signal (send,receive) peer=\"jim-box\","):
         assert kept in text, kept
     # The profile confines this container and no other name.
     assert "docker-default" not in text
