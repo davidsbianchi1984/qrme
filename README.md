@@ -617,7 +617,7 @@ vocabulary at all, which a test greps the source to prove.
 ## The console, driven
 
 Every picture below was photographed while `tools/walkthrough.py` drove
-the 3.0.0 release gate: a live backend, a profile born during the run,
+the 3.0.6 release gate: a live backend, a profile born during the run,
 and whatever the drive put on screen still on it. Nothing here is
 staged — the chat shows the answer the profile actually gave, the room
 holds the message the harness actually spoke, and the company on the
