@@ -73,6 +73,10 @@ OWN_DOOR = {
     "watermark_design": ("qrme/watermark.py", r"SET watermark_design="),
     "unlisted": ("qrme/friends.py", r"SET unlisted="),
     "demographics": ("qrme/routers/steering.py", r"SET demographics="),
+    # The hash of the token that opens the profile's inbound mail address
+    # — minted (and rotated) by its own door, never typed: the token is
+    # shown once and the column holds only its hash.
+    "mail_inbound_token": ("qrme/mailbox.py", r"SET mail_inbound_token="),
 }
 
 

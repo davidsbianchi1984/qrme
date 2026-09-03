@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS profiles (
     purpose           TEXT,                   -- legacy_memorial | family | creator_persona
                                               -- | social_fan | companion_coach | enterprise_agent
     maturity          TEXT NOT NULL DEFAULT 'balanced',  -- strict | balanced | open
+    mail_inbound_token TEXT,                 -- sha256 of the inbound-mail token
     cloud_contribution INTEGER NOT NULL DEFAULT 0,  -- opt-in: share rated,
                                                     -- anonymized exchanges to
                                                     -- improve the cloud model
@@ -3256,6 +3257,9 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # every account made before there was a menu per region; it stands on
     # the default until its holder says otherwise on Settings.
     ("accounts", "region", "TEXT"),
+    # The hash of the token that opens a profile's inbound mail address
+    # (qrme/mailbox.py). NULL is a mailbox with no webhook minted.
+    ("profiles", "mail_inbound_token", "TEXT"),
 )
 
 

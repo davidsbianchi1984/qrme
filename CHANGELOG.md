@@ -6,6 +6,38 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.0.4] - 2026-09-03
+
+### Added
+
+- **The inbound wire: mail arrives in a profile's mailbox on its own.**
+  3.0.3 built the mailbox and said, honestly, that inbound was the
+  wiring step. This is the wire, in two shapes, and the posture that says
+  which is connected (`qrme/mailbox.py`):
+  * **the inbound address** — `POST /mail/inbound/{profile_id}`, a
+    per-profile webhook any mail provider's inbound-parse can post to,
+    opened by a token the owner mints through
+    `POST /profiles/{id}/mail/inbound-token` (shown once, hashed at rest,
+    rotated by minting again) and reading the field names SendGrid,
+    Mailgun, Postmark and a plain JSON post all use. Multipart and
+    urlencoded forms are read with the standard library — a multipart
+    body is MIME, and the mail parser already here reads it — so the
+    image carries no new dependency. Not a client call: recorded in
+    `clientpaths.NOT_A_CLIENT_CALL` beside the OAuth callbacks.
+  * **the poll** — `POST /profiles/{id}/mail/poll` reads the attached
+    Gmail, Outlook or Mail connector over IMAP with the credential it was
+    authorized with, sealed in the vault, and lets the profile work what
+    arrived. Each connector reports what happened to it — fetched,
+    answered, held, or why it was skipped (not signed in; no vault to
+    read the credential from; the inbox unreachable, named) — rather than
+    the poll failing as a whole. Offline mode keeps it home. The
+    deployment's own poller rounds every pollable profile on
+    `QRME_MAIL_POLL_MINUTES`; blank is off, the default and the suite's
+    posture.
+  Either way the message lands through `receive`, so the profile works
+  it exactly as one handed in. The corner shows the address, mints the
+  token, and reads the inbox on a press, with the poll's report beside it.
+
 ## [3.0.3] - 2026-09-02
 
 ### Added
@@ -17711,7 +17743,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.3...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.4...HEAD
+[3.0.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.3...app-v3.0.4
 [3.0.3]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.2...app-v3.0.3
 [3.0.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.1...app-v3.0.2
 [3.0.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.0...app-v3.0.1

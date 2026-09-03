@@ -626,6 +626,12 @@ NOT_A_CLIENT_CALL = (
     # a scope is requested, so its half of the door arrives as a POST with
     # the code in a urlencoded body.
     "/auth/oauth/{provider}/callback",
+    # A profile's inbound mail address (qrme/mailbox.py). A mail provider's
+    # inbound-parse webhook posts here, opened by a token the owner minted;
+    # no client of this product constructs it — the console shows the
+    # address so the owner can paste it into the provider, the same shape as
+    # the far end's acknowledgment in JIM-mini.
+    "/mail/inbound/{profile_id}",
 )
 
 

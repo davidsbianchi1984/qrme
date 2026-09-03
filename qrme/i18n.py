@@ -3192,6 +3192,17 @@ _PUBLIC.update(_PRIVILEGE_SENTENCES)
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    "that inbound token does not open this profile's mailbox": {
+        'es': 'ese token de entrada no abre el buzón de este perfil',
+        'fr': "ce jeton entrant n'ouvre pas la boîte aux lettres de ce profil",
+        'de': 'dieses Eingangs-Token öffnet das Postfach dieses Profils nicht',
+        'pt': 'esse token de entrada não abre a caixa de correio deste perfil',
+        'it': 'quel token in entrata non apre la casella di posta di questo profilo',
+        'ja': 'その受信トークンではこのプロフィールのメールボックスは開けません',
+        'zh': '该入站令牌无法打开此形象的邮箱',
+        'hi': 'वह इनबाउंड टोकन इस प्रोफ़ाइल का मेलबॉक्स नहीं खोलता',
+        'ar': 'رمز الوارد هذا لا يفتح صندوق بريد هذا الملف',
+    },
     # The moderated mailbox (qrme/mailbox.py) and the region menu
     # (qrme/loadouts.py) — 3.0.3.
     'that is not a region this product offers a menu for': {

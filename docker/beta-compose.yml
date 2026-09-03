@@ -233,6 +233,8 @@ services:
       QRME_FILM_PROVIDER: ${QRME_FILM_PROVIDER:-}
       # The region menu's one lever (qrme/loadouts.py): blank is `all`.
       QRME_MODEL_POLICY: ${QRME_MODEL_POLICY:-}
+      # The mail poller's interval (qrme/mailbox.py): blank is off.
+      QRME_MAIL_POLL_MINUTES: ${QRME_MAIL_POLL_MINUTES:-}
       QRME_FILM_URL: ${QRME_FILM_URL:-http://film:8700}
       # Present so `filming.keyed()` is true — the real credential is the
       # adapter's FAL_KEY and never enters this container.

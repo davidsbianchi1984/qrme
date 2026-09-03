@@ -1291,6 +1291,15 @@ export interface MailPosture {
                  authorized: boolean }[];
   inbox_attached: boolean; outbound_transport: string; outbound_ready: boolean;
   inbound_ready: boolean; moderated: boolean; note: string;
+  // The inbound wire: the profile's own address a provider posts to, and
+  // whether an attached connector can be polled.
+  inbound: { webhook_url: string; webhook_set: boolean; pollable: boolean;
+             poll_minutes: number };
+}
+export interface MailPollReport {
+  profile_id: string; fetched: number; answered: number; held: number;
+  connectors: { id: string; app: string; fetched: number; answered: number;
+                held: number; skipped: string | null }[];
 }
 export interface MailDeskProfile {
   profile_id: string; display_name: string; via: string; held: number;
@@ -5258,6 +5267,16 @@ export const api = {
   mailDraft: (profileId: string, messageId: string, token: string) =>
     req<{ thread_id: string; draft: MailMessage }>(
       `/profiles/${profileId}/mail/${messageId}/draft`, { method: "POST", body: {}, token }),
+  /** Mint (or rotate) the token that opens this profile's inbound mail
+   *  address. Shown once — the server keeps only its hash. */
+  mailInboundToken: (profileId: string, token: string) =>
+    req<{ profile_id: string; token: string; shown_once: boolean; url: string }>(
+      `/profiles/${profileId}/mail/inbound-token`, { method: "POST", body: {}, token }),
+  /** Read the attached inbox connectors now, over IMAP, and let the
+   *  profile work what arrived. Each connector says what happened to it. */
+  mailPoll: (profileId: string, token: string) =>
+    req<MailPollReport>(`/profiles/${profileId}/mail/poll`,
+                        { method: "POST", body: {}, token }),
   /** The owner's decision on a held draft. */
   mailModerate: (profileId: string, draftId: string,
                  body: { action: "approve" | "edit" | "discard"; edited?: string },

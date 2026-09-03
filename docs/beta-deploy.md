@@ -122,6 +122,13 @@ QRME_FILM_KEY=
 # `all`, the beta posture.
 QRME_MODEL_POLICY=
 
+# --- optional: the mail poller ------------------------------------------
+# Every profile with a signed-in Gmail, Outlook or Mail connector has its
+# inbox read over IMAP on this interval, and works what arrived. Blank
+# is off: mail then arrives through each profile's inbound address (a
+# webhook a provider posts to) or on a press from the corner.
+QRME_MAIL_POLL_MINUTES=
+
 # --- optional: somewhere else to point the hands ------------------------
 # The hands decide their next move with the model the profile chose on
 # the Settings screen, and a provider may decline to work a screen at

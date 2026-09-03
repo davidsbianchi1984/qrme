@@ -1323,6 +1323,39 @@ const CHROME: Table = {
   "onb.region.hint": {
     en: "The models and video services you are offered are the set for your region. You can change it later on Settings.", es: "Los modelos y servicios de vídeo que se te ofrecen son el conjunto de tu región. Puedes cambiarlo después en Ajustes.", fr: "Les modèles et services vidéo proposés sont la sélection de votre région. Vous pourrez la changer plus tard dans les Réglages.", de: "Die angebotenen Modelle und Videodienste sind die Auswahl für deine Region. Du kannst sie später in den Einstellungen ändern.", pt: "Os modelos e serviços de vídeo oferecidos são a seleção da tua região. Podes mudá-la depois nas Definições.", it: "I modelli e i servizi video offerti sono la selezione della tua regione. Puoi cambiarla in seguito nelle Impostazioni.", ja: "提供されるモデルと動画サービスは、あなたの地域向けの構成です。あとで設定から変更できます。", zh: "向你提供的模型和视频服务是你所在地区的配置。之后可在“设置”中更改。", hi: "आपको दिए गए मॉडल और वीडियो सेवाएँ आपके क्षेत्र का सेट हैं। इसे बाद में सेटिंग्स में बदल सकते हैं।", ar: "النماذج وخدمات الفيديو المعروضة عليك هي تشكيلة منطقتك. يمكنك تغييرها لاحقًا في الإعدادات.",
   },
+  "mail.inbound": {
+    en: "Where its mail arrives", es: "Dónde llega su correo", fr: "Où son courrier arrive", de: "Wo seine Post ankommt", pt: "Onde chega o seu correio", it: "Dove arriva la sua posta", ja: "メールの届く場所", zh: "邮件送达的位置", hi: "इसकी डाक कहाँ आती है", ar: "أين يصل بريده",
+  },
+  "mail.inbound.pitch": {
+    en: "Two ways in: point a mail provider's inbound webhook at this address with a minted token, or attach Gmail, Outlook or Mail on Plug-ins and the profile reads that inbox itself.", es: "Dos vías de entrada: apunta el webhook de entrada de tu proveedor de correo a esta dirección con un token emitido, o conecta Gmail, Outlook o Mail en Plug-ins y el perfil leerá ese buzón por sí mismo.", fr: "Deux entrées : pointez le webhook entrant de votre fournisseur de messagerie vers cette adresse avec un jeton émis, ou reliez Gmail, Outlook ou Mail dans les Plug-ins et le profil lit cette boîte lui-même.", de: "Zwei Wege hinein: richte den Eingangs-Webhook deines Mailanbieters mit einem erzeugten Token auf diese Adresse, oder verbinde Gmail, Outlook oder Mail unter Plug-ins, und das Profil liest diesen Posteingang selbst.", pt: "Duas entradas: aponta o webhook de entrada do teu fornecedor de correio para este endereço com um token emitido, ou liga o Gmail, o Outlook ou o Mail em Plug-ins e o perfil lê essa caixa sozinho.", it: "Due vie d'ingresso: punta il webhook in entrata del tuo provider di posta a questo indirizzo con un token emesso, oppure collega Gmail, Outlook o Mail nei Plug-in e il profilo legge quella casella da sé.", ja: "入口は2つ。メールプロバイダーの受信 Webhook を発行済みトークン付きでこのアドレスに向けるか、プラグインで Gmail・Outlook・Mail を接続してプロフィール自身にその受信箱を読ませます。", zh: "两种进入方式：用铸造的令牌把邮件服务商的入站 Webhook 指向此地址，或在插件中连接 Gmail、Outlook 或 Mail，让形象自己读取该收件箱。", hi: "दो रास्ते: अपने मेल प्रदाता के इनबाउंड वेबहुक को जारी टोकन के साथ इस पते पर लगाएँ, या प्लग-इन में Gmail, Outlook या Mail जोड़ें और प्रोफ़ाइल उस इनबॉक्स को खुद पढ़ेगा।", ar: "طريقتان للدخول: وجّه Webhook الوارد لدى مزوّد بريدك إلى هذا العنوان برمز مُصدَر، أو أضف Gmail أو Outlook أو Mail في الإضافات وسيقرأ الملف ذلك الصندوق بنفسه.",
+  },
+  "mail.inbound.set": {
+    en: "token minted", es: "token emitido", fr: "jeton émis", de: "Token erzeugt", pt: "token emitido", it: "token emesso", ja: "トークン発行済み", zh: "已铸造令牌", hi: "टोकन जारी", ar: "الرمز مُصدَر",
+  },
+  "mail.inbound.unset": {
+    en: "no token yet", es: "aún sin token", fr: "pas encore de jeton", de: "noch kein Token", pt: "ainda sem token", it: "ancora nessun token", ja: "トークン未発行", zh: "尚无令牌", hi: "अभी कोई टोकन नहीं", ar: "لا رمز بعد",
+  },
+  "mail.inbound.polling": {
+    en: "inbox read every {n} min", es: "buzón leído cada {n} min", fr: "boîte lue toutes les {n} min", de: "Posteingang alle {n} Min. gelesen", pt: "caixa lida a cada {n} min", it: "casella letta ogni {n} min", ja: "受信箱を{n}分ごとに読み取り", zh: "每 {n} 分钟读取收件箱", hi: "हर {n} मिनट में इनबॉक्स पढ़ा जाता है", ar: "يُقرأ الصندوق كل {n} دقيقة",
+  },
+  "mail.inbound.onpress": {
+    en: "inbox read on a press", es: "buzón leído al pulsar", fr: "boîte lue sur pression", de: "Posteingang auf Knopfdruck gelesen", pt: "caixa lida ao carregar", it: "casella letta alla pressione", ja: "押したときに受信箱を読み取り", zh: "按下时读取收件箱", hi: "दबाने पर इनबॉक्स पढ़ा जाता है", ar: "يُقرأ الصندوق عند الضغط",
+  },
+  "mail.inbound.nopoll": {
+    en: "no signed-in inbox to read", es: "sin buzón con sesión para leer", fr: "aucune boîte connectée à lire", de: "kein angemeldeter Posteingang zum Lesen", pt: "nenhuma caixa com sessão para ler", it: "nessuna casella collegata da leggere", ja: "読み取れるサインイン済み受信箱なし", zh: "没有已登录的收件箱可读取", hi: "पढ़ने के लिए कोई साइन-इन इनबॉक्स नहीं", ar: "لا صندوق وارد مسجَّل الدخول للقراءة",
+  },
+  "mail.inbound.mint": {
+    en: "Mint a token", es: "Emitir un token", fr: "Émettre un jeton", de: "Token erzeugen", pt: "Emitir um token", it: "Emetti un token", ja: "トークンを発行", zh: "铸造令牌", hi: "टोकन जारी करें", ar: "أصدِر رمزًا",
+  },
+  "mail.inbound.poll": {
+    en: "Read the inbox now", es: "Leer el buzón ahora", fr: "Lire la boîte maintenant", de: "Posteingang jetzt lesen", pt: "Ler a caixa agora", it: "Leggi la casella ora", ja: "今すぐ受信箱を読む", zh: "立即读取收件箱", hi: "अभी इनबॉक्स पढ़ें", ar: "اقرأ الصندوق الآن",
+  },
+  "mail.inbound.minted": {
+    en: "Keep this. It is shown once, and minting again replaces it. Send it as the x-mail-inbound-token header, or as ?token= on the address.", es: "Guarda esto. Se muestra una sola vez y emitir otro lo reemplaza. Envíalo como cabecera x-mail-inbound-token, o como ?token= en la dirección.", fr: "Conservez ceci. Il n'est affiché qu'une fois, et en émettre un autre le remplace. Envoyez-le dans l'en-tête x-mail-inbound-token, ou en ?token= sur l'adresse.", de: "Bewahre das auf. Es wird einmal gezeigt, und ein neues Token ersetzt es. Sende es als Header x-mail-inbound-token oder als ?token= an der Adresse.", pt: "Guarda isto. Mostra-se uma vez e emitir outro substitui-o. Envia-o no cabeçalho x-mail-inbound-token, ou como ?token= no endereço.", it: "Conserva questo. Viene mostrato una volta, ed emetterne un altro lo sostituisce. Invialo come header x-mail-inbound-token, o come ?token= sull'indirizzo.", ja: "これを控えてください。一度だけ表示され、再発行すると置き換わります。受信トークンのヘッダー、またはアドレスのクエリとして送ってください。", zh: "请保存好。它只显示一次，再次铸造会替换它。作为入站令牌请求头，或地址上的查询参数发送。", hi: "इसे सहेज लें। यह एक बार दिखता है, और दोबारा जारी करने पर बदल जाता है। इसे x-mail-inbound-token हेडर या पते पर ?token= के रूप में भेजें।", ar: "احتفظ بهذا. يُعرض مرة واحدة، وإصدار رمز جديد يستبدله. أرسله في الترويسة x-mail-inbound-token أو كـ ?token= على العنوان.",
+  },
+  "mail.inbound.report": {
+    en: "Read: {fetched} taken in, {answered} answered on its own, {held} held for you.", es: "Lectura: {fetched} recibidos, {answered} respondidos por sí mismo, {held} retenidos para ti.", fr: "Lecture : {fetched} reçus, {answered} répondus tout seul, {held} retenus pour vous.", de: "Gelesen: {fetched} aufgenommen, {answered} selbst beantwortet, {held} für dich zurückgehalten.", pt: "Leitura: {fetched} recebidos, {answered} respondidos sozinho, {held} retidos para ti.", it: "Lettura: {fetched} acquisiti, {answered} risposti da sé, {held} trattenuti per te.", ja: "読み取り: {fetched}件取り込み、{answered}件自動返信、{held}件があなたの承認待ち。", zh: "读取：接收 {fetched} 封，自行回复 {answered} 封，为你保留 {held} 封。", hi: "पढ़ा: {fetched} लिए गए, {answered} खुद जवाब दिए, {held} आपके लिए रोके गए।", ar: "قراءة: {fetched} مستلَمة، {answered} أُجيبت ذاتيًا، {held} محتجَزة لك.",
+  },
   "corner.title": {
     en: "My Corner", es: "Mi rincón", fr: "Mon coin", de: "Meine Ecke", pt: "O meu cantinho", it: "Il mio angolo", ja: "マイコーナー", zh: "我的角落", hi: "मेरा कोना", ar: "ركني",
   },

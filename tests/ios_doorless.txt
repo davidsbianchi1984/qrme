@@ -256,3 +256,11 @@ POST /profiles/{profile_id}/mail/receive
 POST /profiles/{profile_id}/mail/compose
 POST /profiles/{profile_id}/mail/{message_id}/draft
 POST /profiles/{profile_id}/mail/{draft_id}/moderate
+
+# The inbound wire (qrme/mailbox.py, 3.0.4): the owner's two doors — mint
+# the token that opens the profile's inbound address, and read the
+# attached inbox now. Console-only for the same reason as the mailbox
+# above; the provider's own post (/mail/inbound/{profile_id}) is not a
+# client call at all and is recorded in clientpaths.NOT_A_CLIENT_CALL.
+POST /profiles/{profile_id}/mail/inbound-token
+POST /profiles/{profile_id}/mail/poll

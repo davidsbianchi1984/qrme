@@ -74,7 +74,7 @@ def create_app(pdi_client: PDIClient | None = None,
     # cannot be added to the product and forgotten at one of its routes,
     # because no route opts in. See qrme/tiers.py for the table and for why
     # browsing stays open.
-    app = FastAPI(title="QRME", version="3.0.3",
+    app = FastAPI(title="QRME", version="3.0.4",
                   dependencies=[Depends(tiers.gate)])
 
     @app.get("/terms")
@@ -169,6 +169,11 @@ def create_app(pdi_client: PDIClient | None = None,
     app.include_router(identity.router)
     app.include_router(inbox_routes.router)
     app.include_router(mailbox_routes.router)
+    # The deployment's own mail poller (qrme/mailbox.py), when
+    # QRME_MAIL_POLL_MINUTES is set. Blank — the default, and the suite's
+    # posture — starts nothing.
+    from . import mailbox as mailbox_mod
+    mailbox_mod.start_poller(app)
     app.include_router(placemic.router)
     app.include_router(overlay_routes.router)
     app.include_router(gamelobby.router)

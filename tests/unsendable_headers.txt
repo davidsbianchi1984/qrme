@@ -1,4 +1,4 @@
-# status: floor — 0 rows
+# status: floor — 1 row
 # ceiling: 6
 #
 # Client/header pairs that are deliberate: a route a client has a door to
@@ -24,3 +24,13 @@
 # exactly when /health says the deployment is gated, and this file goes to
 # zero the way a backlog should: by the gap closing, not the reason
 # improving.
+
+# The inbound mail address (qrme/mailbox.py, 3.0.4). A mail provider's
+# inbound-parse webhook presents this — the token the owner minted from
+# the corner and pasted into the provider — on POST /mail/inbound/{id}.
+# No client of this product is meant to send it: the console is where
+# the token is minted and shown once, not a place that posts mail to
+# itself, and a client that carried it would be a client holding a
+# credential whose only reader is a third party. The route is in
+# clientpaths.NOT_A_CLIENT_CALL for the same reason.
+*: x-mail-inbound-token

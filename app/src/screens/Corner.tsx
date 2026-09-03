@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   accountApi, api, type DmMessage, type DmThread, type Homepage,
-  type MailDeskProfile, type MailMessage,
+  type MailDeskProfile, type MailMessage, type MailPollReport,
 } from "../api";
 import { Refusal } from "../Refusal";
 import { fill, t as tr, visitorLang } from "../l10n";
@@ -244,6 +244,10 @@ function MailDesk() {
   const [outTo, setOutTo] = useState("");
   const [outSubject, setOutSubject] = useState("");
   const [outObjective, setOutObjective] = useState("");
+  // The inbound wire's two receipts: a freshly minted token (shown once,
+  // never again), and the last poll's report.
+  const [minted, setMinted] = useState<{ token: string; url: string } | null>(null);
+  const [polled, setPolled] = useState<MailPollReport | null>(null);
 
   const load = useCallback(() => {
     if (session.accountId && session.accountToken) {
@@ -385,6 +389,57 @@ function MailDesk() {
       ))}
 
       {me && token && (<>
+        <h4>{tr("mail.inbound", lang)}</h4>
+        <p className="muted small">{tr("mail.inbound.pitch", lang)}</p>
+        {(() => {
+          const mine = profiles.find((p) => p.profile_id === me);
+          const wire = mine?.posture.inbound;
+          return wire ? (
+            <p className="muted small">
+              <code>{wire.webhook_url}</code>
+              {" · "}
+              {wire.webhook_set ? tr("mail.inbound.set", lang) : tr("mail.inbound.unset", lang)}
+              {" · "}
+              {wire.pollable
+                ? (wire.poll_minutes > 0
+                    ? fill(tr("mail.inbound.polling", lang), { n: String(wire.poll_minutes) })
+                    : tr("mail.inbound.onpress", lang))
+                : tr("mail.inbound.nopoll", lang)}
+            </p>
+          ) : null;
+        })()}
+        <div className="row">
+          <button disabled={busy}
+                  onClick={() => void run(async () => {
+                    const r = await api.mailInboundToken(me, token);
+                    setMinted({ token: r.token, url: r.url });
+                  })}>
+            {tr("mail.inbound.mint", lang)}
+          </button>
+          <button disabled={busy}
+                  onClick={() => void run(async () => {
+                    setPolled(await api.mailPoll(me, token));
+                  })}>
+            {tr("mail.inbound.poll", lang)}
+          </button>
+        </div>
+        {minted && (
+          <div className="card">
+            <p className="muted small">{tr("mail.inbound.minted", lang)}</p>
+            <code>{minted.token}</code>
+          </div>
+        )}
+        {polled && (
+          <div className="muted small">
+            {fill(tr("mail.inbound.report", lang), {
+              fetched: String(polled.fetched), answered: String(polled.answered),
+              held: String(polled.held) })}
+            {polled.connectors.filter((c) => c.skipped).map((c) => (
+              <div key={c.id}>{c.app}: {c.skipped}</div>
+            ))}
+          </div>
+        )}
+
         <h4>{tr("mail.receive", lang)}</h4>
         <div className="row">
           <input placeholder={tr("mail.receive.from", lang)} value={inFrom}
