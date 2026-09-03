@@ -36,14 +36,19 @@ remember.
 
 ## For examination
 
-This page is written to be checked, not believed. Every `.png` under
-`docs/screens/` and `docs/walkthrough/` is a capture of the running
-console taken by `tools/shoot_screens.py` and `tools/walkthrough.py`
-against a live backend; an `.svg` is a design drawing and is captioned
-as one; the frames under "Real output" are from footage this platform
-rendered. The suite (`python -m pytest`, 5,000-plus cases) reads this
-file — the release banner, the release table, the gallery, the numbering
-and the closing passage fail the build when they drift from the product.
+This page is written to be checked, not believed, and it is written for
+an examiner. Every section grounds the product in three things: the
+**technical problem** in the machine, the **implementation** as built —
+named modules, named constants, named tests — and a **measurable effect**
+that follows from the implementation and not from a description of it.
+Every `.png` under `docs/screens/` and `docs/walkthrough/` is a capture
+of the running console taken by `tools/shoot_screens.py` and
+`tools/walkthrough.py` against a live backend; an `.svg` is a design
+drawing and is captioned as one; the frames under "Real output" are from
+footage this platform rendered. The suite (`python -m pytest`, 5,700-plus
+cases) reads this file — the release banner, the release table, the
+gallery, the numbering and the closing passage fail the build when they
+drift from the product.
 
 ### Components
 
@@ -89,26 +94,29 @@ is photographed on the screens below.
 
 ### Where each highlight is proven
 
-| Highlight | Module | Test | Screen |
-|---|---|---|---|
-| Offline is enforced at every socket | `qrme/offline.py` | `test_nothing_leaves_the_host.py`, `test_offline.py` | — |
-| The room society: nine seats that take turns | `qrme/society.py`, `qrme/roomface.py` | `test_the_room_becomes_a_society.py`, `test_the_room_speaks_for_itself.py` | 175 |
-| The room hears, reads, shares and remembers | `qrme/roomreach.py`, `qrme/sharing.py` | `test_the_room_hears_you_without_being_asked.py`, `test_the_room_shares.py`, `test_the_room_is_remembered.py` | 175 |
-| The stage: flat, AR, and VR on every headset | `qrme/xr.py` | `test_the_rooms_reach_every_headset.py` | 106, 109, 209 |
-| Video generation, bounded and watermarked | `qrme/filming.py` | `test_the_room_films_its_turns.py`, `test_the_owner_picks_the_video_company.py`, `test_the_video_door_is_open.py` | 209, Real output |
-| Voiceprints under attestation | `qrme/voiceprint.py` | `test_voiceprint.py` | 147 |
-| The recoverable watermark | `qrme/watermark.py` | `test_watermark.py`, `test_watermark_recovery.py` | 148 |
-| Avatars, the registry and the stage | `qrme/avatarforge.py`, `qrme/avatarreg.py` | `test_avatars.py`, `test_the_avatar_registry.py`, `test_the_avatar_takes_the_screen.py` | 44, 205 |
-| The Company Builder | `qrme/company.py` | `test_a_company_is_hired_one_interview_at_a_time.py` | 210, 146 |
-| The marketplace and the shops | `qrme/marketplace.py`, `qrme/shops.py` | `test_marketplace_cards.py`, `test_marketplace_search.py`, `test_a_shop_is_not_a_desk.py` | 152, 187 |
-| The bodies a profile may bind | `qrme/robotics.py` | `test_the_body_market.py` | 163 |
-| Wearables that pair and never listen | `qrme/wearables.py` | `test_wearables.py`, `test_two_microphones_two_destinations.py` | faces 01–11 |
-| The Studio agent and widgets in a box | `qrme/widgets.py`, `qrme/authoring.py` | `test_the_widget_cannot_leave_its_box.py` | 200 |
-| A profile's own mailbox, answering in its profession | `qrme/mailbox.py` | `test_the_profiles_own_mailbox.py` | My Corner |
-| The model menu by region | `qrme/loadouts.py` | `test_the_region_loadouts.py` | Settings |
-| Moderation before a doubtful turn ships | `qrme/moderation.py` | `test_moderation.py` | 32 |
-| Signatures that survive dispute | `qrme/signatures.py` | `test_a_signature_over_the_bytes.py` | 112, 113 |
-| A person settles it, signed in or not | `qrme/matters.py` | — | 203 |
+Each row: the technical problem, the implementation with its own numbers, the test that holds it, and the photograph.
+
+| Highlight | The technical problem | As built, with its numbers | Test | Screen |
+|---|---|---|---|---|
+| Offline is enforced at every socket | A privacy promise made in prose leaks through one forgotten HTTP call. | `qrme/offline.py` replaces the socket layer's connect with a refusal for every non-loopback address while the offline gate is up; no module opts in, so none can opt out. | `test_nothing_leaves_the_host.py`, `test_offline.py` | — |
+| The room society: nine seats that take turns | Several synthetic speakers in one room talk over each other, or one never speaks. | `qrme/society.py` holds up to nine seats and a turn order; `qrme/roomface.py` draws each seat's face and light; a turn is a row the console polls. | `test_the_room_becomes_a_society.py`, `test_the_room_speaks_for_itself.py` | 175 |
+| The room hears, reads, shares and remembers | A room that only takes typed text is a chat with pictures of people in it. | `qrme/roomreach.py` accepts speech, files and links per turn; `qrme/sharing.py` keeps what was shared as rows the room re-reads; the transcript is remembered to the vault. | `test_the_room_hears_you_without_being_asked.py`, `test_the_room_shares.py`, `test_the_room_is_remembered.py` | 175, 83 |
+| The stage: flat, AR, and VR on every headset | One room drawn three ways by three code paths drifts three ways. | `qrme/xr.py` publishes one scene description; the console draws it flat, overlaid (AR) or entered (VR) from the same rows; WebXR gates only the headset door. | `test_the_rooms_reach_every_headset.py` | 106, 109, 209 |
+| Video generation, bounded and watermarked | A reply rendered as footage costs real money per second and carries nothing that says a machine made it. | `qrme/filming.py` caps a render at `MAX_SECONDS = 30` and a direction at `MAX_DIRECTION = 600` characters, stamps every frame set with the profile's watermark, and lets the owner pick the company (`docker/film`). | `test_the_room_films_its_turns.py`, `test_the_owner_picks_the_video_company.py`, `test_the_video_door_is_open.py` | 209, Real output |
+| Voiceprints under attestation | A cloned voice with no record of consent is a cloned voice with no owner. | `qrme/voiceprint.py` refuses enrollment without a granted consent row, reports readiness as counted samples and seconds, and marks every utterance. | `test_voiceprint.py` | 147 |
+| The recoverable watermark | Text leaves the platform as plain characters; nothing in it says who produced it. | `qrme/watermark.py` stamps each approved render with a credential derived from the producing profile (`stamp`) and answers `lookup` from the text alone — no database of copies, the mark is in the bytes. | `test_watermark.py`, `test_watermark_recovery.py` | 148 |
+| Avatars, the registry and the stage | A face built from a portrait must be the same face in the bubble, the room and full screen, and must say it is synthetic. | `qrme/avatarforge.py` builds face, torso and `.glb` from one portrait; `qrme/avatarreg.py` is the registry every surface reads; the stage marks the figure `✦ AI` in its own pixels. | `test_avatars.py`, `test_the_avatar_registry.py`, `test_the_avatar_takes_the_screen.py` | 44, 205 |
+| The Company Builder | A staffed digital company built by hand is a pile of unrelated profiles. | `qrme/company.py` founds a company, opens seats, drafts each interview, and signs a hire into a department under the founder's account. | `test_a_company_is_hired_one_interview_at_a_time.py` | 210, 146 |
+| The marketplace and the shops | A listing and a desk are different things that one table would collapse. | `qrme/marketplace.py` lists and licenses profiles; `qrme/shops.py` keeps a shop as its own row with its own hours, never a desk. | `test_marketplace_cards.py`, `test_marketplace_search.py`, `test_a_shop_is_not_a_desk.py` | 152, 187 |
+| The bodies a profile may bind | A profile that can drive any robot can drive the wrong one. | `qrme/robotics.py` keeps an allowlist of commands per model and a learned-task list per robot; the wrist's quick ring is the intersection. | `test_the_body_market.py` | 163 |
+| Wearables that pair and never listen | A paired watch that carries readings through the platform makes the platform a health record. | `qrme/wearables.py` stores only the deposit address the owner chose; readings go from the device's app to the guardian directly; a device that senses nothing is refused a guardian. | `test_wearables.py`, `test_two_microphones_two_destinations.py` | faces 01–11 |
+| The Studio agent and widgets in a box | A widget written by a model runs in the page that holds the owner's session. | `qrme/widgets.py` serves each widget in its own sandboxed frame with no ambient credential; `qrme/authoring.py` keeps the draft and the published copy apart. | `test_the_widget_cannot_leave_its_box.py` | 200 |
+| A profile's own mailbox, answering in its profession | Mail to a synthetic professional either goes unanswered or is answered by a generic assistant. | `qrme/mailbox.py` receives mail on the profile's own address and answers in the profile's persona, with the owner's moderation queue in front of every send. | `test_the_profiles_own_mailbox.py` | My Corner |
+| The model menu by region | One global provider list is wrong somewhere in the world. | `qrme/loadouts.py` publishes a provider menu per region with an American taper lever; the console draws the region's menu and nothing else. | `test_the_region_loadouts.py` | Settings |
+| The feed ranks by relationship, and popularity is capped | An uncapped like count lets one loud stranger outrank every friend. | `qrme/wall.py` scores a post with `W_FRIEND = 100`, `W_TALKED = 60`, `W_TAG = 25`, and `W_LIKES = 2` per like capped at `W_LIKES_CAP = 40`; every entry carries the reason it is there. | `test_wall.py` | 186, 189 |
+| Moderation before a doubtful turn ships | A reply the owner would not have signed leaves before anyone sees it. | `qrme/moderation.py` holds a doubtful turn as a pending message the owner approves or rejects; the pass rate is a computed number on the front page. | `test_moderation.py` | 32 |
+| Signatures that survive dispute | A signature over a document's name is not a signature over the document. | `qrme/signatures.py` signs the bytes and records the hash, the signer and the time; a changed byte is a failed verification. | `test_a_signature_over_the_bytes.py` | 112, 113 |
+| A person settles it, signed in or not | A complaint that needs an account cannot be made by the person locked out of one. | `qrme/matters.py` accepts a matter from the front door with no session and hands it to a person; the reply reaches the address given. | — | 203 |
 
 ## Ability is not a gate
 
@@ -345,7 +353,7 @@ and the full tour is in [docs/gallery.md](docs/gallery.md).
     <td align="center" width="25%"><a href="docs/screens/103-audio-room.svg"><img src="docs/screens/103-audio-room.svg" width="165" alt="Audio room"></a><br><sub><b>103</b> · Audio room<br>voices in seats, barge-in welcome</sub></td>
     <td align="center" width="25%"><a href="docs/screens/106-ar-room.svg"><img src="docs/screens/106-ar-room.svg" width="165" alt="AR room"></a><br><sub><b>106</b> · AR room<br>the room laid over where you stand</sub></td>
     <td align="center" width="25%"><a href="docs/screens/109-vr-room.svg"><img src="docs/screens/109-vr-room.svg" width="165" alt="VR room"></a><br><sub><b>109</b> · VR room<br>the room as a place you enter</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/90-full-screen.svg"><img src="docs/screens/90-full-screen.svg" width="165" alt="Full screen"></a><br><sub><b>90</b> · Full screen<br>video held, turned and watched together</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/90-full-screen.svg"><img src="docs/screens/90-full-screen.svg" width="165" alt="Full screen"></a><br><sub><b>90</b> · Full screen<br>video held, turned and watched together — design drawing</sub></td>
   </tr>
 </table>
 
@@ -356,7 +364,7 @@ and the full tour is in [docs/gallery.md](docs/gallery.md).
     <td align="center" width="25%"><a href="docs/screens/07-memory.png"><img src="docs/screens/07-memory.png" width="165" alt="Memory vault"></a><br><sub><b>07</b> · Memory vault<br>what it holds about you, erasable by conversation</sub></td>
     <td align="center" width="25%"><a href="docs/screens/147-voice.png"><img src="docs/screens/147-voice.png" width="165" alt="Your own voice"></a><br><sub><b>147</b> · Your own voice<br>cloned by consent, watermarked every utterance</sub></td>
     <td align="center" width="25%"><a href="docs/screens/44-avatar-studio.png"><img src="docs/screens/44-avatar-studio.png" width="165" alt="Avatar studio"></a><br><sub><b>44</b> · Avatar studio<br>the face, aged and dressed as you choose</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/85-my-page.svg"><img src="docs/screens/85-my-page.svg" width="165" alt="My page"></a><br><sub><b>85</b> · My page<br>your public corner, in real HTML</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/85-my-page.svg"><img src="docs/screens/85-my-page.svg" width="165" alt="My page"></a><br><sub><b>85</b> · My page<br>your public corner, in real HTML — design drawing</sub></td>
   </tr>
 </table>
 
@@ -378,7 +386,7 @@ and the full tour is in [docs/gallery.md](docs/gallery.md).
     <td align="center" width="25%"><a href="docs/screens/205-avatar-stage.png"><img src="docs/screens/205-avatar-stage.png" width="165" alt="Avatar stage"></a><br><sub><b>205</b> · Avatar stage<br>the avatar full screen, wardrobe rail down the edge</sub></td>
     <td align="center" width="25%"><a href="docs/screens/155-party.png"><img src="docs/screens/155-party.png" width="165" alt="Watch party"></a><br><sub><b>155</b> · Watch party<br>watched together — and watchable by the platform's own eyes</sub></td>
     <td align="center" width="25%"><a href="docs/screens/156-identity.png"><img src="docs/screens/156-identity.png" width="165" alt="Identity"></a><br><sub><b>156</b> · Identity<br>who a profile is — and the avatar deck it dresses from</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/194-the-vastscape.svg"><img src="docs/screens/194-the-vastscape.svg" width="165" alt="A party you can find"></a><br><sub><b>194</b> · The vastscape<br>the wide view of everything running</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/194-the-vastscape.svg"><img src="docs/screens/194-the-vastscape.svg" width="165" alt="A party you can find"></a><br><sub><b>194</b> · The vastscape<br>the wide view of everything running — design drawing</sub></td>
   </tr>
 </table>
 
@@ -396,11 +404,95 @@ and the full tour is in [docs/gallery.md](docs/gallery.md).
 <table>
   <tr>
     <td align="center" width="25%"><a href="docs/screens/148-who-wrote-this.png"><img src="docs/screens/148-who-wrote-this.png" width="165" alt="Who wrote this"></a><br><sub><b>148</b> · Who wrote this<br>the watermark answers, even reworded</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/32-moderation.svg"><img src="docs/screens/32-moderation.svg" width="165" alt="Moderation"></a><br><sub><b>32</b> · Moderation<br>review before a doubtful turn ships</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/32-moderation.svg"><img src="docs/screens/32-moderation.svg" width="165" alt="Moderation"></a><br><sub><b>32</b> · Moderation<br>review before a doubtful turn ships — design drawing</sub></td>
     <td align="center" width="25%"><a href="docs/screens/202-allowed.png"><img src="docs/screens/202-allowed.png" width="165" alt="What it may do"></a><br><sub><b>202</b> · What it may do<br>every power off until somebody says yes</sub></td>
     <td align="center" width="25%"><a href="docs/screens/203-matters.png"><img src="docs/screens/203-matters.png" width="165" alt="Get help"></a><br><sub><b>203</b> · Get help<br>a person settles it, signed in or not</sub></td>
   </tr>
 </table>
+
+## The starter collection
+
+Thirty-four professionals, one per trade, seeded by `qrme/seed.py` and
+installed as standing friends on every profile after the founder pins.
+Each card below is the profile as the console draws it — the portrait
+the platform serves, the role, the `✦ AI` mark in the picture — composed
+from the running seed by `tools/starter_cards.py` and laid out by
+`tools/starter_gallery.py`, which fails the build when the gallery drifts
+from the seed list. The rated profile stands behind the age gate and is
+installed on nobody.
+
+<!-- starter-gallery:begin -->
+<table>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/dr_amara_osei.svg" width="176" alt="Dr. Amara Osei — physician & health educator, healthcare"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/marcus_bell.svg" width="176" alt="Marcus Bell — retired fee-only financial planner, finance"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/priya_raman.svg" width="176" alt="Priya Raman — software architect, technology"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/elena_vasquez.svg" width="176" alt="Elena Vasquez — classroom teacher & learning coach, education"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/jonathan_ashe.svg" width="176" alt="Jonathan Ashe — retired contracts attorney, legal"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/sam_whitfield.svg" width="176" alt="Sam Whitfield — row-crop & vegetable farmer, agriculture"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/ingrid_halvorsen.svg" width="176" alt="Ingrid Halvorsen — plant operations engineer, manufacturing"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/diego_fuentes.svg" width="176" alt="Diego Fuentes — general contractor, construction"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/naomi_clarke.svg" width="176" alt="Naomi Clarke — residential broker, real estate"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/tomas_rivera.svg" width="176" alt="Tomás Rivera — power-systems engineer, energy"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/odessa_grant.svg" width="176" alt="Odessa Grant — logistics director, transportation"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/ken_nakamura.svg" width="176" alt="Ken Nakamura — omnichannel merchant, retail"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/lucia_moretti.svg" width="176" alt="Lucia Moretti — hotelier, hospitality"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/ray_coleman.svg" width="176" alt="Ray Coleman — documentary producer, media"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/wren_okafor.svg" width="176" alt="Wren Okafor — designer-illustrator, arts design"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/coach_dana_reyes.svg" width="176" alt="Coach Dana Reyes — strength & conditioning coach, sports fitness"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/chef_henri_laurent.svg" width="176" alt="Chef Henri Laurent — classically trained chef, culinary"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/dr_sana_iqbal.svg" width="176" alt="Dr. Sana Iqbal — climate scientist, environment"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/pete_kowalski.svg" width="176" alt="Pete Kowalski — retired city administrator, government"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/grace_mwangi.svg" width="176" alt="Grace Mwangi — nonprofit director, nonprofit"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/dr_felix_baum.svg" width="176" alt="Dr. Felix Baum — research physicist, science"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/aisha_diallo.svg" width="176" alt="Aisha Diallo — network engineer, telecom"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/harold_jenkins.svg" width="176" alt="Harold Jenkins — claims adjuster & underwriter, insurance"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/rosa_delgado.svg" width="176" alt="Rosa Delgado — master mechanic, automotive"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/cmdr_ellen_park.svg" width="176" alt="Ellen Park — aerospace engineer & test pilot, aerospace"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/mimi_beaumont.svg" width="176" alt="Mimi Beaumont — stylist & atelier seamstress, fashion beauty"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/jack_osei_turner.svg" width="176" alt="Jack Osei-Turner — brand strategist, marketing"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/nadia_petrova.svg" width="176" alt="Nadia Petrova — defensive security analyst, cybersecurity"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/bev_lindqvist.svg" width="176" alt="Bev Lindqvist — HR director, human resources"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/otis_marsh.svg" width="176" alt="Otis Marsh — session musician & teacher, music"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/dr_lena_whitcomb.svg" width="176" alt="Dr. Lena Whitcomb — clinical psychologist, mental health"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/dr_marcus_adeyemi.svg" width="176" alt="Dr. Marcus Adeyemi — psychiatrist, psychiatry"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/dr_priya_nair.svg" width="176" alt="Dr. Priya Nair — family & couples therapist, counseling"></td>
+    <td align="center" width="50%" valign="top"><img src="docs/portraits/cards/vivienne_sable.svg" width="176" alt="Vivienne Sable — cabaret headliner & burlesque historian, adult"></td>
+  </tr>
+</table>
+<!-- starter-gallery:end -->
 
 ## Watch faces, and the wearables that show them
 

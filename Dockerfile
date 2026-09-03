@@ -40,7 +40,7 @@ ENV PYTHONUNBUFFERED=1 \
 # so a checkout without them keeps the honest refusal; the image carries
 # them so the beta can actually read what it is handed.
 RUN apt-get update \
- && apt-get install -y --no-install-recommends tesseract-ocr poppler-utils \
+ && apt-get install -y --no-install-recommends tesseract-ocr poppler-utils ffmpeg \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /srv

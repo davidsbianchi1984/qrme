@@ -1,6 +1,8 @@
 import { t as tr, fill, type Lang } from "./l10n";
 import { type SceneRender } from "./api";
-import { playable, useRenderRow } from "./sceneRender";
+import { useState } from "react";
+import { getBase } from "./api";
+import { mediaIdOf, playable, useRenderRow } from "./sceneRender";
 
 /**
  * The reply, as footage — and the wait in between.
@@ -26,6 +28,7 @@ import { playable, useRenderRow } from "./sceneRender";
  */
 export function SceneFilm({ scene, lang }: { scene: SceneRender; lang: Lang }) {
   const { row, gaveUp } = useRenderRow(scene);
+  const [full, setFull] = useState(false);
 
   if (row.status === "capped") {
     return (
@@ -55,8 +58,38 @@ export function SceneFilm({ scene, lang }: { scene: SceneRender; lang: Lang }) {
             decides by path and the file itself carries the badge, but a
             person watching a video in a chat bubble reads the caption
             under it, not the URL it came from. */}
-        <video src={src} controls playsInline preload="metadata" />
+        {/* The badge is the outermost layer, never in the pixels: the
+            player's own full-screen and download are switched off so the
+            only way to fill the screen is the takeover below, which
+            carries the badge, and the only download is the burned copy. */}
+        <video src={src} controls playsInline preload="metadata"
+               controlsList="nofullscreen nodownload" />
         <span className="bubble-scene-ai">{tr("chat.scene.ai", lang)}</span>
+        {mediaIdOf(row.video_url) && (
+          <a className="rs-film-down" download
+             href={getBase() + "/media/" + mediaIdOf(row.video_url) + "/download"}
+             aria-label={tr("ins.film.download", lang)}
+             title={tr("ins.film.download", lang)}>⤓</a>
+        )}
+        <button className="rs-film-grow" type="button"
+                aria-label={tr("ins.film.full", lang)}
+                title={tr("ins.film.full", lang)}
+                onClick={() => setFull(true)}>
+          <span aria-hidden="true">⛶</span>
+        </button>
+        {full && (
+          <div className="rs-film-over" role="dialog" aria-modal="true">
+            <video src={src} controls autoPlay playsInline
+                   controlsList="nofullscreen nodownload" />
+            <span className="rs-film-ai">{tr("ins.film.ai", lang)}</span>
+            <button className="rs-film-x" type="button"
+                    aria-label={tr("ins.film.close", lang)}
+                    title={tr("ins.film.close", lang)}
+                    onClick={() => setFull(false)}>
+              <span aria-hidden="true">✕</span>
+            </button>
+          </div>
+        )}
       </div>
     );
   }

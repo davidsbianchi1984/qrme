@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { api, type SceneRender } from "./api";
+import { api, getBase, type SceneRender } from "./api";
 import { t as tr, type Lang } from "./l10n";
-import { playable, useRenderRow } from "./sceneRender";
+import { mediaIdOf, playable, useRenderRow } from "./sceneRender";
 
 /**
  * The turn, as footage, in the room's own frame.
@@ -100,11 +100,19 @@ export function SeatFilm({ profileId, display, talking, lang, onFull,
     <>
       <div className={"rs-film" + (talking ? " talking" : "")}>
         <video src={src} controls playsInline preload="metadata"
+               controlsList="nofullscreen nodownload"
                aria-label={display} />
         {/* Marked on the surface as well as in the file. The stored file
             carries the badge, but somebody watching in a room reads the
             corner of the frame, not the URL it came from. */}
         <span className="rs-film-ai">{tr("ins.film.ai", lang)}</span>
+        {mediaIdOf(row.video_url as string) && (
+          <a className="rs-film-down" download
+             href={getBase() + "/media/" + mediaIdOf(row.video_url as string) + "/download"}
+             aria-label={tr("ins.film.download", lang)}
+             title={tr("ins.film.download", lang)}
+             onClick={(e) => e.stopPropagation()}>⤓</a>
+        )}
         <button className="rs-film-grow" type="button"
                 aria-label={tr("ins.film.full", lang)}
                 title={tr("ins.film.full", lang)}
@@ -116,7 +124,11 @@ export function SeatFilm({ profileId, display, talking, lang, onFull,
       {full && (
         <div className="rs-film-over" role="dialog" aria-modal="true"
              aria-label={display}>
-          <video src={src} controls autoPlay playsInline />
+          <video src={src} controls autoPlay playsInline
+                 controlsList="nofullscreen nodownload" />
+          {/* The badge rides the takeover too — the outermost layer,
+              above the player, above the way out. */}
+          <span className="rs-film-ai">{tr("ins.film.ai", lang)}</span>
           <button className="rs-film-x" type="button"
                   aria-label={tr("ins.film.close", lang)}
                   title={tr("ins.film.close", lang)}

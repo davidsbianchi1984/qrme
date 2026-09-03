@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from .. import (auth, avatarforge, avatarreg, avatars, filming, media,
+from .. import (auth, avatarforge, avatarreg, avatars, badge, filming, media,
                 modelshop,
                 portraitist,
                 presentation, skins)
@@ -757,3 +757,26 @@ def get_brief(handle: str) -> dict:
     if brief is None:
         raise HTTPException(404, i18n.fill(i18n.NO_PORTRAIT_BRIEF, handle=handle))
     return brief
+
+
+@router.get("/media/{media_id}/download")
+def download_marked(media_id: str):
+    """A rendered file, with the AI badge burned into its pixels.
+
+    The console draws the badge as its outermost layer, over the player
+    and over the full-screen takeover; a downloaded file has no console
+    around it, so the badge goes into the bytes here. Only synthetic
+    media has a burned copy — an authentic upload is never stamped — and
+    a deployment that cannot burn footage refuses rather than serving an
+    unmarked file.
+    """
+    from fastapi.responses import FileResponse
+    try:
+        path = badge.burned(media_id)
+    except badge.NoBadge as exc:
+        raise HTTPException(404, str(exc)) from None
+    except badge.NoBurner as exc:
+        raise HTTPException(503, str(exc)) from None
+    return FileResponse(str(path), filename=path.name,
+                        headers={"content-disposition":
+                                 f'attachment; filename="{path.name}"'})

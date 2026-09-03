@@ -312,6 +312,13 @@ INSIDE: tuple[tuple[str, str, str, tuple, str], ...] = (
     # beside it — the one screen the dock is the subject of rather than
     # a thing at the edge of.
     ("211", "the-edge-dock", "home", (".wl-tab",), ".watch-lights"),
+    # The three kinds of room the front page opens: voices only, and the
+    # AR and VR rooms as the console draws them on a phone with no
+    # headset — the scene is the same rows either way, and WebXR only
+    # gates the headset door.
+    ("103", "audio-room", "home", ('text="Voice chat only"',), ".room-scene"),
+    ("106", "ar-room", "home", ('text="AR"',), ".room-scene"),
+    ("109", "vr-room", "home", ('text="VR"',), ".room-scene"),
 )
 
 
@@ -332,6 +339,11 @@ def open_inside(page, session, start, presses, proof) -> bool:
     else:
         page.evaluate("s => localStorage.setItem('qrme.session', s)",
                       json.dumps(session))
+        # A fresh page first: a room opened by the recipe before this one
+        # has put the nav away, and the tab this one starts from is not
+        # on screen until the console is reloaded out of the room.
+        page.goto(BASE + "/", wait_until="networkidle")
+        page.wait_for_timeout(600)
         if not open_tab(page, start):
             print(f"  ? could not open the {start} tab")
             return False
@@ -356,7 +368,14 @@ def open_inside(page, session, start, presses, proof) -> bool:
         else:
             target.fill(text)
         page.wait_for_timeout(900)
-    return page.query_selector(proof) is not None
+    # Waited for, not glanced at: a room takes a moment to seat itself,
+    # and a proof read the instant after the press called every room
+    # unreachable.
+    try:
+        page.wait_for_selector(proof, timeout=8000)
+    except Exception:  # noqa: BLE001 — the caller says which screen
+        return False
+    return True
 
 
 def answer_the_notice(page) -> None:

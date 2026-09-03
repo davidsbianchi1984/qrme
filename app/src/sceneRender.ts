@@ -100,3 +100,11 @@ export function useRenderRow(scene: SceneRender) {
 export function playable(url: string) {
   return url.startsWith("http") ? url : getBase() + url;
 }
+
+
+/** The media id behind a served `/media/<id>.<ext>` url — the handle the
+ *  burned download is asked for by. Null for anything not served here. */
+export function mediaIdOf(url: string): string | null {
+  const m = /\/media\/(med_[A-Za-z0-9]+)\.[a-z0-9]+$/i.exec(url);
+  return m ? m[1] : null;
+}

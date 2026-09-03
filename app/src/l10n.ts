@@ -742,6 +742,9 @@ const CHROME: Table = {
   "ins.film.none": {
     en: "No footage for this turn yet.", es: "Aún no hay imágenes de este turno.", fr: "Pas encore d'images pour ce tour.", de: "Für diesen Zug gibt es noch keine Aufnahmen.", pt: "Ainda não há imagens desta vez.", it: "Ancora nessuna immagine per questo turno.", ja: "この発言の映像はまだありません。", zh: "这一轮还没有画面。", hi: "इस बारी का फ़ुटेज अभी नहीं है।", ar: "لا توجد لقطات لهذا الدور بعد.",
   },
+  "ins.film.download": {
+    en: "Download, with the AI badge burned in", es: "Descargar, con la insignia de IA grabada", fr: "Télécharger, avec le badge IA incrusté", de: "Herunterladen, mit eingebranntem KI-Abzeichen", pt: "Transferir, com o selo de IA gravado", it: "Scarica, con il badge IA impresso", ja: "AIバッジを焼き込んでダウンロード", zh: "下载（已烧录 AI 标识）", hi: "AI बैज सहित डाउनलोड करें", ar: "تنزيل مع شارة الذكاء الاصطناعي المحفورة",
+  },
   "ins.film.full": {
     en: "Fill the screen", es: "Ocupar la pantalla", fr: "Occuper l'écran", de: "Bildschirm füllen", pt: "Ocupar a tela", it: "Riempire lo schermo", ja: "画面いっぱいに", zh: "占满屏幕", hi: "पूरी स्क्रीन पर", ar: "ملء الشاشة",
   },
