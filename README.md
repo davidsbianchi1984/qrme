@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v3.0.5** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v3.0.6** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -33,6 +33,76 @@ tools inside the same private network. The sister products complete it:
 specialists through the tandem, and
 [PDI](https://github.com/davidsbianchi1984/pdi) seals what the profiles
 remember.
+
+## For examination
+
+This page is written to be checked, not believed. Every `.png` under
+`docs/screens/` and `docs/walkthrough/` is a capture of the running
+console taken by `tools/shoot_screens.py` and `tools/walkthrough.py`
+against a live backend; an `.svg` is a design drawing and is captioned
+as one; the frames under "Real output" are from footage this platform
+rendered. The suite (`python -m pytest`, 5,000-plus cases) reads this
+file — the release banner, the release table, the gallery, the numbering
+and the closing passage fail the build when they drift from the product.
+
+### Components
+
+| Component | Where | What it is |
+|---|---|---|
+| API server | `qrme/`, routers under `qrme/routers/` | FastAPI over SQLite: profiles, persona conditioning, rooms, the community, commerce, governance, the offline gate, the audit chain. |
+| Web console | `app/` | React and TypeScript, ten languages; the 210 numbered screens photographed and drawn below. |
+| Watch faces | `docs/watch/`, `qrme/wearables.py` | Eleven faces a paired wearable may show, and the catalogue of devices that may pair. |
+| iOS, Android, Windows shells | `native/` | Native shells at parity with the console, each route they call published by the server. |
+| Store manifests | `stores/` | Steam, Meta Horizon and Viveport manifests, versioned with the product. |
+| The ears | `docker/ears` | Speech into words and pictures into descriptions, on the deployment's own machine. |
+| The film house | `docker/film`, `qrme/filming.py` | Video generation: a reply rendered as footage by a service the deployment named, watermarked, bounded by a daily ceiling. |
+| The forge and the renderer | `docker/forge`, `docker/renderer`, `qrme/avatarforge.py` | Avatars built from a portrait, and scenes rendered for the stage. |
+| The voice door | `docker/voice` | The phone line JIM-mini rings emergency contacts on: a stateless sidecar holding the house's credential, five houses behind one interface. |
+| The model layer | `qrme/llm.py`, `qrme/loadouts.py`, `qrme/modelshop.py` | A provider menu per region with an American taper lever, bring-your-own key per request, the offline stub. |
+| The vault | `qrme/pdi_client.py`, `qrme/exchange.py`, `qrme/recollection.py` | What a pair builds together, sealed in PDI, curatable and forgettable to the vectors. |
+| The stack | `docker/beta-compose.yml`, `docker/beta.Caddyfile` | All three products, every sidecar and Caddy, deployed as one; the deploy runbook is [docs/beta-deploy.md](docs/beta-deploy.md). |
+
+### The mechanisms on file
+
+The ten numbered mechanisms in
+[docs/invention-disclosure.md](docs/invention-disclosure.md), with where
+each lives:
+
+| § | Mechanism | Reduced to practice in |
+|---|---|---|
+| 1 | Owner-governed synthetic profile as a product | `qrme/persona.py`, `qrme/moderation.py`, `qrme/adaptation.py` |
+| 2 | Membership gating as a single application-wide chokepoint | `qrme/tiers.py` — `test_tiers.py`, `test_the_free_tier_says_what_it_is.py` |
+| 3 | Request-scoped bring-your-own-credential inference | `qrme/llm.py` — `test_byo_key.py` |
+| 4 | Vault-sealed tandem exchanges with auditable custody | `qrme/exchange.py`, `qrme/pdi_client.py` — `test_exchange.py` |
+| 5 | Desk beacons and lend-a-microphone | `qrme/desks.py`, `qrme/roommic.py` — `test_desks.py`, `test_room_mic.py` |
+| 6 | Weighted hybrid personas with a public composition | `qrme/composite.py` |
+| 7 | Predictive simulation with evidence-earned confidence | `qrme/simulation.py` |
+| 8 | Environmental context beside biometric context | `qrme/attention.py`, `qrme/wearables.py` — `test_the_wearable_tells_the_guardian.py` |
+| 9 | Proceeds designations with token-lifecycle succession | `qrme/ledger.py`, `qrme/signatures.py` — `test_signatures.py` |
+| 10 | Departmental agent coordination over revocable scopes | `qrme/organization.py`, `qrme/delegation.py` — `test_organizations.py`, `test_delegation.py` |
+
+### Where each highlight is proven
+
+| Highlight | Module | Test | Screen |
+|---|---|---|---|
+| Offline is enforced at every socket | `qrme/offline.py` | `test_nothing_leaves_the_host.py`, `test_offline.py` | — |
+| The room society: nine seats that take turns | `qrme/society.py`, `qrme/roomface.py` | `test_the_room_becomes_a_society.py`, `test_the_room_speaks_for_itself.py` | 175 |
+| The room hears, reads, shares and remembers | `qrme/roomreach.py`, `qrme/sharing.py` | `test_the_room_hears_you_without_being_asked.py`, `test_the_room_shares.py`, `test_the_room_is_remembered.py` | 175 |
+| The stage: flat, AR, and VR on every headset | `qrme/xr.py` | `test_the_rooms_reach_every_headset.py` | 106, 109, 209 |
+| Video generation, bounded and watermarked | `qrme/filming.py` | `test_the_room_films_its_turns.py`, `test_the_owner_picks_the_video_company.py`, `test_the_video_door_is_open.py` | 209, Real output |
+| Voiceprints under attestation | `qrme/voiceprint.py` | `test_voiceprint.py` | 147 |
+| The recoverable watermark | `qrme/watermark.py` | `test_watermark.py`, `test_watermark_recovery.py` | 148 |
+| Avatars, the registry and the stage | `qrme/avatarforge.py`, `qrme/avatarreg.py` | `test_avatars.py`, `test_the_avatar_registry.py`, `test_the_avatar_takes_the_screen.py` | 44, 205 |
+| The Company Builder | `qrme/company.py` | `test_a_company_is_hired_one_interview_at_a_time.py` | 210, 146 |
+| The marketplace and the shops | `qrme/marketplace.py`, `qrme/shops.py` | `test_marketplace_cards.py`, `test_marketplace_search.py`, `test_a_shop_is_not_a_desk.py` | 152, 187 |
+| The bodies a profile may bind | `qrme/robotics.py` | `test_the_body_market.py` | 163 |
+| Wearables that pair and never listen | `qrme/wearables.py` | `test_wearables.py`, `test_two_microphones_two_destinations.py` | faces 01–11 |
+| The Studio agent and widgets in a box | `qrme/widgets.py`, `qrme/authoring.py` | `test_the_widget_cannot_leave_its_box.py` | 200 |
+| A profile's own mailbox, answering in its profession | `qrme/mailbox.py` | `test_the_profiles_own_mailbox.py` | My Corner |
+| The model menu by region | `qrme/loadouts.py` | `test_the_region_loadouts.py` | Settings |
+| Moderation before a doubtful turn ships | `qrme/moderation.py` | `test_moderation.py` | 32 |
+| Signatures that survive dispute | `qrme/signatures.py` | `test_a_signature_over_the_bytes.py` | 112, 113 |
+| A person settles it, signed in or not | `qrme/matters.py` | — | 203 |
 
 ## Ability is not a gate
 
@@ -81,6 +151,9 @@ whole loop: your words become tracked work.
 | **The room society** | Eight seats that take turns: profiles announce who they speak to, answer when addressed, wait when not, rotate past your silent chair, join and summon each other on their own, collaborate on tasks — and pause after ten turns apiece, steered entirely by words, never a toggle. |
 | **Governance** | Objections, takedowns, lifecycle states, signatures that survive dispute, tamper-evident provenance, moderation that can hold a reply for its owner, and refusals translated in ten languages. |
 | **Privacy** | Room pixels never cross clients; disclosures are recorded, not footage; microphones pair without listening. `QRME_OFFLINE=1` keeps everything on the host, enforced at every socket. |
+| **The profile's own mailbox** | Every profile answers its own correspondence in its profession, from its own moderated inbox under its owner's corner: an inbound address any mail provider can post to, the attached Gmail, Outlook or Mail connector read over IMAP, drafts held for the owner in manual mode and sent on the profile's own word in auto. |
+| **The model menu by region** | Where an account signed up decides which providers it may pick from — American, European and Asian houses region by region — with a lever that tapers the American loadout to American providers if a government asks, and a key of your own on any request. |
+| **The phone line** | The voice sidecar in this stack is the line JIM-mini rings emergency contacts on: five phone houses behind one interface, the house's credential held here and never in the product, every spoken sentence supplied by JIM. |
 | **Tandem** | Runs beside JIM-mini and on top of the PDI vault, one version number across the three. |
 
 ## Capabilities, and what each one rests on
@@ -574,6 +647,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **3.0.6** | **The voice door answers** — the number's voice webhook and status callback land on two inbound doors under the same locks as every leg. A call that comes in is handed to JIM with who is calling; when JIM matches the caller to a reach-out, the leg's own doors carry the conversation from there, and the status callback finds the leg by the house's reference. `/standing` reports the two URLs to point the number at and, for Twilio, whether it is pointed there. |
 | **3.0.5** | **The voice door** — the phone line JIM 3.0.8 rings its emergency contacts on, as a sidecar in the compose stack, the same shape as the camera and the ears. It holds the phone house's credential, speaks one small protocol to JIM, turns the house's webhooks into JIM's own call-id doors, and composes no prose of its own — every spoken sentence rides JIM's line envelope. Five houses behind one interface, each verifying its own webhook signature and the per-call signature before a word is spoken. Caddy publishes only the house-facing doors under `/voice`; the door JIM places calls through is not on the internet. The 911 send stays held shut in JIM's source whatever is set here. |
 | **3.0.4** | **The inbound wire — mail arrives in a profile's mailbox on its own** — 3.0.3 said honestly that inbound was the wiring step; this is the wire, in two shapes. Every profile has an inbound address, a webhook any mail provider's inbound-parse can post to, opened by a token its owner mints from the corner (shown once, hashed at rest, rotated by minting again) and reading the field names SendGrid, Mailgun, Postmark and a plain JSON post all use — multipart included, with no parsing dependency the image lacks. And the attached Gmail, Outlook or Mail connector is read over IMAP with the credential it was authorized with, sealed in the vault: on a press from the corner, or on the deployment's own poller when `QRME_MAIL_POLL_MINUTES` is set, each connector reporting what happened to it rather than the poll failing as a whole. Either way the message lands as one handed in — the profile drafts in its profession, screens, answers on its own in auto mode, holds for the owner in manual — and the posture says which wire is connected. Offline mode keeps the poll home. |
 | **3.0.3** | **The twin: a menu per region, the profiles work their own mail, and the corner carries your name** — the region is chosen at sign-up and editable on Settings, and the model tiles are the loadout for it: home providers first, then a curated few popular foreign ones (a US account sees the American houses plus DeepSeek, Mistral, Qwen and Kimi; a Chinese account leads with Qwen, DeepSeek, Kimi and GLM; Europe leads with Mistral), with the registry widened from ten providers to twenty-two, every one naming its home, and one lever — `QRME_MODEL_POLICY=american` — that tapers the American-region menu to American, local and self-supplied providers and binds no other region. The video shelf is the same shape: Higgsfield, Hailuo and Vidu join it, the picker on Identity draws the region's menu rather than the whole shelf, and a house off the menu is refused with the menu. Every synthetic profile has its own mailbox and works it itself — reads, drafts in its profession through the persona prompt every surface speaks from, screens the reply through the same moderation a chat turn passes, and in auto mode answers on its own (sent over SMTP when wired, staged and held when not); manual mode holds the reply for the owner, and a flagged reply is held whatever the mode. The operator's corner is the review desk over every mailbox the account is answerable for. The provider tiles drop the borrowed brand marks for a generic monogram in one accent, and the tab that read like somebody else's trademark is *My Corner* — *Dana's corner* once a profile is signed in. |
@@ -899,8 +973,12 @@ does, this is where to find it.
 - **Storage**: SQLite (`qrme/db.py`), path via `QRME_DB` (default `qrme.db`).
 - **Persona conditioning**: `qrme/persona.py` builds the system prompt from
   profile identity + relationship + engagement + aging.
-- **LLM**: official Anthropic SDK (`qrme/llm.py`); the default model is
-  set by `QRME_MODEL`, with adaptive thinking. Without credentials (or with `QRME_LLM=stub`) a
+- **LLM**: a provider menu (`qrme/llm.py`) — Anthropic through the
+  official SDK by default, and OpenAI, Gemini, Grok, Meta, Azure, Bedrock,
+  Groq, Together, Fireworks, NVIDIA, Mistral, Cohere, DeepSeek, Qwen, Kimi
+  and GLM behind one interface — narrowed per region by
+  `qrme/loadouts.py` and tapered by `QRME_MODEL_POLICY`. The default model
+  is set by `QRME_MODEL`. Without credentials (or with `QRME_LLM=stub`) a
   deterministic stub provider is used, so everything runs offline.
   **Bring your own key:** send `x-llm-api-key` on any request (the console's
   Control Center stores it device-side) and that request's generations run
