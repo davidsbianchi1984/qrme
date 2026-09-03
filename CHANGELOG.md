@@ -6,6 +6,33 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.1.3] - 2026-09-03
+
+### Added
+
+- **The AI badge is the outermost layer, and a download is burned.** On
+  screen the badge on rendered footage is drawn by the console over the
+  player and over the full-screen takeover — never in the pixels — and the
+  player's own full-screen and download are switched off, so expanding
+  cannot hide it and the only download offered is the burned copy.
+  `GET /media/{id}/download` serves synthetic media with the badge burned
+  into the image (Pillow for pictures, ffmpeg for footage, top-left,
+  sized to the frame); an authentic upload is never stamped and answers
+  404; a deployment without ffmpeg refuses footage with 503 rather than
+  serving it unmarked. The image now ships ffmpeg. Guard:
+  `test_the_badge_is_the_outermost_layer.py`.
+- **The starter collection in the README**, thirty-four cards as the
+  console draws them, generated from the running seed and checked
+  against it.
+
+### Documentation
+
+- **For examination.** Every highlight names the technical problem in the
+  machine, the implementation with its own numbers, the test that holds
+  it and the photograph; the remaining drawings are captioned as
+  drawings; the help box can direct somebody to the dock; screen 83 is a
+  photograph.
+
 ## [3.1.2] - 2026-09-03
 
 ### Changed
@@ -17901,7 +17928,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.2...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.3...HEAD
+[3.1.3]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.2...app-v3.1.3
 [3.1.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.1...app-v3.1.2
 [3.1.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.0...app-v3.1.1
 [3.1.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.6...app-v3.1.0

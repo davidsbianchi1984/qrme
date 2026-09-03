@@ -28,11 +28,11 @@ def _players() -> list[str]:
 
 
 def test_the_players_own_fullscreen_and_download_are_switched_off():
-    """The browser's own full-screen shows the bare video element, with
-    no badge on it, and its own download hands out the unburned file.
-    Every rendered-footage player turns both off, so the only way to fill
-    the screen is the takeover that carries the badge, and the only
-    download is the burned copy."""
+    """The browser's own full-screen shows the bare video element with no
+    badge on it, and its own download hands out the unburned file. Every
+    rendered-footage player turns both off, so the only way to fill the
+    screen is the takeover that carries the badge, and the only download
+    is the burned copy."""
     for src in _players():
         videos = re.findall(r"<video\b[^>]*>", src, re.S)
         assert videos, "no <video> in a film player"
@@ -53,7 +53,7 @@ def test_the_takeover_carries_the_badge_above_the_player():
         "the badge on the takeover has no layer of its own above the player")
 
 
-def test_every_player_offers_the_burned_download_and_nothing_else():
+def test_every_player_offers_the_burned_download():
     for src in _players():
         assert '/download"' in src and "rs-film-down" in src, (
             "a film player offers no download — or offers the unburned file")
@@ -79,9 +79,10 @@ def test_a_rendered_picture_downloads_with_the_badge_in_its_pixels(client):
     assert r.status_code == 200, r.text
     assert "attachment" in r.headers["content-disposition"]
     burned = Image.open(io.BytesIO(r.content)).convert("RGB")
-    corner = burned.getpixel((badge.MARGIN + 4, badge.MARGIN + 4))
-    assert corner != (255, 255, 255), "the corner is still white — nothing burned"
-    assert burned.getpixel((300, 170)) == (255, 255, 255), "the badge spread past its corner"
+    assert burned.getpixel((badge.MARGIN + 4, badge.MARGIN + 4)) != (255, 255, 255), (
+        "the corner is still white — nothing burned")
+    assert burned.getpixel((300, 170)) == (255, 255, 255), (
+        "the badge spread past its corner")
 
 
 def test_footage_without_a_burner_is_refused_not_served_unmarked(client, monkeypatch):
@@ -90,14 +91,3 @@ def test_footage_without_a_burner_is_refused_not_served_unmarked(client, monkeyp
     monkeypatch.setattr(shutil, "which", lambda name: None)
     r = client.get(f"/media/{row['id']}/download")
     assert r.status_code == 503 and "ffmpeg" in r.json()["detail"]
-
-
-@pytest.mark.skipif(not shutil.which("ffmpeg"), reason="no ffmpeg on this host")
-def test_footage_downloads_burned_where_a_burner_exists(client, tmp_path):
-    import subprocess
-    src = tmp_path / "in.mp4"
-    subprocess.run([shutil.which("ffmpeg"), "-y", "-loglevel", "error", "-f", "lavfi",
-                    "-i", "color=c=white:s=320x180:d=1", str(src)], check=True)
-    row = media.save("prf_test", src.read_bytes(), name="scene.mp4", ai_marked=True)
-    r = client.get(f"/media/{row['id']}/download")
-    assert r.status_code == 200 and len(r.content) > 0

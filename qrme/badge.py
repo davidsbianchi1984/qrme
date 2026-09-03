@@ -9,9 +9,9 @@ is burned into the image itself, top-left, before the bytes go out.
 
     asked     the AI badge is the outermost overlay, and a download
               still carries it
-    mattered  a badge drawn by the page is not in the file; a badge in
-              the file cannot be the page's outermost layer — so there
-              are two, one for each
+    mattered  a badge the page draws is not in the file; a badge in the
+              file cannot be the page's outermost layer — so there are
+              two, one for each
 
 `ai_marked` on a media row is the only thing that earns a burn: an
 authentic upload is never stamped, because stamping it would be a false
@@ -54,14 +54,15 @@ def _badge_png(height: int) -> bytes:
         font = ImageFont.load_default(size=size)
     except TypeError:  # an older Pillow: one size only
         font = ImageFont.load_default()
+    label = "AI " + TEXT
     probe = ImageDraw.Draw(Image.new("RGBA", (1, 1)))
-    box = probe.textbbox((0, 0), "✦ " + TEXT, font=font)
+    box = probe.textbbox((0, 0), label, font=font)
     w, h = box[2] - box[0] + size, box[3] - box[1] + size // 2
     img = Image.new("RGBA", (w, h), (8, 6, 16, 200))
     draw = ImageDraw.Draw(img)
     draw.rounded_rectangle((0, 0, w - 1, h - 1), radius=h // 3,
                            outline=(159, 216, 232, 230), width=1)
-    draw.text((size // 2 - box[0], size // 4 - box[1]), "✦ " + TEXT,
+    draw.text((size // 2 - box[0], size // 4 - box[1]), label,
               font=font, fill=(159, 216, 232, 255))
     out = io.BytesIO()
     img.save(out, "PNG")
@@ -116,12 +117,9 @@ def _burn_video(source: Path, target: Path) -> None:
                        "be burned into footage — the download is refused "
                        "rather than served unmarked")
     badge = source.with_name(source.stem + ".badge.png")
-    # Sized for a 720-line frame; ffmpeg scales the overlay with the
-    # frame so it reads the same at any height.
     badge.write_bytes(_badge_png(720))
     cmd = [ffmpeg, "-y", "-loglevel", "error", "-i", str(source),
-           "-i", str(badge),
-           "-filter_complex",
+           "-i", str(badge), "-filter_complex",
            f"[1][0]scale2ref=w='iw*0.28':h='ow/mdar'[b][v];"
            f"[v][b]overlay={MARGIN}:{MARGIN}",
            "-c:a", "copy", "-movflags", "+faststart", str(target)]
