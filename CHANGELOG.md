@@ -6,6 +6,47 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.0.5] - 2026-09-03
+
+### Added
+
+- **The voice door — the phone line JIM rings emergency contacts on, as
+  a sidecar in the stack.** JIM-mini 3.0.8 rings its reach-out cascade
+  through a phone line, and the line's other half lives here
+  (`docker/voice`), the same shape as the camera and the ears: a
+  stateless sidecar that holds the phone house's credential, speaks one
+  small protocol to JIM — `GET /health`, `GET /standing` and
+  `POST /calls` under the one shared secret — turns the house's webhooks
+  into JIM's own call-id doors, and composes no prose of its own: every
+  spoken sentence rides JIM's line envelope, and the six it may speak
+  alone come from JIM's table. Five houses behind one interface —
+  Twilio, SignalWire, Telnyx, Plivo, Vonage — each verifying its own
+  webhook signature and the per-call signature before a word is spoken,
+  each mapping its terminal words onto JIM's six. A machine or a fax
+  answering is hung up on before a word of health text is spoken. The
+  sidecar keeps nothing per call that a restart would lose: it asks JIM
+  rather than speaking from memory. `GET /standing` proves the line —
+  reachable, keyed, a number to ring from, the public URL routed, JIM's
+  secret accepted — so JIM's posture names the variable to set before
+  the first call.
+- **The compose stack carries the line.** The `voice` service, JIM's
+  three line variables (`JIM_VOICE_URL` as a compose literal,
+  `JIM_VOICE_SECRET` — one value both containers are set from —
+  `JIM_TELEPHONY_PROVIDER`), and `JIM_LLM_TIMEOUT` with its load-bearing
+  default. Caddy publishes only the house-facing paths under `/voice` on
+  jim-mini.com, named path by path so JIM's own spoken-voice doors keep
+  their prefix and the internet cannot ask this box to ring a number,
+  secret or no secret. The deploy page's `.env` template carries the
+  line's variables, what wiring one means in plain words, and the two
+  curls and the runbook that prove it.
+
+### Unchanged, and pinned
+
+- **The 911 send stays held shut** in JIM's source whatever is set
+  here: the line rings people, never dispatchers, and refuses an
+  emergency number at three locks — JIM's transport, this sidecar, and
+  the dialer's own held send.
+
 ## [3.0.4] - 2026-09-03
 
 ### Added
@@ -17743,7 +17784,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.4...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.5...HEAD
+[3.0.5]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.4...app-v3.0.5
 [3.0.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.3...app-v3.0.4
 [3.0.3]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.2...app-v3.0.3
 [3.0.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.1...app-v3.0.2

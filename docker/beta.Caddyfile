@@ -20,7 +20,20 @@ sntheticprofiles.com, www.sntheticprofiles.com {
 }
 
 jim-mini.com, www.jim-mini.com {
-	reverse_proxy jim:8200
+	# The phone house's webhooks go to the voice sidecar, and only those:
+	# its ping, and the four signed per-call doors under each house's
+	# name. Its JIM-facing doors (/calls, /standing, /health) are not
+	# under /voice and are not published. Named path by path rather than
+	# as /voice/* because JIM serves /voice/quota, /voice/speak and
+	# /voice/transcribe itself — the spoken voice, not the phone line —
+	# and a prefix match would take those from it.
+	@phone path /voice/ping /voice/twilio/* /voice/signalwire/* /voice/telnyx/* /voice/vonage/* /voice/plivo/*
+	handle @phone {
+		reverse_proxy voice:8800
+	}
+	handle {
+		reverse_proxy jim:8200
+	}
 }
 
 pdisystems.net, www.pdisystems.net {
