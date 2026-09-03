@@ -68,14 +68,12 @@ import { Plugins } from "./screens/Plugins";
 import { Settings } from "./screens/Settings";
 import { Access } from "./screens/Access";
 import { Matters } from "./screens/Matters";
-import { Help } from "./Help";
+import { EdgeDock } from "./EdgeDock";
 import { LoudnessRail } from "./LoudnessRail";
 import { ProblemNotice } from "./ProblemNotice";
 import { WalkAlong } from "./WalkAlong";
 import { onWalk } from "./walk";
-import { Footsteps } from "./Footsteps";
 import { VersionGuard } from "./VersionGuard";
-import { WatchLights } from "./WatchLights";
 
 // `profile` is deliberately not in NAV: somebody else's homepage is a place
 // you are taken to by pressing their face, not a standing destination — the
@@ -296,7 +294,6 @@ export function App() {
     return (
       <>
         <VersionGuard />
-        <Footsteps />
         {door
           ? <Public start={door} onBack={() => {
               setPublicDoor(null);
@@ -310,7 +307,6 @@ export function App() {
   return (
     <div className={"app" + (inRoom ? " in-room" : "")}>
       <VersionGuard />
-      <Footsteps />
       <button className="menu-fab" aria-label={t("nav.menu", lang)}
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen(!menuOpen)}>☰</button>
@@ -468,11 +464,12 @@ export function App() {
       </main>
 
       {/* Outside the tab switch on purpose: it is part of the shell, so every
-          screen has it without each screen having to remember. */}
-      <Help />
-      {/* Same reason: the agent task lights are on every screen, watch-sized,
-          minimizable to a dot when they're in the way. */}
-      <WatchLights />
+          screen has it without each screen having to remember. The help
+          box and the agent task lights are tabs on the right edge — the
+          lights a stoplight that opens to the round watch face — pressed
+          to open, moved up or down by the grip when they are in the
+          way. */}
+      <EdgeDock />
       {/* And the dial-down for spoken audio, above the surfaces the sound
           actually comes out of — the talk face and the room stage. */}
       <LoudnessRail />

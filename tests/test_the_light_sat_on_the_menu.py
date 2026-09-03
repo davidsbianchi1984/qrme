@@ -37,6 +37,23 @@ survives the redesign in a new shape: the menu must still win. Nothing the
 console pins to the glass may sit *over* an open drawer, which is a
 question of stacking rather than of height — so the drawer's z-index is
 read out of the stylesheet and every pinned widget has to stack below it.
+
+## The third shape
+
+The widgets were then folded into one thing. Three corners — the help
+bubble bottom-right, the agent lights bottom-left, the footsteps chip
+top-right — became one stack of tabs on the right edge, the *edge dock*,
+after the owner's photographs showed all three sitting on screens again
+("they seem to be getting in the way a lot ... maybe horizontal tabs on
+the side of the screen that can be moved up or down that you click onto
+expand"). The question survives a third time: the docks are pinned to the
+glass, so they must stack under the drawer; their tabs are tap targets, so
+they must be thumb-sized on a phone; and their panels must stay inside the
+glass rather than push the page sideways. The owner kept the round watch
+face as what the lights open to, and made the light itself a tab — a
+stoplight, minimized — so the circle is a panel now, opened by a press and
+gone on the next, never parked; and the footsteps count left the console
+altogether, since everyone with an account shows in Discover.
 """
 from __future__ import annotations
 
@@ -191,26 +208,34 @@ def _drawer_z() -> float:
     return z
 
 
-#: Everything pinned to the bottom of the viewport. A new one is a new row
-#: here, which is the point: the question is asked of the class of thing,
-#: not of the one that was reported.
-BOTTOM_FIXED = (".help-fab", ".help-panel", ".watch-lights", ".wl-dot")
+#: The four guards below keep the names they had when the widgets sat in
+#: the corners — `shared_guards.txt` carries those names across the three
+#: products, and a renamed guard reads as a missing one there. What each
+#: asks is the question in the dock's shape; the docstrings say which.
+#:
+#: Everything the shell pins to the glass. A new one is a new row here,
+#: which is the point: the question is asked of the class of thing, not of
+#: the one that was reported.
+PINNED = (".edge-dock", ".edge-panel")
 
 
 def test_the_stylesheet_still_pins_these_to_the_bottom():
-    """The guard on the guard. If the light stopped being fixed — or was
+    """The guard on the guard. If the dock stopped being fixed — or was
     renamed — every assertion below would pass on an empty reading."""
     css = _base()
-    for selector in BOTTOM_FIXED:
-        rule = _rule(css, selector)
-        assert rule, f"{selector} is not in styles.css any more"
-        assert "position: fixed" in rule and _px(rule, "bottom") is not None, (
-            f"{selector} is no longer fixed to the bottom of the viewport — "
-            "either this list is stale or the light moved, and both want a "
-            "person to look")
+    rule = _rule(css, ".edge-dock")
+    assert rule, ".edge-dock is not in styles.css any more"
+    assert "position: fixed" in rule and re.search(r"\bright:\s*0", rule), (
+        ".edge-dock is no longer fixed to the right edge of the viewport — "
+        "either this list is stale or the dock moved, and both want a "
+        "person to look")
+    panel = _rule(css, ".edge-panel")
+    assert panel and "position: absolute" in panel, (
+        ".edge-panel no longer hangs off the dock — where it opens is "
+        "somebody's decision again")
 
 
-@pytest.mark.parametrize("selector", BOTTOM_FIXED)
+@pytest.mark.parametrize("selector", PINNED)
 def test_nothing_fixed_to_the_bottom_covers_the_bar(selector):
     """The defect, in the menu's current shape.
 
@@ -234,83 +259,109 @@ def test_nothing_fixed_to_the_bottom_covers_the_bar(selector):
         if z is not None:
             assert z < drawer, (
                 f"{selector} stacks at {z} and the menu drawer at {drawer}, "
-                "so an open menu sits under the light — the field report "
+                "so an open menu sits under the dock — the field report "
                 'that produced this guard read "It seems to be blocking '
                 'the PDI menus"')
 
 
-#: What the minimized light may occupy on a phone, and how solid it may be.
-#: Both numbers are QRME's, which arrived at them after the same report
-#: about the same widget.
-DOT_MAX_PX, DOT_MAX_OPACITY = 24.0, 0.9
-
 #: What a thumb has to be able to hit. The blanket
 #: `button { min-height: 44px }` in the phone block is where this
-#: number comes from, and the dot is a button like any other.
+#: number comes from, and a tab is a button like any other.
 TAP_MIN_PX = 44.0
+
+def test_a_tab_is_a_thumb_target_on_a_phone():
+    """The tabs lose their words on a phone and keep their glyphs, and a
+    control that shrank to its glyph is exactly the one a thumb misses. The
+    phone block has to give the tab its full height back, in the rule and
+    not by inheritance — `min-height` beats `height`, and the base rule
+    sets both to 36."""
+    rule = _rule(_mobile_block(), ".edge-tab")
+    assert rule, (
+        ".edge-tab has no rule at the mobile breakpoint, so it keeps its "
+        "desktop size on a phone")
+    for prop in ("height", "min-height"):
+        size = _px(rule, prop)
+        assert size is not None and size >= TAP_MIN_PX, (
+            f"a dock tab is {size}px {prop} on a phone, under the "
+            f"{TAP_MIN_PX}px every other control here gets")
 
 
 def test_the_minimized_light_is_a_dot_and_not_a_disc():
-    """The second half of the same field report.
-
-    The first photograph showed the light covering the tabs; lifting it
-    answered that. The next one — *"Same thing with the small green circle
-    when minimized"* — showed the minimized state, and it was not small: a
-    40px solid disc with a heavy shadow, sitting over the screen's own
-    content at full strength.
-
-        asked     does the minimized light clear the menu
-        mattered  is the minimized light small enough to be minimized
-
-    Minimizing is the reader saying *get out of the way*. A widget that
-    answers by staying the same size in a different shape has not obeyed;
-    it has only stopped explaining itself.
-    """
-    # The dot is a <button>, and the phone block sets
-    # `button { min-height: 44px }` so every control is a real tap target.
-    # `min-height` beats `height`, so a 22px square rendered 22 wide and 44
-    # tall — an ellipse. This guard read the declared width and height, saw
-    # 22 and 22, and passed on it for two releases.
-    #
-    #     asked     how big is the dot declared
-    #     mattered  how big is the dot drawn
-    #
-    # So there are two elements and two questions. The button is the tap
-    # target and may not shrink under 44; the face is the paint and may not
-    # grow past a dot. Neither number can be read off the other, which is
-    # the whole reason the first version of this could not see the defect.
-    target = _rule(_mobile_block(), ".wl-dot")
-    assert target, (
-        ".wl-dot has no rule at the mobile breakpoint, so it keeps its "
-        "desktop size on a phone")
-    for prop in ("width", "height"):
-        size = _px(target, prop)
-        assert size is not None and size >= TAP_MIN_PX, (
-            f"the minimized light's tap target is {size}px {prop} on a "
-            f"phone, under the {TAP_MIN_PX}px every other control here "
-            "gets. The face inside it may be small; the thing a thumb has "
-            "to hit may not be")
-
-    rule = _rule(_mobile_block(), ".wl-dot-face")
-    assert rule, (
-        ".wl-dot-face has no rule at the mobile breakpoint, so the dot keeps "
-        "its desktop size on a phone")
-    for prop in ("width", "height"):
-        size = _px(rule, prop)
-        assert size is not None and size <= DOT_MAX_PX, (
-            f"the minimized light's {prop} is {size}px on a phone; a dot "
-            f"that is more than {DOT_MAX_PX}px is a disc parked on the "
-            "content")
-    m = re.search(r"\bopacity:\s*([\d.]+)\s*;", rule)
-    assert m and float(m.group(1)) <= DOT_MAX_OPACITY, (
-        "the minimized light is fully opaque on a phone — it hides whatever "
-        "is under it rather than sitting lightly over it")
+    """The second half of the original field report — *"Same thing with
+    the small green circle when minimized"* — asked of the light's new
+    home. The minimized state is the tab itself, and the tab carries a
+    stoplight glyph rather than a disc: "let's use a stoplight instead of
+    a green inside minimized tab". The worst colour rides the tab's edge,
+    so the glance still gets its answer."""
+    src = (REPO / "app" / "src" / "WatchLights.tsx").read_text(encoding="utf-8")
+    assert "🚦" in src, "the lights' tab lost its stoplight glyph"
+    assert "borderColor: COLORS[worstTone]" in src, (
+        "the tab no longer wears the worst light's colour — a stoplight "
+        "that is the same on a red day and a green one says nothing")
+    assert ".wl-dot-face" not in (REPO / "app" / "src" / "styles.css").read_text(
+        encoding="utf-8"), "the minimized disc is back in the stylesheet"
 
 
 def test_the_light_stays_inside_the_glass():
     """A panel wider than the phone pushes the page sideways, which is the
     other way a fixed element takes a screen over."""
-    rule = _rule(_base(), ".help-panel")
-    assert rule and ("max-width" in rule or "width: min(" in rule), (
-        "the help panel has no width limit, so on a narrow phone it can "
-        "widen past the viewport and push the page sideways")
+    for block in (_base(), _mobile_block()):
+        rule = _rule(block, ".edge-panel")
+        assert rule and ("max-width" in rule or "width: min(" in rule), (
+            "the dock panel has no width limit, so on a narrow phone it can "
+            "widen past the viewport and push the page sideways")
+
+
+def test_the_round_face_opens_from_the_tab_and_is_never_parked():
+    """The circle stays — "I still like the circle version as the full
+    screen window for running agents" — as the panel the tab opens, not
+    as a window pinned to a corner. Pinned is how it came to sit on the
+    sidebar's last tabs and the room's record card."""
+    src = (REPO / "app" / "src" / "WatchLights.tsx").read_text(encoding="utf-8")
+    assert re.search(r"\{open && \(\s*<div className=\{\"edge-panel watch-lights\"", src), (
+        "the watch face is drawn without the tab being pressed — a window "
+        "that is always up is the corner widget again")
+    face = _rule(_base(), ".watch-lights")
+    assert face and "border-radius: 50%" in face, (
+        "the lights' panel is no longer the round watch face the owner kept")
+    assert "position: fixed" not in face, (
+        "the watch face is fixed to the glass on its own — it belongs to "
+        "the dock and opens beside the tab")
+
+
+def test_the_round_face_can_say_which_agent():
+    """"That way it could be elaborated when necessary on that larger
+    window on which particular agent is hung up, running or stopped."
+    Each row of the face is a press, and a pressed row names who stands
+    under that light from the same payload the wrist reads — the agents
+    by goal, the robots by name."""
+    src = (REPO / "app" / "src" / "WatchLights.tsx").read_text(encoding="utf-8")
+    assert re.search(r'className=\{"wl-row"', src) and "aria-expanded={which === r.tone}" in src, (
+        "the rows of the face are no longer presses, so the window cannot "
+        "elaborate")
+    assert "face.agents" in src and "face.robots" in src, (
+        "the elaboration no longer reads the agents and robots off the face")
+    api = (REPO / "app" / "src" / "api.ts").read_text(encoding="utf-8")
+    assert re.search(r"agents\?: \{ id: string; goal: string;", api), (
+        "the WatchFace type no longer carries the agents the route sends")
+    grown = _rule(_base(), ".watch-lights.elaborated")
+    assert grown and "height: auto" in grown, (
+        "the elaborated face cannot grow to hold the names")
+
+
+def test_the_dock_can_be_moved_and_the_move_is_remembered():
+    """The half of the request that is not a stylesheet question: "tabs
+    ... that can be moved up or down". A dock that cannot be moved is the
+    corner widget again, in a new corner."""
+    src = (REPO / "app" / "src" / "EdgeDock.tsx").read_text(encoding="utf-8")
+    assert "onPointerDown={down}" in src and "onPointerMove={move}" in src, (
+        "the dock's grip no longer follows a pointer")
+    assert re.search(r"ArrowUp.*ArrowDown", src), (
+        "the grip answers a pointer and not a keyboard")
+    assert "localStorage.setItem(Y_KEY" in src, (
+        "where the dock was left is forgotten on the next load — a person "
+        "who moved it out of the way has to move it again every time")
+    grip = _rule(_base(), ".edge-grip")
+    assert grip and "touch-action: none" in grip, (
+        "the grip has no `touch-action: none`, so on a phone a drag "
+        "scrolls the page instead of moving the dock")

@@ -25,6 +25,12 @@ def _seeded(client):
     return [out["founder_verified"], out["founder"]]
 
 
+def _pack() -> int:
+    """How many starters a seeded deployment installs as standard — the
+    collection, not the rated shelf behind the age gate."""
+    return len(friends.starter_ids())
+
+
 # -- the founder comes standard ---------------------------------------------
 
 def test_a_new_profile_gets_both_founders_at_the_top(client):
@@ -34,12 +40,58 @@ def test_a_new_profile_gets_both_founders_at_the_top(client):
     profile = make_profile(client, display_name="Newcomer")
 
     listed = client.get(f"/profiles/{profile['id']}/friends").json()
-    assert listed["count"] == 2
-    assert [f["profile_id"] for f in listed["friends"]] == [live, rendered]
-    assert [f["position"] for f in listed["friends"]] == [1, 2]
-    assert all(f["founder"] and f["pinned"] for f in listed["friends"])
-    assert [f["handle"] for f in listed["friends"]] == list(
+    assert listed["count"] == 2 + _pack()
+    assert [f["profile_id"] for f in listed["friends"]][:2] == [live, rendered]
+    assert [f["position"] for f in listed["friends"]][:2] == [1, 2]
+    assert all(f["founder"] and f["pinned"] for f in listed["friends"][:2])
+    assert [f["handle"] for f in listed["friends"]][:2] == list(
         friends.FOUNDER_HANDLES)
+
+
+def test_a_new_profile_gets_the_whole_starter_pack_after_the_founders(client):
+    """"Let's go ahead and list all of them in the starter pack as friends."
+
+    The collection, in the pack's own order, after the pins; each one an
+    ordinary friend — from the pack, not a founder, not pinned. The rated
+    shelf stays behind the age gate and is not installed on anybody."""
+    _seeded(client)
+    profile = make_profile(client, display_name="Newcomer")
+    listed = client.get(f"/profiles/{profile['id']}/friends").json()
+    pack = listed["friends"][2:]
+    assert [f["profile_id"] for f in pack] == friends.starter_ids()
+    assert [f["handle"] for f in pack] == [h for h, *_ in seed.STARTERS]
+    assert all(f["starter"] and not f["founder"] and not f["pinned"]
+               for f in pack)
+    rated = {h for h, *_ in seed.RATED}
+    assert not rated & {f["handle"] for f in listed["friends"]}
+
+
+def test_a_starter_can_be_shown_the_door_and_stays_out(client):
+    """The pack is standard, not fixed: unlike the founder pins a starter is
+    removable, and the backfill that repairs a cleared pin does not bring a
+    removed starter back."""
+    _seeded(client)
+    profile = make_profile(client, display_name="Particular")
+    first = friends.starter_ids()[0]
+    r = client.delete(f"/profiles/{profile['id']}/friends/{first}",
+                      headers=auth_header(profile))
+    assert r.status_code == 200 and r.json()["removed"] is True
+    friends.backfill_standing()
+    listed = client.get(f"/profiles/{profile['id']}/friends").json()
+    assert first not in [f["profile_id"] for f in listed["friends"]]
+    assert listed["count"] == 1 + _pack()
+
+
+def test_a_starter_does_not_get_the_pack(client):
+    """Thirty-five fictional professionals befriending each other is a
+    roster, not a circle. A starter carries the founder pins first and the
+    few colleagues the seed gives it, and never the pack as standard."""
+    live, rendered = _seeded(client)
+    first = friends.starter_ids()[0]
+    listed = client.get(f"/profiles/{first}/friends").json()
+    assert [f["profile_id"] for f in listed["friends"]][:2] == [live, rendered]
+    assert not any(f["starter"] for f in listed["friends"])
+    assert listed["count"] < _pack()
 
 
 def test_the_founder_stays_first_however_many_friends_arrive(client):
@@ -56,10 +108,13 @@ def test_the_founder_stays_first_however_many_friends_arrive(client):
         assert r.status_code == 200, r.text
 
     listed = client.get(f"/profiles/{profile['id']}/friends").json()
-    assert listed["count"] == 5
+    assert listed["count"] == 5 + _pack()
     assert [f["profile_id"] for f in listed["friends"]][:2] == [live, rendered]
-    assert [f["founder"] for f in listed["friends"]] == [
+    assert [f["founder"] for f in listed["friends"]][:5] == [
         True, True, False, False, False]
+    # What the profile chose stands above what came as standard.
+    assert [f["profile_id"] for f in listed["friends"]][2:5] == [
+        o["id"] for o in others]
 
 
 def test_the_founder_is_first_even_when_he_arrives_last(client):
@@ -77,9 +132,9 @@ def test_the_founder_is_first_even_when_he_arrives_last(client):
     live, rendered = _seeded(client)   # the founders appear only now
 
     listed = client.get(f"/profiles/{a['id']}/friends").json()
-    assert listed["count"] == 3
-    assert [f["profile_id"] for f in listed["friends"]] == [live, rendered,
-                                                            b["id"]]
+    assert listed["count"] == 3 + _pack()
+    assert [f["profile_id"] for f in listed["friends"]][:3] == [live, rendered,
+                                                                b["id"]]
     assert listed["friends"][0]["position"] == 1
 
 
@@ -93,18 +148,22 @@ def test_the_backfill_restores_a_pin_that_was_cleared(client):
         "UPDATE friendships SET state='removed' WHERE profile_id=? AND"
         " friend_id=?", (a["id"], live))
     db.connect().commit()
-    assert client.get(f"/profiles/{a['id']}/friends").json()["count"] == 1
+    assert client.get(f"/profiles/{a['id']}/friends").json()["count"] == 1 + _pack()
 
     assert a["id"] in friends.backfill_founder()
-    assert client.get(f"/profiles/{a['id']}/friends").json()["count"] == 2
+    assert client.get(f"/profiles/{a['id']}/friends").json()["count"] == 2 + _pack()
 
 
 def test_a_founder_profile_does_not_befriend_itself(client):
-    """Each carries the other, but neither carries itself."""
+    """Each carries the other, but neither carries itself — and then the
+    pack, like any profile that is not in it."""
     live, rendered = _seeded(client)
     for me, other in ((live, rendered), (rendered, live)):
         listed = client.get(f"/profiles/{me}/friends").json()
-        assert [f["profile_id"] for f in listed["friends"]] == [other]
+        ids = [f["profile_id"] for f in listed["friends"]]
+        assert ids[:1] == [other]
+        assert me not in ids
+        assert ids[1:] == friends.starter_ids()
 
 
 def test_install_is_silent_when_there_is_no_founder(client):
@@ -130,7 +189,7 @@ def test_the_founder_pins_cannot_be_removed(client):
                           headers=auth_header(profile))
         assert r.status_code == 409, r.text
         assert "cannot be removed" in r.json()["detail"]
-    assert client.get(f"/profiles/{profile['id']}/friends").json()["count"] == 2
+    assert client.get(f"/profiles/{profile['id']}/friends").json()["count"] == 2 + _pack()
 
 
 def test_the_list_says_which_rows_are_pinned(client):
@@ -143,7 +202,8 @@ def test_the_list_says_which_rows_are_pinned(client):
                 json={"friend_id": other["id"]}, headers=auth_header(profile))
 
     entries = client.get(f"/profiles/{profile['id']}/friends").json()["friends"]
-    assert [f["pinned"] for f in entries] == [True, True, False]
+    assert [f["pinned"] for f in entries][:3] == [True, True, False]
+    assert not any(f["pinned"] for f in entries[2:])
 
 
 def test_an_ordinary_friend_is_still_removable(client):
@@ -156,7 +216,7 @@ def test_an_ordinary_friend_is_still_removable(client):
     r = client.delete(f"/profiles/{a['id']}/friends/{b['id']}",
                       headers=auth_header(a))
     assert r.status_code == 200 and r.json()["removed"] is True
-    assert client.get(f"/profiles/{a['id']}/friends").json()["count"] == 2
+    assert client.get(f"/profiles/{a['id']}/friends").json()["count"] == 2 + _pack()
 
 
 def test_removing_an_ordinary_friend_sticks(client):
@@ -249,7 +309,7 @@ def test_friendships_and_relationships_are_separate_tables(client):
         (profile["id"],)).fetchone()["n"] == 0
     assert conn.execute(
         "SELECT COUNT(*) AS n FROM friendships WHERE profile_id=?",
-        (profile["id"],)).fetchone()["n"] == 2
+        (profile["id"],)).fetchone()["n"] == 2 + _pack()
 
 
 # -- the founder profile itself ---------------------------------------------

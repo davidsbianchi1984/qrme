@@ -6,6 +6,71 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.1.2] - 2026-09-03
+
+### Changed
+
+- **The edge dock.** The help box, the agent task lights and the
+  footsteps count were three widgets fixed to three corners, and a field
+  round of phone photographs showed all three sitting on screens again —
+  the lights over the sidebar's last tabs, the "?" on the room's record
+  card, the counter on the room's way out. The help box and the lights
+  are one stack of tabs on the right edge of the glass now (screen 211):
+  each tab a short strip protruding from the edge, pressed to open its
+  panel beside it, the stack moved up or down by its grip with the place
+  it is left remembered per device. The lights' tab is a stoplight, its
+  edge in the worst light's colour — the minimized state — and it opens
+  to the round watch-face window the owner kept: three lights, three
+  counts, the approval line. Each row of the face is a press, and a
+  pressed row names who stands under that light — the agents by goal, the
+  robots by name — so the window says which agent is hung up, running or
+  stopped without leaving the screen; the face grows from a circle to an
+  oval to hold the names. One panel open at a time, all of it under the
+  menu drawer, the tabs thumb-sized on a phone. The guards that held the
+  corner widgets (`test_the_light_sat_on_the_menu.py`,
+  `test_the_lights_say_unreachable_rather_than_vanish.py`, the sidebar's
+  reserved footprint) hold the dock's shape instead.
+- **The footsteps count leaves the console.** Everyone with an account
+  shows in the community's Discover, and a number beside a glyph said
+  less than that page does. `/health` still carries the count for the
+  health page.
+- **The whole starter pack, as friends.** A new profile met the platform
+  with the founder's two faces on its list and thirty-five it had to go
+  looking for. Every profile now gets the starter collection installed as
+  standing friends after the founder pins — in the pack's own order,
+  after anyone the profile chose, each one an ordinary friend that can be
+  shown the door and stays out once it is. The rated shelf stays behind
+  the age gate and is installed on nobody; a starter does not get the
+  pack (`friends.install_starters`, `friends.install_standing`,
+  `friends.backfill_standing`; the seed repairs profiles that predate
+  it).
+
+### Fixed
+
+- **The first screen was cropped on a phone.** The onboarding card was
+  440px wide inside a 430px viewport, so the welcome and the
+  create-profile form both lost their right edge. It is as wide as the
+  phone allows now.
+- **The avatar stage blew up the empty frame.** A profile with no
+  portrait yet carries the platform's empty frame as its picture, which
+  is right for a bubble and wrong for a stage that fills the screen with
+  it. The stage reads the `placeholder` flag and says "no avatar yet"
+  instead.
+- **Seat names and fields were cut off in a room.** The name and the
+  profession on a seat wrap to two lines and step down a size on a phone,
+  so "Dr. Amara Osei" and "Mental health" fit whole.
+
+### Documentation
+
+- **Photographs where drawings stood.** Screens 01, 02, 148, 197, 204 and
+  205 are captures of the running console now; the drawings are gone.
+  Screen 211 photographs the edge dock open on the agent lights. The
+  founder's rendered figure stands beside it.
+- **The mechanisms, in the shape an examiner reads.** The ten mechanisms
+  on file are each set out as the technical problem in the machine, the
+  particular solution as built, what it changes in the machine, and
+  where it is reduced to practice and held by a test.
+
 ## [3.1.1] - 2026-09-03
 
 ### Changed
@@ -17836,7 +17901,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.2...HEAD
+[3.1.2]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.1...app-v3.1.2
 [3.1.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.0...app-v3.1.1
 [3.1.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.6...app-v3.1.0
 [3.0.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.5...app-v3.0.6

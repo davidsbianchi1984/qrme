@@ -200,32 +200,30 @@ def test_the_sidebar_reserves_room_for_the_widget_parked_on_it():
     """Found by clicking, not reading.
 
     Adding the Plans tab put it under the always-on agent-lights widget, which
-    is fixed to the bottom-left corner — on top of the sidebar. A real click
+    was fixed to the bottom-left corner — on top of the sidebar. A real click
     landed on the lights. Two more tabs were already under there.
 
-    This is the same fault the 760px block in `styles.css` was written for,
-    when the widget covered Home and Chat on a phone and the tabs were
-    reported as broken screens. On desktop the sidebar simply had not grown
-    long enough to reach it yet, so the fix was made once and the second half
-    of the problem shipped anyway.
-
-    Asserting the arithmetic rather than the number: the column has to reserve
-    the widget's footprint, whatever the widget's size becomes.
+    The widget has since left the column altogether: the lights are a tab on
+    the edge dock, pinned to the *right* edge of the glass and movable up and
+    down, and the round face opens beside the tab only on a press. So nothing
+    the shell floats can sit on the sidebar at any length. The name is kept
+    for the divergence ledger; what it holds now is that the dock is on the
+    other edge and declares no `left` at all, and that the face is never
+    fixed on its own.
     """
     css = _src("app/src/styles.css")
-
-    def px(pattern: str) -> int:
-        m = re.search(pattern, css)
-        assert m, f"styles.css no longer matches {pattern!r}"
-        return int(m.group(1))
-
-    height = px(r"\.watch-lights\s*\{[^}]*?height:\s*(\d+)px")
-    bottom = px(r"\.watch-lights\s*\{[^}]*?bottom:\s*(\d+)px")
-    reserved = px(r"\.sidebar\s*\{[^}]*?padding:\s*\d+px\s+\d+px\s+(\d+)px")
-    assert reserved >= height + bottom, (
-        f"the sidebar reserves {reserved}px at the bottom and the agent-lights "
-        f"widget occupies {height + bottom}px of it — the last tabs are under "
-        "the widget and a click lands on the lights")
+    m = re.search(r"\.edge-dock\s*\{([^}]*)\}", css)
+    assert m, "styles.css no longer has an .edge-dock rule"
+    dock = m.group(1)
+    assert "position: fixed" in dock and re.search(r"\bright:\s*0", dock), (
+        "the edge dock is no longer fixed to the right edge")
+    assert not re.search(r"\bleft:", dock), (
+        "the edge dock declares a `left`, which is how the agent lights came "
+        "to sit on the sidebar's last three tabs")
+    face = re.search(r"\.watch-lights\s*\{([^}]*)\}", css)
+    assert face and "position: fixed" not in face.group(1), (
+        "the round face is fixed to the glass on its own again, which is "
+        "how it came to sit on the sidebar's last three tabs")
 
 
 def test_the_screens_keep_the_error_rather_than_its_sentence():

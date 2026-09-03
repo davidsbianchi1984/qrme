@@ -53,9 +53,13 @@ NOT_A_SURFACE = {
     "store",        # a context provider, no markup
     "api",          # not a component at all
     "l10n",         # not a component at all
-    "Help",         # the assistant dock, drawn inside the screens it floats over
-    "WatchLights",  # the always-on widget; its own gallery lives in the watch faces
-    "Footsteps",   # the corner counter; fixed chrome over every screen, like the version guard
+    "Help",         # the help box, a tab on the edge dock over every screen
+    "WatchLights",  # the agent lights, a tab on the dock; its own gallery lives in the watch faces
+    # The edge dock itself: the stack the three tabs above stand in, on the
+    # right edge of every screen, movable up and down. Chrome by the same
+    # reasoning as the version guard — and photographed open, with the
+    # agent lights' face beside its tab, at screen 211 in the gallery.
+    "EdgeDock",
     "VersionGuard", # a failure banner, deliberately not part of the tour
     "AgentTalk",    # the agent conversation, drawn inside Agent and Studio
     # The walk-along strip: a bar pinned to the bottom of the viewport while

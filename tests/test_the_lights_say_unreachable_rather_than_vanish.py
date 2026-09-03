@@ -21,8 +21,11 @@ into a permanent absence that reads as the feature being removed.
 ## The fix this file pins
 
 Unreachable is a state the widget shows, not one it hides in: with a
-session present and no face, a failed fetch renders the minimized dot,
+session present and no face, a failed fetch renders the tab with its light
 unlit gray, titled in the reader's language, and pressing it retries.
+
+The widget is a tab on the edge dock now rather than a corner window; the
+no-face branch is the same branch, and so is the question.
 """
 
 from __future__ import annotations
@@ -51,8 +54,11 @@ def test_the_widget_is_mounted_in_the_shell():
     unmounting `<WatchLights />` from the shell would orphan the file and the
     suite would call the orphan healthy."""
     app = (REPO / "app/src/App.tsx").read_text(encoding="utf-8")
-    assert "<WatchLights />" in app, (
-        "the watch lights are no longer part of the shell")
+    dock = (REPO / "app/src/EdgeDock.tsx").read_text(encoding="utf-8")
+    assert "<EdgeDock />" in app, (
+        "the edge dock is no longer part of the shell")
+    assert "<WatchLights " in dock, (
+        "the watch lights are no longer a tab on the dock")
 
 
 def test_a_failed_first_fetch_leaves_a_dot_not_a_blank():
@@ -91,8 +97,8 @@ def test_the_dot_retries_when_pressed():
 def test_the_unlit_dot_has_its_own_color():
     css = (REPO / "app/src/styles.css").read_text(encoding="utf-8")
     assert ".wl-dot-off" in css, (
-        "the unreachable dot has no style of its own — it would wear a "
-        "live light's color while the backend is unreachable")
+        "the unreachable tab has no style of its own — it would look like "
+        "a live stoplight while the backend is unreachable")
 
 
 def test_the_title_speaks_the_readers_language():

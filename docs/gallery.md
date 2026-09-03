@@ -52,8 +52,8 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 
 <table>
 <tr>
-<td align="center" width="25%"><a href="screens/01-welcome.svg"><img src="screens/01-welcome.svg" width="210" alt="Welcome"></a><br><sub><b>01</b> · Welcome</sub></td>
-<td align="center" width="25%"><a href="screens/02-create-profile.svg"><img src="screens/02-create-profile.svg" width="210" alt="Create Profile"></a><br><sub><b>02</b> · Create Profile</sub></td>
+<td align="center" width="25%"><a href="screens/01-welcome.png"><img src="screens/01-welcome.png" width="210" alt="Welcome"></a><br><sub><b>01</b> · Welcome</sub></td>
+<td align="center" width="25%"><a href="screens/02-create-profile.png"><img src="screens/02-create-profile.png" width="210" alt="Create Profile"></a><br><sub><b>02</b> · Create Profile</sub></td>
 <td align="center" width="25%"><a href="screens/03-build-your-profile.svg"><img src="screens/03-build-your-profile.svg" width="210" alt="Build Your Profile"></a><br><sub><b>03</b> · Build Your Profile</sub></td>
 <td align="center" width="25%"><a href="screens/04-personality.svg"><img src="screens/04-personality.svg" width="210" alt="Personality"></a><br><sub><b>04</b> · Personality</sub></td>
 </tr>
@@ -293,7 +293,7 @@ The same system on a phone. Regenerate with `python3 docs/screens/build.py`.
 </tr>
 <tr>
 <td align="center" width="25%"><a href="screens/147-voice.png"><img src="screens/147-voice.png" width="210" alt="Your Own Voice"></a><br><sub><b>147</b> · Your Own Voice</sub></td>
-<td align="center" width="25%"><a href="screens/148-who-wrote-this.svg"><img src="screens/148-who-wrote-this.svg" width="210" alt="Who Wrote This?"></a><br><sub><b>148</b> · Who Wrote This?</sub></td>
+<td align="center" width="25%"><a href="screens/148-who-wrote-this.png"><img src="screens/148-who-wrote-this.png" width="210" alt="Who Wrote This?"></a><br><sub><b>148</b> · Who Wrote This?</sub></td>
 <td align="center" width="25%"><a href="screens/149-how-should-they-work.svg"><img src="screens/149-how-should-they-work.svg" width="210" alt="How Should They Work?"></a><br><sub><b>149</b> · How Should They Work?</sub></td>
 <td align="center" width="25%"><a href="screens/150-what-went-wrong.png"><img src="screens/150-what-went-wrong.png" width="210" alt="What Went Wrong"></a><br><sub><b>150</b> · What Went Wrong</sub></td>
 </tr>
@@ -590,7 +590,7 @@ is exactly how the old card came to be showing yours in place of theirs.
 
 <table>
   <tr>
-    <td align="center" width="25%"><a href="screens/197-their-homepage.svg"><img src="screens/197-their-homepage.svg" width="210" alt="Their homepage"></a><br><sub><b>197</b> · Their homepage · a face is a door</sub></td>
+    <td align="center" width="25%"><a href="screens/197-their-homepage.png"><img src="screens/197-their-homepage.png" width="210" alt="Their homepage"></a><br><sub><b>197</b> · Their homepage · a face is a door</sub></td>
     <td align="center" width="25%"><a href="screens/198-beside-the-face.png"><img src="screens/198-beside-the-face.png" width="210" alt="Beside the face"></a><br><sub><b>198</b> · Beside the face · four panels, only what you can open</sub></td>
     <td align="center" width="25%"><a href="screens/199-what-it-is-doing.svg"><img src="screens/199-what-it-is-doing.svg" width="210" alt="What it is doing"></a><br><sub><b>199</b> · What it is doing · bars that mean it</sub></td>
     <td align="center" width="25%"><a href="screens/200-agent.png"><img src="screens/200-agent.png" width="210" alt="Agent"></a><br><sub><b>200</b> · Agent · say what you want changed</sub></td>
@@ -599,10 +599,10 @@ is exactly how the old card came to be showing yours in place of theirs.
     <td align="center" width="25%"><a href="screens/201-plugins.png"><img src="screens/201-plugins.png" width="210" alt="Plug-ins"></a><br><sub><b>201</b> · Plug-ins · what it can reach, and what it needs first</sub></td>
     <td align="center" width="25%"><a href="screens/202-allowed.png"><img src="screens/202-allowed.png" width="210" alt="What it may do"></a><br><sub><b>202</b> · What it may do · every power, and what each one keeps</sub></td>
     <td align="center" width="25%"><a href="screens/203-matters.png"><img src="screens/203-matters.png" width="210" alt="Get help"></a><br><sub><b>203</b> · Get help · your matter, and what happened to it</sub></td>
-    <td align="center" width="25%"><a href="screens/204-your-circle.svg"><img src="screens/204-your-circle.svg" width="210" alt="Your circle"></a><br><sub><b>204</b> · Your circle · everyone you added, and what they do</sub></td>
+    <td align="center" width="25%"><a href="screens/204-your-circle.png"><img src="screens/204-your-circle.png" width="210" alt="Your circle"></a><br><sub><b>204</b> · Your circle · everyone you added, and what they do</sub></td>
   </tr>
   <tr>
-    <td align="center" width="25%"><a href="screens/205-avatar-stage.svg"><img src="screens/205-avatar-stage.svg" width="210" alt="Avatar stage"></a><br><sub><b>205</b> · Avatar stage · the avatar takes the screen, wardrobe on the rail</sub></td>
+    <td align="center" width="25%"><a href="screens/205-avatar-stage.png"><img src="screens/205-avatar-stage.png" width="210" alt="Avatar stage"></a><br><sub><b>205</b> · Avatar stage · the avatar takes the screen, wardrobe on the rail</sub></td>
     <td align="center" width="25%"><a href="screens/206-raise.png"><img src="screens/206-raise.png" width="210" alt="Raise"></a><br><sub><b>206</b> · Raise · grow your own — stages earned, the Album written and never edited</sub></td>
     <td align="center" width="25%"><a href="screens/first-question.png"><img src="screens/first-question.png" width="210" alt="The first question"></a><br><sub><b>·</b> · The first question · the problem-reporting card, before anything else is shown</sub></td>
     <td align="center" width="25%"><a href="screens/207-hands.png"><img src="screens/207-hands.png" width="210" alt="Hands"></a><br><sub><b>207</b> · Hands · what it may work, for how long, and what it will never type</sub></td>
@@ -611,6 +611,7 @@ is exactly how the old card came to be showing yours in place of theirs.
     <td align="center" width="25%"><a href="screens/208-capabilities.png"><img src="screens/208-capabilities.png" width="210" alt="Capabilities"></a><br><sub><b>208</b> · Capabilities · every faculty a profile can be given, what it rests on, and where it is withdrawn</sub></td>
     <td align="center" width="25%"><a href="screens/209-the-reply-as-footage.png"><img src="screens/209-the-reply-as-footage.png" width="210" alt="The reply as footage"></a><br><sub><b>209</b> · The reply as footage · a turn on the video road, being rendered — no one pressed play</sub></td>
     <td align="center" width="25%"><a href="screens/210-companies.png"><img src="screens/210-companies.png" width="210" alt="Companies"></a><br><sub><b>210</b> · Companies · a digital company founded, staffed one interview at a time, and opened for business</sub></td>
+    <td align="center" width="25%"><a href="screens/211-the-edge-dock.png"><img src="screens/211-the-edge-dock.png" width="210" alt="The edge dock"></a><br><sub><b>211</b> · The edge dock · help and the agent lights as tabs on the right edge, the lights opened here to the round watch face</sub></td>
   </tr>
 </table>
 

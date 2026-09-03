@@ -219,7 +219,7 @@ export function Profile({ profileId, onBack, onPlans, onVisit, onInside }: {
   );
 
   return (
-    <div className="screen profile-page">
+    <div className="screen profile-page" data-screen="197">
       <header className="screen-head">
         <button className="ghost" onClick={onBack}>{tr("prf.back", lang)}</button>
         <h2>{name}</h2>

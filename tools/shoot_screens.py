@@ -122,6 +122,16 @@ def seed(db_path: str) -> dict:
          "than a decision.", 8, db.utcnow()))
     conn.commit()
 
+    # The starter collection, seeded the way a deployment seeds it — the
+    # thirty-five professionals with their portraits, and the founder's
+    # two profiles. The seed's last step installs the standing friends on
+    # every profile, this one included, so the circle and the front page
+    # are photographed with the pack on them ("let's go ahead and list
+    # all of them in the starter pack as friends") and a friend's
+    # homepage is a real starter's, not a stand-in made here.
+    from qrme import seed as collection
+    collection.seed()
+
     return {"accountId": account,
             "accountToken": auth.issue("account", account),
             "accountEmail": email,
@@ -164,6 +174,33 @@ def start_backend() -> subprocess.Popen:
         except Exception:
             time.sleep(0.5)
     raise SystemExit("the backend never came up")
+
+
+def _door(path: str, body: dict, token: str = "") -> dict:
+    request = urllib.request.Request(
+        BASE + path, data=json.dumps(body).encode(),
+        headers={"content-type": "application/json",
+                 **({"authorization": f"Bearer {token}"} if token else {})})
+    with urllib.request.urlopen(request, timeout=120) as answer:
+        return json.load(answer)
+
+
+def converse(session: dict) -> None:
+    """One exchange with the profile, through the product's own doors, so
+    the chat screen is photographed with a conversation in it. The person
+    is an interactor made the way the console makes one; the reply is
+    whatever the deployment's model answers — the stub, here."""
+    try:
+        me = _door("/interactors", {"display_name": "A visitor"})
+        session["interactorId"] = me["id"]
+        session["interactorToken"] = me["token"]
+        _door(f"/profiles/{session['profileId']}/chat",
+              {"interactor_id": me["id"],
+               "message": "What do you actually remember about me, and "
+                          "where is it kept?"}, me["token"])
+    except Exception as exc:  # noqa: BLE001 — an empty chat is still the chat
+        print(f"  ? no conversation seeded ({type(exc).__name__}); "
+              "the chat is photographed empty")
 
 
 def open_tab(page, tab: str) -> bool:
@@ -226,6 +263,9 @@ def open_tab(page, tab: str) -> bool:
 #: Where a recipe starts when there is no session yet — the screens a
 #: person meets before the console has anybody in it.
 SIGNED_OUT = "signed-out"
+#: An account that is signed in with no profile chosen yet: the onboarding's
+#: second stage, where a profile is created.
+ACCOUNT_ONLY = "account-only"
 
 #: Screens that are a page, but not one a nav tile opens.
 #:
@@ -242,8 +282,32 @@ INSIDE: tuple[tuple[str, str, str, tuple[str, ...], str], ...] = (
     # them: the press that goes there, named in the markup.
     ("204", "your-circle", "home", ('[data-go="circle"]',),
      '[data-screen="204"]'),
+    # The first door: what a person meets with no account at all.
+    ("01", "welcome", SIGNED_OUT, (), ".tabs"),
+    # The second stage of onboarding: an account signed in, a profile
+    # not yet made, and the form that makes one.
+    ("02", "create-profile", ACCOUNT_ONLY, ("text=Or make another one",),
+     "input[type=date]"),
+    # The chat with a conversation in it — see `converse`.
+    ("83", "chat", "chat", (), ".bubble"),
+    # A friend's face on Home is the door to their homepage.
+    ("197", "their-homepage", "home", ('[data-go="visit"]',),
+     '[data-screen="197"]'),
+    # 205, the avatar stage, is not on this list on purpose. The harness's
+    # profile has no portrait, so the stage it opens says "no avatar yet"
+    # — true, and not the screen. The capture on disk is the owner's own,
+    # taken in a running room with a figure the forge built from a
+    # portrait; a recipe here would photograph over it on every run.
+    # "Is this genuine?" — the watermark asked from the front door, no
+    # account needed.
+    ("148", "who-wrote-this", SIGNED_OUT, ("text=Is this genuine?",),
+     'textarea[placeholder="paste the text"]'),
     ("173", "beginning-and-passing-on", "identity",
      ('[data-go="passing"]',), '[data-screen="173"]'),
+    # The edge dock, opened: the agent lights' tab pressed and the face
+    # beside it — the one screen the dock is the subject of rather than
+    # a thing at the edge of.
+    ("211", "the-edge-dock", "home", (".wl-tab",), ".watch-lights"),
 )
 
 
@@ -253,6 +317,14 @@ def open_inside(page, session, start, presses, proof) -> bool:
         page.goto(BASE + "/", wait_until="networkidle")
         page.evaluate("() => localStorage.clear()")
         page.goto(BASE + "/", wait_until="networkidle")
+    elif start == ACCOUNT_ONLY:
+        page.goto(BASE + "/", wait_until="networkidle")
+        page.evaluate("() => localStorage.clear()")
+        page.evaluate("s => localStorage.setItem('qrme.session', s)",
+                      json.dumps({k: session[k] for k in
+                                  ("accountId", "accountToken", "accountEmail")}))
+        page.goto(BASE + "/", wait_until="networkidle")
+        answer_the_notice(page)
     else:
         page.evaluate("s => localStorage.setItem('qrme.session', s)",
                       json.dumps(session))
@@ -343,9 +415,8 @@ ELEMENTS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
 #: lands in the picture — and all of this is `position: fixed`. Hiding it
 #: here hides nothing from the gallery: each is photographed on every page
 #: capture, which is where a reader meets them.
-FURNITURE = (".help-fab", ".help-panel", ".watch-lights", ".wl-dot",
-             ".underway", ".uw-dot", ".vault-light", ".vl-dot",
-             ".footsteps")
+FURNITURE = (".edge-dock", ".edge-panel",
+             ".underway", ".uw-dot", ".vault-light", ".vl-dot")
 
 
 def hide_furniture(page) -> None:
@@ -513,6 +584,7 @@ def main(shots: list[tuple[str, str, str]]) -> None:
     proc = start_backend()
     try:
         session = seed("/tmp/shots.db")
+        converse(session)
         with sync_playwright() as play:
             browser = play.chromium.launch(
                 executable_path="/opt/pw-browsers/chromium")
@@ -582,6 +654,10 @@ def main(shots: list[tuple[str, str, str]]) -> None:
             # the state is remembered per browser so one press carries
             # across every reload. What is photographed stays a state the
             # product can actually be in.
+            # This console has none left: its lights are a tab on the
+            # edge dock, closed until pressed, so there is nothing to
+            # minimise — the sweep finds nothing here and stays for the
+            # consoles it was written for.
             for control in (".wl-min", ".vl-min", ".uw-min"):
                 minimise = page.query_selector(control)
                 if minimise:

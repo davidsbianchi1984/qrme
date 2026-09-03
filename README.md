@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v3.1.1** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v3.1.2** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -50,7 +50,7 @@ and the closing passage fail the build when they drift from the product.
 | Component | Where | What it is |
 |---|---|---|
 | API server | `qrme/`, routers under `qrme/routers/` | FastAPI over SQLite: profiles, persona conditioning, rooms, the community, commerce, governance, the offline gate, the audit chain. |
-| Web console | `app/` | React and TypeScript, ten languages; the 210 numbered screens photographed and drawn below. |
+| Web console | `app/` | React and TypeScript, ten languages; the 211 numbered screens photographed and drawn below. |
 | Watch faces | `docs/watch/`, `qrme/wearables.py` | Eleven faces a paired wearable may show, and the catalogue of devices that may pair. |
 | iOS, Android, Windows shells | `native/` | Native shells at parity with the console, each route they call published by the server. |
 | Store manifests | `stores/` | Steam, Meta Horizon and Viveport manifests, versioned with the product. |
@@ -65,21 +65,27 @@ and the closing passage fail the build when they drift from the product.
 ### The mechanisms on file
 
 The ten numbered mechanisms in
-[docs/invention-disclosure.md](docs/invention-disclosure.md), with where
-each lives:
+[docs/invention-disclosure.md](docs/invention-disclosure.md). Each row
+names the technical problem in the machine, the particular structure this
+code uses to solve it, what that structure changes about how the machine
+behaves, and where the structure is reduced to practice and held by a
+test. None of them is a rule a person could follow with a pen or a
+business practice dressed in software; each is a specific arrangement of
+data, credentials, channels and checks inside a running system, and each
+is photographed on the screens below.
 
-| § | Mechanism | Reduced to practice in |
-|---|---|---|
-| 1 | Owner-governed synthetic profile as a product | `qrme/persona.py`, `qrme/moderation.py`, `qrme/adaptation.py` |
-| 2 | Membership gating as a single application-wide chokepoint | `qrme/tiers.py` — `test_tiers.py`, `test_the_free_tier_says_what_it_is.py` |
-| 3 | Request-scoped bring-your-own-credential inference | `qrme/llm.py` — `test_byo_key.py` |
-| 4 | Vault-sealed tandem exchanges with auditable custody | `qrme/exchange.py`, `qrme/pdi_client.py` — `test_exchange.py` |
-| 5 | Desk beacons and lend-a-microphone | `qrme/desks.py`, `qrme/roommic.py` — `test_desks.py`, `test_room_mic.py` |
-| 6 | Weighted hybrid personas with a public composition | `qrme/composite.py` |
-| 7 | Predictive simulation with evidence-earned confidence | `qrme/simulation.py` |
-| 8 | Environmental context beside biometric context | `qrme/attention.py`, `qrme/wearables.py` — `test_the_wearable_tells_the_guardian.py` |
-| 9 | Proceeds designations with token-lifecycle succession | `qrme/ledger.py`, `qrme/signatures.py` — `test_signatures.py` |
-| 10 | Departmental agent coordination over revocable scopes | `qrme/organization.py`, `qrme/delegation.py` — `test_organizations.py`, `test_delegation.py` |
+| § | The technical problem | The particular solution, as built | What it changes in the machine | Reduced to practice in |
+|---|---|---|---|---|
+| 1 | A generated likeness, once it leaves the server, carries nothing that says which system produced it, under whose governance, or whether its owner may still withdraw it. | Every approved textual render is **stamped at the output door with the producing profile's credential** (`qrme/watermark.py`), recoverable from the text alone; the owner's steering, moderation queue, licences and erasure all act on the one profile record the stamp resolves to. | Provenance survives the reply leaving the platform: a stranger with only the words can ask the platform who wrote them and get the profile, its owner and its terms back (screen 148). Erasure removes the record the stamp points at, so a withdrawn profile stops answering. | `qrme/persona.py`, `qrme/watermark.py`, `qrme/moderation.py`, `qrme/adaptation.py` — `test_watermark.py`, `test_watermark_recovery.py`, `test_moderation.py`, `test_steering.py`, `test_an_erase_is_measured_against_the_schema.py` |
+| 2 | Paid-capability checks written per route are forgotten at the routes added after them, and an emergency path gated by mistake refuses the one caller who must never be refused. | One **application-wide dependency** over a capability table (`qrme/tiers.py`) runs on every request before any handler; no route opts in, so none can be missed, and a fixed `NEVER_GATED` set of escalation paths is excluded structurally rather than by each route remembering to. | A capability added to the table is enforced everywhere at once; a refusal carries the capability's name and the plan that has it, in a shape a screen renders (screens 130, 161). | `qrme/tiers.py`, `qrme/api.py` — `test_tiers.py`, `test_the_free_tier_says_what_it_is.py` |
+| 3 | A model credential either lives in the server's configuration, where every caller shares it, or in the caller's client, where the server cannot use it for that caller's request. | A caller's key rides **one request in a header into a context variable** read by the provider layer at inference time; it is never written to disk or log, and a request without one falls back to the deployment's own key. | Two callers on the same server generate on two different credentials in the same second, and neither key is ever stored. | `qrme/llm.py`, `qrme/api.py` middleware — `test_byo_key.py` |
+| 4 | An exchange between a guardian and a specialist passes through an application database that any operator with the file can read. | The exchange is **sealed into the encrypted personal-data vault at the seal point** (PDI), with per-record provenance and an audit chain, and read back only through the record owner's scoped custody viewer. | The platform holds the pointer and the audit trail, not the plaintext; the owner sees the chain of custody for each record and can forget it to the vectors. | `qrme/exchange.py`, `qrme/pdi_client.py`, `qrme/recollection.py` — `test_exchange.py`, `test_the_room_that_forgets_on_purpose.py` |
+| 5 | A live workspace has no physical address a passer-by can reach, and a microphone in one profile's room cannot be handed to another without a shared account. | A workspace is published as a **scannable beacon** whose code resolves to the live desk and is deactivated rather than deleted when taken down; a microphone is **lent profile-to-profile** with a named handover and per-channel gain. | A printed code at a venue stops resolving instead of pointing somewhere new; a lent microphone is on the record as lent, and comes back. | `qrme/desks.py`, `qrme/roommic.py` — `test_desks.py`, `test_room_mic.py`, `test_the_visitor_side_of_a_desk.py` |
+| 6 | Blending several personas into one produces a profile that can claim to be any of its sources, with no record of what was borrowed from whom. | One profile is built from several with **normalized weights and named borrowed aspects**, the composition stored per constituent and published to every reader; the prompt carries an honesty rule, and rated sources and free-hand hybrids are refused at the door. | A reader of the blend sees its recipe; the blend cannot pass as a single constituent; a source that has departed is still credited. | `qrme/composite.py` — `test_spec_mined.py`, `test_the_last_doors.py`, `test_overlays.py` |
+| 7 | A model asked to simulate a person's decisions answers with the same confidence whether it has a year of evidence or none. | The simulation's confidence is **computed from the volume of real conditioning evidence** (source items, remembered turns, the latent embedding) rather than from the model's output, and the narrative is watermarked and excluded from distribution. | A simulation of a thinly-documented person is shown as guesswork; the score moves only when evidence does. | `qrme/simulation.py` — `test_spec_mined.py`, `test_the_last_doors.py` |
+| 8 | Replies are conditioned on who a person is, not where they are or what they are doing, so a reply is the same at a desk and on a mountain. | Each interaction carries an **environment payload** (location, conditions, local time, activity) stored beside the biometric context and rendered into the inference conditioning. | The same question gets a different answer at night in the rain than at noon at a desk, and the record shows why. | `qrme/attention.py`, `qrme/wearables.py`, `environment_context` — `test_the_room_is_remembered.py`, `test_the_wearable_tells_the_guardian.py` |
+| 9 | Money raised on a profile has no stated destination until somebody is asked, and control of the profile at the owner's death depends on a status flag anyone with the database can flip. | Proceeds are **routed in advance to named designees whose shares must sum to 100**, each donation split at the door in integer cents onto an auditable ledger; succession is enforced by **token lifecycle** — the old credential revoked and a new one minted for the named successor on a verified attestation. | A campaign cannot open without a destination; a split is arithmetic on the ledger, not a promise; the successor holds a credential the predecessor's cannot forge. | `qrme/campaigns.py`, `qrme/ledger.py`, `qrme/signatures.py` — `test_campaigns.py`, `test_signatures.py`, `test_the_keys_the_till_and_the_lifeline.py`, `test_memorial.py` |
+| 10 | Several agents working one goal either share every data source or cannot coordinate at all. | Departments are staffed with role-specific agents whose data pulls are scoped by **independently revocable grants**; one goal fans out across departments, each agent contributing from its own scoped material, the initiating agent composing the joint plan, and the record sealed to the vault. | Revoking one department's grant stops that department's contribution and nothing else; the plan names which department contributed what. | `qrme/organization.py`, `qrme/delegation.py`, `qrme/company.py` — `test_organizations.py`, `test_delegation.py`, `test_a_company_is_hired_one_interview_at_a_time.py` |
 
 ### Where each highlight is proven
 
@@ -297,14 +303,14 @@ The majority of what a person actually encounters, with what each screen
 does — drawn at phone scale, and the same screens serve the web console
 on a computer and the installed app. The Android tellings live beside
 these in `docs/screens/android/`, the watch has its own gallery below,
-and the complete tour of all 207 is in [docs/gallery.md](docs/gallery.md).
+and the full tour is in [docs/gallery.md](docs/gallery.md).
 
 **Getting in**
 
 <table>
   <tr>
-    <td align="center" width="25%"><a href="docs/screens/01-welcome.svg"><img src="docs/screens/01-welcome.svg" width="165" alt="Welcome"></a><br><sub><b>01</b> · Welcome<br>the first door, no account needed to look</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/02-create-profile.svg"><img src="docs/screens/02-create-profile.svg" width="165" alt="Create a profile"></a><br><sub><b>02</b> · Create a profile<br>a synthetic person, made from your answers</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/01-welcome.png"><img src="docs/screens/01-welcome.png" width="165" alt="Welcome"></a><br><sub><b>01</b> · Welcome<br>the first door, no account needed to look</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/02-create-profile.png"><img src="docs/screens/02-create-profile.png" width="165" alt="Create a profile"></a><br><sub><b>02</b> · Create a profile<br>a synthetic person, made from your answers</sub></td>
     <td align="center" width="25%"><a href="docs/screens/39-sign-in.png"><img src="docs/screens/39-sign-in.png" width="165" alt="Sign in"></a><br><sub><b>39</b> · Sign in<br>your account, your held profiles</sub></td>
     <td align="center" width="25%"><a href="docs/screens/05-home.png"><img src="docs/screens/05-home.png" width="165" alt="Profile home"></a><br><sub><b>05</b> · Profile home<br>memory, engagement and moderation at a glance</sub></td>
   </tr>
@@ -326,9 +332,9 @@ and the complete tour of all 207 is in [docs/gallery.md](docs/gallery.md).
 <table>
   <tr>
     <td align="center" width="25%"><a href="docs/screens/185-discover.png"><img src="docs/screens/185-discover.png" width="165" alt="Discover"></a><br><sub><b>185</b> · Discover<br>everybody here, described, with an offer</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/204-your-circle.svg"><img src="docs/screens/204-your-circle.svg" width="165" alt="Your circle"></a><br><sub><b>204</b> · Your circle<br>only your friends, and what they do</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/204-your-circle.png"><img src="docs/screens/204-your-circle.png" width="165" alt="Your circle"></a><br><sub><b>204</b> · Your circle<br>only your friends, and what they do</sub></td>
     <td align="center" width="25%"><a href="docs/screens/84-friends.png"><img src="docs/screens/84-friends.png" width="165" alt="Friends"></a><br><sub><b>84</b> · Friends<br>the workbench: search, add, remove</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/197-their-homepage.svg"><img src="docs/screens/197-their-homepage.svg" width="165" alt="Their homepage"></a><br><sub><b>197</b> · Their homepage<br>a face pressed anywhere lands here</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/197-their-homepage.png"><img src="docs/screens/197-their-homepage.png" width="165" alt="Their homepage"></a><br><sub><b>197</b> · Their homepage<br>a face pressed anywhere lands here</sub></td>
   </tr>
 </table>
 
@@ -369,10 +375,19 @@ and the complete tour of all 207 is in [docs/gallery.md](docs/gallery.md).
 
 <table>
   <tr>
-    <td align="center" width="25%"><a href="docs/screens/205-avatar-stage.svg"><img src="docs/screens/205-avatar-stage.svg" width="165" alt="Avatar stage"></a><br><sub><b>205</b> · Avatar stage<br>the avatar full screen, wardrobe rail down the edge</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/205-avatar-stage.png"><img src="docs/screens/205-avatar-stage.png" width="165" alt="Avatar stage"></a><br><sub><b>205</b> · Avatar stage<br>the avatar full screen, wardrobe rail down the edge</sub></td>
     <td align="center" width="25%"><a href="docs/screens/155-party.png"><img src="docs/screens/155-party.png" width="165" alt="Watch party"></a><br><sub><b>155</b> · Watch party<br>watched together — and watchable by the platform's own eyes</sub></td>
     <td align="center" width="25%"><a href="docs/screens/156-identity.png"><img src="docs/screens/156-identity.png" width="165" alt="Identity"></a><br><sub><b>156</b> · Identity<br>who a profile is — and the avatar deck it dresses from</sub></td>
     <td align="center" width="25%"><a href="docs/screens/194-the-vastscape.svg"><img src="docs/screens/194-the-vastscape.svg" width="165" alt="A party you can find"></a><br><sub><b>194</b> · The vastscape<br>the wide view of everything running</sub></td>
+  </tr>
+</table>
+
+**On every screen**
+
+<table>
+  <tr>
+    <td align="center" width="50%"><a href="docs/screens/211-the-edge-dock.png"><img src="docs/screens/211-the-edge-dock.png" width="165" alt="The edge dock"></a><br><sub><b>211</b> · The edge dock<br>help and the agent lights as tabs on the right edge — the lights a stoplight that opens to the round watch face, each row pressable to say which agent is working, waiting or stopped; the stack moved up or down by its grip</sub></td>
+    <td align="center" width="50%"><a href="docs/scenes/avatar-figure-david-bianchi.jpg"><img src="docs/scenes/avatar-figure-david-bianchi.jpg" width="165" alt="The founder's rendered figure"></a><br><sub><b>figure</b> · The founder's rendered profile<br>the whole figure the forge built from a portrait, as the stage (205) stands it — marked AI in its own pixels</sub></td>
   </tr>
 </table>
 
@@ -380,7 +395,7 @@ and the complete tour of all 207 is in [docs/gallery.md](docs/gallery.md).
 
 <table>
   <tr>
-    <td align="center" width="25%"><a href="docs/screens/148-who-wrote-this.svg"><img src="docs/screens/148-who-wrote-this.svg" width="165" alt="Who wrote this"></a><br><sub><b>148</b> · Who wrote this<br>the watermark answers, even reworded</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/148-who-wrote-this.png"><img src="docs/screens/148-who-wrote-this.png" width="165" alt="Who wrote this"></a><br><sub><b>148</b> · Who wrote this<br>the watermark answers, even reworded</sub></td>
     <td align="center" width="25%"><a href="docs/screens/32-moderation.svg"><img src="docs/screens/32-moderation.svg" width="165" alt="Moderation"></a><br><sub><b>32</b> · Moderation<br>review before a doubtful turn ships</sub></td>
     <td align="center" width="25%"><a href="docs/screens/202-allowed.png"><img src="docs/screens/202-allowed.png" width="165" alt="What it may do"></a><br><sub><b>202</b> · What it may do<br>every power off until somebody says yes</sub></td>
     <td align="center" width="25%"><a href="docs/screens/203-matters.png"><img src="docs/screens/203-matters.png" width="165" alt="Get help"></a><br><sub><b>203</b> · Get help<br>a person settles it, signed in or not</sub></td>
@@ -666,6 +681,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **3.1.2** | **The edge dock, and the whole starter pack as friends** — the help box and the agent lights are tabs on the right edge, the lights a stoplight opening to the round watch face that names which agent is working, waiting or stopped; the stack moved up or down by its grip (screen 211); the footsteps count is gone, since everyone with an account shows in Discover; every profile gets the starter collection as standing friends after the founder pins; the onboarding card fits a phone, the avatar stage says "no avatar yet" instead of blowing up the empty frame, seat names wrap; six drawings replaced by captures, and the mechanisms on file set out for examination |
 | **3.1.1** | **No functional changes to QRME — cut with the siblings.** JIM-mini's image gained what its box runs; the three products keep one number. |
 | **3.1.0** | **The assistant's box opens on the hosted cloud, and one number across the three** — Docker's default seccomp and AppArmor profiles refused the namespaces JIM's coding assistant raises to try a drafted edit; two profiles widen exactly those calls for the jim service only, the compose file names them, an idempotent script loads the AppArmor half into the host's kernel before every deploy, and a guard holds the profiles to the defaults plus those calls. |
 | **3.0.6** | **The voice door answers** — the number's voice webhook and status callback land on two inbound doors under the same locks as every leg. A call that comes in is handed to JIM with who is calling; when JIM matches the caller to a reach-out, the leg's own doors carry the conversation from there, and the status callback finds the leg by the house's reference. `/standing` reports the two URLs to point the number at and, for Twilio, whether it is pointed there. |

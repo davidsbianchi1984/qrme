@@ -132,6 +132,79 @@ def install_founder(profile_id: str) -> dict:
     return {"installed": bool(installed), "friend_ids": installed}
 
 
+#: How a row installed from the starter collection is marked. Zero-padded
+#: so the pack keeps its own order under the plain ``origin ASC`` sort in
+#: :func:`friends_of` — ``starter:10`` after ``starter:09``, not after
+#: ``starter:1``.
+STARTER_ORIGIN = "starter"
+
+
+def starter_ids() -> list[str]:
+    """The starter collection's profile ids, in the pack's own order.
+
+    Looked up by handle, like the founder, because ids are minted at seed
+    time. The rated collection is not in this list: it stands behind the age
+    gate, and a friend installed by default is a friend nobody asked for.
+    An unseeded deployment answers with an empty list.
+    """
+    from . import seed  # the seed imports this module; lazily, both ways
+    conn = db.connect()
+    out = []
+    for handle, *_ in seed.STARTERS:
+        row = conn.execute("SELECT profile_id FROM handles WHERE handle=?",
+                           (handle,)).fetchone()
+        if row:
+            out.append(row["profile_id"])
+    return out
+
+
+def install_starters(profile_id: str) -> dict:
+    """Give a profile the whole starter collection as friends.
+
+        asked     "let's go ahead and list all of them in the starter
+                  pack as friends"
+        mattered  a new profile met the platform with two faces on it —
+                  the founder's — and thirty-five it had to go looking for
+
+    Unlike the founder pins these are ordinary friends: they stand after
+    the founder and after anyone the profile chose, and they can be shown
+    the door. A starter somebody removed stays removed — only a row that
+    was never written is written, so the backfill cannot bring back what
+    a person cleared. A starter profile does not get the pack: thirty-five
+    fictional professionals befriending each other is a roster, not a
+    circle.
+    """
+    ids = starter_ids()
+    if not ids or profile_id in ids:
+        return {"installed": False, "reason": "no starters to install"}
+
+    conn = db.connect()
+    installed = []
+    for order, sid in enumerate(ids):
+        existing = conn.execute(
+            "SELECT id FROM friendships WHERE profile_id=? AND friend_id=?",
+            (profile_id, sid)).fetchone()
+        if existing is None:
+            conn.execute(
+                "INSERT INTO friendships (id, profile_id, friend_id, origin,"
+                " state, created_at) VALUES (?,?,?,?,?,?)",
+                (db.new_id("frn"), profile_id, sid,
+                 f"{STARTER_ORIGIN}:{order:02d}", "active", db.utcnow()))
+            installed.append(sid)
+    conn.commit()
+    return {"installed": bool(installed), "friend_ids": installed}
+
+
+def install_standing(profile_id: str) -> dict:
+    """Everything a profile has as standard: the founder pins, then the
+    starter collection. Creation calls this on every profile; both halves
+    are silent when there is nothing to do."""
+    founder = install_founder(profile_id)
+    starters = install_starters(profile_id)
+    return {"installed": founder["installed"] or starters["installed"],
+            "founder": founder, "starters": starters}
+
+
 def befriend(profile_id: str, friend_id: str) -> dict:
     """Add ``friend_id`` to ``profile_id``'s list.
 
@@ -201,8 +274,9 @@ def unfriend(profile_id: str, friend_id: str) -> dict:
 
 
 def friends_of(profile_id: str) -> list[dict]:
-    """The list: the founder pins in their fixed order, then everyone else
-    oldest-first.
+    """The list: the founder pins in their fixed order, then the friends the
+    profile chose oldest-first, then the starter collection in the pack's
+    own order.
 
     The ordering is computed here rather than stored, so it cannot drift out of
     step with what ``origin`` says. A stored position column would have to be
@@ -211,7 +285,9 @@ def friends_of(profile_id: str) -> list[dict]:
 
     ``origin`` is ``founder:0``, ``founder:1``, … for the pins, so their order
     among themselves is fixed too and does not depend on which row happened to
-    be written first.
+    be written first; ``chosen`` for a friendship the profile made, and
+    ``starter:00`` … for the pack — so the plain ``origin ASC`` puts what a
+    person chose above what came as standard.
     """
     rows = db.connect().execute(
         "SELECT f.friend_id, f.origin, f.created_at, p.display_name, p.avatar,"
@@ -243,6 +319,9 @@ def friends_of(profile_id: str) -> list[dict]:
             "avatar": avatars.shown(r["avatar"]),
             "kind": r["kind"],
             "founder": founder,
+            # From the starter collection, installed as standard: a client
+            # can say so beside the face, and the row is removable.
+            "starter": r["origin"].startswith(STARTER_ORIGIN),
             # Said out loud so a client renders the row without a remove
             # control, rather than offering one that will 409.
             "pinned": founder,
@@ -272,6 +351,14 @@ def _mutual_with(profile_id: str, friend_ids: list[str]) -> set[str]:
         f"SELECT profile_id FROM friendships WHERE friend_id=? AND"
         f" state='active' AND profile_id IN ({marks})",
         [profile_id] + list(friend_ids)).fetchall()}
+
+
+def backfill_standing() -> list[str]:
+    """Install the founder pins and the starter pack on every profile that
+    is missing them — profiles that predate either. The seed is the repair,
+    exactly as it is for the starters' portraits."""
+    rows = db.connect().execute("SELECT id FROM profiles").fetchall()
+    return [r["id"] for r in rows if install_standing(r["id"])["installed"]]
 
 
 def backfill_founder() -> list[str]:

@@ -1070,6 +1070,21 @@ const CHROME: Table = {
     pt: "Lojas", it: "Negozi", ja: "ショップ", zh: "商店",
     hi: "दुकानें", ar: "المتاجر",
   },
+  "dock.move": {
+    en: "Move the tabs up or down", es: "Mueve las pestañas arriba o abajo", fr: "Déplacer les onglets vers le haut ou le bas", de: "Die Reiter nach oben oder unten schieben", pt: "Mover as abas para cima ou para baixo", it: "Sposta le schede in su o in giù", ja: "タブを上下に動かす", zh: "上下移动标签", hi: "टैब ऊपर या नीचे खिसकाएँ", ar: "حرّك علامات التبويب لأعلى أو لأسفل",
+  },
+  "dock.help": {
+    en: "Help", es: "Ayuda", fr: "Aide", de: "Hilfe", pt: "Ajuda", it: "Aiuto", ja: "ヘルプ", zh: "帮助", hi: "सहायता", ar: "مساعدة",
+  },
+  "dock.lights": {
+    en: "Agents", es: "Agentes", fr: "Agents", de: "Agenten", pt: "Agentes", it: "Agenti", ja: "エージェント", zh: "代理", hi: "एजेंट", ar: "الوكلاء",
+  },
+  "lights.which": {
+    en: "Which ones", es: "Cuáles", fr: "Lesquels", de: "Welche", pt: "Quais", it: "Quali", ja: "どれか", zh: "哪些", hi: "कौन-से", ar: "أيّها",
+  },
+  "lights.nobody": {
+    en: "Nobody under this light", es: "Nadie bajo esta luz", fr: "Personne sous ce voyant", de: "Niemand unter diesem Licht", pt: "Ninguém sob esta luz", it: "Nessuno sotto questa luce", ja: "このライトの下には誰もいません", zh: "此灯下没有任何代理", hi: "इस बत्ती के नीचे कोई नहीं", ar: "لا أحد تحت هذا الضوء",
+  },
   "lights.unreachable": {
     en: "The agent lights can’t reach the backend — press to retry",
     es: "Las luces de agentes no alcanzan el servidor — pulsa para reintentar",
@@ -10243,14 +10258,6 @@ const CHROME: Table = {
   },
   "rms.signinpick": {
     en: "Sign in and pick a profile first — the room opens with the two of you inside.", es: "Inicia sesión y elige un perfil primero — la sala se abre con los dos dentro.", fr: "Connectez-vous et choisissez d'abord un profil — la salle s'ouvre avec vous deux à l'intérieur.", de: "Meld dich an und wähl zuerst ein Profil — der Raum öffnet sich mit euch beiden darin.", pt: "Inicie sessão e escolha primeiro um perfil — a sala abre com os dois lá dentro.", it: "Accedi e scegli prima un profilo — la stanza si apre con voi due dentro.", ja: "先にサインインしてプロフィールを選んでください — 部屋は、あなたたち二人が中にいる状態で開きます。", zh: "请先登录并选择一个档案——房间开启时，你们两个就在里面。", hi: "पहले साइन इन कीजिए और एक प्रोफ़ाइल चुनिए — कमरा आप दोनों के भीतर होते हुए खुलता है।", ar: "سجّل الدخول واختر ملفًا أولًا — فالغرفة تُفتح وأنتما الاثنان بداخلها.",
-  },
-  // The footsteps chip in the corner. The same two rows stand verbatim in
-  // the JIM-mini and PDI consoles — one wording, one translation.
-  "steps.count": {
-    en: "{n} footsteps here", es: "{n} pasos por aquí", fr: "{n} pas par ici", de: "{n} Fußspuren hier", pt: "{n} passos por aqui", it: "{n} passi qui", ja: "ここに{n}の足あと", zh: "这里有 {n} 个足迹", hi: "यहाँ {n} क़दमों के निशान", ar: "{n} أثر أقدام هنا",
-  },
-  "steps.tip": {
-    en: "How many people hold accounts here", es: "Cuántas personas tienen cuenta aquí", fr: "Combien de personnes ont un compte ici", de: "Wie viele Menschen hier ein Konto haben", pt: "Quantas pessoas têm conta aqui", it: "Quante persone hanno un account qui", ja: "ここにアカウントを持つ人の数", zh: "这里有多少人持有账户", hi: "यहाँ कितने लोगों के खाते हैं", ar: "كم شخصًا يملك حسابًا هنا",
   },
   "rms.standing": {
     en: "Standing rooms", es: "Salas permanentes", fr: "Salles permanentes", de: "Ständige Räume", pt: "Salas permanentes", it: "Stanze permanenti", ja: "常設の部屋", zh: "常设房间", hi: "स्थायी कमरे", ar: "غرف دائمة",

@@ -116,7 +116,10 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
   const paintable = fictional && (owned || guestsOk);
   // The whole figure when the platform holds one, the face otherwise —
   // the stage is a person standing in a frame, not a passport photo.
-  const art = face?.torso || face?.asset || null;
+  // The empty frame is neither: it is the bubble's honest drawing of no
+  // picture, and blown up to fill a screen it read as a broken avatar.
+  // Here it is no picture, and the stage says so in words.
+  const art = face?.torso || (face?.placeholder ? null : face?.asset) || null;
   const src = art
     ? (art.startsWith("http") ? art : getBase() + art)
     : null;

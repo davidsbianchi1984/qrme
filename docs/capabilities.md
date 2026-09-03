@@ -1521,13 +1521,15 @@ Three more things that were only visible by driving it:
   says it as it happens.
 
 Adding the tab also turned up something only clicking finds: the always-on
-agent-lights widget is fixed to the bottom-left corner, **on top of the
+agent-lights widget was fixed to the bottom-left corner, **on top of the
 sidebar**, and the sidebar had grown long enough that its last three tabs were
 underneath it — a click landed on the lights. That is the same fault the phone
 layout was fixed for in an earlier round, when the widget covered Home and Chat
 and the tabs were reported as broken screens; the desktop half simply had not
-grown into it yet. The column now reserves the widget's footprint, and a test
-asserts the arithmetic rather than the number.
+grown into it yet. The column reserved the widget's footprint for a while; the
+widget has since left the column altogether for the edge dock (screen 211),
+and the test that held the arithmetic now holds that nothing the shell floats
+declares a `left` at all.
 
 ## Channel 3 — sharing your camera
 
@@ -2824,7 +2826,7 @@ Defined once, in [`qrme/agentlight.py`](https://github.com/davidsbianchi1984/qrm
 | **Watch** — *36 Agents* (JIM) | three lights and three counts, and **no agent names** | a wrist is glanced at, not read. Naming the agents was the first cut and was wrong: a name is something you read, and reading is the thing a glance cannot do. Which agent went amber is a question for the app, where there is room to answer it |
 | **App** — *82 Agents* | the same three lights, each a **tappable group** — what is working, what needs you, what stopped | somebody opening this *because* amber appeared should not have to scan a flat list for the one that changed. Grouping puts the answer first and the roster second |
 | **Overlay** — *83 Chat · overlay*, and every desktop view | a small translucent box in the bottom-right corner — the same three rows as the wrist, each its own way in | an agent that reports only on its own screen is one you have to remember to check, and amber and red are exactly the states nobody thinks to look for. On desktop it is on **every** view, because those users have no wrist to glance at |
-| **Studio widget** — the packaged console (`app/`) | a round, watch-face-sized window pinned bottom-left on every screen: the wrist's exact payload (`GET /profiles/{id}/watch`) — three lights, three counts, the approval line — with a **minimize** control that collapses it to a dot in the worst light's colour | the studio is where owners actually sit, and the wrist's face is already the right size and shape for "does this need me right now?" — so the studio shows the same face at all times, and when it is in the way it folds to a dot rather than disappearing: still one glance, still the worst colour |
+| **Studio widget** — the packaged console (`app/`) | a stoplight tab on the edge dock, on every screen, its edge in the worst light's colour — the minimized state; pressed, it opens the round watch-face window beside it with the wrist's exact payload (`GET /profiles/{id}/watch`) — three lights, three counts, the approval line — and each row pressed names which agent stands under that light; the dock slides up or down the right edge by its grip (screen 211) | the studio is where owners actually sit, and the wrist's face is already the right size and shape for "does this need me right now?" — so the studio shows the same face at all times, and when it is in the way it folds to a dot rather than disappearing: still one glance, still the worst colour |
 
 The same three colours, on all three sizes of glass:
 

@@ -1238,10 +1238,11 @@ def seed() -> dict:
         if row and _homepage(conn, row["profile_id"], handle, industry):
             homed.append(handle)
 
-    # Anybody who predates the founder, including profiles a deployment made
-    # before this shipped. Runs last so it sees every profile created above.
+    # Anybody who predates the founder or the pack, including profiles a
+    # deployment made before this shipped. Runs last so it sees every
+    # profile created above.
     from . import friends as _friends
-    befriended = _friends.backfill_founder()
+    befriended = _friends.backfill_standing()
 
     return {"created": len(created), "skipped": len(skipped),
             # Starters that already existed and were missing their portrait or

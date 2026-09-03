@@ -129,11 +129,12 @@ def create_profile(body: ProfileCreate) -> dict:
                 422, i18n.fill(i18n.MUST_BE_ONE_OF, field="language",
                                choices=", ".join(i18n.SUPPORTED)))
         i18n.set_language(profile_id, body.language)
-    # The standing first friend. Silent when there is nothing to install —
-    # an unseeded deployment has no founder, and a cosmetic default must not
-    # be a reason profile creation fails.
+    # The standing friends: the founder pins, then the whole starter
+    # collection. Silent when there is nothing to install — an unseeded
+    # deployment has neither, and a cosmetic default must not be a reason
+    # profile creation fails.
     from .. import friends
-    friends.install_founder(profile_id)
+    friends.install_standing(profile_id)
     # Making something is what a membership is *for*, so creating a profile is
     # where an account joins one. Free unless a plan is named: putting somebody
     # on a paid plan they did not ask for is the wrong default even at a fair
@@ -195,7 +196,7 @@ def create_composite(body: CompositeCreate) -> dict:
                                choices=", ".join(i18n.SUPPORTED)))
         i18n.set_language(profile_id, body.language)
     from .. import friends
-    friends.install_founder(profile_id)
+    friends.install_standing(profile_id)
     _enrol(body.owner_id, body.plan)
     token = auth.issue("owner", profile_id)
     out = {**profile_out(profile_or_404(profile_id), owner=True).model_dump(),

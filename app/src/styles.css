@@ -43,8 +43,10 @@ code, .mono { font-family: ui-monospace, Menlo, monospace; }
 .sidebar {
   background: linear-gradient(180deg, #1b1445, #100b2c);
   border-right: 1px solid var(--line);
-  /* The bottom padding is the agent-lights widget's footprint: it is fixed at
-     `left: 22px; bottom: 22px` and 176px across, so it sits *on* this column.
+  /* The bottom padding was the agent-lights widget's footprint when it
+     was fixed to this column's corner; the lights are a tab on the edge
+     dock now (right edge, movable), and the column keeps the room as
+     breathing space under its last tab.
      The same fault was found and fixed for phones (see the 760px block near
      the end of this file) where it covered Home and Chat and the tabs read as
      broken. On desktop the sidebar simply had not grown long enough to reach
@@ -103,8 +105,12 @@ nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
 
 /* ---- onboarding ---- */
 .onboarding { display: grid; place-items: center; height: 100%; padding: 24px; overflow-y: auto; }
+/* `width: 440px` on a card inside a 430px phone was the first screen a
+   person meets, cropped at the right edge — the welcome and the
+   create-profile form both. The card is as wide as the phone allows and
+   440 on anything wider. */
 .onboard-card {
-  width: 440px; background: linear-gradient(160deg, var(--card), var(--card2));
+  width: min(440px, 100%); box-sizing: border-box; background: linear-gradient(160deg, var(--card), var(--card2));
   border: 1px solid var(--line); border-radius: 20px; padding: 28px; text-align: center;
 }
 .onboard-card .orb.big { margin: 4px auto 10px; }
@@ -415,17 +421,72 @@ button.danger { background: rgba(224,104,122,0.14) !important; color: var(--red)
   .sidebar, .content { min-width: 0; }
 }
 
+/* ---- The edge dock ------------------------------------------------------
+   Every control the shell floats over the screens, as one stack of tabs
+   on the right edge of the glass: the help box, and the agent task lights
+   as a stoplight. Each tab is a short horizontal strip protruding from
+   the edge; pressing one opens its panel beside it; the grip at the top
+   slides the whole stack up or down, and the place it is left is
+   remembered per device.
+
+       asked     they seem to be getting in the way a lot
+       mattered  three corners, three widgets, and a phone has no
+                 empty corner
+
+   Fixed, like the corner widgets it replaces, and for the same reason: a
+   control that has to be pressable whatever is on screen. Under the menu
+   drawer (60) so an open menu wins, above every card (any positive
+   number beats `auto`). The panels sit at 50 and the tabs at 48, so a
+   panel opens over the neighbouring tabs and still under the drawer. */
+.edge-dock {
+  position: fixed; right: 0; top: 72%; z-index: 48;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+}
+.edge-grip {
+  width: 28px; height: 22px; min-height: 22px; padding: 0; border: 0;
+  border-radius: 8px 0 0 8px; cursor: grab; touch-action: none;
+  background: rgba(255,255,255,0.08); color: var(--muted);
+  font-size: 16px; line-height: 1; display: grid; place-items: center;
+}
+.edge-grip:active { cursor: grabbing; }
+.edge-tab {
+  display: flex; align-items: center; gap: 8px;
+  height: 36px; min-height: 36px; padding: 0 12px 0 10px;
+  border: 1px solid var(--line); border-right: 0;
+  border-radius: 10px 0 0 10px; cursor: pointer;
+  background: rgba(13,10,32,0.88); color: var(--t2);
+  font-size: 12px; font-weight: 700; white-space: nowrap;
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+}
+.edge-tab:hover { background: rgba(123,92,255,0.18); color: var(--text); }
+.edge-tab.on { background: rgba(123,92,255,0.28); color: var(--text);
+  border-color: var(--brand); }
+.edge-tab-n { font-size: 12px; font-weight: 800; }
+.help-fab { color: var(--brand); }
+.help-mark { font-size: 16px; font-weight: 800; width: 14px;
+  text-align: center; }
+.edge-panel {
+  position: absolute; z-index: 50;
+  width: min(360px, calc(100vw - 64px));
+  max-height: min(60vh, calc(100vh - var(--dock-y, 72vh) - 12px));
+  overflow-y: auto; box-sizing: border-box;
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.5); display: flex; flex-direction: column;
+}
+/* High on the glass a panel hangs from the dock's top edge; low, it stands
+   on the dock's bottom edge and grows upward, so it never opens off the
+   bottom of a phone. */
+.edge-panel { right: 100%; margin-right: 6px; }
+.edge-dock:not(.low) .edge-panel { top: 0; }
+.edge-dock.low .edge-panel { bottom: 0;
+  max-height: min(60vh, calc(var(--dock-y, 72vh) + 40px)); }
+.edge-panel-line { margin: 12px 14px 4px; font-weight: 700; }
+.edge-panel-note { margin: 0 14px 12px; font-size: 12.5px; color: var(--muted);
+  line-height: 1.45; }
+
 /* The help box — on every screen, and deliberately plain. A help assistant
    with a face would be one more character to tell apart on a product whose
    subject is synthetic people who look real. */
-.help-fab { position: fixed; right: 22px; bottom: 22px; width: 46px;
-  height: 46px; border-radius: 50%; font-size: 20px; font-weight: 800;
-  color: var(--brand); background: rgba(123,92,255,0.16);
-  border: 1px solid var(--brand); cursor: pointer; }
-.help-fab:hover { background: rgba(123,92,255,0.28); }
-.help-panel { position: fixed; right: 22px; bottom: 22px; width: min(360px, calc(100vw - 44px));
-  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
-  box-shadow: 0 20px 50px rgba(0,0,0,.5); display: flex; flex-direction: column; }
 .help-panel header { display: flex; align-items: center; justify-content: space-between;
   padding: 12px 14px; border-bottom: 1px solid var(--line); }
 .help-close { background: none; border: 0; color: var(--muted); font-size: 20px;
@@ -498,46 +559,49 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .convo-row .actions { display: flex; gap: 6px; }
 .convo-row button { font-size: 12px; padding: 5px 12px; }
 
-/* The agent task lights — a watch-face-sized round window, always on
-   screen (bottom-left; Help owns bottom-right). Ring color = worst light.
-   Minimizes to a dot in that color when it's in the way. */
-.watch-lights { position: fixed; left: 22px; bottom: 22px; width: 176px;
-  height: 176px; border-radius: 50%; border: 3px solid var(--line);
+/* The agent task lights — the wrist's payload, as a tab on the dock.
+   The tab is a stoplight glyph, the minimized state, its edge in the
+   worst light's colour; the panel it opens is the round watch-face
+   window, the size and shape of the wrist's own face: three lights,
+   three counts, the approval line. Each row is a press, and a pressed
+   row lists who stands under that light — the face grows from a circle
+   to an oval to hold the names. Declared after .edge-panel so the circle
+   wins over the card. */
+.wl-glyph { font-size: 18px; line-height: 1; }
+.wl-tab { border-width: 1px 0 1px 2px; }
+.wl-dot-off { opacity: 0.6; }
+.watch-lights { width: 176px; height: 176px; max-height: none;
+  border-radius: 50%; border: 3px solid var(--line);
   background: radial-gradient(120% 120% at 50% 20%, #1a1440 0%, #0d0a24 70%);
-  box-shadow: 0 16px 40px rgba(0,0,0,.55);
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 6px; padding: 18px; z-index: 40; }
+  box-shadow: 0 16px 40px rgba(0,0,0,.55); overflow: hidden;
+  align-items: center; justify-content: center; gap: 6px; padding: 18px;
+  transition: width .2s ease, height .2s ease, border-radius .2s ease; }
+.watch-lights.elaborated { width: min(280px, calc(100vw - 72px)); height: auto;
+  max-height: min(60vh, calc(100vh - var(--dock-y, 72vh) - 12px));
+  border-radius: 48px; padding: 20px 22px; overflow-y: auto;
+  align-items: stretch; justify-content: flex-start; }
+.edge-dock.low .watch-lights.elaborated {
+  max-height: min(60vh, calc(var(--dock-y, 72vh) + 40px)); }
+.wl-group { display: flex; flex-direction: column; align-items: center; }
+.watch-lights.elaborated .wl-group { align-items: stretch; }
+.wl-row.on { background: rgba(255,255,255,0.08); }
+.wl-who { list-style: none; margin: 2px 0 6px; padding: 0 0 0 20px;
+  font-size: 11px; line-height: 1.4; color: var(--text); }
+.wl-who li { padding: 2px 0; overflow-wrap: anywhere; }
+.wl-who .wl-none { color: var(--muted); font-style: italic; }
 .wl-head { display: flex; align-items: center; gap: 6px; max-width: 130px; }
 .wl-name { font-size: 11px; font-weight: 700; color: var(--muted);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.wl-min { background: none; border: 0; color: var(--muted); font-size: 16px;
-  line-height: 1; cursor: pointer; padding: 0 2px; }
-.wl-row { display: flex; align-items: center; gap: 8px; width: 116px; }
+.wl-row { display: flex; align-items: center; gap: 8px; width: 116px;
+  min-height: 0; padding: 2px 4px; border: 0; border-radius: 8px;
+  background: none; color: inherit; font: inherit; cursor: pointer;
+  text-align: left; }
+.watch-lights.elaborated .wl-row { width: 100%; }
 .wl-light { width: 12px; height: 12px; border-radius: 50%; flex: none;
   box-shadow: 0 0 8px currentColor; }
 .wl-count { font-size: 15px; font-weight: 800; width: 20px; text-align: right; }
 .wl-label { font-size: 11px; color: var(--muted); }
 .wl-foot { font-size: 10px; color: var(--muted); margin-top: 2px; }
-/* Two elements, and the reason is a phone.
-
-   The dot is a button, and the phone block sets `button { min-height: 44px }`
-   so every control is a real tap target. `min-height` beats `height`, so the
-   22px dot this widget shrinks to on a phone rendered 22 wide and 44 tall —
-   a coloured ellipse, in answer to a field report asking for a smaller
-   circle. The declared width and height both said 22 and the guard next
-   door read them and passed; nothing here could see the rectangle.
-
-       asked     how big is the dot declared
-       mattered  how big is the dot drawn
-
-   So the button is the tap target and carries no paint, and `.wl-dot-face`
-   is the circle. */
-.wl-dot { position: fixed; left: 22px; bottom: 22px; z-index: 40;
-  width: 46px; height: 46px; padding: 0; border: 0; background: none;
-  display: grid; place-items: center; cursor: pointer; }
-.wl-dot-face { width: 46px; height: 46px; border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.25);
-  box-shadow: 0 8px 24px rgba(0,0,0,.45); }
 
 /* The version-mismatch banner — visible on every screen until the older
    backend is out of the way. Red on purpose: nothing else in the app may
@@ -580,13 +644,6 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 }
 .loudness-rail.asleep .loudness-count { visibility: hidden; }
 
-/* The footsteps in the corner: how many people hold accounts here. A quiet
-   chip, not a banner — it shares the fixed layer with the version guard but
-   never competes with it for attention. */
-.footsteps { position: fixed; top: 6px; right: 8px; z-index: 90;
-  padding: 1px 6px; border-radius: 999px; background: rgba(13, 23, 41, .85);
-  border: 1px solid #2f4a72; color: #9fb4d8; font-size: 9px;
-  line-height: 1.4; pointer-events: auto; }
 
 /* The error-reporting notice: shown once, before anything is sent. Calm on
    purpose — the version guard above is an alarm, this is a question. */
@@ -805,40 +862,28 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(123,92,255,.55); }
   50% { transform: scale(1.12); box-shadow: 0 0 0 14px rgba(123,92,255,0); } }
 
-/* ---- Corner widgets on a phone ------------------------------------------
-   Last in the file on purpose: these override .help-fab/.watch-lights/.wl-dot,
-   whose base rules sit above, and the cascade gives the later rule the win.
-   At desktop sizes 22px of bottom margin clears nothing important; on a
-   phone it parked the agent lights on top of Home and Chat and the help fab
-   on top of Campaigns — unpressable tabs, reported as broken screens. The
-   widgets ride above the tab bar instead, and the lights shrink a notch:
-   still a watch face, just a smaller wrist. */
+/* ---- The edge dock on a phone -------------------------------------------
+   Last in the file on purpose: these override .edge-tab/.edge-panel, whose
+   base rules sit above, and the cascade gives the later rule the win.
+   The tabs lose their words and keep their glyphs, and grow to the 44px
+   every other control on a phone gets — a tab is a tap target first. The
+   panel keeps inside the glass: as wide as the phone allows beside the
+   tabs, never wider. */
 @media (max-width: 760px) {
-  /* The 76px in these rules was clearance over the bottom tab bar. The bar
-     is a drawer now, so the widgets come back down to the corner — the
-     drawer itself wins any overlap by z-index, above every light. */
-  .help-fab, .help-panel {
-    bottom: calc(14px + env(safe-area-inset-bottom));
-  }
-  .watch-lights {
-    left: 12px; bottom: calc(14px + env(safe-area-inset-bottom));
-    width: 132px; height: 132px; padding: 12px; gap: 4px;
-  }
+  .edge-tab { height: 44px; min-height: 44px; padding: 0 10px 0 8px;
+    gap: 6px; }
+  .edge-tab-word { display: none; }
+  .edge-grip { width: 34px; height: 28px; min-height: 28px; }
+  .edge-panel { width: min(360px, calc(100vw - 58px)); margin-right: 4px; }
+  /* The face shrinks a notch on a phone: still a watch face, just a
+     smaller wrist. Elaborated, it keeps its width and grows down. */
+  .watch-lights { width: 132px; height: 132px; padding: 12px; gap: 4px; }
   .watch-lights .wl-row { width: 96px; }
   .watch-lights .wl-count { font-size: 13px; }
   .watch-lights .wl-label, .watch-lights .wl-name { font-size: 10px; }
-  .wl-dot {
-    left: 12px; bottom: calc(14px + env(safe-area-inset-bottom));
-    width: 44px; height: 44px;
-  }
-  /* A field report showed the minimized light as a solid disc parked over
-     whatever the screen was trying to say. On a phone the face shrinks to a
-     true dot and loses the heavy shadow — still pressable, because the
-     button around it keeps the whole 44px, no longer furniture. */
-  .wl-dot-face {
-    width: 22px; height: 22px; opacity: 0.75;
-    box-shadow: 0 2px 8px rgba(0,0,0,.35);
-  }
+  .watch-lights.elaborated { width: min(280px, calc(100vw - 72px)); height: auto;
+    padding: 16px 18px; }
+  .watch-lights.elaborated .wl-row { width: 100%; min-height: 32px; }
 }
 
 /* ---- the Wall (For You feed) --------------------------------------------
@@ -919,8 +964,6 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 
 /* The lights' unreachable state: the same dot, unlit. Gray on purpose —
    the three live colors all mean "the backend answered". */
-.wl-dot-off .wl-dot-face { background: #3a3654;
-  border-color: rgba(255,255,255,0.35); }
 
 /* When the device asks for reduced motion, nothing here moves. The
    accessibility statement says so, which makes this rule the sentence's
@@ -4537,39 +4580,15 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
   flex: 0 0 auto; max-height: none; overflow: visible;
 }
 
-/* The sphere and the helper are the outermost layer, everywhere.
+/* The sphere is above the cards and under the drawer.
  *
- *     asked     they always need to be on the outermost layer
- *     mattered  neither of them was ever ON a layer
- *
- * `.help-fab` declares `position: fixed` and no `z-index` at all, so it
- * paints at the bottom of the positioned stack and every card with a
- * layer of its own goes over it — visible in the room as the "?" cut in
- * half by the record card underneath. The green sphere is `.wl-dot`, the
- * watch light, and it had `z-index: 40` — above the page and below the
- * card, so the record clipped its bottom third. Measured: the dot sits
- * at y 832–878 and the record card starts at y 850. The orb carried the
- * same 40.
- *
- * Both are the same kind of thing: a control fixed to the window that
- * has to be pressable whatever is on screen, including the panels each
- * one opens. So they go above everything — the orb one step under the
- * helper, because the helper's own panel opens over the orb. */
-/* Above the cards, and still under the drawer.
- *
- * The first pass put these at 120 and 130, which fixed the clipping and
- * broke the guard that exists because of an earlier field report: "It
- * seems to be blocking the PDI menus." The navigation is a drawer now,
- * not a band, so a pinned widget cannot sit beside it — only over it —
- * and every one of them has to stay below the drawer's 60.
- *
- * So the range between a card and the drawer, which is the whole of what
- * was needed: a card with a layer of its own beat `auto`, and any
- * positive number beats a card. The orb and the light sit one step under
- * the helper, because the helper's panel opens over both. */
+ * `.agent-orb` once carried `z-index: 40` — above the page and below a
+ * card with a layer of its own, so the room's record card clipped it. Any
+ * positive number beats a card at `auto`; the drawer holds 60 and every
+ * pinned thing has to stay under it (the field report: "It seems to be
+ * blocking the PDI menus"). The edge dock's tabs sit at the same 48 and
+ * its panels at 50, declared with the dock. */
 .agent-orb { z-index: 48; }
-.watch-lights, .wl-dot { z-index: 48; }
-.help-fab, .help-panel { z-index: 50; }
 
 /* Room to breathe, in both directions.
  *
@@ -5086,7 +5105,8 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
  * A room owns the window, so the count of who holds an account here is
  * not something the room needs. It stands down, like the drawer and the
  * side dock, and the corner belongs to the way out. */
-.app.in-room .footsteps { display: none; }
+/* (The footsteps chip that once stood here is gone from the console —
+   everyone with an account shows in Discover.) */
 
 /* The side dock stands down inside a room.
  *
@@ -5127,3 +5147,29 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .com-handoff { display: flex; gap: 10px; align-items: flex-start; }
 .com-handoff code { word-break: break-all; }
 .com-qr { width: 96px; height: 96px; background: #fff; border-radius: 6px; }
+
+/* The name and the field are not cropped.
+ *
+ *     asked     the names and professions are cut off on the seats —
+ *               reduce the font or something
+ *     mattered  a seat that says "David…" and "Dr. A…" says nothing
+ *
+ * `.rs-name` was one line with an ellipsis, which is right for a strip of
+ * narrow tiles and wrong for a card wide enough to hold two lines. Both
+ * lines wrap now and clamp at two, the field at two as well, and on a
+ * phone the size steps down one notch so "Dr. Amara Osei" and "Mental
+ * health" fit whole. */
+.screen.room-place > .card.room-stage > .room-scene .rs-name {
+  white-space: normal; overflow-wrap: anywhere; text-overflow: clip;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; line-height: 1.2;
+}
+.screen.room-place > .card.room-stage > .room-scene .rs-role {
+  white-space: normal; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+@media (max-width: 719px) {
+  .screen.room-place > .card.room-stage > .room-scene .rs-name { font-size: 11px; }
+  .screen.room-place > .card.room-stage > .room-scene .rs-role { font-size: 10px; }
+}

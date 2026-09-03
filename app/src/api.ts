@@ -1498,6 +1498,13 @@ export interface WatchFace {
     light: "green" | "orange" | "red"; pending_approvals: number;
   };
   summary: { working: number; needing_assistance: number; stopped: number };
+  /** Every agent with its light, and every robot — what the counts are
+   *  counts *of*, so the round window can say which one is hung up,
+   *  running or stopped when a row is pressed. */
+  agents?: { id: string; goal: string; phase: string | null; status: string;
+             light: string; awaiting: unknown }[];
+  robots?: { id: string; name: string; model: string; status: string;
+             light: string }[];
   haptic: string | null;
 }
 
@@ -3824,7 +3831,7 @@ export const api = {
 
   healthInfo: () => req<{ status?: string; version?: string;
                           signup_key?: boolean;
-                          footsteps?: number }>("/health"),
+                          footsteps?: number }>("/health"),  // the count stays on the wire for the health page; the console no longer draws it
 
   // How to open this studio on a phone: its URL on the local network.
   pair: () => req<PairInfo>("/pair"),

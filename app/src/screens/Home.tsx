@@ -136,7 +136,7 @@ export function Home({ go, onVisit, onInside }: {
               // underneath — four different faces, four identical screens.
               // See screens/Profile.tsx for why no stats row followed them
               // over.
-              <button key={f.profile_id}
+              <button key={f.profile_id} data-go="visit"
                       onClick={() => onVisit(f.profile_id)}>
                 {f.avatar ? (
                   <img className="presence-bubble" alt=""
