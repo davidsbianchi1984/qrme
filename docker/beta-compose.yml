@@ -482,10 +482,20 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    # The Caddyfile rides in as a compose config rather than a bind mount:
+    # its content is part of the service's hash, so a changed route recreates
+    # the container on `up` instead of leaving Caddy on the config it read at
+    # its last start (the 3.0.5 deploy needed a restart by hand for /voice).
+    configs:
+      - source: caddyfile
+        target: /etc/caddy/Caddyfile
     volumes:
-      - ./beta.Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
+
+configs:
+  caddyfile:
+    file: ./beta.Caddyfile
 
 volumes:
   shared:

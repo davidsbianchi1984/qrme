@@ -290,6 +290,12 @@ without being asked. Watch it happen:
 docker compose -f docker/beta-compose.yml --env-file .env logs caddy | grep -i certificate
 ```
 
+A changed `docker/beta.Caddyfile` needs no step of its own: it rides into
+the container as a compose config, so its content is part of the service's
+hash and `up -d --build` recreates Caddy when it changes. (The 3.0.5 deploy
+mounted it as a plain bind, and Caddy stayed on the file it had read at its
+last start until somebody restarted it by hand.)
+
 If a name fails, the cause is almost always DNS — that name does not resolve
 to this host yet. Fix the record, then restart the one container:
 
