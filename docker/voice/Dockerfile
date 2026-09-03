@@ -13,5 +13,13 @@ RUN pip install --no-cache-dir fastapi uvicorn cryptography
 WORKDIR /srv
 COPY server.py .
 COPY houses/ houses/
+# The process that holds the house's credential does not run as root, the
+# same as every other container in the stack; and the access log is off,
+# because every vendor webhook URL carries the per-call signature and a log
+# line is not where a capability belongs.
+RUN useradd --system --no-create-home --uid 10001 voice
+USER voice
 EXPOSE 8800
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8800"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD ["python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8800/health', timeout=4).status == 200 else 1)"]
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8800", "--no-access-log"]

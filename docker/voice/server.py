@@ -75,6 +75,7 @@ import urllib.request
 from datetime import datetime, timezone
 
 from fastapi import FastAPI, HTTPException, Request, Response
+from starlette.concurrency import run_in_threadpool
 from pydantic import BaseModel, Field
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -97,11 +98,18 @@ EMERGENCY_NUMBERS = frozenset({"911", "112", "999", "000", "111", "119",
 #: because a model turn sits behind it; the phone house itself waits about
 #: fifteen seconds for markup, so the deploy page sets JIM_LLM_TIMEOUT to
 #: ten on a box with a line.
-JIM_TIMEOUT = 5.0
+JIM_TIMEOUT = 12.0
 SAY_TIMEOUT = 12.0
 
 #: How long a probe of the house or the public URL waits.
 PROBE_TIMEOUT = 3.0
+#: How long the house gets to take a call. Shorter than JIM's wait on
+#: /calls (10 s), which is shorter than this door's wait on JIM's call-id
+#: doors (12 s), which fits inside the 15 s a house gives a webhook — so a
+#: slow answer is never recorded as no answer at any link of the chain.
+HOUSE_TIMEOUT = 8.0
+#: The most a vendor may post to a public door before either lock is read.
+MAX_BODY = 64 * 1024
 
 #: How long the standing probes are believed before they are made again.
 STANDING_CACHE_S = 60
@@ -111,7 +119,7 @@ STANDING_CACHE_S = 60
 MAX_AGE = 30 * 60
 
 _STRIP = str.maketrans("", "", " -.()")
-_E164 = re.compile(r"^\+[1-9]\d{6,14}$")
+_E164 = re.compile(r"^\+[1-9][0-9]{6,14}$")
 _CALL_ID = re.compile(r"^[A-Za-z0-9_.-]{1,80}$")
 
 
@@ -168,7 +176,7 @@ def normalize(to: str) -> str:
     got = (to or "").strip().translate(_STRIP)
     if got.startswith("00"):
         got = "+" + got[2:]
-    if re.fullmatch(r"\d{10}", got):
+    if re.fullmatch(r"[0-9]{10}", got):
         got = "+1" + got
     return got
 
@@ -195,7 +203,7 @@ def is_emergency(to: str) -> bool:
 
 def _house_http(method: str, url: str, *, headers: dict | None = None,
                 body: bytes | None = None,
-                timeout: float = 10.0) -> tuple[int, str]:
+                timeout: float = HOUSE_TIMEOUT) -> tuple[int, str]:
     """The one request toward the internet: the house's API, and the
     box's own public name for the webhooks probe. Answers ``(status,
     text)`` for anything the far end said, and raises
@@ -598,7 +606,12 @@ async def _admit(house: str, call_id: str,
     cfg = _config()
     if house not in HOUSES:
         raise HTTPException(404, "no such house")
+    declared = request.headers.get("content-length") or "0"
+    if not declared.isdigit() or int(declared) > MAX_BODY:
+        raise HTTPException(413, "too large for a webhook")
     raw = await request.body()
+    if len(raw) > MAX_BODY:
+        raise HTTPException(413, "too large for a webhook")
     given = request.query_params.get("sig", "")
     if not cfg.secret or not given or not hmac.compare_digest(
             given.encode(), _sig(cfg.secret, call_id).encode()):
@@ -665,12 +678,23 @@ def _speak(row: House, call_id: str, status: int, body: dict,
     return _play(row, call_id, line, **counters)
 
 
+# Every vendor door reads its body on the event loop and does the rest — the
+# two locks are already checked by then — in a worker thread. The rest is
+# blocking: a request to JIM that may itself place the next contact's call
+# back through this door's POST /calls. On the loop, that round trip would
+# wait on itself until both timeouts fired and the next leg read
+# "unplaced" while the house rang it.
+
 @app.post("/voice/{house}/{call_id}/answer")
 async def answer(house: str, call_id: str, request: Request) -> Response:
+    row, ev = await _admit(house, call_id, request)
+    return await run_in_threadpool(_answer, row, ev, call_id)
+
+
+def _answer(row: House, ev: Event, call_id: str) -> Response:
     """The far end picked up. A machine or a fax is hung up on before a
     word of health text is spoken, and JIM is told `voicemail`; a person
     is told JIM's opening and asked for a key."""
-    row, ev = await _admit(house, call_id, request)
     who = (ev.answered_by or "").lower()
     if who.startswith(("machine", "fax")):
         _ask("POST", f"/reachout/call/{call_id}/event",
@@ -697,11 +721,15 @@ def _consent(row: House, call_id: str, digit: str) -> Response:
 
 @app.post("/voice/{house}/{call_id}/gather")
 async def gather(house: str, call_id: str, request: Request) -> Response:
+    row, ev = await _admit(house, call_id, request)
+    return await run_in_threadpool(_gather, row, ev, call_id,
+                                   _counter(request, "try", 1))
+
+
+def _gather(row: House, ev: Event, call_id: str, attempt: int) -> Response:
     """The keypad choice. 1 and 2 go to JIM at once; anything else gets
     one re-prompt from the remembered line (try=2) before it is sent as
     pressed — a mis-press is not an opt-out."""
-    row, ev = await _admit(house, call_id, request)
-    attempt = _counter(request, "try", 1)
     digit = (ev.digit or "").strip()
     if digit in ("1", "2"):
         return _consent(row, call_id, digit)
@@ -722,14 +750,18 @@ def _say(row: House, call_id: str, heard: str, turn: int) -> Response:
 
 @app.post("/voice/{house}/{call_id}/speech")
 async def speech(house: str, call_id: str, request: Request) -> Response:
+    row, ev = await _admit(house, call_id, request)
+    return await run_in_threadpool(
+        _speech, row, ev, call_id, _counter(request, "first", 0),
+        _counter(request, "silence", 0), _counter(request, "turn", 0))
+
+
+def _speech(row: House, ev: Event, call_id: str, first: int, silence: int,
+            turn: int) -> Response:
     """The conversation. `first=1` is the leg after consent, where JIM
     speaks before the contact has said anything; a spoken answer goes to
     JIM as heard; a silence gets one prompt from the remembered line and
     a second silence the closing."""
-    row, ev = await _admit(house, call_id, request)
-    first = _counter(request, "first", 0)
-    silence = _counter(request, "silence", 0)
-    turn = _counter(request, "turn", 0)
     heard = (ev.speech or "").strip()
     if first or heard:
         return _say(row, call_id, "" if first else heard, turn)
@@ -748,14 +780,23 @@ async def speech(house: str, call_id: str, request: Request) -> Response:
 @app.post("/voice/{house}/{call_id}/status")
 async def status_callback(house: str, call_id: str,
                           request: Request) -> Response:
-    """How the call ended, in JIM's words, and 204 whatever JIM said — a
-    5xx would only make the house retry into an idempotent door. JIM
-    decides reached or unreached; this door decides nothing."""
     row, ev = await _admit(house, call_id, request)
+    return await run_in_threadpool(_status, row, ev, call_id)
+
+
+def _status(row: House, ev: Event, call_id: str) -> Response:
+    """How the call ended, in JIM's words. 204 once JIM has heard it —
+    whatever JIM decided, including `already`, and including a 404 for a
+    call JIM never minted. A 502 only when JIM did not hear it at all
+    (unreachable, or a 5xx), so a house that retries retries into an
+    idempotent door rather than losing the word. JIM decides reached or
+    unreached; this door decides nothing."""
     if ev.status is None:
         return Response(status_code=204)
-    _ask("POST", f"/reachout/call/{call_id}/event",
-         {"event": ev.status, "seconds": int(ev.seconds or 0),
-          "detail": ev.detail})
+    status, _ = _ask("POST", f"/reachout/call/{call_id}/event",
+                     {"event": ev.status, "seconds": int(ev.seconds or 0),
+                      "detail": ev.detail})
     _LINES.pop(call_id, None)
+    if not status or status >= 500:
+        return Response(status_code=502)
     return Response(status_code=204)

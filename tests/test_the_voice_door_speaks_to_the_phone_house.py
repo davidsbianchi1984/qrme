@@ -777,7 +777,10 @@ def test_a_person_answering_hears_the_opening_and_a_keypad(voice, door,
     assert asked.body == {"event": "answered", "seconds": 0,
                           "detail": "CallStatus=in-progress;AnsweredBy=human"}
     assert asked.bearer == f"Bearer {SECRET}"
-    assert asked.timeout == voice.JIM_TIMEOUT == 5.0
+    # Longer than JIM's own wait on POST /calls (10 s), which is longer than
+    # the house's 8 s: a slow answer is never recorded as no answer.
+    assert asked.timeout == voice.JIM_TIMEOUT == 12.0
+    assert voice.HOUSE_TIMEOUT < 10.0 < voice.JIM_TIMEOUT < 15.0
     gather = root.find("Gather")
     assert gather is not None
     assert gather.get("input") == "dtmf" and gather.get("numDigits") == "1"
@@ -1012,14 +1015,27 @@ def test_every_terminal_status_reaches_jim_in_its_own_word(voice, door,
                                            "SipResponseCode=486"}
 
 
-def test_a_status_callback_is_204_whatever_jim_said(voice, door, monkeypatch):
-    """A 5xx would only make the house retry into an idempotent door."""
-    for answer in ((500, {}), (403, {"detail": "invalid voice adapter "
-                                               "token"}), (0, {})):
+def test_a_status_callback_is_204_once_jim_heard_it(voice, door, monkeypatch):
+    """Whatever JIM decided — including a refusal or a call it never minted —
+    the word was heard, and a retry would only be refused again."""
+    for answer in ((200, {"decided": "already"}),
+                   (403, {"detail": "invalid voice adapter token"}),
+                   (404, {"detail": "no such call"})):
         jim = FakeJim(event=lambda body, a=answer: a)
         monkeypatch.setattr(voice, "_jim", jim)
         got = twilio_post(door, voice, "status", {"CallStatus": "completed"})
-        assert got.status_code == 204
+        assert got.status_code == 204, answer
+        assert len(jim.calls) == 1
+
+
+def test_a_status_callback_is_502_when_jim_did_not_hear_it(voice, door, monkeypatch):
+    """JIM unreachable or failing is the one case a house's retry helps:
+    the door is idempotent, and the terminal word must not be lost."""
+    for answer in ((500, {}), (0, {})):
+        jim = FakeJim(event=lambda body, a=answer: a)
+        monkeypatch.setattr(voice, "_jim", jim)
+        got = twilio_post(door, voice, "status", {"CallStatus": "completed"})
+        assert got.status_code == 502, answer
         assert len(jim.calls) == 1
 
 
@@ -1632,3 +1648,60 @@ def test_the_public_ping_is_open_and_says_voice(door):
     # The JIM-facing doors are not under /voice — nothing there to publish.
     assert door.post("/voice/calls").status_code == 404
     assert door.get("/voice/standing").status_code == 404
+
+
+# --- the review's locks ------------------------------------------------------------
+
+def test_a_stale_vonage_webhook_is_refused(voice, door, monkeypatch):
+    """A signed webhook is good for minutes: a captured one does not replay
+    a day later."""
+    monkeypatch.setenv("VOICE_PROVIDER", "vonage")
+    monkeypatch.setenv("VOICE_WEBHOOK_KEY", "signature-secret")
+    jim = FakeJim(event=lambda body: ok(LINE_OPEN))
+    monkeypatch.setattr(voice, "_jim", jim)
+    sig = voice._sig(SECRET, CALL)
+    body = json.dumps({"from": "15550001111", "to": "15551110000",
+                       "uuid": "u-1", "conversation_uuid": "c-1"}).encode()
+    stale = _hs256("signature-secret", {
+        "iat": int(time.time()) - 86400, "jti": "j-old",
+        "payload_hash": hashlib.sha256(body).hexdigest()})
+    got = door.post(f"/voice/vonage/{CALL}/answer?sig={sig}", content=body,
+                    headers={"Content-Type": "application/json",
+                             "Authorization": f"Bearer {stale}"})
+    assert got.status_code == 403 and got.content == b""
+    unstamped = _hs256("signature-secret", {
+        "jti": "j-none", "payload_hash": hashlib.sha256(body).hexdigest()})
+    got = door.post(f"/voice/vonage/{CALL}/answer?sig={sig}", content=body,
+                    headers={"Content-Type": "application/json",
+                             "Authorization": f"Bearer {unstamped}"})
+    assert got.status_code == 403
+    assert jim.calls == []
+
+
+def test_a_body_too_large_for_a_webhook_is_refused_before_either_lock(voice, door,
+                                                                      monkeypatch):
+    jim = FakeJim()
+    monkeypatch.setattr(voice, "_jim", jim)
+    sig = voice._sig(SECRET, CALL)
+    huge = b"Digits=1&pad=" + b"x" * (voice.MAX_BODY + 1)
+    got = door.post(f"/voice/twilio/{CALL}/gather?sig={sig}", content=huge,
+                    headers={"Content-Type": "application/x-www-form-urlencoded"})
+    assert got.status_code == 413
+    assert jim.calls == []
+
+
+def test_the_vendor_doors_do_their_blocking_work_off_the_event_loop(voice):
+    """A door that blocks the loop while asking JIM cannot serve the
+    POST /calls JIM makes back through it for the next contact — the
+    round trip would wait on itself. Each door reads the body on the loop
+    and hands the rest to a worker thread."""
+    import asyncio
+    import inspect
+    for door_fn, worker in ((voice.answer, voice._answer),
+                            (voice.gather, voice._gather),
+                            (voice.speech, voice._speech),
+                            (voice.status_callback, voice._status)):
+        assert asyncio.iscoroutinefunction(door_fn)
+        assert not asyncio.iscoroutinefunction(worker)
+        src = inspect.getsource(door_fn)
+        assert "run_in_threadpool" in src and "_ask(" not in src

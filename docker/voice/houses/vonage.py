@@ -60,9 +60,9 @@ class Vonage(House):
         except (ValueError, TypeError) as exc:
             raise Misconfigured(
                 "VOICE_TOKEN is not a PEM private key for vonage — set "
-                "JIM_VOICE_TOKEN to the application's private key, or "
-                "JIM_VOICE_TOKEN_FILE to a path mounted into the "
-                "container") from exc
+                "JIM_VOICE_TOKEN to the application's private key, the "
+                "PEM's full text (the compose template forwards that one "
+                "variable; VOICE_TOKEN_FILE is for a mounted file)") from exc
         now = int(time.time())
         head = b64url(json.dumps({"alg": "RS256", "typ": "JWT"}).encode())
         claims = b64url(json.dumps({
@@ -129,6 +129,18 @@ class Vonage(House):
                 return False
             claims = json_body(b64url_decode(parts[1]))
         except (ValueError, TypeError):
+            return False
+        # A signed webhook is good for minutes, not forever: a captured one
+        # must not replay a day later.
+        now = time.time()
+        try:
+            iat = float(claims.get("iat") or 0)
+            exp = float(claims.get("exp") or 0)
+        except (TypeError, ValueError):
+            return False
+        if not iat or abs(now - iat) > 300:
+            return False
+        if exp and exp < now - 60:
             return False
         given = str(claims.get("payload_hash") or "")
         return hmac.compare_digest(given.encode(),

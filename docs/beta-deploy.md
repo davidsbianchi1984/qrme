@@ -210,10 +210,11 @@ QRME_SMTP_PASSWORD=
 # in JIM's source whatever is set here: the line rings people, never
 # dispatchers, and refuses an emergency number at three locks.
 #
-# LLM_TIMEOUT is JIM's model ceiling per turn, in seconds: 10 on a box
-# with a line, because the house waits fifteen seconds for the next
-# thing to say and a slow model should end a call politely, never hang
-# the line.
+# LLM_TIMEOUT is JIM's model ceiling per turn, in seconds, for every
+# model path (the Anthropic SDK and the OpenAI-compatible wire alike).
+# Leave it at 30 on a box with no line. Set it to 10 once a line is
+# wired: the house waits fifteen seconds for the next thing to say, and
+# a slow model should end a call politely, never hang the line.
 JIM_VOICE_SECRET=
 JIM_TELEPHONY_PROVIDER=twilio
 JIM_VOICE_PUBLIC_URL=
@@ -222,7 +223,7 @@ JIM_VOICE_ACCOUNT=
 JIM_VOICE_TOKEN=
 JIM_VOICE_WEBHOOK_KEY=
 JIM_VOICE_HOUSE_REF=
-JIM_LLM_TIMEOUT=10
+JIM_LLM_TIMEOUT=30
 EOF
 
 nano .env      # paste the key on the last line
