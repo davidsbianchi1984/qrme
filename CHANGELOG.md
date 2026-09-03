@@ -6,6 +6,27 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.0.7] - 2026-09-03
+
+### Added
+
+- **The assistant's box opens on the hosted cloud.** JIM's coding
+  assistant tries a drafted edit inside user, mount, network and pid
+  namespaces (JIM 3.0.11), and Docker's defaults refused it: the default
+  seccomp profile denies `unshare` and `mount` to a container without
+  `CAP_SYS_ADMIN`, the default AppArmor profile denies every mount and,
+  on Ubuntu 24.04, the user namespace itself. Two files widen exactly
+  that, for the jim service only — `docker/jim-box.seccomp.json`,
+  Docker's default profile with `unshare`, `mount`, `umount2` and the
+  new mount API allowed; `docker/jim-box.apparmor`, Docker's default
+  profile with mounts allowed and user namespaces permitted — named as
+  `security_opt` on the jim service. `docker/jim-box-install.sh` loads
+  the AppArmor half into the host's kernel, idempotently, taking the
+  profile as written on AppArmor 4 and without the `userns` rule on an
+  older parser; the deploy page runs it before every `up`. A guard reads
+  all three files against the compose file and holds the profiles to
+  Docker's default plus those calls and nothing more.
+
 ## [3.0.6] - 2026-09-03
 
 ### Added
@@ -17801,7 +17822,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.6...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.7...HEAD
+[3.0.7]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.6...app-v3.0.7
 [3.0.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.5...app-v3.0.6
 [3.0.5]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.4...app-v3.0.5
 [3.0.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.0.3...app-v3.0.4

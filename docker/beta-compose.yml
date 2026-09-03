@@ -369,6 +369,18 @@ services:
     volumes:
       - shared:/shared
       - jim-data:/data
+    # The assistant's box (jim/workroom.py) raises user, mount, network and
+    # pid namespaces for every drafted edit it tries, and mounts inside
+    # them. Docker's default seccomp profile refuses `unshare` and `mount`
+    # to a container without CAP_SYS_ADMIN, and its default AppArmor
+    # profile denies every mount — so on a stock box the box refuses with
+    # a sentence. These two are the defaults widened by exactly those
+    # calls, for this service only. The AppArmor one lives in the host's
+    # kernel: docker/jim-box-install.sh loads it, idempotently, and the
+    # deploy page runs it before this file is brought up.
+    security_opt:
+      - seccomp=./jim-box.seccomp.json
+      - apparmor=jim-box
     expose:
       - "8200"
     command: ["sh", "-c", ". /shared/jim.env; exec uvicorn jim.api:app --host 0.0.0.0 --port 8200"]

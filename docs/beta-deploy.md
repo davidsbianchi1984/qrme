@@ -326,6 +326,45 @@ sidecar then reports `pointed: true` on its own; the other houses answer
 the phone you used as the emergency contact within a day of the test
 reach-out, and hear where things stand.
 
+### The assistant's box (3.0.7)
+
+JIM's coding assistant tries a drafted edit inside four kernel-held walls
+before oversight reads it (`jim/workroom.py` in the JIM-mini repository),
+and for that the JIM container raises user, mount, network and pid
+namespaces. Docker's defaults refuse it twice over: the default seccomp
+profile denies `unshare` and `mount` to a container without
+`CAP_SYS_ADMIN`, and the default AppArmor profile denies every mount and,
+on Ubuntu 24.04, the user namespace itself. On a stock box the probe fails
+with *unshare failed: Operation not permitted* and the Studio shows a
+sentence instead of a button.
+
+Two files widen exactly that, for the jim service only:
+`docker/jim-box.seccomp.json` is Docker's default profile with `unshare`,
+`mount`, `umount2` and the new mount API allowed, and
+`docker/jim-box.apparmor` is Docker's default profile with mounts allowed
+and user namespaces permitted. The compose file names both on the jim
+service. The AppArmor half lives in the host's kernel, so it is loaded on
+the host — once, and again on every deploy, because the script is
+idempotent and a container named for a profile the kernel does not hold
+will not start:
+
+```bash
+cd /srv/qrme && sh docker/jim-box-install.sh
+```
+
+Then bring the service up and ask the box itself:
+
+```bash
+cd /srv/qrme && docker compose -f docker/beta-compose.yml --env-file .env up -d jim
+docker exec docker-jim-1 python3 -c "from jim import workroom; print(workroom.available(force=True))"
+```
+
+`(True, '')` is the box open. Anything else prints the probe's own words
+above it. Nothing outside the container is loosened: the profiles let the
+namespaces be raised, and the namespaces confine the run. To close the box
+again, remove the two `security_opt` lines from the jim service and bring
+it up the same way.
+
 ## 5. Check it from somewhere else
 
 From your own machine, not the host — that is the path a tester takes.
@@ -678,8 +717,14 @@ cd /srv/jim-mini && git checkout main && git pull --ff-only
 cd /srv/pdi      && git checkout main && git pull --ff-only
 
 cd /srv/qrme
+sh docker/jim-box-install.sh
 docker compose -f docker/beta-compose.yml --env-file .env up -d --build
 ```
+
+The `sh docker/jim-box-install.sh` line loads the AppArmor profile the
+assistant's box needs (section 4, *The assistant's box*). It is idempotent
+and it comes before the `up` because a container named for a profile the
+kernel does not hold will not start.
 
 The `git checkout main` is the fifth repair of the same kind, and it cost
 two releases on the live beta before anybody saw it. `/srv/qrme` was on a

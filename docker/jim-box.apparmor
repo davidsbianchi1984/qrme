@@ -1,0 +1,71 @@
+# The JIM container's AppArmor profile for the assistant's box
+# (jim/workroom.py in the JIM-mini repository).
+#
+# This is Docker's default profile — the one github.com/moby/profiles/apparmor
+# generates as docker-default — with two changes and nothing else:
+#
+#   mount,    where the default says `deny mount,`. The box mounts an empty
+#             tmpfs over every hidden place, binds its own room back, binds
+#             the tree read-only and gives the run a finite scratch space.
+#             Outside a user namespace the container still holds no
+#             CAP_SYS_ADMIN, so what this permits is what the kernel allows
+#             a user namespace's root: tmpfs, bind, and their remounts.
+#   userns,   so the box may create the user namespace at all. Ubuntu 24.04
+#             restricts unprivileged user namespaces unless the confining
+#             profile says so; this rule needs AppArmor 4 and abi 4.0, and
+#             docker/jim-box-install.sh strips both lines on an older
+#             parser, where the restriction does not exist.
+#
+# Everything else — the /proc and /sys denials, the signal and ptrace scope,
+# the network rules — is the default, kept verbatim. Loaded on the host by
+# docker/jim-box-install.sh; named by beta-compose.yml as `apparmor=jim-box`
+# on the jim service only.
+
+abi <abi/4.0>,
+#include <tunables/global>
+
+profile jim-box flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+
+  network,
+  # Disallow AF_ALG (Linux kernel crypto API); see https://copy.fail/
+  deny network alg,
+  # Disallow AF_VSOCK to prevent host/guest communication.
+  deny network vsock,
+  capability,
+  file,
+  umount,
+  # Host (privileged) processes may send signals to container processes.
+  signal (receive) peer=unconfined,
+  # runc may send signals to container processes (for "docker stop").
+  signal (receive) peer=runc,
+  # crun may send signals to container processes (for "docker stop" when used with crun OCI runtime).
+  signal (receive) peer=crun,
+  # Container processes may send signals amongst themselves.
+  signal (send,receive) peer=jim-box,
+
+  # The assistant's box: the user namespace, and the mounts inside it.
+  userns,
+  mount,
+
+  deny @{PROC}/* w,   # deny write for all files directly in /proc (not in a subdir)
+  # deny write to files not in /proc/<number>/** or /proc/sys/**
+  deny @{PROC}/{[^1-9/],[^1-9/][^0-9/],[^1-9s/][^0-9y/][^0-9s/],[^1-9/][^0-9/][^0-9/][^0-9/]*}/** w,
+  deny @{PROC}/sys/[^k]** w,  # deny /proc/sys except /proc/sys/k* (effectively /proc/sys/kernel)
+  deny @{PROC}/sys/kernel/{?,??,[^s][^h][^m]**} w,  # deny everything except shm* in /proc/sys/kernel/
+  deny @{PROC}/sysrq-trigger rwklx,
+  deny @{PROC}/kcore rwklx,
+
+  deny /sys/[^f]*/** wklx,
+  deny /sys/f[^s]*/** wklx,
+  deny /sys/fs/[^c]*/** wklx,
+  deny /sys/fs/c[^g]*/** wklx,
+  deny /sys/fs/cg[^r]*/** wklx,
+  deny /sys/firmware/** rwklx,
+  deny /sys/devices/virtual/powercap/** rwklx,
+  deny /sys/kernel/security/** rwklx,
+
+  # allow processes within the container to trace each other,
+  # provided all other LSM and yama setting allow it.
+  ptrace (trace,tracedby,read,readby) peer=jim-box,
+}
