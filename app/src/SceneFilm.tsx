@@ -67,7 +67,7 @@ export function SceneFilm({ scene, lang }: { scene: SceneRender; lang: Lang }) {
         <span className="bubble-scene-ai">{tr("chat.scene.ai", lang)}</span>
         {mediaIdOf(row.video_url) && (
           <a className="rs-film-down" download
-             href={getBase() + "/media/" + mediaIdOf(row.video_url) + "/download"}
+             href={getBase() + `/media/${mediaIdOf(row.video_url)}/download`}
              aria-label={tr("ins.film.download", lang)}
              title={tr("ins.film.download", lang)}>⤓</a>
         )}

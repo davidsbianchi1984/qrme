@@ -55,7 +55,7 @@ def test_the_takeover_carries_the_badge_above_the_player():
 
 def test_every_player_offers_the_burned_download():
     for src in _players():
-        assert '/download"' in src and "rs-film-down" in src, (
+        assert "/download`" in src and "rs-film-down" in src, (
             "a film player offers no download — or offers the unburned file")
 
 

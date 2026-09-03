@@ -31,7 +31,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from . import db, media
+from . import db, i18n, media
 
 TEXT = "AI-GENERATED"
 #: Where the badge sits, in pixels from the top-left corner.
@@ -74,10 +74,9 @@ def _row(media_id: str):
         "SELECT id, kind, filename, ai_marked FROM media WHERE id=?",
         (media_id,)).fetchone()
     if row is None:
-        raise NoBadge(f"no such media: {media_id}")
+        raise NoBadge(i18n.NO_SUCH_MEDIA)
     if not row["ai_marked"]:
-        raise NoBadge("this file is not synthetic media; nothing is burned "
-                      "into an authentic upload")
+        raise NoBadge(i18n.NOT_SYNTHETIC_NOTHING_BURNED)
     return row
 
 
@@ -86,7 +85,7 @@ def burned(media_id: str) -> Path:
     row = _row(media_id)
     source = media.media_dir() / row["filename"]
     if not source.exists():
-        raise NoBadge(f"the file behind {media_id} is gone")
+        raise NoBadge(i18n.NO_SUCH_MEDIA)
     target = source.with_name(source.stem + ".badged" + source.suffix)
     if target.exists() and target.stat().st_mtime >= source.stat().st_mtime:
         return target
@@ -95,7 +94,7 @@ def burned(media_id: str) -> Path:
     elif row["kind"] == "video":
         _burn_video(source, target)
     else:
-        raise NoBurner("only pictures and footage carry a burned badge")
+        raise NoBurner(i18n.BADGE_ONLY_PICTURES_AND_FOOTAGE)
     return target
 
 
@@ -113,9 +112,7 @@ def _burn_image(source: Path, target: Path) -> None:
 def _burn_video(source: Path, target: Path) -> None:
     ffmpeg = shutil.which("ffmpeg")
     if not ffmpeg:
-        raise NoBurner("this deployment has no ffmpeg, so the badge cannot "
-                       "be burned into footage — the download is refused "
-                       "rather than served unmarked")
+        raise NoBurner(i18n.NO_FFMPEG_BADGE_REFUSED)
     badge = source.with_name(source.stem + ".badge.png")
     badge.write_bytes(_badge_png(720))
     cmd = [ffmpeg, "-y", "-loglevel", "error", "-i", str(source),
@@ -125,5 +122,7 @@ def _burn_video(source: Path, target: Path) -> None:
            "-c:a", "copy", "-movflags", "+faststart", str(target)]
     done = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
     if done.returncode != 0 or not target.exists():
-        raise NoBurner("ffmpeg could not burn the badge: "
-                       + done.stderr.strip()[-300:])
+        import sys
+        print("badge: ffmpeg could not burn:", done.stderr.strip()[-300:],
+              file=sys.stderr)
+        raise NoBurner(i18n.NO_FFMPEG_BADGE_REFUSED)

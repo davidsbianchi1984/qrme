@@ -264,3 +264,8 @@ POST /profiles/{profile_id}/mail/{draft_id}/moderate
 # client call at all and is recorded in clientpaths.NOT_A_CLIENT_CALL.
 POST /profiles/{profile_id}/mail/inbound-token
 POST /profiles/{profile_id}/mail/poll
+# The burned download of rendered footage. The phones play footage
+# with the badge as the console's outermost layer; saving the burned
+# copy is a console door for now, and the shells will carry it when they
+# next carry the film players.
+GET /media/{media_id}/download

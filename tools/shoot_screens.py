@@ -131,6 +131,17 @@ def seed(db_path: str) -> dict:
     # homepage is a real starter's, not a stand-in made here.
     from qrme import seed as collection
     collection.seed()
+    # The camera's own profile wears the founder's rendered portrait, so a
+    # seat in a room shows a face rather than initials — "this one didn't
+    # have my profile photo". The same file the seed gives the founder's
+    # AI profile; the camera's profile is a stand-in for that one.
+    founder = conn.execute(
+        "SELECT p.avatar FROM profiles p JOIN handles h ON h.profile_id = p.id"
+        " WHERE h.handle = 'david_bianchi_ai'").fetchone()
+    if founder and founder["avatar"]:
+        conn.execute("UPDATE profiles SET avatar=? WHERE id=?",
+                     (founder["avatar"], profile_id))
+        conn.commit()
 
     return {"accountId": account,
             "accountToken": auth.issue("account", account),

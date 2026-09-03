@@ -1335,6 +1335,10 @@ PAIRED_DEVICES_LIMIT = "{max} paired devices is the limit — unpair one"
 SENSES_NOTHING_FOR_A_GUARDIAN = ("this device senses nothing a guardian could watch")
 GUARDIAN_ADDRESS_IS_A_URL = ("the guardian address is a web address — it starts with http or https")
 NO_SUCH_DEVICE_PAIR_FIRST = "no such device — pair it first"
+NO_SUCH_MEDIA = "no such media"
+NOT_SYNTHETIC_NOTHING_BURNED = ("this file is not synthetic media; nothing is burned into an authentic upload")
+NO_FFMPEG_BADGE_REFUSED = ("this deployment has no ffmpeg, so the badge cannot be burned into footage — the download is refused rather than served unmarked")
+BADGE_ONLY_PICTURES_AND_FOOTAGE = "only pictures and footage carry a burned badge"
 DEVICE_ADVERTISED_NO_NAME = ("the device did not advertise a name — connect again")
 BATTERY_READING_RANGE = "a battery reading is 0-100"
 SCREENS_LIMIT = "{max} screens is the limit — take one down first"
@@ -3192,6 +3196,50 @@ _PUBLIC.update(_PRIVILEGE_SENTENCES)
 
 
 _REFUSALS: dict[str, dict[str, str]] = {
+    'no such media': {
+        'es': 'no existe ese archivo',
+        'fr': 'aucun média de ce nom',
+        'de': 'kein solches Medium',
+        'pt': 'não existe esse ficheiro',
+        'it': 'nessun media con quel nome',
+        'ja': 'そのメディアは存在しません',
+        'zh': '没有这个媒体文件',
+        'hi': 'ऐसा कोई मीडिया नहीं',
+        'ar': 'لا يوجد وسيط بهذا الاسم',
+    },
+    'this file is not synthetic media; nothing is burned into an authentic upload': {
+        'es': 'este archivo no es contenido sintético; nada se graba en una subida auténtica',
+        'fr': "ce fichier n'est pas un média synthétique ; rien n'est incrusté dans un envoi authentique",
+        'de': 'diese Datei ist kein synthetisches Medium; in einen echten Upload wird nichts eingebrannt',
+        'pt': 'este ficheiro não é conteúdo sintético; nada é gravado num carregamento autêntico',
+        'it': 'questo file non è un media sintetico; nulla viene impresso su un caricamento autentico',
+        'ja': 'このファイルは合成メディアではありません。本物のアップロードには何も焼き込みません',
+        'zh': '此文件不是合成媒体；不会在真实上传中烧录任何内容',
+        'hi': 'यह फ़ाइल कृत्रिम मीडिया नहीं है; असली अपलोड में कुछ भी अंकित नहीं किया जाता',
+        'ar': 'هذا الملف ليس وسيطًا اصطناعيًا؛ لا يُحفر شيء على تحميل أصلي',
+    },
+    'this deployment has no ffmpeg, so the badge cannot be burned into footage — the download is refused rather than served unmarked': {
+        'es': 'esta instalación no tiene ffmpeg, así que la insignia no puede grabarse en el vídeo — la descarga se rechaza en lugar de servirse sin marca',
+        'fr': "ce déploiement n'a pas ffmpeg, le badge ne peut donc pas être incrusté dans la vidéo — le téléchargement est refusé plutôt que servi sans marque",
+        'de': 'diese Installation hat kein ffmpeg, das Abzeichen kann also nicht ins Video eingebrannt werden — der Download wird verweigert statt unmarkiert geliefert',
+        'pt': 'esta instalação não tem ffmpeg, por isso o selo não pode ser gravado no vídeo — a transferência é recusada em vez de servida sem marca',
+        'it': 'questa installazione non ha ffmpeg, quindi il badge non può essere impresso nel video — il download è rifiutato invece di essere servito senza marchio',
+        'ja': 'この環境には ffmpeg がないため、映像にバッジを焼き込めません。無印のまま渡すのではなく、ダウンロードを拒否します',
+        'zh': '此部署没有 ffmpeg，无法将标识烧录进视频——下载被拒绝，而不是提供无标识的文件',
+        'hi': 'इस तैनाती में ffmpeg नहीं है, इसलिए फ़ुटेज में बैज अंकित नहीं हो सकता — बिना निशान के देने के बजाय डाउनलोड अस्वीकार किया जाता है',
+        'ar': 'لا يتوفر ffmpeg في هذا النشر، فلا يمكن حفر الشارة في المقطع — يُرفض التنزيل بدل تقديمه دون علامة',
+    },
+    'only pictures and footage carry a burned badge': {
+        'es': 'solo las imágenes y los vídeos llevan una insignia grabada',
+        'fr': 'seuls les images et les vidéos portent un badge incrusté',
+        'de': 'nur Bilder und Videos tragen ein eingebranntes Abzeichen',
+        'pt': 'só imagens e vídeos levam um selo gravado',
+        'it': 'solo immagini e video portano un badge impresso',
+        'ja': '焼き込みバッジを持つのは画像と映像だけです',
+        'zh': '只有图片和视频带有烧录标识',
+        'hi': 'केवल चित्रों और फ़ुटेज पर ही अंकित बैज होता है',
+        'ar': 'الصور والمقاطع فقط تحمل شارة محفورة',
+    },
     "that inbound token does not open this profile's mailbox": {
         'es': 'ese token de entrada no abre el buzón de este perfil',
         'fr': "ce jeton entrant n'ouvre pas la boîte aux lettres de ce profil",

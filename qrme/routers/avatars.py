@@ -774,9 +774,9 @@ def download_marked(media_id: str):
     try:
         path = badge.burned(media_id)
     except badge.NoBadge as exc:
-        raise HTTPException(404, str(exc)) from None
+        raise HTTPException(404, i18n.raised(exc)) from None
     except badge.NoBurner as exc:
-        raise HTTPException(503, str(exc)) from None
+        raise HTTPException(503, i18n.raised(exc)) from None
     return FileResponse(str(path), filename=path.name,
                         headers={"content-disposition":
                                  f'attachment; filename="{path.name}"'})

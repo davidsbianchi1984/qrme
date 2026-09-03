@@ -108,7 +108,7 @@ export function SeatFilm({ profileId, display, talking, lang, onFull,
         <span className="rs-film-ai">{tr("ins.film.ai", lang)}</span>
         {mediaIdOf(row.video_url as string) && (
           <a className="rs-film-down" download
-             href={getBase() + "/media/" + mediaIdOf(row.video_url as string) + "/download"}
+             href={getBase() + `/media/${mediaIdOf(row.video_url as string)}/download`}
              aria-label={tr("ins.film.download", lang)}
              title={tr("ins.film.download", lang)}
              onClick={(e) => e.stopPropagation()}>⤓</a>
