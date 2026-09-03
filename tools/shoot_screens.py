@@ -316,9 +316,12 @@ INSIDE: tuple[tuple[str, str, str, tuple, str], ...] = (
     # AR and VR rooms as the console draws them on a phone with no
     # headset — the scene is the same rows either way, and WebXR only
     # gates the headset door.
-    ("103", "audio-room", "home", ('text="Voice chat only"',), ".room-scene"),
-    ("106", "ar-room", "home", ('text="AR"',), ".room-scene"),
-    ("109", "vr-room", "home", ('text="VR"',), ".room-scene"),
+    # Opening a room lands on its lobby — "knowing its id is not the same
+    # as being here" — so the recipe goes in the way a person does.
+    ("103", "audio-room", "home", ('text="Voice chat only"', 'text="Go in"'),
+     ".room-scene"),
+    ("106", "ar-room", "home", ('text="AR"', 'text="Go in"'), ".room-scene"),
+    ("109", "vr-room", "home", ('text="VR"', 'text="Go in"'), ".room-scene"),
 )
 
 

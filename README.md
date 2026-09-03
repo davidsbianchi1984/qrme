@@ -351,9 +351,9 @@ and the full tour is in [docs/gallery.md](docs/gallery.md).
 
 <table>
   <tr>
-    <td align="center" width="25%"><a href="docs/screens/103-audio-room.svg"><img src="docs/screens/103-audio-room.svg" width="165" alt="Audio room"></a><br><sub><b>103</b> · Audio room<br>voices in seats, barge-in welcome</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/106-ar-room.svg"><img src="docs/screens/106-ar-room.svg" width="165" alt="AR room"></a><br><sub><b>106</b> · AR room<br>the room laid over where you stand</sub></td>
-    <td align="center" width="25%"><a href="docs/screens/109-vr-room.svg"><img src="docs/screens/109-vr-room.svg" width="165" alt="VR room"></a><br><sub><b>109</b> · VR room<br>the room as a place you enter</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/103-audio-room.png"><img src="docs/screens/103-audio-room.png" width="165" alt="Audio room"></a><br><sub><b>103</b> · Audio room<br>voices in seats, barge-in welcome</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/106-ar-room.png"><img src="docs/screens/106-ar-room.png" width="165" alt="AR room"></a><br><sub><b>106</b> · AR room<br>the room the AR door opens — photographed on a phone with no headset, the AR and VR buttons on every seat</sub></td>
+    <td align="center" width="25%"><a href="docs/screens/109-vr-room.png"><img src="docs/screens/109-vr-room.png" width="165" alt="VR room"></a><br><sub><b>109</b> · VR room<br>the room the VR door opens — photographed on a phone with no headset; the headset door is WebXR's</sub></td>
     <td align="center" width="25%"><a href="docs/screens/90-full-screen.svg"><img src="docs/screens/90-full-screen.svg" width="165" alt="Full screen"></a><br><sub><b>90</b> · Full screen<br>video held, turned and watched together — design drawing</sub></td>
   </tr>
 </table>
