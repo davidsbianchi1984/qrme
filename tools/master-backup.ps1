@@ -94,6 +94,17 @@ foreach ($repo in $Repos) {
         if (Test-Path $mirror) {
             Write-Host "  repository: updating"
             $code = Invoke-Native { git -C $mirror remote update --prune --quiet }
+            if ($code -ne 0) {
+                # A run cut short mid-clone leaves a folder that is not yet a
+                # repository, and every later update fails against it. The
+                # mirror holds nothing of its own, so throwing it away and
+                # cloning again costs a minute and loses nothing.
+                Write-Host "  repository: unusable, cloning again"
+                Remove-Item -Recurse -Force $mirror -ErrorAction SilentlyContinue
+                Remove-Item -Recurse -Force (Join-Path $root 'source') `
+                            -ErrorAction SilentlyContinue
+                $code = Invoke-Native { git clone --mirror --quiet $url $mirror }
+            }
         } else {
             Write-Host "  repository: cloning"
             $code = Invoke-Native { git clone --mirror --quiet $url $mirror }

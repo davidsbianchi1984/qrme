@@ -6,6 +6,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+- **A half-built mirror is not a mirror.** A run cut short mid-clone leaves
+  a `<repo>.git` folder that is not yet a repository. On the next run
+  `master-backup.ps1` saw the folder, chose `remote update` over `clone`,
+  and git exited 128 against something that was never a repository —
+  reporting failure and moving on, so the folder stayed broken on every
+  subsequent run. A failed update now deletes the mirror and its working
+  copy and clones again: they hold nothing of their own, so the retry
+  costs a minute and loses nothing. Found on a real Windows run, where it
+  cost one product its git history until it was repaired by hand.
+
 - **A tool that dies on progress output.** `tools/master-backup.ps1` set
   `$ErrorActionPreference = 'Stop'` and then piped git through
   `2>&1 | Out-Null`. Git writes its ordinary progress to stderr, so
