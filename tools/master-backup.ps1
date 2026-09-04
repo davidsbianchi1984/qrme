@@ -37,6 +37,21 @@ $Curl  = "$env:SystemRoot\System32\curl.exe"
 if (-not (Test-Path $Curl)) { throw "curl.exe not found at $Curl" }
 $HasGit = [bool](Get-Command git -ErrorAction SilentlyContinue)
 
+function Invoke-Native {
+    <#
+      git and curl write ordinary progress to stderr, not stdout. Under
+      $ErrorActionPreference = 'Stop' PowerShell turns that chatter into a
+      terminating error - "Cloning into bare repository" is enough to kill
+      the run. A native command reports failure through its exit code, so
+      quiet the stream and read that instead.
+    #>
+    param([Parameter(Mandatory)][scriptblock]$Command)
+    $was = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try { & $Command 2>&1 | Out-Null; return $LASTEXITCODE }
+    finally { $ErrorActionPreference = $was }
+}
+
 function Api($Path) {
     $h = @{ Accept = 'application/vnd.github+json' }
     if ($env:GITHUB_TOKEN) { $h['Authorization'] = "Bearer $env:GITHUB_TOKEN" }
@@ -75,15 +90,23 @@ foreach ($repo in $Repos) {
     # --- the repository itself: every branch, every tag, all history ------
     if ($HasGit) {
         $mirror = Join-Path $root "$repo.git"
+        $url = "https://github.com/$Owner/$repo.git"
         if (Test-Path $mirror) {
             Write-Host "  repository: updating"
-            git -C $mirror remote update --prune 2>&1 | Out-Null
+            $code = Invoke-Native { git -C $mirror remote update --prune --quiet }
         } else {
             Write-Host "  repository: cloning"
-            git clone --mirror "https://github.com/$Owner/$repo.git" $mirror 2>&1 | Out-Null
+            $code = Invoke-Native { git clone --mirror --quiet $url $mirror }
         }
-        $work = Join-Path $root 'source'
-        if (-not (Test-Path $work)) { git clone $mirror $work 2>&1 | Out-Null }
+        if ($code -ne 0) {
+            Write-Host "  repository: git exited $code - the release files are unaffected" `
+                       -ForegroundColor Yellow
+        } else {
+            $work = Join-Path $root 'source'
+            if (-not (Test-Path $work)) {
+                Invoke-Native { git clone --quiet $mirror $work } | Out-Null
+            }
+        }
     }
 
     # --- list every file attached to every release -----------------------
@@ -119,8 +142,8 @@ foreach ($repo in $Repos) {
         }
         Write-Host ("`r  [{0}/{1}] {2}/{3}" -f $i, $total, $a.Tag, $a.Name).PadRight(78) `
                    -NoNewline
-        & $Curl -fsSL --retry 5 --retry-delay 3 -o "$out.part" $a.Url
-        if ($LASTEXITCODE -eq 0 -and (Test-Path "$out.part")) {
+        $code = Invoke-Native { & $Curl -fsSL --retry 5 --retry-delay 3 -o "$out.part" $a.Url }
+        if ($code -eq 0 -and (Test-Path "$out.part")) {
             Move-Item -Force "$out.part" $out; $got++
         } else {
             Remove-Item -Force -ErrorAction SilentlyContinue "$out.part"
@@ -149,7 +172,7 @@ if ($Pack) {
     foreach ($repo in $Repos) {
         Write-Host "  $repo.tar ... " -NoNewline
         Push-Location $full
-        & "$env:SystemRoot\System32\tar.exe" -cf "$repo.tar" $repo
+        Invoke-Native { & "$env:SystemRoot\System32\tar.exe" -cf "$repo.tar" $repo } | Out-Null
         Pop-Location
         $t = Join-Path $full "$repo.tar"
         if (Test-Path $t) {

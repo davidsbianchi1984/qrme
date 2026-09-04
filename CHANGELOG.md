@@ -6,6 +6,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+- **A tool that dies on progress output.** `tools/master-backup.ps1` set
+  `$ErrorActionPreference = 'Stop'` and then piped git through
+  `2>&1 | Out-Null`. Git writes its ordinary progress to stderr, so
+  "Cloning into bare repository" — a success message — became a terminating
+  `RemoteException` and killed the run at the first repository. One
+  `Invoke-Native` helper now runs every external command with the
+  preference relaxed and reads the exit code, which is where a native
+  command actually reports failure; a git that does fail says so and the
+  release files carry on regardless. Found on a real Windows run, not here:
+  this script has no interpreter in the environment it was written in.
+
 - **A backup you cannot start is not a backup.** The release assets — 5,938
   files, 315 GiB across the three products — are the one part of these apps
   that cannot travel in a git history, and the instructions for pulling them
