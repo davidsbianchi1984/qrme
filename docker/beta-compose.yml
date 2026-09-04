@@ -23,6 +23,7 @@
 #   qrme      8000   synthetic profiles
 #   jim       8200   the health guardian
 #   cloudgw   8300   shared: greater model, contributions, error reports
+#   voice     8800   the phone line JIM rings emergency contacts on
 #   caddy     80/443 the only container with a published port
 #
 # `expose` rather than `ports` on the four services is deliberate: they speak
@@ -161,6 +162,43 @@ services:
       FAL_KEY: ${QRME_FILM_HOUSE_KEY:-}
     expose:
       - "8700"
+
+  # --- the phone line -----------------------------------------------------
+  # JIM's calls to a person's emergency contacts, placed through whichever
+  # phone house JIM_TELEPHONY_PROVIDER names (twilio by default) and the
+  # house's webhooks turned back into JIM's own call-id doors. The vendor
+  # credential lives here and never in JIM's image; JIM holds only the
+  # address of this door and the one shared secret.
+  #
+  # Two faces. Toward JIM, on this network only: /health, /standing and
+  # /calls. Toward the house, published by Caddy under /voice/* on
+  # jim-mini.com: /voice/ping and the signed per-call webhooks. The
+  # JIM-facing doors are not under /voice, so the internet cannot ask this
+  # box to ring a number even with the secret.
+  #
+  # Empty JIM_VOICE_SECRET means no phone line — today's posture, where
+  # every contact call comes back prepared and JIM's console says so. The
+  # 911 send is held shut in JIM's own source and this container has no
+  # route to it: it rings people, never dispatchers.
+  voice:
+    build:
+      context: ${QRME_CONTEXT:-..}/docker/voice
+    restart: unless-stopped
+    environment:
+      VOICE_PROVIDER: ${JIM_TELEPHONY_PROVIDER:-twilio}
+      VOICE_SECRET: ${JIM_VOICE_SECRET:-}
+      # Where the house's webhooks are turned into JIM's call-id doors.
+      # Topology, not a secret, and named in this block because compose
+      # forwards only what a block names.
+      VOICE_JIM_URL: http://jim:8200
+      VOICE_PUBLIC_URL: ${JIM_VOICE_PUBLIC_URL:-}
+      VOICE_FROM: ${JIM_VOICE_FROM:-}
+      VOICE_ACCOUNT: ${JIM_VOICE_ACCOUNT:-}
+      VOICE_TOKEN: ${JIM_VOICE_TOKEN:-}
+      VOICE_WEBHOOK_KEY: ${JIM_VOICE_WEBHOOK_KEY:-}
+      VOICE_HOUSE_REF: ${JIM_VOICE_HOUSE_REF:-}
+    expose:
+      - "8800"
 
   # --- one-shot: mint the tenant tokens ----------------------------------
   #
@@ -315,6 +353,19 @@ services:
       # degrading in silence. QRME reads the same variable now — the spoken
       # voice, qrme/spoken.py — so one key serves both products.
       ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:-}
+      # The phone line (the voice service above). JIM_VOICE_URL is
+      # topology and a literal, like JIM_QRME_URL; the secret is the one
+      # shared value both containers are set from, so the operator cannot
+      # mis-pair them. Empty secret means unwired — today's behaviour.
+      JIM_VOICE_URL: http://voice:8800
+      JIM_VOICE_SECRET: ${JIM_VOICE_SECRET:-}
+      JIM_TELEPHONY_PROVIDER: ${JIM_TELEPHONY_PROVIDER:-}
+      # The model's ceiling per turn, in seconds. The default is
+      # load-bearing: jim/llm.py does int() on it at import, and an empty
+      # forward would crash the container. The deploy page sets 10 on a
+      # box with a line, because the phone house waits fifteen seconds
+      # for the next thing to say.
+      JIM_LLM_TIMEOUT: ${JIM_LLM_TIMEOUT:-30}
     volumes:
       - shared:/shared
       - jim-data:/data
@@ -427,7 +478,7 @@ services:
   caddy:
     image: caddy:2
     restart: unless-stopped
-    depends_on: [qrme, jim, pdi, cloudgw]
+    depends_on: [qrme, jim, pdi, cloudgw, voice]
     ports:
       - "80:80"
       - "443:443"
