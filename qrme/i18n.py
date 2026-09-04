@@ -8904,7 +8904,12 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     'html': {'en': 'HTML', 'es': 'HTML', 'fr': 'HTML', 'de': 'HTML', 'pt': 'HTML', 'it': 'HTML', 'ja': 'HTML', 'zh': 'HTML', 'hi': 'HTML', 'ar': 'HTML'},
     'id': {'en': 'Id', 'es': 'Id', 'fr': 'Id', 'de': 'ID', 'pt': 'Id', 'it': 'Id', 'ja': 'ID', 'zh': 'ID', 'hi': 'आईडी', 'ar': 'المعرّف'},
     'include_remote': {'en': 'Include remote', 'es': 'Incluir remotos', 'fr': 'Inclure à distance', 'de': 'Remote einbeziehen', 'pt': 'Incluir remotos', 'it': 'Includi remoti', 'ja': 'リモートを含む', 'zh': '包含远程', 'hi': 'रिमोट शामिल करें', 'ar': 'تضمين البعيد'},
-    'job_title': {'en': 'Job title', 'es': 'Puesto', 'fr': 'Intitulé du poste', 'de': 'Position', 'pt': 'Cargo', 'it': 'Ruolo', 'ja': '職種', 'zh': '职位', 'hi': 'पद', 'ar': 'المسمى الوظيفي'},
+    # Worded as PDI already words it — the shared vocabulary guard is the
+    # reason this row is not written twice. German in particular: this
+    # product's `position` is an ordinal, and 'Position' for the job
+    # would have been the same collision in German that `job_title`
+    # exists to avoid in English.
+    'job_title': {'en': 'Job title', 'es': 'Puesto', 'fr': 'Intitulé du poste', 'de': 'Berufsbezeichnung', 'pt': 'Cargo', 'it': 'Qualifica', 'ja': '職種', 'zh': '职位', 'hi': 'पद', 'ar': 'المسمى الوظيفي'},
     'industry': {'en': 'Industry', 'es': 'Sector', 'fr': 'Secteur', 'de': 'Branche', 'pt': 'Setor', 'it': 'Settore', 'ja': '業界', 'zh': '行业', 'hi': 'उद्योग', 'ar': 'القطاع'},
     'input': {'en': 'Input', 'es': 'Entrada', 'fr': 'Entrée', 'de': 'Eingabe', 'pt': 'Entrada', 'it': 'Input', 'ja': '入力', 'zh': '输入', 'hi': 'इनपुट', 'ar': 'الإدخال'},
     'keep': {'en': 'Keep', 'es': 'Conservar', 'fr': 'Conserver', 'de': 'Behalten', 'pt': 'Manter', 'it': 'Mantieni', 'ja': '保持', 'zh': '保留', 'hi': 'रखें', 'ar': 'الاحتفاظ'},
