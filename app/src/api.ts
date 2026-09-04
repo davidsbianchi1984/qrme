@@ -1310,6 +1310,14 @@ export interface Profile {
   id: string;
   display_name: string;
   persona: string;
+  /** The field this profile works in, in its own words — "healthcare",
+   *  "real_estate". Shown under the name where a name alone does not say
+   *  enough. Absent on a profile that has not said. */
+  industry?: string | null;
+  /** And the job inside that field — "Software architect". Absent on a
+   *  profile that has not said. `job_title`, not `position`: the friends
+   *  list already puts a `position` on the wire and it is an ordinal. */
+  job_title?: string | null;
   kind: string;
   purpose?: string;
   status?: string;
@@ -4036,6 +4044,10 @@ export const api = {
   friends: (profileId: string) =>
     req<{ friends: { profile_id: string; display_name: string; pinned?: boolean;
                      handle?: string | null; avatar?: string | null;
+                     /** What they do — the line under the name, same as the
+                      *  pool's. Null on a profile that has not said. */
+                     industry?: string | null;
+                     job_title?: string | null;
                      founder?: boolean }[]; founder_handles: string[] }>(
       `/profiles/${profileId}/friends`),
   // People search: publicly listed profiles only, by name or handle —
@@ -4044,7 +4056,8 @@ export const api = {
   findPeople: (q: string) =>
     req<{ q: string; found: { profile_id: string; display_name: string;
                               handle: string | null; avatar: string | null;
-                              kind: string;
+                              kind: string; industry: string | null;
+                              job_title: string | null;
                               verification: Record<string, unknown> }[] }>(
       `/people?q=${encodeURIComponent(q)}`),
   // Everyone here: the browse pool and the honest head count. Every
@@ -4058,6 +4071,12 @@ export const api = {
                       // no client re-derives it from the asset path.
                       avatar_kind: string | null;
                       kind: string;
+                      /** The field they work in, as the profile wrote it —
+                       *  the line under the name on every card built on
+                       *  this pool. Null on a profile that has not said. */
+                      industry: string | null;
+                      /** And the job in it — the line a reader chooses on. */
+                      job_title: string | null;
                       verification: Record<string, unknown> }[];
           head_count: number; kind_counts: Record<string, number> }>(
       "/people/browse"),

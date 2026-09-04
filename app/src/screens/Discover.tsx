@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, getBase } from "../api";
 import { t as tr, visitorLang } from "../l10n";
+import { Trade } from "../Trade";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
 
@@ -36,6 +37,10 @@ export function Discover({ onPlans, onVisit }: {
   const lang = visitorLang();
   type Card = Awaited<ReturnType<typeof api.marketplace>>[number] & {
     verified?: boolean;
+    /** What they do, off the pool row — the marketplace listing does not
+     *  carry it, and the pool is where every card on this screen starts. */
+    industry?: string | null;
+    job_title?: string | null;
   };
   const [cards, setCards] = useState<Card[]>([]);
   // Who is already on the list. Every card said "Add friend", including
@@ -68,6 +73,8 @@ export function Discover({ onPlans, onVisit }: {
             // Server-decided on both sides, so a face is badged the same
             // whichever pool the card came from.
             avatar_kind: l?.avatar_kind ?? p.avatar_kind,
+            industry: p.industry,
+            job_title: p.job_title,
             verified: Boolean(
               (p.verification as { verified?: boolean } | null)?.verified),
           } as Card;
@@ -177,13 +184,25 @@ export function Discover({ onPlans, onVisit }: {
                   {c.display_name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2)}
                 </span>
               )}
+              {/* The AI mark rides ON the picture, hung off its corner, in
+                  the standard badge — the same one the talk face and the
+                  room seat wear. It sat under the portrait for years
+                  because a field report showed a pill swallowing the face
+                  once a phone's font boosting inflated it; the pill is
+                  pinned against boosting and grows outward from a corner
+                  now, so that reason has been answered rather than
+                  overruled. See `.dc-ai`.
+
+                  The other two labels stay below. They are different
+                  claims — the face is authentic, the person is who they
+                  say — and three pills on one 64px circle is a face
+                  nobody can see. */}
+              {c.avatar_kind === "ai" && (
+                <span className="ai-pill dc-ai">
+                  {tr("dsc.badge.ai", lang)}
+                </span>
+              )}
             </div>
-            {/* The kind label sits under the portrait, never on it — a
-                field report showed the green pill swallowing the face
-                once a phone's font boosting inflated it. */}
-            {c.avatar_kind === "ai" && (
-              <span className="dc-badge ai">{tr("dsc.badge.ai", lang)}</span>
-            )}
             {c.avatar_kind === "real_photo" && (
               <span className="dc-badge real">{tr("dsc.badge.real", lang)}</span>
             )}
@@ -194,6 +213,8 @@ export function Discover({ onPlans, onVisit }: {
             )}
             <b>{c.display_name}</b>
             </button>
+            <Trade industry={c.industry} position={c.job_title}
+                   className="card-trade" />
             {c.blurb && <p className="muted small">{c.blurb}</p>}
             <div className="tag-row">
               {c.tags.slice(0, 4).map((t) => <span key={t} className="tag">{t}</span>)}

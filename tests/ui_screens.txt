@@ -1,4 +1,4 @@
-# status: floor — 78 rows
+# status: floor — 79 rows
 #
 # Which console surface each screen drawing depicts.
 #
@@ -61,6 +61,9 @@ Hands           207
 SkinTiles       44
 TalkRail        198
 Waveform        199
+# The line under a name: the job and the field. One component, drawn on
+# the talk surface and on every card that lists profiles beside each other.
+Trade           199,185,204,84
 Solitude        192
 Chat            6,45,83
 Desk            69,70

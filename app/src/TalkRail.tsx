@@ -27,6 +27,33 @@ export type RailPanel = "profile" | "memory" | "relationship" | "controls";
 /** Owner-only panels, named once so the rail and the opener agree. */
 const OWNERS: RailPanel[] = ["relationship", "controls"];
 
+/** The word on the tab, which is not the sentence on the panel.
+ *
+ * The tabs carried the panel's own title — "What you are to each other" —
+ * into a 60-pixel column beside a face, where the browser cut all four to
+ * their first eight characters. The owner's report was that the row read
+ * "Who the… / What th… / What yo… / How the…" and could not be told apart
+ * at all, which is exactly what four labels sharing a first word do once
+ * they are truncated.
+ *
+ *     asked     does the tab say what the panel is
+ *     mattered  can the tab be read
+ *
+ * So the tab gets a word and the panel keeps its sentence — and the
+ * sentence is still the tooltip and still what a screen reader announces,
+ * because a shorter label must not be a smaller one.
+ *
+ * A branch per key rather than a lookup table: `tr(TABLE[p])` shows the
+ * localizer's reader no literal, and this file has been through that
+ * repair once already.
+ */
+function tabWord(panel: RailPanel, lang: string): string {
+  if (panel === "profile") return tr("rail.tab.profile", lang);
+  if (panel === "memory") return tr("rail.tab.memory", lang);
+  if (panel === "relationship") return tr("rail.tab.relationship", lang);
+  return tr("rail.tab.controls", lang);
+}
+
 export function TalkRail({
   profileId, interactorId, lang, ownerToken, interactorToken, onError,
   onAsk,
@@ -65,9 +92,10 @@ export function TalkRail({
                   className={"talk-rail-btn" + (open === p ? " on" : "")}
                   aria-pressed={open === p}
                   title={tr(`rail.${p}`, lang)}
+                  aria-label={tr(`rail.${p}`, lang)}
                   onClick={() => setOpen((o) => (o === p ? null : p))}>
             <span aria-hidden="true">{GLYPH[p]}</span>
-            <span className="talk-rail-label">{tr(`rail.${p}`, lang)}</span>
+            <span className="talk-rail-label">{tabWord(p, lang)}</span>
           </button>
         ))}
       </div>

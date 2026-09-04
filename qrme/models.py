@@ -165,6 +165,10 @@ class ProfileUpdate(BaseModel):
     # what it is for has no way to say so, and the seats go on announcing
     # the old answer.
     industry: str | None = None
+    # And the job in it. Settable for the same reason `industry` is: a
+    # profile that changes what it does has to be able to say so, and the
+    # seats and cards go on announcing the old answer until it can.
+    job_title: str | None = None
 
 
 class ProfileOut(BaseModel):
@@ -177,6 +181,16 @@ class ProfileOut(BaseModel):
     kind: ProfileKind
     display_name: str
     persona: str
+    # The field this profile works in, in the profile's own words. Public,
+    # and public on purpose: it is the line under the name that answers
+    # "and who is that?" — "Dr. Amara Osei" and "Dr. Amara Osei ·
+    # Healthcare" are different amounts of introduction, and the second is
+    # the one a person can act on. Null for a profile that has not said.
+    industry: str | None = None
+    # And the job inside that field. The sector says which shelf; this says
+    # what the person does, and a reader choosing between thirty faces is
+    # choosing on the second.
+    job_title: str | None = None
     demographics: dict
     sources: list[str]
     anonymous: bool

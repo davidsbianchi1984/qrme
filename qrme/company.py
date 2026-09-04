@@ -351,6 +351,17 @@ def hire(company: dict, seat_id: str, answers: list[dict]) -> dict:
         verification=Verification(birthdate=_BIRTHDATE)))
 
     conn = db.connect()
+    # The job, on the profile itself rather than only inside the charter it
+    # was hired on. Every surface that draws a face draws the line under
+    # the name from these two columns, and a hire whose title lives only in
+    # a source item is a hire every one of those surfaces has to call
+    # untitled.
+    # "Head baker" alone leaves a reader asking where — the same question
+    # the owner asked of a bare "Founder". The seat's title and the company
+    # it is a seat AT go on one line, because that is how a person says it.
+    conn.execute("UPDATE profiles SET job_title=?, industry=? WHERE id=?",
+                 (f"{seat['title']}, {company['name']}",
+                  company["industry"], profile["id"]))
     conn.execute(
         "INSERT INTO source_items (id, profile_id, kind, title, content,"
         " pdi_key, pack_id, created_at) VALUES (?,?,?,?,?,NULL,NULL,?)",

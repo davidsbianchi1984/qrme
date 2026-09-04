@@ -101,7 +101,7 @@ def seed(db_path: str) -> dict:
         " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
         (profile_id, account, "self", "David Bianchi",
          "The owner's own profile, seeded so the console has something "
-         "true to draw.", "{}", "[]", 0, 0, "public", "auto", 0,
+         "true to draw.", "{}", "[]", 0, 0, "reactive", "auto", 0,
          "balanced", 0, terms.TERMS_VERSION, db.utcnow(), db.utcnow()))
     conn.commit()
     # The video road, and one render on it.
@@ -136,12 +136,19 @@ def seed(db_path: str) -> dict:
     # seat in a room shows a face rather than initials — "this one didn't
     # have my profile photo". The same file the seed gives the founder's
     # AI profile; the camera's profile is a stand-in for that one.
+    # …and the field it works in, which the talk surface draws under the
+    # name. A profile with none draws no line there, which is right for a
+    # profile that has not said and wrong for the camera's stand-in for one
+    # that has.
     founder = conn.execute(
-        "SELECT p.avatar FROM profiles p JOIN handles h ON h.profile_id = p.id"
+        "SELECT p.avatar, p.industry, p.job_title FROM profiles p"
+        " JOIN handles h ON h.profile_id = p.id"
         " WHERE h.handle = 'david_bianchi_ai'").fetchone()
     if founder and founder["avatar"]:
-        conn.execute("UPDATE profiles SET avatar=? WHERE id=?",
-                     (founder["avatar"], profile_id))
+        conn.execute(
+            "UPDATE profiles SET avatar=?, industry=?, job_title=? WHERE id=?",
+            (founder["avatar"], founder["industry"], founder["job_title"],
+             profile_id))
         conn.commit()
     # And the same profile's bound voice, so the chat is photographed
     # without the "no spoken voice bound" notice — a bound voice is the
@@ -524,6 +531,35 @@ INSIDE: tuple[tuple[str, str, str, tuple, str], ...] = (
 )
 
 
+#: The recipes that need a microphone, and are photographed in their own
+#: browser because of it.
+#:
+#: Headless Chromium ships with no capture device, so the talk surface
+#: photographed as "No microphone the browser can reach" — a true sentence
+#: about this host and a false one about the product. Chromium's fake
+#: device fixes that, and the console still takes the ordinary road to it:
+#: the recogniser fails on its speech service, the recorded ear answers,
+#: and the wave reads what the ear is doing.
+#:
+#: A second browser rather than a flag on the first, because the fake
+#: device carries the fake device's NAME — Voice and Settings both list
+#: what audio is playing through, and both came back saying "Fake Default
+#: Audio Output". A device invented for one screen must not sign its name
+#: across the others.
+#:
+#:     asked     can the camera give the page a microphone
+#:     mattered  can it give one screen a microphone
+MIC_INSIDE: tuple[tuple[str, str, str, tuple, str], ...] = (
+    # What it is doing. The talk surface, opened the way a person opens it
+    # — the microphone in the chat's composer — with the wave reading the
+    # ear that press opened. The marker sits on the wave, so the proof is
+    # the wave; the capture is the whole page, because a reading cropped
+    # away from the thing it reads is not the screen.
+    ("199", "what-it-is-doing", "chat", (".chat-wave",),
+     '[data-screen="199"]'),
+)
+
+
 def open_inside(page, session, start, presses, proof) -> bool:
     """Reach a screen that is not a tab, and refuse to lie about it."""
     if start == SIGNED_OUT:
@@ -633,7 +669,10 @@ ELEMENTS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
     ("22", "providers", "settings", ()),
     ("44", "avatar-studio", "identity", ()),
     ("198", "beside-the-face", "chat", ()),
-    ("199", "what-it-is-doing", "chat", ()),
+    # 199 is not on this list. The wave carries the marker, but the wave
+    # is 21 bars three millimetres tall — cropped to itself it is a strip
+    # nobody can read, and the thing it is a reading OF is the surface
+    # around it. It is photographed as a page instead, in INSIDE.
     # The reply as footage. It draws on the chat screen because that is
     # where a reply is read, and it is photographed as a card because the
     # four states it has are the whole surface — three of them have no
@@ -944,7 +983,38 @@ def main(shots: list[tuple[str, str, str]]) -> None:
                 print(f"  {target.name}")
 
             browser.close()
-            write_long_gallery()
+
+            # And the screens that need an ear, in a browser that has one.
+            miked = play.chromium.launch(
+                executable_path="/opt/pw-browsers/chromium",
+                args=["--use-fake-device-for-media-stream",
+                      "--use-fake-ui-for-media-stream"])
+            mpage = miked.new_page(viewport=VIEWPORT,
+                                   device_scale_factor=SCALE,
+                                   permissions=["microphone"])
+            mpage.goto(BASE + "/", wait_until="networkidle")
+            mpage.evaluate("s => localStorage.setItem('qrme.session', s)",
+                           json.dumps(session))
+            mpage.reload(wait_until="networkidle")
+            mpage.wait_for_timeout(600)
+            answer_the_notice(mpage)
+            tuck_the_widgets(mpage)
+            for number, stem, start, presses, proof in MIC_INSIDE:
+                if not open_inside(mpage, session, start, presses, proof):
+                    print(f"  ! {number}-{stem}: never reached — "
+                          "nothing written")
+                    continue
+                # A beat for the ear to settle into a reading: the wave is
+                # the subject, and a capture taken in the quarter-second
+                # before the first turn photographs it flat.
+                mpage.wait_for_timeout(2500)
+                mpage.evaluate("window.scrollTo(0, 0)")
+                mpage.wait_for_timeout(250)
+                print(f"  {number}-{stem}.png")
+                for part in shoot_page(mpage, number, stem):
+                    print(f"  {part}")
+            miked.close()
+
             write_long_gallery()
     finally:
         proc.terminate()

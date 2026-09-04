@@ -399,8 +399,16 @@ export function Agent({ onPlans, go }: {
           setEarFault(tr("agent.ear.blocked", lang));
         }
       } else if (code === "audio-capture") {
+        // The recogniser saying IT could not get audio, which is not the
+        // same claim as the browser being unable to. Where a recording
+        // can run, the turn goes that way; where it cannot, the sentence
+        // about a missing microphone is the honest one and stands.
         fatal = true;
-        setEarFault(tr("agent.ear.nomic", lang));
+        if (canRecord() && session.interactorId) {
+          void voiceRecord();
+        } else {
+          setEarFault(tr("agent.ear.nomic", lang));
+        }
       } else if (code === "network") {
         fatal = true;
         // The recogniser exists but its speech service is unreachable —
@@ -546,7 +554,13 @@ export function Agent({ onPlans, go }: {
           setEarFault(tr("agent.ear.blocked", lang));
         }
       } else if (code === "audio-capture") {
-        setEarFault(tr("agent.ear.nomic", lang));
+        // Same fork as the orb's, for the same reason.
+        if (canRecord() && session.interactorId) {
+          routed = true;
+          void dictRecord();
+        } else {
+          setEarFault(tr("agent.ear.nomic", lang));
+        }
       } else if (code === "network") {
         // Same route-around as the orb's: the service is unreachable, the
         // microphone is not. `routed` keeps this recogniser's own end from

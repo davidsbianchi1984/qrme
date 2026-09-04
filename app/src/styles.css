@@ -658,7 +658,22 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .pn-yes { font-weight: 700; }
 
 /* Discovery cards: the face, and which kind of face it is. */
+/* `overflow` is left visible on purpose: the badge hangs off this box. */
 .dc-face { position: relative; width: 64px; height: 64px; margin-bottom: 8px; }
+/* The AI mark on a card's picture, in the standard badge.
+   
+   It lived under the portrait because a field report showed a pill
+   swallowing the face once a phone's font boosting inflated 9px text.
+   Both halves of that are answered here rather than argued with:
+   `text-size-adjust: none` is the direct refusal of the boosting, and the
+   pill is hung off the top-right corner so what growth remains goes
+   OUTWARD, away from the face, instead of across it.
+   
+       asked     is the mark on the card
+       mattered  is the mark on the picture, and the picture still a face */
+.dc-ai { position: absolute; top: -4px; right: -10px; z-index: 3;
+  padding: 2px 8px; font-size: 10px; line-height: 1.3;
+  -webkit-text-size-adjust: none; text-size-adjust: none; }
 .dc-avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
   display: inline-flex; align-items: center; justify-content: center;
   background: #0d0a24; border: 1px solid var(--line); }
@@ -755,9 +770,12 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
    caption read the wrong field and called every human a profile — and it
    does it the way the rest of the platform does: the synthetic thing is
    marked and the person is left alone. */
-.rs-ai { position: absolute; top: 8px; left: 8px; border-radius: 7px;
-  padding: 1px 5px; font-size: 7px; font-weight: 800; letter-spacing: .06em;
-  color: #9fd8e8; background: rgba(159,216,232,0.22); }
+/* The seat's mark, in the standard badge. It stays at the tile's LEFT
+   corner where every other mark on this tile is placed around it (the
+   on-camera marker below shifts for it by name); the look is the shared
+   one, so a reader learns the badge once. */
+.rs-ai { position: absolute; top: 8px; left: 8px; z-index: 3;
+  padding: 2px 7px; font-size: 8px; line-height: 1.3; }
 /* Said to a screen reader and to nobody else. A person's seat carries no
    visible mark by design — the marking is what the synthetic ones get — but
    "person" is still the answer to what that seat is, and a reader who cannot
@@ -1006,21 +1024,55 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 
        asked     is the face given a size
        mattered  can anything take it back */
+/* `overflow: visible`, and the picture clips itself instead.
+   The frame used to do the clipping, which put every child inside the
+   circle — including the mark, whose whole job is to be seen. */
 .talk-face { width: min(30vw, 120px); height: min(30vw, 120px);
   flex: 0 0 auto;
   position: relative;
-  border-radius: 50%; overflow: hidden; border: 2px solid var(--line);
+  border-radius: 50%; overflow: visible; border: 2px solid var(--line);
   box-shadow: 0 0 28px rgba(64,224,255,0.25); }
-/* The designation, over the face it belongs to. `Avatar.watermark` is
-   documented as "always displayed, by the product's own rule" and this
-   surface — the one where the face is largest and talking — was the one
-   showing it without. */
-.talk-wm { position: absolute; left: 0; right: 0; bottom: 0;
-  padding: 6px 8px 8px; font-size: 12px; line-height: 1.2;
-  letter-spacing: 0.02em; color: #eaf6ff;
-  background: linear-gradient(to top, rgba(3,6,14,0.86), rgba(3,6,14,0));
+/* The designation, on the face it belongs to and OVER its edge.
+   `Avatar.watermark` is documented as "always displayed, by the product's
+   own rule", and this surface — the face at its largest, talking — was
+   the one showing it without.
+   
+   It began as a band across the bottom of the circle, inside the frame's
+   own `overflow: hidden`. Two things were wrong with that. A round frame
+   is 110 pixels wide, so the line wrapped onto two lines and covered the
+   chin; and anything the frame clips is a mark somebody can crop away by
+   making the frame smaller. Asked for directly: "the badge needs to be
+   off the photo and now on the outermost layer on top hanging off."
+   
+       asked     is the mark on the picture
+       mattered  is the mark on top of everything the picture can do to it
+   
+   So it is a chip that hangs off the corner, above the frame, above the
+   glow, and above the image — the outermost thing in the stack. */
+/* Sat at `top: -9px` first, clear of the frame entirely — and that put it
+   ABOVE the pill some portraits carry burned into their own top-right
+   corner, so the face showed two marks, one of them half-eaten by the
+   round crop. The chip is placed to land ON that corner instead: still
+   hanging off the right edge, still the outermost thing in the stack, and
+   now the only mark on the picture. */
+/* THE BADGE. One look, everywhere a picture of a synthetic profile needs
+   one — "make that standard across everybody's profile that requires a
+   badge". A dark pill with a hairline, above everything the picture can do
+   to it, hung off a corner so no frame can crop it.
+   
+   Each surface sets its own size and corner below; nothing else. A badge
+   that is a different colour or shape on the seat than on the face is a
+   badge a reader has to learn twice. */
+.ai-pill { font-weight: 800; letter-spacing: 0.04em; white-space: nowrap;
+  color: #eaf6ff; background: rgba(5,7,15,0.88);
+  border: 1px solid rgba(255,255,255,0.3); border-radius: 999px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.55);
   text-shadow: 0 1px 2px rgba(0,0,0,0.9); pointer-events: none; }
-.talk-face img { width: 100%; height: 100%; object-fit: cover; }
+.talk-wm { position: absolute; top: 0; right: -2px; z-index: 3;
+  padding: 5px 11px; font-size: 14px; line-height: 1.2; }
+/* The picture does its own clipping now that the frame does not. */
+.talk-face img { width: 100%; height: 100%; object-fit: cover;
+  border-radius: 50%; }
 .talk-face.listening { animation: talk-pulse 1.6s ease-in-out infinite;
   border-color: var(--brand, #40e0ff); }
 /* No orb. A profile with no portrait yet shows the empty frame, like it does
@@ -1042,14 +1094,37 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 /* The torso is an image, so the mark needs a box to sit on. Same rule as the
    circle: it keeps its size and does not lend height to a panel below it. */
 .talk-torso-wrap { position: relative; flex: 0 0 auto; display: inline-flex;
-  border-radius: 26px 26px 14px 14px; overflow: hidden; }
-.talk-torso-wrap .talk-torso { border-radius: 0; }
-.talk-torso-wrap .talk-wm { border-radius: 0; }
+  border-radius: 26px 26px 14px 14px; overflow: visible; }
 @keyframes talk-pulse {
   0%, 100% { transform: scale(1); box-shadow: 0 0 34px rgba(64,224,255,0.35); }
   50% { transform: scale(1.05); box-shadow: 0 0 64px rgba(64,224,255,0.6); }
 }
 .talk-name { font-size: 17px; font-weight: 800; }
+/* The trade, under the name — one rule, every surface that draws it, so a
+   face on the circle and the same face on the talk screen introduce
+   themselves the same way. Quieter than the name and louder than whatever
+   is below it, because it is part of the introduction rather than part of
+   what is happening right now. */
+.trade { display: flex; flex-direction: column; align-items: center;
+         gap: 1px; }
+/* The job leads: it is what a person choosing between faces reads. */
+.trade-job { font-size: 13px; font-weight: 700; color: var(--txt);
+             opacity: 0.9; }
+/* The sector sits under it, in the quieter register — it groups rather
+   than distinguishes. */
+.trade-field { font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+               text-transform: uppercase; color: var(--t2); }
+/* Beside the face, where the column must not let anything shrink it. */
+.trade.talk-trade { margin-top: 2px; flex: 0 0 auto; }
+/* On a card, under the name and above the blurb — left-aligned, because
+   the card's own text is. */
+.trade.card-trade { align-items: flex-start; margin-top: 2px; }
+.trade.card-trade .trade-job { font-size: 12px; }
+/* In a list row, which is horizontal — so the two run on one line rather
+   than pushing the name and the button apart. */
+.trade.row-trade { flex-direction: row; align-items: baseline; gap: 6px; }
+.trade.row-trade .trade-job { font-size: 12px; }
+.trade.row-trade .trade-field { font-size: 10px; }
 .talk-heard { max-width: 480px; font-size: 15px; color: var(--txt);
   background: rgba(255,255,255,0.05); border: 1px solid var(--line);
   border-radius: 14px; padding: 10px 14px; }
@@ -2480,10 +2555,11 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 }
 .stage-face { width: 100%; height: 100%; object-fit: cover; }
 .stage-empty { color: var(--muted, #8b90a8); padding: 24px; }
+/* The full-screen stage's mark, in the standard badge. Top-left here
+   because the close and the shrink already own the right corner. */
 .stage-mark {
   position: absolute; top: 14px; left: 14px; z-index: 62;
-  background: rgba(5,7,15,0.65); color: #fff; border-radius: 999px;
-  padding: 4px 10px; font-size: 0.8rem;
+  padding: 5px 11px; font-size: 14px; line-height: 1.2;
 }
 .stage-close {
   position: absolute; top: 12px; right: 12px; z-index: 62;

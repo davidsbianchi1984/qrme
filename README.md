@@ -334,6 +334,9 @@ and the full tour is in [docs/gallery.md](docs/gallery.md).
     <td align="center" width="25%"><a href="docs/screens/175-inside.png"><img src="docs/screens/175-inside.png" width="165" alt="Inside a room"></a><br><sub><b>175</b> · Inside a room<br>you and up to eight, files and links read aloud</sub></td>
     <td align="center" width="25%"><a href="docs/screens/200-agent.png"><img src="docs/screens/200-agent.png" width="165" alt="Agent"></a><br><sub><b>200</b> · Agent<br>builds your page and widgets on your word</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="25%"><a href="docs/screens/199-what-it-is-doing.png"><img src="docs/screens/199-what-it-is-doing.png" width="165" alt="What it is doing"></a><br><sub><b>199</b> · What it is doing<br>the wave reads the ear: in, out, working, or flat — photographed mid-answer, with the job and the field under the name</sub></td>
+  </tr>
 </table>
 
 **People**

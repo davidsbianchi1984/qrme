@@ -346,6 +346,11 @@ def profile_out(row: dict, request: Request | None = None, *,
         display_name=(identity.anonymous_name(row["id"]) if hidden
                       else row["display_name"]),
         persona=row["persona"],
+        # Not redacted with the name. A trade is not an identifier — the
+        # anonymous emblems are chosen BY field, so the platform already
+        # shows an anonymous profile's line of work on its picture.
+        industry=row["industry"],
+        job_title=row["job_title"],
         demographics=json.loads(row["demographics"]),
         sources=json.loads(row["sources"]),
         anonymous=bool(row["anonymous"]),

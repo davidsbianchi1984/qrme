@@ -25,6 +25,15 @@ CREATE TABLE IF NOT EXISTS profiles (
     -- "Dr. Amara Osei · Healthcare" answer different questions. NULL is a
     -- profile that has not said, which is most of them.
     industry          TEXT,
+    -- And the job inside that field — "Family physician", "Software
+    -- architect". The sector says which shelf; the position says what the
+    -- person does. Drawn on the line under the name beside `industry`,
+    -- and filled from the seat's title when a company hires somebody.
+    --
+    -- `job_title`, not `position`: the friends list already puts a
+    -- `position` on the wire and it is an ordinal — which place in the list
+    -- somebody holds. One name, one type.
+    job_title         TEXT,
     demographics      TEXT NOT NULL DEFAULT '{}',
     sources           TEXT NOT NULL DEFAULT '[]',  -- imported content sources
     anonymous         INTEGER NOT NULL DEFAULT 0,
@@ -3134,6 +3143,16 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # or leave it out. Nullable, because a profile that has not said is a
     # profile that has not said.
     ("profiles", "industry", "TEXT"),
+    # And what they are IN that field — the job, not the sector. "Technology"
+    # says which shelf somebody works on; "Software architect" says what they
+    # do all day, and a person reading a wall of faces is choosing on the
+    # second. Asked for beside the first: "I like how you put the profession,
+    # but I need you to also put the position."
+    #
+    # Nullable for the same reason `industry` is. A hire fills it from the
+    # seat's own title when a company takes somebody on (`qrme/company.py`),
+    # so an employed profile never has to be told twice what its job is.
+    ("profiles", "job_title", "TEXT"),
     ("briefcase_items", "unread_why", "TEXT"),
     ("briefcase_items", "full_chars", "INTEGER"),
     # What a memory landed under, and — when the arrangement is platform

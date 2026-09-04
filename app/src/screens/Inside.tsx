@@ -1880,6 +1880,12 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
         // phone changes it and no number of presses will either, so the
         // sentence says that instead of sending somebody to a switch.
         fatal = true; setEarFault(tr("ins.ear.platform", lang));
+      } else if (code === "audio-capture" && canRecord()) {
+        // The recogniser could not get audio; the browser's own recorder
+        // still can. Same fork as the other three, and self-correcting —
+        // a microphone that is truly gone fails at `getUserMedia`.
+        recorderOnly.current = true;
+        fatal = true;
       } else if (code === "audio-capture") {
         fatal = true; setEarFault(tr("ins.ear.nomic", lang));
       } else if (code === "network" && canRecord()) {
@@ -2065,7 +2071,8 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
     rec.onerror = (e: { error?: string }) => {
       const code = e.error || "";
       if ((code === "service-not-allowed" || code === "not-allowed"
-           || code === "network") && canRecord()) {
+           || code === "network" || code === "audio-capture")
+          && canRecord()) {
         recorderOnly.current = true;
         dictation.current = null;
         void dictRecorded();
@@ -3617,7 +3624,7 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                 {s.kind === "user" ? (
                   <span className="sr-only">{tr("ins.seat.person", lang)}</span>
                 ) : (
-                  <span className="rs-ai" title={tr("ins.seat.profile", lang)}>
+                  <span className="ai-pill rs-ai" title={tr("ins.seat.profile", lang)}>
                     {tr("ins.seat.aimark", lang)}
                   </span>
                 )}
@@ -4003,7 +4010,7 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                       {stageFace(s)}
                       <span className="rs-name">{s.display}</span>
                       {s.kind !== "user" && (
-                        <span className="rs-ai"
+                        <span className="ai-pill rs-ai"
                               title={tr("ins.seat.profile", lang)}>
                           {tr("ins.seat.aimark", lang)}
                         </span>
@@ -4033,7 +4040,7 @@ export function Inside({ onPlans, start = "", onLeave, onInside }: {
                   {stageFace(s)}
                   <span className="rs-name">{s.display}</span>
                   {s.kind !== "user" && (
-                    <span className="rs-ai" title={tr("ins.seat.profile", lang)}>
+                    <span className="ai-pill rs-ai" title={tr("ins.seat.profile", lang)}>
                       {tr("ins.seat.aimark", lang)}
                     </span>
                   )}

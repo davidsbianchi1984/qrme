@@ -291,7 +291,7 @@ def friends_of(profile_id: str) -> list[dict]:
     """
     rows = db.connect().execute(
         "SELECT f.friend_id, f.origin, f.created_at, p.display_name, p.avatar,"
-        "       p.kind, h.handle"
+        "       p.kind, p.industry, p.job_title, h.handle"
         "  FROM friendships f"
         "  JOIN profiles p ON p.id = f.friend_id"
         "  LEFT JOIN handles h ON h.profile_id = f.friend_id"
@@ -318,6 +318,10 @@ def friends_of(profile_id: str) -> list[dict]:
             "handle": r["handle"],
             "avatar": avatars.shown(r["avatar"]),
             "kind": r["kind"],
+            # The same line the pool rows carry, so a face on the circle
+            # and the same face in Discover introduce themselves alike.
+            "industry": r["industry"],
+            "job_title": r["job_title"],
             "founder": founder,
             # From the starter collection, installed as standard: a client
             # can say so beside the face, and the row is removable.
@@ -422,7 +426,8 @@ def find(q: str, limit: int = 20) -> list[dict]:
         raise FriendError("nothing to search for — say a few words first")
     like = f"%{q.lstrip('@')}%"
     rows = db.connect().execute(
-        "SELECT p.id, p.display_name, p.avatar, p.kind, h.handle"
+        "SELECT p.id, p.display_name, p.avatar, p.kind, p.industry,"
+        "       p.job_title, h.handle"
         "  FROM profiles p LEFT JOIN handles h ON h.profile_id = p.id"
         " WHERE (p.display_name LIKE ? OR h.handle LIKE ?)"
         "   AND p.status = 'active' AND p.anonymous = 0"
@@ -443,6 +448,17 @@ def _public_rows(rows) -> list[dict]:
         # built on this pool would show a generated portrait with no badge.
         "avatar_kind": avatars.kind_of(r["avatar"]),
         "kind": r["kind"],
+        # The field they work in, which is the line under the name on every
+        # surface built on these rows. A name alone answers "who" and
+        # leaves "and who is that?" standing, and the pool is exactly where
+        # that question gets asked — thirty-odd faces, one of them a
+        # physician and one a locksmith, and nothing on the card saying so.
+        # Null on a profile that has not said, which draws nothing.
+        "industry": r["industry"],
+        # And what they are in it. Two fields, because "Technology" and
+        # "Software architect" answer different questions and a card that
+        # only answers the first is a card nobody can choose from.
+        "job_title": r["job_title"],
         "verification": badges.get(r["id"], {}),
     } for r in rows]
 
@@ -466,7 +482,8 @@ def browse(limit: int = 200) -> dict:
     where = ("p.status = 'active' AND p.anonymous = 0"
              " AND p.unlisted = 0")
     rows = conn.execute(
-        "SELECT p.id, p.display_name, p.avatar, p.kind, h.handle"
+        "SELECT p.id, p.display_name, p.avatar, p.kind, p.industry,"
+        "       p.job_title, h.handle"
         f"  FROM profiles p LEFT JOIN handles h ON h.profile_id = p.id"
         f" WHERE {where}"
         " ORDER BY p.created_at DESC LIMIT ?", (limit,)).fetchall()

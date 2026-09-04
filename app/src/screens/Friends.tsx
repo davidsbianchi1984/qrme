@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api, getBase, InboxEvent } from "../api";
 import { t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
+import { Trade } from "../Trade";
 import { useSession } from "../store";
 
 // The friends list, founder first — the backend pins David Bianchi and his
@@ -36,7 +37,8 @@ export function Friends({ onPlans, onVisit }: {
   const [findQ, setFindQ] = useState("");
   const [found, setFound] = useState<
     { profile_id: string; display_name: string; handle: string | null;
-      avatar: string | null }[] | null>(null);
+      avatar: string | null; industry?: string | null;
+      job_title?: string | null }[] | null>(null);
 
   async function findPeople() {
     if (!findQ.trim()) return;
@@ -237,6 +239,8 @@ export function Friends({ onPlans, onVisit }: {
                 {p.display_name}
               </button>
               {p.handle && <span className="muted small">@{p.handle}</span>}
+              <Trade industry={p.industry} position={p.job_title}
+                     className="row-trade" />
               {mine ? (
                 <span className="muted small">{tr("frn.already", lang)}</span>
               ) : (
@@ -297,6 +301,8 @@ export function Friends({ onPlans, onVisit }: {
                   {p.display_name}
                 </button>
                 {p.handle && <span className="muted small">@{p.handle}</span>}
+                <Trade industry={p.industry} position={p.job_title}
+                     className="row-trade" />
                 <span className="tag">{tr(`frn.kind.${p.kind}`, lang)}</span>
                 {me ? (
                   <span className="muted small">{tr("frn.pool.you", lang)}</span>

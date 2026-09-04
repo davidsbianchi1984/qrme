@@ -242,7 +242,7 @@ export function AvatarStage({ profileId, token, avatar, owned, clear,
         ? <img className={"stage-face" + (face?.torso ? " standing" : "")}
                src={src} alt="" />
         : <div className="stage-empty">{tr("stage.none", lang)}</div>}
-      <span className="stage-mark" aria-hidden="true">✦ AI</span>
+      <span className="ai-pill stage-mark" aria-hidden="true">✦ AI</span>
       {inline
         ? <button className="stage-grow" aria-label={tr("stage.full", lang)}
                   title={tr("stage.full", lang)}

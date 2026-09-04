@@ -11001,6 +11001,20 @@ const CHROME: Table = {
   "rail.controls": {
     en: "How they behave", es: "Cómo se comporta", fr: "Comment il se comporte", de: "Wie sie sich verhalten", pt: "Como se comporta", it: "Come si comporta", ja: "ふるまい方", zh: "行为方式", hi: "वे कैसे व्यवहार करते हैं", ar: "كيف يتصرفون",
   },
+  // The tab's word. The panel's sentence is above; these are what fits in
+  // the column beside the face without being cut to "What yo…".
+  "rail.tab.profile": {
+    en: "Who", es: "Quién", fr: "Qui", de: "Wer", pt: "Quem", it: "Chi", ja: "誰", zh: "是谁", hi: "कौन", ar: "من",
+  },
+  "rail.tab.memory": {
+    en: "Memory", es: "Memoria", fr: "Mémoire", de: "Gedächtnis", pt: "Memória", it: "Memoria", ja: "記憶", zh: "记忆", hi: "स्मृति", ar: "الذاكرة",
+  },
+  "rail.tab.relationship": {
+    en: "Us", es: "Nosotros", fr: "Nous", de: "Wir", pt: "Nós", it: "Noi", ja: "関係", zh: "关系", hi: "रिश्ता", ar: "علاقتنا",
+  },
+  "rail.tab.controls": {
+    en: "Manner", es: "Modales", fr: "Manières", de: "Verhalten", pt: "Modos", it: "Modi", ja: "ふるまい", zh: "举止", hi: "व्यवहार", ar: "الأسلوب",
+  },
   "rail.loading": {
     en: "Reading…", es: "Leyendo…", fr: "Lecture…", de: "Wird gelesen…", pt: "A ler…", it: "Lettura…", ja: "読み込み中…", zh: "读取中…", hi: "पढ़ रहे हैं…", ar: "جارٍ القراءة…",
   },

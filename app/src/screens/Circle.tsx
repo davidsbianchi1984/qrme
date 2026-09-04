@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, getBase } from "../api";
 import { t as tr, visitorLang } from "../l10n";
+import { Trade } from "../Trade";
 import { useSession } from "../store";
 
 /**
@@ -35,6 +36,7 @@ export function Circle({ onVisit, onMeet }: {
   type Row = {
     profile_id: string; display_name: string; handle?: string | null;
     avatar?: string | null; avatar_kind?: string | null;
+    industry?: string | null; job_title?: string | null;
     verified: boolean; blurb?: string | null; tags: string[];
   };
   const [rows, setRows] = useState<Row[] | null>(null);
@@ -65,6 +67,10 @@ export function Circle({ onVisit, onMeet }: {
           handle: f.handle,
           avatar: f.avatar ?? p?.avatar ?? null,
           avatar_kind: l?.avatar_kind ?? p?.avatar_kind ?? null,
+          // The friends list carries it now; the pool is the fallback for
+          // a friend who has left the pool (gone private) since.
+          industry: f.industry ?? p?.industry ?? null,
+          job_title: f.job_title ?? p?.job_title ?? null,
           verified: Boolean(
             (p?.verification as { verified?: boolean } | null)?.verified),
           blurb: l?.blurb ?? l?.purpose ?? null,
@@ -105,10 +111,14 @@ export function Circle({ onVisit, onMeet }: {
                       .slice(0, 2)}
                   </span>
                 )}
+                {/* On the picture, in the standard badge — see the same
+                    spot in Discover.tsx for why it moved. */}
+                {c.avatar_kind === "ai" && (
+                  <span className="ai-pill dc-ai">
+                    {tr("dsc.badge.ai", lang)}
+                  </span>
+                )}
               </div>
-              {c.avatar_kind === "ai" && (
-                <span className="dc-badge ai">{tr("dsc.badge.ai", lang)}</span>
-              )}
               {c.avatar_kind === "real_photo" && (
                 <span className="dc-badge real">
                   {tr("dsc.badge.real", lang)}
@@ -124,6 +134,8 @@ export function Circle({ onVisit, onMeet }: {
                 <span className="muted small">@{c.handle}</span>
               )}
             </button>
+            <Trade industry={c.industry} position={c.job_title}
+                   className="card-trade" />
             {c.blurb && <p className="muted small">{c.blurb}</p>}
             <div className="tag-row">
               {c.tags.slice(0, 4).map((t) =>

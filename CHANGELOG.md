@@ -6,6 +6,62 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **A profile says what it does, not only who it is.** `industry` said
+  which field; nothing said which job, so a wall of thirty-four faces
+  offered a reader nothing to choose on. Profiles carry a `job_title`
+  beside the field — settable by their owner, filled for the thirty-four
+  starters from the personas already written, and taken from the seat's
+  own title when a company hires somebody, so a hire reads "Bookkeeper,
+  Bianchi & Sons Bakery" rather than a title with no house on it. One
+  `Trade` component draws both lines on the talk surface, the pool card,
+  the circle card and the friends row; the room's seat has carried its
+  own since it was built.
+
+### Changed
+
+- **One badge, on the picture, hung off its corner.** The talk face, the
+  room seat and the full-screen stage each had their own mark — a band
+  across the bottom of the circle, a 7px tint, a grey pill — so the same
+  fact about the same kind of profile looked like three different facts.
+  All three wear `.ai-pill` now: dark, hairline, above everything the
+  picture can do to it, and hung off the corner where a round frame used
+  to crop it in half. The card's mark moved back onto the picture with
+  the field report that moved it off answered rather than overruled —
+  the text refuses a phone's font boosting, and what growth remains goes
+  outward from the corner instead of across the face.
+- **The talk surface stopped saying the name twice.** The band across the
+  portrait carried "✦ AI · <name>" while `.talk-name` printed the same
+  name two lines below, wrapped onto two lines and covering the chin to
+  do it. The picture carries the designation; the name is said once.
+- **The four panels beside the face are readable.** Their tabs carried
+  each panel's full title into a 60-pixel column, where the browser cut
+  all four to their first eight characters — "Who the… / What th… / What
+  yo… / How the…", four labels sharing a first word and telling nobody
+  apart. The tab gets a word (Who, Memory, Us, Manner) in ten languages;
+  the sentence stays as the tooltip and as what a screen reader says.
+
+### Fixed
+
+- **A recogniser that could not hear was treated as a microphone that was
+  not there.** `audio-capture` is the recogniser's report that *it* could
+  not get audio, which is not the same fact as the browser being unable
+  to — a handheld that hands its microphone to a call, and a desktop
+  whose recogniser loses the device while `getUserMedia` still opens it,
+  both landed on "No microphone the browser can reach" over a microphone
+  the browser could reach. All four ears (chat overlay, room, orb,
+  dictation) route it to the recorded ear like the three faults beside
+  it, and it stays self-correcting: where the device really is gone, the
+  recording fails at `getUserMedia` and says so.
+- **Screen 199 was a drawing because the camera could not reach it.** The
+  wave lives inside the talk overlay, which opens from the composer's
+  microphone; the camera presses it now, in a browser given a capture
+  device of its own so the surface is photographed in the state it is
+  for. Its own browser, because the fake device carries the fake device's
+  name and Voice and Settings both list what audio is playing through.
+
+
 ## [3.1.4] - 2026-09-03
 
 ### Fixed

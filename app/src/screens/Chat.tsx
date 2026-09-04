@@ -8,6 +8,7 @@ import { Refusal } from "../Refusal";
 import { SceneFilm } from "../SceneFilm";
 import { micClosed, openTheEar, plainVoice, speakInPieces } from "../spoken";
 import { TalkRail } from "../TalkRail";
+import { Trade } from "../Trade";
 import { Waveform } from "../Waveform";
 import { presenceOf, presenceKey, animatedIn } from "../presence";
 import { useSession } from "../store";
@@ -48,10 +49,38 @@ interface Msg { who: "you" | "assistant"; text: string; note?: string;
  * designation an owner customised reads the same on this screen as on every
  * other, and a deployment that changes the mark changes it once.
  */
+/** The designation on the picture — and only the designation.
+ *
+ * `watermark.line` is "✦ AI · David Bianchi", and the talk surface prints
+ * the same name in `.talk-name` two lines below the face. So the band
+ * across the portrait said the name a second time, wrapped onto two lines
+ * because a circular frame is 110 pixels wide, and covered the chin to do
+ * it. The owner's report: "he doesn't need to show the name twice."
+ *
+ *     asked     does the picture carry the mark
+ *     mattered  does the picture carry anything the screen has not said
+ *
+ * So the name comes off the picture and the **mark stays on it**, which is
+ * the half that is a promise: `Avatar.watermark.always_displayed` is true,
+ * and this is the surface that was not displaying it. A custom designation
+ * an owner wrote keeps every word — only the trailing " · <name>" the
+ * default builds is dropped, and only when it is the name already on the
+ * screen.
+ */
 function TalkMark({ avatar }: { avatar: Avatar }) {
-  const line = avatar.watermark?.line;
-  if (!line) return null;
-  return <span className="talk-wm">{line}</span>;
+  const wm = avatar.watermark;
+  if (!wm?.line) return null;
+  // `label` is "AI · David Bianchi" and `.talk-name` two lines below the
+  // face prints the same thing, so the band said the name a second time,
+  // wrapped onto two lines because a circular frame is 110 pixels wide,
+  // and covered the chin to do it. The first cut of this trimmed against
+  // `session.profile.display_name` — which is not loaded on this screen,
+  // so it trimmed nothing and the owner reported the same picture twice.
+  // The designation is the part before the separator the watermark itself
+  // builds with; a custom label that has no separator keeps every word.
+  const designation = (wm.label || "").split(" · ")[0] || wm.label;
+  const shown = wm.mark ? `${wm.mark} ${designation}` : designation;
+  return <span className="ai-pill talk-wm">{shown}</span>;
 }
 
 /** What the engine's error codes mean to somebody looking at the screen.
@@ -259,6 +288,32 @@ export function Chat({ onPlans }: {
    */
   const shownName = talkAvatar?.watermark?.label
     || session.profile?.display_name;
+  // The field this profile works in, drawn under the name.
+  //
+  // Read from the profile door rather than off `session.profile`: the
+  // session carries a profile object only where the screen that made one
+  // put it there, and a console resumed from storage has an id and a
+  // token and nothing else. That is why the first cut of this line drew
+  // nothing at all.
+  //
+  //     asked     is the trade on the session
+  //     mattered  is the trade on the screen
+  const [ownField, setOwnField] = useState("");
+  const [ownJob, setOwnJob] = useState("");
+  useEffect(() => {
+    const pid = session.profileId;
+    if (!pid) { setOwnField(""); setOwnJob(""); return; }
+    let live = true;
+    api.getProfile(pid)
+       .then((p) => {
+         if (!live) return;
+         setOwnField(p.industry || "");
+         setOwnJob(p.job_title || "");
+       })
+       .catch(() => { if (live) { setOwnField(""); setOwnJob(""); } });
+    return () => { live = false; };
+  }, [session.profileId]);
+
   const [heard, setHeard] = useState("");
   // Handing your own profile something to read, and changing the face it
   // wears. Both shipped with a door on somebody *else's* homepage and none
@@ -535,8 +590,17 @@ export function Chat({ onPlans }: {
       // The recorded ear answers all three, and it is self-correcting: if
       // the person truly blocked the microphone, the recording fails at
       // getUserMedia and says so honestly.
+      // `audio-capture` joined them for the same reason the other three
+      // are here: it is the recogniser's report that IT could not get
+      // audio, which is not the same fact as the browser being unable to.
+      // A handheld that hands its microphone to a call, and a desktop
+      // whose recogniser loses the device while `getUserMedia` still
+      // opens it, both land here — and both were told "no microphone the
+      // browser can reach" over a microphone the browser could reach.
+      // The route is self-correcting either way: where the device really
+      // is gone, the recording fails at `getUserMedia` and says so.
       if ((why === "network" || why === "service-not-allowed"
-           || why === "not-allowed")
+           || why === "not-allowed" || why === "audio-capture")
           && canRecord() && session.interactorId) {
         talkRec.current = null;
         void talkRecord(settled);
@@ -790,8 +854,17 @@ export function Chat({ onPlans }: {
       // microphone permission reads Allow — hands the bar to the recorded
       // ear. The meter restarts inside it, fed by the recording's own
       // analyser.
+      // `audio-capture` joined them for the same reason the other three
+      // are here: it is the recogniser's report that IT could not get
+      // audio, which is not the same fact as the browser being unable to.
+      // A handheld that hands its microphone to a call, and a desktop
+      // whose recogniser loses the device while `getUserMedia` still
+      // opens it, both land here — and both were told "no microphone the
+      // browser can reach" over a microphone the browser could reach.
+      // The route is self-correcting either way: where the device really
+      // is gone, the recording fails at `getUserMedia` and says so.
       if ((why === "network" || why === "service-not-allowed"
-           || why === "not-allowed")
+           || why === "not-allowed" || why === "audio-capture")
           && canRecord() && session.interactorId) {
         stopDictMeter();
         void dictRecord();
@@ -1336,6 +1409,10 @@ export function Chat({ onPlans }: {
             </div>
           ) : null}
           <div className="talk-name">{shownName}</div>
+          {/* And what they do — the same component every other surface
+              draws it with, so the pool card and the face agree. */}
+          <Trade industry={ownField} position={ownJob}
+                 className="talk-trade" />
           {/* Seven states rather than two, and the strip below reads from the
               same decision — so the caption and the bars cannot disagree
               about what is happening. */}

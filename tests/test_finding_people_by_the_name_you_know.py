@@ -27,17 +27,27 @@ def test_a_name_finds_its_profile(client):
     found = client.get("/people?q=marisol").json()["found"]
     assert [p["profile_id"] for p in found] == [pid]
     row = found[0]
-    # `avatar_kind` is in this set deliberately, and it is the only key here
-    # that was ever added after the guard was written. It is not new exposure:
-    # it is derived from `avatar`, which the row already hands out, and a
-    # caller can read `/photos/...` against `/portraits/...` for themselves.
-    # What it buys is that no *surface* has to — the AI badge is mandatory,
-    # and a rule re-derived per client is a rule that drifts.
+    # `avatar_kind` is in this set deliberately, and it was the first key
+    # added after the guard was written. It is not new exposure: it is
+    # derived from `avatar`, which the row already hands out, and a caller
+    # can read `/photos/...` against `/portraits/...` for themselves. What
+    # it buys is that no *surface* has to — the AI badge is mandatory, and a
+    # rule re-derived per client is a rule that drifts.
+    #
+    # `industry` and `job_title` are here on the same test and pass it.
+    # Neither is a new fact: `GET /profiles/{id}` is public and hands both
+    # to anybody who asks, and the browse pool beside this search has
+    # carried them since. What the search would otherwise be is the one
+    # public list of people that shows a name and refuses to say who it
+    # belongs to — thirty results reading "Marcus Bell" and nothing else,
+    # while the same person on the card next door reads "Financial
+    # planner". A profile that has not said either draws nothing.
     #
     #     asked     did the row grow a key
     #     mattered  did the row grow a fact
     assert set(row) == {"profile_id", "display_name", "handle", "avatar",
-                        "avatar_kind", "kind", "verification"}, (
+                        "avatar_kind", "kind", "industry", "job_title",
+                        "verification"}, (
         "the row grew keys beyond what the profile already shows the public")
 
 

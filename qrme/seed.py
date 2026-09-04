@@ -440,6 +440,7 @@ def _seed_one_founder(conn, handle, name, persona, appearance, asset) -> str:
         if handle == FOUNDER_HANDLE:
             for industry in FOUNDER_AI_PACKS:
                 _say_field(conn, taken["profile_id"], industry)
+                _say_position(conn, taken["profile_id"], handle)
                 _ground(conn, taken["profile_id"], industry, force=True)
         return taken["profile_id"]
 
@@ -511,6 +512,7 @@ def _seed_one_founder(conn, handle, name, persona, appearance, asset) -> str:
     if handle == FOUNDER_HANDLE:
         for industry in FOUNDER_AI_PACKS:
             _say_field(conn, profile["id"], industry)
+            _say_position(conn, profile["id"], handle)
             _ground(conn, profile["id"], industry, force=True)
     return profile["id"]
 
@@ -887,6 +889,57 @@ def repair() -> dict:
             "unseated": unseated}
 
 
+#: The job, one per starter, taken from the first line of the persona
+#: already written above.
+#:
+#: `industry` says which shelf somebody works on and this says what they
+#: actually do — and a reader looking at a wall of thirty-four faces is
+#: choosing on the second. "Technology" narrows nothing; "Software
+#: architect" is a person you either want to talk to or do not. Asked for
+#: beside the field: "I like how you put the profession, but I need you to
+#: also put the position."
+#:
+#: A dict keyed by handle rather than a seventh element in the STARTERS
+#: tuples, because every reader of that table unpacks it positionally and
+#: none of them wants this.
+POSITIONS: dict[str, str] = {
+    "dr_amara_osei": "Family physician",
+    "marcus_bell": "Financial planner",
+    "priya_raman": "Software architect",
+    "elena_vasquez": "Classroom teacher",
+    "jonathan_ashe": "Contracts attorney",
+    "sam_whitfield": "Row-crop farmer",
+    "ingrid_halvorsen": "Plant operations engineer",
+    "diego_fuentes": "General contractor",
+    "naomi_clarke": "Residential broker",
+    "tomas_rivera": "Power-systems engineer",
+    "odessa_grant": "Logistics director",
+    "ken_nakamura": "Merchant",
+    "lucia_moretti": "Hotelier",
+    "ray_coleman": "Documentary producer",
+    "wren_okafor": "Designer-illustrator",
+    "coach_dana_reyes": "Strength coach",
+    "chef_henri_laurent": "Chef",
+    "dr_sana_iqbal": "Climate scientist",
+    "pete_kowalski": "City administrator",
+    "grace_mwangi": "Nonprofit director",
+    "dr_felix_baum": "Research physicist",
+    "aisha_diallo": "Network engineer",
+    "harold_jenkins": "Claims adjuster",
+    "rosa_delgado": "Master mechanic",
+    "cmdr_ellen_park": "Aerospace engineer",
+    "mimi_beaumont": "Stylist",
+    "jack_osei_turner": "Brand strategist",
+    "nadia_petrova": "Security analyst",
+    "bev_lindqvist": "HR director",
+    "otis_marsh": "Session musician",
+    "dr_lena_whitcomb": "Clinical psychologist",
+    "dr_marcus_adeyemi": "Psychiatrist",
+    "dr_priya_nair": "Family therapist",
+    "vivienne_sable": "Cabaret headliner",
+}
+
+
 def _say_field(conn, profile_id: str, industry: str) -> None:
     """Record what field this profile works in, on the profile itself.
 
@@ -907,6 +960,39 @@ def _say_field(conn, profile_id: str, industry: str) -> None:
         "UPDATE profiles SET industry=? WHERE id=?"
         " AND (industry IS NULL OR industry='')",
         (industry, profile_id))
+
+
+#: What the founder's profiles do. Not in POSITIONS, for the same reason the
+#: founder is not in STARTERS: those are invented people and this is a real
+#: one.
+#:
+#: Named, not bare. "Founder" on its own is the half of a title that says
+#: nothing — the owner read it off the screen and asked "founder of what?",
+#: which is the question a stranger would have asked silently. A title that
+#: leaves the reader with a question has not been written yet.
+FOUNDER_POSITION = "Founder, QRME"
+
+
+def _say_position(conn, profile_id: str, handle: str) -> None:
+    """Record the job, beside the field :func:`_say_field` records.
+
+        asked     what field is this starter in
+        mattered  what does this starter DO
+
+    Blank-only, like every other backfill in this module: an owner who has
+    written their own title keeps it, and re-seeding repairs rather than
+    resets. That also makes this the repair for every deployment seeded
+    before the column existed — the titles are in code, so they arrive on
+    the next seed without anybody typing thirty-four of them.
+    """
+    said = (FOUNDER_POSITION if handle == FOUNDER_HANDLE
+            else POSITIONS.get(handle))
+    if not said:
+        return
+    conn.execute(
+        "UPDATE profiles SET job_title=? WHERE id=?"
+        " AND (job_title IS NULL OR job_title='')",
+        (said, profile_id))
 
 
 def _ground(conn, profile_id: str, industry: str,
@@ -1149,6 +1235,7 @@ def seed() -> dict:
             # before this shipped has starters with no source material at
             # all, and they cannot be fixed by hand at 34 profiles.
             _say_field(conn, taken["profile_id"], industry)
+            _say_position(conn, taken["profile_id"], handle)
             if _ground(conn, taken["profile_id"], industry):
                 grounded.append(handle)
             continue
@@ -1214,6 +1301,7 @@ def seed() -> dict:
             business=True,
             profile_id=profile["id"]))
         _say_field(conn, profile["id"], industry)
+        _say_position(conn, profile["id"], handle)
         if _ground(conn, profile["id"], industry):
             grounded.append(handle)
         created.append({"handle": f"@{handle}", "industry": industry,
