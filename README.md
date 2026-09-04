@@ -79,18 +79,89 @@ business practice dressed in software; each is a specific arrangement of
 data, credentials, channels and checks inside a running system, and each
 is photographed on the screens below.
 
-| § | The technical problem | The particular solution, as built | What it changes in the machine | Reduced to practice in |
-|---|---|---|---|---|
-| 1 | A generated likeness, once it leaves the server, carries nothing that says which system produced it, under whose governance, or whether its owner may still withdraw it. | Every approved textual render is **stamped at the output door with the producing profile's credential** (`qrme/watermark.py`), recoverable from the text alone; the owner's steering, moderation queue, licences and erasure all act on the one profile record the stamp resolves to. | Provenance survives the reply leaving the platform: a stranger with only the words can ask the platform who wrote them and get the profile, its owner and its terms back (screen 148). Erasure removes the record the stamp points at, so a withdrawn profile stops answering. | `qrme/persona.py`, `qrme/watermark.py`, `qrme/moderation.py`, `qrme/adaptation.py` — `test_watermark.py`, `test_watermark_recovery.py`, `test_moderation.py`, `test_steering.py`, `test_an_erase_is_measured_against_the_schema.py` |
-| 2 | Paid-capability checks written per route are forgotten at the routes added after them, and an emergency path gated by mistake refuses the one caller who must never be refused. | One **application-wide dependency** over a capability table (`qrme/tiers.py`) runs on every request before any handler; no route opts in, so none can be missed, and a fixed `NEVER_GATED` set of escalation paths is excluded structurally rather than by each route remembering to. | A capability added to the table is enforced everywhere at once; a refusal carries the capability's name and the plan that has it, in a shape a screen renders (screens 130, 161). | `qrme/tiers.py`, `qrme/api.py` — `test_tiers.py`, `test_the_free_tier_says_what_it_is.py` |
-| 3 | A model credential either lives in the server's configuration, where every caller shares it, or in the caller's client, where the server cannot use it for that caller's request. | A caller's key rides **one request in a header into a context variable** read by the provider layer at inference time; it is never written to disk or log, and a request without one falls back to the deployment's own key. | Two callers on the same server generate on two different credentials in the same second, and neither key is ever stored. | `qrme/llm.py`, `qrme/api.py` middleware — `test_byo_key.py` |
-| 4 | An exchange between a guardian and a specialist passes through an application database that any operator with the file can read. | The exchange is **sealed into the encrypted personal-data vault at the seal point** (PDI), with per-record provenance and an audit chain, and read back only through the record owner's scoped custody viewer. | The platform holds the pointer and the audit trail, not the plaintext; the owner sees the chain of custody for each record and can forget it to the vectors. | `qrme/exchange.py`, `qrme/pdi_client.py`, `qrme/recollection.py` — `test_exchange.py`, `test_the_room_that_forgets_on_purpose.py` |
-| 5 | A live workspace has no physical address a passer-by can reach, and a microphone in one profile's room cannot be handed to another without a shared account. | A workspace is published as a **scannable beacon** whose code resolves to the live desk and is deactivated rather than deleted when taken down; a microphone is **lent profile-to-profile** with a named handover and per-channel gain. | A printed code at a venue stops resolving instead of pointing somewhere new; a lent microphone is on the record as lent, and comes back. | `qrme/desks.py`, `qrme/roommic.py` — `test_desks.py`, `test_room_mic.py`, `test_the_visitor_side_of_a_desk.py` |
-| 6 | Blending several personas into one produces a profile that can claim to be any of its sources, with no record of what was borrowed from whom. | One profile is built from several with **normalized weights and named borrowed aspects**, the composition stored per constituent and published to every reader; the prompt carries an honesty rule, and rated sources and free-hand hybrids are refused at the door. | A reader of the blend sees its recipe; the blend cannot pass as a single constituent; a source that has departed is still credited. | `qrme/composite.py` — `test_spec_mined.py`, `test_the_last_doors.py`, `test_overlays.py` |
-| 7 | A model asked to simulate a person's decisions answers with the same confidence whether it has a year of evidence or none. | The simulation's confidence is **computed from the volume of real conditioning evidence** (source items, remembered turns, the latent embedding) rather than from the model's output, and the narrative is watermarked and excluded from distribution. | A simulation of a thinly-documented person is shown as guesswork; the score moves only when evidence does. | `qrme/simulation.py` — `test_spec_mined.py`, `test_the_last_doors.py` |
-| 8 | Replies are conditioned on who a person is, not where they are or what they are doing, so a reply is the same at a desk and on a mountain. | Each interaction carries an **environment payload** (location, conditions, local time, activity) stored beside the biometric context and rendered into the inference conditioning. | The same question gets a different answer at night in the rain than at noon at a desk, and the record shows why. | `qrme/attention.py`, `qrme/wearables.py`, `environment_context` — `test_the_room_is_remembered.py`, `test_the_wearable_tells_the_guardian.py` |
-| 9 | Money raised on a profile has no stated destination until somebody is asked, and control of the profile at the owner's death depends on a status flag anyone with the database can flip. | Proceeds are **routed in advance to named designees whose shares must sum to 100**, each donation split at the door in integer cents onto an auditable ledger; succession is enforced by **token lifecycle** — the old credential revoked and a new one minted for the named successor on a verified attestation. | A campaign cannot open without a destination; a split is arithmetic on the ledger, not a promise; the successor holds a credential the predecessor's cannot forge. | `qrme/campaigns.py`, `qrme/ledger.py`, `qrme/signatures.py` — `test_campaigns.py`, `test_signatures.py`, `test_the_keys_the_till_and_the_lifeline.py`, `test_memorial.py` |
-| 10 | Several agents working one goal either share every data source or cannot coordinate at all. | Departments are staffed with role-specific agents whose data pulls are scoped by **independently revocable grants**; one goal fans out across departments, each agent contributing from its own scoped material, the initiating agent composing the joint plan, and the record sealed to the vault. | Revoking one department's grant stops that department's contribution and nothing else; the plan names which department contributed what. | `qrme/organization.py`, `qrme/delegation.py`, `qrme/company.py` — `test_organizations.py`, `test_delegation.py`, `test_a_company_is_hired_one_interview_at_a_time.py` |
+<table width="100%">
+<thead>
+<tr>
+<th width="4%" align="left">§</th>
+<th width="23%" align="left">The technical problem</th>
+<th width="30%" align="left">The particular solution, as built</th>
+<th width="26%" align="left">What it changes in the machine</th>
+<th width="17%" align="left">Reduced to practice in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td valign="top">1</td>
+<td valign="top">A generated likeness, once it leaves the server, carries nothing that says which system produced it, under whose governance, or whether its owner may still withdraw it.</td>
+<td valign="top">Every approved textual render is <strong>stamped at the output door with the producing profile's credential</strong> (<code>qrme/watermark.py</code>), recoverable from the text alone; the owner's steering, moderation queue, licences and erasure all act on the one profile record the stamp resolves to.</td>
+<td valign="top">Provenance survives the reply leaving the platform: a stranger with only the words can ask the platform who wrote them and get the profile, its owner and its terms back (screen 148). Erasure removes the record the stamp points at, so a withdrawn profile stops answering.</td>
+<td valign="top"><code>qrme/persona.py</code>,<br><code>qrme/watermark.py</code>,<br><code>qrme/moderation.py</code>,<br><code>qrme/adaptation.py</code> — <code>test_watermark.py</code>,<br><code>test_watermark_recovery.py</code>,<br><code>test_moderation.py</code>,<br><code>test_steering.py</code>,<br><code>test_an_erase_is_measured_against_the_schema.py</code></td>
+</tr>
+<tr>
+<td valign="top">2</td>
+<td valign="top">Paid-capability checks written per route are forgotten at the routes added after them, and an emergency path gated by mistake refuses the one caller who must never be refused.</td>
+<td valign="top">One <strong>application-wide dependency</strong> over a capability table (<code>qrme/tiers.py</code>) runs on every request before any handler; no route opts in, so none can be missed, and a fixed <code>NEVER_GATED</code> set of escalation paths is excluded structurally rather than by each route remembering to.</td>
+<td valign="top">A capability added to the table is enforced everywhere at once; a refusal carries the capability's name and the plan that has it, in a shape a screen renders (screens 130, 161).</td>
+<td valign="top"><code>qrme/tiers.py</code>,<br><code>qrme/api.py</code> — <code>test_tiers.py</code>,<br><code>test_the_free_tier_says_what_it_is.py</code></td>
+</tr>
+<tr>
+<td valign="top">3</td>
+<td valign="top">A model credential either lives in the server's configuration, where every caller shares it, or in the caller's client, where the server cannot use it for that caller's request.</td>
+<td valign="top">A caller's key rides <strong>one request in a header into a context variable</strong> read by the provider layer at inference time; it is never written to disk or log, and a request without one falls back to the deployment's own key.</td>
+<td valign="top">Two callers on the same server generate on two different credentials in the same second, and neither key is ever stored.</td>
+<td valign="top"><code>qrme/llm.py</code>,<br><code>qrme/api.py</code> middleware — <code>test_byo_key.py</code></td>
+</tr>
+<tr>
+<td valign="top">4</td>
+<td valign="top">An exchange between a guardian and a specialist passes through an application database that any operator with the file can read.</td>
+<td valign="top">The exchange is <strong>sealed into the encrypted personal-data vault at the seal point</strong> (PDI), with per-record provenance and an audit chain, and read back only through the record owner's scoped custody viewer.</td>
+<td valign="top">The platform holds the pointer and the audit trail, not the plaintext; the owner sees the chain of custody for each record and can forget it to the vectors.</td>
+<td valign="top"><code>qrme/exchange.py</code>,<br><code>qrme/pdi_client.py</code>,<br><code>qrme/recollection.py</code> — <code>test_exchange.py</code>,<br><code>test_the_room_that_forgets_on_purpose.py</code></td>
+</tr>
+<tr>
+<td valign="top">5</td>
+<td valign="top">A live workspace has no physical address a passer-by can reach, and a microphone in one profile's room cannot be handed to another without a shared account.</td>
+<td valign="top">A workspace is published as a <strong>scannable beacon</strong> whose code resolves to the live desk and is deactivated rather than deleted when taken down; a microphone is <strong>lent profile-to-profile</strong> with a named handover and per-channel gain.</td>
+<td valign="top">A printed code at a venue stops resolving instead of pointing somewhere new; a lent microphone is on the record as lent, and comes back.</td>
+<td valign="top"><code>qrme/desks.py</code>,<br><code>qrme/roommic.py</code> — <code>test_desks.py</code>,<br><code>test_room_mic.py</code>,<br><code>test_the_visitor_side_of_a_desk.py</code></td>
+</tr>
+<tr>
+<td valign="top">6</td>
+<td valign="top">Blending several personas into one produces a profile that can claim to be any of its sources, with no record of what was borrowed from whom.</td>
+<td valign="top">One profile is built from several with <strong>normalized weights and named borrowed aspects</strong>, the composition stored per constituent and published to every reader; the prompt carries an honesty rule, and rated sources and free-hand hybrids are refused at the door.</td>
+<td valign="top">A reader of the blend sees its recipe; the blend cannot pass as a single constituent; a source that has departed is still credited.</td>
+<td valign="top"><code>qrme/composite.py</code> — <code>test_spec_mined.py</code>,<br><code>test_the_last_doors.py</code>,<br><code>test_overlays.py</code></td>
+</tr>
+<tr>
+<td valign="top">7</td>
+<td valign="top">A model asked to simulate a person's decisions answers with the same confidence whether it has a year of evidence or none.</td>
+<td valign="top">The simulation's confidence is <strong>computed from the volume of real conditioning evidence</strong> (source items, remembered turns, the latent embedding) rather than from the model's output, and the narrative is watermarked and excluded from distribution.</td>
+<td valign="top">A simulation of a thinly-documented person is shown as guesswork; the score moves only when evidence does.</td>
+<td valign="top"><code>qrme/simulation.py</code> — <code>test_spec_mined.py</code>,<br><code>test_the_last_doors.py</code></td>
+</tr>
+<tr>
+<td valign="top">8</td>
+<td valign="top">Replies are conditioned on who a person is, not where they are or what they are doing, so a reply is the same at a desk and on a mountain.</td>
+<td valign="top">Each interaction carries an <strong>environment payload</strong> (location, conditions, local time, activity) stored beside the biometric context and rendered into the inference conditioning.</td>
+<td valign="top">The same question gets a different answer at night in the rain than at noon at a desk, and the record shows why.</td>
+<td valign="top"><code>qrme/attention.py</code>,<br><code>qrme/wearables.py</code>,<br><code>environment_context</code> — <code>test_the_room_is_remembered.py</code>,<br><code>test_the_wearable_tells_the_guardian.py</code></td>
+</tr>
+<tr>
+<td valign="top">9</td>
+<td valign="top">Money raised on a profile has no stated destination until somebody is asked, and control of the profile at the owner's death depends on a status flag anyone with the database can flip.</td>
+<td valign="top">Proceeds are <strong>routed in advance to named designees whose shares must sum to 100</strong>, each donation split at the door in integer cents onto an auditable ledger; succession is enforced by <strong>token lifecycle</strong> — the old credential revoked and a new one minted for the named successor on a verified attestation.</td>
+<td valign="top">A campaign cannot open without a destination; a split is arithmetic on the ledger, not a promise; the successor holds a credential the predecessor's cannot forge.</td>
+<td valign="top"><code>qrme/campaigns.py</code>,<br><code>qrme/ledger.py</code>,<br><code>qrme/signatures.py</code> — <code>test_campaigns.py</code>,<br><code>test_signatures.py</code>,<br><code>test_the_keys_the_till_and_the_lifeline.py</code>,<br><code>test_memorial.py</code></td>
+</tr>
+<tr>
+<td valign="top">10</td>
+<td valign="top">Several agents working one goal either share every data source or cannot coordinate at all.</td>
+<td valign="top">Departments are staffed with role-specific agents whose data pulls are scoped by <strong>independently revocable grants</strong>; one goal fans out across departments, each agent contributing from its own scoped material, the initiating agent composing the joint plan, and the record sealed to the vault.</td>
+<td valign="top">Revoking one department's grant stops that department's contribution and nothing else; the plan names which department contributed what.</td>
+<td valign="top"><code>qrme/organization.py</code>,<br><code>qrme/delegation.py</code>,<br><code>qrme/company.py</code> — <code>test_organizations.py</code>,<br><code>test_delegation.py</code>,<br><code>test_a_company_is_hired_one_interview_at_a_time.py</code></td>
+</tr>
+</tbody>
+</table>
 
 ### Where each highlight is proven
 
