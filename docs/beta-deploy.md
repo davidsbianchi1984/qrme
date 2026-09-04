@@ -184,6 +184,45 @@ QRME_SMTP_PORT=
 QRME_SMTP_USER=
 QRME_SMTP_FROM=
 QRME_SMTP_PASSWORD=
+
+# --- optional: the phone line JIM rings emergency contacts on ---
+# Empty SECRET means no phone line: every contact call comes back
+# prepared, the Safety screen says the line is waiting, and nothing
+# below is read. To wire one: buy a number at the house, set SECRET to
+# $(openssl rand -hex 24) — one value, and both containers are set from
+# it — and fill the rest in. PROVIDER is one of: twilio, signalwire,
+# telnyx, vonage, plivo. PUBLIC_URL is where the house posts its
+# webhooks and must end in /voice (https://jim-mini.com/voice): the
+# proxy forwards that prefix to the line and nothing else. ACCOUNT is
+# the account SID (Twilio), project id (SignalWire), auth id (Plivo) or
+# application id (Vonage); TOKEN the auth token, API key or private
+# key; WEBHOOK_KEY only for a house that signs webhooks with something
+# other than the token (Telnyx public key, Vonage signature secret);
+# HOUSE_REF the SignalWire space or Telnyx TeXML application, else
+# empty. The token is typed on this box, never pasted into a document.
+#
+# What this is, said plainly: the opening and every one of JIM's turns
+# are spoken by the house's voice and the contact's words heard by its
+# recogniser, and the house keeps call logs — health content transits
+# the house, kept to the coarse situation ("a fall with no answer") and
+# never a reading. A trial account rings only numbers verified at the
+# house and prefixes an announcement. And the 911 send stays held shut
+# in JIM's source whatever is set here: the line rings people, never
+# dispatchers, and refuses an emergency number at three locks.
+#
+# LLM_TIMEOUT is JIM's model ceiling per turn, in seconds: 10 on a box
+# with a line, because the house waits fifteen seconds for the next
+# thing to say and a slow model should end a call politely, never hang
+# the line.
+JIM_VOICE_SECRET=
+JIM_TELEPHONY_PROVIDER=twilio
+JIM_VOICE_PUBLIC_URL=
+JIM_VOICE_FROM=
+JIM_VOICE_ACCOUNT=
+JIM_VOICE_TOKEN=
+JIM_VOICE_WEBHOOK_KEY=
+JIM_VOICE_HOUSE_REF=
+JIM_LLM_TIMEOUT=10
 EOF
 
 nano .env      # paste the key on the last line
@@ -278,6 +317,35 @@ From your own machine, not the host — that is the path a tester takes.
 
 If ops gets `403` and consoles `200`, the two are the wrong way round in
 `.env`.
+
+### The phone line, if you wired one
+
+Two curls from your own machine say whether the house can reach the line
+and the internet cannot ring a number through it:
+
+```bash
+curl -si https://jim-mini.com/voice/ping
+curl -si https://jim-mini.com/voice/calls
+```
+
+The first is `200` with `{"ok":true,"voice":true}` — the path a webhook
+takes, and the one `Check the line` walks from inside the box. The
+second is `404`: the door JIM places calls through is not under
+`/voice` and is not published, so nobody outside the compose network
+can reach it, secret or no secret.
+
+Then the runbook, once, with your own phone as the emergency contact.
+On JIM's Safety screen press **Check the line** and read `ready` — any
+other word names the variable to set or the thing to fix, in a sentence.
+Start a reach-out to your own number, press **1** when it rings, say
+something, hear JIM answer, hang up. The reach-out row reads `reached`
+and the audit shows `contact.called`, `contact.answered`,
+`contact.reached` in that order. Do it again pressing **2**: the number
+lands in `do_not_call` and the next contact rings. Before the box relies
+on a house other than Twilio, capture one real webhook from it and
+confirm the line's verifier passes it — the four other verifiers are
+written from published schemes and proven against vectors in tests, not
+yet against a live call.
 
 ### Which model actually answers
 
