@@ -6,6 +6,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+- **A backup you cannot start is not a backup.** The release assets — 5,938
+  files, 315 GiB across the three products — are the one part of these apps
+  that cannot travel in a git history, and the instructions for pulling them
+  down lived in a chat window. `tools/master-backup.sh` and
+  `tools/master-backup.ps1` do it instead: one folder per product holding the
+  mirror clone, a readable working copy, every asset filed under its tag, and
+  a SHA-256 for each file. Both resume — a file already on disk at the right
+  size is skipped, so a run interrupted at 200 GB continues rather than
+  restarts — and neither ever deletes. The PowerShell version needs nothing
+  installed beyond what Windows ships (`curl.exe`, `tar.exe`); git is optional
+  and its absence is reported rather than fatal.
+
 ### Added
 
 - **The writing that lived only in GitHub now travels with the clone.**
