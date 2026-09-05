@@ -8664,8 +8664,11 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     # JIM-mini's are — the shared vocabulary guard holds them alike.
     'from_addr': {'en': 'From', 'es': 'De', 'fr': 'De', 'de': 'Von', 'pt': 'De', 'it': 'Da', 'ja': '差出人', 'zh': '发件人', 'hi': 'भेजने वाला', 'ar': 'من'},
     'objective': {'en': 'What it should accomplish', 'es': 'Qué debe lograr', 'fr': "Ce qu'il doit accomplir", 'de': 'Was es erreichen soll', 'pt': 'O que deve alcançar', 'it': 'Cosa deve ottenere', 'ja': '達成すべきこと', 'zh': '要达成什么', 'hi': 'इससे क्या हासिल हो', 'ar': 'ما ينبغي أن يحققه'},
-    # The Company Builder's two form fields (qrme/routers/company.py),
-    # worded as the founding card asks them.
+    # The Company Builder's form fields (qrme/routers/company.py), worded
+    # as the founding card asks them. `skills` and `connections` are the
+    # two the founder edits on the study card after the download.
+    "skills": {"en": "Skills this one must have", "es": "Habilidades que debe tener", "fr": "Compétences requises", "de": "Erforderliche Fähigkeiten", "pt": "Competências necessárias", "it": "Competenze necessarie", "ja": "必要な技能", "zh": "必备技能", "hi": "आवश्यक कौशल", "ar": "المهارات المطلوبة"},
+    "connections": {"en": "Who and what it must reach", "es": "A quién y a qué debe llegar", "fr": "Qui et quoi il doit joindre", "de": "Wen und was es erreichen muss", "pt": "Quem e o que deve alcançar", "it": "Chi e cosa deve raggiungere", "ja": "つながる相手", "zh": "必须联系的人与系统", "hi": "किससे जुड़ना होगा", "ar": "بمن يجب أن يتصل"},
     "department": {"en": "Which department", "es": "Qué departamento", "fr": "Quel département", "de": "Welche Abteilung", "pt": "Qual departamento", "it": "Quale reparto", "ja": "どの部門", "zh": "哪个部门", "hi": "कौन-सा विभाग", "ar": "أي قسم"},
     "device_name": {"en": "Device name", "es": "Nombre del dispositivo", "fr": "Nom de l\u2019appareil", "de": "Gerätename", "pt": "Nome do dispositivo", "it": "Nome del dispositivo", "ja": "デバイス名", "zh": "设备名称", "hi": "डिवाइस का नाम", "ar": "اسم الجهاز"},
     "battery": {"en": "Battery", "es": "Batería", "fr": "Batterie", "de": "Batterie", "pt": "Bateria", "it": "Batteria", "ja": "バッテリー", "zh": "电量", "hi": "बैटरी", "ar": "البطارية"},

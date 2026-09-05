@@ -703,10 +703,16 @@ export type CompanySeat = {
   status: "open" | "hired" | "retired";
   interview: InterviewQ[] | null;
   charter: { question: string; answer: string }[] | null;
+  skills: string[] | null; connections: string[] | null;
   profile_id: string | null; hired_at: string | null;
 };
 /** One drafted interview question, with the platform's suggestion. */
 export type InterviewQ = { question: string; suggested: string };
+/** One position out of the pool the app carries. The knowledge is the
+ *  deferred half and is not here — `studySeat` fetches it per seat. */
+export type PoolRow = {
+  title: string; family: string; skills: string[]; connections: string[];
+};
 
 export type WearableView = {
   profile_id: string;
@@ -6420,6 +6426,32 @@ export const api = {
     req<{ questions: InterviewQ[] }>(
       `/companies/${companyId}/seats/${seatId}/interview`,
       { method: "POST", token }),
+  // The pool the app carries: forty-five thousand positions, browsable
+  // and searchable without a model and without the network. An empty
+  // query is a browse, not an error.
+  browseOccupations: (q: string, family: string, token: string) =>
+    req<{ positions: { title: string; family: string; skills: string[];
+                       connections: string[] }[]; total: number }>(
+      `/occupations?q=${encodeURIComponent(q)}` +
+      `&family=${encodeURIComponent(family)}&limit=40`, { token }),
+  occupationFamilies: (token: string) =>
+    req<{ families: string[] }>("/occupations/families", { token }),
+  // Download what the seat has to know. Skills and connections come off
+  // the carried pool; the working knowledge is fetched and kept on the
+  // seat, which is what makes the hire offline afterwards.
+  studySeat: (companyId: string, seatId: string, token: string) =>
+    req<{ seat_id: string; title: string; known_as: string | null;
+          family: string | null; found: boolean; skills: string[];
+          connections: string[]; knowledge: string;
+          studied_by: string | null }>(
+      `/companies/${companyId}/seats/${seatId}/study`,
+      { method: "POST", token }),
+  keepStudy: (companyId: string, seatId: string,
+              body: { skills: string[]; connections: string[] },
+              token: string) =>
+    req<{ seat_id: string; skills: string[]; connections: string[] }>(
+      `/companies/${companyId}/seats/${seatId}/study/keep`,
+      { method: "POST", body, token }),
   hireSeat: (companyId: string, seatId: string,
              body: { answers: { question: string; answer: string }[] },
              token: string) =>

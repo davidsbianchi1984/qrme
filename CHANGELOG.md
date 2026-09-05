@@ -6,6 +6,41 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The occupation pool: 45,147 positions the app carries.** The Company
+  Builder asked a model for a roster and, when the answer did not parse,
+  fell back to "Industry lead", "Front desk", "Bookkeeper" — which on a
+  deployment answering from the local stub *is* the feature. The app
+  carries the positions now: 516 written out by family, 1,276 official
+  taxonomy occupations, and 43,355 reported job titles, the names workers
+  actually call themselves. Every row has the digital skills a synthetic
+  one needs and the connections it must reach; the working knowledge is
+  the deferred half, fetched per seat, which is what keeps an exhaustive
+  pool at 4.1 MB. `tools/split_titles.py` recovers title boundaries from
+  the pasted lists — "Cooks, Fast Food" is one job — and reproduces 392
+  hand-transcribed titles byte for byte.
+
+- **Browse the positions.** `GET /occupations` and
+  `GET /occupations/families` open the pool from the Company Builder: a
+  search bar that answers what the job *does* rather than what it is
+  called, and sixteen headings to walk. An empty query is a browse, not
+  an error — a blank list is the moment the three canned seats used to
+  fill. Picking a position fills the title box and never opens a seat;
+  typing your own stays exactly as good.
+
+- **Download knowledge, before the signature.** `study_role` had gone
+  online and stored a study of the trade since the Builder shipped — and
+  it ran inside `draft_interview`, silently, so the knowledge grounded
+  the questions and was never shown to the person doing the hiring. A
+  founder pressed one button, got an interview, and signed against an
+  understanding they had no way to read. It is a step now:
+  `POST /companies/{id}/seats/{seat}/study` hands back the skills and
+  connections off the carried pool — readable with nothing reachable —
+  plus the fetched working knowledge and the name of whoever answered.
+  Every line can be taken off or added to, `…/study/keep` stores the
+  founder's edits, and Sign and hire waits until the study is on screen.
+
 ### Fixed
 
 - **A flag git does not have.** `git remote update` takes `--prune` and

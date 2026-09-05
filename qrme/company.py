@@ -103,14 +103,28 @@ CREATE TABLE IF NOT EXISTS company_seats (
     status      TEXT NOT NULL DEFAULT 'open',   -- open | hired | retired
     interview   TEXT,                           -- drafted questions, JSON
     charter     TEXT,                           -- signed answers, JSON
+    study       TEXT,                           -- the trade, in prose
+    skills      TEXT,                           -- digital skills, JSON
+    connections TEXT,                           -- who it must reach, JSON
     profile_id  TEXT,
     hired_at    TEXT
 );
 """
 
 
+#: Columns added after the table first shipped. A database founded
+#: before them is still a database, so they are added when missing
+#: rather than the schema being versioned for three text fields.
+_LATER = ("study", "skills", "connections")
+
+
 def _ensure(conn) -> None:
     conn.executescript(_TABLES)
+    held = {r[1] for r in conn.execute("PRAGMA table_info(company_seats)")}
+    for column in _LATER:
+        if column not in held:
+            conn.execute(
+                f"ALTER TABLE company_seats ADD COLUMN {column} TEXT")
 
 
 def found(owner_id: str, name: str, industry: str, headcount: int) -> dict:
@@ -168,7 +182,7 @@ def seats(company_id: str) -> list[dict]:
             "SELECT * FROM company_seats WHERE company_id=? ORDER BY rowid",
             (company_id,)):
         row = dict(r)
-        for field in ("interview", "charter"):
+        for field in ("interview", "charter", "skills", "connections"):
             row[field] = json.loads(row[field]) if row[field] else None
         out.append(row)
     return out
@@ -243,14 +257,88 @@ def study_role(company: dict, seat_id: str, cloud=None) -> str:
         "of the profession a good one holds.")
     findings = research.gather(brief, cloud=cloud)
     conn = db.connect()
-    try:
-        conn.execute("ALTER TABLE company_seats ADD COLUMN study TEXT")
-    except Exception:
-        pass  # the column already stands
+    _ensure(conn)
     conn.execute("UPDATE company_seats SET study=? WHERE id=?",
                  (findings, seat["id"]))
     conn.commit()
     return findings
+
+
+def study_seat(company: dict, seat_id: str, cloud=None) -> dict:
+    """Download what this seat has to know, and hand it back to be read.
+
+        asked     does the platform know the trade
+        mattered  does the *founder* get to see what it knows before
+                  signing somebody into the job
+
+    `study_role` already went online and stored the prose. It ran inside
+    `draft_interview`, silently, so the knowledge existed and nobody was
+    ever shown it: the founder pressed one button and got questions,
+    with no way to check whether the platform had understood the job at
+    all before hiring against its understanding.
+
+    This is that step made a step. It carries two halves that arrive
+    differently. The skills and the connections come from the pool the
+    app already carries, so they are on screen the moment this returns
+    even with nothing reachable. The working knowledge is the fetched
+    half, and once fetched it is stored on the seat — which is what
+    makes the hire offline from then on.
+
+    `found` says whether the pool recognised the title. A seat the pool
+    has never heard of is not an error and not a lesser seat: it studies
+    the same way, it just starts from an empty list rather than a
+    filled one.
+    """
+    from . import occupations
+    seat = _seat(company, seat_id)
+    known = occupations.find(seat["title"])
+    if known is None:
+        hits = occupations.search(seat["title"], limit=1)
+        known = hits[0] if hits else None
+    skills = list(known["skills"]) if known else []
+    connections = list(known["connections"]) if known else []
+    knowledge = study_role(company, seat_id, cloud=cloud)
+    conn = db.connect()
+    _ensure(conn)
+    conn.execute(
+        "UPDATE company_seats SET skills=?, connections=? WHERE id=?",
+        (json.dumps(skills), json.dumps(connections), seat["id"]))
+    conn.commit()
+    return {"seat_id": seat["id"], "title": seat["title"],
+            "known_as": known["title"] if known else None,
+            "family": known["family"] if known else None,
+            "found": known is not None,
+            "skills": skills, "connections": connections,
+            "knowledge": knowledge, "studied_by": _who_studied()}
+
+
+def _who_studied() -> str | None:
+    """Who answered the study, by name — the same record the letters'
+    author line reads, so a founder can tell a real study from the local
+    fallback standing in for one."""
+    answered = llm.answered_by()
+    return answered[0] if answered else None
+
+
+def keep_study(company: dict, seat_id: str, skills: list[str],
+               connections: list[str]) -> dict:
+    """The founder's edits to what the study found.
+
+    Review means being able to change it. A skill the pool suggested and
+    this business does not want comes off; one it never thought of goes
+    on. Nothing here hires anybody — that is still the signature.
+    """
+    seat = _seat(company, seat_id)
+    clean_s = [s.strip() for s in skills if s and s.strip()][:60]
+    clean_c = [c.strip() for c in connections if c and c.strip()][:60]
+    conn = db.connect()
+    _ensure(conn)
+    conn.execute(
+        "UPDATE company_seats SET skills=?, connections=? WHERE id=?",
+        (json.dumps(clean_s), json.dumps(clean_c), seat["id"]))
+    conn.commit()
+    return {"seat_id": seat["id"], "skills": clean_s,
+            "connections": clean_c}
 
 
 def draft_interview(company: dict, seat_id: str, cloud=None) -> list[dict]:

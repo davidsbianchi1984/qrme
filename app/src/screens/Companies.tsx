@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { accountApi, api, Company, CompanySeat, Display, Embodiment,
+         PoolRow,
          getBase, InterviewQ, RobotCatalogue } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
@@ -55,6 +56,26 @@ export function Companies({ onOpenProfile }: {
   // Drafting a seat.
   const [title, setTitle] = useState("");
   const [department, setDepartment] = useState("");
+
+  // The pool, browsable. `poolOpen` is the panel; `poolQ` is what was
+  // typed and `poolFam` the heading being walked. Nothing here opens a
+  // seat on its own — picking a position fills the title box, and the
+  // founder still presses to open it.
+  const [poolOpen, setPoolOpen] = useState(false);
+  const [poolQ, setPoolQ] = useState("");
+  const [poolFam, setPoolFam] = useState("");
+  const [families, setFamilies] = useState<string[]>([]);
+  const [pool, setPool] = useState<PoolRow[]>([]);
+  const [poolTotal, setPoolTotal] = useState(0);
+
+  // What the study downloaded for a seat, under review before signing.
+  const [study, setStudy] = useState<{
+    seatId: string; found: boolean; knownAs: string | null;
+    skills: string[]; connections: string[]; knowledge: string;
+    studiedBy: string | null;
+  } | null>(null);
+  const [addSkill, setAddSkill] = useState("");
+  const [addConn, setAddConn] = useState("");
 
   // The interview under edit, per seat.
   const [interview, setInterview] = useState<{
@@ -252,6 +273,97 @@ export function Companies({ onOpenProfile }: {
               </div>
             ))}
           </div>
+
+          {/* The pool, browsable. The Builder used to offer three canned
+              seats when the study did not parse; the app carries the
+              positions now, so the founder can go and look. Typing your
+              own stays exactly as good — this is a way in, never a wall. */}
+          <div className="row">
+            <button disabled={busy}
+                    onClick={act(async () => {
+                      const next = !poolOpen;
+                      setPoolOpen(next);
+                      if (next && !families.length) {
+                        const f = await api.occupationFamilies(token);
+                        setFamilies(f.families);
+                      }
+                      if (next) {
+                        const r = await api.browseOccupations(
+                          poolQ, poolFam, token);
+                        setPool(r.positions); setPoolTotal(r.total);
+                      }
+                    })}>
+              {/* Each branch says its own key: a key chosen inside the
+                  call renders fine and is invisible to the localizer
+                  audit, which is how translated strings go unread. */}
+              {poolOpen ? tr("com.browse.close", lang)
+                        : tr("com.browse", lang)}
+            </button>
+            {poolOpen && poolTotal > 0 && (
+              <span className="muted small">
+                {poolTotal.toLocaleString()} {tr("com.browse.count", lang)}
+              </span>
+            )}
+          </div>
+
+          {poolOpen && (
+            <div className="com-pool">
+              <div className="row">
+                <input value={poolQ} style={{ flex: 2 }}
+                       placeholder={tr("com.browse.ask", lang)}
+                       onChange={(e) => setPoolQ(e.target.value)}
+                       onKeyDown={(e) => {
+                         if (e.key === "Enter") {
+                           act(async () => {
+                             const r = await api.browseOccupations(
+                               poolQ, poolFam, token);
+                             setPool(r.positions);
+                           })();
+                         }
+                       }} />
+                <select value={poolFam} style={{ flex: 1 }}
+                        onChange={(e) => {
+                          // `act` wraps a no-argument thunk, so the
+                          // chosen heading is read off the event before
+                          // the request is handed over.
+                          const fam = e.target.value;
+                          setPoolFam(fam);
+                          act(async () => {
+                            const r = await api.browseOccupations(
+                              poolQ, fam, token);
+                            setPool(r.positions);
+                          })();
+                        }}>
+                  <option value="">{tr("com.browse.all", lang)}</option>
+                  {families.map((f) => (
+                    <option key={f} value={f}>{f}</option>
+                  ))}
+                </select>
+              </div>
+              {!pool.length && (
+                <p className="muted small">{tr("com.browse.none", lang)}</p>
+              )}
+              {pool.map((r) => (
+                <div key={r.title} className="com-pool-row">
+                  <div className="row">
+                    <b style={{ flex: 1 }}>{r.title}</b>
+                    <span className="muted small">{r.family}</span>
+                    <button disabled={busy}
+                            onClick={() => {
+                              setTitle(r.title);
+                              if (!department.trim()) setDepartment(r.family);
+                            }}>
+                      {tr("com.seat.add", lang)}
+                    </button>
+                  </div>
+                  {/* What the seat would need, before it is opened. The
+                      knowledge is the deferred half and arrives on the
+                      Download knowledge press. */}
+                  <p className="muted small">{r.skills.slice(0, 6).join(" · ")}</p>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="row">
             <input value={title} onChange={(e) => setTitle(e.target.value)}
@@ -500,8 +612,130 @@ export function Companies({ onOpenProfile }: {
                                 }} />
                     </label>
                   ))}
-                  {/* Signing is hiring — the whole builder in one press. */}
-                  <button disabled={busy}
+                  {/* Download knowledge. The study already ran, silently,
+                      inside the draft — the platform knew the trade and
+                      the founder was never shown it, so a seat was signed
+                      against an understanding nobody had read. This is
+                      that step made a step: press it, read what came
+                      back, change what is wrong, then sign. */}
+                  {study?.seatId !== s.id && (
+                    <button disabled={busy}
+                            onClick={act(async () => {
+                              const found = await api.studySeat(
+                                open.id, s.id, token);
+                              setStudy({
+                                seatId: s.id, found: found.found,
+                                knownAs: found.known_as,
+                                skills: found.skills,
+                                connections: found.connections,
+                                knowledge: found.knowledge,
+                                studiedBy: found.studied_by,
+                              });
+                            })}>
+                      {busy ? tr("com.study.busy", lang)
+                            : tr("com.study", lang)}
+                    </button>
+                  )}
+
+                  {study?.seatId === s.id && (
+                    <div className="com-study">
+                      {!study.found && (
+                        <p className="muted small">
+                          {tr("com.study.unknown", lang)}
+                        </p>
+                      )}
+                      {study.found && study.knownAs
+                        && study.knownAs !== s.title && (
+                        <p className="muted small">{study.knownAs}</p>
+                      )}
+
+                      <b className="small">{tr("com.study.skills", lang)}</b>
+                      {study.skills.map((k, i) => (
+                        <div key={k + i} className="row">
+                          <span style={{ flex: 1 }}>{k}</span>
+                          <button className="muted small"
+                                  onClick={() => setStudy({
+                                    ...study,
+                                    skills: study.skills.filter(
+                                      (_, j) => j !== i) })}>
+                            {tr("com.study.drop", lang)}
+                          </button>
+                        </div>
+                      ))}
+                      <div className="row">
+                        <input value={addSkill} style={{ flex: 1 }}
+                               placeholder={tr("com.study.add", lang)}
+                               onChange={(e) => setAddSkill(e.target.value)} />
+                        <button disabled={!addSkill.trim()}
+                                onClick={() => {
+                                  setStudy({ ...study,
+                                    skills: [...study.skills,
+                                             addSkill.trim()] });
+                                  setAddSkill("");
+                                }}>
+                          {tr("com.study.add", lang)}
+                        </button>
+                      </div>
+
+                      <b className="small">{tr("com.study.conns", lang)}</b>
+                      {study.connections.map((c, i) => (
+                        <div key={c + i} className="row">
+                          <span style={{ flex: 1 }}>{c}</span>
+                          <button className="muted small"
+                                  onClick={() => setStudy({
+                                    ...study,
+                                    connections: study.connections.filter(
+                                      (_, j) => j !== i) })}>
+                            {tr("com.study.drop", lang)}
+                          </button>
+                        </div>
+                      ))}
+                      <div className="row">
+                        <input value={addConn} style={{ flex: 1 }}
+                               placeholder={tr("com.study.add", lang)}
+                               onChange={(e) => setAddConn(e.target.value)} />
+                        <button disabled={!addConn.trim()}
+                                onClick={() => {
+                                  setStudy({ ...study,
+                                    connections: [...study.connections,
+                                                  addConn.trim()] });
+                                  setAddConn("");
+                                }}>
+                          {tr("com.study.add", lang)}
+                        </button>
+                      </div>
+
+                      <b className="small">
+                        {tr("com.study.knowledge", lang)}
+                      </b>
+                      <p className="muted small com-study-text">
+                        {study.knowledge}
+                      </p>
+                      {/* Who answered, by name, so a real study is
+                          telling apart from the local fallback standing
+                          in for one. */}
+                      {study.studiedBy && (
+                        <p className="muted small">
+                          {tr("com.study.by", lang)}: {study.studiedBy}
+                        </p>
+                      )}
+
+                      <button disabled={busy}
+                              onClick={act(async () => {
+                                await api.keepStudy(open.id, s.id, {
+                                  skills: study.skills,
+                                  connections: study.connections,
+                                }, token);
+                              })}>
+                        {tr("com.study.keep", lang)}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Signing is hiring. It waits for the study now: a
+                      seat signed before anybody read what the job needs
+                      is the thing this whole step exists to stop. */}
+                  <button disabled={busy || study?.seatId !== s.id}
                           onClick={act(async () => {
                             await api.hireSeat(open.id, s.id, {
                               answers: interview.rows
@@ -510,6 +744,7 @@ export function Companies({ onOpenProfile }: {
                                                answer: r.answer.trim() })),
                             }, token);
                             setInterview(null);
+                            setStudy(null);
                           })}>
                     {tr("com.sign", lang)}
                   </button>

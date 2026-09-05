@@ -970,6 +970,54 @@ const CHROME: Table = {
   "com.interview": {
     en: "Draft the interview", es: "Redactar la entrevista", fr: "Rédiger l'entretien", de: "Das Interview entwerfen", pt: "Redigir a entrevista", it: "Prepara il colloquio", ja: "面接を作成", zh: "起草面试", hi: "साक्षात्कार तैयार करें", ar: "صِغ المقابلة",
   },
+  "com.browse": {
+    en: "Browse the positions", es: "Explorar los puestos", fr: "Parcourir les postes", de: "Positionen durchsuchen", pt: "Explorar os cargos", it: "Sfoglia le posizioni", ja: "職種を見る", zh: "浏览职位", hi: "पद देखें", ar: "تصفَّح المناصب",
+  },
+  "com.browse.close": {
+    en: "Close the list", es: "Cerrar la lista", fr: "Fermer la liste", de: "Liste schließen", pt: "Fechar a lista", it: "Chiudi l'elenco", ja: "一覧を閉じる", zh: "关闭列表", hi: "सूची बंद करें", ar: "أغلق القائمة",
+  },
+  "com.browse.ask": {
+    en: "What should this one do? Try what the job does, not its name.", es: "¿Qué debe hacer? Prueba con lo que hace el puesto, no su nombre.", fr: "Que doit-il faire ? Décrivez le travail, pas son nom.", de: "Was soll diese Person tun? Beschreib die Arbeit, nicht den Titel.", pt: "O que este deve fazer? Tente o que o cargo faz, não o nome.", it: "Che cosa deve fare? Prova con ciò che fa, non con il nome.", ja: "何をする人ですか。名前ではなく仕事の内容で。", zh: "这个职位做什么？可描述工作内容，而非名称。", hi: "यह क्या करेगा? नाम नहीं, काम लिखें।", ar: "ماذا سيفعل؟ اكتب العمل نفسه لا اسمه.",
+  },
+  "com.browse.all": {
+    en: "Every family", es: "Todas las familias", fr: "Toutes les familles", de: "Alle Familien", pt: "Todas as famílias", it: "Tutte le famiglie", ja: "すべての分野", zh: "全部门类", hi: "सभी वर्ग", ar: "كل الفئات",
+  },
+  "com.browse.count": {
+    en: "positions carried", es: "puestos incluidos", fr: "postes intégrés", de: "mitgeführte Positionen", pt: "cargos incluídos", it: "posizioni incluse", ja: "収録職種", zh: "已收录职位", hi: "शामिल पद", ar: "منصب محفوظ",
+  },
+  "com.browse.none": {
+    en: "Nothing in the list matches that — your own words open a seat just as well.", es: "Nada coincide — tus propias palabras abren un puesto igual de bien.", fr: "Rien ne correspond — vos propres mots ouvrent un poste tout aussi bien.", de: "Nichts passt — deine eigenen Worte öffnen ebenso gut eine Stelle.", pt: "Nada corresponde — as tuas palavras abrem um lugar igualmente bem.", it: "Nessuna corrispondenza — le tue parole aprono un posto ugualmente.", ja: "一致なし。ご自身の言葉でも席は開けます。", zh: "没有匹配项——用你自己的说法一样可以开席位。", hi: "कोई मेल नहीं — आपके अपने शब्दों से भी सीट खुलती है।", ar: "لا تطابق — كلماتك تفتح مقعدًا بالمثل.",
+  },
+  "com.study": {
+    en: "Download knowledge", es: "Descargar conocimiento", fr: "Télécharger le savoir", de: "Wissen herunterladen", pt: "Descarregar conhecimento", it: "Scarica le conoscenze", ja: "知識をダウンロード", zh: "下载知识", hi: "ज्ञान डाउनलोड करें", ar: "نزّل المعرفة",
+  },
+  "com.study.busy": {
+    en: "Studying the trade…", es: "Estudiando el oficio…", fr: "Étude du métier…", de: "Das Handwerk wird studiert…", pt: "A estudar o ofício…", it: "Studio del mestiere…", ja: "職務を調べています…", zh: "正在研究这门职业…", hi: "पेशा पढ़ा जा रहा है…", ar: "جارٍ دراسة المهنة…",
+  },
+  "com.study.skills": {
+    en: "Skills this one must have", es: "Habilidades que debe tener", fr: "Compétences requises", de: "Erforderliche Fähigkeiten", pt: "Competências necessárias", it: "Competenze necessarie", ja: "必要な技能", zh: "必备技能", hi: "आवश्यक कौशल", ar: "المهارات المطلوبة",
+  },
+  "com.study.conns": {
+    en: "Who and what it must reach", es: "A quién y a qué debe llegar", fr: "Qui et quoi il doit joindre", de: "Wen und was es erreichen muss", pt: "Quem e o que deve alcançar", it: "Chi e cosa deve raggiungere", ja: "つながる相手", zh: "必须联系的人与系统", hi: "किससे जुड़ना होगा", ar: "بمن يجب أن يتصل",
+  },
+  "com.study.add": {
+    en: "Add your own", es: "Añade el tuyo", fr: "Ajouter le vôtre", de: "Eigenes hinzufügen", pt: "Acrescenta o teu", it: "Aggiungi il tuo", ja: "自分で追加", zh: "自行添加", hi: "अपना जोड़ें", ar: "أضف ما تريد",
+  },
+  "com.study.drop": {
+    en: "Take it off", es: "Quitarlo", fr: "Le retirer", de: "Entfernen", pt: "Retirar", it: "Togli", ja: "外す", zh: "移除", hi: "हटाएँ", ar: "أزِلها",
+  },
+  "com.study.knowledge": {
+    en: "What the study found", es: "Lo que encontró el estudio", fr: "Ce que l'étude a trouvé", de: "Was die Studie ergab", pt: "O que o estudo encontrou", it: "Che cosa ha trovato lo studio", ja: "調査の結果", zh: "研究结果", hi: "अध्ययन में क्या मिला", ar: "ما وجدته الدراسة",
+  },
+  "com.study.by": {
+    en: "Studied by", es: "Estudiado por", fr: "Étudié par", de: "Studiert von", pt: "Estudado por", it: "Studiato da", ja: "調査者", zh: "研究者", hi: "अध्ययनकर्ता", ar: "أجرى الدراسة",
+  },
+  "com.study.unknown": {
+    en: "The list has never heard of this one — the study starts from your words alone.", es: "La lista no conoce este puesto — el estudio parte solo de tus palabras.", fr: "La liste ne connaît pas ce poste — l'étude part de vos seuls mots.", de: "Die Liste kennt diese Stelle nicht — die Studie beginnt allein bei deinen Worten.", pt: "A lista não conhece este cargo — o estudo parte só das tuas palavras.", it: "L'elenco non conosce questa posizione — lo studio parte solo dalle tue parole.", ja: "一覧にない職種です。調査はあなたの言葉だけから始まります。", zh: "列表中没有这个职位——研究只从你的描述开始。", hi: "यह पद सूची में नहीं है — अध्ययन केवल आपके शब्दों से शुरू होगा।", ar: "هذا المنصب ليس في القائمة — تبدأ الدراسة من كلماتك وحدها.",
+  },
+  "com.study.keep": {
+    en: "Keep these and continue", es: "Guardar y continuar", fr: "Conserver et continuer", de: "Übernehmen und fortfahren", pt: "Guardar e continuar", it: "Conserva e continua", ja: "保存して次へ", zh: "保存并继续", hi: "सहेजें और आगे बढ़ें", ar: "احفظ وتابع",
+  },
   "com.sign": {
     en: "Sign and hire", es: "Firmar y contratar", fr: "Signer et recruter", de: "Unterschreiben und einstellen", pt: "Assinar e contratar", it: "Firma e assumi", ja: "署名して採用", zh: "签署并聘用", hi: "हस्ताक्षर कर नियुक्त करें", ar: "وقّع وعيّن",
   },

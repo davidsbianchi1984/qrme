@@ -5220,6 +5220,23 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .com-q { display: flex; flex-direction: column; gap: 4px; }
 .com-q textarea { min-height: 56px; }
 
+/* The pool, browsable. Forty-five thousand positions do not go on one
+   screen, so the list is a bounded scroller and the search bar above it
+   is the way in. */
+.com-pool { display: flex; flex-direction: column; gap: 8px;
+  margin: 10px 0; max-height: 340px; overflow-y: auto;
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
+.com-pool-row { display: flex; flex-direction: column; gap: 2px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.com-pool-row:last-child { border-bottom: 0; padding-bottom: 0; }
+
+/* What the study downloaded, under review before the signature. */
+.com-study { display: flex; flex-direction: column; gap: 8px;
+  margin-top: 10px; padding: 10px; border: 1px solid var(--line);
+  border-radius: 8px; }
+.com-study-text { white-space: pre-wrap; max-height: 260px;
+  overflow-y: auto; }
+
 /* The employee file: the two sections that make a hired employee a thing
    in the world — bodies and screens, then the handoff. */
 .com-file { border-top: 1px dashed rgba(255, 255, 255, 0.15);

@@ -16,7 +16,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from .. import auth, company as companies, db
+from .. import auth, company as companies, db, occupations
 
 router = APIRouter()
 
@@ -79,6 +79,11 @@ class SeatHire(BaseModel):
     answers: list[InterviewAnswer] = Field(min_length=3, max_length=40)
 
 
+class StudyKeep(BaseModel):
+    skills: list[str] = Field(default_factory=list, max_length=60)
+    connections: list[str] = Field(default_factory=list, max_length=60)
+
+
 @router.post("/companies", status_code=201)
 def found_company(body: CompanyFound, request: Request) -> dict:
     try:
@@ -118,6 +123,67 @@ def draft_interview(company_id: str, seat_id: str, request: Request) -> dict:
     try:
         return {"questions": companies.draft_interview(
             row, seat_id, cloud=getattr(request.app.state, "cloud", None))}
+    except companies.CompanyError as exc:
+        _fail(exc)
+
+
+@router.get("/occupations")
+def browse_occupations(request: Request, q: str = "", family: str = "",
+                       limit: int = 25) -> dict:
+    """Browse the pool the app carries — the way into forty-five thousand
+    positions without a model and without the network.
+
+    An empty query is a browse rather than a search: it answers with the
+    head of the pool, or of one family, so the list is never blank while
+    somebody is deciding what to type. Typing a job the pool has never
+    heard of is not an error either — the founder's own title stays
+    exactly as good as a picked one.
+    """
+    _caller_owner_id(request)
+    rows = occupations.search(q, limit=max(1, min(limit, 100)),
+                              family=family or None)
+    return {"positions": [
+        {"title": r["title"], "family": r["family"],
+         "skills": r["skills"], "connections": r["connections"]}
+        for r in rows], "total": occupations.count()}
+
+
+@router.get("/occupations/families")
+def occupation_families(request: Request) -> dict:
+    """The headings a founder can walk the pool by."""
+    _caller_owner_id(request)
+    return {"families": occupations.families()}
+
+
+@router.post("/companies/{company_id}/seats/{seat_id}/study",
+             status_code=201)
+def study_seat(company_id: str, seat_id: str, request: Request) -> dict:
+    """Download what this seat has to know.
+
+    The skills and the connections come back off the pool the app
+    carries, so they are readable even with nothing reachable; the
+    working knowledge is fetched and stored on the seat, which is what
+    makes the hire offline afterwards. Nothing is hired here — this is
+    the step before the founder reads what was found.
+    """
+    row = _company_or_404(company_id, request)
+    try:
+        return companies.study_seat(
+            row, seat_id, cloud=getattr(request.app.state, "cloud", None))
+    except companies.CompanyError as exc:
+        _fail(exc)
+
+
+@router.post("/companies/{company_id}/seats/{seat_id}/study/keep")
+def keep_study(company_id: str, seat_id: str, body: StudyKeep,
+               request: Request) -> dict:
+    """The founder's edits to what the study found — a skill this
+    business does not want comes off, one the pool never thought of goes
+    on. Still nobody hired; the signature does that."""
+    row = _company_or_404(company_id, request)
+    try:
+        return companies.keep_study(row, seat_id, body.skills,
+                                    body.connections)
     except companies.CompanyError as exc:
         _fail(exc)
 

@@ -223,6 +223,14 @@ POST /companies/{company_id}/seats
 POST /companies/{company_id}/seats/{seat_id}/hire
 POST /companies/{company_id}/seats/{seat_id}/interview
 POST /companies/{company_id}/seats/{seat_id}/retire
+# The Company Builder is a console surface: founding, seats, the
+# interview and the hire are all already deferred here, and the pool
+# browser and the knowledge download are the same screen. Deferred
+# with them rather than separately.
+GET /occupations
+GET /occupations/families
+POST /companies/{company_id}/seats/{seat_id}/study
+POST /companies/{company_id}/seats/{seat_id}/study/keep
 # Open for business (2.9.10): the storefront doors, console-first for the
 # same reason the builder's seven above are.
 POST /companies/{company_id}/publish
