@@ -66,7 +66,15 @@ RULES: list[tuple[str, str]] = [
      "embalmer*, funeral, cytotechnologist*, cytogenetic, histotechnolog*, "
      "histolog*, magnetic resonance, diagnostic medical, orderlies, "
      "orderly, dialysis, genetic counselor*, genetic counsellor*, "
-     "biostatistician*, neuropsycholog*"),
+     "biostatistician*, neuropsycholog*, otolaryngolog*, otorhinolaryngolog*, "
+     "physiatrist*, intensivist*, hospitalist*, resident, residents, intern, "
+     "interns, clinician*, prescriptionist*, acupressurist*, rolfer*, "
+     "encephalograph*, accessioner*, sonologist*, anatomist*, "
+     "osteopath*, chiroprax*, midwif*, doula*, nurse-midwife, apothecary, "
+     "apothecaries, extern*, bioanalyst*, biotechnician*, cytotechnician*, "
+     "histotechnician*, diagnostician*, geriatrician*, neurosurgeon*, "
+     "naprapath*, psychoanalyst*, paraoptometric*, polysomnograph*, "
+     "emt, emt-p, emt-i, hydrotechnician*"),
 
     ("Mental health & social care",
      "psycholog*, counselor*, counsellor*, counselling, counseling, "
@@ -93,7 +101,11 @@ RULES: list[tuple[str, str]] = [
      "mathematician*, actuar*, statistician*, economist*, "
      "mathematical science, survey researcher*, geneticist*, "
      "statistical, mathematical, learning experience, instructional design*, "
-     "learning ecosystem, forest school"),
+     "learning ecosystem, forest school, graduate fellow*, graduate student*, "
+     "montessori, paraprofessional*, vice principal*, housefellow*, "
+     "protohistorian*, metaphysician*, econometrician*, biomathematician*, "
+     "biometrician*, geometrician*, psychometrician*, ballistician*, "
+     "cryptanalyst*, nanotechnician*, geotechnician*, microarchitect*"),
 
     ("Law & public administration",
      "lawyer*, attorney*, solicitor*, barrister*, judge*, judicial, "
@@ -103,7 +115,16 @@ RULES: list[tuple[str, str]] = [
      "regulatory, customs, immigration, border, tax examiner*, revenue, "
      "eligibility interviewer*, notary, notaries, ombudsman, "
      "senior government, traditional chief*, special-interest, "
-     "clergy, religious, chaplain*, social benefits"),
+     "clergy, religious, chaplain*, social benefits, alderman, aldermen, "
+     "councilman, councilmen, councilwoman, councilwomen, comptroller*, "
+     "bondsman, bondsmen, rector*, officiant*, advocate*, activist*, "
+     "admeasurer*, abstractor*, abstract searcher*, deputy*, marshal*, "
+     "bishop*, monk, monks, nun, nuns, priest*, curate*, deacon*, imam*, "
+     "rabbi*, reverend*, vicar*, sacristan*, sexton*, mohel*, shochet*, "
+     "shohet*, missionary, missionaries, postulant*, novice*, infirmarian*, "
+     "attache*, consul*, delegate*, politician*, councilperson*, "
+     "commandant*, register in chancery, register of, tipstaff, bursar*, "
+     "conferee*, liaison*, sanitarian*, provost*, scribe*, prefect*"),
 
     ("Finance, accounting & insurance",
      "accountant*, accounting, auditor*, auditing, bookkeep*, payroll, "
@@ -155,7 +176,13 @@ RULES: list[tuple[str, str]] = [
      "tree trimmer*, logging equipment, forester*, log grader*, scaler*, "
      "pesticide, vegetation, sprayer*, applicator*, permaculture, apiarist*, "
      "apiary, beekeep*, mycolog*, forag*, herbalist*, mushroom, dog, cat, "
-     "pet, pets, kennel*, aquarium"),
+     "pet, pets, kennel*, aquarium, picker*, viner*, snapper*, snipper*, "
+     "floricultur*, silvicultur*, avicultur*, apicultur*, viticultur*, "
+     "lumberjack*, lumberman, lumbermen, woodsman, woodsmen, axman, axmen, "
+     "roguer*, weed*, orchard*, vineyard*, harvest*, thresher*, "
+     "shepherd*, herder*, milker*, shearer*, stockman, stockmen, cowboy*, "
+     "vaquero*, jackaroo*, barn, corral, zanjero*, "
+     "hatchery, tier, tiers, transplanter*, cultivator*"),
 
     ("Public safety, defence & security",
      "police, detective*, sheriff*, deputy, constable*, firefighter*, "
@@ -165,7 +192,12 @@ RULES: list[tuple[str, str]] = [
      "non-commissioned, infantry, artillery, armored, armoured, "
      "ordnance, special forces, air crew, missile, "
      "emergency management, lifeguard*, animal control, other ranks, "
-     "protective service*, guard, guards, telecommunicator*, public safety"),
+     "protective service*, guard, guards, telecommunicator*, public safety, "
+     "cop, cops, watchman, watchmen, patroller*, gunner*, crewmember*, "
+     "lieutenant*, sergeant*, corporal*, captain, sentry, sentries, "
+     "custodian*, redcap*, red cap, bodyguard*, watchguard*, mercenary, "
+     "mercenaries, navy seal*, spy, spies, reconnaissance, expeditionary, "
+     "multi-national, combat"),
 
     ("Transport & logistics",
      "driver*, pilot*, copilot*, flight, aircraft, airline*, air traffic, "
@@ -197,7 +229,14 @@ RULES: list[tuple[str, str]] = [
      "presser*, personal service*, other personal, conference and event, "
      "meeting, convention, concierge*, merchant*, attendant*, athlete*, "
      "sports, umpire*, referee*, coach*, scout*, preserver*, tobacco, "
-     "cheesemaker*, cheese, mixologist*, mixology"),
+     "cheesemaker*, cheese, mixologist*, mixology, bar back, barback*, "
+     "barkeep*, barmaid*, bellperson*, bellstaff, busboy*, carhop*, "
+     "curb hop, skate hop, chambermaid*, housemaid*, houseperson*, "
+     "doorperson*, concessionaire*, restaurateur*, scullion*, stewardess*, "
+     "valet*, sky cap, skycap*, caddie*, caddy, caddies, expo, bobarista*, "
+     "fountain jerk, cosmetician*, aesthetician*, esthetician*, masseur*, "
+     "masseuse*, chaperon*, companion*, governess*, matron*, laundress*, "
+     "bootblack*, shoeblack*, docent*, page, pages, banquet"),
 
     ("Media, creative & communications",
      "writer*, writers, author*, editor*, journalist*, reporter*, "
@@ -213,7 +252,16 @@ RULES: list[tuple[str, str]] = [
      "television, media, poet*, lyricist*, agents and business managers, "
      "creative, cultural, museum technician*, designer*, designers, "
      "costume*, projectionist*, motion picture, exhibit, muralist*, mural, "
-     "reviewer*, typeface*, font, fonts, glyph*, emoji, foley"),
+     "reviewer*, typeface*, font, fonts, glyph*, emoji, foley, "
+     "accompanist*, pianist*, violinist*, cellist*, guitarist*, organist*, "
+     "harpist*, flautist*, drummer*, instrumentalist*, vocalist*, "
+     "cartoonist*, caricaturist*, acrobat*, aerialist*, juggler*, "
+     "magician*, prestidigitator*, clown*, mime, puppeteer*, ventriloquist*, "
+     "circus, stunt*, extra, extras, role player*, storyteller*, "
+     "double bass, piano, banjo, fiddler*, bugler*, trumpeter*, ballerina*, "
+     "bandperson*, comedian*, comic, comics, critic*, emcee*, maestro*, "
+     "mascot*, medium, mediums, clairvoyant*, grip, grips, cyberathlete*, "
+     "equestrian*, jockey, jockeys, shill*, freak*"),
 
     ("Skilled trades",
      "plumber*, pipefitter*, pipe fitter*, steamfitter*, electrician*, "
@@ -276,6 +324,27 @@ def _pattern(tokens: str) -> re.Pattern:
 
 
 _COMPILED = [(fam, _pattern(tokens)) for fam, tokens in RULES]
+
+
+#: Agent-noun endings. A title that is only somebody who *does* a thing —
+#: "Abrasive Mixer", "Acetylene Burner", "Bone Puller", "Sole Skiver" — is
+#: a maker or a handler, and the taxonomy's forty thousand reported titles
+#: are full of them. This is the last resort, applied only after the words
+#: and the nearest known occupation have both had their say, and the build
+#: prints how many landed here so it never becomes an invisible bucket.
+_SHAPES = ("er", "or", "man", "men", "ist", "smith", "wright", "hand",
+           "monger", "eer", "layer", "maker", "keeper")
+
+
+def by_shape(title: str) -> str | None:
+    """Skilled trades, when the title's shape is all there is to go on."""
+    words = title.replace("-", " ").split()
+    if not words:
+        return None
+    last = words[-1].lower().rstrip("s")
+    if any(last.endswith(shape) for shape in _SHAPES):
+        return "Skilled trades"
+    return None
 
 
 def family_of(title: str) -> str:

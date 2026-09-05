@@ -35,6 +35,7 @@ question.
 
 from __future__ import annotations
 
+import bisect
 import json
 import math
 import re
@@ -101,7 +102,12 @@ _NOISE = {"the", "and", "of", "for", "to", "in", "on", "with", "who", "what",
           # leaving it in put an investment analyst at the top of a
           # roster for a lorry business.
           "company", "companies", "firm", "business", "ltd", "limited",
-          "inc", "llc", "plc", "corp", "corporation", "co"}
+          "inc", "llc", "plc", "corp", "corporation", "co",
+          # Size and newness, which say nothing about the trade. A "small
+          # artisan bakery" and "a small app studio" both hired an
+          # outdoor power equipment mechanic off the word small.
+          "small", "large", "big", "little", "tiny", "new", "old",
+          "local", "regional", "national", "independent", "growing"}
 
 
 def _stem(w: str) -> str:
@@ -125,6 +131,35 @@ def _terms(q: str) -> list[str]:
 
 
 @lru_cache(maxsize=1)
+def _index() -> dict[str, list[int]]:
+    """Stem to the rows carrying it.
+
+    With the taxonomies' reported titles folded in the pool is forty-five
+    thousand rows, and scoring every one of them per keystroke took the
+    best part of a second. A search only has to look at rows that carry at
+    least one of the words typed, which is a few hundred.
+    """
+    index: dict[str, list[int]] = {}
+    for i, row in enumerate(_pool()):
+        for term in _row_terms(row):
+            index.setdefault(term, []).append(i)
+    return index
+
+
+@lru_cache(maxsize=1)
+def _keys() -> list[str]:
+    """Every stem in the index, sorted, for prefix lookups."""
+    return sorted(_index())
+
+
+def _row_terms(row: dict) -> set[str]:
+    terms = {_stem(w) for w in re.findall(r"[a-z0-9]+", row["title"].lower())}
+    terms |= {_stem(w) for w in
+              re.findall(r"[a-z0-9]+", " ".join(row["skills"]).lower())}
+    return terms | set(row["keywords"])
+
+
+@lru_cache(maxsize=1)
 def _rarity() -> dict[str, float]:
     """How much each term is worth, by how few rows carry it.
 
@@ -138,12 +173,7 @@ def _rarity() -> dict[str, float]:
     rows = _pool()
     seen_in = Counter()
     for row in rows:
-        terms = {_stem(w) for w in
-                 re.findall(r"[a-z0-9]+", row["title"].lower())}
-        terms |= {_stem(w) for w in
-                  re.findall(r"[a-z0-9]+", " ".join(row["skills"]).lower())}
-        terms |= set(row["keywords"])
-        seen_in.update(terms)
+        seen_in.update(_row_terms(row))
     n = max(len(rows), 1)
     # A term on every row still counts for something, so the floor is not 0.
     return {t: max(math.log(n / c), 0.25) for t, c in seen_in.items()}
@@ -172,6 +202,29 @@ def _heads(term: str, words: set[str]) -> bool:
         if _stem(word[len(term):]) in vocab:
             return True
     return False
+
+
+def _candidates(terms: list[str]) -> set[int]:
+    """The rows worth scoring for these terms.
+
+    A row carrying none of the words typed cannot match, so scoring the
+    whole pool was forty-five thousand wasted comparisons per keystroke.
+    """
+    index, keys = _index(), _keys()
+    found: set[int] = set()
+    for term in terms:
+        found.update(index.get(term, ()))
+        # A compound match reaches words the term only begins, so the
+        # candidates have to include them or _heads would never be asked.
+        # Walking every stem to find them cost a third of a second a
+        # keystroke; the stems are sorted, so the ones starting with a
+        # term are one contiguous run.
+        if len(term) >= 4:
+            lo = bisect.bisect_left(keys, term)
+            hi = bisect.bisect_left(keys, term + "\uffff")
+            for word in keys[lo:hi]:
+                found.update(index[word])
+    return found
 
 
 def _score(row: dict, terms: list[str]) -> tuple[int, int]:
@@ -237,44 +290,85 @@ def search(q: str, limit: int = 25, family: str | None = None) -> list[dict]:
     the pool (optionally within one family) so the list is never blank
     while somebody is deciding what to type.
     """
-    rows = [r for r in _pool() if family is None or r["family"] == family]
+    pool = _pool()
     terms = _terms(q)
     if not terms:
+        rows = [r for r in pool if family is None or r["family"] == family]
         return sorted(rows, key=lambda r: (r["family"], r["title"]))[:limit]
+    candidates = _candidates(terms)
     scored = []
-    for row in rows:
+    want = _plain(q)
+    for i in candidates:
+        row = pool[i]
+        if family is not None and row["family"] != family:
+            continue
         matched, strength = _score(row, terms)
         if matched and _enough(matched, len(terms)):
-            scored.append((matched, strength, row))
+            scored.append((matched, strength, row, _plain(row["title"]) == want))
     scored.sort(key=_rank)
-    return [r for _, _, r in scored[:limit]]
+    return [x[2] for x in scored[:limit]]
 
 
 def _rank(scored_row: tuple) -> tuple:
-    """Best first, and on a tie the row that says more.
+    """Best first: coverage, then the exact name, then the written row.
 
-    A written role and a taxonomy title can answer a question equally
-    well — "fixes cars" reaches both the Auto mechanic and every row with
-    "mechanic" in its name — and the tie used to fall to whichever sorted
-    first alphabetically, which is how a query for a car put agricultural
-    machinery at the top. The written row carries skills and connections
-    of its own, so it is the more useful of two equal answers.
+    The written row's edge used to be a tie-break on strength, which was
+    enough against a thousand taxonomy titles and useless against forty
+    thousand reported ones: "flies planes" answered with a Pilot Plant
+    Operator, and "fixes cars" with a Fixed-Wing Aircraft Flight Mechanic,
+    because a reported title is a *name* for work somebody already does
+    and there are dozens of them around every real occupation.
+
+    So a written row now outranks strength outright. What protects the
+    reported titles from disappearing is the rung above: somebody who
+    types a name exactly gets that row, whoever wrote it.
     """
-    matched, strength, row = scored_row
-    return (-matched, -strength, not row["written"], row["title"])
+    matched, strength, row, exact = scored_row
+    return (-matched, not exact, not row["written"], -strength, row["title"])
+
+
+def same_name(a: str, b: str) -> bool:
+    """Do these two name the same job?
+
+    Capitalisation and a trailing plural are the whole difference between
+    a founder's typing and a taxonomy's entry, and between two taxonomies:
+    the pool carries both "Dental Hygienist" and "Dental Hygienists",
+    which are not two jobs.
+    """
+    return _plain(a) == _plain(b)
+
+
+def _plain(title: str) -> str:
+    words = []
+    for w in re.findall(r"[a-z0-9]+", (title or "").lower()):
+        words.append(w[:-1] if w.endswith("s") and not w.endswith("ss") else w)
+    return " ".join(words)
 
 
 def find(title: str) -> dict | None:
     """One position by name, matched loosely enough to survive a founder's
     capitalisation and a trailing plural."""
-    want = (title or "").strip().lower().rstrip("s")
     for row in _pool():
-        if row["title"].lower().rstrip("s") == want:
+        if same_name(row["title"], title):
             return row
     return None
 
 
-def for_trade(industry: str, limit: int = 50) -> list[dict]:
+#: A taxonomy files what it could not place into a residual bucket —
+#: "All Other", "not elsewhere classified". Those are real rows and stay
+#: searchable, because somebody looking for one should find it. They are
+#: not roles to *offer*: a founder handed "Construction and Related
+#: Workers, All Other" has been handed a filing label, not a job.
+_RESIDUAL = ("all other", "not elsewhere classified", "other ranks",
+             "occupations, all other")
+
+
+def _residual(title: str) -> bool:
+    low = title.lower()
+    return any(mark in low for mark in _RESIDUAL)
+
+
+def for_trade(industry: str, limit: int = 50, described: str = "") -> list[dict]:
     """The roster to offer a company in this trade, most fitting first.
 
     The cap is the caller's, not this function's: `MAX_HEADCOUNT` governs
@@ -283,13 +377,39 @@ def for_trade(industry: str, limit: int = 50) -> list[dict]:
     behaviour and it hid the roles a founder had not thought of, which is
     the whole reason to suggest anything.
     """
-    terms = _terms(industry)
+    trade, said = _terms(industry), _terms(described)
+    pool = _pool()
+    hits = _candidates(trade)
     scored, rest = [], []
-    for row in _pool():
-        matched, strength = _score(row, terms)
-        (scored if matched else rest).append((matched, strength, row))
-    scored.sort(key=_rank)
-    offered = [r for _, _, r in scored[:limit]]
+    for i, row in enumerate(pool):
+        if _residual(row["title"]):
+            continue
+        if i not in hits:
+            rest.append((0, 0, row))
+            continue
+        matched, strength = _score(row, trade)
+        if matched:
+            # The founder's own words rank within the trade, never above
+            # it. Scored together, "a small artisan bakery on the high
+            # street" put a university lecturer second in a bakery, on
+            # the strength of the word high.
+            extra = _score(row, said) if said else (0, 0)
+            scored.append((matched, strength, row, extra))
+        else:
+            rest.append((matched, strength, row))
+    # A roster is read by a founder, so the written name goes first at
+    # equal coverage: "Software engineer" rather than "Software and
+    # applications developers and analysts not elsewhere classified",
+    # which is the same job wearing a taxonomy's filing label.
+    scored.sort(key=lambda x: (-x[0], not x[2]["written"], -x[1],
+                              -x[3][0], -x[3][1], x[2]["title"]))
+    # Half the roster at most comes from matching the founder's words. A
+    # bakery "on the high street" filled its whole roster off the word
+    # street — a subway operator, a highway maintenance worker — because
+    # every seat was a word match and there was no room left for the job
+    # the sign says.
+    direct = max(1, limit // 2)
+    offered = [x[2] for x in scored[:direct]]
     if len(offered) >= limit:
         return offered
 

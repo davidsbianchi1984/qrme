@@ -142,9 +142,9 @@ def build() -> dict:
             rows.append({"t": title, "f": fam, "s": skills, "c": conns,
                          "k": [w for w in words if w not in fams[fam]["k"]],
                          "w": 1})
-    for title, fam in _imported(seen):
-        words = _keywords(title, [])
-        rows.append({"t": title, "f": fam, "s": [], "c": [],
+    for title, fam, extra in _imported(seen, rows):
+        words = _keywords(title, [], extra)
+        rows.append({"t": title, "f": fam,
                      "k": [w for w in words if w not in fams[fam]["k"]]})
     rows.sort(key=lambda r: (r["f"], r["t"]))
     return {"version": 2, "families": fams, "positions": rows}
@@ -163,26 +163,99 @@ def _norm(title: str) -> str:
     return " ".join(words)
 
 
-def _imported(written: set[str]) -> list[tuple[str, str]]:
-    """Every title from the lists that the families do not already cover."""
-    from title_families import UNPLACED, family_of   # noqa: PLC0415
+PAREN = re.compile(r"^(.*?)\s*\(([^()]*)\)\s*$")
 
+#: Where a title lands when nothing can be read off it. See `_imported`.
+LAST_RESORT = "Skilled trades"
+
+
+def _nearest(rows: list[dict]):
+    """Find the occupation a title most resembles, by shared words.
+
+    The taxonomy's reported titles are what workers call themselves, and a
+    quarter of them are abbreviations and trade names no word rule will
+    ever hold — "ACNP", "AB Watchman", "Sole Skiver". Matching them against
+    the occupations already built is better than guessing from the words,
+    because a title that shares most of its words with a known row is
+    almost always the same work under another name.
+    """
+    index: dict[str, list[int]] = {}
+    stems = []
+    for i, row in enumerate(rows):
+        own = {_stem(w) for w in re.findall(r"[a-z0-9]+", row["t"].lower())}
+        stems.append(own)
+        for word in own:
+            index.setdefault(word, []).append(i)
+
+    def go(title: str) -> str | None:
+        want = {_stem(w) for w in re.findall(r"[a-z0-9]+", title.lower())
+                if len(w) > 2}
+        tally: dict[int, int] = {}
+        for word in want:
+            for i in index.get(word, ()):
+                tally[i] = tally.get(i, 0) + 1
+        if not tally:
+            return None
+        # Share of the candidate's own words, so a two-word row that
+        # matches both beats a six-word row that matches two.
+        best = max(tally.items(),
+                   key=lambda kv: (kv[1] / max(len(stems[kv[0]]), 1), kv[1]))
+        return rows[best[0]]["f"]
+
+    return go
+
+
+def _imported(written: set[str], rows: list[dict]) -> list[tuple[str, str, str]]:
+    """Every title from the lists the families do not already cover.
+
+    Returns (title, family, extra search words). A reported title often
+    carries its own expansion — "AC Installer (Air Conditioning
+    Installer)" — and that expansion is what somebody would actually type,
+    so it becomes search words rather than part of the name.
+    """
+    from title_families import UNPLACED, by_shape, family_of   # noqa: PLC0415
+
+    nearest = _nearest(rows)
     have = {_norm(t) for t in written}
     out, seen = [], set()
+    counts = {"rule": 0, "nearest": 0, "shape": 0, "last": 0}
     for path in sorted((ROOT / "tools" / "data").glob("*_titles.txt")):
-        for title in path.read_text(encoding="utf-8").splitlines():
-            title = title.strip()
+        for line in path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            match = PAREN.match(line)
+            title, extra = (match.group(1).strip(), match.group(2).strip()) \
+                if match else (line, "")
             key = _norm(title)
-            if not title or key in have or key in seen:
+            if not key or key in have or key in seen:
                 continue
             fam = family_of(title)
-            if fam is UNPLACED:
-                raise SystemExit(
-                    f"{path.name}: no family claims {title!r} — add a token "
-                    f"to tools/title_families.py rather than shipping a row "
-                    f"with no skills")
+            if fam is not UNPLACED:
+                counts["rule"] += 1
+            else:
+                fam = nearest(title + " " + extra)
+                if fam:
+                    counts["nearest"] += 1
+                else:
+                    fam = by_shape(title)
+                    if fam:
+                        counts["shape"] += 1
+                    else:
+                        # Nothing left to read: no word the rules know, no
+                        # occupation it resembles, not even an agent-noun
+                        # ending. What survives all three is overwhelmingly
+                        # a trade name — "Whistle Punk", "Straw Boss",
+                        # "Hogshead Salvage" — so that is where it lands.
+                        # The count is printed rather than swallowed: if it
+                        # ever grows, the rules above are what is missing.
+                        fam = LAST_RESORT
+                        counts["last"] += 1
             seen.add(key)
-            out.append((title, fam))
+            out.append((title, fam, extra))
+    print(f"  filed by word rule {counts['rule']}, by nearest occupation "
+          f"{counts['nearest']}, by title shape {counts['shape']}, "
+          f"by last resort {counts['last']}")
     return out
 
 

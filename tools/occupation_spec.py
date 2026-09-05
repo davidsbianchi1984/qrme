@@ -24,7 +24,7 @@ role that cannot reach its escalation is a role that stalls.
 WORD_SYNONYMS = {
     "dental": "teeth tooth mouth",
     "dentist": "teeth tooth fillings mouth",
-    "hygienist": "cleans teeth tooth scale polish mouth",
+    "dental hygienist": "cleans teeth tooth scale polish mouth",
     "orthodont": "braces teeth straighten",
     "optometr": "eye test glasses sight vision",
     "optician": "glasses lenses eye sight",

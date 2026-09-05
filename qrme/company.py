@@ -439,12 +439,59 @@ def plan_company(company: dict, description: str, cloud=None) -> list[dict]:
                     for r in parsed if isinstance(r, dict)]
             rows = [r for r in rows if r["title"] and r["department"]]
             if rows:
-                return rows[:company["headcount"]]
+                return [_with_pool(r) for r in rows[:company["headcount"]]]
         except Exception:
             pass
-    # The honest floor: the trade itself, somebody at the front, and
-    # somebody minding the books — said plainly rather than dressed up
-    # as a study that did not parse.
+    return _from_pool(company, description)
+
+
+def _with_pool(row: dict) -> dict:
+    """Attach what the pool knows about a role the model named.
+
+    A suggested seat used to arrive as three strings and nothing else, so
+    the founder chose a title without being told what the job would need.
+    If the pool carries the role, its digital skills and connections come
+    with it; if not, the row is unchanged and `study_seat` fills them in.
+    """
+    from . import occupations
+    known = occupations.find(row["title"])
+    if not known:
+        found = occupations.search(row["title"], limit=1)
+        known = found[0] if found else None
+    if known:
+        row = dict(row, skills=known["skills"],
+                   connections=known["connections"], known_as=known["title"])
+    return row
+
+
+def _from_pool(company: dict, description: str) -> list[dict]:
+    """The roster the app can answer with on its own.
+
+    This is where "Industry lead / Front desk / Bookkeeper" used to be.
+    Those three were what a founder saw whenever the study did not parse
+    — most often on a deployment with no model to ask — and three canned
+    strings are not a roster. The pool answers the same question offline,
+    from the trade and the founder's own words, and the seats come with
+    their skills and connections already on them.
+
+    The headcount caps what a company may *open*, so it caps this list;
+    it does not cap `occupations.for_trade`, which is a menu and is meant
+    to show the roles the founder had not thought of.
+    """
+    from . import occupations
+    rows = [
+        {"title": row["title"], "department": row["family"],
+         "why": "carried by a working " + company["industry"],
+         "skills": row["skills"], "connections": row["connections"],
+         "known_as": row["title"]}
+        for row in occupations.for_trade(
+            company["industry"], limit=company["headcount"],
+            described=description)
+    ]
+    if rows:
+        return rows
+    # Only reachable with no pool file at all, and still better than a
+    # blank screen: the trade itself, the front, and the books.
     return [
         {"title": company["industry"].title() + " lead",
          "department": "The trade",

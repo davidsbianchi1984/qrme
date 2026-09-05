@@ -1236,7 +1236,7 @@ RATCHETS: tuple[Ratchet, ...] = (
             "rows in Android's own L10n table"),
     Ratchet("l10n.held.windows", 880, _l10n("windows", "held"),
             "rows in the desktop's own L10n table"),
-    Ratchet("occupations.positions", 1700, _pool_positions,
+    Ratchet("occupations.positions", 45000, _pool_positions,
             "positions the app carries without a model or a network"),
     Ratchet("occupations.families", 16, _pool_families,
             "families a founder can browse the pool by"),
