@@ -3,7 +3,7 @@
 **People, made of software — built by you, governed by you, honest about
 what they are.**
 
-**Current release: v3.1.5** ([changelog](CHANGELOG.md)) — one of three products
+**Current release: v3.1.6** ([changelog](CHANGELOG.md)) — one of three products
 ([jim-mini](https://github.com/davidsbianchi1984/jim-mini),
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
@@ -890,6 +890,7 @@ how it got here; full detail in <a href="CHANGELOG.md">CHANGELOG.md</a>.</summar
 
 | Release | What landed |
 |---|---|
+| **3.1.6** | **The writing travels with the clone, and the backup you can actually start** — `docs/github/` carries 282 release notes and 351 pull request bodies into the repository, so a clone holds the argument for every change and not only the diff; both long pages are split into evenly sized parts GitHub renders as pages rather than plain text. `tools/master-backup.sh` and `tools/master-backup.ps1` pull the whole product down — mirror clone, working copy, every release asset filed under its tag, SHA-256 for each — resuming rather than restarting, and needing nothing installed beyond what Windows ships. Three defects found on a real Windows run: progress written to stderr killed the run, a half-built mirror was reported rather than re-cloned, and a stale `FAILED.txt` outlived the failures it named |
 | **3.1.5** | **The face says what it is and what it does** — screen 199 is a photograph: the wave inside the talk overlay, opened the way a person opens it, in a browser given a capture device of its own. Underneath it, `audio-capture` stops being a dead end in all four ears — it is the recogniser saying it could not hear, not the browser, and the recorded ear answers it. The AI mark is one badge everywhere a profile has a picture, hung off the corner instead of cropped in half by it; the name is said once; the four panels beside the face get a word each in ten languages; and a `job_title` beside the field puts the job under the name on the talk surface, the pool, the circle and the friends list — "Founder, QRME", "Bookkeeper, Bianchi & Sons Bakery" |
 | **3.1.4** | **A screenshot is the whole screen** — the console's content column is unrolled before the shutter, so a capture is no longer the first phone-height of its screen; 163 phone-height slices stand beside the whole pictures. The camera's profile wears the founder's face and voice; forty-five holograms in the older drawings become the starters' photographs; 194 and 32 are redrawn; the memory vault, the company and the shop are furnished before they are photographed; and the README gathers the agent, the profile, its connections and its permissions |
 | **3.1.3** | **The AI badge is the outermost layer, and a download is burned** — the badge on rendered footage rides over the player and the full-screen takeover, the player's own full-screen and download are off, and `GET /media/{id}/download` burns the badge into the pixels of synthetic media (never into an authentic upload; refused where footage cannot be burned); the starter collection stands in the README as the console draws it; every highlight names its problem, implementation, numbers and test |

@@ -31,6 +31,9 @@ api() {                                    # $1 = path after /repos/OWNER
 }
 
 mkdir -p "$DEST" || exit 1
+# A run that fails nothing must not inherit the last run's accusation, and
+# the tee below appends, so a stale list would grow rather than be replaced.
+rm -f "$DEST/FAILED.txt"
 printf 'Destination: %s\n' "$DEST"
 df -h "$DEST" | tail -1
 printf '\n'

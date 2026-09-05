@@ -80,6 +80,9 @@ if (-not $HasGit) {
 Write-Host ""
 Start-Sleep -Seconds 5
 
+# A run that fails nothing must not inherit the last run's accusation.
+Remove-Item -Force (Join-Path $full 'FAILED.txt') -ErrorAction SilentlyContinue
+
 $failed = New-Object System.Collections.Generic.List[string]
 
 foreach ($repo in $Repos) {

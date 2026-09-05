@@ -6,6 +6,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.1.6] - 2026-09-05
+
+- **A file named FAILED is a claim about this run.** The backup scripts
+  wrote `FAILED.txt` when a download failed and never cleared it, so a
+  later run that failed nothing left the accusation standing — a finished
+  backup with a file in it saying otherwise. Worse in the shell version,
+  where `tee -a` appends: a stale list would grow across runs rather than
+  be replaced. Both now clear it at the start, so its presence always
+  describes the run that just happened.
+
 - **A half-built mirror is not a mirror.** A run cut short mid-clone leaves
   a `<repo>.git` folder that is not yet a repository. On the next run
   `master-backup.ps1` saw the folder, chose `remote update` over `clone`,
@@ -18084,7 +18094,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.5...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.6...HEAD
+[3.1.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.5...app-v3.1.6
 [3.1.5]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.4...app-v3.1.5
 [3.1.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.3...app-v3.1.4
 [3.1.3]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.2...app-v3.1.3
