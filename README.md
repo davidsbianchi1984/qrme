@@ -8,7 +8,6 @@ what they are.**
 [pdi](https://github.com/davidsbianchi1984/pdi)) versioned and cut together, so
 one number names one combination of all three.
 
-
 > **Patent pending** — *Synthetic User Profile Management System*
 > (U.S. Patent Application No. 19/056,418, Attorney Docket 526.P002;
 > **published as US 2025/0265659 A1 on August 21, 2025**).
@@ -34,196 +33,7 @@ specialists through the tandem, and
 [PDI](https://github.com/davidsbianchi1984/pdi) seals what the profiles
 remember.
 
-## For examination
-
-This page is written to be checked, not believed, and it is written for
-an examiner. Every section grounds the product in three things: the
-**technical problem** in the machine, the **implementation** as built —
-named modules, named constants, named tests — and a **measurable effect**
-that follows from the implementation and not from a description of it.
-Every `.png` under `docs/screens/` and `docs/walkthrough/` is a capture
-of the running console taken by `tools/shoot_screens.py` and
-`tools/walkthrough.py` against a live backend; an `.svg` is a design
-drawing and is captioned as one; the frames under "Real output" are from
-footage this platform rendered. The suite (`python -m pytest`, 5,700-plus
-cases) reads this file — the release banner, the release table, the
-gallery, the numbering and the closing passage fail the build when they
-drift from the product.
-The writing GitHub holds and a clone does not — every release note
-and every pull request body — is checked in under
-[`docs/github/`](docs/github/), so the argument for each change
-travels with the code.
-
-### Components
-
-| Component | Where | What it is |
-|---|---|---|
-| API server | `qrme/`, routers under `qrme/routers/` | FastAPI over SQLite: profiles, persona conditioning, rooms, the community, commerce, governance, the offline gate, the audit chain. |
-| Web console | `app/` | React and TypeScript, ten languages; the 211 numbered screens photographed and drawn below. |
-| Watch faces | `docs/watch/`, `qrme/wearables.py` | Eleven faces a paired wearable may show, and the catalogue of devices that may pair. |
-| iOS, Android, Windows shells | `native/` | Native shells at parity with the console, each route they call published by the server. |
-| Store manifests | `stores/` | Steam, Meta Horizon and Viveport manifests, versioned with the product. |
-| The ears | `docker/ears` | Speech into words and pictures into descriptions, on the deployment's own machine. |
-| The film house | `docker/film`, `qrme/filming.py` | Video generation: a reply rendered as footage by a service the deployment named, watermarked, bounded by a daily ceiling. |
-| The forge and the renderer | `docker/forge`, `docker/renderer`, `qrme/avatarforge.py` | Avatars built from a portrait, and scenes rendered for the stage. |
-| The voice door | `docker/voice` | The phone line JIM-mini rings emergency contacts on: a stateless sidecar holding the house's credential, five houses behind one interface. |
-| The model layer | `qrme/llm.py`, `qrme/loadouts.py`, `qrme/modelshop.py` | A provider menu per region with an American taper lever, bring-your-own key per request, the offline stub. |
-| The vault | `qrme/pdi_client.py`, `qrme/exchange.py`, `qrme/recollection.py` | What a pair builds together, sealed in PDI, curatable and forgettable to the vectors. |
-| The stack | `docker/beta-compose.yml`, `docker/beta.Caddyfile` | All three products, every sidecar and Caddy, deployed as one; the deploy runbook is [docs/beta-deploy.md](docs/beta-deploy.md). |
-
-### The mechanisms on file
-
-The ten numbered mechanisms in
-[docs/invention-disclosure.md](docs/invention-disclosure.md). Each row
-names the technical problem in the machine, the particular structure this
-code uses to solve it, what that structure changes about how the machine
-behaves, and where the structure is reduced to practice and held by a
-test. None of them is a rule a person could follow with a pen or a
-business practice dressed in software; each is a specific arrangement of
-data, credentials, channels and checks inside a running system, and each
-is photographed on the screens below.
-
-<table width="100%">
-<thead>
-<tr>
-<th width="4%" align="left">§</th>
-<th width="23%" align="left">The technical problem</th>
-<th width="30%" align="left">The particular solution, as built</th>
-<th width="26%" align="left">What it changes in the machine</th>
-<th width="17%" align="left">Reduced to practice in</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td valign="top">1</td>
-<td valign="top">A generated likeness, once it leaves the server, carries nothing that says which system produced it, under whose governance, or whether its owner may still withdraw it.</td>
-<td valign="top">Every approved textual render is <strong>stamped at the output door with the producing profile's credential</strong> (<code>qrme/<wbr>watermark.py</code>), recoverable from the text alone; the owner's steering, moderation queue, licences and erasure all act on the one profile record the stamp resolves to.</td>
-<td valign="top">Provenance survives the reply leaving the platform: a stranger with only the words can ask the platform who wrote them and get the profile, its owner and its terms back (screen 148). Erasure removes the record the stamp points at, so a withdrawn profile stops answering.</td>
-<td valign="top"><code>qrme/<wbr>persona.py</code>,<br><code>qrme/<wbr>watermark.py</code>,<br><code>qrme/<wbr>moderation.py</code>,<br><code>qrme/<wbr>adaptation.py</code> — <code>test_<wbr>watermark.py</code>,<br><code>test_<wbr>watermark_<wbr>recovery.py</code>,<br><code>test_<wbr>moderation.py</code>,<br><code>test_<wbr>steering.py</code>,<br><code>test_<wbr>an_<wbr>erase_<wbr>is_<wbr>measured_<wbr>against_<wbr>the_<wbr>schema.py</code></td>
-</tr>
-<tr>
-<td valign="top">2</td>
-<td valign="top">Paid-capability checks written per route are forgotten at the routes added after them, and an emergency path gated by mistake refuses the one caller who must never be refused.</td>
-<td valign="top">One <strong>application-wide dependency</strong> over a capability table (<code>qrme/<wbr>tiers.py</code>) runs on every request before any handler; no route opts in, so none can be missed, and a fixed <code>NEVER_<wbr>GATED</code> set of escalation paths is excluded structurally rather than by each route remembering to.</td>
-<td valign="top">A capability added to the table is enforced everywhere at once; a refusal carries the capability's name and the plan that has it, in a shape a screen renders (screens 130, 161).</td>
-<td valign="top"><code>qrme/<wbr>tiers.py</code>,<br><code>qrme/<wbr>api.py</code> — <code>test_<wbr>tiers.py</code>,<br><code>test_<wbr>the_<wbr>free_<wbr>tier_<wbr>says_<wbr>what_<wbr>it_<wbr>is.py</code></td>
-</tr>
-<tr>
-<td valign="top">3</td>
-<td valign="top">A model credential either lives in the server's configuration, where every caller shares it, or in the caller's client, where the server cannot use it for that caller's request.</td>
-<td valign="top">A caller's key rides <strong>one request in a header into a context variable</strong> read by the provider layer at inference time; it is never written to disk or log, and a request without one falls back to the deployment's own key.</td>
-<td valign="top">Two callers on the same server generate on two different credentials in the same second, and neither key is ever stored.</td>
-<td valign="top"><code>qrme/<wbr>llm.py</code>,<br><code>qrme/<wbr>api.py</code> middleware — <code>test_<wbr>byo_<wbr>key.py</code></td>
-</tr>
-<tr>
-<td valign="top">4</td>
-<td valign="top">An exchange between a guardian and a specialist passes through an application database that any operator with the file can read.</td>
-<td valign="top">The exchange is <strong>sealed into the encrypted personal-data vault at the seal point</strong> (PDI), with per-record provenance and an audit chain, and read back only through the record owner's scoped custody viewer.</td>
-<td valign="top">The platform holds the pointer and the audit trail, not the plaintext; the owner sees the chain of custody for each record and can forget it to the vectors.</td>
-<td valign="top"><code>qrme/<wbr>exchange.py</code>,<br><code>qrme/<wbr>pdi_<wbr>client.py</code>,<br><code>qrme/<wbr>recollection.py</code> — <code>test_<wbr>exchange.py</code>,<br><code>test_<wbr>the_<wbr>room_<wbr>that_<wbr>forgets_<wbr>on_<wbr>purpose.py</code></td>
-</tr>
-<tr>
-<td valign="top">5</td>
-<td valign="top">A live workspace has no physical address a passer-by can reach, and a microphone in one profile's room cannot be handed to another without a shared account.</td>
-<td valign="top">A workspace is published as a <strong>scannable beacon</strong> whose code resolves to the live desk and is deactivated rather than deleted when taken down; a microphone is <strong>lent profile-to-profile</strong> with a named handover and per-channel gain.</td>
-<td valign="top">A printed code at a venue stops resolving instead of pointing somewhere new; a lent microphone is on the record as lent, and comes back.</td>
-<td valign="top"><code>qrme/<wbr>desks.py</code>,<br><code>qrme/<wbr>roommic.py</code> — <code>test_<wbr>desks.py</code>,<br><code>test_<wbr>room_<wbr>mic.py</code>,<br><code>test_<wbr>the_<wbr>visitor_<wbr>side_<wbr>of_<wbr>a_<wbr>desk.py</code></td>
-</tr>
-<tr>
-<td valign="top">6</td>
-<td valign="top">Blending several personas into one produces a profile that can claim to be any of its sources, with no record of what was borrowed from whom.</td>
-<td valign="top">One profile is built from several with <strong>normalized weights and named borrowed aspects</strong>, the composition stored per constituent and published to every reader; the prompt carries an honesty rule, and rated sources and free-hand hybrids are refused at the door.</td>
-<td valign="top">A reader of the blend sees its recipe; the blend cannot pass as a single constituent; a source that has departed is still credited.</td>
-<td valign="top"><code>qrme/<wbr>composite.py</code> — <code>test_<wbr>spec_<wbr>mined.py</code>,<br><code>test_<wbr>the_<wbr>last_<wbr>doors.py</code>,<br><code>test_<wbr>overlays.py</code></td>
-</tr>
-<tr>
-<td valign="top">7</td>
-<td valign="top">A model asked to simulate a person's decisions answers with the same confidence whether it has a year of evidence or none.</td>
-<td valign="top">The simulation's confidence is <strong>computed from the volume of real conditioning evidence</strong> (source items, remembered turns, the latent embedding) rather than from the model's output, and the narrative is watermarked and excluded from distribution.</td>
-<td valign="top">A simulation of a thinly-documented person is shown as guesswork; the score moves only when evidence does.</td>
-<td valign="top"><code>qrme/<wbr>simulation.py</code> — <code>test_<wbr>spec_<wbr>mined.py</code>,<br><code>test_<wbr>the_<wbr>last_<wbr>doors.py</code></td>
-</tr>
-<tr>
-<td valign="top">8</td>
-<td valign="top">Replies are conditioned on who a person is, not where they are or what they are doing, so a reply is the same at a desk and on a mountain.</td>
-<td valign="top">Each interaction carries an <strong>environment payload</strong> (location, conditions, local time, activity) stored beside the biometric context and rendered into the inference conditioning.</td>
-<td valign="top">The same question gets a different answer at night in the rain than at noon at a desk, and the record shows why.</td>
-<td valign="top"><code>qrme/<wbr>attention.py</code>,<br><code>qrme/<wbr>wearables.py</code>,<br><code>environment_<wbr>context</code> — <code>test_<wbr>the_<wbr>room_<wbr>is_<wbr>remembered.py</code>,<br><code>test_<wbr>the_<wbr>wearable_<wbr>tells_<wbr>the_<wbr>guardian.py</code></td>
-</tr>
-<tr>
-<td valign="top">9</td>
-<td valign="top">Money raised on a profile has no stated destination until somebody is asked, and control of the profile at the owner's death depends on a status flag anyone with the database can flip.</td>
-<td valign="top">Proceeds are <strong>routed in advance to named designees whose shares must sum to 100</strong>, each donation split at the door in integer cents onto an auditable ledger; succession is enforced by <strong>token lifecycle</strong> — the old credential revoked and a new one minted for the named successor on a verified attestation.</td>
-<td valign="top">A campaign cannot open without a destination; a split is arithmetic on the ledger, not a promise; the successor holds a credential the predecessor's cannot forge.</td>
-<td valign="top"><code>qrme/<wbr>campaigns.py</code>,<br><code>qrme/<wbr>ledger.py</code>,<br><code>qrme/<wbr>signatures.py</code> — <code>test_<wbr>campaigns.py</code>,<br><code>test_<wbr>signatures.py</code>,<br><code>test_<wbr>the_<wbr>keys_<wbr>the_<wbr>till_<wbr>and_<wbr>the_<wbr>lifeline.py</code>,<br><code>test_<wbr>memorial.py</code></td>
-</tr>
-<tr>
-<td valign="top">10</td>
-<td valign="top">Several agents working one goal either share every data source or cannot coordinate at all.</td>
-<td valign="top">Departments are staffed with role-specific agents whose data pulls are scoped by <strong>independently revocable grants</strong>; one goal fans out across departments, each agent contributing from its own scoped material, the initiating agent composing the joint plan, and the record sealed to the vault.</td>
-<td valign="top">Revoking one department's grant stops that department's contribution and nothing else; the plan names which department contributed what.</td>
-<td valign="top"><code>qrme/<wbr>organization.py</code>,<br><code>qrme/<wbr>delegation.py</code>,<br><code>qrme/<wbr>company.py</code> — <code>test_<wbr>organizations.py</code>,<br><code>test_<wbr>delegation.py</code>,<br><code>test_<wbr>a_<wbr>company_<wbr>is_<wbr>hired_<wbr>one_<wbr>interview_<wbr>at_<wbr>a_<wbr>time.py</code></td>
-</tr>
-</tbody>
-</table>
-
-
-### Where each highlight is proven
-
-Each row: the technical problem, the implementation with its own numbers, the test that holds it, and the photograph.
-
-| Highlight | The technical problem | As built, with its numbers | Test | Screen |
-|---|---|---|---|---|
-| Offline is enforced at every socket | A privacy promise made in prose leaks through one forgotten HTTP call. | `qrme/offline.py` replaces the socket layer's connect with a refusal for every non-loopback address while the offline gate is up; no module opts in, so none can opt out. | `test_nothing_leaves_the_host.py`, `test_offline.py` | — |
-| The room society: nine seats that take turns | Several synthetic speakers in one room talk over each other, or one never speaks. | `qrme/society.py` holds up to nine seats and a turn order; `qrme/roomface.py` draws each seat's face and light; a turn is a row the console polls. | `test_the_room_becomes_a_society.py`, `test_the_room_speaks_for_itself.py` | 175 |
-| The room hears, reads, shares and remembers | A room that only takes typed text is a chat with pictures of people in it. | `qrme/roomreach.py` accepts speech, files and links per turn; `qrme/sharing.py` keeps what was shared as rows the room re-reads; the transcript is remembered to the vault. | `test_the_room_hears_you_without_being_asked.py`, `test_the_room_shares.py`, `test_the_room_is_remembered.py` | 175, 83 |
-| The stage: flat, AR, and VR on every headset | One room drawn three ways by three code paths drifts three ways. | `qrme/xr.py` publishes one scene description; the console draws it flat, overlaid (AR) or entered (VR) from the same rows; WebXR gates only the headset door. | `test_the_rooms_reach_every_headset.py` | 106, 109, 209 |
-| Video generation, bounded and watermarked | A reply rendered as footage costs real money per second and carries nothing that says a machine made it. | `qrme/filming.py` caps a render at `MAX_SECONDS = 30` and a direction at `MAX_DIRECTION = 600` characters, stamps every frame set with the profile's watermark, and lets the owner pick the company (`docker/film`). | `test_the_room_films_its_turns.py`, `test_the_owner_picks_the_video_company.py`, `test_the_video_door_is_open.py` | 209, Real output |
-| The AI badge is the outermost layer, and a download is burned | A badge drawn by the page is not in the file; a badge in the file cannot be the page's outermost layer. | Two badges: the console draws `.rs-film-ai` over the player and over the full-screen takeover with the player's own full-screen and download switched off; `qrme/badge.py` burns the same badge into the pixels for `GET /media/{id}/download` — Pillow for pictures, ffmpeg for footage, `MARGIN = 12` px from the top-left, never on an authentic upload, refused (503) where footage cannot be burned. | `test_the_badge_is_the_outermost_layer.py` | 209 |
-| Voiceprints under attestation | A cloned voice with no record of consent is a cloned voice with no owner. | `qrme/voiceprint.py` refuses enrollment without a granted consent row, reports readiness as counted samples and seconds, and marks every utterance. | `test_voiceprint.py` | 147 |
-| The recoverable watermark | Text leaves the platform as plain characters; nothing in it says who produced it. | `qrme/watermark.py` stamps each approved render with a credential derived from the producing profile (`stamp`) and answers `lookup` from the text alone — no database of copies, the mark is in the bytes. | `test_watermark.py`, `test_watermark_recovery.py` | 148 |
-| Avatars, the registry and the stage | A face built from a portrait must be the same face in the bubble, the room and full screen, and must say it is synthetic. | `qrme/avatarforge.py` builds face, torso and `.glb` from one portrait; `qrme/avatarreg.py` is the registry every surface reads; the stage marks the figure `✦ AI` in its own pixels. | `test_avatars.py`, `test_the_avatar_registry.py`, `test_the_avatar_takes_the_screen.py` | 44, 205 |
-| The Company Builder | A staffed digital company built by hand is a pile of unrelated profiles. | `qrme/company.py` founds a company, opens seats, drafts each interview, and signs a hire into a department under the founder's account. | `test_a_company_is_hired_one_interview_at_a_time.py` | 210, 146 |
-| The marketplace and the shops | A listing and a desk are different things that one table would collapse. | `qrme/marketplace.py` lists and licenses profiles; `qrme/shops.py` keeps a shop as its own row with its own hours, never a desk. | `test_marketplace_cards.py`, `test_marketplace_search.py`, `test_a_shop_is_not_a_desk.py` | 152, 187 |
-| The bodies a profile may bind | A profile that can drive any robot can drive the wrong one. | `qrme/robotics.py` keeps an allowlist of commands per model and a learned-task list per robot; the wrist's quick ring is the intersection. | `test_the_body_market.py` | 163 |
-| Wearables that pair and never listen | A paired watch that carries readings through the platform makes the platform a health record. | `qrme/wearables.py` stores only the deposit address the owner chose; readings go from the device's app to the guardian directly; a device that senses nothing is refused a guardian. | `test_wearables.py`, `test_two_microphones_two_destinations.py` | faces 01–11 |
-| The Studio agent and widgets in a box | A widget written by a model runs in the page that holds the owner's session. | `qrme/widgets.py` serves each widget in its own sandboxed frame with no ambient credential; `qrme/authoring.py` keeps the draft and the published copy apart. | `test_the_widget_cannot_leave_its_box.py` | 200 |
-| A profile's own mailbox, answering in its profession | Mail to a synthetic professional either goes unanswered or is answered by a generic assistant. | `qrme/mailbox.py` receives mail on the profile's own address and answers in the profile's persona, with the owner's moderation queue in front of every send. | `test_the_profiles_own_mailbox.py` | My Corner |
-| The model menu by region | One global provider list is wrong somewhere in the world. | `qrme/loadouts.py` publishes a provider menu per region with an American taper lever; the console draws the region's menu and nothing else. | `test_the_region_loadouts.py` | Settings |
-| The feed ranks by relationship, and popularity is capped | An uncapped like count lets one loud stranger outrank every friend. | `qrme/wall.py` scores a post with `W_FRIEND = 100`, `W_TALKED = 60`, `W_TAG = 25`, and `W_LIKES = 2` per like capped at `W_LIKES_CAP = 40`; every entry carries the reason it is there. | `test_wall.py` | 186, 189 |
-| Moderation before a doubtful turn ships | A reply the owner would not have signed leaves before anyone sees it. | `qrme/moderation.py` holds a doubtful turn as a pending message the owner approves or rejects; the pass rate is a computed number on the front page. | `test_moderation.py` | 32 |
-| Signatures that survive dispute | A signature over a document's name is not a signature over the document. | `qrme/signatures.py` signs the bytes and records the hash, the signer and the time; a changed byte is a failed verification. | `test_a_signature_over_the_bytes.py` | 112, 113 |
-| A person settles it, signed in or not | A complaint that needs an account cannot be made by the person locked out of one. | `qrme/matters.py` accepts a matter from the front door with no session and hands it to a person; the reply reaches the address given. | — | 203 |
-
-## Ability is not a gate
-
-If how a person's body or mind works stands between them and this product,
-that is a defect in the product — not in them. This is stated upfront, before
-features, because it shapes them: we build for blind and low-vision people,
-deaf and hard-of-hearing people, mute and nonspeaking people, people with
-limited mobility or amputation or tremor, autistic and cognitively different
-people, people with dyslexia, people sensitive to motion — and for every need
-not on that list, which is a gap in the list, not in the person.
-
-What is true today, enforced by the suite rather than promised: every
-function works by text alone and voice is always optional; every image in
-the console carries a description (`test_ability_is_not_a_gate.py` fails on
-one that does not); no step is timed; the console honours
-`prefers-reduced-motion`; and the known gaps live in
-[`tests/a11y_backlog.txt`](tests/a11y_backlog.txt), a ledger that only
-shrinks. Anything that stands in your way can be reported from the
-**Accessibility** screen — reachable *before* sign-in (`#access`), in ten
-languages, with three questions and no diagnosis: what were you trying to
-do, what stood in the way, what would help. Reports stay on the deployment
-that received them (sealed to the PDI vault when one is configured, never
-relayed to the shared error collector), are read with the deployment's
-reviewer token, and become rows in that only-shrinks ledger. That is the
-whole loop: your words become tracked work.
-
-
-
-
-## What it does
+## Features
 
 | Capability | Description |
 |---|---|
@@ -287,7 +97,6 @@ QRME lends a profile an ear and an eye *into a place*, where JIM-mini
 attaches them to a monitor on one person; copying the sibling's wording
 would have produced a register that described the wrong product
 accurately.
-
 
 ## How a profile is seen: three roads
 
@@ -382,7 +191,7 @@ runs the model is `docker/film`.
   </tr>
 </table>
 
-## The screens you'll meet
+## Screenshots
 
 The majority of what a person actually encounters, with what each screen
 does — drawn at phone scale, and the same screens serve the web console
@@ -613,7 +422,6 @@ installed on nobody.
 
 ## Watch faces, and the wearables that show them
 
-
 QRME had a watch *API* and no way to say **which watch**. `POST
 /profiles/{id}/wearables` pairs one over Bluetooth — a watch, band, ring,
 earbuds or glasses — and says which faces it may show.
@@ -721,7 +529,6 @@ would be false.
 **02 Activity is the community layer on a wrist, as counts.** Not the content:
 a feed is a reading surface, and reading is the thing a glance cannot do. Same
 reasoning that kept agent names off face 01.
-
 
 The full desktop, mobile and portrait galleries live in
 [docs/gallery.md](docs/gallery.md).
@@ -881,6 +688,268 @@ books is the one it founded. Re-take the set with
 <td align="center" width="50%"><a href="docs/walkthrough/06-shop.png"><img src="docs/walkthrough/06-shop.png" width="460" alt="Shop — the storefront"></a><br><sub>Shop — the storefront</sub></td>
 </tr>
 </table>
+
+## Ability is not a gate
+
+If how a person's body or mind works stands between them and this product,
+that is a defect in the product — not in them. This is stated upfront, before
+features, because it shapes them: we build for blind and low-vision people,
+deaf and hard-of-hearing people, mute and nonspeaking people, people with
+limited mobility or amputation or tremor, autistic and cognitively different
+people, people with dyslexia, people sensitive to motion — and for every need
+not on that list, which is a gap in the list, not in the person.
+
+What is true today, enforced by the suite rather than promised: every
+function works by text alone and voice is always optional; every image in
+the console carries a description (`test_ability_is_not_a_gate.py` fails on
+one that does not); no step is timed; the console honours
+`prefers-reduced-motion`; and the known gaps live in
+[`tests/a11y_backlog.txt`](tests/a11y_backlog.txt), a ledger that only
+shrinks. Anything that stands in your way can be reported from the
+**Accessibility** screen — reachable *before* sign-in (`#access`), in ten
+languages, with three questions and no diagnosis: what were you trying to
+do, what stood in the way, what would help. Reports stay on the deployment
+that received them (sealed to the PDI vault when one is configured, never
+relayed to the shared error collector), are read with the deployment's
+reviewer token, and become rows in that only-shrinks ledger. That is the
+whole loop: your words become tracked work.
+
+## Quick start
+
+```bash
+pip install -e .[dev]
+uvicorn qrme.api:app --reload
+```
+
+Set `ANTHROPIC_API_KEY` (or log in with `ant auth login`) for real model
+replies; otherwise the stub provider answers. Override the model with
+`QRME_MODEL`.
+
+## Run it on your phone
+
+The studio is a web app, so a phone on the same Wi-Fi runs it straight from
+this backend — no app store, no second server, nothing to configure on the
+phone.
+
+```bash
+python -m qrme          # the launcher menu: choose your device
+python -m qrme phone    # straight to the phone flow
+```
+
+Bare `python -m qrme` prints the launcher menu — every way to run QRME,
+one command each, so you pick per device: **phone** (this section),
+**desktop** (`python -m qrme desktop`, the Electron app on this PC),
+**packaged installer** (`.dmg`/`.exe`/`.AppImage` from the releases page —
+no toolchain needed), or **headless API** (`python -m qrme serve`). Same
+backend, same data, same token checks in every form.
+
+The packaged installer is **double-click-and-done**: it ships the whole
+Python backend as a frozen binary (`packaging/backend_entry.py`, built by
+PyInstaller in the release workflow) and the app spawns it at launch when no
+backend is already answering — no Python install, no terminal, data under
+the app's own user-data directory, and the spawned backend dies with the
+window. A backend you already run yourself is left alone.
+
+`python -m qrme phone` builds the studio if it's missing (first run installs the
+npm dependencies too), prints the phone URL **with a QR code right in the
+terminal**, and starts the API on the network — scan, Add to Home Screen,
+done. Flags: `--port`, `--rebuild`, `--no-build`, `--print-only`.
+
+## Configuration
+
+<table>
+<tr><th align="left"><sub>Variable</sub></th><th align="left"><sub>Default</sub></th><th align="left"><sub>Purpose</sub></th></tr>
+<tr><td valign="top"><sub><code>QRME_DB</code></sub></td><td valign="top"><sub><code>qrme.db</code></sub></td><td valign="top"><sub>SQLite database path</sub></td></tr>
+<tr><td valign="top"><sub><code>QRME_LLM</code></sub></td><td valign="top"><sub>auto</sub></td><td valign="top"><sub><code>stub</code> forces the offline deterministic provider; <code>anthropic</code> forces the SDK</sub></td></tr>
+<tr><td valign="top"><sub><code>QRME_OFFLINE</code></sub></td><td valign="top"><sub>off</sub></td><td valign="top"><sub><code>1</code>/<code>true</code> runs <b>fully offline</b>: local inference only (Anthropic SDK and cloud gateway bypassed even if configured), cloud never attached, embeddings/fine-tuning recomputed on-host. <code>GET /offline/status</code> reports the posture</sub></td></tr>
+<tr><td valign="top"><sub><code>QRME_MODEL</code></sub></td><td valign="top"><sub><code>claude-opus-5</code></sub></td><td valign="top"><sub>Model used for profile replies</sub></td></tr>
+<tr><td valign="top"><sub><code>ANTHROPIC_API_KEY</code></sub></td><td valign="top"><sub>—</sub></td><td valign="top"><sub>Enables real model replies</sub></td></tr>
+<tr><td valign="top"><sub><code>QRME_PDI_URL</code> / <code>QRME_PDI_TOKEN</code></sub></td><td valign="top"><sub>—</sub></td><td valign="top"><sub>PDI tandem: seal source material in the encrypted vault</sub></td></tr>
+<tr><td valign="top"><sub><code>QRME_CLOUD_URL</code> / <code>QRME_CLOUD_TOKEN</code></sub></td><td valign="top"><sub>—</sub></td><td valign="top"><sub>Cloud Model Gateway: greater-model inference with local fallback + opt-in contribution (<a href="docs/cloud-model.md">docs/cloud-model.md</a>; standing one up: <a href="docs/cloudgw-deploy.md">docs/cloudgw-deploy.md</a>)</sub></td></tr>
+<tr><td valign="top"><sub><code>QRME_RP_ID</code></sub></td><td valign="top"><sub><code>qrme.app</code></sub></td><td valign="top"><sub>The WebAuthn relying party — <b>the deployment's own domain</b>. Passkeys are bound to it, so leaving the default on a real deployment makes every signature fail as "made for a different site". A relying party id must be a <b>domain</b>: on a loopback install set <code>localhost</code>, never an IP (<a href="docs/signatures.md">docs/signatures.md</a>, <a href="docs/windows-hello-field-test.md">docs/windows-hello-field-test.md</a>)</sub></td></tr>
+<tr><td valign="top"><sub><code>QRME_RP_ORIGINS</code></sub></td><td valign="top"><sub>any</sub></td><td valign="top"><sub>Comma-separated allowlist of origins a signing ceremony may come from. Unset accepts any origin the relying party matches</sub></td></tr>
+<tr><td valign="top"><sub><code>QRME_GOOGLE_CLIENT_ID</code> / <code>QRME_GOOGLE_CLIENT_SECRET</code></sub></td><td valign="top"><sub>—</sub></td><td valign="top"><sub>Sign in with Google. Unset greys the button and shows why (<a href="docs/sign-in.md">docs/sign-in.md</a>)</sub></td></tr>
+<tr><td valign="top"><sub><code>QRME_APPLE_CLIENT_ID</code> / <code>QRME_APPLE_CLIENT_SECRET</code></sub></td><td valign="top"><sub>—</sub></td><td valign="top"><sub>Sign in with Apple. The secret is a <b>JWT you sign yourself and it expires within six months</b> — mint and check it with <code>scripts/mint_apple_secret.py</code> (<a href="docs/sign-in.md">docs/sign-in.md</a>)</sub></td></tr>
+<tr><td valign="top"><sub><code>QRME_CONSOLE_DIR</code></sub></td><td valign="top"><sub><code>app/dist</code></sub></td><td valign="top"><sub>Where the built studio is served from. Set it explicitly in a container — it resolves relative to the installed package otherwise, which is not where the build lands</sub></td></tr>
+<tr><td valign="top"><sub><code>QRME_CORS_ORIGINS</code></sub></td><td valign="top"><sub>off</sub></td><td valign="top"><sub>Comma-separated allowlist for a front-end on another origin; <code>*</code> for any. Off is right when the studio and API share an origin</sub></td></tr>
+</table>
+
+## Tests
+
+```bash
+pytest
+```
+
+## Example flow
+
+```bash
+# 1. Create a profile (owner is age-verified)
+curl -s localhost:8000/profiles -H 'content-type: application/json' -d '{
+  "owner_id": "owner-1", "kind": "self", "display_name": "Dana",
+  "persona": "A retired teacher who loves gardening and dry humor.",
+  "verification": {"birthdate": "1984-06-01"}}'
+
+# 2. Register an interactor and set the relationship
+curl -s localhost:8000/interactors -d '{"display_name": "Sam", "birthdate": "2000-01-15"}' -H 'content-type: application/json'
+curl -s -X PUT localhost:8000/profiles/$PROFILE/relationships/$INTERACTOR \
+  -H 'content-type: application/json' \
+  -d '{"relationship_type": "grandchild", "nickname": "kiddo", "tone": "playful", "boundaries": ["finances"]}'
+
+# 3. Chat — reply is persona-, relationship-, and engagement-conditioned,
+#    and moderated before it is shown
+curl -s localhost:8000/profiles/$PROFILE/chat -H 'content-type: application/json' \
+  -d '{"interactor_id": "'$INTERACTOR'", "message": "Tell me about your garden!"}'
+```
+
+## Architecture
+
+- **API**: FastAPI (`qrme/api.py`), app factory `create_app()`.
+- **Storage**: SQLite (`qrme/db.py`), path via `QRME_DB` (default `qrme.db`).
+- **Persona conditioning**: `qrme/persona.py` builds the system prompt from
+  profile identity + relationship + engagement + aging.
+- **LLM**: a provider menu (`qrme/llm.py`) — Anthropic through the
+  official SDK by default, and OpenAI, Gemini, Grok, Meta, Azure, Bedrock,
+  Groq, Together, Fireworks, NVIDIA, Mistral, Cohere, DeepSeek, Qwen, Kimi
+  and GLM behind one interface — narrowed per region by
+  `qrme/loadouts.py` and tapered by `QRME_MODEL_POLICY`. The default model
+  is set by `QRME_MODEL`. Without credentials (or with `QRME_LLM=stub`) a
+  deterministic stub provider is used, so everything runs offline.
+  **Bring your own key:** send `x-llm-api-key` on any request (the console's
+  Control Center stores it device-side) and that request's generations run
+  on your credential — never persisted, never logged; the deployment's env
+  key (an operator lending theirs out) answers requests that bring none.
+- **Marketplace expertise**: `qrme/packs.py` (knowledge packs + robot task
+  packs, starter content, seeding) with routes in `qrme/routers/packs.py`;
+  `qrme/seed.py` (starter profile collection); `qrme/robotics.py` (robot
+  catalog, per-kind command allowlists) with routes in
+  `qrme/routers/robots.py`.
+- **Native clients**: three idiomatic codebases under [`native/`](native/)
+  (SwiftUI, Jetpack Compose, WinUI 3) exercising the real API — see
+  [native/README.md](native/README.md) for the screen-by-screen endpoint
+  map.
+
+### Components
+
+| Component | Where | What it is |
+|---|---|---|
+| API server | `qrme/`, routers under `qrme/routers/` | FastAPI over SQLite: profiles, persona conditioning, rooms, the community, commerce, governance, the offline gate, the audit chain. |
+| Web console | `app/` | React and TypeScript, ten languages; the 211 numbered screens photographed and drawn below. |
+| Watch faces | `docs/watch/`, `qrme/wearables.py` | Eleven faces a paired wearable may show, and the catalogue of devices that may pair. |
+| iOS, Android, Windows shells | `native/` | Native shells at parity with the console, each route they call published by the server. |
+| Store manifests | `stores/` | Steam, Meta Horizon and Viveport manifests, versioned with the product. |
+| The ears | `docker/ears` | Speech into words and pictures into descriptions, on the deployment's own machine. |
+| The film house | `docker/film`, `qrme/filming.py` | Video generation: a reply rendered as footage by a service the deployment named, watermarked, bounded by a daily ceiling. |
+| The forge and the renderer | `docker/forge`, `docker/renderer`, `qrme/avatarforge.py` | Avatars built from a portrait, and scenes rendered for the stage. |
+| The voice door | `docker/voice` | The phone line JIM-mini rings emergency contacts on: a stateless sidecar holding the house's credential, five houses behind one interface. |
+| The model layer | `qrme/llm.py`, `qrme/loadouts.py`, `qrme/modelshop.py` | A provider menu per region with an American taper lever, bring-your-own key per request, the offline stub. |
+| The vault | `qrme/pdi_client.py`, `qrme/exchange.py`, `qrme/recollection.py` | What a pair builds together, sealed in PDI, curatable and forgettable to the vectors. |
+| The stack | `docker/beta-compose.yml`, `docker/beta.Caddyfile` | All three products, every sidecar and Caddy, deployed as one; the deploy runbook is [docs/beta-deploy.md](docs/beta-deploy.md). |
+
+## Maintenance: rows the old profile delete left behind
+
+Before 0.59.9 the profile delete ran off a list of twenty-four table names
+against a schema of sixty-six. Every profile ended on a build older than that
+release left forty-two tables standing — `clinical_notes` and the `media`
+behind them, `media_watermarks`, `anonymous_pictures`, `homepages`,
+`friendships`, `inbox_events` — and nothing in the running product will ever
+look at them again, because the `profiles` row is gone and the API answers
+404. Fixing the cascade fixed the next delete. It did not reach back.
+
+```bash
+python -m qrme.orphans            # count them, change nothing
+python -m qrme.orphans --json     # the same survey, machine-readable
+python -m qrme.orphans --apply    # clear them
+```
+
+**Dry by default.** The command a person runs to find out how bad it is is not
+the command that changes it. A row counts as an orphan only when its
+`profile_id` names a profile that is not in `profiles`; rows with a NULL or
+empty subject are left alone. The scope is the delete cascade's own reader,
+so this is that cascade applied retroactively rather than a second list to
+keep in step.
+
+A deployment first installed on 0.59.9 or later has nothing to sweep, and the
+command says so in a sentence.
+
+The manual equivalent, if you prefer the steps separately:
+
+```bash
+npm --prefix app install && npm --prefix app run build   # build the studio once
+uvicorn qrme.api:app --host 0.0.0.0                      # listen on the network
+curl localhost:8000/pair                                 # what to open on the phone
+```
+
+`GET /pair` answers with the studio's URL on your local network (and
+`GET /pair/qr.svg` is the same URL as a QR code — the Control Center screen
+shows both, so you can scan it off the laptop). Open that URL on the phone,
+then **Add to Home Screen**: it installs as a standalone app with its own
+icon, runs full-screen, and keeps working through a brief drop in
+connectivity.
+
+Why it needs no setup: the API serves the studio at `/app`, so the UI and
+the API share one origin — the studio simply calls the address it was loaded
+from. The phone layout follows: the sidebar becomes a thumb-reachable bottom
+tab bar, inputs stay at 16px so iOS doesn't zoom, and the layout respects
+the notch and home indicator.
+
+#### Published deployments
+
+The same code serves a laptop on Wi-Fi and an instance you host for yourself
+and your colleagues to reach from anywhere:
+
+<table>
+<tr><th align="left"><sub>Variable</sub></th><th align="left"><sub>Effect</sub></th></tr>
+<tr><td valign="top"><sub><code>QRME_PUBLIC_URL</code></sub></td><td valign="top"><sub><code>GET /pair</code> advertises this address (QR included) instead of a LAN one, so the phone flow works over the internet. Serve it over HTTPS — tokens travel in headers.</sub></td></tr>
+<tr><td valign="top"><sub><code>QRME_SIGNUP_KEY</code></sub></td><td valign="top"><sub>Profile creation requires this key as the <code>x-signup-key</code> header, so a published instance stays yours rather than open registration. Unset = open, the right default on a LAN.</sub></td></tr>
+</table>
+
+Talking to a profile stays public either way; the key gates creating an
+account on your deployment, not using one.
+
+Beyond self-hosting, the [`stores/`](stores/README.md) room holds the
+three storefront counters — Meta Horizon as a packaged PWA, Steam and
+Viveport as thin launchers over the Windows shell — with one shared
+[listing](stores/listing.md) and a guard that keeps every shelf's
+version equal to the app's.
+
+The `Dockerfile` packages the studio and the API into one image so a hosted
+instance serves both from the same origin, exactly like the phone flow does:
+
+```bash
+docker build -t qrme .
+docker run -p 8000:8000 -v qrme-data:/data \
+  -e QRME_PUBLIC_URL=https://qrme.example.com \
+  -e QRME_SIGNUP_KEY="$(openssl rand -base64 24)" qrme
+```
+
+[docs/hosting.md](docs/hosting.md) covers the rest — TLS, what mounting
+`/data` protects, and what running profiles for other people commits you to.
+
+Without `QRME_PUBLIC_URL`, the address is local-network only and deliberately
+not reachable from the internet — your profiles and their memories stay on
+your own network.
+Everything still requires the owner or interactor bearer token; a phone on
+the LAN is exactly as authorized as a laptop on the LAN. If `/pair` reports
+`reachable: false`, it could only find loopback (which on a phone means the
+phone itself): set `QRME_LAN_HOST` to this machine's address and restart.
+
+## Documentation
+
+- [docs/PRD.md](docs/PRD.md) — what the product is
+- [docs/ROADMAP.md](docs/ROADMAP.md) — where it goes next
+- [docs/gallery.md](docs/gallery.md) — every screen, full size
+- [docs/beta-deploy.md](docs/beta-deploy.md) — deploying all three products
+- [docs/github/](docs/github/) — every release note and pull request body,
+  checked in, so a clone carries the argument for each change
+- [docs/invention-disclosure.md](docs/invention-disclosure.md) — the
+  numbered mechanisms
+
+### For examination
+
+The technical problem each mechanism solves, the structure this code uses
+to solve it, what that changes in the machine, and where it is reduced to
+practice and held by a test:
+[docs/examination.md](docs/examination.md).
 
 ## Release history
 
@@ -1209,216 +1278,6 @@ response says so in its own body. [docs/commerce.md](docs/commerce.md) lists
 what is absent.
 
 </details>
-
-## Reference
-
-Everything below is lookup material — how to run it, what to configure, what
-the endpoints are. It is at the bottom on purpose: if you see a command in one
-of the screens in [docs/gallery.md](docs/gallery.md) and want to know what it
-does, this is where to find it.
-
-### Architecture
-
-- **API**: FastAPI (`qrme/api.py`), app factory `create_app()`.
-- **Storage**: SQLite (`qrme/db.py`), path via `QRME_DB` (default `qrme.db`).
-- **Persona conditioning**: `qrme/persona.py` builds the system prompt from
-  profile identity + relationship + engagement + aging.
-- **LLM**: a provider menu (`qrme/llm.py`) — Anthropic through the
-  official SDK by default, and OpenAI, Gemini, Grok, Meta, Azure, Bedrock,
-  Groq, Together, Fireworks, NVIDIA, Mistral, Cohere, DeepSeek, Qwen, Kimi
-  and GLM behind one interface — narrowed per region by
-  `qrme/loadouts.py` and tapered by `QRME_MODEL_POLICY`. The default model
-  is set by `QRME_MODEL`. Without credentials (or with `QRME_LLM=stub`) a
-  deterministic stub provider is used, so everything runs offline.
-  **Bring your own key:** send `x-llm-api-key` on any request (the console's
-  Control Center stores it device-side) and that request's generations run
-  on your credential — never persisted, never logged; the deployment's env
-  key (an operator lending theirs out) answers requests that bring none.
-- **Marketplace expertise**: `qrme/packs.py` (knowledge packs + robot task
-  packs, starter content, seeding) with routes in `qrme/routers/packs.py`;
-  `qrme/seed.py` (starter profile collection); `qrme/robotics.py` (robot
-  catalog, per-kind command allowlists) with routes in
-  `qrme/routers/robots.py`.
-- **Native clients**: three idiomatic codebases under [`native/`](native/)
-  (SwiftUI, Jetpack Compose, WinUI 3) exercising the real API — see
-  [native/README.md](native/README.md) for the screen-by-screen endpoint
-  map.
-
-### Run
-
-```bash
-pip install -e .[dev]
-uvicorn qrme.api:app --reload
-```
-
-Set `ANTHROPIC_API_KEY` (or log in with `ant auth login`) for real model
-replies; otherwise the stub provider answers. Override the model with
-`QRME_MODEL`.
-
-### Run it on your phone
-
-The studio is a web app, so a phone on the same Wi-Fi runs it straight from
-this backend — no app store, no second server, nothing to configure on the
-phone.
-
-```bash
-python -m qrme          # the launcher menu: choose your device
-python -m qrme phone    # straight to the phone flow
-```
-
-Bare `python -m qrme` prints the launcher menu — every way to run QRME,
-one command each, so you pick per device: **phone** (this section),
-**desktop** (`python -m qrme desktop`, the Electron app on this PC),
-**packaged installer** (`.dmg`/`.exe`/`.AppImage` from the releases page —
-no toolchain needed), or **headless API** (`python -m qrme serve`). Same
-backend, same data, same token checks in every form.
-
-The packaged installer is **double-click-and-done**: it ships the whole
-Python backend as a frozen binary (`packaging/backend_entry.py`, built by
-PyInstaller in the release workflow) and the app spawns it at launch when no
-backend is already answering — no Python install, no terminal, data under
-the app's own user-data directory, and the spawned backend dies with the
-window. A backend you already run yourself is left alone.
-
-`python -m qrme phone` builds the studio if it's missing (first run installs the
-npm dependencies too), prints the phone URL **with a QR code right in the
-terminal**, and starts the API on the network — scan, Add to Home Screen,
-done. Flags: `--port`, `--rebuild`, `--no-build`, `--print-only`.
-
-### Maintenance: rows the old profile delete left behind
-
-Before 0.59.9 the profile delete ran off a list of twenty-four table names
-against a schema of sixty-six. Every profile ended on a build older than that
-release left forty-two tables standing — `clinical_notes` and the `media`
-behind them, `media_watermarks`, `anonymous_pictures`, `homepages`,
-`friendships`, `inbox_events` — and nothing in the running product will ever
-look at them again, because the `profiles` row is gone and the API answers
-404. Fixing the cascade fixed the next delete. It did not reach back.
-
-```bash
-python -m qrme.orphans            # count them, change nothing
-python -m qrme.orphans --json     # the same survey, machine-readable
-python -m qrme.orphans --apply    # clear them
-```
-
-**Dry by default.** The command a person runs to find out how bad it is is not
-the command that changes it. A row counts as an orphan only when its
-`profile_id` names a profile that is not in `profiles`; rows with a NULL or
-empty subject are left alone. The scope is the delete cascade's own reader,
-so this is that cascade applied retroactively rather than a second list to
-keep in step.
-
-A deployment first installed on 0.59.9 or later has nothing to sweep, and the
-command says so in a sentence.
-
-
-The manual equivalent, if you prefer the steps separately:
-
-```bash
-npm --prefix app install && npm --prefix app run build   # build the studio once
-uvicorn qrme.api:app --host 0.0.0.0                      # listen on the network
-curl localhost:8000/pair                                 # what to open on the phone
-```
-
-`GET /pair` answers with the studio's URL on your local network (and
-`GET /pair/qr.svg` is the same URL as a QR code — the Control Center screen
-shows both, so you can scan it off the laptop). Open that URL on the phone,
-then **Add to Home Screen**: it installs as a standalone app with its own
-icon, runs full-screen, and keeps working through a brief drop in
-connectivity.
-
-Why it needs no setup: the API serves the studio at `/app`, so the UI and
-the API share one origin — the studio simply calls the address it was loaded
-from. The phone layout follows: the sidebar becomes a thumb-reachable bottom
-tab bar, inputs stay at 16px so iOS doesn't zoom, and the layout respects
-the notch and home indicator.
-
-#### Published deployments
-
-The same code serves a laptop on Wi-Fi and an instance you host for yourself
-and your colleagues to reach from anywhere:
-
-<table>
-<tr><th align="left"><sub>Variable</sub></th><th align="left"><sub>Effect</sub></th></tr>
-<tr><td valign="top"><sub><code>QRME_PUBLIC_URL</code></sub></td><td valign="top"><sub><code>GET /pair</code> advertises this address (QR included) instead of a LAN one, so the phone flow works over the internet. Serve it over HTTPS — tokens travel in headers.</sub></td></tr>
-<tr><td valign="top"><sub><code>QRME_SIGNUP_KEY</code></sub></td><td valign="top"><sub>Profile creation requires this key as the <code>x-signup-key</code> header, so a published instance stays yours rather than open registration. Unset = open, the right default on a LAN.</sub></td></tr>
-</table>
-
-Talking to a profile stays public either way; the key gates creating an
-account on your deployment, not using one.
-
-Beyond self-hosting, the [`stores/`](stores/README.md) room holds the
-three storefront counters — Meta Horizon as a packaged PWA, Steam and
-Viveport as thin launchers over the Windows shell — with one shared
-[listing](stores/listing.md) and a guard that keeps every shelf's
-version equal to the app's.
-
-The `Dockerfile` packages the studio and the API into one image so a hosted
-instance serves both from the same origin, exactly like the phone flow does:
-
-```bash
-docker build -t qrme .
-docker run -p 8000:8000 -v qrme-data:/data \
-  -e QRME_PUBLIC_URL=https://qrme.example.com \
-  -e QRME_SIGNUP_KEY="$(openssl rand -base64 24)" qrme
-```
-
-[docs/hosting.md](docs/hosting.md) covers the rest — TLS, what mounting
-`/data` protects, and what running profiles for other people commits you to.
-
-Without `QRME_PUBLIC_URL`, the address is local-network only and deliberately
-not reachable from the internet — your profiles and their memories stay on
-your own network.
-Everything still requires the owner or interactor bearer token; a phone on
-the LAN is exactly as authorized as a laptop on the LAN. If `/pair` reports
-`reachable: false`, it could only find loopback (which on a phone means the
-phone itself): set `QRME_LAN_HOST` to this machine's address and restart.
-
-### Configuration
-
-<table>
-<tr><th align="left"><sub>Variable</sub></th><th align="left"><sub>Default</sub></th><th align="left"><sub>Purpose</sub></th></tr>
-<tr><td valign="top"><sub><code>QRME_DB</code></sub></td><td valign="top"><sub><code>qrme.db</code></sub></td><td valign="top"><sub>SQLite database path</sub></td></tr>
-<tr><td valign="top"><sub><code>QRME_LLM</code></sub></td><td valign="top"><sub>auto</sub></td><td valign="top"><sub><code>stub</code> forces the offline deterministic provider; <code>anthropic</code> forces the SDK</sub></td></tr>
-<tr><td valign="top"><sub><code>QRME_OFFLINE</code></sub></td><td valign="top"><sub>off</sub></td><td valign="top"><sub><code>1</code>/<code>true</code> runs <b>fully offline</b>: local inference only (Anthropic SDK and cloud gateway bypassed even if configured), cloud never attached, embeddings/fine-tuning recomputed on-host. <code>GET /offline/status</code> reports the posture</sub></td></tr>
-<tr><td valign="top"><sub><code>QRME_MODEL</code></sub></td><td valign="top"><sub><code>claude-opus-5</code></sub></td><td valign="top"><sub>Model used for profile replies</sub></td></tr>
-<tr><td valign="top"><sub><code>ANTHROPIC_API_KEY</code></sub></td><td valign="top"><sub>—</sub></td><td valign="top"><sub>Enables real model replies</sub></td></tr>
-<tr><td valign="top"><sub><code>QRME_PDI_URL</code> / <code>QRME_PDI_TOKEN</code></sub></td><td valign="top"><sub>—</sub></td><td valign="top"><sub>PDI tandem: seal source material in the encrypted vault</sub></td></tr>
-<tr><td valign="top"><sub><code>QRME_CLOUD_URL</code> / <code>QRME_CLOUD_TOKEN</code></sub></td><td valign="top"><sub>—</sub></td><td valign="top"><sub>Cloud Model Gateway: greater-model inference with local fallback + opt-in contribution (<a href="docs/cloud-model.md">docs/cloud-model.md</a>; standing one up: <a href="docs/cloudgw-deploy.md">docs/cloudgw-deploy.md</a>)</sub></td></tr>
-<tr><td valign="top"><sub><code>QRME_RP_ID</code></sub></td><td valign="top"><sub><code>qrme.app</code></sub></td><td valign="top"><sub>The WebAuthn relying party — <b>the deployment's own domain</b>. Passkeys are bound to it, so leaving the default on a real deployment makes every signature fail as "made for a different site". A relying party id must be a <b>domain</b>: on a loopback install set <code>localhost</code>, never an IP (<a href="docs/signatures.md">docs/signatures.md</a>, <a href="docs/windows-hello-field-test.md">docs/windows-hello-field-test.md</a>)</sub></td></tr>
-<tr><td valign="top"><sub><code>QRME_RP_ORIGINS</code></sub></td><td valign="top"><sub>any</sub></td><td valign="top"><sub>Comma-separated allowlist of origins a signing ceremony may come from. Unset accepts any origin the relying party matches</sub></td></tr>
-<tr><td valign="top"><sub><code>QRME_GOOGLE_CLIENT_ID</code> / <code>QRME_GOOGLE_CLIENT_SECRET</code></sub></td><td valign="top"><sub>—</sub></td><td valign="top"><sub>Sign in with Google. Unset greys the button and shows why (<a href="docs/sign-in.md">docs/sign-in.md</a>)</sub></td></tr>
-<tr><td valign="top"><sub><code>QRME_APPLE_CLIENT_ID</code> / <code>QRME_APPLE_CLIENT_SECRET</code></sub></td><td valign="top"><sub>—</sub></td><td valign="top"><sub>Sign in with Apple. The secret is a <b>JWT you sign yourself and it expires within six months</b> — mint and check it with <code>scripts/mint_apple_secret.py</code> (<a href="docs/sign-in.md">docs/sign-in.md</a>)</sub></td></tr>
-<tr><td valign="top"><sub><code>QRME_CONSOLE_DIR</code></sub></td><td valign="top"><sub><code>app/dist</code></sub></td><td valign="top"><sub>Where the built studio is served from. Set it explicitly in a container — it resolves relative to the installed package otherwise, which is not where the build lands</sub></td></tr>
-<tr><td valign="top"><sub><code>QRME_CORS_ORIGINS</code></sub></td><td valign="top"><sub>off</sub></td><td valign="top"><sub>Comma-separated allowlist for a front-end on another origin; <code>*</code> for any. Off is right when the studio and API share an origin</sub></td></tr>
-</table>
-
-### Test
-
-```bash
-pytest
-```
-
-### Example flow
-
-```bash
-# 1. Create a profile (owner is age-verified)
-curl -s localhost:8000/profiles -H 'content-type: application/json' -d '{
-  "owner_id": "owner-1", "kind": "self", "display_name": "Dana",
-  "persona": "A retired teacher who loves gardening and dry humor.",
-  "verification": {"birthdate": "1984-06-01"}}'
-
-# 2. Register an interactor and set the relationship
-curl -s localhost:8000/interactors -d '{"display_name": "Sam", "birthdate": "2000-01-15"}' -H 'content-type: application/json'
-curl -s -X PUT localhost:8000/profiles/$PROFILE/relationships/$INTERACTOR \
-  -H 'content-type: application/json' \
-  -d '{"relationship_type": "grandchild", "nickname": "kiddo", "tone": "playful", "boundaries": ["finances"]}'
-
-# 3. Chat — reply is persona-, relationship-, and engagement-conditioned,
-#    and moderated before it is shown
-curl -s localhost:8000/profiles/$PROFILE/chat -H 'content-type: application/json' \
-  -d '{"interactor_id": "'$INTERACTOR'", "message": "Tell me about your garden!"}'
-```
 
 ## Made by
 
