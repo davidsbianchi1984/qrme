@@ -20,7 +20,7 @@ The screens referred to below are shown in
 
 ## The mechanisms on file
 
-The ten numbered mechanisms in
+The thirteen numbered mechanisms in
 [docs/invention-disclosure.md](docs/invention-disclosure.md). Each row
 names the technical problem in the machine, the particular structure this
 code uses to solve it, what that structure changes about how the machine
@@ -111,6 +111,27 @@ is photographed on the screens below.
 <td valign="top">Revoking one department's grant stops that department's contribution and nothing else; the plan names which department contributed what.</td>
 <td valign="top"><code>qrme/<wbr>organization.py</code>,<br><code>qrme/<wbr>delegation.py</code>,<br><code>qrme/<wbr>company.py</code> — <code>test_<wbr>organizations.py</code>,<br><code>test_<wbr>delegation.py</code>,<br><code>test_<wbr>a_<wbr>company_<wbr>is_<wbr>hired_<wbr>one_<wbr>interview_<wbr>at_<wbr>a_<wbr>time.py</code></td>
 </tr>
+<tr>
+<td valign="top">11</td>
+<td valign="top">A reference table large enough to answer without a model is too slow to search on every keystroke: each query scores every row, so the cost of an exhaustive table is paid on every character typed.</td>
+<td valign="top">Each row's title, skills and search terms are reduced to stems and written into an <strong>inverted index built once at load</strong> (<code>qrme/<wbr>occupations.py</code> <code>_index</code>), so a query scores only rows carrying at least one typed stem. Terms that begin a word rather than matching it are found through a <strong>sorted stem list walked by bisection</strong> (<code>_candidates</code>) — the contiguous run starting with the term — because scanning every stem to find them cost most of what the index saved.</td>
+<td valign="top">45,147 rows answer in <strong>108 ms rather than 900 ms</strong>, and the roster call fell from 1.5 s to 0.07 s. The table is loaded lazily and costs 0.45 s and 68 MB resident on first use, so server start is unchanged.</td>
+<td valign="top"><code>qrme/<wbr>occupations.py</code> — <code>test_<wbr>the_<wbr>pool_<wbr>answers_<wbr>what_<wbr>people_<wbr>type.py</code>,<br><code>tests/<wbr>ratchets.py</code> (<code>occupations.<wbr>positions</code>, <code>occupations.<wbr>families</code>)</td>
+</tr>
+<tr>
+<td valign="top">12</td>
+<td valign="top">A record set that must be complete and must ship inside the application cannot hold everything each record needs: carrying the full working knowledge of 45,000 occupations is hundreds of megabytes, and carrying none of it means the application cannot answer offline at all.</td>
+<td valign="top">Each record is <strong>split at the point of use into a bundled half and a fetched half</strong>. The bundled half — title, family, digital skills, connections, search terms — ships in the application; what a family shares is stored once in a family block and merged onto its rows at load (<code>_pool</code>), rather than repeated on every row. The heavy half is retrieved per record when a seat is opened (<code>company.<wbr>study_<wbr>seat</code>) and written onto that seat, so it is present from then on without the network.</td>
+<td valign="top">An exhaustive table ships at <strong>4.1 MB</strong>; storing the shared half per row instead of per family had made the same table 725 KB at 1,792 rows and would have tripled it again at 45,147. A seat opened once answers offline afterwards, and a title the table has never held is studied the same way rather than refused.</td>
+<td valign="top"><code>qrme/<wbr>occupations.py</code>,<br><code>qrme/<wbr>company.py</code>,<br><code>tools/<wbr>build_<wbr>occupations.py</code> — <code>test_<wbr>the_<wbr>founder_<wbr>reads_<wbr>the_<wbr>job_<wbr>before_<wbr>signing_<wbr>for_<wbr>it.py</code>,<br><code>test_<wbr>the_<wbr>pool_<wbr>answers_<wbr>what_<wbr>people_<wbr>type.py</code></td>
+</tr>
+<tr>
+<td valign="top">13</td>
+<td valign="top">Records arriving as one comma-separated run cannot be recovered by splitting on the separator when the records themselves contain it: "Cooks, Fast Food" is one record and splitting it yields two that name nothing.</td>
+<td valign="top">Boundaries are recovered by <strong>constraint rather than by delimiter</strong> (<code>tools/<wbr>split_<wbr>titles.py</code>): the run is sorted, so each record must sort after the one before it; a serial comma requires three items, never two; and a trailing qualifier is either lowercase or a short capitalised tail. A dynamic program over the fragments returns the segmentation satisfying all three. The places where the source itself is out of order are <strong>declared</strong>, because an unnamed inversion is absorbed by the solver as a merge — silently gluing two records into one.</td>
+<td valign="top">Reproduces <strong>392 records transcribed by hand, byte for byte</strong>, and recovers 961 from a run of 1,458 fragments. Four source inversions are named rather than hidden; before they were named the solver merged four pairs of distinct records without failing.</td>
+<td valign="top"><code>tools/<wbr>split_<wbr>titles.py</code>,<br><code>tools/<wbr>title_<wbr>families.py</code>,<br><code>tools/<wbr>build_<wbr>occupations.py</code> — <code>test_<wbr>the_<wbr>pool_<wbr>answers_<wbr>what_<wbr>people_<wbr>type.py</code> (<code>test_<wbr>every_<wbr>title_<wbr>on_<wbr>the_<wbr>lists_<wbr>reaches_<wbr>the_<wbr>pool</code>)</td>
+</tr>
 </tbody>
 </table>
 
@@ -130,6 +151,8 @@ Each row: the technical problem, the implementation with its own numbers, the te
 | The recoverable watermark | Text leaves the platform as plain characters; nothing in it says who produced it. | `qrme/watermark.py` stamps each approved render with a credential derived from the producing profile (`stamp`) and answers `lookup` from the text alone — no database of copies, the mark is in the bytes. | `test_watermark.py`, `test_watermark_recovery.py` | 148 |
 | Avatars, the registry and the stage | A face built from a portrait must be the same face in the bubble, the room and full screen, and must say it is synthetic. | `qrme/avatarforge.py` builds face, torso and `.glb` from one portrait; `qrme/avatarreg.py` is the registry every surface reads; the stage marks the figure `✦ AI` in its own pixels. | `test_avatars.py`, `test_the_avatar_registry.py`, `test_the_avatar_takes_the_screen.py` | 44, 205 |
 | The Company Builder | A staffed digital company built by hand is a pile of unrelated profiles. | `qrme/company.py` founds a company, opens seats, drafts each interview, and signs a hire into a department under the founder's account. | `test_a_company_is_hired_one_interview_at_a_time.py` | 210, 146 |
+| The carried occupation table | Asked for a roster with no model reachable, the Builder answered with three canned seats — the trade, a front desk, a bookkeeper — because it had nothing else to answer from. | `qrme/occupations.py` carries 45,147 positions in 16 families, each with the digital skills and connections the work needs; `for_trade` ranks the trade above the founder's own adjectives and never offers a taxonomy's residual bucket as a job. Search is by what the work *does*, not its name. | `test_the_pool_answers_what_people_type.py` | — |
+| The study a founder reads before signing | The study of a trade ran inside the interview draft, so it grounded every question and was shown to nobody: a seat was signed against an understanding the founder had no way to read. | `company.study_seat` returns the skills and connections off the carried table — legible with nothing reachable — plus the fetched working knowledge and the name of whoever answered it; `keep_study` stores the founder's edits, and the signature is disabled until the study is on screen. | `test_the_founder_reads_the_job_before_signing_for_it.py` | — |
 | The marketplace and the shops | A listing and a desk are different things that one table would collapse. | `qrme/marketplace.py` lists and licenses profiles; `qrme/shops.py` keeps a shop as its own row with its own hours, never a desk. | `test_marketplace_cards.py`, `test_marketplace_search.py`, `test_a_shop_is_not_a_desk.py` | 152, 187 |
 | The bodies a profile may bind | A profile that can drive any robot can drive the wrong one. | `qrme/robotics.py` keeps an allowlist of commands per model and a learned-task list per robot; the wrist's quick ring is the intersection. | `test_the_body_market.py` | 163 |
 | Wearables that pair and never listen | A paired watch that carries readings through the platform makes the platform a health record. | `qrme/wearables.py` stores only the deposit address the owner chose; readings go from the device's app to the guardian directly; a device that senses nothing is refused a guardian. | `test_wearables.py`, `test_two_microphones_two_destinations.py` | faces 01–11 |
