@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.1.7] - 2026-09-05
+
 ### Added
 
 - **The occupation pool: 45,147 positions the app carries.** The Company
@@ -18145,7 +18147,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.6...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.7...HEAD
+[3.1.7]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.6...app-v3.1.7
 [3.1.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.5...app-v3.1.6
 [3.1.5]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.4...app-v3.1.5
 [3.1.4]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.3...app-v3.1.4
