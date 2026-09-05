@@ -597,6 +597,13 @@ def _ratchet_files() -> int:
     return len(_ratchets())
 
 
+def _backup_git_calls() -> int:
+    """The git invocations the backup scripts build, run against a scratch
+    repository so a flag git does not have fails in the suite."""
+    from .test_a_flag_the_tool_does_not_have import _calls
+    return len(_calls())
+
+
 def _readme_files() -> int:
     from .test_readme_scripture import _readmes
     return len(_readmes())
@@ -1074,6 +1081,8 @@ RATCHETS: tuple[Ratchet, ...] = (
             "each long screen's slices are a table of their own"),
     Ratchet("route.verbs_min", 4, _verbs_min,
             "the distinct verbs the thinnest-reading shell reports"),
+    Ratchet("backup.git_calls", 5, _backup_git_calls,
+            "the git invocations the backup scripts build"),
     Ratchet("readme.files", 7, _readme_files,
             "the READMEs the passage check reads"),
     Ratchet("workflow.files", 5, _workflow_files,

@@ -6,6 +6,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **A flag git does not have.** `git remote update` takes `--prune` and
+  nothing else. A `--quiet` was added to it while fixing the stderr crash,
+  so git answered every run with ``error: unknown option `quiet'`` and exit
+  129 — which `master-backup.ps1`'s own repair logic read as "this mirror is
+  broken" and acted on, deleting three healthy repositories and re-cloning
+  them on every run. The output said `repository: unusable, cloning again`
+  where it should have said `updating`. Found on a real refresh, where it
+  re-fetched about a gigabyte it already had.
+  `test_a_flag_the_tool_does_not_have.py` now reads every `git remote
+  update` and `git clone` invocation out of both scripts and runs it against
+  a scratch repository, so a flag that does not exist fails in the suite
+  rather than on somebody's machine — and it was confirmed to fail on the
+  bug before the fix went in.
+
 ## [3.1.6] - 2026-09-05
 
 - **A file named FAILED is a claim about this run.** The backup scripts

@@ -96,7 +96,7 @@ foreach ($repo in $Repos) {
         $url = "https://github.com/$Owner/$repo.git"
         if (Test-Path $mirror) {
             Write-Host "  repository: updating"
-            $code = Invoke-Native { git -C $mirror remote update --prune --quiet }
+            $code = Invoke-Native { git -C $mirror remote update --prune }
             if ($code -ne 0) {
                 # A run cut short mid-clone leaves a folder that is not yet a
                 # repository, and every later update fails against it. The
