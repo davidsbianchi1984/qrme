@@ -1,0 +1,294 @@
+Legislators
+Senior government officials
+Traditional chiefs and heads of villages
+Senior officials of special-interest organizations
+Managing directors and chief executives
+Finance managers
+Human resource managers
+Policy and planning managers
+Business services and administration managers not elsewhere classified
+Sales and marketing managers
+Advertising and public relations managers
+Research and development managers
+Agricultural and forestry production managers
+Aquaculture and fisheries production managers
+Manufacturing managers
+Mining managers
+Construction managers
+Supply, distribution and related managers
+Information and communications technology service managers
+Professional services managers not elsewhere classified
+Hotel managers
+Restaurant managers
+Retail and wholesale trade managers
+Other services managers
+Physicists and astronomers
+Meteorologists
+Chemists
+Geologists and geophysicists
+Mathematicians, actuaries and statisticians
+Biologists, botanists, zoologists and related professionals
+Farming, forestry and fisheries advisers
+Environmental protection professionals
+Industrial and production engineers
+Civil engineers
+Environmental engineers
+Mechanical engineers
+Chemical engineers
+Mining engineers, metallurgists and related professionals
+Engineering professionals not elsewhere classified
+Electrical engineers
+Electronics engineers
+Telecommunications engineers
+Building architects
+Landscape architects
+Product and garment designers
+Town and traffic planners
+Cartographers and surveyors
+Graphic and multimedia designers
+Generalist medical practitioners
+Specialist medical practitioners
+Nursing professionals
+Midwifery professionals
+Traditional and complementary medicine professionals
+Paramedical practitioners
+Veterinarians
+Dentists
+Pharmacists
+Environmental and occupational health and hygiene professionals
+Physiotherapists
+Dieticians and nutritionists
+Audiologists and speech therapists
+Optometrists and ophthalmic opticians
+Health professionals not elsewhere classified
+University and higher education teachers
+Vocational education teachers
+Secondary education teachers
+Primary school teachers
+Early childhood educators
+Education methods specialists
+Special needs teachers
+Other teaching professionals
+Accountants
+Financial and investment advisers
+Financial analysts
+Management and organization analysts
+Policy administration professionals
+Personnel and careers professionals
+Training and staff development professionals
+Advertising and marketing professionals
+Public relations professionals
+Technical and medical sales professionals (excluding ICT)
+Information and communications technology sales professionals
+Systems analysts
+Software developers
+Web and multimedia developers
+Applications programmers
+Software and applications developers and analysts not elsewhere classified
+Database designers and administrators
+Systems administrators
+Computer network professionals
+Database and network professionals not elsewhere classified
+Lawyers
+Judges
+Legal professionals not elsewhere classified
+Archivists and curators
+Librarians and related information professionals
+Economists
+Sociologists, anthropologists and related professionals
+Philosophers, historians and political scientists
+Psychologists
+Social work and counselling professionals
+Religious professionals
+Authors and related writers
+Journalists
+Translators, interpreters and other linguists
+Visual artists
+Musicians, singers and composers
+Dancers and choreographers
+Film, stage and related directors and producers
+Actors
+Announcers on radio, television and other media
+Creative and performing artists not elsewhere classified
+Chemical and physical science technicians
+Civil engineering technicians
+Electrical engineering technicians
+Electronics engineering technicians
+Mechanical engineering technicians
+Chemical engineering technicians
+Mining and metallurgical technicians
+Draughtspersons
+Physical and engineering science technicians not elsewhere classified
+Mining supervisors
+Manufacturing supervisors
+Construction supervisors
+Power production plant operators
+Incinerator and water treatment plant operators
+Chemical processing plant controllers
+Petroleum and natural gas refining plant operators
+Metal production process controllers
+Process control technicians not elsewhere classified
+Life science technicians (excluding medical)
+Medical and pathology laboratory technicians
+Pharmaceutical technicians and assistants
+Medical and dental prosthetic technicians
+Nursing associate professionals
+Midwifery associate professionals
+Traditional and complementary medicine associate professionals
+Medical and dental assistants
+Veterinary technicians and assistants
+Medical records and health information technicians
+Community health workers
+Ambulance workers
+Health associate professionals not elsewhere classified
+Financial and insurance services agents
+Real estate agents and property managers
+Legal and related associate professionals
+Social work associate professionals
+Religious associate professionals
+Sports and fitness workers
+Artistic and cultural associate professionals
+Chefs
+Information and communications technology operations technicians
+Information and communications technology user support technicians
+Computer network and systems technicians
+Web technicians
+Broadcasting and audio-visual technicians
+Telecommunications engineering technicians
+Medical imaging and therapeutic equipment technicians
+Securities and finance dealers and brokers
+Credit and loans officers
+Accounting associate professionals
+Statistical, mathematical and related associate professionals
+Valuers and loss assessors
+Administrative and specialised secretaries
+Legal secretaries
+Medical secretaries
+Administrative and specialised secretaries not elsewhere classified
+Customs and border inspectors
+Government social benefits officials
+Government tax and excise officials
+Government licensing officials
+Police inspectors and detectives
+Waiters
+Bartenders
+Building and housekeeping supervisors
+Other personal services workers
+Travel attendants and travel stewards
+Transport conductors
+Travel guides
+Conference and event planners
+Travel consultants and clerks
+Contact centre information clerks
+Hotel receptionists
+Enquiry clerks
+Receptionists (general)
+Client information workers not elsewhere classified
+Bank tellers and related clerks
+Bookmakers, croupiers and related gaming workers
+Pawnbrokers and money-lenders
+Debt-collectors and related workers
+Numerical clerks not elsewhere classified
+Stock clerks
+Production clerks
+Transport clerks
+Library clerks
+Mail carriers and sorting clerks
+Coding, proof-reading and related clerks
+Filing and copying clerks
+Personnel clerks
+Clerical support workers not elsewhere classified
+Child care workers
+Teachers aides
+Health care assistants
+Home-based personal care workers
+Personal care workers in health services not elsewhere classified
+Fire-fighters
+Police officers
+Prison guards
+Security guards
+Protective services workers not elsewhere classified
+Market gardeners and crop growers
+Animal producers
+Mixed crop and animal producers
+Forestry and related workers
+Fishery workers, hunters and trappers
+Subsistence crop farmers
+Subsistence livestock farmers
+Subsistence mixed crop and livestock farmers
+Subsistence fishers, hunters, trappers and gatherers
+Building frame and related trades workers
+Bricklayers and related workers
+Stonemasons, stone cutters, splitters and carvers
+Concrete placers, concrete finishers and related workers
+Carpenters and joiners
+Roofers
+Floor layers and tile setters
+Plasterers
+Insulation workers
+Glaziers
+Plumbers and pipe fitters
+Air conditioning and refrigeration mechanics
+Painters and related workers
+Spray painters and varnishers
+Building structure cleaners
+Sheet metal workers
+Structural metal preparers and erectors
+Welders and flamecutters
+Blacksmiths, hammersmiths and forging press workers
+Toolmakers and related workers
+Metal working machine tool setters and operators
+Metal polishers, wheel grinders and tool sharpeners
+Motor vehicle mechanics and repairers
+Aircraft engine mechanics and repairers
+Agricultural and industrial machinery mechanics and repairers
+Bicycle and related repairers
+Precision instrument makers and repairers
+Musical instrument makers and tuners
+Jewellery and precious-metal workers
+Potters and related workers
+Glass makers, cutters, grinders and finishers
+Sign writers, decorative painters, engravers and etchers
+Handicraft workers in wood, basketry and related materials
+Handicraft workers in textile, leather and related materials
+Handicraft workers not elsewhere classified
+Pre-press technicians
+Printers
+Print finishing and binding workers
+Building and related electricians
+Electrical mechanics and fitters
+Electrical line installers and repairers
+Electronics mechanics and servicers
+Information and communications technology installers and servicers
+Butchers, fishmongers and related food preparers
+Bakers, pastry-cooks and confectionery makers
+Dairy-products makers
+Fruit, vegetable and related preservers
+Food and beverage tasters and graders
+Tobacco preparers and tobacco products makers
+Wood treaters
+Cabinet-makers and related workers
+Basket weavers and related workers
+Woodworking-machine tool setters and operators
+Garment and related pattern-makers and cutters
+Sewing, embroidery and related workers
+Upholsterers and related workers
+Pelt dressers, tanners and fellmongers
+Shoemakers and related workers
+Underwater divers
+Mining and quarrying labourers
+Civil engineering labourers
+Building construction labourers
+Hand packers
+Manufacturing labourers
+Transport and storage labourers
+Food preparation assistants
+Street and related service workers
+Refuse workers
+Sweepers and related labourers
+Agricultural, forestry and fishery labourers
+Mining and construction labourers
+Armed forces occupations
+Commissioned armed forces officers
+Non-commissioned armed forces officers
+Other ranks

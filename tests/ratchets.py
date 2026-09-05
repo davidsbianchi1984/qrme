@@ -933,6 +933,16 @@ def _shellstable_rows(shell: str):
     return go
 
 
+def _pool_positions() -> int:
+    from qrme import occupations
+    return occupations.count()
+
+
+def _pool_families() -> int:
+    from qrme import occupations
+    return len(occupations.families())
+
+
 RATCHETS: tuple[Ratchet, ...] = (
     Ratchet("screens.declared.android", 13, _screens_declared("android"),
             "the screens android declares, as the navigation scan reads them"),
@@ -1226,6 +1236,10 @@ RATCHETS: tuple[Ratchet, ...] = (
             "rows in Android's own L10n table"),
     Ratchet("l10n.held.windows", 880, _l10n("windows", "held"),
             "rows in the desktop's own L10n table"),
+    Ratchet("occupations.positions", 1700, _pool_positions,
+            "positions the app carries without a model or a network"),
+    Ratchet("occupations.families", 16, _pool_families,
+            "families a founder can browse the pool by"),
     Ratchet("route.calls.console", 340, _calls("console"),
             "call sites the route audit reads out of the console"),
     Ratchet("route.calls.ios", 340, _calls("ios"),
