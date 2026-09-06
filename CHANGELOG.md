@@ -6,6 +6,32 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The deploy block checks its own versions.** `docker/beta-versions.sh`
+  is the last line of the runbook's deploy block. It reads the three
+  public names from the same `.env` the compose line uses, asks each
+  what version it answers, prints the three beside the version in this
+  checkout's `pyproject.toml`, and exits non-zero if any disagrees.
+
+  The from-outside check in step 5 stays — it is the only place
+  reachability is proven — but it has two shells and a choice between
+  them, and the choice has now been made wrong three times running: a
+  Windows handheld SSH'd into Ubuntu is sitting at a Unix prompt,
+  `curl.exe` is not a program there, and the deploy reads as broken
+  after it went perfectly. This line has no choice in it. It runs where
+  the deploy block already put you, and it answers the one question the
+  outside check was actually catching — *did the pull fetch the thing
+  you are releasing* — on the deploy that caused a drift rather than
+  two releases later.
+
+  The script reads `.env` with `sed`, never sources it: the file holds
+  the master key. Six tests run it against three local servers standing
+  in for the names — all three agreeing, one on the old version, one
+  not answering — and one holds that its name does not contain
+  `/health`, because the page's own guards find check blocks by that
+  string and a check block may not begin with `ssh`.
+
 ## [3.3.0] - 2026-09-06
 
 ### Added

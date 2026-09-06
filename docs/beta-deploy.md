@@ -719,7 +719,28 @@ cd /srv/pdi      && git checkout main && git pull --ff-only
 cd /srv/qrme
 sh docker/jim-box-install.sh
 docker compose -f docker/beta-compose.yml --env-file .env up -d --build
+sh docker/beta-versions.sh
 ```
+
+The last line prints what each of the three names answers beside the
+version this checkout carries, and exits non-zero if they disagree:
+
+    QRME  sntheticprofiles.com             3.3.0
+    JIM   jim-mini.com                     3.3.0
+    PDI   pdisystems.net                   3.3.0
+    all three answer 3.3.0
+
+It is in the deploy block, on the host, on purpose. The check in step 5
+below runs from your own machine, and that is still the only place
+reachability is proven — but step 5 has two shells and a choice between
+them, and the choice has now been made wrong three times running, from a
+Windows handheld sitting at a Unix prompt. This line has no choice in it.
+It answers the one question step 5 was actually catching — *did the pull
+fetch the thing you are releasing* — and it answers it before you have left
+the window, against the number in `pyproject.toml` rather than against
+your memory of what you just released. A line reading `2.5.0  <- this
+checkout is 2.7.0` is the branch drift described below, caught on the
+deploy that caused it rather than two releases later.
 
 The `sh docker/jim-box-install.sh` line loads the AppArmor profile the
 assistant's box needs (section 4, *The assistant's box*). It is idempotent
