@@ -5278,7 +5278,8 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 /* The whole catalogue is on this rung, and the whole catalogue is not
    what a founder is deciding between — they are looking for one
    machine. It scrolls, so the rung stays the size of a rung. */
-.com-rung .com-scroll { max-height: 320px; overflow-y: auto;
+.com-rung .com-scroll, .com-file .com-scroll {
+  max-height: 320px; overflow-y: auto;
   display: flex; flex-direction: column; gap: 8px; }
 
 /* The employee file: the two sections that make a hired employee a thing

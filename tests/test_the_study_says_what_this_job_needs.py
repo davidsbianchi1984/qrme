@@ -269,3 +269,170 @@ def test_the_tool_matcher_scores_rather_than_guesses():
     assert "the system" not in by and "the system" not in missing
     # A real system with no connector is named rather than dropped.
     assert missing == ["the practice management system"]
+
+
+# --- a truncation is not a study --------------------------------------------
+
+def test_the_marker_alone_is_not_a_study():
+    """`llm._capped` returns `CONTINUES` on its own when the model
+    produced no text before hitting the ceiling. Every caller then sees a
+    non-empty string, and `hire` files anything non-empty as the trade's
+    knowledge — which is how a real employee on the live deployment came
+    to carry a source item whose entire content was "cut off here"."""
+    assert not companies.a_real_study(llm.CONTINUES)
+    assert not companies.a_real_study("")
+    assert not companies.a_real_study(None)
+    # Cut off after one clause is still not something to write into
+    # somebody's memory as what they know about their profession.
+    assert not companies.a_real_study("A radiologist reads scans. "
+                                      + llm.CONTINUES)
+    # Cut off after a real answer is one, and keeps the marker so the
+    # founder can see it was cut.
+    assert companies.a_real_study("y" * 250 + "\n\n" + llm.CONTINUES)
+
+
+def test_a_truncated_study_is_shown_and_not_stored(client, monkeypatch):
+    """Two different jobs. The founder sees what came back; the seat does
+    not keep it, so the signature has nothing to file."""
+    from qrme import db
+    from tests.test_capabilities import auth_header, make_profile
+    from tests.test_a_company_is_hired_one_interview_at_a_time import (
+        _found, _seat)
+
+    monkeypatch.setattr(llm, "get_provider",
+                        lambda cloud=None: _Says(llm.CONTINUES))
+    me = make_profile(client)
+    co = _found(client, me, name="Bianchi Imaging", industry="imaging")
+    seat = _seat(client, me, co, title="Radiologist", department="Imaging")
+    body = client.post(f"/companies/{co['id']}/seats/{seat['id']}/study",
+                       headers=auth_header(me)).json()
+    # Shown: hiding the truncation would leave the founder wondering why
+    # the skills below it look generic.
+    assert llm.CONTINUES in body["knowledge"]
+    # Not stored.
+    held = db.connect().execute(
+        "SELECT study FROM company_seats WHERE id=?", (seat["id"],)).fetchone()
+    assert held["study"] is None
+
+    # And the signature files no trade knowledge for it.
+    pid = _hire(client, me, co, seat, "Amara Osei").json()["profile_id"]
+    titles = [r["title"] for r in db.connect().execute(
+        "SELECT title FROM source_items WHERE profile_id=?", (pid,))]
+    assert "The trade: Radiologist" not in titles, (
+        "a truncation was written into this employee's memory as what it "
+        "knows about its profession")
+    # The rest of the hire is untouched — the position is still filed.
+    assert "The position: Radiologist (Bianchi Imaging)" in titles
+
+
+# --- re-evaluating a job, without firing anybody -----------------------------
+
+def test_a_hired_seat_can_be_studied_again(client, monkeypatch):
+    """The whole point: correct a bad study without destroying the person.
+
+        asked     re-evaluate a job/position without having to fire and
+                  rehire
+        mattered  everything a study produced was written at the
+                  signature and nowhere else
+
+    A truncated study — the one that shipped a live employee whose trade
+    knowledge read "cut off here, not finished" — could only be fixed by
+    retiring the profile and making a new one, which throws away its id,
+    its charter, its colleagues and everything ever said to it.
+    """
+    from qrme import db
+    from tests.test_capabilities import auth_header, make_profile
+    from tests.test_a_company_is_hired_one_interview_at_a_time import (
+        _found, _seat)
+
+    # Hire against a study that came back truncated.
+    monkeypatch.setattr(llm, "get_provider",
+                        lambda cloud=None: _Says(llm.CONTINUES))
+    me = make_profile(client)
+    co = _found(client, me, name="Bianchi Imaging", industry="imaging")
+    seat = _seat(client, me, co, title="Radiologist", department="Imaging")
+    client.post(f"/companies/{co['id']}/seats/{seat['id']}/study",
+                headers=auth_header(me))
+    hired = _hire(client, me, co, seat, "Amara Osei").json()
+    pid = hired["profile_id"]
+    titles = lambda: [r["title"] for r in db.connect().execute(
+        "SELECT title FROM source_items WHERE profile_id=?", (pid,))]
+    assert "The trade: Radiologist" not in titles()
+
+    # Now a model that answers. Same seat, same person.
+    real = "A radiologist reads imaging studies and dictates reports. " * 6
+    monkeypatch.setattr(llm, "get_provider", lambda cloud=None: _Says(
+        real + '{"skills": ["image report dictation"], "connections": '
+        '["imaging technologists"], "tools": ["Google Calendar"]}'))
+    body = client.post(f"/companies/{co['id']}/seats/{seat['id']}/study",
+                       headers=auth_header(me)).json()
+    kept = client.post(
+        f"/companies/{co['id']}/seats/{seat['id']}/study/keep",
+        json={"skills": body["skills"], "connections": body["connections"]},
+        headers=auth_header(me)).json()
+    assert kept["carried_to_employee"] is True
+
+    # The trade is on the person now, and so is who they reach.
+    assert "The trade: Radiologist" in titles()
+    assert "Who this job reaches: Radiologist" in titles()
+    prof = client.get(f"/profiles/{pid}").json()
+    assert "imaging technologists" in prof["works_with"]
+    assert prof["trade_domain"] == "healthcare"
+
+    # And it is the same employee — not a replacement.
+    assert client.get(f"/companies/{co['id']}",
+                      headers=auth_header(me)).json()["seats"][0][
+        "profile_id"] == pid
+
+
+def test_studying_twice_replaces_rather_than_piles_up(client, monkeypatch):
+    """An employee grounding on two contradictory accounts of its own
+    trade is worse off than one grounding on the older of them."""
+    from qrme import db
+    from tests.test_capabilities import auth_header, make_profile
+    from tests.test_a_company_is_hired_one_interview_at_a_time import (
+        _found, _seat)
+
+    long_study = "A radiologist reads imaging studies all day long. " * 6
+    monkeypatch.setattr(llm, "get_provider", lambda cloud=None: _Says(
+        long_study + '{"skills": ["image report dictation"], '
+        '"connections": ["imaging technologists"], "tools": []}'))
+    me = make_profile(client)
+    co = _found(client, me, name="Bianchi Imaging", industry="imaging")
+    seat = _seat(client, me, co, title="Radiologist", department="Imaging")
+    client.post(f"/companies/{co['id']}/seats/{seat['id']}/study",
+                headers=auth_header(me))
+    pid = _hire(client, me, co, seat, "Amara Osei").json()["profile_id"]
+
+    for _ in range(3):
+        body = client.post(
+            f"/companies/{co['id']}/seats/{seat['id']}/study",
+            headers=auth_header(me)).json()
+        client.post(f"/companies/{co['id']}/seats/{seat['id']}/study/keep",
+                    json={"skills": body["skills"],
+                          "connections": body["connections"]},
+                    headers=auth_header(me))
+
+    rows = [r["title"] for r in db.connect().execute(
+        "SELECT title FROM source_items WHERE profile_id=?", (pid,))]
+    assert rows.count("The trade: Radiologist") == 1, rows
+    assert rows.count("Who this job reaches: Radiologist") == 1, rows
+
+
+def test_keeping_a_study_on_an_open_seat_touches_no_profile(client,
+                                                            monkeypatch):
+    """The pre-hire path is unchanged: there is nobody to carry it to."""
+    from tests.test_capabilities import auth_header, make_profile
+    from tests.test_a_company_is_hired_one_interview_at_a_time import (
+        _found, _seat)
+    monkeypatch.setattr(llm, "get_provider", lambda cloud=None: _Says("{}"))
+    me = make_profile(client)
+    co = _found(client, me, name="Bianchi Imaging", industry="imaging")
+    seat = _seat(client, me, co, title="Radiologist", department="Imaging")
+    body = client.post(f"/companies/{co['id']}/seats/{seat['id']}/study",
+                       headers=auth_header(me)).json()
+    kept = client.post(
+        f"/companies/{co['id']}/seats/{seat['id']}/study/keep",
+        json={"skills": body["skills"], "connections": body["connections"]},
+        headers=auth_header(me)).json()
+    assert kept["carried_to_employee"] is False

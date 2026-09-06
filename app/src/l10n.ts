@@ -991,6 +991,12 @@ const CHROME: Table = {
   "com.study": {
     en: "Download knowledge", es: "Descargar conocimiento", fr: "Télécharger le savoir", de: "Wissen herunterladen", pt: "Descarregar conhecimento", it: "Scarica le conoscenze", ja: "知識をダウンロード", zh: "下载知识", hi: "ज्ञान डाउनलोड करें", ar: "نزّل المعرفة",
   },
+  "com.reevaluate": {
+    en: "Re-evaluate the job", es: "Reevaluar el puesto", fr: "Réévaluer le poste", de: "Die Stelle neu bewerten", pt: "Reavaliar o cargo", it: "Rivalutare la posizione", ja: "職務を見直す", zh: "重新评估这份工作", hi: "काम का पुनर्मूल्यांकन करें", ar: "أعد تقييم الوظيفة",
+  },
+  "com.study.again": {
+    en: "Keeping these updates the employee already in this seat — same person, same charter, same colleagues.", es: "Guardar esto actualiza al empleado que ya ocupa el puesto: misma persona, mismo contrato, mismos colegas.", fr: "Conserver ceci met à jour la personne déjà en poste — même personne, même charte, mêmes collègues.", de: "Übernehmen aktualisiert die Person, die schon auf dieser Stelle sitzt — dieselbe Person, dieselbe Charta, dieselben Kolleginnen und Kollegen.", pt: "Guardar isto actualiza o funcionário que já ocupa o lugar: mesma pessoa, mesma carta, mesmos colegas.", it: "Conservare aggiorna la persona già al posto: stessa persona, stessa carta, stessi colleghi.", ja: "保存すると、この席の現在の担当者が更新されます。同じ人、同じ契約、同じ同僚です。", zh: "保存后会更新已在该岗位上的员工——同一个人、同一份契约、同样的同事。", hi: "इसे सहेजने पर इस सीट पर पहले से मौजूद कर्मचारी अपडेट होगा — वही व्यक्ति, वही चार्टर, वही सहकर्मी।", ar: "الحفظ يحدّث الموظف الموجود فعلًا في هذا المقعد — الشخص نفسه، والميثاق نفسه، والزملاء أنفسهم.",
+  },
   "com.study.busy": {
     en: "Studying the trade…", es: "Estudiando el oficio…", fr: "Étude du métier…", de: "Das Handwerk wird studiert…", pt: "A estudar o ofício…", it: "Studio del mestiere…", ja: "職務を調べています…", zh: "正在研究这门职业…", hi: "पेशा पढ़ा जा रहा है…", ar: "جارٍ دراسة المهنة…",
   },

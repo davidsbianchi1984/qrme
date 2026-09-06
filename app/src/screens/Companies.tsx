@@ -575,11 +575,43 @@ export function Companies({ onOpenProfile }: {
                 </button>
               )}
 
+              {/* Re-evaluate the job. The same two presses as before the
+                  hire — study, then keep — reaching the person who is
+                  already in the seat. Everything a study produced used
+                  to be written at the signature and nowhere else, so a
+                  study that came back truncated could only be corrected
+                  by retiring the employee and making a new one: a new
+                  id, an empty charter, no colleagues, nothing anybody
+                  had ever said to them. */}
+              {s.status === "hired" && study?.seatId !== s.id && (
+                <button className="muted small" disabled={busy}
+                        data-go="reevaluate"
+                        onClick={act(async () => {
+                          const found = await api.studySeat(
+                            open.id, s.id, token);
+                          setStudy({
+                            seatId: s.id, found: found.found,
+                            knownAs: found.known_as,
+                            skills: found.skills,
+                            connections: found.connections,
+                            tailored: found.tailored,
+                            tools: found.tools,
+                            toolsNamed: found.tools_named,
+                            knowledge: found.knowledge,
+                            studiedBy: found.studied_by,
+                          });
+                        })}>
+                  {busy ? tr("com.study.busy", lang)
+                        : tr("com.reevaluate", lang)}
+                </button>
+              )}
+
               {/* The employee file, in place: where they work and how to
                   hand them out — no other menu involved, because the
                   founder is standing here in front of the seat. */}
               {s.status === "hired" && s.profile_id && fileFor !== s.id && (
                 <button className="muted small" disabled={busy}
+                        data-go="file"
                         onClick={act(async () => {
                           await loadFile(s.profile_id!);
                           setHandoff(null);
@@ -625,6 +657,13 @@ export function Companies({ onOpenProfile }: {
                       hidden — see qrme/robotics.py on why hiding a
                       published machine would be the worse lie. */}
                   <p className="muted small">{tr("com.work.shelf", lang)}</p>
+                  {/* The whole catalogue, capped. The rung got this fix
+                      when the photograph found it at 6,974 pixels; the
+                      file kept the uncapped copy and measured 5,626,
+                      which is the same defect wearing a different
+                      screen. A founder here is looking for one machine,
+                      not reading a catalogue. */}
+                  <div className="com-scroll">
                   {shelf && Object.entries(shelf.by_maker).map(
                     ([maker, models]) => (
                     <div key={maker} className="com-shelf">
@@ -651,6 +690,7 @@ export function Companies({ onOpenProfile }: {
                       ))}
                     </div>
                   ))}
+                  </div>
 
                   <div className="row">
                     <select value={screenKind}
@@ -769,6 +809,127 @@ export function Companies({ onOpenProfile }: {
                   {h.display_name}
                 </button>
               ))}
+              {/* The study card, at the seat rather than inside the
+                  interview panel. It was nested there because the only
+                  way to reach a study was on the way to a signature;
+                  a filled seat can be re-evaluated now, and that press
+                  has no interview above it to live under. */}
+                {study?.seatId === s.id && (
+                  <div className="com-study" data-screen="213">
+                    {!study.found && (
+                      <p className="muted small">
+                        {tr("com.study.unknown", lang)}
+                      </p>
+                    )}
+                    {study.found && study.knownAs
+                      && study.knownAs !== s.title && (
+                      <p className="muted small">{study.knownAs}</p>
+                    )}
+
+                    {/* Where these came from. Six generic skills look
+                        the same whether the study found nothing
+                        specific or was never reachable to be asked,
+                        and those are different things to be told. */}
+                    <p className="muted small">
+                      {study.tailored > 0
+                        ? fill(tr("com.study.tailored", lang),
+                               { n: String(study.tailored) })
+                        : tr("com.study.family", lang)}
+                    </p>
+
+                    <b className="small">{tr("com.study.skills", lang)}</b>
+                    {study.skills.map((k, i) => (
+                      <div key={k + i} className="com-line">
+                        <span style={{ flex: 1 }}>{k}</span>
+                        <button className="muted small"
+                                onClick={() => setStudy({
+                                  ...study,
+                                  skills: study.skills.filter(
+                                    (_, j) => j !== i) })}>
+                          {tr("com.study.drop", lang)}
+                        </button>
+                      </div>
+                    ))}
+                    <div className="com-add">
+                      <input value={addSkill}
+                             placeholder={tr("com.study.add", lang)}
+                             onChange={(e) => setAddSkill(e.target.value)} />
+                      <button disabled={!addSkill.trim()}
+                              onClick={() => {
+                                setStudy({ ...study,
+                                  skills: [...study.skills,
+                                           addSkill.trim()] });
+                                setAddSkill("");
+                              }}>
+                        {tr("com.study.add", lang)}
+                      </button>
+                    </div>
+
+                    <b className="small">{tr("com.study.conns", lang)}</b>
+                    {study.connections.map((c, i) => (
+                      <div key={c + i} className="com-line">
+                        <span style={{ flex: 1 }}>{c}</span>
+                        <button className="muted small"
+                                onClick={() => setStudy({
+                                  ...study,
+                                  connections: study.connections.filter(
+                                    (_, j) => j !== i) })}>
+                          {tr("com.study.drop", lang)}
+                        </button>
+                      </div>
+                    ))}
+                    <div className="com-add">
+                      <input value={addConn}
+                             placeholder={tr("com.study.add", lang)}
+                             onChange={(e) => setAddConn(e.target.value)} />
+                      <button disabled={!addConn.trim()}
+                              onClick={() => {
+                                setStudy({ ...study,
+                                  connections: [...study.connections,
+                                                addConn.trim()] });
+                                setAddConn("");
+                              }}>
+                        {tr("com.study.add", lang)}
+                      </button>
+                    </div>
+
+                    <b className="small">
+                      {tr("com.study.knowledge", lang)}
+                    </b>
+                    <p className="muted small com-study-text">
+                      {study.knowledge}
+                    </p>
+                    {/* Who answered, by name, so a real study is
+                        telling apart from the local fallback standing
+                        in for one. */}
+                    {study.studiedBy && (
+                      <p className="muted small">
+                        {tr("com.study.by", lang)}: {study.studiedBy}
+                      </p>
+                    )}
+
+                    {/* Keeping the study is what opens the kit. The
+                        founder has just read what the job needs;
+                        that is the moment to decide what the person
+                        doing it works with. */}
+                    {s.status === "hired" && (
+                      <p className="muted small">
+                        {tr("com.study.again", lang)}
+                      </p>
+                    )}
+                    <button disabled={busy} data-go="keep"
+                            onClick={act(async () => {
+                              await api.keepStudy(open.id, s.id, {
+                                skills: study.skills,
+                                connections: study.connections,
+                              }, token);
+                              await startKit(s.id);
+                            })}>
+                      {tr("com.study.keep", lang)}
+                    </button>
+                  </div>
+                )}
+
               {s.status === "open" && interview?.seatId !== s.id && (
                 <button disabled={busy} data-go="interview"
                         onClick={act(async () => {
@@ -825,117 +986,6 @@ export function Companies({ onOpenProfile }: {
                       {busy ? tr("com.study.busy", lang)
                             : tr("com.study", lang)}
                     </button>
-                  )}
-
-                  {study?.seatId === s.id && (
-                    <div className="com-study" data-screen="213">
-                      {!study.found && (
-                        <p className="muted small">
-                          {tr("com.study.unknown", lang)}
-                        </p>
-                      )}
-                      {study.found && study.knownAs
-                        && study.knownAs !== s.title && (
-                        <p className="muted small">{study.knownAs}</p>
-                      )}
-
-                      {/* Where these came from. Six generic skills look
-                          the same whether the study found nothing
-                          specific or was never reachable to be asked,
-                          and those are different things to be told. */}
-                      <p className="muted small">
-                        {study.tailored > 0
-                          ? fill(tr("com.study.tailored", lang),
-                                 { n: String(study.tailored) })
-                          : tr("com.study.family", lang)}
-                      </p>
-
-                      <b className="small">{tr("com.study.skills", lang)}</b>
-                      {study.skills.map((k, i) => (
-                        <div key={k + i} className="com-line">
-                          <span style={{ flex: 1 }}>{k}</span>
-                          <button className="muted small"
-                                  onClick={() => setStudy({
-                                    ...study,
-                                    skills: study.skills.filter(
-                                      (_, j) => j !== i) })}>
-                            {tr("com.study.drop", lang)}
-                          </button>
-                        </div>
-                      ))}
-                      <div className="com-add">
-                        <input value={addSkill}
-                               placeholder={tr("com.study.add", lang)}
-                               onChange={(e) => setAddSkill(e.target.value)} />
-                        <button disabled={!addSkill.trim()}
-                                onClick={() => {
-                                  setStudy({ ...study,
-                                    skills: [...study.skills,
-                                             addSkill.trim()] });
-                                  setAddSkill("");
-                                }}>
-                          {tr("com.study.add", lang)}
-                        </button>
-                      </div>
-
-                      <b className="small">{tr("com.study.conns", lang)}</b>
-                      {study.connections.map((c, i) => (
-                        <div key={c + i} className="com-line">
-                          <span style={{ flex: 1 }}>{c}</span>
-                          <button className="muted small"
-                                  onClick={() => setStudy({
-                                    ...study,
-                                    connections: study.connections.filter(
-                                      (_, j) => j !== i) })}>
-                            {tr("com.study.drop", lang)}
-                          </button>
-                        </div>
-                      ))}
-                      <div className="com-add">
-                        <input value={addConn}
-                               placeholder={tr("com.study.add", lang)}
-                               onChange={(e) => setAddConn(e.target.value)} />
-                        <button disabled={!addConn.trim()}
-                                onClick={() => {
-                                  setStudy({ ...study,
-                                    connections: [...study.connections,
-                                                  addConn.trim()] });
-                                  setAddConn("");
-                                }}>
-                          {tr("com.study.add", lang)}
-                        </button>
-                      </div>
-
-                      <b className="small">
-                        {tr("com.study.knowledge", lang)}
-                      </b>
-                      <p className="muted small com-study-text">
-                        {study.knowledge}
-                      </p>
-                      {/* Who answered, by name, so a real study is
-                          telling apart from the local fallback standing
-                          in for one. */}
-                      {study.studiedBy && (
-                        <p className="muted small">
-                          {tr("com.study.by", lang)}: {study.studiedBy}
-                        </p>
-                      )}
-
-                      {/* Keeping the study is what opens the kit. The
-                          founder has just read what the job needs;
-                          that is the moment to decide what the person
-                          doing it works with. */}
-                      <button disabled={busy} data-go="keep"
-                              onClick={act(async () => {
-                                await api.keepStudy(open.id, s.id, {
-                                  skills: study.skills,
-                                  connections: study.connections,
-                                }, token);
-                                await startKit(s.id);
-                              })}>
-                        {tr("com.study.keep", lang)}
-                      </button>
-                    </div>
                   )}
 
                   {/* The kit, one rung at a time, and the ladder ends

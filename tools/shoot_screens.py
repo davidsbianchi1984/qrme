@@ -206,6 +206,16 @@ def start_backend() -> subprocess.Popen:
     raise SystemExit("the backend never came up")
 
 
+def _rows(path: str, token: str = "") -> dict:
+    """A GET, for the one place the seed has to read back what it made:
+    a seat's id is minted server-side and the roster is where it is."""
+    request = urllib.request.Request(
+        BASE + path,
+        headers={"authorization": f"Bearer {token}"} if token else {})
+    with urllib.request.urlopen(request, timeout=60) as answer:
+        return json.load(answer)
+
+
 def _door(path: str, body: dict, token: str = "") -> dict:
     request = urllib.request.Request(
         BASE + path, data=json.dumps(body).encode(),
@@ -302,6 +312,31 @@ def furnish(session: dict) -> None:
                             ("Housekeeper", "Household")):
             _door(f"/companies/{care['id']}/seats",
                   {"title": title, "department": dept}, token)
+        # One of the two hired the way a founder actually hires: study
+        # first, then sign. Every other seeded hire posts straight to
+        # /hire, which leaves `connections` NULL on the seat — so the
+        # employee file's "Who they reach" rendered empty and looked
+        # like a missing feature rather than a seat nobody studied.
+        #
+        # The study's own half needs a model and this host has none. The
+        # pool's half does not: `regulators, families, clients,
+        # supervisors` come off the carried table, so the line
+        # photographs true on a keyless host instead of blank.
+        keep = [s for s in _rows(f"/companies/{care['id']}", token)["seats"]
+                if s["title"] == "Housekeeper"]
+        if keep:
+            sid = keep[0]["id"]
+            _door(f"/companies/{care['id']}/seats/{sid}/study", {}, token)
+            _door(f"/companies/{care['id']}/seats/{sid}/hire",
+                  {"answers": [
+                      {"question": "Full name:", "answer": "Rosa Delgado"},
+                      {"question": "Duties:",
+                       "answer": "Keep the rooms, the linen and the "
+                                 "supplies; report what needs fixing."},
+                      {"question": "Decides alone vs escalates:",
+                       "answer": "Decides the day's order of rooms; "
+                                 "escalates damage and anything missing."}]},
+                  token)
     except Exception as exc:  # noqa: BLE001 — an empty company is still the screen
         print(f"  ? no company founded ({type(exc).__name__})")
     try:
@@ -758,6 +793,12 @@ ELEMENTS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
     # One rung further: the trade's programs. The card is the same
     # element as 217, which is why the recipe names it — a card carries
     # one `data-screen` and this is the second screen taken of it.
+    # The employee file, on a hire that was studied before it was
+    # signed. "Who they reach" is the study's connections list on the
+    # person it is about — the half that had nowhere to go until the
+    # signature carried it.
+    ("219", "who-they-reach", "companies",
+     ("text=Bianchi Home Care", '[data-go="file"]'), ".com-file"),
     ("218", "the-trades-tools", "companies",
      ("text=Bianchi Home Care", '[data-go="interview"]',
       '[data-go="study"]', '[data-go="keep"]', '[data-go="pass"]',

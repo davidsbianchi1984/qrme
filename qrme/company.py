@@ -227,6 +227,31 @@ def _seat(company: dict, seat_id: str) -> dict:
     return dict(r)
 
 
+def a_real_study(findings: str | None) -> bool:
+    """Is this a study, or only the platform saying it ran out of room?
+
+        asked     the hire arrives knowing its profession
+        mattered  what arrived was the sentence that says nothing arrived
+
+    `llm.CONTINUES` is appended when the answer hit the token ceiling,
+    and `llm._capped` returns it *alone* when the model produced no text
+    at all before hitting it. That string is then a non-empty study as
+    far as every caller is concerned: `hire` files anything non-empty as
+    the trade's own knowledge, so a real employee on the live deployment
+    carries a source item titled "The trade: AI content creator" whose
+    entire content is "— cut off here, not finished."
+
+    A hire grounding on that is grounding on nothing while believing it
+    has read its profession. So the marker is stripped and what remains
+    has to be long enough to be an answer rather than a fragment — a
+    study cut off after one clause is still worth showing the founder,
+    and is not worth writing into somebody's memory as what they know.
+    """
+    from . import llm
+    text = (findings or "").replace(llm.CONTINUES, "").strip()
+    return len(text) >= 200
+
+
 def study_role(company: dict, seat_id: str, cloud=None) -> str:
     """The platform studies the trade before it writes the interview.
 
@@ -259,8 +284,13 @@ def study_role(company: dict, seat_id: str, cloud=None) -> str:
     findings = research.gather(brief, cloud=cloud)
     conn = db.connect()
     _ensure(conn)
+    # Stored only if it is one. The founder is still handed the raw
+    # answer — a truncation is worth seeing on the card, and hiding it
+    # would leave them wondering why the skills look generic — but it
+    # does not become the seat's study, so it cannot be filed at the
+    # signature as what this employee knows about its trade.
     conn.execute("UPDATE company_seats SET study=? WHERE id=?",
-                 (findings, seat["id"]))
+                 (findings if a_real_study(findings) else None, seat["id"]))
     conn.commit()
     return findings
 
@@ -539,6 +569,71 @@ def _who_studied() -> str | None:
     return answered[0] if answered else None
 
 
+def _carry_study_onto(conn, seat: dict, profile_id: str) -> None:
+    """Put what the seat's study found onto the person it is about.
+
+        asked     re-evaluate a job without having to fire and rehire
+        mattered  everything the study produced was written at the
+                  signature and nowhere else, so the only way to correct
+                  a bad study was to destroy the employee and remake them
+
+    Three writes, and every one of them **replaces** rather than adds.
+    A re-evaluation that appended would leave an employee grounding on
+    two contradictory accounts of its own trade — the second study is
+    the founder's correction of the first, not a second opinion to be
+    weighed against it.
+
+    The colleague links are not here on purpose. Those are made once at
+    the signature and are a relationship between two profiles; a study
+    that stops naming somebody is not an instruction to unfriend them.
+    """
+    from . import occupations
+    title = seat["title"]
+    works_with = json.loads(seat["connections"] or "[]")
+    known = occupations.find(title)
+    if known is None:
+        hits = occupations.search(title, limit=1)
+        known = hits[0] if hits else None
+    family = known["family"] if known else None
+
+    named = {w.lower() for w in works_with}
+    mates = [o["title"] for o in seats(seat["company_id"])
+             if o["status"] == "hired" and o["profile_id"] != profile_id
+             and (o["title"].lower() in named
+                  or o["department"].lower() in named)]
+
+    items = []
+    if a_real_study(seat.get("study")):
+        items.append((f"The trade: {title}", seat["study"]))
+    if works_with:
+        items.append((f"Who this job reaches: {title}",
+                      "This position works with, and answers to:\n"
+                      + "\n".join(f"- {w}" for w in works_with)))
+    if mates:
+        items.append(("Colleagues the study named",
+                      "These people are on this company's roster and this "
+                      "job reaches them by name:\n"
+                      + "\n".join(f"- {t}" for t in mates)))
+
+    # Out with the old three, in with whichever of them this study
+    # supports. A study that stops naming colleagues takes that item
+    # away rather than leaving a stale one behind it.
+    conn.execute(
+        "DELETE FROM source_items WHERE profile_id=? AND kind='knowledge'"
+        " AND title IN (?,?,?)",
+        (profile_id, f"The trade: {title}",
+         f"Who this job reaches: {title}", "Colleagues the study named"))
+    for item_title, content in items:
+        conn.execute(
+            "INSERT INTO source_items (id, profile_id, kind, title, content,"
+            " pdi_key, pack_id, created_at) VALUES (?,?,?,?,?,NULL,NULL,?)",
+            (db.new_id("src"), profile_id, "knowledge", item_title,
+             content, db.utcnow()))
+    conn.execute(
+        "UPDATE profiles SET works_with=?, trade_family=? WHERE id=?",
+        (json.dumps(works_with), family, profile_id))
+
+
 def keep_study(company: dict, seat_id: str, skills: list[str],
                connections: list[str]) -> dict:
     """The founder's edits to what the study found.
@@ -555,9 +650,21 @@ def keep_study(company: dict, seat_id: str, skills: list[str],
     conn.execute(
         "UPDATE company_seats SET skills=?, connections=? WHERE id=?",
         (json.dumps(clean_s), json.dumps(clean_c), seat["id"]))
+    # And through to the employee, when the seat has one. Before this,
+    # everything a study produced was written at the signature and
+    # nowhere else: a seat whose study came back truncated could only be
+    # corrected by retiring the person and hiring them again. Pressing
+    # Download knowledge on a filled seat and keeping what comes back is
+    # a re-evaluation of the job, and the person in it keeps their id,
+    # their charter, their colleagues and everything said to them.
+    seat = _seat(company, seat_id)
+    carried = False
+    if seat["status"] == "hired" and seat["profile_id"]:
+        _carry_study_onto(conn, seat, seat["profile_id"])
+        carried = True
     conn.commit()
     return {"seat_id": seat["id"], "skills": clean_s,
-            "connections": clean_c}
+            "connections": clean_c, "carried_to_employee": carried}
 
 
 def draft_interview(company: dict, seat_id: str, cloud=None) -> list[dict]:
@@ -675,84 +782,28 @@ def hire(company: dict, seat_id: str, answers: list[dict]) -> dict:
         (db.new_id("src"), profile["id"], "knowledge",
          f"The position: {seat['title']} ({company['name']})",
          json.dumps(kept, indent=1), db.utcnow()))
-    if seat.get("study"):
-        # The trade's own knowledge, filed beside the job description —
-        # the hire arrives knowing its profession, provenance-counted
-        # like every grounding already is.
-        conn.execute(
-            "INSERT INTO source_items (id, profile_id, kind, title, content,"
-            " pdi_key, pack_id, created_at) VALUES (?,?,?,?,?,NULL,NULL,?)",
-            (db.new_id("src"), profile["id"], "knowledge",
-             f"The trade: {seat['title']}", seat["study"], db.utcnow()))
+    # `a_real_study` again rather than a truthiness check: `hire` is
+    # reachable on a seat studied before this guard existed, and those
+    # rows still hold the marker.
 
-    # Who this one works with, off the study, onto the person it is about.
-    #
-    # The list has been fetched since the study became a step and read by
-    # nobody: `hire` did not touch it, and there was nowhere for it to go
-    # if it had. `routers/connections.py` is anonymous person-to-person
-    # chat and a referrer is not a profile. So it lands three ways, each
-    # answering a different question:
-    #
-    #   grounding   filed as source material, so every reply knows who
-    #               this job answers to — the half that changes what the
-    #               employee *does* rather than what a screen shows
-    #   the roster  a named connection that is also a colleague already
-    #               hired becomes a real link, through the same door the
-    #               colleague loop below uses
-    #   stated      kept on the profile, so the employee file and the
-    #               page can say it and the owner can edit it
-    works_with = json.loads(seat["connections"] or "[]")
-    # The trade this seat was studied as, looked up rather than stored:
-    # `hire` is reachable without a study — the console gates the
-    # signature on one, the route does not — and a seat that skipped it
-    # still deserves the right industry if the pool knows the title.
-    from . import occupations
-    known = occupations.find(seat["title"])
-    if known is None:
-        hits = occupations.search(seat["title"], limit=1)
-        known = hits[0] if hits else None
-    seat_family = known["family"] if known else None
-    if works_with:
-        conn.execute(
-            "INSERT INTO source_items (id, profile_id, kind, title, content,"
-            " pdi_key, pack_id, created_at) VALUES (?,?,?,?,?,NULL,NULL,?)",
-            (db.new_id("src"), profile["id"], "knowledge",
-             f"Who this job reaches: {seat['title']}",
-             "This position works with, and answers to:\n"
-             + "\n".join(f"- {w}" for w in works_with), db.utcnow()))
-    conn.execute(
-        "UPDATE profiles SET works_with=?, trade_family=? WHERE id=?",
-        (json.dumps(works_with), seat_family, profile["id"]))
+    # Everything the study found, onto the person it is about — the same
+    # write a re-evaluation makes, so the two cannot drift apart. See
+    # `_carry_study_onto` for why each of its three items replaces
+    # rather than adds.
+    _carry_study_onto(conn, seat, profile["id"])
 
     # The colleagues: everyone already hired is a connection, because a
     # company whose employees are strangers to each other is an org chart,
-    # not a staff. A colleague the study also *named* is the same link
-    # arriving twice, which `befriend` already tolerates.
-    named = {w.lower() for w in works_with}
+    # not a staff. This one stays here rather than in the helper: a link
+    # between two profiles is made once, at the signature, and a later
+    # study that stops naming somebody is not an instruction to unfriend
+    # them.
     for other in seats(company["id"]):
         if other["status"] == "hired" and other["profile_id"]:
             try:
                 befriend(profile["id"], other["profile_id"])
             except Exception:
                 pass  # a duplicate link is not a failed hire
-    # And the other direction: a connection the study named that matches
-    # a colleague's title or department is why that link exists, so it is
-    # recorded as one rather than left to look like a coincidence.
-    if named:
-        matched = [o["title"] for o in seats(company["id"])
-                   if o["status"] == "hired"
-                   and (o["title"].lower() in named
-                        or o["department"].lower() in named)]
-        if matched:
-            conn.execute(
-                "INSERT INTO source_items (id, profile_id, kind, title,"
-                " content, pdi_key, pack_id, created_at)"
-                " VALUES (?,?,?,?,?,NULL,NULL,?)",
-                (db.new_id("src"), profile["id"], "knowledge",
-                 "Colleagues the study named",
-                 "These people are on this company's roster and this job "
-                 "reaches them by name:\n"
-                 + "\n".join(f"- {t}" for t in matched), db.utcnow()))
 
     org = organization.get(company["org_id"])
     if org is not None:

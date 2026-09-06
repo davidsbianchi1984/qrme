@@ -827,7 +827,7 @@ LESSONS: tuple[dict, ...] = (
               "so ticking chooses, the signature makes the connector, "
               "and it can do nothing at all until you hand over the "
               "sign-in on Plugins.",
-         screens=(217, 218),
+         screens=(217, 218, 219),
          try_it="Keep a study, then walk the four rungs and sign at the "
                 "end of them."),
     dict(key="dock", chapter="Working", title="The edge dock",

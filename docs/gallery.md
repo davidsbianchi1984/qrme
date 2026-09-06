@@ -623,6 +623,7 @@ is exactly how the old card came to be showing yours in place of theirs.
     <td align="center" width="25%"><a href="screens/213-download-knowledge.png"><img src="screens/213-download-knowledge.png" width="210" alt="Download knowledge"></a><br><sub><b>213</b> · Download knowledge · what the job needs, read and edited before the signature — and the card names whoever answered the study</sub></td>
     <td align="center" width="25%"><a href="screens/217-kitted-out-in-the-seat.png"><img src="screens/217-kitted-out-in-the-seat.png" width="210" alt="Kitted out in the seat"></a><br><sub><b>217</b> · Kitted out in the seat · eyes, ears, hands and a body, one rung at a time — the robot shelf reached without leaving the hire it is for</sub></td>
     <td align="center" width="25%"><a href="screens/218-the-trades-tools.png"><img src="screens/218-the-trades-tools.png" width="210" alt="The trade's tools"></a><br><sub><b>218</b> · The trade's tools · the fifth rung, on a host with no model reachable — ticking gives the hire a door, the sign-in is handed over afterwards</sub></td>
+    <td align="center" width="25%"><a href="screens/219-who-they-reach.png"><img src="screens/219-who-they-reach.png" width="210" alt="Who they reach"></a><br><sub><b>219</b> · Who they reach · the study's connections on the person they are about, in the employee file — a list that had nowhere to go until the signature carried it</sub></td>
   </tr>
 </table>
 

@@ -6,6 +6,75 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.2.0] - 2026-09-06
+
+### Added
+
+- **Re-evaluate the job, without firing anybody.** Everything a study
+  produced was written at the signature and nowhere else, so the only
+  way to correct a bad one was to retire the employee and hire a new
+  one — a new id, an empty charter, no colleagues, and nothing anybody
+  had ever said to them. The truncated study above is exactly that
+  case: a live employee whose trade knowledge was one sentence saying
+  the answer never arrived, and no way to fix it short of destroying
+  them.
+
+  **Re-evaluate the job** sits on every filled seat. It runs the same
+  study and shows the same card; Keep now carries through to the person
+  rather than stopping at the seat. `company._carry_study_onto` is the
+  one write both the signature and a re-evaluation make, so the two
+  cannot drift, and each of its three knowledge items **replaces**
+  rather than adds — a second study is the founder's correction of the
+  first, not a second opinion for the employee to weigh against it.
+
+  Two things it deliberately does not do. The colleague links are not
+  re-made: they are a relationship between two profiles, made once at
+  the signature, and a study that stops naming somebody is not an
+  instruction to unfriend them. And the kit ladder does not reopen —
+  there is already somebody in the chair, and the rung after the last
+  one is a signature that would be refused. Equipment for a hired
+  employee is the employee file.
+
+  The study card moved out of the interview panel to the seat level
+  with it. It was nested there because the only route to a study was on
+  the way to a signature; a filled seat has no interview above it to
+  live under.
+
+### Fixed
+
+- **A truncation was being written into an employee's memory as what it
+  knows about its profession.** Found in an export off the live
+  deployment: a hired AI content creator whose `The trade` source item
+  read, in full, "— cut off here, not finished. Ask me to continue."
+
+  That sentence is `llm.CONTINUES`, appended when an answer hits the
+  token ceiling — and `llm._capped` returns it *alone* when the model
+  produced no text at all before hitting it. Every caller downstream
+  sees a non-empty string, and `hire` files anything non-empty as the
+  trade's knowledge. The hire then grounds every reply on nothing while
+  believing it has read its profession, and `role_specifics` has nothing
+  to parse, which is why that profile's tools came back empty while its
+  skills and connections arrived from the pool.
+
+  `company.a_real_study` strips the marker and requires what remains to
+  be an answer rather than a fragment. A study that is only the marker
+  is still shown on the card — hiding it would leave the founder
+  wondering why the skills look generic — but it is not stored on the
+  seat, so the signature has nothing to file. Seats studied before this
+  guard existed still hold the marker, so the check runs at the
+  signature too rather than only at the study.
+
+- **The employee file rendered the whole robot catalogue uncapped.**
+  1,910 pixels rather than 5,626 — the same defect the tools rung had at
+  6,974, in the copy that fix did not reach.
+
+- **No seeded hire had ever been studied.** Every capture posted straight
+  to `/hire`, so `connections` was NULL on the seat and the employee
+  file's "Who they reach" photographed blank — reading as a missing
+  feature rather than as a seat nobody studied. One seeded hire studies
+  first now; the pool's half of that list needs no model, so the line is
+  true on a host with no key.
+
 ## [3.1.10] - 2026-09-06
 
 ### Added
@@ -18315,7 +18384,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.10...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.2.0...HEAD
+[3.2.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.10...app-v3.2.0
 [3.1.10]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.9...app-v3.1.10
 [3.1.9]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.8...app-v3.1.9
 [3.1.8]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.7...app-v3.1.8
