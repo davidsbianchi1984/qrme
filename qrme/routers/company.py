@@ -160,11 +160,13 @@ def occupation_families(request: Request) -> dict:
 def study_seat(company_id: str, seat_id: str, request: Request) -> dict:
     """Download what this seat has to know.
 
-    The skills and the connections come back off the pool the app
-    carries, so they are readable even with nothing reachable; the
-    working knowledge is fetched and stored on the seat, which is what
-    makes the hire offline afterwards. Nothing is hired here — this is
-    the step before the founder reads what was found.
+    The working knowledge is fetched and stored on the seat, which is
+    what makes the hire offline afterwards. The skills and connections
+    are two halves: what the study found about *this* job leads, and
+    what the carried pool knows about its family fills in behind — so
+    the lists stay readable with nothing reachable and get specific when
+    something is. `tailored` counts the first half. Nothing is hired
+    here; this is the step before the founder reads what was found.
     """
     row = _company_or_404(company_id, request)
     try:

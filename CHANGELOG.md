@@ -6,6 +6,35 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.1.9] - 2026-09-06
+
+### Added
+
+- **The study says what *this* job needs.** 516 of 45,153 rows carry
+  skills of their own; the other 44,637 inherit their family's, so a
+  browse of the whole table read as sixteen jobs repeated. The carried
+  pool is exhaustive in titles and coarse in detail — the bargain that
+  keeps it at 4.2 MB — while the study is the opposite: it is about one
+  job, it is fetched, and it was stored as prose and thrown away as
+  data. A paragraph naming this job's actual work sat in the same
+  function that took the structured half off the pool.
+
+  `company.role_specifics` reads that paragraph and returns the two
+  lists the seat stores. What it finds leads; what the pool knows about
+  the family fills in behind, deduped case-blind because the two are
+  describing the same job. The card says which is which — "3 of these
+  came from the study of this job itself" — because six generic skills
+  look identical whether the study found nothing specific or was never
+  reachable to be asked, and those are different things to be told.
+
+  Entries stay records and coordination rather than acts: the charter
+  every hire signs ends "duties that are licensed or physical acts are
+  assisted, never performed", and a skill list reading "administers
+  medication" would contradict the document the same profile carries.
+  Any failure — nothing reachable, a refusal, a shape that will not
+  parse, a study that is blank — leaves the pool's answer standing,
+  which is the screen exactly as it was before this existed.
+
 ## [3.1.8] - 2026-09-06
 
 ### Added
@@ -18218,7 +18247,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.8...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.9...HEAD
+[3.1.9]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.8...app-v3.1.9
 [3.1.8]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.7...app-v3.1.8
 [3.1.7]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.6...app-v3.1.7
 [3.1.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.5...app-v3.1.6

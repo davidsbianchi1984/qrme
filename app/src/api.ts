@@ -6436,13 +6436,17 @@ export const api = {
       `&family=${encodeURIComponent(family)}&limit=40`, { token }),
   occupationFamilies: (token: string) =>
     req<{ families: string[] }>("/occupations/families", { token }),
-  // Download what the seat has to know. Skills and connections come off
-  // the carried pool; the working knowledge is fetched and kept on the
-  // seat, which is what makes the hire offline afterwards.
+  // Download what the seat has to know. The working knowledge is fetched
+  // and kept on the seat, which is what makes the hire offline
+  // afterwards; the skills and connections are what the study found
+  // about this job ahead of what the carried pool knows about its
+  // family. `tailored` counts the first half, so a card of six generic
+  // skills can say whether the study contributed nothing or was never
+  // reachable to be asked.
   studySeat: (companyId: string, seatId: string, token: string) =>
     req<{ seat_id: string; title: string; known_as: string | null;
           family: string | null; found: boolean; skills: string[];
-          connections: string[]; knowledge: string;
+          connections: string[]; tailored: number; knowledge: string;
           studied_by: string | null }>(
       `/companies/${companyId}/seats/${seatId}/study`,
       { method: "POST", token }),

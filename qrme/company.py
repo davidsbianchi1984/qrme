@@ -264,6 +264,107 @@ def study_role(company: dict, seat_id: str, cloud=None) -> str:
     return findings
 
 
+#: How many of each the study may contribute. The card is read on a
+#: phone, and a list long enough to scroll is a list nobody edits — which
+#: is the whole point of putting it in front of the founder.
+_MAX_FOUND_SKILLS = 8
+_MAX_FOUND_CONNECTIONS = 6
+
+
+def _tidy(items, cap: int) -> list[str]:
+    """Short noun phrases, deduped case-blind, in the order given.
+
+    A model asked for a list returns some of it as sentences, some
+    capitalised, and some twice. None of those is a reason to throw the
+    answer away — they are a reason to read it carefully.
+    """
+    out: list[str] = []
+    seen: set[str] = set()
+    for raw in items if isinstance(items, list) else ():
+        text = " ".join(str(raw).strip().split())
+        # A trailing full stop means it was written as a sentence; a long
+        # one *is* a sentence, and a sentence is not a skill.
+        text = text.rstrip(".").strip()
+        if not text or len(text) > 60:
+            continue
+        key = text.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(text)
+        if len(out) >= cap:
+            break
+    return out
+
+
+def _lead_with(found: list[str], pooled: list[str]) -> list[str]:
+    """This job's own first, its family's behind, nothing said twice."""
+    seen = {t.lower() for t in found}
+    return found + [p for p in pooled if p.lower() not in seen]
+
+
+def role_specifics(seat: dict, findings: str, cloud=None
+                   ) -> tuple[list[str], list[str]]:
+    """What *this* job needs, read out of the study that was just fetched.
+
+        asked     skills and connections tailored to every profile, for
+                  what they need for their particular job
+        mattered  516 of 45,153 rows carry skills of their own; the rest
+                  inherit their family's, so a browse of the whole table
+                  read as sixteen jobs repeated
+
+    The carried pool is exhaustive in titles and coarse in detail — that
+    is the bargain that keeps it at 4.2 MB. The study is the opposite: it
+    is about one job and it is prose. This turns that prose into the two
+    lists the seat actually stores, so a radiologist's seat carries
+    "prior study comparison" because the study said so and not because
+    somebody wrote that row out by hand.
+
+    It returns two empty lists rather than raising. Nothing reachable,
+    a refusal, a shape that will not parse — every one of those leaves
+    the pool's own answer standing, which is what was on screen before
+    this existed and is still a true answer about the family.
+
+    Entries stay records and coordination rather than acts. The charter
+    every hire signs ends "duties that are licensed or physical acts are
+    assisted, never performed", and a skill list reading "administers
+    medication" would contradict the document the same profile carries.
+    """
+    if not findings or not findings.strip():
+        return [], []
+    system = (
+        "You read a study of one occupation and extract two lists for a "
+        "builder of synthetic employees. Answer ONLY as a JSON object "
+        'with keys "skills" and "connections".\n\n'
+        '"skills": what a competent one does with information in this '
+        "job specifically — a record kept, a note written, a schedule "
+        "made, a check reported, a document read. Never a licensed or "
+        "physical act: this employee assists with those, it does not "
+        "perform them. Never a generic office skill that would be true "
+        "of any job.\n"
+        '"connections": who and what this job must reach — the people, '
+        "the departments, the outside bodies, the systems.\n\n"
+        "Each entry is a short lowercase noun phrase of two to four "
+        f"words, not a sentence. At most {_MAX_FOUND_SKILLS} skills and "
+        f"{_MAX_FOUND_CONNECTIONS} connections. Fewer is better than "
+        "padding: return only what this study actually supports.")
+    ask = (f"Role: {seat['title']}\nDepartment: {seat['department']}\n\n"
+           "THE STUDY:\n" + findings[:4000])
+    try:
+        raw = llm.get_provider(cloud=cloud).generate(
+            system, [{"role": "user", "content": ask}])
+        start, end = raw.find("{"), raw.rfind("}")
+        if start < 0 or end <= start:
+            return [], []
+        parsed = json.loads(raw[start:end + 1])
+        if not isinstance(parsed, dict):
+            return [], []
+        return (_tidy(parsed.get("skills"), _MAX_FOUND_SKILLS),
+                _tidy(parsed.get("connections"), _MAX_FOUND_CONNECTIONS))
+    except Exception:  # noqa: BLE001 — the pool's answer still stands
+        return [], []
+
+
 def study_seat(company: dict, seat_id: str, cloud=None) -> dict:
     """Download what this seat has to know, and hand it back to be read.
 
@@ -278,11 +379,16 @@ def study_seat(company: dict, seat_id: str, cloud=None) -> dict:
     all before hiring against its understanding.
 
     This is that step made a step. It carries two halves that arrive
-    differently. The skills and the connections come from the pool the
-    app already carries, so they are on screen the moment this returns
-    even with nothing reachable. The working knowledge is the fetched
-    half, and once fetched it is stored on the seat — which is what
-    makes the hire offline from then on.
+    differently. The working knowledge is the fetched half, and once
+    fetched it is stored on the seat — which is what makes the hire
+    offline from then on.
+
+    The skills and the connections are themselves two halves. The pool
+    the app carries answers for the *family*, and answers instantly with
+    nothing reachable; `role_specifics` reads the study that was just
+    fetched and answers for *this job*. The second leads and the first
+    fills in behind, so the card is specific where the study was and
+    never empty where it was not.
 
     `found` says whether the pool recognised the title. A seat the pool
     has never heard of is not an error and not a lesser seat: it studies
@@ -295,9 +401,17 @@ def study_seat(company: dict, seat_id: str, cloud=None) -> dict:
     if known is None:
         hits = occupations.search(seat["title"], limit=1)
         known = hits[0] if hits else None
-    skills = list(known["skills"]) if known else []
-    connections = list(known["connections"]) if known else []
+    pooled_skills = list(known["skills"]) if known else []
+    pooled_connections = list(known["connections"]) if known else []
     knowledge = study_role(company, seat_id, cloud=cloud)
+    # What the study found about *this* job leads; the pool's answer,
+    # which is true of the family, fills in behind it. Both halves are on
+    # the card and both are editable, because the founder is the one who
+    # knows which of them is right about their own store.
+    found_skills, found_connections = role_specifics(
+        seat, knowledge, cloud=cloud)
+    skills = _lead_with(found_skills, pooled_skills)
+    connections = _lead_with(found_connections, pooled_connections)
     conn = db.connect()
     _ensure(conn)
     conn.execute(
@@ -309,6 +423,11 @@ def study_seat(company: dict, seat_id: str, cloud=None) -> dict:
             "family": known["family"] if known else None,
             "found": known is not None,
             "skills": skills, "connections": connections,
+            # How many of the lists came from this job's own study rather
+            # than its family. A founder reading a card of six generic
+            # skills has no way to tell whether the study contributed
+            # nothing or was never asked, and those are different.
+            "tailored": len(found_skills) + len(found_connections),
             "knowledge": knowledge, "studied_by": _who_studied()}
 
 

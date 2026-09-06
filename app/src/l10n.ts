@@ -994,6 +994,12 @@ const CHROME: Table = {
   "com.study.busy": {
     en: "Studying the trade…", es: "Estudiando el oficio…", fr: "Étude du métier…", de: "Das Handwerk wird studiert…", pt: "A estudar o ofício…", it: "Studio del mestiere…", ja: "職務を調べています…", zh: "正在研究这门职业…", hi: "पेशा पढ़ा जा रहा है…", ar: "جارٍ دراسة المهنة…",
   },
+  "com.study.tailored": {
+    en: "{n} of these came from the study of this job itself — the rest are what its family shares.", es: "{n} de estos vienen del estudio de este puesto; el resto es lo que comparte su familia.", fr: "{n} d'entre eux viennent de l'étude de ce poste ; le reste est ce que partage sa famille.", de: "{n} davon stammen aus der Studie dieser Stelle selbst — der Rest ist das, was ihre Familie teilt.", pt: "{n} destes vêm do estudo deste cargo; o resto é o que a sua família partilha.", it: "{n} di questi vengono dallo studio di questa posizione; il resto è ciò che condivide la sua famiglia.", ja: "うち {n} 件はこの職種自体の調査からです。残りは同じ分野に共通のものです。", zh: "其中 {n} 项来自对这份工作本身的研究，其余是同类岗位共有的。", hi: "इनमें से {n} इसी काम के अध्ययन से आए हैं — बाकी इसके समूह के साझा हैं।", ar: "{n} منها جاءت من دراسة هذه الوظيفة نفسها، والباقي ما تتشاركه فئتها.",
+  },
+  "com.study.family": {
+    en: "These are what this job's family shares — the study added nothing of its own. Add what is missing.", es: "Esto es lo que comparte la familia de este puesto; el estudio no añadió nada propio. Añade lo que falte.", fr: "Voici ce que partage la famille de ce poste ; l'étude n'a rien ajouté en propre. Ajoutez ce qui manque.", de: "Das teilt die Familie dieser Stelle — die Studie hat nichts Eigenes beigetragen. Ergänze, was fehlt.", pt: "Isto é o que a família deste cargo partilha; o estudo não acrescentou nada de próprio. Acrescenta o que faltar.", it: "Questo è ciò che condivide la famiglia di questa posizione: lo studio non ha aggiunto nulla di proprio. Aggiungi ciò che manca.", ja: "これらは同じ分野に共通のもので、調査は独自の項目を加えませんでした。足りないものを追加してください。", zh: "这些是同类岗位共有的，研究没有补充任何特有项。请自行添加缺少的。", hi: "ये इस काम के समूह के साझा हैं — अध्ययन ने अपना कुछ नहीं जोड़ा। जो छूट रहा है वह जोड़ें।", ar: "هذه ما تتشاركه فئة هذه الوظيفة — لم تضف الدراسة شيئًا خاصًا. أضف ما ينقص.",
+  },
   "com.study.skills": {
     en: "Skills this one must have", es: "Habilidades que debe tener", fr: "Compétences requises", de: "Erforderliche Fähigkeiten", pt: "Competências necessárias", it: "Competenze necessarie", ja: "必要な技能", zh: "必备技能", hi: "आवश्यक कौशल", ar: "المهارات المطلوبة",
   },

@@ -113,8 +113,8 @@ export function Companies({ onOpenProfile }: {
   // What the study downloaded for a seat, under review before signing.
   const [study, setStudy] = useState<{
     seatId: string; found: boolean; knownAs: string | null;
-    skills: string[]; connections: string[]; knowledge: string;
-    studiedBy: string | null;
+    skills: string[]; connections: string[]; tailored: number;
+    knowledge: string; studiedBy: string | null;
   } | null>(null);
   const [addSkill, setAddSkill] = useState("");
   const [addConn, setAddConn] = useState("");
@@ -772,6 +772,7 @@ export function Companies({ onOpenProfile }: {
                                 knownAs: found.known_as,
                                 skills: found.skills,
                                 connections: found.connections,
+                                tailored: found.tailored,
                                 knowledge: found.knowledge,
                                 studiedBy: found.studied_by,
                               });
@@ -792,6 +793,17 @@ export function Companies({ onOpenProfile }: {
                         && study.knownAs !== s.title && (
                         <p className="muted small">{study.knownAs}</p>
                       )}
+
+                      {/* Where these came from. Six generic skills look
+                          the same whether the study found nothing
+                          specific or was never reachable to be asked,
+                          and those are different things to be told. */}
+                      <p className="muted small">
+                        {study.tailored > 0
+                          ? fill(tr("com.study.tailored", lang),
+                                 { n: String(study.tailored) })
+                          : tr("com.study.family", lang)}
+                      </p>
 
                       <b className="small">{tr("com.study.skills", lang)}</b>
                       {study.skills.map((k, i) => (
