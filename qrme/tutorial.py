@@ -821,9 +821,13 @@ LESSONS: tuple[dict, ...] = (
               "Nothing is fitted before the signature because there is "
               "nobody to fit it to: the hire is what creates the profile, "
               "and the equipment goes on in the same act. If a piece will "
-              "not go on, you are told which piece \u2014 the person is "
-              "still hired and still seated.",
-         screens=(217,),
+              "not go on, you are told which piece — the person is "
+              "still hired and still seated.\n\nThe tools rung is the "
+              "odd one, on purpose: a connection is your own credential, "
+              "so ticking chooses, the signature makes the connector, "
+              "and it can do nothing at all until you hand over the "
+              "sign-in on Plugins.",
+         screens=(217, 218),
          try_it="Keep a study, then walk the four rungs and sign at the "
                 "end of them."),
     dict(key="dock", chapter="Working", title="The edge dock",

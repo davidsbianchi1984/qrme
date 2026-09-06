@@ -755,6 +755,13 @@ ELEMENTS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
      ("text=Bianchi Home Care", '[data-go="interview"]',
       '[data-go="study"]', '[data-go="keep"]',
       '[data-go="pass"]', '[data-go="pass"]')),
+    # One rung further: the trade's programs. The card is the same
+    # element as 217, which is why the recipe names it — a card carries
+    # one `data-screen` and this is the second screen taken of it.
+    ("218", "the-trades-tools", "companies",
+     ("text=Bianchi Home Care", '[data-go="interview"]',
+      '[data-go="study"]', '[data-go="keep"]', '[data-go="pass"]',
+      '[data-go="pass"]', '[data-go="pass"]'), ".com-kit"),
     ("150", "what-went-wrong", "settings", ()),
     ("22", "providers", "settings", ()),
     ("44", "avatar-studio", "identity", ()),
