@@ -182,6 +182,83 @@ RULES: list[tuple[str, str]] = [
      "records clerk*, file clerk*, filing, archivist*, registrar*, "
      "record*, clerk*"),
 
+    # -- the fields with a shape of their own ------------------------------
+    #
+    # Below the office, so a legal secretary is a secretary and a tax
+    # clerk is a clerk; above the professions and the trades, so a
+    # deckhand is at sea and a farm hand is on a farm before either is a
+    # hand. Stems are checked against the pool, not guessed: `tax*` is
+    # not here because it takes the taxi drivers and the taxidermists,
+    # `fire*` because a kiln firer is not a firefighter, `server` because
+    # half the servers administer machines.
+    ("Fire and rescue",
+     "firefighter*, fire fighter*, fireman, firemen, fire officer*, "
+     "fire chief*, fire captain*, rescue, paramedic*, ambulance, "
+     "lifeguard*, emergency medical"),
+
+    ("Security and policing",
+     "security, police, constable*, sheriff*, detective*, patrol*, "
+     "correctional, corrections, prison, warden*, bailiff*, "
+     "crossing guard*, security guard*, bodyguard*, investigator*"),
+
+    ("Clinical practice",
+     "physician*, doctor*, surgeon*, dentist*, dental*, pharmac*, "
+     "optometr*, podiatr*, chiropract*, anesthesiolog*, anaesthe*, "
+     "orthodont*, paediatric*, pediatric*, psychiatr*, physiotherap*, "
+     "clinician*, medical officer*, general practitioner*"),
+
+    ("Aviation",
+     "pilot*, aircraft*, flight*, aviation, air traffic*, cabin crew*, "
+     "air steward*, aircrew*, airline*, aerodrome*, airport*"),
+
+    ("Marine and fishing",
+     "deckhand*, deck officer*, deck cadet*, seaman*, seafarer*, "
+     "sailor*, mariner*, boatswain*, skipper*, fisherman*, fisher*, "
+     "shipmaster*, harbour master*, harbor master*, coxswain*, "
+     "able seaman*, ship's*, marine engineer*, dock worker*, docker*, "
+     "stevedore*, longshore*"),
+
+    ("Farming and growing",
+     "farm*, grower*, harvest*, crop*, orchard*, vineyard*, ranch*, "
+     "agricultur*, horticultur*, nursery worker*, forester*, forestry, "
+     "arborist*, tree surgeon*, gardener*, greenhouse*, "
+     "shepherd*, herdsman*, dairy*"),
+
+    ("Cooking and food preparation",
+     "cook, cooks, chef*, baker*, butcher*, pastry*, kitchen*, "
+     "caterer*, catering, barista*, bartender*, sommelier*, "
+     "line cook*, prep cook*, sous chef*, fishmonger*, confectioner*"),
+
+    ("Front of house",
+     "waiter*, waitress*, waitstaff*, food server*, banquet server*, "
+     "hostess*, busser*, busboy*, room attendant*, wine steward*, "
+     "maitre d*, restaurant host*, bar staff*, barback*"),
+
+    ("Legal practice",
+     "lawyer*, attorney*, solicitor*, barrister*, paralegal*, legal, "
+     "notary*, judge*, magistrate*, conveyanc*, litigation, "
+     "legal executive*, law clerk*"),
+
+    ("Finance and accounting",
+     "accountant*, accounting, auditor*, audit, actuar*, banker*, "
+     "teller*, loan*, mortgage*, tax advisor*, tax adviser*, "
+     "tax preparer*, tax examiner*, tax consultant*, taxation, "
+     "treasur*, financial*, finance*, credit analyst*, investment*"),
+
+    ("Performing arts",
+     "musician*, singer*, vocalist*, actor*, actress*, dancer*, "
+     "performer*, entertainer*, composer*, conductor*, choreograph*, "
+     "comedian*, magician*, drummer*, guitarist*, pianist*, dj"),
+
+    ("Visual arts and photography",
+     "artist*, photograph*, sculptor*, printmaker*, ceramicist*, "
+     "cartoonist*, muralist*, videograph*, cinematograph*"),
+
+    ("Clergy and ministry",
+     "clergy*, priest*, pastor*, chaplain*, rabbi*, imam*, "
+     "minister of religion*, vicar*, deacon*, reverend*, monk*, nun, "
+     "religious"),
+
     # -- work whose shape is what it produces -----------------------------
     #
     # Above the trades, because a teacher of a trade teaches: "Auto
@@ -458,6 +535,84 @@ SPECIFICS: dict[str, dict[str, list[str]]] = {
               "incident and outcome reporting"],
         "c": ["the team", "senior management",
               "human resources", "the department's customers"]},
+    "Fire and rescue": {
+        "s": ["incident log keeping", "equipment check records",
+              "patient handover writing", "hazard and risk noting",
+              "post-incident reporting"],
+        "c": ["control room", "hospital emergency department",
+              "police", "station officer"]},
+    "Security and policing": {
+        "s": ["incident and occurrence logging", "statement taking",
+              "evidence and exhibit recording", "patrol and check records",
+              "report writing for the file"],
+        "c": ["control room", "supervising officer",
+              "the public and complainants", "courts and prosecutors"]},
+    "Clinical practice": {
+        "s": ["consultation note writing", "prescription and order writing",
+              "referral letter drafting", "result review and actioning",
+              "consent and safeguarding records"],
+        "c": ["patients", "nursing and allied staff",
+              "specialists and referrals", "pharmacy and laboratory"]},
+    "Aviation": {
+        "s": ["flight plan and log keeping", "weather and notice checking",
+              "checklist and defect recording", "manifest and load records",
+              "occurrence reporting"],
+        "c": ["air traffic control", "operations and dispatch",
+              "engineering", "crew and passengers"]},
+    "Marine and fishing": {
+        "s": ["log book keeping", "watch and weather records",
+              "catch and cargo recording", "safety drill records",
+              "port and customs paperwork"],
+        "c": ["the master or skipper", "harbour and port authority",
+              "coastguard", "buyers and agents ashore"]},
+    "Farming and growing": {
+        "s": ["field and crop records", "stock and movement records",
+              "input and treatment logging", "yield and sales recording",
+              "compliance and inspection paperwork"],
+        "c": ["merchants and buyers", "veterinary and agronomy advisers",
+              "inspectors", "contractors and seasonal labour"]},
+    "Cooking and food preparation": {
+        "s": ["prep list and par level keeping", "recipe and portion following",
+              "temperature and hygiene logs", "allergen record keeping",
+              "stock and waste recording"],
+        "c": ["head chef", "front of house",
+              "suppliers", "environmental health"]},
+    "Front of house": {
+        "s": ["table and booking management", "order taking and relaying",
+              "bill and payment handling", "allergen and dietary noting",
+              "complaint and comment recording"],
+        "c": ["guests", "kitchen",
+              "shift manager", "reservations"]},
+    "Legal practice": {
+        "s": ["matter and file opening", "document drafting and review",
+              "deadline and court date keeping", "attendance note writing",
+              "time recording and billing"],
+        "c": ["clients", "courts and tribunals",
+              "opposing representatives", "supervising solicitor"]},
+    "Finance and accounting": {
+        "s": ["ledger and journal posting", "reconciliation writing",
+              "return and filing preparation", "variance and review notes",
+              "audit evidence gathering"],
+        "c": ["clients or budget holders", "the bank",
+              "auditors and regulators", "the finance team"]},
+    "Performing arts": {
+        "s": ["rehearsal and call sheet keeping", "repertoire and set lists",
+              "booking and contract records", "rider and technical notes",
+              "royalty and rights tracking"],
+        "c": ["agent or manager", "venues and promoters",
+              "other performers", "audiences"]},
+    "Visual arts and photography": {
+        "s": ["brief and shot list keeping", "edit and proof handling",
+              "licensing and usage records", "portfolio and archive keeping",
+              "invoice and delivery notes"],
+        "c": ["clients and commissioners", "galleries and publishers",
+              "printers and labs", "subjects and models"]},
+    "Clergy and ministry": {
+        "s": ["service and sermon preparation", "pastoral visit records",
+              "register keeping", "safeguarding records",
+              "correspondence with the congregation"],
+        "c": ["the congregation", "denominational authority",
+              "families in the parish", "community organisations"]},
     "Teaching and instruction": {
         "s": ["lesson planning", "progress recording",
               "assessment and marking", "report writing to parents",

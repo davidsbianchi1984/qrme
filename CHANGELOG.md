@@ -31,10 +31,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   and `title_families.py` read side by side. `occupations._pool` merges
   own, then group, then family, dropping a phrase two tiers share.
 
-  Forty-two groups reach **26,084 of 45,153 positions (57.8%)** for
-  563 KB: the shapes that fill the trades, the six that were visibly
+  Fifty-five groups reach **28,508 of 45,153 positions (63.1%)** for
+  623 KB: the shapes that fill the trades, the six that were visibly
   wrong, what the hands are doing — cutting, finishing, mixing, making,
-  building, labouring — hairdressing and beauty, the office — claims, payroll, purchasing, human resources,
+  building, labouring — hairdressing and beauty, the fields with a shape
+  of their own — fire and rescue, security and policing, clinical
+  practice, aviation, marine and fishing, farming, cooking, front of
+  house, legal practice, finance and accounting, the performing and
+  visual arts, clergy — the office — claims, payroll, purchasing, human resources,
   reception, secretarial support, customer service, scheduling, data
   entry, and records and filing last of those because it is the one keyed
   on bare `clerk*` — and the professions: teaching, training, therapy and
@@ -64,7 +68,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   them ever becomes a token. Coverage is the ratchet's measure, not its
   goal.
 
-  Two stems that looked obvious and were not: `hair*`, because a
+  Six stems that looked obvious and were measured wrong before they
+  were written: `tax*` takes the taxi drivers and the taxidermists;
+  `fire*` takes the kiln firers; `server` takes the people who
+  administer machines; `logger*` takes seven oil-well loggers for every
+  four who fell trees; `hair*`, because a
   hairspring is a watch part and the watchmaking titles outnumber the
   salon ones — Hairspring Inspector, Balance and Hairspring Assembler —
   and `cat*`, which takes every catalogue clerk. Animal care knows `dog`

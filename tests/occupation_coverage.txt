@@ -27,7 +27,7 @@
 # number here. Lowering it is a deliberate act with a reason beside it,
 # not something a rebuild does by accident.
 
-COVERED  26084  of  45153
+COVERED  28508  of  45153
 
 # ## RAISED
 #
@@ -97,6 +97,22 @@ COVERED  26084  of  45153
 #             Inspector and Balance and Hairspring Assembler in a salon.
 #             Animal care also learned about dogs — `dog` and `canine*`
 #             but never `cat*`, which takes the catalogue clerks.
+#
+# 2026-09-06  26084 -> 28508 (63.1%). The fields with a shape of their
+#             own: fire and rescue, security and policing, clinical
+#             practice, aviation, marine and fishing, farming and
+#             growing, cooking, front of house, legal practice, finance
+#             and accounting, performing arts, visual arts and
+#             photography, clergy and ministry. Placed below the office
+#             and above the trades, so a legal secretary is a secretary
+#             and a deckhand is at sea.
+#
+#             Four stems were measured wrong before they were written.
+#             `tax*` takes the taxi drivers and the taxidermists. `fire*`
+#             takes the kiln firers. `server` takes the people who
+#             administer machines. `logger*` takes seven oil-well
+#             loggers for every four who fell trees. The phrases that
+#             mean the job are the tokens instead.
 #
 # ## What is deliberately not covered
 #

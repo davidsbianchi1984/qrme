@@ -271,7 +271,46 @@ def test_a_rank_that_says_nothing_is_not_a_group():
     named = {tok.strip() for _, tokens in RULES for tok in tokens.split(",")}
     assert not named & set(empty), (
         f"a rank that says nothing became a group: {sorted(named & set(empty))}")
-    assert group_of("Physician Assistant") is None
+    # A physician assistant is a clinician, and Clinical practice claims
+    # it on `physician*` — the word that says the work, not the one that
+    # says the rank. What must never happen is the row landing somewhere
+    # on the strength of "assistant".
+    assert group_of("Physician Assistant") == "Clinical practice"
+    assert group_of("Executive Assistant") == "Secretarial and executive support"
+    assert group_of("Research Assistant") == "Analysis and research"
+
+
+def test_a_stem_is_checked_against_the_pool_before_it_is_written():
+    """Four stems that looked obvious and were measured wrong.
+
+    `tax*` takes the taxi drivers and the taxidermists. `fire*` takes
+    the kiln firers. `server` takes the people who administer machines.
+    `logger*` takes seven oil-well loggers for every four who fell trees.
+    None is a token; the phrases that mean the job are.
+    """
+    assert group_of("Taxi Driver") == "Driving and delivery"
+    assert group_of("Taxidermist") is None
+    assert group_of("Kiln Firer") is None
+    assert group_of("Server Administrator") is None
+    assert group_of("Mud Logger") is None
+    assert group_of("Firefighter") == "Fire and rescue"
+    assert group_of("Tax Preparer") == "Finance and accounting"
+    bare = {tok.strip() for _, tokens in RULES for tok in tokens.split(",")}
+    assert not bare & {"tax*", "fire*", "server", "server*", "logger*"}
+
+
+def test_the_field_shapes_sit_between_the_office_and_the_trades():
+    """A legal secretary is a secretary; a deckhand is at sea.
+
+    Below the office so `clerk` and `secretary` keep their titles, above
+    the trades and the process shapes so a farm hand is on a farm and a
+    deckhand is on a deck before either is a hand.
+    """
+    assert group_of("Legal Secretary") == "Secretarial and executive support"
+    assert group_of("Tax Clerk") == "Records and filing"
+    assert group_of("Farm Hand") == "Farming and growing"
+    assert group_of("Deckhand") == "Marine and fishing"
+    assert group_of("Deck Builder") == "Building and construction"
 
 
 def test_a_group_never_speaks_over_a_written_role():
