@@ -27,7 +27,7 @@
 # number here. Lowering it is a deliberate act with a reason beside it,
 # not something a rebuild does by accident.
 
-COVERED  22979  of  45153
+COVERED  26084  of  45153
 
 # ## RAISED
 #
@@ -79,3 +79,34 @@ COVERED  22979  of  45153
 #             `operator*` outranks them. Lifting Driving above Machine
 #             operation fixed those four and broke six others, so the
 #             four stand.
+#
+# 2026-09-06  22979 -> 26084 (57.8%). What the hands are doing: cutting
+#             and shaping, finishing and coating, mixing and batching,
+#             making and craft, building and construction, labouring and
+#             helping — placed below every other rule, because they are
+#             for the titles that are only a process and a material.
+#             "Bone Cutter", "Sole Trimmer", "Abrasive Mixer": what
+#             by_shape files into Skilled trades on a word ending alone.
+#             A "Cutting Machine Operator" stays with Machine operation,
+#             because it is being operated.
+#
+#             Plus hairdressing and beauty, which had 108 titles, 67 with
+#             no group and six reading as machine operation. Written in
+#             phrases and never as a `hair*` stem: a hairspring is a
+#             watch part, and the stem would have put Hairspring
+#             Inspector and Balance and Hairspring Assembler in a salon.
+#             Animal care also learned about dogs — `dog` and `canine*`
+#             but never `cat*`, which takes the catalogue clerks.
+#
+# ## What is deliberately not covered
+#
+# The largest words left are technician (1,352), specialist (1,206),
+# worker (917), assistant (331) and associate (207), and none of them
+# will become a group. They say where somebody sits, not what they do,
+# and a group leads the merged row — so a Physician Assistant given
+# "task list working" reads worse than one given Health care's clinical
+# phrases, while this number goes up.
+#
+# Which is the thing to remember about this file: coverage is its
+# measure, not its goal. It is here to stop the catalogue sliding
+# backwards, and it is worth less than a right answer.

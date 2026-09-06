@@ -31,9 +31,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   and `title_families.py` read side by side. `occupations._pool` merges
   own, then group, then family, dropping a phrase two tiers share.
 
-  Thirty-five groups reach **22,979 of 45,153 positions (50.9%)** for
-  482 KB: the shapes that fill the trades, the six that were visibly
-  wrong, the office — claims, payroll, purchasing, human resources,
+  Forty-two groups reach **26,084 of 45,153 positions (57.8%)** for
+  563 KB: the shapes that fill the trades, the six that were visibly
+  wrong, what the hands are doing — cutting, finishing, mixing, making,
+  building, labouring — hairdressing and beauty, the office — claims, payroll, purchasing, human resources,
   reception, secretarial support, customer service, scheduling, data
   entry, and records and filing last of those because it is the one keyed
   on bare `clerk*` — and the professions: teaching, training, therapy and
@@ -52,6 +53,22 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   locomotive, stationary and maintenance senses are named explicitly on
   the groups that hold them. `coach*` is a token in no rule at all: as a
   stem it made every coach driver a trainer.
+
+  **What is deliberately not a group.** `technician` (1,352 unclaimed
+  titles), `specialist` (1,206), `worker` (917), `assistant` (331) and
+  `associate` (207) are the largest words left, and none becomes a
+  group. They say where somebody sits, not what they do, and a group
+  leads the merged row: a `Physician Assistant` given "task list
+  working" would read worse than one given Health care's clinical
+  phrases, while the coverage number went up. A test holds that none of
+  them ever becomes a token. Coverage is the ratchet's measure, not its
+  goal.
+
+  Two stems that looked obvious and were not: `hair*`, because a
+  hairspring is a watch part and the watchmaking titles outnumber the
+  salon ones — Hairspring Inspector, Balance and Hairspring Assembler —
+  and `cat*`, which takes every catalogue clerk. Animal care knows `dog`
+  and not `cat`.
 
   One wrong answer is recorded rather than fixed. Four coach and bus
   operators read as machine operation because `operator*` outranks them,

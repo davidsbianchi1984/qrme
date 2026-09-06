@@ -216,6 +216,64 @@ def test_the_words_that_live_inside_machines():
     assert group_of("Driver License Examiner") == "Inspection and testing"
 
 
+def test_a_hairspring_is_a_watch_part():
+    """The salon is written in phrases and never as a `hair*` stem.
+
+    48 titles in the pool start a word with "hair" and the watchmaking
+    ones outnumber the salon ones: Hairspring Inspector, Hairspring
+    Truing Inspector, Balance and Hairspring Assembler. `Hair Boiler` is
+    a rendering job. A stem would have taken all of them.
+    """
+    assert group_of("Hairspring Inspector") == "Inspection and testing"
+    assert group_of("Balance and Hairspring Assembler") == "Assembly"
+    assert group_of("Hair and Makeup Artist") == "Hairdressing and beauty"
+    assert not any("hair*" in {tok.strip() for tok in tokens.split(",")}
+                   for _, tokens in RULES), "a bare hair stem takes the watchmakers"
+
+
+def test_a_cat_is_a_catalogue():
+    """Animal care knows `dog` and not `cat`.
+
+    Three letters, and the stem that would have been symmetrical takes
+    every catalogue clerk with it. The animals it cannot name this way
+    are worth less than the clerks it would cost.
+    """
+    assert group_of("Dog Walker") == "Animal care"
+    assert group_of("Poultry Farmer") == "Animal care"
+    assert group_of("Catalog Clerk") == "Records and filing"
+    assert not any(tok.strip() in ("cat", "cat*")
+                   for _, tokens in RULES for tok in tokens.split(","))
+
+
+def test_the_process_shapes_sit_under_the_machine():
+    """A title that is only a process and a material is what these are for.
+
+    They sit below every other rule. "Bone Cutter" has nothing but the
+    process; "Cutting Machine Operator" is being operated, and the run
+    sheet is the work, so Machine operation keeps it.
+    """
+    assert group_of("Bone Cutter") == "Cutting and shaping"
+    assert group_of("Abrasive Mixer") == "Mixing and batching"
+    assert group_of("Cutting Machine Operator") == "Machine operation"
+
+
+def test_a_rank_that_says_nothing_is_not_a_group():
+    """Coverage is the ratchet's measure, not its goal.
+
+    `technician`, `specialist`, `worker`, `assistant` and `associate` are
+    the largest words left unclaimed, and grouping them would raise the
+    number while making the answers worse: a group leads the merged row,
+    so a Physician Assistant given "task list working" would lose the
+    clinical phrases it has now.
+    """
+    empty = ("technician*", "specialist*", "worker*", "assistant*",
+             "associate*", "consultant*", "professional*")
+    named = {tok.strip() for _, tokens in RULES for tok in tokens.split(",")}
+    assert not named & set(empty), (
+        f"a rank that says nothing became a group: {sorted(named & set(empty))}")
+    assert group_of("Physician Assistant") is None
+
+
 def test_a_group_never_speaks_over_a_written_role():
     """The 529 hand-written roles say more about themselves than a rule
     keyed on one word in a title ever can, so they take no group."""

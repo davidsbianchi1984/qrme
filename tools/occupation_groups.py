@@ -36,6 +36,25 @@ It also never outranks a written role. The 529 roles hand-written in
 merge order is own, then group, then family — the same order `_lead_with`
 already uses for a seat's own skills against its family's.
 
+## What is deliberately not a group
+
+`technician` (1,352 unclaimed titles), `specialist` (1,206), `worker`
+(917), `assistant` (331), `associate` (207) and `consultant` (278) are
+the largest words left, and none of them becomes a group. They say where
+somebody sits, not what they do, and a group leads the merged row — so a
+`Physician Assistant` given "task list working" would read worse than a
+`Physician Assistant` given Health care's clinical phrases, while the
+coverage number went up.
+
+`Supervision and management` is the one rank that is a group, and it
+earns it by being last: it decides only what nothing else claimed, and a
+title reaching it is read as a gap in the rules above. A rank rule placed
+where it can outrank real work is not coverage, it is noise with a
+percentage attached.
+
+Coverage is the ratchet's measure, not its goal. It exists to stop the
+catalogue sliding backwards, and it is worth less than a right answer.
+
 ## Coverage
 
 This file is not finished and is not meant to be finished in one sitting.
@@ -81,7 +100,8 @@ RULES: list[tuple[str, str]] = [
 
     ("Animal care",
      "veterinar*, animal, kennel*, groomer*, zookeep*, stable*, equine, "
-     "livestock, pet, aquarium*, wildlife"),
+     "livestock, pet, aquarium*, wildlife, dog, dogs, canine*, "
+     "feline*, puppy, kitten*, poultry, apiar*, beekeep*"),
 
     ("Personal care",
      "caregiver*, care aide*, care assistant*, care worker*, "
@@ -90,6 +110,13 @@ RULES: list[tuple[str, str]] = [
 
     ("Nursing",
      "nurse*, nursing, midwife*, midwives, midwifery"),
+
+    ("Hairdressing and beauty",
+     "hairdress*, hairstylist*, hair stylist*, barber*, beautician*, "
+     "cosmetolog*, manicur*, pedicur*, nail technician*, esthetic*, "
+     "aesthetic*, waxing, lash technician*, "
+     "hair assistant*, hair worker*, hair specialist*, hair artist*, "
+     "hair stylist*, shampooer*, makeup artist*, make-up artist*"),
 
     # -- keeping a place ---------------------------------------------------
     ("Cleaning and housekeeping",
@@ -190,7 +217,8 @@ RULES: list[tuple[str, str]] = [
 
     ("Sales and accounts",
      "sales, salesperson*, salesman*, saleswoman*, account executive*, "
-     "account manager*, business development, canvasser*, broker*"),
+     "account manager*, business development, canvasser*, broker*, "
+     "market maker*"),
 
     # -- the shapes that fill the trades -----------------------------------
     # `stationary engineer` and `operating engineer` are machine minders,
@@ -246,6 +274,42 @@ RULES: list[tuple[str, str]] = [
      "motor coach operator*, coach operator*, bus operator*, "
      "driver*, chauffeur*, courier*, delivery, dispatcher*, "
      "haulier*, trucker*, rider*"),
+
+    # -- what the hands are doing ------------------------------------------
+    #
+    # Below every rule above, on purpose. These claim the titles that are
+    # only a process and a material — "Bone Cutter", "Sole Trimmer",
+    # "Abrasive Mixer" — which is what `title_families.by_shape` files
+    # into Skilled trades on the strength of a word ending alone, and
+    # 9,769 of them are still sitting there. A "Cutting Machine Operator"
+    # is claimed by Machine operation above and stays there: it is being
+    # operated, and the run sheet is the work.
+    ("Cutting and shaping",
+     "cutter*, cutting, trimmer*, trimming, sawyer*, shearer*, "
+     "grinder*, grinding, borer*, driller*, turner*, planer*, "
+     "slitter*, slicer*, chopper*"),
+
+    ("Finishing and coating",
+     "finisher*, finishing, painter*, painting, polisher*, plater*, "
+     "plating, coater*, coating, varnisher*, lacquerer*, buffer*, "
+     "sandblaster*, galvaniz*, galvanis*, enameler*, enameller*"),
+
+    ("Mixing and batching",
+     "mixer*, mixing, blender*, blending, batch*, compounder*, "
+     "dyer*, dyeing, brewer*, distiller*, refiner*"),
+
+    ("Making and craft",
+     "maker*, craftsman*, craftswoman*, crafter*, carver*, weaver*, "
+     "potter*, tailor*, seamstress*, cobbler*, upholsterer*, "
+     "bookbinder*, engraver*, jeweler*, jeweller*"),
+
+    ("Building and construction",
+     "builder*, bricklayer*, mason*, carpenter*, joiner*, roofer*, "
+     "plasterer*, paver*, concreter*, scaffolder*, demolition"),
+
+    ("Labouring and helping",
+     "labourer*, laborer*, helper*, handyman*, handyperson*, "
+     "yard hand*, deck hand*, farm hand*, general hand*"),
 
     # -- the ambiguous one -------------------------------------------------
     #
@@ -310,6 +374,12 @@ SPECIFICS: dict[str, dict[str, list[str]]] = {
               "deterioration escalation"],
         "c": ["patients and families", "the responsible doctor",
               "ward and shift lead", "pharmacy"]},
+    "Hairdressing and beauty": {
+        "s": ["consultation and patch test records", "appointment card keeping",
+              "colour and formula recording", "product and stock use logging",
+              "aftercare advice writing"],
+        "c": ["clients", "product suppliers",
+              "salon manager", "the next stylist"]},
     "Cleaning and housekeeping": {
         "s": ["room and area checklists", "cleaning schedule keeping",
               "chemical safety records", "linen and supply counts",
@@ -436,6 +506,42 @@ SPECIFICS: dict[str, dict[str, list[str]]] = {
               "account review writing"],
         "c": ["prospects and customers", "sales manager",
               "delivery or fulfilment team", "credit control"]},
+    "Cutting and shaping": {
+        "s": ["cut list working", "measurement and marking records",
+              "offcut and yield recording", "blade and tool change logs",
+              "dimension checking"],
+        "c": ["the person who set the job", "materials store",
+              "quality checker", "the next operation"]},
+    "Finishing and coating": {
+        "s": ["surface preparation records", "coat and cure logging",
+              "colour and batch matching", "defect and rework noting",
+              "material safety records"],
+        "c": ["the person who set the job", "paint and coating suppliers",
+              "quality checker", "safety officer"]},
+    "Mixing and batching": {
+        "s": ["recipe and formulation following", "batch weight recording",
+              "sample retention logging", "yield and loss recording",
+              "contamination and allergen records"],
+        "c": ["the person who set the batch", "ingredient suppliers",
+              "laboratory", "production planner"]},
+    "Making and craft": {
+        "s": ["order and specification taking", "pattern and template keeping",
+              "material and cost estimating", "work-in-progress recording",
+              "repair and alteration notes"],
+        "c": ["customers", "material merchants",
+              "other makers", "the person who commissioned it"]},
+    "Building and construction": {
+        "s": ["setting-out records", "material take-off and ordering",
+              "daywork and variation sheets", "inspection hold points",
+              "site diary keeping"],
+        "c": ["site manager", "other trades",
+              "building inspector", "builders merchants"]},
+    "Labouring and helping": {
+        "s": ["task list working", "material moving records",
+              "timesheet keeping", "hazard and near-miss reporting",
+              "tool and equipment sign-out"],
+        "c": ["the person being helped", "site or shift supervisor",
+              "stores", "safety officer"]},
     "Engineering": {
         "s": ["requirement and specification writing", "calculation recording",
               "drawing and revision control", "test and inspection reports",
