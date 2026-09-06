@@ -172,7 +172,8 @@ Each row: the technical problem, the implementation with its own numbers, the te
 | The recoverable watermark | Text leaves the platform as plain characters; nothing in it says who produced it. | `qrme/watermark.py` stamps each approved render with a credential derived from the producing profile (`stamp`) and answers `lookup` from the text alone — no database of copies, the mark is in the bytes. | `test_watermark.py`, `test_watermark_recovery.py` | 148 |
 | Avatars, the registry and the stage | A face built from a portrait must be the same face in the bubble, the room and full screen, and must say it is synthetic. | `qrme/avatarforge.py` builds face, torso and `.glb` from one portrait; `qrme/avatarreg.py` is the registry every surface reads; the stage marks the figure `✦ AI` in its own pixels. | `test_avatars.py`, `test_the_avatar_registry.py`, `test_the_avatar_takes_the_screen.py` | 44, 205 |
 | The Company Builder | A staffed digital company built by hand is a pile of unrelated profiles. | `qrme/company.py` founds a company, opens seats, drafts each interview, and signs a hire into a department under the founder's account. | `test_a_company_is_hired_one_interview_at_a_time.py` | 210, 146 |
-| The carried occupation table | Asked for a roster with no model reachable, the Builder answered with three canned seats — the trade, a front desk, a bookkeeper — because it had nothing else to answer from. | `qrme/occupations.py` carries 45,147 positions in 16 families, each with the digital skills and connections the work needs; `for_trade` ranks the trade above the founder's own adjectives and never offers a taxonomy's residual bucket as a job. Search is by what the work *does*, not its name. | `test_the_pool_answers_what_people_type.py` | — |
+| The carried occupation table | Asked for a roster with no model reachable, the Builder answered with three canned seats — the trade, a front desk, a bookkeeper — because it had nothing else to answer from. | `qrme/occupations.py` carries 45,153 positions in 16 families, each with the digital skills and connections the work needs; `for_trade` ranks the trade above the founder's own adjectives and never offers a taxonomy's residual bucket as a job. Search is by what the work *does*, not its name. | `test_the_pool_answers_what_people_type.py` | — |
+| A position says what it does, not what field it is in | 529 of 45,153 positions were written by hand; the other 44,624 arrived as titles and took their skills from one of sixteen family blocks, so a Commercial Housekeeper claimed till reconciliation and a Radiologist claimed triage by severity. | `tools/occupation_groups.py` adds a third tier between the title and the family — the *shape* of the work — matched as families are: ordered rules, first match wins, `*` a stem. `qrme/occupations.py` merges own, then group, then family, and a group never speaks over a written row. 64 groups reach 29,710 positions (65.8%); `tests/occupation_coverage.txt` only lets that number rise; 22 guards hold the order — teaching before its subject, engineering after the trade, a coach is also a vehicle, a hairspring is a watch part. Rows are examined below. | `test_a_job_is_not_its_family.py`, `test_the_examination_page_reads_the_catalogue.py` | — |
 | The study's findings become the record's own fields | 516 of 45,153 occupations carry skills of their own; the rest inherited their family's, so a browse of the whole table read as sixteen jobs repeated. | `company.role_specifics` parses the fetched study into the same structured lists the seat stores, merged ahead of the pool's and deduplicated case-blind; `tailored` counts what the study contributed, so a generic card can say whether nothing was found or nothing was asked. | `test_the_study_says_what_this_job_needs.py` | 213 |
 | A door the new hire cannot open | Equipping a hire with a third-party program needs a credential the platform must not mint. | The trade's tools are matched against the connector catalogue by counted word overlap; the signature writes a connector with `authorized_at` NULL for anything needing a sign-in or key, so the grant is real, revocable and inert until the owner supplies the credential on Plugins. Tools with no connector are named rather than dropped. | `test_the_new_hire_is_kitted_out_in_the_seat.py` | 218 |
 | Eyes, ears, hands and a body, fitted in the seat | Kitting out a new hire meant leaving the hire: a screen was placed from the employee file, a speaker added in the Workshop, a robot bound on the settings shelf, a face claimed in the studio. | The Company Builder walks a four-rung ladder — `RUNGS` in `app/src/screens/Companies.tsx` — holding the choices against a seat that has no profile yet; `signAndSeat` signs, mints the new profile's own key, and applies each held choice through its existing door, reporting per piece what did not go on. | `test_the_new_hire_is_kitted_out_in_the_seat.py` | 217 |
@@ -188,3 +189,32 @@ Each row: the technical problem, the implementation with its own numbers, the te
 | Signatures that survive dispute | A signature over a document's name is not a signature over the document. | `qrme/signatures.py` signs the bytes and records the hash, the signer and the time; a changed byte is a failed verification. | `test_a_signature_over_the_bytes.py` | 112, 113 |
 | A person settles it, signed in or not | A complaint that needs an account cannot be made by the person locked out of one. | `qrme/matters.py` accepts a matter from the front door with no session and hands it to a person; the reply reaches the address given. | — | 203 |
 
+## The catalogue, examined
+
+Ten rows from the carried table, as the reader returns them. *Family
+alone* is what the row led with before the group tier existed; *now* is
+what `qrme.occupations.find` returns today. The family column is
+unchanged on every row — nothing was re-filed, and a row the taxonomy
+put in the wrong family keeps that family for the search index and stops
+leading with the wrong half. Two rows were written by hand and carry no
+group, because a group never speaks over a written role; one has no
+group at all, and is listed as the honest gap it is.
+
+The table is generated, not typed: `test_the_examination_page_reads_the_
+catalogue.py` rebuilds every cell from the reader and fails when the page
+and the pool disagree.
+
+<!-- catalogue-examined:start -->
+| Title | Family | Group | Family alone | Now |
+|---|---|---|---|---|
+| Commercial Housekeeper | Hospitality, food & retail | Cleaning and housekeeping | order taking / stock rotation / hygiene record keeping | room and area checklists / cleaning schedule keeping / chemical safety records |
+| Attending Radiologist | Health care | Clinical imaging | patient history intake / clinical note writing / coded record keeping | study protocol selection / image report dictation / prior study comparison |
+| Animal Caregiver | Mental health & social care | Animal care | case note writing / risk flagging / referral drafting | animal record keeping / feeding and treatment logs / welfare observation notes |
+| Physician Assistant | Health care | Clinical practice | patient history intake / clinical note writing / coded record keeping | consultation note writing / prescription and order writing / referral letter drafting |
+| Mud Logger | Agriculture, environment & animals | Energy and extraction | field or site record keeping / seasonal planning / compliance recording | shift and tour reporting / permit-to-work handling / well and plant log keeping |
+| Hairspring Inspector | Business, people & operations | Inspection and testing | meeting minutes / process documentation / stakeholder updating | defect logging / sampling records / non-conformance reporting |
+| Deckhand | Transport & logistics | Marine and fishing | route planning / manifest handling / hours and rest recording | log book keeping / watch and weather records / catch and cargo recording |
+| Train Conductor | Transport & logistics | — (written by hand) | route planning / manifest handling / hours and rest recording | ticket inspection / dispatch procedure / route planning |
+| Legal Secretary | Law & public administration | — (written by hand) | statute reading / precedent research / document drafting | diary management / document formatting / statute reading |
+| Kiln Firer | Skilled trades | — (no group yet) | job sheet keeping / materials estimating / quotation drafting | job sheet keeping / materials estimating / quotation drafting |
+<!-- catalogue-examined:end -->

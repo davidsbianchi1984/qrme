@@ -8,6 +8,28 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- **The catalogue, examined.** `docs/examination.md` carries a highlight
+  row for the group tier with the build's numbers, and ends with ten
+  positions shown three ways: what the family alone led with, what the
+  reader returns now, and the group that made the difference. Seven are
+  repairs — Commercial Housekeeper no longer leads with stock rotation,
+  Attending Radiologist with patient history intake, Mud Logger with
+  seasonal planning. Two are written rows the group stays silent on,
+  because a group never speaks over a written role. One, Kiln Firer, has
+  no group and is listed as the gap it is. The family column is unchanged
+  on every row: nothing was re-filed.
+
+  The table is generated, not typed. `test_the_examination_page_reads_
+  the_catalogue.py` rebuilds every cell from `qrme.occupations.find` and
+  the pool's family blocks, holds that all three outcomes are shown, and
+  holds the highlight row's group count and reach against the build. The
+  page's older row for the carried table said 45,147 positions; it says
+  45,153 now, and the number is read rather than remembered. The two
+  floors the guard stands on — ten rows, seven repairs — are registered
+  in `tests/ratchets.py`, because the suite's own meta-guard refused
+  them as bare literals: a number written into an assertion is a number
+  nothing will ever compare against what it measures.
+
 - **The deploy block checks its own versions.** `docker/beta-versions.sh`
   is the last line of the runbook's deploy block. It reads the three
   public names from the same `.env` the compose line uses, asks each

@@ -664,6 +664,16 @@ def _deploy_check_blocks() -> int:
     return len(_checks())
 
 
+def _examined_rows() -> int:
+    from .test_the_examination_page_reads_the_catalogue import _page_rows
+    return len(_page_rows())
+
+
+def _examined_repairs() -> int:
+    from .test_the_examination_page_reads_the_catalogue import _page_rows
+    return sum(1 for cells in _page_rows() if not cells[2].startswith("—"))
+
+
 def _generating_routes() -> int:
     from .test_a_memorial_does_not_keep_posting import _generating_routes
     return len(_generating_routes())
@@ -996,6 +1006,10 @@ RATCHETS: tuple[Ratchet, ...] = (
             "the `i18n.fill` call sites the conversion left behind"),
     Ratchet("deploy.check_blocks", 2, _deploy_check_blocks,
             "the check blocks the deploy page offers a choice between"),
+    Ratchet("examination.catalogue_rows", 10, _examined_rows,
+            "the positions the examination page shows three ways"),
+    Ratchet("examination.catalogue_repairs", 7, _examined_repairs,
+            "the examined rows a group repaired"),
     Ratchet("route.generating", 10, _generating_routes,
             "the routes that generate, as the walk finds them"),
     Ratchet("form.declared_fields", 256, _form_declared_fields,
