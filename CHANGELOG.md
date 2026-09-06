@@ -32,6 +32,23 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   any dependency does not, the other proves the masked fields still agree
   with `app/package.json`.
 
+- **A guard so the gateway cannot answer for one product and not the
+  other.** `docker/beta-compose.yml` runs one `cloudgw` doing two jobs,
+  and the box uses one of them: the error-report collector. Greater-model
+  inference is switched on by `QRME_CLOUD_URL` and `JIM_CLOUD_URL`, and
+  neither is set — a decision the file argues for and then left resting on
+  a comment. Setting one and not the other is a one-line edit that deploys
+  clean, brings both containers up healthy, and shows only as two
+  `/health` bodies disagreeing about a field nobody reads on purpose.
+  `test_the_gateway_answers_for_both_products_or_neither` makes the split
+  a red suite instead, and holds three things beside it: a wired product
+  carries a token as well as an address, the variable names in the
+  compose comment are the ones `qrme/api.py` actually reads, and
+  switching inference off is never read as licence to drop the container
+  the collector runs in. The comment is corrected too — it claimed all
+  three products answer `"cloud": false`, and PDI has no such field at
+  all.
+
 ## [3.2.0] - 2026-09-06
 
 ### Added

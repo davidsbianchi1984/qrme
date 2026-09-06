@@ -406,19 +406,31 @@ services:
   #      is what QRME_CLOUD_URL / JIM_CLOUD_URL would switch on, and neither
   #      is set anywhere in this file.
   #
-  # Which is why all three products answer `"cloud": false` on /health. Read
-  # cold that looks like a container running for nothing, and it was listed as
-  # an undecided question for two releases. It is decided here rather than
-  # inferred again: setting those variables routes **inference** for everybody
-  # on the box to the gateway's hosted tier, and the local provider stack
-  # already works. A beta is not where you change which model answers.
+  # Which is why QRME and JIM both answer `"cloud": false` on /health. (PDI
+  # has no such field: it holds no switch, so there is nothing about it to
+  # disagree. The two that can be pointed at the gateway are the two this
+  # rule is about.) Read cold, `false` on both looks like a container
+  # running for nothing, and it was listed as an undecided question for two
+  # releases. It is decided here rather than inferred again: setting those
+  # variables routes **inference** for everybody on the box to the gateway's
+  # hosted tier, and the local provider stack already works. A beta is not
+  # where you change which model answers.
   #
-  # It is one edit away when that is wanted, and all three go together — a box
-  # where two products use the greater model and the third does not is a box
+  # It is one edit away when that is wanted, and both go together — a box
+  # where one product uses the greater model and the other does not is a box
   # answering the same question two ways:
   #
   #   QRME_CLOUD_URL: http://cloudgw:8300
   #   QRME_CLOUD_TOKEN: ${CLOUDGW_CONSOLES_TOKEN:?}
+  #   JIM_CLOUD_URL: http://cloudgw:8300
+  #   JIM_CLOUD_TOKEN: ${CLOUDGW_CONSOLES_TOKEN:?}
+  #
+  # That pairing is no longer a sentence anybody has to remember: setting one
+  # and not the other is a red suite. See
+  # tests/test_the_gateway_answers_for_both_products_or_neither.py, which also
+  # holds that a wired product carries a token, that the names here are the
+  # names qrme/api.py reads, and that switching inference off never gets read
+  # as licence to drop the container the error-report collector runs in.
   #
   # Contribution stays opt-in per profile either way; pointing a product at
   # the gateway only makes the offer possible, it does not accept it.
