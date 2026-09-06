@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.3.0] - 2026-09-06
+
 ### Added
 
 - **A position says what it does, not what field it is in.** The pool
@@ -18539,7 +18541,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.2.1...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.3.0...HEAD
+[3.3.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.2.1...app-v3.3.0
 [3.2.1]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.2.0...app-v3.2.1
 [3.2.0]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.10...app-v3.2.0
 [3.1.10]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.9...app-v3.1.10
