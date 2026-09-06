@@ -19,7 +19,7 @@ import { useSession } from "../store";
  * Nothing about the doors needed the founder to leave. Only the screens
  * did.
  */
-const RUNGS = ["eyes", "ears", "hands", "body"] as const;
+const RUNGS = ["eyes", "ears", "hands", "tools", "body"] as const;
 
 /** Has this rung been answered? `body` is the awkward one: a face can be
  *  a pick off the shelf or a sentence handed to the forge, and either
@@ -28,6 +28,7 @@ function filled(kit: Kit, rung: typeof RUNGS[number]): boolean {
   if (rung === "eyes") return !!kit.eyes;
   if (rung === "ears") return !!kit.ears;
   if (rung === "hands") return !!kit.hands;
+  if (rung === "tools") return kit.tools.length > 0;
   return !!kit.face || !!kit.painted.trim();
 }
 
@@ -41,6 +42,13 @@ type Kit = {
   eyes: { kind: string; label: string } | null;
   ears: { kind: string; name: string } | null;
   hands: { model: string; label: string } | null;
+  /** The programs the study named that this platform has a door to, and
+   *  that the founder pressed. A connection is the owner's own
+   *  credential, so unlike the other rungs nothing here is chosen and
+   *  applied later — the press runs the ordinary connect flow against
+   *  the hire the moment it exists, which is why this list holds what
+   *  has *been* connected rather than what will be. */
+  tools: { provider: string; app: string; label: string }[];
   face: { id: string; label: string } | null;
   /** A face described in words when the shelf has none that fits. Held
    *  as text rather than as a fifth `| null` because the forge is given
@@ -114,6 +122,9 @@ export function Companies({ onOpenProfile }: {
   const [study, setStudy] = useState<{
     seatId: string; found: boolean; knownAs: string | null;
     skills: string[]; connections: string[]; tailored: number;
+    tools: { provider: string; app: string; label: string;
+             because: string }[];
+    toolsNamed: string[];
     knowledge: string; studiedBy: string | null;
   } | null>(null);
   const [addSkill, setAddSkill] = useState("");
@@ -131,6 +142,9 @@ export function Companies({ onOpenProfile }: {
   const [eyeLabel, setEyeLabel] = useState("");
   const [earKind, setEarKind] = useState("speaker");
   const [earName, setEarName] = useState("");
+  // Which of the trade's programs the founder ticked. Held apart from
+  // `kit.tools`, which is what actually went on at the signature.
+  const [toolPick, setToolPick] = useState<string[]>([]);
 
   // The interview under edit, per seat.
   const [interview, setInterview] = useState<{
@@ -146,6 +160,7 @@ export function Companies({ onOpenProfile }: {
   const [screens, setScreens] = useState<Display[]>([]);
   const [shelf, setShelf] = useState<RobotCatalogue | null>(null);
   const [kinds, setKinds] = useState<{ kind: string; means: string }[]>([]);
+  const [worksWith, setWorksWith] = useState<string[]>([]);
   const [screenKind, setScreenKind] = useState("");
   const [screenLabel, setScreenLabel] = useState("");
   const [handoff, setHandoff] = useState<{
@@ -189,6 +204,7 @@ export function Companies({ onOpenProfile }: {
       api.displayCatalog(),
     ]);
     setForms(bodies);
+    setWorksWith((await api.getProfile(profileId)).works_with || []);
     setScreens(myScreens.displays.filter((d) => d.live));
     setShelf(catalogue);
     setKinds(vocab.kinds.map((k) => ({ kind: k.kind, means: k.means })));
@@ -220,8 +236,9 @@ export function Companies({ onOpenProfile }: {
   // Open the ladder at its first rung. Pressed from the study's Keep,
   // so reading what the job needs is what leads into equipping for it.
   const startKit = async (seatId: string) => {
-    setKit({ seatId, eyes: null, ears: null, hands: null,
+    setKit({ seatId, eyes: null, ears: null, hands: null, tools: [],
              face: null, painted: "" });
+    setToolPick([]);
     setRung(RUNGS[0]);
     await loadKit();
   };
@@ -242,10 +259,10 @@ export function Companies({ onOpenProfile }: {
         .map((r) => ({ question: r.question, answer: r.answer.trim() })),
     }, token);
     const chosen = kit?.seatId === seatId ? kit : null;
-    setInterview(null); setStudy(null); setKit(null); setRung("");
+    setInterview(null); setKit(null); setRung("");
     if (!chosen) return;
 
-    const key = await employeeKey(hired.profile_id);
+    const key2 = await employeeKey(hired.profile_id);
     const missed: string[] = [];
     const fit = async (what: string, go: () => Promise<unknown>) => {
       try { await go(); } catch { missed.push(what); }
@@ -253,7 +270,7 @@ export function Companies({ onOpenProfile }: {
     if (chosen.eyes) {
       const eyes = chosen.eyes;
       await fit(tr("com.kit.eyes", lang), () => api.placeDisplay(
-        hired.profile_id, { kind: eyes.kind, label: eyes.label }, key));
+        hired.profile_id, { kind: eyes.kind, label: eyes.label }, key2));
     }
     if (chosen.ears) {
       const ears = chosen.ears;
@@ -262,21 +279,34 @@ export function Companies({ onOpenProfile }: {
       // rides on the hardware would be a claim about the hardware.
       await fit(tr("com.kit.ears", lang), () => api.addEmbodiment(
         hired.profile_id,
-        { name: ears.name, kind: ears.kind, has_llm: false }, key));
+        { name: ears.name, kind: ears.kind, has_llm: false }, key2));
     }
     if (chosen.hands) {
       const hands = chosen.hands;
       await fit(tr("com.kit.hands", lang), () => api.bindRobot(
-        hired.profile_id, { model: hands.model, name: hands.label }, key));
+        hired.profile_id, { model: hands.model, name: hands.label }, key2));
+    }
+    // The programs. `connectApp` creates the connector and leaves it
+    // unauthorised — `authorized_at` stays NULL for anything needing a
+    // sign-in or a key — so this hands the new hire a door and never a
+    // credential. The founder finishes each one on Plugins.
+    if (toolPick.length && study?.seatId === seatId) {
+      for (const key of toolPick) {
+        const t = study.tools.find(
+          (x) => `${x.provider}/${x.app}` === key);
+        if (!t) continue;
+        await fit(t.label, () => api.connectApp(
+          hired.profile_id, { provider: t.provider, app: t.app }, key2));
+      }
     }
     if (chosen.face) {
       const face = chosen.face;
       await fit(tr("com.kit.body", lang), () => api.claimFace(
-        hired.profile_id, face.id, key));
+        hired.profile_id, face.id, key2));
     } else if (chosen.painted.trim()) {
       const words = chosen.painted.trim();
       await fit(tr("com.kit.body", lang), () => api.paintFace(
-        hired.profile_id, words, key));
+        hired.profile_id, words, key2));
     }
     if (missed.length) {
       // Plain substitution, not `fill`: `fill` returns nodes for a
@@ -560,6 +590,19 @@ export function Companies({ onOpenProfile }: {
               )}
               {fileFor === s.id && s.profile_id && (
                 <div className="com-file">
+                  {/* Who this one works with, off the study it was hired
+                      on. The list reached the profile at the signature;
+                      this is the founder seeing it afterwards, on the
+                      person it is about, rather than only on the card
+                      that fetched it. */}
+                  {worksWith.length > 0 && (
+                    <>
+                      <h4>{tr("com.file.reaches", lang)}</h4>
+                      <p className="muted small">
+                        {worksWith.join(" · ")}
+                      </p>
+                    </>
+                  )}
                   <h4>{tr("com.work.title", lang)}</h4>
                   {forms.length === 0 && screens.length === 0 && (
                     <p className="muted small">{tr("com.work.none", lang)}</p>
@@ -773,6 +816,8 @@ export function Companies({ onOpenProfile }: {
                                 skills: found.skills,
                                 connections: found.connections,
                                 tailored: found.tailored,
+                                tools: found.tools,
+                                toolsNamed: found.tools_named,
                                 knowledge: found.knowledge,
                                 studiedBy: found.studied_by,
                               });
@@ -1041,6 +1086,83 @@ export function Companies({ onOpenProfile }: {
                           </div>
                           <div className="com-add">
                             <button disabled={!kit.hands}
+                                    onClick={() => setRung("tools")}>
+                              {fill(tr("com.kit.next", lang),
+                                    { next: tr("com.kit.tools", lang) })}
+                            </button>
+                            <button className="muted small"
+                                    data-go="pass"
+                                    onClick={() => setRung("tools")}>
+                              {tr("com.kit.skip", lang)}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Tools: the programs the study said this trade is
+                          worked in, split into the ones this platform
+                          has a door to and the ones it has not.
+
+                          This rung differs from the four around it in a
+                          way the founder should feel rather than read
+                          about: a connection is *their* credential. The
+                          tick chooses; the signature creates the
+                          connector; nothing acts until the credential is
+                          handed over on the Plugins screen. A connector
+                          made here and never authorised can do nothing
+                          at all, which is what makes it safe to make
+                          one on somebody's behalf. */}
+                      {rung === "tools" && (
+                        <div className="com-rung">
+                          <p className="muted small">
+                            {tr("com.kit.tools.pitch", lang)}
+                          </p>
+                          {study?.seatId === s.id
+                            && !study.tools.length
+                            && !study.toolsNamed.length && (
+                            <p className="muted small">
+                              {tr("com.kit.tools.none", lang)}
+                            </p>
+                          )}
+                          <div className="com-scroll">
+                            {study?.seatId === s.id
+                              && study.tools.map((t) => {
+                              const key = `${t.provider}/${t.app}`;
+                              const on = toolPick.includes(key);
+                              return (
+                                <div key={key} className="com-line">
+                                  <span>
+                                    <b>{t.label}</b>{" "}
+                                    <span className="muted small">
+                                      {t.because}
+                                    </span>
+                                  </span>
+                                  <button className="muted small"
+                                          onClick={() => setToolPick(
+                                            on ? toolPick.filter(
+                                                   (k) => k !== key)
+                                               : [...toolPick, key])}>
+                                    {on ? tr("com.kit.picked", lang)
+                                        : tr("com.kit.pick", lang)}
+                                  </button>
+                                </div>
+                              );
+                            })}
+                          </div>
+                          {/* Named and not offered. The study found these
+                              and this platform has no connector for
+                              them; saying so is the difference between a
+                              list of what the job needs and a list of
+                              what can be sold to the founder. */}
+                          {study?.seatId === s.id
+                            && study.toolsNamed.length > 0 && (
+                            <p className="muted small">
+                              {tr("com.kit.tools.named", lang)}{" "}
+                              {study.toolsNamed.join(" · ")}
+                            </p>
+                          )}
+                          <div className="com-add">
+                            <button disabled={!toolPick.length}
                                     onClick={() => setRung("body")}>
                               {fill(tr("com.kit.next", lang),
                                     { next: tr("com.kit.body", lang) })}

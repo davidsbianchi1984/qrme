@@ -191,6 +191,25 @@ class ProfileOut(BaseModel):
     # what the person does, and a reader choosing between thirty faces is
     # choosing on the second.
     job_title: str | None = None
+    # Who this one works with, and the trade it was hired into.
+    #
+    # `works_with` is the study's own list — imaging technologists,
+    # referrers, pharmacy — on the person it describes. Public with the
+    # job title, and for the same reason: it is part of the introduction,
+    # not a secret. Empty for every profile that was not hired into a
+    # studied seat.
+    #
+    # `trade_family` is one of the sixteen occupation families, and it is
+    # here so a surface can ask what industry this one proposes work
+    # under (`exchange.industry_for`) instead of defaulting to whatever
+    # sits first in a menu.
+    works_with: list[str] = Field(default_factory=list)
+    trade_family: str | None = None
+    # The family put through `exchange.industry_for`, computed here so a
+    # client never has to carry a copy of the map. Always one of
+    # `exchange.INDUSTRIES`, "other" for a profile with no trade — which
+    # is a truthful default in a way that "software" was not.
+    trade_domain: str = "other"
     demographics: dict
     sources: list[str]
     anonymous: bool

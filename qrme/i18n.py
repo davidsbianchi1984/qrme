@@ -8669,6 +8669,13 @@ _FIELD_LABELS: dict[str, dict[str, str]] = {
     # two the founder edits on the study card after the download.
     "skills": {"en": "Skills this one must have", "es": "Habilidades que debe tener", "fr": "Compétences requises", "de": "Erforderliche Fähigkeiten", "pt": "Competências necessárias", "it": "Competenze necessarie", "ja": "必要な技能", "zh": "必备技能", "hi": "आवश्यक कौशल", "ar": "المهارات المطلوبة"},
     "connections": {"en": "Who and what it must reach", "es": "A quién y a qué debe llegar", "fr": "Qui et quoi il doit joindre", "de": "Wen und was es erreichen muss", "pt": "Quem e o que deve alcançar", "it": "Chi e cosa deve raggiungere", "ja": "つながる相手", "zh": "必须联系的人与系统", "hi": "किससे जुड़ना होगा", "ar": "بمن يجب أن يتصل"},
+    # What the signature carries onto the person, off the study it was
+    # hired on. Output-only — `hire` writes them, nothing types them —
+    # but a field a person can meet in a refusal needs the words the
+    # screen uses for it rather than its column name.
+    "works_with": {"en": "Who they reach", "es": "A quién llegan", "fr": "Qui ils joignent", "de": "Wen sie erreichen", "pt": "Quem alcançam", "it": "Chi raggiungono", "ja": "つながる相手", "zh": "他们联系的人", "hi": "वे किससे जुड़ते हैं", "ar": "من يصلون إليه"},
+    "trade_family": {"en": "Trade", "es": "Oficio", "fr": "Métier", "de": "Handwerk", "pt": "Ofício", "it": "Mestiere", "ja": "職種", "zh": "行业", "hi": "पेशा", "ar": "المهنة"},
+    "trade_domain": {"en": "Industry", "es": "Sector", "fr": "Secteur", "de": "Branche", "pt": "Setor", "it": "Settore", "ja": "業界", "zh": "行业领域", "hi": "उद्योग", "ar": "القطاع"},
     "department": {"en": "Which department", "es": "Qué departamento", "fr": "Quel département", "de": "Welche Abteilung", "pt": "Qual departamento", "it": "Quale reparto", "ja": "どの部門", "zh": "哪个部门", "hi": "कौन-सा विभाग", "ar": "أي قسم"},
     "device_name": {"en": "Device name", "es": "Nombre del dispositivo", "fr": "Nom de l\u2019appareil", "de": "Gerätename", "pt": "Nome do dispositivo", "it": "Nome del dispositivo", "ja": "デバイス名", "zh": "设备名称", "hi": "डिवाइस का नाम", "ar": "اسم الجهاز"},
     "battery": {"en": "Battery", "es": "Batería", "fr": "Batterie", "de": "Batterie", "pt": "Bateria", "it": "Batteria", "ja": "バッテリー", "zh": "电量", "hi": "बैटरी", "ar": "البطارية"},

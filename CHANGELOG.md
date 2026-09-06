@@ -6,6 +6,74 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.1.10] - 2026-09-06
+
+### Added
+
+- **The rest of what the study found reaches the hire.** Skills were the
+  only one of four lists that went anywhere. `hire` never read
+  `seat["connections"]` at all — the people, departments and outside
+  bodies a job has to reach were fetched, stored on the seat, and read
+  by nobody. There was nowhere for them to go, either:
+  `routers/connections.py` is anonymous person-to-person chat and a
+  referrer is not a profile.
+
+  They land three ways now, each answering a different question. Filed
+  as source material, so every reply grounds on who this job answers to
+  — the half that changes what the employee *does*. Cross-matched
+  against the roster, so a named connection that is also a colleague
+  already hired is recorded as why that link exists. And kept on the
+  profile as `works_with`, public with the job title, because who
+  somebody works with is part of the introduction rather than a secret.
+
+- **A fifth rung: the trade's tools.** The study names the programs a
+  job is worked in; `company.match_tools` splits them into the ones this
+  platform has a connector for and the ones it does not, and both halves
+  travel. A founder shown only what can be sold to them cannot tell a
+  job that needs nothing else from one that needs something nobody here
+  supports.
+
+  The rung is deliberately unlike the four around it. A connection is
+  the owner's own credential, so ticking chooses, the signature calls
+  `connectApp`, and `authorized_at` stays NULL for anything needing a
+  sign-in or a key — the hire holds a door it cannot open until the
+  credential is handed over on Plugins. Making a connector on somebody's
+  behalf is safe precisely because an unauthorised one can do nothing.
+
+### Fixed
+
+- **Every synthetic professional proposed work under "software".** The
+  Exchanges screen opened on `useState("software")` — the first entry of
+  `exchange.INDUSTRIES` — because nothing on a profile said what trade
+  it was hired into. The sixteen occupation families are mapped onto the
+  sixteen exchange industries (`exchange.industry_for`), the signature
+  writes the family onto the profile, and the menu opens on it. A hired
+  radiologist gets `healthcare`. Four families land on `other`, which is
+  the honest answer rather than a gap: a zookeeper is real work and is
+  not one of the fifteen named industries. An unmapped family falls to
+  `other` too — the first entry of a menu is a position, not a meaning,
+  and defaulting to it is how every trade ended up filed as software.
+
+- **The Grants form asked which skill and knew the answer.** `kind`
+  already defaulted to `profession`, which is right for a hired
+  professional; the skill itself now fills from the job title.
+
+- **The tool matcher took the first hit rather than the best.** Two bugs
+  in one function, both caught before it shipped: "Google Calendar"
+  matched *Apple's* Calendar because any single shared word won and
+  Apple's entry came first, and "a computer" matched "Read a page"
+  because discarding "computer" as a category word left the article
+  behind. Overlap is counted rather than merely detected, and words of
+  two characters or fewer go with the categories.
+
+- **A tall card lost its first lines to the camera.**
+  `scroll_into_view_if_needed()` centres what it scrolls to, which is
+  right for a control and wrong for a card: the study card measured
+  y = −94.75, taller than the viewport and centred with its top above
+  the window, and the stitched capture rendered everything off-screen as
+  black. It had been quietly eating a heading and the line beneath it,
+  both present in the DOM the whole time.
+
 ## [3.1.9] - 2026-09-06
 
 ### Added
@@ -18247,7 +18315,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.9...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.10...HEAD
+[3.1.10]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.9...app-v3.1.10
 [3.1.9]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.8...app-v3.1.9
 [3.1.8]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.7...app-v3.1.8
 [3.1.7]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.6...app-v3.1.7

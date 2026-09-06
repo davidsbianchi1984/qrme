@@ -1324,6 +1324,13 @@ export interface Profile {
    *  profile that has not said. `job_title`, not `position`: the friends
    *  list already puts a `position` on the wire and it is an ordinal. */
   job_title?: string | null;
+  /** Who this one works with, off the study it was hired on, and the
+   *  trade it was hired into. `trade_domain` is that family already put
+   *  through the exchange map, so a screen defaults to the right
+   *  industry without carrying a copy of it. */
+  works_with?: string[];
+  trade_family?: string | null;
+  trade_domain?: string;
   kind: string;
   purpose?: string;
   status?: string;
@@ -6446,8 +6453,11 @@ export const api = {
   studySeat: (companyId: string, seatId: string, token: string) =>
     req<{ seat_id: string; title: string; known_as: string | null;
           family: string | null; found: boolean; skills: string[];
-          connections: string[]; tailored: number; knowledge: string;
-          studied_by: string | null }>(
+          connections: string[]; tailored: number;
+          tools: { provider: string; app: string; label: string;
+                   because: string }[];
+          tools_named: string[];
+          knowledge: string; studied_by: string | null }>(
       `/companies/${companyId}/seats/${seatId}/study`,
       { method: "POST", token }),
   keepStudy: (companyId: string, seatId: string,

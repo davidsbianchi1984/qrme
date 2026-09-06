@@ -66,6 +66,50 @@ INDUSTRIES: tuple[str, ...] = (
     "marketing", "research", "manufacturing", "other",
 )
 
+#: The occupation family a synthetic professional was studied as, mapped
+#: onto the industry an exchange belongs to.
+#:
+#: The two vocabularies were written for different jobs and neither is
+#: wrong: sixteen families sort 45,153 occupations, sixteen industries
+#: sort the work people bring to a desk. What was missing was the road
+#: between them. A hired radiologist proposing an exchange got whatever
+#: sat first in the menu — "software" — because nothing on the profile
+#: said what trade it was hired into.
+#:
+#: Several families land on `other` and that is the honest answer, not a
+#: gap: a zookeeper and a customs officer are both real work and neither
+#: is one of the fifteen named industries. `other` is in the list for
+#: exactly this.
+FAMILY_INDUSTRY: dict[str, str] = {
+    "Software & IT": "software",
+    "Media, creative & communications": "design",
+    "Creator economy & online media": "video",
+    "Engineering & built environment": "engineering",
+    "Skilled trades": "trades",
+    "Finance, accounting & insurance": "finance",
+    "Law & public administration": "legal",
+    "Health care": "healthcare",
+    "Mental health & social care": "healthcare",
+    "Education & research": "education",
+    "Business, people & operations": "marketing",
+    "Energy, utilities & resources": "manufacturing",
+    "Agriculture, environment & animals": "other",
+    "Hospitality, food & retail": "other",
+    "Public safety, defence & security": "other",
+    "Transport & logistics": "other",
+}
+
+
+def industry_for(family: str | None) -> str:
+    """The industry a profile of this trade proposes work under.
+
+    `other` for an unknown family rather than the first of the list:
+    the menu's first entry is a position, not a meaning, and defaulting
+    to it is how every trade ended up filed as software.
+    """
+    return FAMILY_INDUSTRY.get(family or "", "other")
+
+
 # What an item *is*. The kind is not decoration: `source` and `build` are
 # things that run on the receiving machine if anybody double-clicks them, and
 # a surface should be able to say so without inspecting a filename.

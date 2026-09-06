@@ -48,7 +48,20 @@ export function Exchanges({ onPlans }: {
   // A new proposal.
   const [guest, setGuest] = useState("");
   const [work, setWork] = useState("");
-  const [industry, setIndustry] = useState("software");
+  // "software" was the default for every trade on the platform, because
+  // it is the first entry in `exchange.INDUSTRIES` and nothing on a
+  // profile said what it was hired into. A hired radiologist proposed
+  // work under software. The profile carries `trade_domain` now — its
+  // occupation family already put through the map — and the menu opens
+  // on it. "other" for a profile with no trade, which is true where
+  // "software" was not; the founder can still pick any of the sixteen.
+  const [industry, setIndustry] = useState("other");
+  useEffect(() => {
+    if (!session.profileId) return;
+    api.getProfile(session.profileId)
+      .then((p) => setIndustry(p.trade_domain || "other"))
+      .catch(() => {/* the menu keeps its default */});
+  }, [session.profileId]);
   const [fee, setFee] = useState("0");
 
   // A new line on the manifest.

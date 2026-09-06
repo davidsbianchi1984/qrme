@@ -106,6 +106,7 @@ CREATE TABLE IF NOT EXISTS company_seats (
     study       TEXT,                           -- the trade, in prose
     skills      TEXT,                           -- digital skills, JSON
     connections TEXT,                           -- who it must reach, JSON
+    tools       TEXT,                           -- the trade's programs, JSON
     profile_id  TEXT,
     hired_at    TEXT
 );
@@ -115,7 +116,7 @@ CREATE TABLE IF NOT EXISTS company_seats (
 #: Columns added after the table first shipped. A database founded
 #: before them is still a database, so they are added when missing
 #: rather than the schema being versioned for three text fields.
-_LATER = ("study", "skills", "connections")
+_LATER = ("study", "skills", "connections", "tools")
 
 
 def _ensure(conn) -> None:
@@ -269,6 +270,7 @@ def study_role(company: dict, seat_id: str, cloud=None) -> str:
 #: is the whole point of putting it in front of the founder.
 _MAX_FOUND_SKILLS = 8
 _MAX_FOUND_CONNECTIONS = 6
+_MAX_FOUND_TOOLS = 8
 
 
 def _tidy(items, cap: int) -> list[str]:
@@ -303,8 +305,87 @@ def _lead_with(found: list[str], pooled: list[str]) -> list[str]:
     return found + [p for p in pooled if p.lower() not in seen]
 
 
+#: Words that match half the catalogue and mean nothing on their own. A
+#: study naming "a computer" or "the phone" is describing furniture, and
+#: matching those against 103 connectors offers a founder every app there
+#: is under the claim that the trade asked for it.
+_TOOL_NOISE = frozenset((
+    "app", "apps", "computer", "phone", "system", "systems", "software",
+    "tool", "tools", "device", "devices", "platform", "internet", "web",
+    "browser", "email", "e-mail", "mail", "files", "file", "settings",
+    # Articles and joiners. Three letters each, so the length rule below
+    # lets them through, and "the" is a word in enough labels to make
+    # "the system" look like a match for something.
+    "the", "and", "for", "with", "their", "your", "our", "its", "any",
+))
+
+
+def match_tools(tools: list[str]) -> tuple[list[dict], list[str]]:
+    """Split the trade's tools into ones this platform can connect and
+    ones it cannot.
+
+        asked     the plug-ins too, for these new hires
+        mattered  a connection is the owner's own credential, so the
+                  platform can offer one and must never mint one
+
+    A matched tool is an entry in `catalog.CONNECTORS` — a real provider
+    and a real app — and becomes a button that runs the ordinary connect
+    flow under the founder's press. An unmatched one is returned by name
+    rather than dropped: "the practice management system" is a true thing
+    the study found, and a screen that shows only what it can sell is a
+    screen that lies by omission about what the job needs.
+
+    Matching is scored rather than first-past-the-post, and the two
+    reasons are the bugs the first version shipped with:
+
+    * **"Google Calendar" matched Apple's "Calendar".** Any single shared
+      word won, and Apple's entry came first in the catalogue. The score
+      counts *all* the words two names share, so the entry that shares
+      both beats the entry that shares one.
+    * **"a computer" matched "Read a page".** "computer" is discarded as
+      a category word, which left the article "a" — and "a" is a word in
+      plenty of labels. Words of two characters or fewer carry no meaning
+      here and are dropped with the categories.
+
+    A tool left with no meaningful words at all is neither matched nor
+    reported missing: "the system" names nothing a founder could act on
+    in either direction.
+    """
+    from . import catalog
+    matched: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+    missing: list[str] = []
+    for raw in tools:
+        want = " ".join(str(raw).lower().split())
+        words = {w for w in want.replace("&", " ").replace("·", " ").split()
+                 if len(w) > 2 and w not in _TOOL_NOISE}
+        if not words:
+            continue
+        best, score = None, 0
+        for c in catalog.CONNECTORS:
+            label = c["label"].lower()
+            label_words = {
+                w for w in label.replace("&", " ").replace("·", " ")
+                .replace("(", " ").replace(")", " ").split() if len(w) > 2}
+            # An exact name beats any amount of overlap, and overlap is
+            # counted rather than merely detected.
+            hit = len(words & label_words) * (10 if want == label else 1)
+            if hit > score:
+                best, score = c, hit
+        if best is None:
+            missing.append(str(raw).strip())
+            continue
+        key = (best["provider"], best["app"])
+        if key not in seen:
+            seen.add(key)
+            matched.append({"provider": best["provider"], "app": best["app"],
+                            "label": best["label"],
+                            "because": str(raw).strip()})
+    return matched, missing
+
+
 def role_specifics(seat: dict, findings: str, cloud=None
-                   ) -> tuple[list[str], list[str]]:
+                   ) -> tuple[list[str], list[str], list[str]]:
     """What *this* job needs, read out of the study that was just fetched.
 
         asked     skills and connections tailored to every profile, for
@@ -331,11 +412,11 @@ def role_specifics(seat: dict, findings: str, cloud=None
     medication" would contradict the document the same profile carries.
     """
     if not findings or not findings.strip():
-        return [], []
+        return [], [], []
     system = (
         "You read a study of one occupation and extract two lists for a "
         "builder of synthetic employees. Answer ONLY as a JSON object "
-        'with keys "skills" and "connections".\n\n'
+        'with keys "skills", "connections" and "tools".\n\n'
         '"skills": what a competent one does with information in this '
         "job specifically — a record kept, a note written, a schedule "
         "made, a check reported, a document read. Never a licensed or "
@@ -343,11 +424,16 @@ def role_specifics(seat: dict, findings: str, cloud=None
         "perform them. Never a generic office skill that would be true "
         "of any job.\n"
         '"connections": who and what this job must reach — the people, '
-        "the departments, the outside bodies, the systems.\n\n"
+        "the departments, the outside bodies, the systems.\n"
+        '"tools": the named programs and services this job is worked in '
+        "— name the product, not the category, so "
+        '"Google Calendar" rather than "a calendar".\n\n'
         "Each entry is a short lowercase noun phrase of two to four "
-        f"words, not a sentence. At most {_MAX_FOUND_SKILLS} skills and "
-        f"{_MAX_FOUND_CONNECTIONS} connections. Fewer is better than "
-        "padding: return only what this study actually supports.")
+        "words, not a sentence, except a tool which keeps the product's "
+        f"own capitalisation. At most {_MAX_FOUND_SKILLS} skills, "
+        f"{_MAX_FOUND_CONNECTIONS} connections and {_MAX_FOUND_TOOLS} "
+        "tools. Fewer is better than padding: return only what this "
+        "study actually supports.")
     ask = (f"Role: {seat['title']}\nDepartment: {seat['department']}\n\n"
            "THE STUDY:\n" + findings[:4000])
     try:
@@ -355,14 +441,15 @@ def role_specifics(seat: dict, findings: str, cloud=None
             system, [{"role": "user", "content": ask}])
         start, end = raw.find("{"), raw.rfind("}")
         if start < 0 or end <= start:
-            return [], []
+            return [], [], []
         parsed = json.loads(raw[start:end + 1])
         if not isinstance(parsed, dict):
-            return [], []
+            return [], [], []
         return (_tidy(parsed.get("skills"), _MAX_FOUND_SKILLS),
-                _tidy(parsed.get("connections"), _MAX_FOUND_CONNECTIONS))
+                _tidy(parsed.get("connections"), _MAX_FOUND_CONNECTIONS),
+                _tidy(parsed.get("tools"), _MAX_FOUND_TOOLS))
     except Exception:  # noqa: BLE001 — the pool's answer still stands
-        return [], []
+        return [], [], []
 
 
 def study_seat(company: dict, seat_id: str, cloud=None) -> dict:
@@ -408,15 +495,24 @@ def study_seat(company: dict, seat_id: str, cloud=None) -> dict:
     # which is true of the family, fills in behind it. Both halves are on
     # the card and both are editable, because the founder is the one who
     # knows which of them is right about their own store.
-    found_skills, found_connections = role_specifics(
+    found_skills, found_connections, found_tools = role_specifics(
         seat, knowledge, cloud=cloud)
     skills = _lead_with(found_skills, pooled_skills)
     connections = _lead_with(found_connections, pooled_connections)
+    # The trade's own programs, split into the ones this platform can
+    # connect and the ones it cannot. Both halves travel: a founder who
+    # is only shown what can be sold to them cannot tell the difference
+    # between a job that needs nothing else and one that needs something
+    # nobody here supports.
+    connectable, unreachable = match_tools(found_tools)
     conn = db.connect()
     _ensure(conn)
     conn.execute(
-        "UPDATE company_seats SET skills=?, connections=? WHERE id=?",
-        (json.dumps(skills), json.dumps(connections), seat["id"]))
+        "UPDATE company_seats SET skills=?, connections=?, tools=? "
+        "WHERE id=?",
+        (json.dumps(skills), json.dumps(connections),
+         json.dumps({"connect": connectable, "named": unreachable}),
+         seat["id"]))
     conn.commit()
     return {"seat_id": seat["id"], "title": seat["title"],
             "known_as": known["title"] if known else None,
@@ -428,6 +524,10 @@ def study_seat(company: dict, seat_id: str, cloud=None) -> dict:
             # skills has no way to tell whether the study contributed
             # nothing or was never asked, and those are different.
             "tailored": len(found_skills) + len(found_connections),
+            # The programs the trade is worked in. `tools` are real
+            # connectors the founder can press; `tools_named` are the
+            # ones the study found that this platform has no door to.
+            "tools": connectable, "tools_named": unreachable,
             "knowledge": knowledge, "studied_by": _who_studied()}
 
 
@@ -585,15 +685,74 @@ def hire(company: dict, seat_id: str, answers: list[dict]) -> dict:
             (db.new_id("src"), profile["id"], "knowledge",
              f"The trade: {seat['title']}", seat["study"], db.utcnow()))
 
+    # Who this one works with, off the study, onto the person it is about.
+    #
+    # The list has been fetched since the study became a step and read by
+    # nobody: `hire` did not touch it, and there was nowhere for it to go
+    # if it had. `routers/connections.py` is anonymous person-to-person
+    # chat and a referrer is not a profile. So it lands three ways, each
+    # answering a different question:
+    #
+    #   grounding   filed as source material, so every reply knows who
+    #               this job answers to — the half that changes what the
+    #               employee *does* rather than what a screen shows
+    #   the roster  a named connection that is also a colleague already
+    #               hired becomes a real link, through the same door the
+    #               colleague loop below uses
+    #   stated      kept on the profile, so the employee file and the
+    #               page can say it and the owner can edit it
+    works_with = json.loads(seat["connections"] or "[]")
+    # The trade this seat was studied as, looked up rather than stored:
+    # `hire` is reachable without a study — the console gates the
+    # signature on one, the route does not — and a seat that skipped it
+    # still deserves the right industry if the pool knows the title.
+    from . import occupations
+    known = occupations.find(seat["title"])
+    if known is None:
+        hits = occupations.search(seat["title"], limit=1)
+        known = hits[0] if hits else None
+    seat_family = known["family"] if known else None
+    if works_with:
+        conn.execute(
+            "INSERT INTO source_items (id, profile_id, kind, title, content,"
+            " pdi_key, pack_id, created_at) VALUES (?,?,?,?,?,NULL,NULL,?)",
+            (db.new_id("src"), profile["id"], "knowledge",
+             f"Who this job reaches: {seat['title']}",
+             "This position works with, and answers to:\n"
+             + "\n".join(f"- {w}" for w in works_with), db.utcnow()))
+    conn.execute(
+        "UPDATE profiles SET works_with=?, trade_family=? WHERE id=?",
+        (json.dumps(works_with), seat_family, profile["id"]))
+
     # The colleagues: everyone already hired is a connection, because a
     # company whose employees are strangers to each other is an org chart,
-    # not a staff.
+    # not a staff. A colleague the study also *named* is the same link
+    # arriving twice, which `befriend` already tolerates.
+    named = {w.lower() for w in works_with}
     for other in seats(company["id"]):
         if other["status"] == "hired" and other["profile_id"]:
             try:
                 befriend(profile["id"], other["profile_id"])
             except Exception:
                 pass  # a duplicate link is not a failed hire
+    # And the other direction: a connection the study named that matches
+    # a colleague's title or department is why that link exists, so it is
+    # recorded as one rather than left to look like a coincidence.
+    if named:
+        matched = [o["title"] for o in seats(company["id"])
+                   if o["status"] == "hired"
+                   and (o["title"].lower() in named
+                        or o["department"].lower() in named)]
+        if matched:
+            conn.execute(
+                "INSERT INTO source_items (id, profile_id, kind, title,"
+                " content, pdi_key, pack_id, created_at)"
+                " VALUES (?,?,?,?,?,NULL,NULL,?)",
+                (db.new_id("src"), profile["id"], "knowledge",
+                 "Colleagues the study named",
+                 "These people are on this company's roster and this job "
+                 "reaches them by name:\n"
+                 + "\n".join(f"- {t}" for t in matched), db.utcnow()))
 
     org = organization.get(company["org_id"])
     if org is not None:

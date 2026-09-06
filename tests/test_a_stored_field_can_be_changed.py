@@ -77,6 +77,12 @@ OWN_DOOR = {
     # — minted (and rotated) by its own door, never typed: the token is
     # shown once and the column holds only its hash.
     "mail_inbound_token": ("qrme/mailbox.py", r"SET mail_inbound_token="),
+    # Written by the signature, off the study the seat was hired on, and
+    # never typed: who this job reaches is a finding, not a preference,
+    # and the founder edits it on the study card *before* the hire —
+    # `keep_study` — rather than on the profile afterwards.
+    "works_with": ("qrme/company.py", r"SET works_with="),
+    "trade_family": ("qrme/company.py", r"trade_family=\?"),
 }
 
 

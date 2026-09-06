@@ -333,7 +333,7 @@ def profile_out(row: dict, request: Request | None = None, *,
     authorized by. The incoming request there holds the signup key, so asking
     it who is calling would redact the creator's own new profile from them.
     """
-    from . import auth, identity
+    from . import auth, exchange, identity
 
     who = auth.principal(request) if request is not None else None
     is_owner = owner or who == {"role": "owner", "subject_id": row["id"]}
@@ -351,6 +351,20 @@ def profile_out(row: dict, request: Request | None = None, *,
         # shows an anonymous profile's line of work on its picture.
         industry=row["industry"],
         job_title=row["job_title"],
+        # Same posture as the trade above: who somebody works with is
+        # part of what they are, not an identifier, so it travels with
+        # the job title rather than being redacted with the name.
+        # `.get` with a default, like `guest_styling` below: these
+        # columns postdate several creation paths that build a dict by
+        # hand and never learned about them.
+        works_with=json.loads(
+            (row.get("works_with") if hasattr(row, "get")
+             else row["works_with"]) or "[]"),
+        trade_family=(row.get("trade_family") if hasattr(row, "get")
+                      else row["trade_family"]),
+        trade_domain=exchange.industry_for(
+            row.get("trade_family") if hasattr(row, "get")
+            else row["trade_family"]),
         demographics=json.loads(row["demographics"]),
         sources=json.loads(row["sources"]),
         anonymous=bool(row["anonymous"]),

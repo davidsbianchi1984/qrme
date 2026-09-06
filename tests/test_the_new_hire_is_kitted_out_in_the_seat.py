@@ -179,7 +179,7 @@ def test_a_fitting_that_fails_does_not_unhire_anybody(client, monkeypatch):
     assert ok.status_code in (200, 201), ok.text
 
 
-def test_the_builder_reaches_all_four_without_leaving_the_seat():
+def test_the_builder_reaches_every_rung_without_leaving_the_seat():
     """The regression that would put the founder back out in settings.
 
     This is a source assertion on purpose. The bug it guards against is
@@ -189,10 +189,16 @@ def test_the_builder_reaches_all_four_without_leaving_the_seat():
     with open(BUILDER, encoding="utf-8") as fh:
         src = fh.read()
     for door in ("api.placeDisplay(", "api.addEmbodiment(",
-                 "api.bindRobot(", "api.claimFace(", "api.paintFace("):
+                 "api.bindRobot(", "api.claimFace(", "api.paintFace(",
+                 # The fifth rung. Unlike the four above it this one
+                 # creates a connector rather than fitting equipment —
+                 # unauthorised, so it is a door the hire cannot open
+                 # until the founder hands over the credential.
+                 "api.connectApp("):
         assert door in src, (
-            f"{door} is not in the Company Builder, so that half of the "
+            f"{door} is not in the Company Builder, so that part of the "
             "kit is somewhere the founder has to walk to")
     # And in order. A ladder whose rungs are declared out of order is a
     # wall of forms with a list on top of it.
-    assert 'const RUNGS = ["eyes", "ears", "hands", "body"] as const;' in src
+    assert ('const RUNGS = ["eyes", "ears", "hands", "tools", "body"]'
+            ' as const;') in src

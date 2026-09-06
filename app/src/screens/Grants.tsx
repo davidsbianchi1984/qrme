@@ -44,7 +44,17 @@ export function Grants({ onPlans }: {
   const [surface, setSurface] = useState("room");
   const [surfaceId, setSurfaceId] = useState("");
   const [kind, setKind] = useState("profession");
+  // What is being lent. `kind` already defaults to `profession`, which
+  // is right for a hired professional, and this is the profession — the
+  // job title the seat was signed into. Empty for a profile that was
+  // never hired into one, and editable either way.
   const [ref, setRef] = useState("");
+  useEffect(() => {
+    if (!session.profileId) return;
+    api.getProfile(session.profileId)
+      .then((p) => setRef((r) => r || p.job_title || ""))
+      .catch(() => {/* the box stays empty */});
+  }, [session.profileId]);
   const [title, setTitle] = useState("");
   const [what, setWhat] = useState("");
   const [reason, setReason] = useState("");

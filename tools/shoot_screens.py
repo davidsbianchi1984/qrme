@@ -1100,7 +1100,19 @@ def main(shots: list[tuple[str, str, str]]) -> None:
                           "nothing written")
                     continue
                 el = page.query_selector(where)
-                el.scroll_into_view_if_needed()
+                # `block: "start"`, not `scroll_into_view_if_needed()`.
+                # That one centres what it scrolls to, which is right for
+                # a control and wrong for a card: an element taller than
+                # the viewport gets centred with its *top above the
+                # window*, and the stitched capture renders everything
+                # off-screen as black. The study card measured
+                # y = -94.75 and lost its first two lines that way — a
+                # heading and the sentence saying where the skills below
+                # it came from, both present in the DOM and both absent
+                # from the photograph.
+                el.evaluate(
+                    "e => e.scrollIntoView({block: 'start', "
+                    "inline: 'nearest'})")
                 page.wait_for_timeout(250)
                 target = OUT / f"{number}-{stem}.png"
                 hide_furniture(page)

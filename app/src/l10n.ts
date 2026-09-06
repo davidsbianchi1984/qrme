@@ -1033,6 +1033,21 @@ const CHROME: Table = {
   "com.kit.hands": {
     en: "Hands", es: "Manos", fr: "Mains", de: "Hände", pt: "Mãos", it: "Mani", ja: "手", zh: "手", hi: "हाथ", ar: "يدان",
   },
+  "com.kit.tools": {
+    en: "Tools", es: "Herramientas", fr: "Outils", de: "Werkzeuge", pt: "Ferramentas", it: "Strumenti", ja: "道具", zh: "工具", hi: "औजार", ar: "أدوات",
+  },
+  "com.kit.tools.pitch": {
+    en: "The programs this trade is worked in. Ticking one gives the new hire the door; you hand over the sign-in afterwards, on Plugins — until then it can do nothing.", es: "Los programas de este oficio. Marcar uno le da la puerta al nuevo empleado; la sesión la entregas después, en Plugins — hasta entonces no puede hacer nada.", fr: "Les programmes de ce métier. En cocher un donne la porte à la recrue ; vous remettez la connexion ensuite, dans Plugins — d'ici là elle ne peut rien faire.", de: "Die Programme dieses Handwerks. Ein Haken gibt der neuen Kraft die Tür; die Anmeldung übergibst du danach unter Plugins — bis dahin kann sie nichts tun.", pt: "Os programas deste ofício. Marcar um dá a porta ao novo funcionário; a autenticação entregas depois, em Plugins — até lá não pode fazer nada.", it: "I programmi di questo mestiere. Spuntarne uno dà la porta al nuovo assunto; l'accesso lo consegni dopo, in Plugins — fino ad allora non può fare nulla.", ja: "この職種で使うプログラム。選ぶと新人に入口が渡ります。サインインは後で Plugins から。それまでは何もできません。", zh: "这个行业使用的程序。勾选后新员工获得入口；登录凭据稍后在 Plugins 交付——在那之前它什么也做不了。", hi: "इस पेशे में इस्तेमाल होने वाले प्रोग्राम। चुनने पर नए कर्मचारी को दरवाज़ा मिलता है; साइन-इन बाद में Plugins से दें — तब तक वह कुछ नहीं कर सकता।", ar: "البرامج التي تُمارس فيها هذه المهنة. اختيار أحدها يمنح الموظف الجديد الباب؛ وتُسلّم بيانات الدخول لاحقًا من Plugins — وحتى ذلك لا يستطيع فعل شيء.",
+  },
+  "com.kit.tools.none": {
+    en: "The study named no programs for this one.", es: "El estudio no nombró ningún programa para este puesto.", fr: "L'étude n'a nommé aucun programme pour ce poste.", de: "Die Studie hat für diese Stelle keine Programme genannt.", pt: "O estudo não nomeou programas para este cargo.", it: "Lo studio non ha nominato programmi per questa posizione.", ja: "この職種について調査はプログラムを挙げませんでした。", zh: "研究没有为这个岗位点名任何程序。", hi: "अध्ययन ने इसके लिए कोई प्रोग्राम नहीं बताया।", ar: "لم تذكر الدراسة أي برنامج لهذه الوظيفة.",
+  },
+  "com.kit.tools.named": {
+    en: "Also named, with no door here:", es: "También mencionados, sin puerta aquí:", fr: "Aussi nommés, sans porte ici :", de: "Ebenfalls genannt, ohne Tür hier:", pt: "Também mencionados, sem porta aqui:", it: "Nominati anche questi, senza porta qui:", ja: "名前は挙がったがここに入口のないもの：", zh: "也被点名、但此处无入口：", hi: "ये भी बताए गए, पर यहाँ दरवाज़ा नहीं:", ar: "ذُكرت أيضًا ولا باب لها هنا:",
+  },
+  "com.file.reaches": {
+    en: "Who they reach", es: "A quién llegan", fr: "Qui ils joignent", de: "Wen sie erreichen", pt: "Quem alcançam", it: "Chi raggiungono", ja: "つながる相手", zh: "他们联系的人", hi: "वे किससे जुड़ते हैं", ar: "من يصلون إليه",
+  },
   "com.kit.body": {
     en: "Body", es: "Cuerpo", fr: "Corps", de: "Körper", pt: "Corpo", it: "Corpo", ja: "姿", zh: "身", hi: "शरीर", ar: "جسد",
   },

@@ -34,6 +34,11 @@ CREATE TABLE IF NOT EXISTS profiles (
     -- `position` on the wire and it is an ordinal — which place in the list
     -- somebody holds. One name, one type.
     job_title         TEXT,
+    -- Who this one works with, and the trade it was studied as. Both are
+    -- written by `company.hire` off the seat's study; see the migration
+    -- table below for why they exist at all.
+    works_with        TEXT NOT NULL DEFAULT '[]',
+    trade_family      TEXT,
     demographics      TEXT NOT NULL DEFAULT '{}',
     sources           TEXT NOT NULL DEFAULT '[]',  -- imported content sources
     anonymous         INTEGER NOT NULL DEFAULT 0,
@@ -3279,6 +3284,21 @@ _ADDED_COLUMNS: tuple[tuple[str, str, str], ...] = (
     # The hash of the token that opens a profile's inbound mail address
     # (qrme/mailbox.py). NULL is a mailbox with no webhook minted.
     ("profiles", "mail_inbound_token", "TEXT"),
+    # Who a hire works with, and the trade it was studied as.
+    #
+    # `company.study_seat` has fetched a list of the people, departments
+    # and outside bodies a job has to reach since the study became a
+    # step — imaging technologists, referrers, pharmacy — and `hire` did
+    # not read it. The list ended at the card it was drawn on. It has
+    # nowhere else to go either: `routers/connections.py` is anonymous
+    # person-to-person chat, and a referrer is not a profile.
+    #
+    # `works_with` is that list, on the person it is about. `trade_family`
+    # is the occupation family the seat was studied as, which is how a
+    # synthetic professional gets an exchange industry that is not
+    # whatever sits first in the menu.
+    ("profiles", "works_with", "TEXT NOT NULL DEFAULT '[]'"),
+    ("profiles", "trade_family", "TEXT"),
 )
 
 

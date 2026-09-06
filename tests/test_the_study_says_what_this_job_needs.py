@@ -61,14 +61,16 @@ def test_the_specifics_come_out_of_the_study(monkeypatch):
     answer = json.dumps({
         "skills": ["staffing rota building", "inspection preparation",
                    "incident report writing"],
-        "connections": ["regulators", "families"]})
+        "connections": ["regulators", "families"],
+        "tools": ["Google Calendar", "QuickBooks"]})
     said = _Says("Here you go:\n" + answer + "\nThat's all.")
     monkeypatch.setattr(llm, "get_provider", lambda cloud=None: said)
 
-    skills, connections = companies.role_specifics(SEAT, STUDY)
+    skills, connections, tools = companies.role_specifics(SEAT, STUDY)
     assert skills == ["staffing rota building", "inspection preparation",
                       "incident report writing"]
     assert connections == ["regulators", "families"]
+    assert tools == ["Google Calendar", "QuickBooks"]
     # The study is what it read, not the title alone — a model asked only
     # for a job title is answering from memory, which is the thing the
     # study exists to replace.
@@ -80,14 +82,15 @@ def test_prose_around_the_json_does_not_lose_it(monkeypatch):
     monkeypatch.setattr(llm, "get_provider", lambda cloud=None: _Says(
         'Certainly. {"skills": ["visit log keeping"], '
         '"connections": ["district nurses"]} Let me know if…'))
-    skills, connections = companies.role_specifics(SEAT, STUDY)
+    skills, connections, tools = companies.role_specifics(SEAT, STUDY)
     assert skills == ["visit log keeping"]
     assert connections == ["district nurses"]
+    assert tools == []
 
 
 def test_a_refusal_leaves_the_pools_answer_standing(monkeypatch):
     monkeypatch.setattr(llm, "get_provider", lambda cloud=None: _Refuses())
-    assert companies.role_specifics(SEAT, STUDY) == ([], [])
+    assert companies.role_specifics(SEAT, STUDY) == ([], [], [])
 
 
 def test_a_shape_that_will_not_parse_is_not_an_error(monkeypatch):
@@ -95,7 +98,7 @@ def test_a_shape_that_will_not_parse_is_not_an_error(monkeypatch):
                  '{"skills": "not a list"}'):
         monkeypatch.setattr(llm, "get_provider",
                             lambda cloud=None, t=text: _Says(t))
-        assert companies.role_specifics(SEAT, STUDY) == ([], [])
+        assert companies.role_specifics(SEAT, STUDY) == ([], [], [])
 
 
 def test_an_empty_study_is_never_sent(monkeypatch):
@@ -103,7 +106,7 @@ def test_an_empty_study_is_never_sent(monkeypatch):
     nothing in it to read. Asking anyway spends a call to be told so."""
     said = _Says("{}")
     monkeypatch.setattr(llm, "get_provider", lambda cloud=None: said)
-    assert companies.role_specifics(SEAT, "   ") == ([], [])
+    assert companies.role_specifics(SEAT, "   ") == ([], [], [])
     assert not said.asked, "a blank study was sent to be parsed"
 
 
@@ -158,3 +161,111 @@ def test_the_seat_carries_what_the_study_found(client, monkeypatch):
     # The family's are still behind them — the study narrows, it does
     # not replace what the pool knows about the trade.
     assert len(body["skills"]) > 2
+
+
+# --- what the signature carries ---------------------------------------------
+
+def _hire(client, me, co, seat, name):
+    from tests.test_capabilities import auth_header
+    return client.post(
+        f"/companies/{co['id']}/seats/{seat['id']}/hire",
+        json={"answers": [{"question": "Full name:", "answer": name},
+                          {"question": "Duties:", "answer": "Does the job."},
+                          {"question": "Authority:", "answer": "Escalates."}]},
+        headers=auth_header(me))
+
+
+def test_the_signature_carries_the_study_onto_the_person(client, monkeypatch):
+    """The list was fetched, stored on the seat, and read by nobody.
+
+    `hire` never touched `seat["connections"]`, and there was nowhere for
+    it to go if it had: `routers/connections.py` is anonymous
+    person-to-person chat and a referrer is not a profile. It lands three
+    ways now, and all three are asserted here because each answers a
+    different question — what the employee knows, who it is linked to,
+    and what a screen can say about it.
+    """
+    from qrme import db, exchange
+    from tests.test_capabilities import auth_header, make_profile
+    from tests.test_a_company_is_hired_one_interview_at_a_time import (
+        _found, _seat)
+
+    monkeypatch.setattr(llm, "get_provider", lambda cloud=None: _Says(
+        '{"skills": ["image report dictation"], "connections": '
+        '["imaging technologists", "referrers", "Counter clerk"], '
+        '"tools": ["Google Calendar", "the practice management system"]}'))
+    me = make_profile(client)
+    co = _found(client, me, name="Bianchi Imaging", industry="imaging")
+    mate = _seat(client, me, co, title="Counter clerk", department="Front")
+    _hire(client, me, co, mate, "June Okafor")
+
+    seat = _seat(client, me, co, title="Radiologist", department="Imaging")
+    body = client.post(f"/companies/{co['id']}/seats/{seat['id']}/study",
+                       headers=auth_header(me)).json()
+    # The trade's programs, split by whether this platform has a door.
+    assert [t["label"] for t in body["tools"]] == ["Google Calendar"]
+    assert body["tools_named"] == ["the practice management system"]
+
+    pid = _hire(client, me, co, seat, "Amara Osei").json()["profile_id"]
+
+    # 1. Stated, on the person it is about.
+    prof = client.get(f"/profiles/{pid}").json()
+    assert prof["works_with"][:3] == ["imaging technologists", "referrers",
+                                      "Counter clerk"]
+    # 2. Grounding: filed as source material, so replies know it.
+    titles = [r["title"] for r in db.connect().execute(
+        "SELECT title FROM source_items WHERE profile_id=?", (pid,))]
+    assert "Who this job reaches: Radiologist" in titles
+    # 3. The roster: a named connection that is also a colleague.
+    assert "Colleagues the study named" in titles
+
+    # And the trade it was hired into, which is what stops every
+    # synthetic professional proposing work under "software".
+    assert prof["trade_family"] == "Health care"
+    assert prof["trade_domain"] == "healthcare"
+    assert prof["trade_domain"] in exchange.INDUSTRIES
+
+
+def test_a_hire_with_no_study_still_gets_its_trade(client, monkeypatch):
+    """`hire` is reachable without a study — the console gates the
+    signature on one, the route does not — and the pool still knows what
+    a radiologist is."""
+    from tests.test_capabilities import make_profile
+    from tests.test_a_company_is_hired_one_interview_at_a_time import (
+        _found, _seat)
+    me = make_profile(client)
+    co = _found(client, me, name="Bianchi Imaging", industry="imaging")
+    seat = _seat(client, me, co, title="Radiologist", department="Imaging")
+    pid = _hire(client, me, co, seat, "Amara Osei").json()["profile_id"]
+    prof = client.get(f"/profiles/{pid}").json()
+    assert prof["trade_domain"] == "healthcare"
+    assert prof["works_with"] == []
+
+
+def test_every_family_maps_to_a_real_industry():
+    """The two vocabularies were written apart. A family that fell
+    through the map would default to the first of the menu, which is the
+    bug this map exists to end."""
+    from qrme import exchange, occupations
+    assert not set(occupations.families()) - set(exchange.FAMILY_INDUSTRY)
+    assert not set(exchange.FAMILY_INDUSTRY.values()) - set(
+        exchange.INDUSTRIES)
+    assert exchange.industry_for(None) == "other"
+    assert exchange.industry_for("Nonesuch") == "other"
+
+
+def test_the_tool_matcher_scores_rather_than_guesses():
+    """Both bugs the first version shipped with."""
+    matched, missing = companies.match_tools(
+        ["Google Calendar", "a computer", "the system", "QuickBooks",
+         "the practice management system"])
+    by = {m["because"]: f"{m['provider']}/{m['app']}" for m in matched}
+    # Not Apple's Calendar: overlap is counted, not merely detected.
+    assert by["Google Calendar"] == "google/calendar"
+    assert by["QuickBooks"] == "work/quickbooks"
+    # Category-only tools name nothing a founder could act on, either
+    # way — neither offered nor reported as missing.
+    assert "a computer" not in by and "a computer" not in missing
+    assert "the system" not in by and "the system" not in missing
+    # A real system with no connector is named rather than dropped.
+    assert missing == ["the practice management system"]
