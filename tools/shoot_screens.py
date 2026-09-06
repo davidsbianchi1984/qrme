@@ -270,7 +270,38 @@ def furnish(session: dict) -> None:
                                 "answer": "Decides the day's small calls; "
                                           "escalates money and complaints."}]},
                   token)
+        # A fourth seat, left open. The three above are hired, and a
+        # hired seat has no interview to draft and no study to download
+        # — so with only those the two cards below could never be
+        # photographed, and the recipe would report "never reached"
+        # every run without saying why.
+        _door(f"/companies/{co['id']}/seats",
+              {"title": "Pastry chef", "department": "Kitchen"}, token)
         session["companyId"] = co["id"]
+        # A second company, and the reason it exists is the exhibit
+        # rather than the bakery. The study card and the kit ladder are
+        # photographed on an open seat, and the bakery's open seat is a
+        # pastry chef — whose skills read "recipe scaling, production
+        # scheduling" and whose connections read "suppliers, shift
+        # managers". True, and it says nothing a reader could not have
+        # guessed from the word bakery. A home carer's do: the point of
+        # a table of 45,147 positions is that the specific ones are
+        # specific, and an exhibit has to be of a job somebody would not
+        # already know the answer for.
+        care = _door("/companies", {"name": "Bianchi Home Care",
+                                    "industry": "home care",
+                                    "headcount": 6}, token)
+        # Both of these are rows the pool has written out by hand, and
+        # that is the point of choosing them: a written row carries the
+        # skills and the connections of *that job* ahead of the ones its
+        # whole family shares, so the card photographs specifics rather
+        # than a family heading repeated. "Home care assistant" was here
+        # first and matched a physical-therapy row three families over,
+        # which is the failure this exhibit is supposed to disprove.
+        for title, dept in (("Care home manager", "Care"),
+                            ("Housekeeper", "Household")):
+            _door(f"/companies/{care['id']}/seats",
+                  {"title": title, "department": dept}, token)
     except Exception as exc:  # noqa: BLE001 — an empty company is still the screen
         print(f"  ? no company founded ({type(exc).__name__})")
     try:
@@ -665,6 +696,65 @@ def tuck_the_widgets(page) -> None:
 #: reader can both check, where a selector guessed from outside silently
 #: starts matching the wrong card.
 ELEMENTS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
+    # Typed rather than left blank, and typed as somebody describes the
+    # work rather than names it — an empty search bar photographs the
+    # head of the list in alphabetical order, which proves nothing about
+    # a search. "bakes bread" was the first choice and was no better: it
+    # shares a stem with Baker, so a plain substring match would have
+    # found it too and the capture would show nothing the ranking does.
+    # "delivers babies" shares no letter with Midwife, so the answer
+    # cannot be explained by the characters typed — which is the whole
+    # of what this screen is evidence for.
+    #
+    # The pool, opened the way a founder opens it. The tab shows the list
+    # of companies, so the first press opens one — the seat form and
+    # everything under it only exist inside a company. The panel is not
+    # on the page until the second press, which is why this is a card
+    # with a recipe rather than part of the companies tab.
+    ("212", "browse-the-positions", "companies",
+     (".com-row", '[data-go="browse"]',
+      (".com-pool input", "delivers babies"))),
+    # The same panel, asked a second way. One phrasing could be a lucky
+    # row; two unrelated ones, neither sharing a letter with its answer,
+    # are the ranking working rather than a coincidence photographed.
+    #
+    # "looks after old people" was chosen first and dropped: it answers
+    # correctly — Care home manager, Support worker — and then puts a
+    # zookeeper third. Cropping that row would have made a better picture
+    # and a worse exhibit, so the query changed instead of the evidence.
+    ("214", "reads-scans", "companies",
+     (".com-row", '[data-go="browse"]',
+      (".com-pool input", "reads scans")), ".com-pool"),
+    # The care side, asked the way somebody asks for it. Three home-care
+    # rows, none of which the typed words name.
+    ("215", "cares-for-someone-at-home", "companies",
+     (".com-row", '[data-go="browse"]',
+      (".com-pool input", "cares for someone at home")), ".com-pool"),
+    # And the money side. "advises on investments" reaches the adviser
+    # under three spellings the taxonomies each chose differently —
+    # Adviser, Advisor, and the plural form — which is the pool holding
+    # one job under every name it is filed by rather than three jobs.
+    ("216", "advises-on-investments", "companies",
+     (".com-row", '[data-go="browse"]',
+      (".com-pool input", "advises on investments")), ".com-pool"),
+    # The study, after the interview is drafted — two presses, in the
+    # order the screen requires them. Whatever answers the study is named
+    # on the card, so a capture taken on a host with no model reachable
+    # says so on its face rather than looking like one that had one.
+    ("213", "download-knowledge", "companies",
+     ("text=Bianchi Home Care", '[data-go="interview"]',
+      '[data-go="study"]')),
+    # The kit ladder, photographed on its third rung. Six presses and
+    # not one of them leaves the seat — which is the entire claim the
+    # picture is here to carry: the robot shelf used to live in
+    # settings, and getting to it meant walking out of the hire you
+    # were making. The two `pass` presses are the eyes and ears rungs
+    # declined; only one rung is on the page at a time, so the same
+    # selector means a different button each press, on purpose.
+    ("217", "kitted-out-in-the-seat", "companies",
+     ("text=Bianchi Home Care", '[data-go="interview"]',
+      '[data-go="study"]', '[data-go="keep"]',
+      '[data-go="pass"]', '[data-go="pass"]')),
     ("150", "what-went-wrong", "settings", ()),
     ("22", "providers", "settings", ()),
     ("44", "avatar-studio", "identity", ()),
@@ -712,8 +802,17 @@ def show_furniture(page) -> None:
         }""")
 
 
-def shoot_element(page, session, number, start, presses) -> bool:
-    """Photograph one card, and refuse to photograph the wrong one."""
+def shoot_element(page, session, where, start, presses) -> bool:
+    """Walk the recipe, and say whether the card it was walking to is there.
+
+    `where` is a selector rather than the screen number it used to be.
+    Four of these recipes are the *same* card asked four different
+    questions — the pool, searched four ways — and a card can carry one
+    `data-screen`, so numbering the element could only ever answer for
+    one of the four. The other three silently photographed nothing: the
+    presses all landed, the panel was on the page, and the last line
+    looked for a number that was never in the markup.
+    """
     page.evaluate("s => localStorage.setItem('qrme.session', s)",
                   json.dumps(session))
     if not open_tab(page, start):
@@ -722,14 +821,35 @@ def shoot_element(page, session, number, start, presses) -> bool:
     answer_the_notice(page)
     tuck_the_widgets(page)
     for press in presses:
-        target = page.query_selector(press)
+        # Same shape as `open_inside`: a selector to click, or a
+        # (selector, text) pair to type into. A search bar photographed
+        # with nothing typed shows the head of the list in alphabetical
+        # order, which is the one thing the search is not for.
+        selector, text = press if isinstance(press, tuple) else (press, None)
+        target = page.query_selector(selector)
         if target is None:
-            print(f"  ? nothing matched {press}")
+            print(f"  ? nothing matched {selector}")
             return False
-        target.evaluate("el => el.click()")
+        if text is None:
+            target.evaluate("el => el.click()")
+        else:
+            target.fill(text)
+            target.press("Enter")
         page.wait_for_timeout(700)
     page.wait_for_timeout(600)
-    return page.query_selector(f'[data-screen="{number}"]') is not None
+    # Wait for it rather than glance once. A press that fires a request
+    # — the study downloads a trade, and on a host with no model that is
+    # a provider timeout before the local fallback answers — leaves the
+    # card off the page well past the fixed beat above, and a single
+    # look reported "never reached" for a recipe that was simply slower
+    # than the harness. Two recipes walking the same three presses
+    # disagreed on whether the study card existed, which is the shape of
+    # a race and not of a missing card.
+    for _ in range(20):
+        if page.query_selector(where) is not None:
+            return True
+        page.wait_for_timeout(500)
+    return False
 
 
 #: Things that are painted past the right edge on purpose.
@@ -968,12 +1088,18 @@ def main(shots: list[tuple[str, str, str]]) -> None:
 
             # The cards. Same refusal as the pages: a recipe whose element
             # is not on the page writes nothing and says so.
-            for number, stem, start, presses in ELEMENTS:
-                if not shoot_element(page, session, number, start, presses):
+            for row in ELEMENTS:
+                number, stem, start, presses = row[:4]
+                # Which card to photograph. It defaults to the one tagged
+                # with this screen's own number, and is named outright by
+                # the recipes that are several screens of one element.
+                where = (row[4] if len(row) > 4
+                         else f'[data-screen="{number}"]')
+                if not shoot_element(page, session, where, start, presses):
                     print(f"  ! {number}-{stem}: never reached — "
                           "nothing written")
                     continue
-                el = page.query_selector(f'[data-screen="{number}"]')
+                el = page.query_selector(where)
                 el.scroll_into_view_if_needed()
                 page.wait_for_timeout(250)
                 target = OUT / f"{number}-{stem}.png"

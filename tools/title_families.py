@@ -85,7 +85,19 @@ RULES: list[tuple[str, str]] = [
      "child, family, and school, residential advisor*, personal care aide*, "
      "home health aide*, home-based personal care, caregiver*, "
      "community health worker*, crisis, nannies, nanny, "
-     "health care assistant*, teachers aide*, teaching assistant*"),
+     "health care assistant*, teachers aide*, teaching assistant*, "
+     # Care by its ordinary English names, which the taxonomies do not
+     # use and workers do. Without these the generic shapes downstream
+     # take them: "Home Care Attendant" matched `attendant*` and was
+     # filed under hospitality, so a home carer browsed with "till
+     # reconciliation" and "allergen awareness" as their first skills;
+     # "Care Worker" and "Care Assistant" fell to `worker*` and
+     # `assistant*` and landed in business operations. `carer*` is a
+     # stem and does not reach "career" — that is c-a-r-e-e-r.
+     "care worker*, care assistant*, care attendant*, care aide*, "
+     "carer*, home care, homecare, care home, live-in care, "
+     "domiciliary care, support worker*, elder care, eldercare, "
+     "senior care, respite care"),
 
     ("Education & research",
      "teacher*, teaching, professor*, lecturer*, instructor*, tutor*, "

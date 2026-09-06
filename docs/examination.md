@@ -20,7 +20,7 @@ The screens referred to below are shown in
 
 ## The mechanisms on file
 
-The thirteen numbered mechanisms in
+The fourteen numbered mechanisms in
 [docs/invention-disclosure.md](docs/invention-disclosure.md). Each row
 names the technical problem in the machine, the particular structure this
 code uses to solve it, what that structure changes about how the machine
@@ -132,6 +132,13 @@ is photographed on the screens below.
 <td valign="top">Reproduces <strong>392 records transcribed by hand, byte for byte</strong>, and recovers 961 from a run of 1,458 fragments. Four source inversions are named rather than hidden; before they were named the solver merged four pairs of distinct records without failing.</td>
 <td valign="top"><code>tools/<wbr>split_<wbr>titles.py</code>,<br><code>tools/<wbr>title_<wbr>families.py</code>,<br><code>tools/<wbr>build_<wbr>occupations.py</code> — <code>test_<wbr>the_<wbr>pool_<wbr>answers_<wbr>what_<wbr>people_<wbr>type.py</code> (<code>test_<wbr>every_<wbr>title_<wbr>on_<wbr>the_<wbr>lists_<wbr>reaches_<wbr>the_<wbr>pool</code>)</td>
 </tr>
+<tr>
+<td valign="top">14</td>
+<td valign="top">Equipment cannot be attached to a subject that does not exist yet, so a system that creates a subject and fits it out must either make the operator create it first and go elsewhere to fit it, or fit nothing.</td>
+<td valign="top">The fittings are <strong>chosen against a subject that has no identity yet and applied in the act that creates one</strong>. An ordered selection — a display, a relay embodiment, a machine binding, a registry face — is held as a plan; the signature creates the profile, a scoped credential is minted for the new identity, and each held choice is applied through its own existing owner-gated door. Application is <strong>per-piece and isolated</strong>: a door that refuses is recorded by name and the remaining pieces are still attempted, because the creation has already committed and cannot be rolled back by a later fitting.</td>
+<td valign="top">Four kinds of equipment are fitted from one screen with no navigation away from it; a refused fitting — a deployment with no image service refuses a painted face with 503 — leaves the hire standing, the seat filled, and the other three pieces attached, and is reported as the piece that did not go on rather than as a failed hire.</td>
+<td valign="top"><code>app/<wbr>src/<wbr>screens/<wbr>Companies.<wbr>tsx</code> (<code>signAndSeat</code>),<br><code>qrme/<wbr>company.py</code>,<br><code>qrme/<wbr>routers/<wbr>robots.py</code>,<br><code>qrme/<wbr>displays.py</code> — <code>test_<wbr>the_<wbr>new_<wbr>hire_<wbr>is_<wbr>kitted_<wbr>out_<wbr>in_<wbr>the_<wbr>seat.py</code></td>
+</tr>
 </tbody>
 </table>
 
@@ -152,6 +159,7 @@ Each row: the technical problem, the implementation with its own numbers, the te
 | Avatars, the registry and the stage | A face built from a portrait must be the same face in the bubble, the room and full screen, and must say it is synthetic. | `qrme/avatarforge.py` builds face, torso and `.glb` from one portrait; `qrme/avatarreg.py` is the registry every surface reads; the stage marks the figure `✦ AI` in its own pixels. | `test_avatars.py`, `test_the_avatar_registry.py`, `test_the_avatar_takes_the_screen.py` | 44, 205 |
 | The Company Builder | A staffed digital company built by hand is a pile of unrelated profiles. | `qrme/company.py` founds a company, opens seats, drafts each interview, and signs a hire into a department under the founder's account. | `test_a_company_is_hired_one_interview_at_a_time.py` | 210, 146 |
 | The carried occupation table | Asked for a roster with no model reachable, the Builder answered with three canned seats — the trade, a front desk, a bookkeeper — because it had nothing else to answer from. | `qrme/occupations.py` carries 45,147 positions in 16 families, each with the digital skills and connections the work needs; `for_trade` ranks the trade above the founder's own adjectives and never offers a taxonomy's residual bucket as a job. Search is by what the work *does*, not its name. | `test_the_pool_answers_what_people_type.py` | — |
+| Eyes, ears, hands and a body, fitted in the seat | Kitting out a new hire meant leaving the hire: a screen was placed from the employee file, a speaker added in the Workshop, a robot bound on the settings shelf, a face claimed in the studio. | The Company Builder walks a four-rung ladder — `RUNGS` in `app/src/screens/Companies.tsx` — holding the choices against a seat that has no profile yet; `signAndSeat` signs, mints the new profile's own key, and applies each held choice through its existing door, reporting per piece what did not go on. | `test_the_new_hire_is_kitted_out_in_the_seat.py` | 217 |
 | The study a founder reads before signing | The study of a trade ran inside the interview draft, so it grounded every question and was shown to nobody: a seat was signed against an understanding the founder had no way to read. | `company.study_seat` returns the skills and connections off the carried table — legible with nothing reachable — plus the fetched working knowledge and the name of whoever answered it; `keep_study` stores the founder's edits, and the signature is disabled until the study is on screen. | `test_the_founder_reads_the_job_before_signing_for_it.py` | — |
 | The marketplace and the shops | A listing and a desk are different things that one table would collapse. | `qrme/marketplace.py` lists and licenses profiles; `qrme/shops.py` keeps a shop as its own row with its own hours, never a desk. | `test_marketplace_cards.py`, `test_marketplace_search.py`, `test_a_shop_is_not_a_desk.py` | 152, 187 |
 | The bodies a profile may bind | A profile that can drive any robot can drive the wrong one. | `qrme/robotics.py` keeps an allowlist of commands per model and a learned-task list per robot; the wrist's quick ring is the intersection. | `test_the_body_market.py` | 163 |

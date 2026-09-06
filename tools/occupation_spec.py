@@ -170,6 +170,23 @@ SYNONYMS = {
     "Solicitor": "legal advice contracts conveyancing wills",
     "Care home manager": "looks after old people elderly residential care nursing home",
     "Support worker": "looks after old people elderly disabled daily living help",
+    # Care at home, under the words people actually type for it. The
+    # search is by what the work does, and "cares for someone at home"
+    # reached these rows only through the family they were filed in —
+    # which was hospitality until the classifier learned the word carer.
+    "Home care assistant": "cares for someone at home visits housebound elderly own home",
+    "Home care attendant": "cares for someone at home visits housebound elderly own home",
+    "Caregiver": "looks after someone cares for a person daily help elderly disabled",
+    "Carer": "looks after someone cares for a person unpaid family caring",
+    "Live-in carer": "lives in cares overnight round the clock at home elderly",
+    "Domiciliary care worker": "cares for people at home rounds visits community care",
+    "Care assistant": "helps care for people washing dressing feeding daily living",
+    "Care worker": "cares for people supports daily living residential home",
+    "Personal care aide": "helps someone wash dress eat daily living personal care",
+    "Home health aide": "health care at home visits nursing support elderly",
+    "Dementia support worker": "looks after people with dementia memory alzheimers",
+    "Respite carer": "covers for a carer short stay break relief caring",
+    "Nanny": "looks after children in their home childcare minding kids",
     "Registered nurse": "nurse ward hospital bedside patients",
     "Paramedic": "ambulance emergency 999 911 rescue",
     "Firefighter": "puts out fires rescue engine brigade",
@@ -323,6 +340,32 @@ def load(family):
         "Youth worker": ("activity planning;incident logging", "schools;families"),
         "Care home manager": ("staffing rota building;inspection preparation", "regulators;families"),
         "Support worker": ("daily log keeping;personal care recording", "care managers"),
+        # Care in somebody's own home, written out because the family
+        # block cannot say it. "Home Care Attendant" arrived from the
+        # reported titles with no row of its own, so it browsed with
+        # "case note writing" and "risk flagging" — true of the whole
+        # family and true of nobody in particular. A carer's own work is
+        # the visit, the medicines, and the thing that changed since
+        # last time, and none of those three is anywhere above.
+        #
+        # These stay records and coordination rather than acts. The
+        # charter every hire is signed on ends "duties that are licensed
+        # or physical acts are assisted, never performed", and a skill
+        # list that read "administers medication" would contradict the
+        # document the same profile carries.
+        "Home care assistant": ("visit log keeping;medication prompt recording;change-of-condition reporting", "family carers;district nurses"),
+        "Home care attendant": ("visit note writing;task checklist keeping;wellbeing check reporting", "family carers;care coordinators"),
+        "Caregiver": ("daily routine tracking;medication reminder scheduling;appointment coordination", "families;GPs;pharmacies"),
+        "Carer": ("visit log keeping;medication prompt recording;family update writing", "families;district nurses"),
+        "Live-in carer": ("overnight log keeping;household routine planning;handover writing", "families;relief carers"),
+        "Domiciliary care worker": ("visit scheduling;care plan reading;incident reporting", "care coordinators;district nurses"),
+        "Care assistant": ("care plan updating;food and fluid charting;handover reporting", "senior carers;nurses"),
+        "Care worker": ("shift handover writing;risk note updating;safeguarding referral drafting", "senior carers;social workers"),
+        "Personal care aide": ("task record keeping;consent and dignity noting;supply reordering", "families;care managers"),
+        "Home health aide": ("vital sign recording;visit note writing;clinician escalation", "nurses;therapists;families"),
+        "Dementia support worker": ("orientation cue planning;behaviour log keeping;family update writing", "memory clinics;families"),
+        "Respite carer": ("handover pack reading;short-stay log keeping;return report writing", "regular carers;families"),
+        "Nanny": ("routine and nap logging;activity planning;parent update writing", "parents;schools;health visitors"),
     })
 
     # ---- Software & IT ---------------------------------------------------

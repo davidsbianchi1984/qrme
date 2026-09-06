@@ -1018,6 +1018,54 @@ const CHROME: Table = {
   "com.study.keep": {
     en: "Keep these and continue", es: "Guardar y continuar", fr: "Conserver et continuer", de: "Übernehmen und fortfahren", pt: "Guardar e continuar", it: "Conserva e continua", ja: "保存して次へ", zh: "保存并继续", hi: "सहेजें और आगे बढ़ें", ar: "احفظ وتابع",
   },
+  "com.kit.eyes": {
+    en: "Eyes", es: "Ojos", fr: "Yeux", de: "Augen", pt: "Olhos", it: "Occhi", ja: "目", zh: "眼", hi: "आँखें", ar: "عيون",
+  },
+  "com.kit.ears": {
+    en: "Ears", es: "Oídos", fr: "Oreilles", de: "Ohren", pt: "Ouvidos", it: "Orecchie", ja: "耳", zh: "耳", hi: "कान", ar: "أذن",
+  },
+  "com.kit.hands": {
+    en: "Hands", es: "Manos", fr: "Mains", de: "Hände", pt: "Mãos", it: "Mani", ja: "手", zh: "手", hi: "हाथ", ar: "يدان",
+  },
+  "com.kit.body": {
+    en: "Body", es: "Cuerpo", fr: "Corps", de: "Körper", pt: "Corpo", it: "Corpo", ja: "姿", zh: "身", hi: "शरीर", ar: "جسد",
+  },
+  "com.kit.eyes.pitch": {
+    en: "A screen they stand on, so people can see who they are talking to.", es: "Una pantalla donde estar, para que se vea con quién se habla.", fr: "Un écran où se tenir, pour qu'on voie à qui l'on parle.", de: "Ein Bildschirm, auf dem sie stehen, damit man sieht, mit wem man spricht.", pt: "Um ecrã onde estar, para se ver com quem se fala.", it: "Uno schermo su cui stare, così si vede con chi si parla.", ja: "立つ画面。誰と話しているかが見えます。", zh: "一块可以站上去的屏幕，让人看见在跟谁说话。", hi: "एक स्क्रीन जिस पर वे दिखें, ताकि लोग देख सकें कि वे किससे बात कर रहे हैं।", ar: "شاشة يقفون عليها ليرى الناس من يحادثون.",
+  },
+  "com.kit.ears.pitch": {
+    en: "A speaker in the room or an earpiece on a person — where they hear the work being asked for.", es: "Un altavoz en la sala o un auricular en alguien: donde oyen lo que se les pide.", fr: "Un haut-parleur dans la pièce ou une oreillette sur quelqu'un — là où ils entendent ce qu'on demande.", de: "Ein Lautsprecher im Raum oder ein Ohrstück an einer Person — dort hören sie, worum gebeten wird.", pt: "Uma coluna na sala ou um auricular numa pessoa — onde ouvem o que lhes pedem.", it: "Un altoparlante nella stanza o un auricolare su una persona: dove sentono che cosa viene chiesto.", ja: "部屋のスピーカー、または人に付けるイヤホン。頼まれた仕事を聞く場所です。", zh: "房间里的音箱，或戴在人身上的耳机——他们在这里听到工作请求。", hi: "कमरे में स्पीकर या किसी व्यक्ति पर ईयरपीस — यहीं वे काम की बात सुनते हैं।", ar: "سمّاعة في الغرفة أو سماعة أذن على شخص — من هناك يسمعون ما يُطلب.",
+  },
+  "com.kit.hands.pitch": {
+    en: "A machine to work with, from the shelf of the ones that are real.", es: "Una máquina con la que trabajar, del estante de las que existen.", fr: "Une machine pour travailler, prise sur l'étagère de celles qui existent.", de: "Eine Maschine zum Arbeiten, aus dem Regal der wirklich existierenden.", pt: "Uma máquina com que trabalhar, da prateleira das que existem.", it: "Una macchina con cui lavorare, dallo scaffale di quelle che esistono davvero.", ja: "実在する機体の棚から選ぶ、仕事の道具。", zh: "从真实存在的机型架上，挑一台干活的机器。", hi: "काम करने के लिए एक मशीन, उन्हीं में से जो सचमुच मौजूद हैं।", ar: "آلة للعمل، من رفّ الآلات الموجودة فعلًا.",
+  },
+  "com.kit.body.pitch": {
+    en: "The face they wear. Pick one, or describe one and it gets painted.", es: "La cara que llevan. Elige una, o descíbela y se pinta.", fr: "Le visage qu'ils portent. Choisissez-en un, ou décrivez-le et il sera peint.", de: "Das Gesicht, das sie tragen. Wähle eins, oder beschreib es und es wird gemalt.", pt: "A cara que usam. Escolhe uma, ou descreve-a e será pintada.", it: "Il volto che indossano. Scegline uno, o descrivilo e verrà dipinto.", ja: "まとう顔。選ぶか、言葉で描くと生成されます。", zh: "他们戴的那张脸。挑一张，或者描述一张，系统会画出来。", hi: "वह चेहरा जो वे पहनते हैं। एक चुनें, या बताएँ और वह बना दिया जाएगा।", ar: "الوجه الذي يرتدونه. اختر واحدًا، أو صفه فيُرسم.",
+  },
+  "com.kit.ears.name": {
+    en: "Name this one — kitchen speaker, front desk", es: "Ponle nombre: altavoz de cocina, recepción", fr: "Nommez-le : enceinte de cuisine, accueil", de: "Gib ihm einen Namen — Küchenlautsprecher, Empfang", pt: "Dá-lhe um nome: coluna da cozinha, recepção", it: "Dagli un nome: altoparlante cucina, reception", ja: "名前を付けます（厨房スピーカー、受付など）", zh: "给它起个名字——厨房音箱、前台", hi: "इसे नाम दें — रसोई स्पीकर, रिसेप्शन", ar: "سمّها — سماعة المطبخ، الاستقبال",
+  },
+  "com.kit.body.words": {
+    en: "Or describe the face in your own words", es: "O describe la cara con tus palabras", fr: "Ou décrivez le visage avec vos mots", de: "Oder beschreib das Gesicht mit deinen eigenen Worten", pt: "Ou descreve a cara pelas tuas palavras", it: "Oppure descrivi il volto con parole tue", ja: "または、自分の言葉で顔を描写", zh: "或者用你自己的话描述这张脸", hi: "या चेहरे को अपने शब्दों में बताएँ", ar: "أو صف الوجه بكلماتك",
+  },
+  "com.kit.next": {
+    en: "Next: {next}", es: "Siguiente: {next}", fr: "Ensuite : {next}", de: "Weiter: {next}", pt: "A seguir: {next}", it: "Avanti: {next}", ja: "次へ：{next}", zh: "下一步：{next}", hi: "आगे: {next}", ar: "التالي: {next}",
+  },
+  "com.kit.skip": {
+    en: "Not this one", es: "Este no", fr: "Pas celui-ci", de: "Dieses nicht", pt: "Este não", it: "Questo no", ja: "これは不要", zh: "这项不要", hi: "यह नहीं", ar: "ليس هذا",
+  },
+  "com.kit.pick": {
+    en: "Give them this", es: "Dáselo", fr: "Lui donner ça", de: "Das geben", pt: "Dá-lhe isto", it: "Dagli questo", ja: "これを持たせる", zh: "把这个给他们", hi: "यह इन्हें दें", ar: "امنحه هذا",
+  },
+  "com.kit.picked": {
+    en: "Theirs", es: "Suyo", fr: "À lui", de: "Gehört ihnen", pt: "É seu", it: "Suo", ja: "決定済み", zh: "已给他们", hi: "इन्हीं का", ar: "له",
+  },
+  "com.kit.seat": {
+    en: "Sign, hire and seat them", es: "Firmar, contratar y sentarlo", fr: "Signer, recruter et l'installer", de: "Unterschreiben, einstellen und hinsetzen", pt: "Assinar, contratar e sentar", it: "Firma, assumi e mettilo al posto", ja: "署名して採用し、席に着かせる", zh: "签署、聘用并就座", hi: "हस्ताक्षर कर नियुक्त करें और सीट पर बिठाएँ", ar: "وقّع وعيّن وأجلسه",
+  },
+  "com.kit.partly": {
+    en: "Hired and seated. What would not go on: {what}. The employee file fits it.", es: "Contratado y sentado. No se pudo poner: {what}. El expediente lo permite.", fr: "Recruté et installé. Ce qui n'a pas pu être posé : {what}. Le dossier de l'employé le permet.", de: "Eingestellt und hingesetzt. Nicht angebracht werden konnte: {what}. Die Personalakte kann es.", pt: "Contratado e sentado. Não foi possível colocar: {what}. A ficha do funcionário permite-o.", it: "Assunto e messo al posto. Non è stato possibile montare: {what}. La scheda del dipendente ci riesce.", ja: "採用し着席しました。取り付けられなかったもの：{what}。社員ファイルから付けられます。", zh: "已聘用并就座。未能装上的：{what}。可在员工档案里补装。", hi: "नियुक्त कर सीट पर बिठाया गया। जो नहीं लग सका: {what}। कर्मचारी फ़ाइल से लगाया जा सकता है।", ar: "تمّ التعيين والإجلاس. ما لم يُركّب: {what}. ملف الموظف يسمح بذلك.",
+  },
   "com.sign": {
     en: "Sign and hire", es: "Firmar y contratar", fr: "Signer et recruter", de: "Unterschreiben und einstellen", pt: "Assinar e contratar", it: "Firma e assumi", ja: "署名して採用", zh: "签署并聘用", hi: "हस्ताक्षर कर नियुक्त करें", ar: "وقّع وعيّن",
   },

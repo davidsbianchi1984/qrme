@@ -1,10 +1,52 @@
 import { useEffect, useState } from "react";
 import { accountApi, api, Company, CompanySeat, Display, Embodiment,
-         PoolRow,
+         PoolRow, RegistryRow,
          getBase, InterviewQ, RobotCatalogue } from "../api";
 import { fill, t as tr, visitorLang } from "../l10n";
 import { Refusal } from "../Refusal";
 import { useSession } from "../store";
+
+/* The kit, in the order the founder walks it: what the new hire sees
+ * through, hears through, works with, and wears. Each rung opens the
+ * next and the last one signs, because the request was not "put the
+ * equipment in the builder" — it was that each builder leads into the
+ * next until you hire and seat your new hire.
+ *
+ * Every one of these four doors already existed. What did not exist was
+ * a way to reach them without walking out of the seat you were hiring
+ * for: the screen lived in the employee file, the speaker in the
+ * Workshop, the robot on the settings shelf, the face in the studio.
+ * Nothing about the doors needed the founder to leave. Only the screens
+ * did.
+ */
+const RUNGS = ["eyes", "ears", "hands", "body"] as const;
+
+/** Has this rung been answered? `body` is the awkward one: a face can be
+ *  a pick off the shelf or a sentence handed to the forge, and either
+ *  one counts as answered. */
+function filled(kit: Kit, rung: typeof RUNGS[number]): boolean {
+  if (rung === "eyes") return !!kit.eyes;
+  if (rung === "ears") return !!kit.ears;
+  if (rung === "hands") return !!kit.hands;
+  return !!kit.face || !!kit.painted.trim();
+}
+
+/** What a hire is kitted with, chosen before there is anybody to fit it
+ *  to. A seat has no profile until it is signed, so none of the four
+ *  doors can be pressed while the founder is standing here choosing —
+ *  see `signAndSeat`, which signs first and fits second because that is
+ *  the only order the world allows. */
+type Kit = {
+  seatId: string;
+  eyes: { kind: string; label: string } | null;
+  ears: { kind: string; name: string } | null;
+  hands: { model: string; label: string } | null;
+  face: { id: string; label: string } | null;
+  /** A face described in words when the shelf has none that fits. Held
+   *  as text rather than as a fifth `| null` because the forge is given
+   *  a sentence, and an empty one means the founder did not write it. */
+  painted: string;
+};
 
 /* The Company Builder: found, draft, interview, hire, oversee.
  *
@@ -77,6 +119,19 @@ export function Companies({ onOpenProfile }: {
   const [addSkill, setAddSkill] = useState("");
   const [addConn, setAddConn] = useState("");
 
+  // The kit under assembly, and which rung of it is open. One rung at a
+  // time, in order: the founder asked for a ladder, not a wall of forms.
+  const [kit, setKit] = useState<Kit | null>(null);
+  const [rung, setRung] = useState<typeof RUNGS[number] | "">("");
+  const [faces, setFaces] = useState<RegistryRow[]>([]);
+  // The rungs keep their own boxes rather than borrowing the employee
+  // file's screen placer below: two open panels sharing one input is a
+  // bug that only shows up when somebody has both open.
+  const [eyeKind, setEyeKind] = useState("");
+  const [eyeLabel, setEyeLabel] = useState("");
+  const [earKind, setEarKind] = useState("speaker");
+  const [earName, setEarName] = useState("");
+
   // The interview under edit, per seat.
   const [interview, setInterview] = useState<{
     seatId: string; rows: { question: string; answer: string }[];
@@ -139,6 +194,95 @@ export function Companies({ onOpenProfile }: {
     setKinds(vocab.kinds.map((k) => ({ kind: k.kind, means: k.means })));
     if (vocab.kinds.length) {
       setScreenKind((prev) => prev || vocab.kinds[0].kind);
+    }
+  };
+
+  // The four catalogues behind the ladder. All four doors are public —
+  // no profile, no key — which is exactly what lets the founder kit out
+  // a hire who has not been signed yet. `loadFile` fetches three of the
+  // same four for an employee who already exists; this one adds the
+  // face shelf and takes no token, and the two are kept apart because
+  // one of them is allowed to run before there is anybody there.
+  const loadKit = async () => {
+    const [catalogue, vocab, shelfOfFaces] = await Promise.all([
+      api.robotCatalogue(),
+      api.displayCatalog(),
+      api.avatarShelf(),
+    ]);
+    setShelf(catalogue);
+    setKinds(vocab.kinds.map((k) => ({ kind: k.kind, means: k.means })));
+    if (vocab.kinds.length) {
+      setEyeKind((prev) => prev || vocab.kinds[0].kind);
+    }
+    setFaces(shelfOfFaces.shelf);
+  };
+
+  // Open the ladder at its first rung. Pressed from the study's Keep,
+  // so reading what the job needs is what leads into equipping for it.
+  const startKit = async (seatId: string) => {
+    setKit({ seatId, eyes: null, ears: null, hands: null,
+             face: null, painted: "" });
+    setRung(RUNGS[0]);
+    await loadKit();
+  };
+
+  // Sign, then fit. The order is forced rather than chosen: the hire is
+  // what creates the profile, and until there is a profile there is
+  // nothing to hang a screen, a speaker, a robot or a face on. That has
+  // a consequence this screen must not hide — a fitting can fail after
+  // the hire already stands — so each piece is caught by name and what
+  // did not go on is reported, instead of one failed fitting coming
+  // back looking like a failed hire.
+  const signAndSeat = async (
+    companyId: string, seatId: string,
+    rows: { question: string; answer: string }[],
+  ) => {
+    const hired = await api.hireSeat(companyId, seatId, {
+      answers: rows.filter((r) => r.answer.trim())
+        .map((r) => ({ question: r.question, answer: r.answer.trim() })),
+    }, token);
+    const chosen = kit?.seatId === seatId ? kit : null;
+    setInterview(null); setStudy(null); setKit(null); setRung("");
+    if (!chosen) return;
+
+    const key = await employeeKey(hired.profile_id);
+    const missed: string[] = [];
+    const fit = async (what: string, go: () => Promise<unknown>) => {
+      try { await go(); } catch { missed.push(what); }
+    };
+    if (chosen.eyes) {
+      const eyes = chosen.eyes;
+      await fit(tr("com.kit.eyes", lang), () => api.placeDisplay(
+        hired.profile_id, { kind: eyes.kind, label: eyes.label }, key));
+    }
+    if (chosen.ears) {
+      const ears = chosen.ears;
+      // `has_llm` is false and stays false: a speaker in a room and an
+      // earpiece on a person both relay to this host. Claiming a model
+      // rides on the hardware would be a claim about the hardware.
+      await fit(tr("com.kit.ears", lang), () => api.addEmbodiment(
+        hired.profile_id,
+        { name: ears.name, kind: ears.kind, has_llm: false }, key));
+    }
+    if (chosen.hands) {
+      const hands = chosen.hands;
+      await fit(tr("com.kit.hands", lang), () => api.bindRobot(
+        hired.profile_id, { model: hands.model, name: hands.label }, key));
+    }
+    if (chosen.face) {
+      const face = chosen.face;
+      await fit(tr("com.kit.body", lang), () => api.claimFace(
+        hired.profile_id, face.id, key));
+    } else if (chosen.painted.trim()) {
+      const words = chosen.painted.trim();
+      await fit(tr("com.kit.body", lang), () => api.paintFace(
+        hired.profile_id, words, key));
+    }
+    if (missed.length) {
+      // Plain substitution, not `fill`: `fill` returns nodes for a
+      // button's children, and the refusal banner takes a string.
+      setError(tr("com.kit.partly", lang)
+        .replace("{what}", missed.join(", ")));
     }
   };
 
@@ -279,7 +423,7 @@ export function Companies({ onOpenProfile }: {
               positions now, so the founder can go and look. Typing your
               own stays exactly as good — this is a way in, never a wall. */}
           <div className="row">
-            <button disabled={busy}
+            <button disabled={busy} data-go="browse"
                     onClick={act(async () => {
                       const next = !poolOpen;
                       setPoolOpen(next);
@@ -307,7 +451,7 @@ export function Companies({ onOpenProfile }: {
           </div>
 
           {poolOpen && (
-            <div className="com-pool">
+            <div className="com-pool" data-screen="212">
               <div className="row">
                 <input value={poolQ} style={{ flex: 2 }}
                        placeholder={tr("com.browse.ask", lang)}
@@ -583,7 +727,7 @@ export function Companies({ onOpenProfile }: {
                 </button>
               ))}
               {s.status === "open" && interview?.seatId !== s.id && (
-                <button disabled={busy}
+                <button disabled={busy} data-go="interview"
                         onClick={act(async () => {
                           const qs = await api.draftInterview(
                             open.id, s.id, token);
@@ -619,7 +763,7 @@ export function Companies({ onOpenProfile }: {
                       that step made a step: press it, read what came
                       back, change what is wrong, then sign. */}
                   {study?.seatId !== s.id && (
-                    <button disabled={busy}
+                    <button disabled={busy} data-go="study"
                             onClick={act(async () => {
                               const found = await api.studySeat(
                                 open.id, s.id, token);
@@ -638,7 +782,7 @@ export function Companies({ onOpenProfile }: {
                   )}
 
                   {study?.seatId === s.id && (
-                    <div className="com-study">
+                    <div className="com-study" data-screen="213">
                       {!study.found && (
                         <p className="muted small">
                           {tr("com.study.unknown", lang)}
@@ -651,7 +795,7 @@ export function Companies({ onOpenProfile }: {
 
                       <b className="small">{tr("com.study.skills", lang)}</b>
                       {study.skills.map((k, i) => (
-                        <div key={k + i} className="row">
+                        <div key={k + i} className="com-line">
                           <span style={{ flex: 1 }}>{k}</span>
                           <button className="muted small"
                                   onClick={() => setStudy({
@@ -662,8 +806,8 @@ export function Companies({ onOpenProfile }: {
                           </button>
                         </div>
                       ))}
-                      <div className="row">
-                        <input value={addSkill} style={{ flex: 1 }}
+                      <div className="com-add">
+                        <input value={addSkill}
                                placeholder={tr("com.study.add", lang)}
                                onChange={(e) => setAddSkill(e.target.value)} />
                         <button disabled={!addSkill.trim()}
@@ -679,7 +823,7 @@ export function Companies({ onOpenProfile }: {
 
                       <b className="small">{tr("com.study.conns", lang)}</b>
                       {study.connections.map((c, i) => (
-                        <div key={c + i} className="row">
+                        <div key={c + i} className="com-line">
                           <span style={{ flex: 1 }}>{c}</span>
                           <button className="muted small"
                                   onClick={() => setStudy({
@@ -690,8 +834,8 @@ export function Companies({ onOpenProfile }: {
                           </button>
                         </div>
                       ))}
-                      <div className="row">
-                        <input value={addConn} style={{ flex: 1 }}
+                      <div className="com-add">
+                        <input value={addConn}
                                placeholder={tr("com.study.add", lang)}
                                onChange={(e) => setAddConn(e.target.value)} />
                         <button disabled={!addConn.trim()}
@@ -720,34 +864,250 @@ export function Companies({ onOpenProfile }: {
                         </p>
                       )}
 
-                      <button disabled={busy}
+                      {/* Keeping the study is what opens the kit. The
+                          founder has just read what the job needs;
+                          that is the moment to decide what the person
+                          doing it works with. */}
+                      <button disabled={busy} data-go="keep"
                               onClick={act(async () => {
                                 await api.keepStudy(open.id, s.id, {
                                   skills: study.skills,
                                   connections: study.connections,
                                 }, token);
+                                await startKit(s.id);
                               })}>
                         {tr("com.study.keep", lang)}
                       </button>
                     </div>
                   )}
 
+                  {/* The kit, one rung at a time, and the ladder ends
+                      at the signature. Every door here already worked;
+                      what did not work was reaching them without
+                      leaving the seat you were hiring for. */}
+                  {kit?.seatId === s.id && (
+                    <div className="com-kit" data-screen="217">
+                      <ol className="com-rungs">
+                        {RUNGS.map((r) => (
+                          <li key={r}
+                              className={r === rung ? "at"
+                                : filled(kit, r) ? "done" : ""}>
+                            {tr(`com.kit.${r}`, lang)}
+                          </li>
+                        ))}
+                      </ol>
+
+                      {/* Eyes: a screen this one stands on, and the
+                          vocabulary says who walks past each kind
+                          rather than leaving the founder to guess from
+                          a word like "wall". */}
+                      {rung === "eyes" && (
+                        <div className="com-rung">
+                          <p className="muted small">
+                            {tr("com.kit.eyes.pitch", lang)}
+                          </p>
+                          <div className="com-add">
+                            <select value={eyeKind}
+                                    onChange={(e) =>
+                                      setEyeKind(e.target.value)}>
+                              {kinds.map((k) => (
+                                <option key={k.kind} value={k.kind}>
+                                  {k.kind}
+                                </option>
+                              ))}
+                            </select>
+                            <input value={eyeLabel}
+                                   placeholder={
+                                     tr("com.work.screen.label", lang)}
+                                   onChange={(e) =>
+                                     setEyeLabel(e.target.value)} />
+                          </div>
+                          <p className="muted small">
+                            {kinds.find((k) => k.kind === eyeKind)?.means}
+                          </p>
+                          <div className="com-add">
+                            <button disabled={!eyeLabel.trim()}
+                                    onClick={() => {
+                                      setKit({ ...kit, eyes: {
+                                        kind: eyeKind,
+                                        label: eyeLabel.trim() } });
+                                      setRung("ears");
+                                    }}>
+                              {fill(tr("com.kit.next", lang),
+                                    { next: tr("com.kit.ears", lang) })}
+                            </button>
+                            <button className="muted small"
+                                    data-go="pass"
+                                    onClick={() => setRung("ears")}>
+                              {tr("com.kit.skip", lang)}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Ears: two of the server's six embodiment kinds
+                          — the two that hear. The other four are a
+                          screen, a body, or "other", and offering them
+                          here would 422 on the way out. */}
+                      {rung === "ears" && (
+                        <div className="com-rung">
+                          <p className="muted small">
+                            {tr("com.kit.ears.pitch", lang)}
+                          </p>
+                          <div className="com-add">
+                            <select value={earKind}
+                                    onChange={(e) =>
+                                      setEarKind(e.target.value)}>
+                              {["speaker", "earpiece"].map((k) => (
+                                <option key={k} value={k}>{k}</option>
+                              ))}
+                            </select>
+                            <input value={earName}
+                                   placeholder={
+                                     tr("com.kit.ears.name", lang)}
+                                   onChange={(e) =>
+                                     setEarName(e.target.value)} />
+                          </div>
+                          <div className="com-add">
+                            <button disabled={!earName.trim()}
+                                    onClick={() => {
+                                      setKit({ ...kit, ears: {
+                                        kind: earKind,
+                                        name: earName.trim() } });
+                                      setRung("hands");
+                                    }}>
+                              {fill(tr("com.kit.next", lang),
+                                    { next: tr("com.kit.hands", lang) })}
+                            </button>
+                            <button className="muted small"
+                                    data-go="pass"
+                                    onClick={() => setRung("hands")}>
+                              {tr("com.kit.skip", lang)}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Hands: the same shelf the employee file
+                          carries, choosing rather than binding —
+                          there is nobody to bind to until the
+                          signature. An announced machine renders
+                          un-pickable rather than hidden, for the
+                          reason qrme/robotics.py gives. */}
+                      {rung === "hands" && (
+                        <div className="com-rung">
+                          <p className="muted small">
+                            {tr("com.kit.hands.pitch", lang)}
+                          </p>
+                          <div className="com-scroll">
+                          {shelf && Object.entries(shelf.by_maker).map(
+                            ([maker, models]) => (
+                            <div key={maker} className="com-shelf">
+                              <span className="muted small">{maker}</span>
+                              {models.map((m) => (
+                                <span key={m.model} className="row">
+                                  <b>{m.label}</b>
+                                  <span className={
+                                          "com-avail " + m.availability}>
+                                    {tr(`com.avail.${m.availability}`,
+                                        lang)}
+                                  </span>
+                                  <button className="muted small"
+                                          disabled={!m.bindable}
+                                          onClick={() => setKit({
+                                            ...kit,
+                                            hands: { model: m.model,
+                                                     label: m.label } })}>
+                                    {kit.hands?.model === m.model
+                                      ? tr("com.kit.picked", lang)
+                                      : tr("com.kit.pick", lang)}
+                                  </button>
+                                </span>
+                              ))}
+                            </div>
+                          ))}
+                          </div>
+                          <div className="com-add">
+                            <button disabled={!kit.hands}
+                                    onClick={() => setRung("body")}>
+                              {fill(tr("com.kit.next", lang),
+                                    { next: tr("com.kit.body", lang) })}
+                            </button>
+                            <button className="muted small"
+                                    data-go="pass"
+                                    onClick={() => setRung("body")}>
+                              {tr("com.kit.skip", lang)}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Body: a face off the registry, or a sentence
+                          the forge paints one from. The shelf can be
+                          empty on a fresh deployment, which is why the
+                          words are not the fallback but the other
+                          half of the rung. */}
+                      {rung === "body" && (
+                        <div className="com-rung">
+                          <p className="muted small">
+                            {tr("com.kit.body.pitch", lang)}
+                          </p>
+                          <div className="com-scroll">
+                          {faces.map((f) => (
+                            <div key={f.id} className="com-line">
+                              <span>{f.label || f.provider}</span>
+                              <button className="muted small"
+                                      onClick={() => setKit({
+                                        ...kit, painted: "",
+                                        face: { id: f.id,
+                                                label: f.label
+                                                  || f.provider } })}>
+                                {kit.face?.id === f.id
+                                  ? tr("com.kit.picked", lang)
+                                  : tr("com.kit.pick", lang)}
+                              </button>
+                            </div>
+                          ))}
+                          </div>
+                          <div className="com-add">
+                            <input value={kit.painted}
+                                   placeholder={
+                                     tr("com.kit.body.words", lang)}
+                                   onChange={(e) => setKit({
+                                     ...kit, face: null,
+                                     painted: e.target.value })} />
+                          </div>
+                          {/* The last rung is the signature. This is
+                              the whole point of the ladder: the
+                              founder never leaves the seat, and the
+                              walk ends with somebody sitting in it. */}
+                          <button disabled={busy}
+                                  onClick={act(async () => {
+                                    await signAndSeat(open.id, s.id,
+                                                      interview.rows);
+                                  })}>
+                            {tr("com.kit.seat", lang)}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Signing is hiring. It waits for the study now: a
                       seat signed before anybody read what the job needs
-                      is the thing this whole step exists to stop. */}
-                  <button disabled={busy || study?.seatId !== s.id}
-                          onClick={act(async () => {
-                            await api.hireSeat(open.id, s.id, {
-                              answers: interview.rows
-                                .filter((r) => r.answer.trim())
-                                .map((r) => ({ question: r.question,
-                                               answer: r.answer.trim() })),
-                            }, token);
-                            setInterview(null);
-                            setStudy(null);
-                          })}>
-                    {tr("com.sign", lang)}
-                  </button>
+                      is the thing this whole step exists to stop. While
+                      the ladder is open the signature lives on its last
+                      rung instead, so there is one of this button and
+                      never two. */}
+                  {kit?.seatId !== s.id && (
+                    <button disabled={busy || study?.seatId !== s.id}
+                            onClick={act(async () => {
+                              await signAndSeat(open.id, s.id,
+                                                interview.rows);
+                            })}>
+                      {tr("com.sign", lang)}
+                    </button>
+                  )}
                 </div>
               )}
 

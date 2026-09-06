@@ -792,6 +792,40 @@ LESSONS: tuple[dict, ...] = (
          screens=(210,),
          try_it="Found a bakery, open a counter seat, and sign your first "
                 "hire."),
+    dict(key="positions", chapter="Working", title="Every job on earth",
+         what="The app carries 45,153 positions, searched by what the work "
+              "does rather than what it is called: type \u201ccares for "
+              "someone at home\u201d or \u201creads scans\u201d and the "
+              "carer and the radiologist come back, sharing no letter with "
+              "what you typed. Every row names the digital skills that job "
+              "needs and who and what it has to reach, its own ahead of the "
+              "ones its whole family shares. Picking one fills the title "
+              "box and never opens a seat \u2014 your own words open one "
+              "just as well. Before you sign, Download knowledge fetches "
+              "the trade itself and shows it to you: read it, take off what "
+              "is wrong, add what is missing, and the card names whoever "
+              "answered the study so a host with no model reachable says so "
+              "on its face.",
+         screens=(212, 213, 214, 215, 216),
+         try_it="Open a company, press Browse the positions, and type what "
+                "the job does instead of its title."),
+    dict(key="kit", chapter="Working", title="Eyes, ears, hands and a body",
+         what="A new hire is kitted out where you are hiring them, not out "
+              "in settings. After the study is kept the seat walks a ladder "
+              "\u2014 eyes, a screen they stand on; ears, a speaker in the "
+              "room or an earpiece on a person; hands, a machine off the "
+              "shelf of the ones that are real; a body, a face from the "
+              "registry or one painted from your own words \u2014 and each "
+              "rung opens the next until the last one, which is the "
+              "signature. Any rung can be passed with nothing chosen. "
+              "Nothing is fitted before the signature because there is "
+              "nobody to fit it to: the hire is what creates the profile, "
+              "and the equipment goes on in the same act. If a piece will "
+              "not go on, you are told which piece \u2014 the person is "
+              "still hired and still seated.",
+         screens=(217,),
+         try_it="Keep a study, then walk the four rungs and sign at the "
+                "end of them."),
     dict(key="dock", chapter="Working", title="The edge dock",
          what="Two tabs on the right edge of every screen, movable up or "
               "down by the grip above them. The stoplight is your agents: "

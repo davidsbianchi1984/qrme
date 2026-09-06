@@ -613,6 +613,16 @@ is exactly how the old card came to be showing yours in place of theirs.
     <td align="center" width="25%"><a href="screens/210-companies.png"><img src="screens/210-companies.png" width="210" alt="Companies"></a><br><sub><b>210</b> · Companies · a digital company founded, staffed one interview at a time, and opened for business</sub></td>
     <td align="center" width="25%"><a href="screens/211-the-edge-dock.png"><img src="screens/211-the-edge-dock.png" width="210" alt="The edge dock"></a><br><sub><b>211</b> · The edge dock · help and the agent lights as tabs on the right edge, the lights opened here to the round watch face</sub></td>
   </tr>
+  <tr>
+    <td align="center" width="25%"><a href="screens/212-browse-the-positions.png"><img src="screens/212-browse-the-positions.png" width="210" alt="Browse the positions"></a><br><sub><b>212</b> · Browse the positions · 45,147 jobs the app carries, searched by what the work does — "delivers babies" finds the midwife, sharing no letter with it</sub></td>
+    <td align="center" width="25%"><a href="screens/214-reads-scans.png"><img src="screens/214-reads-scans.png" width="210" alt="Reads scans"></a><br><sub><b>214</b> · Reads scans · the radiologist, and the skills the row carries of its own — image report dictation, prior study comparison — ahead of the ones its family shares</sub></td>
+    <td align="center" width="25%"><a href="screens/215-cares-for-someone-at-home.png"><img src="screens/215-cares-for-someone-at-home.png" width="210" alt="Cares for someone at home"></a><br><sub><b>215</b> · Cares for someone at home · three home-care rows, none of which the typed words name</sub></td>
+    <td align="center" width="25%"><a href="screens/216-advises-on-investments.png"><img src="screens/216-advises-on-investments.png" width="210" alt="Advises on investments"></a><br><sub><b>216</b> · Advises on investments · one job under Adviser, Advisor and the plural, because three taxonomies each spelled it differently</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="25%"><a href="screens/213-download-knowledge.png"><img src="screens/213-download-knowledge.png" width="210" alt="Download knowledge"></a><br><sub><b>213</b> · Download knowledge · what the job needs, read and edited before the signature — and the card names whoever answered the study</sub></td>
+    <td align="center" width="25%"><a href="screens/217-kitted-out-in-the-seat.png"><img src="screens/217-kitted-out-in-the-seat.png" width="210" alt="Kitted out in the seat"></a><br><sub><b>217</b> · Kitted out in the seat · eyes, ears, hands and a body, one rung at a time — the robot shelf reached without leaving the hire it is for</sub></td>
+  </tr>
 </table>
 
 The strip changes with the room and only with the room. An audio room has no

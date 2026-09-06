@@ -60,6 +60,14 @@ def _pool() -> list[dict]:
     nothing new — so a row's own skills, connections and search terms are
     added to its family's here. Callers see whole rows either way.
 
+    **A row's own come first.** The family's used to lead, and every
+    screen that shows a few of them showed the family's few: Radiologist
+    carries "image report dictation" and "prior study comparison" and
+    displayed six generic health-care skills, so a browse of 45,147
+    positions read as sixteen positions repeated. The specific half is
+    the half worth the first six lines; the shared half fills in behind
+    it.
+
     A missing or unreadable file is an empty pool rather than an exception:
     the Company Builder must still open, and typing your own is always
     allowed.
@@ -75,8 +83,9 @@ def _pool() -> list[dict]:
     for r in raw.get("positions", []):
         row = {_LONG[k]: v for k, v in r.items() if k in _LONG}
         shared = fams.get(row.get("family"), {})
-        row["skills"] = list(shared.get("s", ())) + row.get("skills", [])
-        row["connections"] = list(shared.get("c", ())) + row.get("connections", [])
+        row["skills"] = row.get("skills", []) + list(shared.get("s", ()))
+        row["connections"] = (row.get("connections", [])
+                              + list(shared.get("c", ())))
         row["keywords"] = row.get("keywords", []) + list(shared.get("k", ()))
         row["written"] = bool(row.get("written"))
         rows.append(row)

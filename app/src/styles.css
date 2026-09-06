@@ -5237,13 +5237,72 @@ button.mic.listening { background: rgba(123,196,127,0.18); border-color: var(--g
 .com-study-text { white-space: pre-wrap; max-height: 260px;
   overflow-y: auto; }
 
+/* A name and the small button that removes it — not a two-column form
+   field, which is what `.row` is. `.row` is a 1fr 1fr grid that collapses
+   to a single column on a narrow viewport, so on the phone this console
+   is designed for, every skill and every connection took two full-width
+   lines: eighteen of them made the study card 3,128 pixels tall. The
+   photograph is what showed it; at desktop width it looked fine.
+   The label takes the room and the button takes its own text. */
+.com-study .com-line { display: flex; align-items: center; gap: 8px; }
+.com-study .com-line span { flex: 1; min-width: 0; }
+.com-study .com-line button { flex: 0 0 auto; padding: 4px 10px; }
+.com-study .com-add { display: flex; gap: 8px; }
+.com-study .com-add input { flex: 1; min-width: 0; }
+.com-study .com-add button { flex: 0 0 auto; }
+
+/* The kit ladder: eyes, ears, hands, body, and the signature at the end
+   of it. One rung is open at a time, so this card stays about the height
+   of the study card above it rather than stacking four forms — the same
+   lesson the 3,128-pixel study card taught, applied before the
+   photograph rather than after it. */
+.com-kit { display: flex; flex-direction: column; gap: 8px;
+  margin-top: 10px; padding: 10px; border: 1px solid var(--line);
+  border-radius: 8px; }
+.com-rungs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0;
+  padding: 0; list-style: none; font-size: 12px; }
+.com-rungs li { opacity: 0.45; padding: 0 6px; border-radius: 8px; }
+/* Walked and answered, walked and passed, and the one you are on. A
+   passed rung is not marked: nothing was chosen, and a tick beside it
+   would say something was. */
+.com-rungs li.done { opacity: 0.9; color: #7bc47f; }
+.com-rungs li.at { opacity: 1; border: 1px solid var(--line); }
+.com-rung { display: flex; flex-direction: column; gap: 8px; }
+.com-rung .com-line { display: flex; align-items: center; gap: 8px; }
+.com-rung .com-line span { flex: 1; min-width: 0; }
+.com-rung .com-line button { flex: 0 0 auto; padding: 4px 10px; }
+.com-rung .com-add { display: flex; gap: 8px; }
+.com-rung .com-add input, .com-rung .com-add select { flex: 1;
+  min-width: 0; }
+.com-rung .com-add button { flex: 0 0 auto; }
+/* The whole catalogue is on this rung, and the whole catalogue is not
+   what a founder is deciding between — they are looking for one
+   machine. It scrolls, so the rung stays the size of a rung. */
+.com-rung .com-scroll { max-height: 320px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 8px; }
+
 /* The employee file: the two sections that make a hired employee a thing
    in the world — bodies and screens, then the handoff. */
 .com-file { border-top: 1px dashed rgba(255, 255, 255, 0.15);
   margin-top: 10px; padding-top: 10px; }
 .com-file h4 { margin: 8px 0 4px; }
-.com-shelf { display: flex; flex-wrap: wrap; gap: 6px;
-  align-items: center; }
+/* The robot shelf: a maker, then that maker's machines under it.
+   `flex-wrap: wrap` with `align-items: center` was written for a row of
+   chips, and the rows inside it are `.row` — the 1fr 1fr grid that
+   collapses to one column on a phone. So each machine became three
+   stacked full-width lines wrapping around a maker name that sat beside
+   them, and thirty machines made the card 6,974 pixels tall with the
+   first two thousand of them empty. Same lesson as the study card, one
+   floor down: a name-and-button line is a flex line, never a form
+   field. The shelf stacks, each machine is one line, and the list
+   scrolls inside itself rather than growing the card. */
+.com-shelf { display: flex; flex-direction: column; gap: 4px;
+  align-items: stretch; }
+.com-shelf > .muted { margin-top: 4px; }
+.com-shelf .row { display: flex; align-items: center; gap: 8px; }
+.com-shelf .row b { flex: 1; min-width: 0; }
+.com-shelf .row .com-avail { flex: 0 0 auto; }
+.com-shelf .row button { flex: 0 0 auto; padding: 4px 10px; }
 .com-avail { font-size: 11px; padding: 0 6px; border-radius: 8px;
   opacity: 0.9; }
 .com-avail.shipping { color: #7bc47f; }

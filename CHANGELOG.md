@@ -6,6 +6,77 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.1.8] - 2026-09-06
+
+### Added
+
+- **Eyes, ears, hands and a body — without leaving the seat.** Kitting
+  out a new hire meant walking out of the hire: the screen lived in the
+  employee file, the speaker in the Workshop, the robot on the settings
+  shelf, and the face in the studio. Every one of those doors already
+  worked. Only the screens made the founder leave. The Company Builder
+  carries all four now, as a ladder the seat walks by itself — the study
+  is kept, then eyes (a screen they stand on), then ears (a speaker in
+  the room or an earpiece on a person), then hands (the robot shelf, in
+  place), then the body (a face off the registry, or a sentence the
+  forge paints one from) — and the last rung is the signature. Each rung
+  opens the next and any rung can be passed with nothing chosen; the
+  ladder ends at somebody sitting in the seat.
+
+  The order is forced rather than chosen. A seat has no profile until it
+  is signed, so none of the four fittings can be pressed while the
+  founder is standing there choosing them: the choices are held and the
+  hire is what fits them. That has a consequence the screen states
+  instead of hiding — a fitting can fail after the hire already stands,
+  so each piece is tried by name and what did not go on is reported
+  along with the fact that the person was hired and seated anyway.
+
+  The photograph found the layout defect the study card taught once
+  already, one floor down: the robot shelf's rows were `.row`, the
+  1fr 1fr grid that collapses to a single column on a phone, so each
+  machine became three stacked full-width lines wrapping around its
+  maker's name. Thirty machines made the card **6,974 pixels tall with
+  the first two thousand of them empty**. It is 958 now, and the shelf
+  scrolls inside the rung. The employee file's copy of the same shelf is
+  fixed with it.
+
+### Fixed
+
+- **A browse of 45,147 positions read as sixteen positions repeated.**
+  A row's skills and connections are its family's plus its own, and the
+  family's came first — so every screen showing a few of them showed the
+  family's few. Radiologist carries "image report dictation" and "prior
+  study comparison" and displayed six generic health-care skills. The
+  row's own lead now; the shared half fills in behind.
+
+- **A home carer with a till.** "Home Care Attendant" matched
+  `attendant*` and was filed under hospitality, so its first skills read
+  "till reconciliation" and "allergen awareness"; "Care Worker" and
+  "Care Assistant" fell through `worker*` and `assistant*` into business
+  operations. The classifier knows care by its ordinary English names
+  now — carer, care worker, home care, care home, domiciliary, respite,
+  and the rest — and the pool is rebuilt. `carer*` is a stem and does
+  not reach "career". Thirteen home-care roles are written out by hand
+  besides — home care assistant and attendant, caregiver, carer,
+  live-in, domiciliary, care assistant, care worker, personal care
+  aide, home health aide, dementia support, respite, nanny — because a
+  family block cannot say what a carer does. They carry visit logs,
+  medication prompt records, food and fluid charts and change-of-
+  condition reports, and they reach family carers and district nurses
+  rather than suppliers and shift managers. Each stays a record or a
+  coordination rather than an act: the charter every hire signs ends
+  "duties that are licensed or physical acts are assisted, never
+  performed", and a skill list reading "administers medication" would
+  contradict the document the same profile carries.
+
+- **Three screen recipes photographed nothing and said they had.** Four
+  of the capture recipes are the same card — the occupation pool —
+  asked four different questions, and the harness looked for the card by
+  the screen's own number. A card can carry one `data-screen`, so three
+  of the four could never be found: the presses all landed, the panel
+  was on the page, and the run reported "never reached". A recipe names
+  the element it photographs now, and the number stays the default.
+
 ## [3.1.7] - 2026-09-05
 
 ### Added
@@ -18147,7 +18218,8 @@ and [pdi](https://github.com/davidsbianchi1984/pdi)).
   screen designs; a suite launcher; CI that smoke-builds the front-ends and a
   per-OS installer release workflow.
 
-[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.7...HEAD
+[Unreleased]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.8...HEAD
+[3.1.8]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.7...app-v3.1.8
 [3.1.7]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.6...app-v3.1.7
 [3.1.6]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.5...app-v3.1.6
 [3.1.5]: https://github.com/davidsbianchi1984/qrme/compare/app-v3.1.4...app-v3.1.5
