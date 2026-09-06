@@ -48,7 +48,8 @@ DATA = Path(__file__).resolve().parent / "data" / "occupations.json"
 #: A row's stored shape is short-keyed to keep the shipped file small.
 #: Nothing outside this module sees those keys.
 _LONG = {"t": "title", "f": "family", "s": "skills",
-         "c": "connections", "k": "keywords", "w": "written"}
+         "c": "connections", "k": "keywords", "w": "written",
+         "g": "group"}
 
 
 @lru_cache(maxsize=1)
@@ -59,6 +60,15 @@ def _pool() -> list[dict]:
     eight phrases repeated across a thousand rows tripled it and said
     nothing new — so a row's own skills, connections and search terms are
     added to its family's here. Callers see whole rows either way.
+
+    **Three tiers, narrowest first.** A row's own, then its group's,
+    then its family's. The group is the shape of the work — operating a
+    machine, repairing one, installing one — and it exists because
+    sixteen families cannot say anything specific about forty-five
+    thousand jobs: `Commercial Housekeeper` inherited "till
+    reconciliation" from Hospitality until a Cleaning and housekeeping
+    group got there first. Duplicates are dropped as the tiers merge, so
+    a phrase a group and a family both name is shown once.
 
     **A row's own come first.** The family's used to lead, and every
     screen that shows a few of them showed the family's few: Radiologist
@@ -79,14 +89,20 @@ def _pool() -> list[dict]:
     fams = raw.get("families") or {}
     if not isinstance(fams, dict):        # version 1 listed names only
         fams = {}
+    grps = raw.get("groups") or {}        # versions 1 and 2 had no groups
+    if not isinstance(grps, dict):
+        grps = {}
     rows = []
     for r in raw.get("positions", []):
         row = {_LONG[k]: v for k, v in r.items() if k in _LONG}
-        shared = fams.get(row.get("family"), {})
-        row["skills"] = row.get("skills", []) + list(shared.get("s", ()))
-        row["connections"] = (row.get("connections", [])
-                              + list(shared.get("c", ())))
-        row["keywords"] = row.get("keywords", []) + list(shared.get("k", ()))
+        tiers = [grps.get(row.get("group"), {}),
+                 fams.get(row.get("family"), {})]
+        for short, long in (("s", "skills"), ("c", "connections"),
+                            ("k", "keywords")):
+            out = list(row.get(long, []))
+            for tier in tiers:
+                out += [x for x in tier.get(short, ()) if x not in out]
+            row[long] = out
         row["written"] = bool(row.get("written"))
         rows.append(row)
     return rows

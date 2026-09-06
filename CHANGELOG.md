@@ -6,6 +6,61 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **A position says what it does, not what field it is in.** The pool
+  holds 45,153 positions and 529 were written by hand; the other 44,624
+  arrived as titles from published taxonomies and took their skills from
+  one of **sixteen** family blocks. Sixteen answers to forty-five
+  thousand questions is not a detail of the data — it is what a founder
+  reads on the screen. `Commercial Housekeeper`, filed under Hospitality,
+  claimed it did *stock rotation* and *till reconciliation*. `Animal
+  Caregiver`, filed under Mental health & social care, claimed it drafted
+  referrals to *crisis services*. `Attending Radiologist` got patient
+  history intake and triage by severity and nothing about reading an
+  image. All 17,878 unwritten skilled-trades titles claimed the same five
+  things.
+
+  A **group** is a third tier between the title and the family — the
+  *shape* of the work rather than the field, because shape is what the
+  imported titles vary by. Skilled trades alone holds 3,745 operators,
+  1,121 technicians, 490 mechanics and 335 installers, and those do
+  different work at a keyboard whatever they are working on. Rules are
+  matched exactly as families are — ordered, first match wins, a token is
+  a word or a phrase, a `*` makes it a stem — so `occupation_groups.py`
+  and `title_families.py` read side by side. `occupations._pool` merges
+  own, then group, then family, dropping a phrase two tiers share.
+
+  Twenty-six groups reach **17,713 of 45,153 positions (39.2%)** for
+  350 KB: the shapes that fill the trades, the six that were visibly
+  wrong, and the office — claims, payroll, purchasing, human resources,
+  reception, secretarial support, customer service, scheduling, data
+  entry, and records and filing last of those because it is the one keyed
+  on bare `clerk*`. `Supervision and management` is last of all rules: a
+  rank, not a shape, so it may only decide a title nothing else claimed.
+
+  A group never speaks over a written role, and nothing is re-filed —
+  `Commercial Housekeeper` keeps the family the search index expects and
+  simply stops claiming it reconciles a till.
+
+### Fixed
+
+- **`commission*` had claimed the commissioners.** Thirty titles — Water,
+  Tax, Insurance and Health Commissioner among them — read as
+  installation and commissioning because a stem was written where a word
+  was meant. They are public officials and commission nothing.
+
+- **310 nursing titles had no group at all.** Twenty-three fell through to
+  the rank rule and came out reading as rota planning and budget
+  tracking; two landed in *Driving and delivery*. Nursing is a group now,
+  ordered below Personal care so a nursing assistant stays one and a
+  veterinary nurse stays with the animals. It also corrected a claim
+  written into the code: placing the rank rule last does not stop it
+  taking a nursing supervisor. Last is necessary and not sufficient — a
+  rank is what a title gets when nothing above it knows the work, so a
+  title reaching that rule is read as a missing group rather than a
+  placement error.
+
 ## [3.2.1] - 2026-09-06
 
 ### Fixed

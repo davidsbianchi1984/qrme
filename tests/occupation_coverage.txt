@@ -1,0 +1,56 @@
+# status: ratchet — the share of the pool a group reaches.
+#
+# One line: COVERED  <n>  of  <total>. The guard reads it and fails when
+# the pool's real coverage drops below the recorded share, so this number
+# may rise and may not fall.
+#
+# ## Why a ratchet and not a target
+#
+# The pool holds 45,153 positions and 529 of them were written by hand.
+# The other 44,624 arrived as titles from published taxonomies and take
+# their skills from one of sixteen families, which is sixteen answers to
+# forty-five thousand questions. It reads as repetition on a good day and
+# is wrong on a bad one: `Commercial Housekeeper` claimed it reconciled a
+# till, `Animal Caregiver` claimed it drafted referrals to crisis
+# services, and every one of 17,878 skilled-trades titles claimed the
+# same five things.
+#
+# Groups fix that a shape of work at a time, and there is no sitting in
+# which they all get written. A number that may only rise turns a job too
+# big to finish into a job that cannot quietly go backwards — the same
+# reason the divergence records and the doorless lists only shrink.
+#
+# ## What raising it means
+#
+# Add rules to `tools/occupation_groups.py`, rebuild the pool with
+# `python3 tools/build_occupations.py`, run this test, and write the new
+# number here. Lowering it is a deliberate act with a reason beside it,
+# not something a rebuild does by accident.
+
+COVERED  17713  of  45153
+
+# ## RAISED
+#
+# 2026-09-06  0 -> 12344 (27.3%). The first fourteen groups: the shapes
+#             that fill the trades — machine operation, repair and
+#             service, inspection and testing, installation, assembly,
+#             planned maintenance, materials handling, driving — and the
+#             six that were visibly wrong: clinical imaging, laboratory
+#             work, personal care, animal care, cleaning and
+#             housekeeping, grounds and premises.
+#
+# 2026-09-06  12344 -> 17713 (39.2%). The office: claims and
+#             underwriting, payroll and billing, purchasing, human
+#             resources, reception, secretarial support, customer
+#             service, scheduling, data entry and transcription, and
+#             records and filing — ordered among themselves narrowest
+#             first, because most of those titles end in the same word
+#             and "clerk" alone would make eleven jobs into one.
+#
+#             Two rules that were already wrong showed up while writing
+#             them. `commission*` in Installation had claimed thirty
+#             titles, most of them commissioners — Water, Tax, Insurance,
+#             Health — and is now `commissioning`. And 310 nursing
+#             titles had no group at all, so 23 of them fell through to
+#             the rank rule and read as rota planning; Nursing is a group
+#             now, below Personal care so a nursing assistant stays one.

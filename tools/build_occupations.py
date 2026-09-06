@@ -142,12 +142,26 @@ def build() -> dict:
             rows.append({"t": title, "f": fam, "s": skills, "c": conns,
                          "k": [w for w in words if w not in fams[fam]["k"]],
                          "w": 1})
+    # The group tier. Written roles do not take one: they already say what
+    # makes them that role, and a rule keyed on a word in the title cannot
+    # improve on a line somebody wrote about the job itself.
+    from occupation_groups import SPECIFICS, group_of   # noqa: PLC0415
+    groups = {name: {"s": spec["s"], "c": spec["c"],
+                     "k": _keywords("", spec["s"])}
+              for name, spec in SPECIFICS.items()}
+
     for title, fam, extra in _imported(seen, rows):
         words = _keywords(title, [], extra)
-        rows.append({"t": title, "f": fam,
-                     "k": [w for w in words if w not in fams[fam]["k"]]})
+        row = {"t": title, "f": fam,
+               "k": [w for w in words if w not in fams[fam]["k"]]}
+        grp = group_of(title)
+        if grp:
+            row["g"] = grp
+            row["k"] = [w for w in row["k"] if w not in groups[grp]["k"]]
+        rows.append(row)
     rows.sort(key=lambda r: (r["f"], r["t"]))
-    return {"version": 2, "families": fams, "positions": rows}
+    return {"version": 3, "families": fams, "groups": groups,
+            "positions": rows}
 
 
 def _norm(title: str) -> str:
@@ -268,8 +282,11 @@ def main() -> None:
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
     kb = OUT.stat().st_size / 1024
+    grouped = sum(1 for r in data["positions"] if r.get("g"))
     print(f"{len(data['positions'])} positions in {len(data['families'])} "
           f"families — {kb:.0f} KB")
+    print(f"{grouped} carry a group ({100 * grouped / len(data['positions']):.1f}%) "
+          f"across {len(data['groups'])} groups")
 
 
 if __name__ == "__main__":
