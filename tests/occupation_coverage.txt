@@ -27,7 +27,7 @@
 # number here. Lowering it is a deliberate act with a reason beside it,
 # not something a rebuild does by accident.
 
-COVERED  17713  of  45153
+COVERED  22979  of  45153
 
 # ## RAISED
 #
@@ -54,3 +54,28 @@ COVERED  17713  of  45153
 #             titles had no group at all, so 23 of them fell through to
 #             the rank rule and read as rota planning; Nursing is a group
 #             now, below Personal care so a nursing assistant stays one.
+#
+# 2026-09-06  17713 -> 22979 (50.9%). The professions: teaching and
+#             instruction, training and coaching, therapy and
+#             counselling, software and data, analysis and research,
+#             design, writing and editing, sales and accounts, and
+#             engineering.
+#
+#             Ordering did most of the work here and is where the
+#             thinking is. Teaching went to the top of every rule —
+#             "Nursing Instructor" read as nursing and "Radiology
+#             Instructor" as imaging, and whoever the instruction is
+#             about, instructing is the work. Training did not go with
+#             it: an animal trainer trains animals, so it stays below
+#             Animal care. Engineering went the other way, below the
+#             trades, because "engineer" carries an operator sense all
+#             through these lists — maintenance engineer, stationary
+#             engineer, locomotive engineer — and those three are named
+#             explicitly on the groups that should hold them. `coach*` is
+#             not a token anywhere: a coach is also a vehicle.
+#
+#             One known wrong answer, measured rather than guessed. Four
+#             coach and bus operators read as machine operation because
+#             `operator*` outranks them. Lifting Driving above Machine
+#             operation fixed those four and broke six others, so the
+#             four stand.

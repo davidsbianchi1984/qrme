@@ -55,6 +55,21 @@ from title_families import _pattern  # noqa: E402
 #: narrow shapes come before the broad ones. A group whose rule can never
 #: fire is a guard failure, not a dead line.
 RULES: list[tuple[str, str]] = [
+    # -- instruction, before the subject being instructed ------------------
+    #
+    # First of every rule. "Nursing Instructor" read as nursing and
+    # "Radiology Instructor" as imaging, because the care groups sit high
+    # and both titles name their subject. Whoever the instruction is
+    # about, instructing is the work: lesson plans, marking and reports
+    # to parents, not observation charts.
+    #
+    # Training and coaching does not come with it. It stays below Animal
+    # care, because an animal trainer trains animals.
+    ("Teaching and instruction",
+     "teacher*, teaching, instructor*, professor*, lecturer*, tutor*, "
+     "faculty, educator*, headteacher*, principal of, schoolmaster*, "
+     "schoolmistress*"),
+
     # -- care of a person, before anything that merely contains "care" ----
     ("Clinical imaging",
      "radiolog*, radiograph*, sonograph*, ultrasound, mammograph*, "
@@ -140,8 +155,49 @@ RULES: list[tuple[str, str]] = [
      "records clerk*, file clerk*, filing, archivist*, registrar*, "
      "record*, clerk*"),
 
+    # -- work whose shape is what it produces -----------------------------
+    #
+    # Above the trades, because a teacher of a trade teaches: "Auto
+    # Mechanics Teacher" is an instructor, not a mechanic, and the trade
+    # rules below would have taken it.
+    #
+    # `coach*` is deliberately not a token. A coach is also a vehicle, and
+    # the stem would have made every coach driver a trainer.
+    ("Training and coaching",
+     "trainer*, coaching, life coach*, executive coach*, sports coach*, "
+     "apprenticeship*, instructional design*"),
+
+    ("Therapy and counselling",
+     "therapist*, therapy, counselor*, counsellor*, counseling, "
+     "counselling, psychotherap*, analyst of behaviour"),
+
+    ("Software and data",
+     "software engineer*, programmer*, software develop*, web develop*, "
+     "application develop*, data scientist*, data engineer*, "
+     "machine learning, database administrator*, systems analyst*"),
+
+    ("Analysis and research",
+     "analyst*, analysis, researcher*, research assistant*, "
+     "research associate*, scientist*, statistician*, economist*"),
+
+    ("Design",
+     "designer*, design, draughtsman*, draftsman*, drafter*, "
+     "illustrator*, animator*"),
+
+    ("Writing and editing",
+     "writer*, editor*, journalist*, copywriter*, reporter*, "
+     "proofreader*, translator*, interpreter*"),
+
+    ("Sales and accounts",
+     "sales, salesperson*, salesman*, saleswoman*, account executive*, "
+     "account manager*, business development, canvasser*, broker*"),
+
     # -- the shapes that fill the trades -----------------------------------
+    # `stationary engineer` and `operating engineer` are machine minders,
+    # not engineers in the professional sense. Named here so the
+    # Engineering group below the trades never sees them.
     ("Machine operation",
+     "stationary engineer*, operating engineer*, boiler engineer*, "
      "machine operator*, operator*, tender*, setter*, feeder*, "
      "machinist*, press*, lathe*, mill operator*, extruder*, "
      "molder*, moulder*, caster*, winder*, roller*"),
@@ -174,9 +230,33 @@ RULES: list[tuple[str, str]] = [
      "warehouse*, stockroom*, picker*, forklift*, hoist*, "
      "material handler*, freight handler*"),
 
+    # This rule stays below Machine operation even though `operator*`
+    # there takes the four coach and bus operators off it. Lifting it
+    # above was tried and measured: it fixed those four and broke six —
+    # `Electric Screw Driver Operator`, `Delivery Table Feeder` and
+    # `Delivery Table Operator` became drivers, `Driver License Examiner`
+    # stopped being an inspection, and an `Advance Seal Delivery System
+    # Maintainer` stopped doing maintenance. `driver` and `delivery` are
+    # words that appear inside machines. A net loss of two is not worth
+    # taking, so the four are a known wrong answer rather than a hidden
+    # one.
+    # A locomotive engineer drives the train.
     ("Driving and delivery",
+     "locomotive engineer*, train engineer*, "
+     "motor coach operator*, coach operator*, bus operator*, "
      "driver*, chauffeur*, courier*, delivery, dispatcher*, "
      "haulier*, trucker*, rider*"),
+
+    # -- the ambiguous one -------------------------------------------------
+    #
+    # Below the trades, and alone among the professional shapes in being
+    # so. "Engineer" carries an operator sense all through these
+    # taxonomies — maintenance engineer, stationary engineer, locomotive
+    # engineer — and those are the job the trade rules above describe. Put
+    # this rule up with Design and Software and a maintenance engineer
+    # stops doing maintenance.
+    ("Engineering",
+     "engineer*, engineering"),
 
     # -- last of all -------------------------------------------------------
     #
@@ -308,6 +388,60 @@ SPECIFICS: dict[str, dict[str, list[str]]] = {
               "incident and outcome reporting"],
         "c": ["the team", "senior management",
               "human resources", "the department's customers"]},
+    "Teaching and instruction": {
+        "s": ["lesson planning", "progress recording",
+              "assessment and marking", "report writing to parents",
+              "resource preparation"],
+        "c": ["learners", "parents and guardians",
+              "head of department", "examination board"]},
+    "Training and coaching": {
+        "s": ["training needs noting", "session material writing",
+              "attendance and completion records", "feedback summarising",
+              "competency sign-off"],
+        "c": ["the people trained", "their managers",
+              "awarding body", "learning and development"]},
+    "Therapy and counselling": {
+        "s": ["session note writing", "goal and plan setting",
+              "consent and confidentiality records", "outcome measuring",
+              "onward referral drafting"],
+        "c": ["clients", "referrers",
+              "clinical supervisor", "safeguarding lead"]},
+    "Software and data": {
+        "s": ["change and ticket writing", "code and query review notes",
+              "release and rollback records", "incident write-ups",
+              "documentation keeping"],
+        "c": ["product owner", "other engineers",
+              "operations on call", "the people who use it"]},
+    "Analysis and research": {
+        "s": ["question and method framing", "data gathering and cleaning",
+              "finding write-ups", "assumption and limit stating",
+              "source citation"],
+        "c": ["the people who asked", "data owners",
+              "peer reviewers", "publication or reporting line"]},
+    "Design": {
+        "s": ["brief taking", "concept and option presenting",
+              "specification and drawing issue", "revision recording",
+              "handover to production"],
+        "c": ["clients and stakeholders", "makers and manufacturers",
+              "reviewers and approvers", "suppliers"]},
+    "Writing and editing": {
+        "s": ["commission and brief handling", "draft and revision keeping",
+              "fact and source checking", "style guide following",
+              "publication scheduling"],
+        "c": ["commissioning editor", "sources and contributors",
+              "subeditors and proofreaders", "readers"]},
+    "Sales and accounts": {
+        "s": ["lead and pipeline recording", "quote and proposal writing",
+              "objection and follow-up notes", "order and contract raising",
+              "account review writing"],
+        "c": ["prospects and customers", "sales manager",
+              "delivery or fulfilment team", "credit control"]},
+    "Engineering": {
+        "s": ["requirement and specification writing", "calculation recording",
+              "drawing and revision control", "test and inspection reports",
+              "as-built and handover documentation"],
+        "c": ["the client or project manager", "other disciplines",
+              "approving authority", "contractors and suppliers"]},
     "Machine operation": {
         "s": ["run sheet keeping", "batch and lot logging",
               "tolerance checking", "downtime reporting",

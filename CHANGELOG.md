@@ -31,13 +31,34 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   and `title_families.py` read side by side. `occupations._pool` merges
   own, then group, then family, dropping a phrase two tiers share.
 
-  Twenty-six groups reach **17,713 of 45,153 positions (39.2%)** for
-  350 KB: the shapes that fill the trades, the six that were visibly
-  wrong, and the office — claims, payroll, purchasing, human resources,
+  Thirty-five groups reach **22,979 of 45,153 positions (50.9%)** for
+  482 KB: the shapes that fill the trades, the six that were visibly
+  wrong, the office — claims, payroll, purchasing, human resources,
   reception, secretarial support, customer service, scheduling, data
   entry, and records and filing last of those because it is the one keyed
-  on bare `clerk*`. `Supervision and management` is last of all rules: a
-  rank, not a shape, so it may only decide a title nothing else claimed.
+  on bare `clerk*` — and the professions: teaching, training, therapy and
+  counselling, software and data, analysis and research, design, writing,
+  sales, and engineering. `Supervision and management` is last of all
+  rules: a rank, not a shape, so it may only decide a title nothing else
+  claimed.
+
+  **Order carries as much of the meaning as the tokens do.** Teaching is
+  first of every rule, because `Nursing Instructor` read as nursing and
+  `Radiology Instructor` as imaging: whoever the instruction is about,
+  instructing is the work. Training did not go up with it — an animal
+  trainer trains animals. Engineering went the other way, below the
+  trades, because "engineer" carries an operator sense throughout these
+  lists and a maintenance engineer must keep doing maintenance; the
+  locomotive, stationary and maintenance senses are named explicitly on
+  the groups that hold them. `coach*` is a token in no rule at all: as a
+  stem it made every coach driver a trainer.
+
+  One wrong answer is recorded rather than fixed. Four coach and bus
+  operators read as machine operation because `operator*` outranks them,
+  and lifting Driving above Machine operation was tried and measured: it
+  fixed those four and broke six, since "driver" and "delivery" appear
+  inside the names of machines. The six are pinned by a test so the trade
+  cannot be made by accident later.
 
   A group never speaks over a written role, and nothing is re-filed —
   `Commercial Housekeeper` keeps the family the search index expects and
