@@ -141,7 +141,8 @@ RULES: list[tuple[str, str]] = [
     # not a casting.
     ("Claims and underwriting",
      "claims, claim*, adjuster*, underwrit*, loss assessor*, "
-     "loss adjuster*"),
+     "loss adjuster*, insurance producer*, insurance agent*, "
+     "insurance sales*"),
 
     ("Payroll and billing",
      "payroll*, billing, biller*, invoic*, accounts payable, "
@@ -180,7 +181,88 @@ RULES: list[tuple[str, str]] = [
 
     ("Records and filing",
      "records clerk*, file clerk*, filing, archivist*, registrar*, "
-     "record*, clerk*"),
+     "record, records, recordkeep*, clerk*"),
+
+    # -- the rest of the fields --------------------------------------------
+    #
+    # Above the fields block so a train conductor is not an orchestra's,
+    # and a sales assistant is on a shop floor before Sales gets the
+    # word. Every stem here was probed first: `well*` is not a token
+    # because of the wellness coaches, `gas*` because of the gas
+    # fitters, `stock*` because of the stockbrokers, `shop*` because it
+    # takes the machine shop supervisors, `child*` because it takes the
+    # child psychologists from Therapy, `electric*` because an
+    # electrician is a trade. Transport says `train conductor*` by
+    # phrase and leaves `conductor*` to the orchestras.
+    ("Energy and extraction",
+     "oil well*, gas well*, well driller*, well logger*, wellhead*, "
+     "oilfield*, oil field*, oil rig*, drilling rig*, rig hand*, "
+     "roughneck*, roustabout*, derrickman*, derrickhand*, toolpusher*, "
+     "petroleum*, refinery*, pipeline*, natural gas*, gas plant*, "
+     "miner, miners, mining machine*, mining operator*, "
+     "mining engineer*, surface mining*, underground mining*, "
+     "coal mining*, mine worker*, mining captain*, mining production*, "
+     "gas producer*, mud logger*, quarry*, colliery*, lineman, linemen, "
+     "linesman, linesmen, lineworker*, line worker*, power plant*, "
+     "power station*, substation*, meter reader*, solar*, "
+     "wind turbine*, nuclear*, hydroelectric*, geothermal*"),
+
+    ("Science",
+     "chemist*, physicist*, biolog*, geolog*, meteorolog*, astronom*, "
+     "ecolog*, geoscien*, hydrolog*, oceanograph*, botanist*, "
+     "zoolog*, microbiolog*, biochem*, environmental scientist*, "
+     "seismolog*, metallurg*"),
+
+    ("Public administration",
+     "civil servant*, public servant*, councillor*, council officer*, "
+     "government*, planning officer*, compliance officer*, licensing*, "
+     "environmental health officer*, building inspector*, "
+     "health inspector*, customs officer*, immigration officer*, "
+     "border force*, border patrol*, revenue officer*, "
+     "benefits officer*, housing officer*, ombudsman*, regulator*, "
+     "town planner*, urban planner*, elections*, electoral*, "
+     "clerk of the*, city clerk*, county clerk*"),
+
+    ("Retail and shop floor",
+     "cashier*, retail*, shop assistant*, shopkeeper*, shop floor*, "
+     "checkout*, merchandis*, florist*, grocer*, store clerk*, "
+     "store associate*, store assistant*, sales assistant*, "
+     "sales associate*, salesclerk*, sales clerk*, shelf stacker*, "
+     "till operator*"),
+
+    ("Transport operations",
+     "train conductor*, bus conductor*, railway*, railroad*, "
+     "signaller*, signalman*, signalmen, station master*, "
+     "stationmaster*, transit*, fleet*, logistics, freight*, "
+     "customs broker*, import*, export*, forwarder*, "
+     "traffic controller*, traffic officer*, traffic warden*, "
+     "parking*"),
+
+    ("Media and communications",
+     "broadcast*, producer*, presenter*, announcer*, newscaster*, "
+     "camera operator*, cameraman*, camerawoman*, sound engineer*, "
+     "sound technician*, lighting technician*, publicist*, "
+     "public relations, communications officer*, "
+     "communications manager*, marketing*, advertis*, social media, "
+     "press officer*, media"),
+
+    ("IT operations",
+     "network*, systems administrator*, system administrator*, "
+     "it support*, it technician*, cyber*, infrastructure engineer*, "
+     "devops*, cloud*, database*, sysadmin*, webmaster*, "
+     "computer operator*, computer technician*, it manager*"),
+
+    ("Childcare and community",
+     "childcare*, child care*, childminder*, nanny*, nannies, "
+     "au pair*, playworker*, daycare*, day care*, nursery assistant*, "
+     "youth worker*, social worker*, community worker*, "
+     "community support*, welfare officer*, family support*, "
+     "foster*, care coordinator*, support worker*, outreach*"),
+
+    ("Sport and fitness",
+     "athlete*, fitness*, gym*, personal trainer*, referee*, umpire*, "
+     "jockey*, golf*, swim*, footballer*, cricketer*, sportsman*, "
+     "sportswoman*, sports*, boxer*, wrestler*, cyclist*"),
 
     # -- the fields with a shape of their own ------------------------------
     #
@@ -269,6 +351,7 @@ RULES: list[tuple[str, str]] = [
     # the stem would have made every coach driver a trainer.
     ("Training and coaching",
      "trainer*, coaching, life coach*, executive coach*, sports coach*, "
+     "wellness coach*, health coach*, "
      "apprenticeship*, instructional design*"),
 
     ("Therapy and counselling",
@@ -316,7 +399,8 @@ RULES: list[tuple[str, str]] = [
     # are public officials and do not commission anything.
     ("Installation and commissioning",
      "installer*, installation, erector*, rigger*, splicer*, "
-     "commissioning, fitter-out, glazier*"),
+     "commissioning, fitter-out, glazier*, electrician*, plumber*, "
+     "pipefitter*, steamfitter*, hvac*"),
 
     ("Assembly",
      "assembler*, assembly, fabricator*, bench worker*, "
@@ -535,6 +619,60 @@ SPECIFICS: dict[str, dict[str, list[str]]] = {
               "incident and outcome reporting"],
         "c": ["the team", "senior management",
               "human resources", "the department's customers"]},
+    "Energy and extraction": {
+        "s": ["shift and tour reporting", "permit-to-work handling",
+              "well and plant log keeping", "gas test and reading records",
+              "incident and near-miss reporting"],
+        "c": ["control room", "site supervisor",
+              "safety officer", "maintenance and contractors"]},
+    "Science": {
+        "s": ["method and protocol writing", "sample and observation logging",
+              "data analysis and plotting", "result validation",
+              "report and paper drafting"],
+        "c": ["principal investigator", "laboratory and field teams",
+              "peer reviewers", "funding and regulatory bodies"]},
+    "Public administration": {
+        "s": ["case and application processing", "decision letter drafting",
+              "statutory record keeping", "consultation summarising",
+              "committee report writing"],
+        "c": ["members of the public", "elected members",
+              "legal services", "other departments and agencies"]},
+    "Retail and shop floor": {
+        "s": ["till and payment handling", "stock count and replenishment",
+              "price and promotion checking", "returns and exchange handling",
+              "customer query answering"],
+        "c": ["customers", "store manager",
+              "stockroom", "head office"]},
+    "Transport operations": {
+        "s": ["timetable and roster following", "movement and manifest records",
+              "delay and incident logging", "customs and consignment paperwork",
+              "safety check recording"],
+        "c": ["control and dispatch", "drivers and crews",
+              "customers and consignees", "regulators and customs"]},
+    "Media and communications": {
+        "s": ["running order and brief keeping", "content scheduling",
+              "release and statement drafting", "coverage and reach tracking",
+              "rights and clearance records"],
+        "c": ["editors and producers", "clients or the organisation",
+              "press and platforms", "talent and contributors"]},
+    "IT operations": {
+        "s": ["ticket and incident handling", "change and patch records",
+              "monitoring and alert response", "access and account management",
+              "runbook and documentation keeping"],
+        "c": ["the people supported", "on-call engineers",
+              "vendors and suppliers", "security team"]},
+    "Childcare and community": {
+        "s": ["daily record and observation writing", "care and support plans",
+              "safeguarding and incident recording", "family communication",
+              "referral and signposting"],
+        "c": ["children and families", "safeguarding lead",
+              "schools and agencies", "supervising practitioner"]},
+    "Sport and fitness": {
+        "s": ["programme and session planning", "attendance and progress records",
+              "fixture and result recording", "injury and incident logging",
+              "equipment and facility checks"],
+        "c": ["participants and members", "club or centre manager",
+              "governing body", "medical and physio support"]},
     "Fire and rescue": {
         "s": ["incident log keeping", "equipment check records",
               "patient handover writing", "hazard and risk noting",

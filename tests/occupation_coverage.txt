@@ -27,7 +27,7 @@
 # number here. Lowering it is a deliberate act with a reason beside it,
 # not something a rebuild does by accident.
 
-COVERED  28508  of  45153
+COVERED  29710  of  45153
 
 # ## RAISED
 #
@@ -113,6 +113,27 @@ COVERED  28508  of  45153
 #             administer machines. `logger*` takes seven oil-well
 #             loggers for every four who fell trees. The phrases that
 #             mean the job are the tokens instead.
+#
+# 2026-09-06  28508 -> 29710 (65.8%). The rest of the
+#             fields: energy and extraction, science, public
+#             administration, retail and shop floor, transport
+#             operations, media and communications, IT operations,
+#             childcare and community, sport and fitness. Placed above
+#             the first fields block so a train conductor is not an
+#             orchestra's and a sales assistant is on a shop floor
+#             before Sales gets the word.
+#
+#             Three stems measured wrong after they were written and
+#             taken back: `record*` took a Recording Studio Setup
+#             Worker, so Records uses the bare words; `producer*` took
+#             the gas producers and the insurance producers, who are
+#             now named on Energy and Claims; bare `mining` took the
+#             data miners, so Energy names the phrases that mean a mine.
+#             Refused before writing: `well*` for the wellness coaches,
+#             `gas*` for the gas fitters, `stock*` for the stockbrokers,
+#             `shop*` for the machine shop supervisors, `child*` for the
+#             child psychologists, `conductor*` for the orchestras,
+#             `electric*` because an electrician is a trade.
 #
 # ## What is deliberately not covered
 #

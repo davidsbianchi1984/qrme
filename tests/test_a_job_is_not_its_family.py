@@ -292,7 +292,8 @@ def test_a_stem_is_checked_against_the_pool_before_it_is_written():
     assert group_of("Taxidermist") is None
     assert group_of("Kiln Firer") is None
     assert group_of("Server Administrator") is None
-    assert group_of("Mud Logger") is None
+    assert group_of("Mud Logger") == "Energy and extraction"
+    assert group_of("Shovel Logger") is None
     assert group_of("Firefighter") == "Fire and rescue"
     assert group_of("Tax Preparer") == "Finance and accounting"
     bare = {tok.strip() for _, tokens in RULES for tok in tokens.split(",")}
@@ -311,6 +312,35 @@ def test_the_field_shapes_sit_between_the_office_and_the_trades():
     assert group_of("Farm Hand") == "Farming and growing"
     assert group_of("Deckhand") == "Marine and fishing"
     assert group_of("Deck Builder") == "Building and construction"
+
+
+def test_a_word_that_is_also_a_thing():
+    """`record`, `producer`, `mining` — each a job word and a thing word.
+
+    A stem or a bare token on any of them claims the other sense: a
+    recording studio, a gas producer, a data miner. Each was written,
+    measured against the pool, and narrowed to the phrases that mean the
+    job. The other senses are pinned here.
+    """
+    assert group_of("Record Clerk") == "Records and filing"
+    assert group_of("Recording Studio Setup Worker") != "Records and filing"
+    assert group_of("Broadcast News Producer") == "Media and communications"
+    assert group_of("Gas Producer") == "Energy and extraction"
+    assert group_of("Insurance Producer") == "Claims and underwriting"
+    assert group_of("Continuous Mining Machine Operator") == "Energy and extraction"
+    assert group_of("Data Mining Analyst") == "Analysis and research"
+    assert group_of("Train Conductor") == "Transport operations"
+    assert group_of("Orchestra Conductor") == "Performing arts"
+    assert group_of("Sales Assistant") == "Retail and shop floor"
+    assert group_of("Sales Representative") == "Sales and accounts"
+    assert group_of("Electrician") == "Installation and commissioning"
+    bare = {tok.strip() for _, tokens in RULES for tok in tokens.split(",")}
+    # `conductor*` is absent from this set on purpose: it is Performing
+    # arts' word, and Transport names the train conductor by phrase.
+    assert not bare & {"record*", "mining", "well*", "gas*", "stock*",
+                       "shop*", "child*", "electric*"}
+    transport = dict(RULES)["Transport operations"]
+    assert "conductor*" not in {tok.strip() for tok in transport.split(",")}
 
 
 def test_a_group_never_speaks_over_a_written_role():
