@@ -329,6 +329,34 @@ def _tidy(items, cap: int) -> list[str]:
     return out
 
 
+#: The interview questions whose answers describe the work itself. The
+#: rest — name, escalation, handoff, manner — say who and how, not what.
+_DESCRIBES = ("in your own words", "responsibilities")
+
+
+def _described(seat: dict) -> list[str]:
+    """The founder's own descriptions of the job, from the charter or,
+    before it is signed, from the interview's suggested answers — one
+    string per answer, the description of the position first, because
+    the pool reads them one at a time: joined, "think study compose
+    create draft" put Drafter and Composer ahead of the content role the
+    first answer named."""
+    out = []
+    for field in ("charter", "interview"):
+        try:
+            pairs = json.loads(seat.get(field) or "[]")
+        except (TypeError, ValueError):
+            pairs = []
+        for pair in pairs:
+            q = str(pair.get("question", "")).lower()
+            a = str(pair.get("answer") or pair.get("suggested") or "").strip()
+            if a and any(mark in q for mark in _DESCRIBES):
+                out.append(a)
+        if out:
+            break
+    return out
+
+
 def _lead_with(found: list[str], pooled: list[str]) -> list[str]:
     """This job's own first, its family's behind, nothing said twice."""
     seen = {t.lower() for t in found}
@@ -514,10 +542,11 @@ def study_seat(company: dict, seat_id: str, cloud=None) -> dict:
     """
     from . import occupations
     seat = _seat(company, seat_id)
-    known = occupations.find(seat["title"])
-    if known is None:
-        hits = occupations.search(seat["title"], limit=1)
-        known = hits[0] if hits else None
+    # The founder's own words about the job are consulted beside its
+    # title: a seat called "AI Specialist" whose charter says "commercial
+    # content pictures and video" is read as the content role the pool
+    # has written, not as the family block the bare title lands on.
+    known = occupations.for_seat(seat["title"], _described(seat))
     pooled_skills = list(known["skills"]) if known else []
     pooled_connections = list(known["connections"]) if known else []
     knowledge = study_role(company, seat_id, cloud=cloud)
@@ -545,7 +574,7 @@ def study_seat(company: dict, seat_id: str, cloud=None) -> dict:
          seat["id"]))
     conn.commit()
     return {"seat_id": seat["id"], "title": seat["title"],
-            "known_as": known["title"] if known else None,
+            "known_as": (known.get("read_as") or known["title"]) if known else None,
             "family": known["family"] if known else None,
             "found": known is not None,
             "skills": skills, "connections": connections,
@@ -590,10 +619,7 @@ def _carry_study_onto(conn, seat: dict, profile_id: str) -> None:
     from . import occupations
     title = seat["title"]
     works_with = json.loads(seat["connections"] or "[]")
-    known = occupations.find(title)
-    if known is None:
-        hits = occupations.search(title, limit=1)
-        known = hits[0] if hits else None
+    known = occupations.for_seat(title, _described(seat))
     family = known["family"] if known else None
 
     named = {w.lower() for w in works_with}

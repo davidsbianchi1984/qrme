@@ -630,6 +630,29 @@ that profile's export, then dies — because a code on a screen is
 legible to any camera in the room, the founder's owner key never rides
 in a QR, a link, or anything else that leaves the screen.
 
+**A position says what it does, not what field it is in.** Search the
+pool for *housekeeper*: the row says *Cleaning and housekeeping* where it
+used to say *Hospitality, food & retail*, and its line reads room status
+reporting, linen control, room and area checklists, cleaning schedule
+keeping, chemical safety records, linen and supply counts — the author's
+own two phrases first, then the shape of the work. The first photograph
+of this screen showed the same row ending in *till reconciliation*,
+because a written row took no group and the family block filled the
+rest; it is the picture that changed the rule.
+
+<table>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/212-browse-the-positions.png"><img src="docs/screens/212-browse-the-positions.png" width="220" alt="Browse the positions"></a><br><sub><b>212</b> · Browse the positions<br>searched by what the work does, not its name</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/213-download-knowledge.png"><img src="docs/screens/213-download-knowledge.png" width="220" alt="Download knowledge"></a><br><sub><b>213</b> · Download knowledge<br>the study a founder reads before signing</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/217-kitted-out-in-the-seat.png"><img src="docs/screens/217-kitted-out-in-the-seat.png" width="220" alt="Kitted out in the seat"></a><br><sub><b>217</b> · Kitted out in the seat<br>eyes, ears, hands and a body, without leaving</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="docs/screens/218-the-trades-tools.png"><img src="docs/screens/218-the-trades-tools.png" width="220" alt="The trade's tools"></a><br><sub><b>218</b> · The trade's tools<br>a door the new hire cannot open until you hand over the key</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/219-who-they-reach.png"><img src="docs/screens/219-who-they-reach.png" width="220" alt="Who they reach"></a><br><sub><b>219</b> · Who they reach<br>the connections land on the profile</sub></td>
+    <td align="center" width="33%"><a href="docs/screens/220-a-position-says-what-it-does.png"><img src="docs/screens/220-a-position-says-what-it-does.png" width="220" alt="A position says what it does"></a><br><sub><b>220</b> · A position says what it does<br>the pool searched for <i>housekeeper</i>; own line first, then the group's</sub></td>
+  </tr>
+</table>
+
 ## The stage: the same room, flat, overlaid, and entered
 
 The room a person talks in renders three ways, and all three are the

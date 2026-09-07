@@ -620,9 +620,12 @@ is exactly how the old card came to be showing yours in place of theirs.
     <td align="center" width="25%"><a href="screens/216-advises-on-investments.png"><img src="screens/216-advises-on-investments.png" width="210" alt="Advises on investments"></a><br><sub><b>216</b> · Advises on investments · one job under Adviser, Advisor and the plural, because three taxonomies each spelled it differently</sub></td>
   </tr>
   <tr>
+    <td align="center" width="25%"><a href="screens/220-a-position-says-what-it-does.png"><img src="screens/220-a-position-says-what-it-does.png" width="210" alt="A position says what it does"></a><br><sub><b>220</b> · A position says what it does · the pool searched for <i>housekeeper</i>: the row says its group, and its line is room status reporting, linen control, then the group's — not till reconciliation</sub></td>
     <td align="center" width="25%"><a href="screens/213-download-knowledge.png"><img src="screens/213-download-knowledge.png" width="210" alt="Download knowledge"></a><br><sub><b>213</b> · Download knowledge · what the job needs, read and edited before the signature — and the card names whoever answered the study</sub></td>
     <td align="center" width="25%"><a href="screens/217-kitted-out-in-the-seat.png"><img src="screens/217-kitted-out-in-the-seat.png" width="210" alt="Kitted out in the seat"></a><br><sub><b>217</b> · Kitted out in the seat · eyes, ears, hands and a body, one rung at a time — the robot shelf reached without leaving the hire it is for</sub></td>
     <td align="center" width="25%"><a href="screens/218-the-trades-tools.png"><img src="screens/218-the-trades-tools.png" width="210" alt="The trade's tools"></a><br><sub><b>218</b> · The trade's tools · the fifth rung, on a host with no model reachable — ticking gives the hire a door, the sign-in is handed over afterwards</sub></td>
+  </tr>
+  <tr>
     <td align="center" width="25%"><a href="screens/219-who-they-reach.png"><img src="screens/219-who-they-reach.png" width="210" alt="Who they reach"></a><br><sub><b>219</b> · Who they reach · the study's connections on the person they are about, in the employee file — a list that had nowhere to go until the signature carried it</sub></td>
   </tr>
 </table>

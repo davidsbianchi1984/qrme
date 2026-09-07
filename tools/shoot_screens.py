@@ -772,6 +772,26 @@ ELEMENTS: tuple[tuple[str, str, str, tuple[str, ...]], ...] = (
     ("216", "advises-on-investments", "companies",
      (".com-row", '[data-go="browse"]',
       (".com-pool input", "advises on investments")), ".com-pool"),
+    # The pool, searched a fifth way — not for the ranking this time but
+    # for what a row leads with. "housekeeper" reaches Commercial
+    # Housekeeper — the hand-written row, not the imported one, as it
+    # turned out — and the line under the title is the photograph. The
+    # first capture of it read room status reporting, linen control,
+    # order taking, stock rotation, hygiene record keeping, till
+    # reconciliation: the author's two phrases and then the family
+    # block, because a written row took no group. That picture changed
+    # the rule; the row now says Cleaning and housekeeping and its line
+    # is its own two phrases and then the group's. Same card, same
+    # selector, a different question.
+    # The `where` here is the panel *holding the row the search should
+    # find*, not the panel alone. The first capture was taken while the
+    # search was still in flight: "housekeeper" typed, the alphabetical
+    # head still showing, the seat button greyed. A panel is on the page
+    # before its answer is, so the proof has to be the answer.
+    ("220", "a-position-says-what-it-does", "companies",
+     (".com-row", '[data-go="browse"]',
+      (".com-pool input", "housekeeper")),
+     '.com-pool:has(.com-pool-row:has-text("Commercial Housekeeper"))'),
     # The study, after the interview is drafted — two presses, in the
     # order the screen requires them. Whatever answers the study is named
     # on the card, so a capture taken on a host with no model reachable
@@ -1107,7 +1127,12 @@ def main(shots: list[tuple[str, str, str]]) -> None:
                 if minimise:
                     minimise.evaluate("el => el.click()")
                     page.wait_for_timeout(200)
+            only = {n.strip() for n in
+                    os.environ.get("SHOT_ONLY", "").split(",") if n.strip()}
+            keep = (lambda n: not only or str(n) in only)
             for number, tab, stem in shots:
+                if not keep(number):
+                    continue
                 if not open_tab(page, tab):
                     print(f"  ! {tab}: never reached — nothing written")
                     continue
@@ -1124,6 +1149,8 @@ def main(shots: list[tuple[str, str, str]]) -> None:
 
             # The pages that are not tabs. Same refusal.
             for number, stem, start, presses, proof in INSIDE:
+                if not keep(number):
+                    continue
                 if not open_inside(page, session, start, presses, proof):
                     print(f"  ! {number}-{stem}: never reached — "
                           "nothing written")
@@ -1138,6 +1165,8 @@ def main(shots: list[tuple[str, str, str]]) -> None:
             # is not on the page writes nothing and says so.
             for row in ELEMENTS:
                 number, stem, start, presses = row[:4]
+                if not keep(number):
+                    continue
                 # Which card to photograph. It defaults to the one tagged
                 # with this screen's own number, and is named outright by
                 # the recipes that are several screens of one element.

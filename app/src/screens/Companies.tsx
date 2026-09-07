@@ -521,11 +521,11 @@ export function Companies({ onOpenProfile }: {
                 <div key={r.title} className="com-pool-row">
                   <div className="row">
                     <b style={{ flex: 1 }}>{r.title}</b>
-                    <span className="muted small">{r.family}</span>
+                    <span className="muted small">{r.group || r.family}</span>
                     <button disabled={busy}
                             onClick={() => {
                               setTitle(r.title);
-                              if (!department.trim()) setDepartment(r.family);
+                              if (!department.trim()) setDepartment(r.group || r.family);
                             }}>
                       {tr("com.seat.add", lang)}
                     </button>

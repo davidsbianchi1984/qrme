@@ -358,6 +358,15 @@ RULES: list[tuple[str, str]] = [
      "therapist*, therapy, counselor*, counsellor*, counseling, "
      "counselling, psychotherap*, analyst of behaviour"),
 
+    # Above Software and data, Analysis and Engineering, all of which
+    # were taking these titles for their second word. `ai` is a whole
+    # word, so Air Cargo is untouched; AI Security stays with Security,
+    # which sits earlier in the order.
+    ("AI and machine learning",
+     "ai, artificial intelligence, machine learning, ml engineer*, "
+     "mlops*, data scientist*, prompt engineer*, llm*, nlp*, "
+     "computer vision, deep learning, neural network*, generative*"),
+
     ("Software and data",
      "software engineer*, programmer*, software develop*, web develop*, "
      "application develop*, data scientist*, data engineer*, "
@@ -769,6 +778,12 @@ SPECIFICS: dict[str, dict[str, list[str]]] = {
               "onward referral drafting"],
         "c": ["clients", "referrers",
               "clinical supervisor", "safeguarding lead"]},
+    "AI and machine learning": {
+        "s": ["model and prompt record keeping", "output review and evaluation logging",
+              "dataset and provenance notes", "experiment tracking",
+              "model card and limitation writing"],
+        "c": ["product and engineering teams", "data owners",
+              "reviewers and compliance", "the people whose data is used"]},
     "Software and data": {
         "s": ["change and ticket writing", "code and query review notes",
               "release and rollback records", "incident write-ups",

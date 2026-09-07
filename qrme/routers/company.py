@@ -144,6 +144,7 @@ def browse_occupations(request: Request, q: str = "", family: str = "",
                               family=family or None)
     return {"positions": [
         {"title": r["title"], "family": r["family"],
+         "group": r.get("group"),
          "skills": r["skills"], "connections": r["connections"]}
         for r in rows], "total": occupations.count()}
 

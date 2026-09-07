@@ -669,6 +669,14 @@ def _examined_rows() -> int:
     return len(_page_rows())
 
 
+def _written_rows_with_a_group() -> int:
+    import json
+    from pathlib import Path
+    here = Path(__file__).resolve().parent.parent
+    raw = json.loads((here / "qrme" / "data" / "occupations.json").read_text(encoding="utf-8"))
+    return sum(1 for r in raw["positions"] if r.get("w") and r.get("g"))
+
+
 def _examined_repairs() -> int:
     from .test_the_examination_page_reads_the_catalogue import _page_rows
     return sum(1 for cells in _page_rows() if not cells[2].startswith("—"))
@@ -1006,9 +1014,11 @@ RATCHETS: tuple[Ratchet, ...] = (
             "the `i18n.fill` call sites the conversion left behind"),
     Ratchet("deploy.check_blocks", 2, _deploy_check_blocks,
             "the check blocks the deploy page offers a choice between"),
-    Ratchet("examination.catalogue_rows", 10, _examined_rows,
+    Ratchet("examination.catalogue_rows", 11, _examined_rows,
             "the positions the examination page shows three ways"),
-    Ratchet("examination.catalogue_repairs", 7, _examined_repairs,
+    Ratchet("catalogue.written_rows_with_a_group", 416, _written_rows_with_a_group,
+            "the hand-written rows a group follows"),
+    Ratchet("examination.catalogue_repairs", 10, _examined_repairs,
             "the examined rows a group repaired"),
     Ratchet("route.generating", 10, _generating_routes,
             "the routes that generate, as the walk finds them"),

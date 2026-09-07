@@ -980,7 +980,7 @@ const CHROME: Table = {
     en: "What should this one do? Try what the job does, not its name.", es: "¿Qué debe hacer? Prueba con lo que hace el puesto, no su nombre.", fr: "Que doit-il faire ? Décrivez le travail, pas son nom.", de: "Was soll diese Person tun? Beschreib die Arbeit, nicht den Titel.", pt: "O que este deve fazer? Tente o que o cargo faz, não o nome.", it: "Che cosa deve fare? Prova con ciò che fa, non con il nome.", ja: "何をする人ですか。名前ではなく仕事の内容で。", zh: "这个职位做什么？可描述工作内容，而非名称。", hi: "यह क्या करेगा? नाम नहीं, काम लिखें।", ar: "ماذا سيفعل؟ اكتب العمل نفسه لا اسمه.",
   },
   "com.browse.all": {
-    en: "Every family", es: "Todas las familias", fr: "Toutes les familles", de: "Alle Familien", pt: "Todas as famílias", it: "Tutte le famiglie", ja: "すべての分野", zh: "全部门类", hi: "सभी वर्ग", ar: "كل الفئات",
+    en: "Family", es: "Familia", fr: "Famille", de: "Familie", pt: "Família", it: "Famiglia", ja: "分野", zh: "门类", hi: "वर्ग", ar: "الفئة",
   },
   "com.browse.count": {
     en: "positions carried", es: "puestos incluidos", fr: "postes intégrés", de: "mitgeführte Positionen", pt: "cargos incluídos", it: "posizioni incluse", ja: "収録職種", zh: "已收录职位", hi: "शामिल पद", ar: "منصب محفوظ",

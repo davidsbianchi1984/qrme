@@ -6,6 +6,49 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The seat hears the founder's own words.** The first real hire on the
+  beta was an AI Specialist whose charter said *Commercial content
+  pictures and video for QRME*. The title is an imported row under
+  Business with no group, so the seat took the family block — meeting
+  minutes, process documentation, record retention — while the
+  description found Video creator, a written row with a content job's
+  phrases, and nothing asked it. `occupations.for_seat` now reads the
+  title's row and, when the founder's description finds a written row
+  that is not the title's own, that row's own phrases lead the seat's
+  skills and connections and the card says what the job was read as. A
+  written title is left alone. Pressing *Download knowledge* on an
+  existing seat re-derives it under the new rule.
+
+  Two more from the same hire: an **AI and machine learning** group, so
+  AI Specialist, Data Scientist and the machine-learning engineers have
+  a shape of their own (`ai` is a whole word, so Air Cargo is untouched);
+  and a row for adult work no longer outranks a general one on a general
+  question — *pictures and video* was answering with Adult content
+  videographer first. Asking for it by name still finds it.
+
+- **Till reconciliation on a housekeeper.** The first photograph of the
+  group tier (screen 220) showed `Housekeeper` — hand-written, two
+  phrases of its own — leading with *room status reporting · linen
+  control* and then *order taking · stock rotation · hygiene record
+  keeping · till reconciliation*. Two rules were wrong. "A group never
+  speaks over a written role" had been built as "a written role gets no
+  group", so the group that would have filled the line never could; and
+  the family block topped up every row regardless, so a row under
+  Hospitality, food & retail got the retail phrases whatever it was.
+
+  Now a written row takes a group and its own line leads it; and the
+  family block fills skills and connections only where a row has nothing
+  narrower. Search terms still take every tier. The author's list is
+  kept whole at build time rather than stripped of phrases the family
+  also named, since nothing adds them back now. Coverage rose from
+  29,710 to 30,126 because the written rows are counted. The pool row
+  and the seat's default department say the group where there is one
+  and the family only where there is not. The guard that encoded the
+  wrong reading now checks order and family on every written row with a
+  group, and `Housekeeper` is pinned by name.
+
 ## [3.3.1] - 2026-09-06
 
 ### Added

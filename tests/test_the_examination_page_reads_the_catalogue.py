@@ -46,8 +46,8 @@ def _expected(title: str, families: dict) -> list[str]:
     fam = row["family"]
     before = " / ".join(families[fam]["s"][:3])
     now = " / ".join(row["skills"][:3])
-    if row["written"]:
-        group = "— (written by hand)"
+    if row.get("group") and row["written"]:
+        group = f"{row['group']} (written; own line leads)"
     elif row.get("group"):
         group = row["group"]
     else:
@@ -67,14 +67,14 @@ def test_every_examined_row_is_the_readers_row():
 
 
 def test_the_examined_rows_show_all_three_outcomes():
-    """A repaired row, a written row the group stays silent on, and a gap.
+    """A repaired row, a written row whose own line leads its group, and a gap.
 
     The page says the table shows the design holding, not only the design
     winning. Each of the three has to be present or the sentence is not
     true.
     """
     groups = [cells[2] for cells in _page_rows()]
-    assert any(g == "— (written by hand)" for g in groups)
+    assert any(g.endswith("(written; own line leads)") for g in groups)
     assert any(g == "— (no group yet)" for g in groups)
     repaired = sum(1 for g in groups if not g.startswith("—"))
     assert repaired >= ratchets.floor("examination.catalogue_repairs"), (

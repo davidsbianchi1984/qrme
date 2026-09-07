@@ -711,7 +711,8 @@ export type InterviewQ = { question: string; suggested: string };
 /** One position out of the pool the app carries. The knowledge is the
  *  deferred half and is not here — `studySeat` fetches it per seat. */
 export type PoolRow = {
-  title: string; family: string; skills: string[]; connections: string[];
+  title: string; family: string; group?: string | null;
+  skills: string[]; connections: string[];
 };
 
 export type WearableView = {
@@ -6437,7 +6438,7 @@ export const api = {
   // and searchable without a model and without the network. An empty
   // query is a browse, not an error.
   browseOccupations: (q: string, family: string, token: string) =>
-    req<{ positions: { title: string; family: string; skills: string[];
+    req<{ positions: { title: string; family: string; group?: string | null; skills: string[];
                        connections: string[] }[]; total: number }>(
       `/occupations?q=${encodeURIComponent(q)}` +
       `&family=${encodeURIComponent(family)}&limit=40`, { token }),

@@ -136,13 +136,25 @@ def build() -> dict:
             if key in seen:
                 raise SystemExit(f"duplicate position: {title}")
             seen.add(key)
-            skills = [x for x in _split(rs) if x not in base_s]
-            conns = [x for x in _split(rc) if x not in base_c]
+            # The author's list, whole. It used to be stripped of any
+            # phrase the family block also named, on the theory that the
+            # reader would add the family's back. The reader no longer
+            # fills from the family once a row has anything narrower, so
+            # a stripped phrase would simply be gone.
+            skills, conns = _split(rs), _split(rc)
             words = _keywords(title, skills, extra)
             rows.append({"t": title, "f": fam, "s": skills, "c": conns,
                          "k": [w for w in words if w not in fams[fam]["k"]],
                          "w": 1})
-    # The group tier. Written roles do not take one: they already say what
+    # The group tier. A written role takes one too, and its own line
+    # leads it: "never speaks over" means the group follows the author's
+    # phrases, not that the row gets no group. Without one, a written
+    # Housekeeper with two phrases of its own filled the rest of its
+    # line from the family — order taking, stock rotation, till
+    # reconciliation — which is the defect this tier exists to end.
+    # The comment that follows is the original reasoning, kept because
+    # the half of it about the author's line leading is still the rule.
+    # Written roles do not take one: they already say what
     # makes them that role, and a rule keyed on a word in the title cannot
     # improve on a line somebody wrote about the job itself.
     from occupation_groups import SPECIFICS, group_of   # noqa: PLC0415
@@ -150,6 +162,11 @@ def build() -> dict:
                      "k": _keywords("", spec["s"])}
               for name, spec in SPECIFICS.items()}
 
+    for row in rows:                                  # the written ones
+        grp = group_of(row["t"])
+        if grp:
+            row["g"] = grp
+            row["k"] = [w for w in row["k"] if w not in groups[grp]["k"]]
     for title, fam, extra in _imported(seen, rows):
         words = _keywords(title, [], extra)
         row = {"t": title, "f": fam,

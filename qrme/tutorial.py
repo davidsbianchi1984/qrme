@@ -805,8 +805,17 @@ LESSONS: tuple[dict, ...] = (
               "the trade itself and shows it to you: read it, take off what "
               "is wrong, add what is missing, and the card names whoever "
               "answered the study so a host with no model reachable says so "
-              "on its face.",
-         screens=(212, 213, 214, 215, 216),
+              "on its face.\n\nA row says what it does, not what field it "
+              "is in: under the title is the shape of the work \u2014 "
+              "Cleaning and housekeeping, Clinical imaging \u2014 and the "
+              "skills line is the row\u2019s own phrases first, then its "
+              "group\u2019s, never the family\u2019s where anything "
+              "narrower exists. And the seat listens to you as well as to "
+              "the title: describe the position in your own words at the "
+              "interview, and a title the pool only knows as a family is "
+              "read as the written role your words find, and the card says "
+              "so.",
+         screens=(212, 213, 214, 215, 216, 220),
          try_it="Open a company, press Browse the positions, and type what "
                 "the job does instead of its title."),
     dict(key="kit", chapter="Working", title="Eyes, ears, hands and a body",

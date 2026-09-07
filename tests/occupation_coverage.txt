@@ -27,7 +27,7 @@
 # number here. Lowering it is a deliberate act with a reason beside it,
 # not something a rebuild does by accident.
 
-COVERED  29710  of  45153
+COVERED  30130  of  45153
 
 # ## RAISED
 #
@@ -134,6 +134,22 @@ COVERED  29710  of  45153
 #             `shop*` for the machine shop supervisors, `child*` for the
 #             child psychologists, `conductor*` for the orchestras,
 #             `electric*` because an electrician is a trade.
+#
+# 2026-09-06  29710 -> 30126 (66.7%). Written rows take a group
+#             too. "A group never speaks over a written role" had been
+#             built as "a written role gets no group", and a written
+#             Housekeeper with two phrases of its own filled the rest of
+#             its line from Hospitality, food & retail: order taking,
+#             stock rotation, till reconciliation. Now the author's line
+#             leads, the group follows, and the family block fills only
+#             a line that would otherwise be empty. The photograph that
+#             caught it is screen 220.
+#
+# 2026-09-07  30126 -> 30130 (66.7%). AI and machine learning: the
+#             founder's first real hire was an AI Specialist, an imported
+#             title under Business with no group, and the seat took the
+#             family block. `ai` is a whole word so Air Cargo is untouched;
+#             AI Security stays with Security, which is earlier.
 #
 # ## What is deliberately not covered
 #

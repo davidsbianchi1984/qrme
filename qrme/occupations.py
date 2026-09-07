@@ -70,6 +70,11 @@ def _pool() -> list[dict]:
     group got there first. Duplicates are dropped as the tiers merge, so
     a phrase a group and a family both name is shown once.
 
+    **The family fills only an empty line.** A row with its own phrases
+    or a group's shows those and nothing broader: the family block is
+    the answer for the rows that have nothing narrower, and a wrong
+    phrase from it on a row that had a right one was the whole defect.
+
     **A row's own come first.** The family's used to lead, and every
     screen that shows a few of them showed the family's few: Radiologist
     carries "image report dictation" and "prior study comparison" and
@@ -95,13 +100,25 @@ def _pool() -> list[dict]:
     rows = []
     for r in raw.get("positions", []):
         row = {_LONG[k]: v for k, v in r.items() if k in _LONG}
-        tiers = [grps.get(row.get("group"), {}),
-                 fams.get(row.get("family"), {})]
+        group, family = (grps.get(row.get("group"), {}),
+                         fams.get(row.get("family"), {}))
+        # The row's own phrases, kept apart from the merged list so a
+        # caller can lead with *this* row's words and nothing broader.
+        row["own_skills"] = list(row.get("skills", []))
+        row["own_connections"] = list(row.get("connections", []))
         for short, long in (("s", "skills"), ("c", "connections"),
                             ("k", "keywords")):
             out = list(row.get(long, []))
-            for tier in tiers:
-                out += [x for x in tier.get(short, ()) if x not in out]
+            out += [x for x in group.get(short, ()) if x not in out]
+            # The family block fills skills and connections only where
+            # the row has nothing narrower. It used to top every row up,
+            # and a written Housekeeper with two phrases of its own then
+            # showed "till reconciliation" in its first six, because the
+            # family is Hospitality, food & retail and the block names
+            # all three. Search terms still take every tier: breadth is
+            # what a search wants.
+            if short == "k" or not out:
+                out += [x for x in family.get(short, ()) if x not in out]
             row[long] = out
         row["written"] = bool(row.get("written"))
         rows.append(row)
@@ -308,8 +325,16 @@ def _enough(matched: int, terms: int) -> bool:
     return matched * 2 >= terms
 
 
-def search(q: str, limit: int = 25, family: str | None = None) -> list[dict]:
+def search(q: str, limit: int = 25, family: str | None = None,
+           loose: bool = False) -> list[dict]:
     """Positions matching what was typed, best first.
+
+    `loose` is for a *description* rather than a name. A title search
+    has to answer at least half of what was typed, or "people" would
+    match half the pool; a founder's sentence about the job — "commercial
+    content pictures and video for QRME" — carries words no row will
+    ever hold, and a row that answers two of them is the answer. Loose
+    asks for two matched terms, or every term when there are fewer.
 
     An empty query is a browse rather than a search: it returns the head of
     the pool (optionally within one family) so the list is never blank
@@ -328,10 +353,89 @@ def search(q: str, limit: int = 25, family: str | None = None) -> list[dict]:
         if family is not None and row["family"] != family:
             continue
         matched, strength = _score(row, terms)
-        if matched and _enough(matched, len(terms)):
+        enough = (matched >= min(2, len(terms))) if loose else _enough(matched, len(terms))
+        if matched and enough:
             scored.append((matched, strength, row, _plain(row["title"]) == want))
-    scored.sort(key=_rank)
+    # A row for adult work never outranks a general one on a general
+    # question. "pictures and video" put Adult content videographer above
+    # Video creator, because the adult row happened to carry the rarer
+    # stem; a founder describing a job did not ask for that and should
+    # not be offered it first. Asking for it by name still finds it.
+    asked_adult = "adult" in terms
+    if loose:
+        # A description is answered by the most general row that fits:
+        # among rows matching the same words, the shorter title. "video"
+        # is Video creator before Short-form video creator.
+        scored.sort(key=lambda x: ((0 if asked_adult or not _adult(x[2]) else 1),
+                                   -x[0], not x[2]["written"],
+                                   len(x[2]["title"].split()), -x[1], x[2]["title"]))
+    else:
+        scored.sort(key=lambda x: ((0 if asked_adult or not _adult(x[2]) else 1),)
+                    + _rank(x))
     return [x[2] for x in scored[:limit]]
+
+
+def _adult(row: dict) -> bool:
+    low = row["title"].lower()
+    return low.startswith("adult ") or " adult " in f" {low} "
+
+
+def _lead(found: list[str], pooled: list[str]) -> list[str]:
+    seen = {x.lower() for x in found}
+    return list(found) + [x for x in pooled if x.lower() not in seen]
+
+
+def for_seat(title: str, described: "str | list[str]" = "") -> dict | None:
+    """The pool's answer for a seat: the title's row, led by what the
+    founder's own words find.
+
+    A founder who types "AI Specialist" and answers the interview with
+    "commercial content pictures and video" has said two things, and the
+    seat used to hear only the first. The title is an imported row under
+    Business with no group, so the seat took the family block — meeting
+    minutes, process documentation, record retention — while the
+    description finds Video creator, a written row with real phrases,
+    and nobody asked it.
+
+    So: the title's row still answers for the seat (its family, its
+    place in the search index). If the description finds a *written* row
+    that is not the title's own, that row's own phrases lead the seat's
+    skills and connections, and the seat says what it was read as. A
+    written title is left alone: the author's line already says what
+    the job does, and a description cannot improve on it the way it can
+    on a family block. No description, or a description that finds
+    nothing written, changes nothing.
+    """
+    known = find(title)
+    if known is None:
+        hits = search(title, limit=1)
+        known = hits[0] if hits else None
+    hit = None
+    answers = [described] if isinstance(described, str) else list(described)
+    answers = [a for a in answers if a and a.strip()]
+    if answers and not (known and known["written"]):
+        # One answer at a time, in the order given: the founder's
+        # description of the position first. Joined into one question
+        # the answers dilute each other, and a word like "draft" in the
+        # second finds Drafter before the first has been heard.
+        for answer in answers:
+            for cand in search(answer, limit=5, loose=True):
+                if cand["written"] and (known is None or cand["title"] != known["title"]):
+                    hit = cand
+                    break
+            if hit is not None:
+                break
+    if known is None and hit is None:
+        return None
+    if known is None:
+        row = dict(hit); row["read_as"] = hit["title"]
+        return row
+    row = dict(known)
+    if hit is not None:
+        row["skills"] = _lead(hit["own_skills"], known["skills"])
+        row["connections"] = _lead(hit["own_connections"], known["connections"])
+        row["read_as"] = hit["title"]
+    return row
 
 
 def _rank(scored_row: tuple) -> tuple:

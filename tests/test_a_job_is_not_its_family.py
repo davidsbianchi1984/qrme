@@ -36,6 +36,8 @@ import re
 import sys
 from pathlib import Path
 
+from . import ratchets
+
 from qrme import occupations
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -44,6 +46,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 from occupation_groups import RULES, SPECIFICS, group_of  # noqa: E402
 
 DATA = json.loads((ROOT / "qrme/data/occupations.json").read_text(encoding="utf-8"))
+DATA_PATH = ROOT / "qrme/data/occupations.json"
 RECORD = Path(__file__).with_name("occupation_coverage.txt")
 
 
@@ -344,10 +347,44 @@ def test_a_word_that_is_also_a_thing():
 
 
 def test_a_group_never_speaks_over_a_written_role():
-    """The 529 hand-written roles say more about themselves than a rule
-    keyed on one word in a title ever can, so they take no group."""
-    spoken_over = [r["t"] for r in DATA["positions"] if r.get("w") and r.get("g")]
-    assert not spoken_over, spoken_over[:10]
+    """The author's line leads; the group follows; the family fills only
+    an empty line.
+
+    The first version of this guard read "never speaks over" as "takes no
+    group", and held that no written row carried one. The photograph
+    that ended that reading is screen 220: Housekeeper, written by hand
+    with two phrases of its own, showing order taking, stock rotation and
+    till reconciliation in its first six — the family block topping up a
+    line the group should have. So the rule is now about order and about
+    the family, and it is checked on every written row that has a group.
+    """
+    fams = json.loads(DATA_PATH.read_text(encoding="utf-8"))["families"]
+    checked = 0
+    for row in occupations._pool():
+        if not (row["written"] and row.get("group")):
+            continue
+        own = next(r for r in DATA["positions"] if r["t"] == row["title"]).get("s", [])
+        assert row["skills"][:len(own)] == own, (row["title"], row["skills"][:6])
+        group = SPECIFICS[row["group"]]["s"]
+        after_own = row["skills"][len(own):]
+        assert after_own[:len([g for g in group if g not in own])] == [g for g in group if g not in own], row["title"]
+        family_only = [s for s in fams[row["family"]]["s"] if s not in own and s not in group]
+        assert not set(family_only) & set(row["skills"]), (
+            f"{row['title']!r} still shows the family's {sorted(set(family_only) & set(row['skills']))}")
+        checked += 1
+    assert checked >= ratchets.floor("catalogue.written_rows_with_a_group")
+
+
+def test_the_family_fills_only_an_empty_line():
+    """Housekeeper, the row in the photograph, and the rule stated once."""
+    row = occupations.find("Housekeeper")
+    assert row["written"] and row["group"] == "Cleaning and housekeeping"
+    assert row["skills"][:2] == ["room status reporting", "linen control"]
+    for phrase in ("till reconciliation", "order taking", "stock rotation"):
+        assert phrase not in row["skills"], phrase
+    bare = occupations.find("Kiln Firer")           # no own line, no group
+    assert not bare["written"] and not bare.get("group")
+    assert bare["skills"][:1] == ["job sheet keeping"], "the family still answers for a bare row"
 
 
 def test_the_specific_half_leads_the_shared_half():
