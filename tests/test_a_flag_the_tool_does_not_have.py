@@ -39,6 +39,7 @@ TAIL = r"([^}\n>|]*)"
 INVOCATIONS = (
     ("remote update", re.compile(r"git\s+-C\s+\S+\s+remote\s+update" + TAIL)),
     ("clone",         re.compile(r"git\s+clone" + TAIL)),
+    ("pull",          re.compile(r"git\s+-C\s+\S+\s+pull" + TAIL)),
 )
 
 
@@ -77,6 +78,19 @@ def test_git_accepts_the_flags_the_script_passes(script, sub, flags, tmp_path):
 
     if sub == "clone":
         argv = ["git", "clone", *flags, str(origin), str(tmp_path / "out")]
+    elif sub == "pull":
+        # The readable copy on a rerun: an origin with a commit, a clone of
+        # it, and the pull the script runs to bring the clone forward.
+        seed = tmp_path / "seed"
+        subprocess.run(["git", "clone", "-q", str(origin), str(seed)], check=True)
+        subprocess.run(["git", "-C", str(seed), "-c", "user.name=t",
+                        "-c", "user.email=t@t", "commit", "-q",
+                        "--allow-empty", "-m", "seed"], check=True)
+        subprocess.run(["git", "-C", str(seed), "push", "-q", "origin", "HEAD"],
+                       check=True)
+        work = tmp_path / "work"
+        subprocess.run(["git", "clone", "-q", str(origin), str(work)], check=True)
+        argv = ["git", "-C", str(work), "pull", *flags]
     else:
         mirror = tmp_path / "mirror.git"
         subprocess.run(["git", "clone", "-q", "--mirror",

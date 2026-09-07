@@ -52,9 +52,14 @@ for repo in "${REPOS[@]}"; do
     git clone --mirror "https://github.com/$OWNER/$repo.git" \
         "$root/$repo.git" >/dev/null 2>&1
   fi
-  # A working copy of main, for reading without git commands.
-  [ -d "$root/source" ] || git clone "$root/$repo.git" "$root/source" \
-      >/dev/null 2>&1
+  # A working copy of main, for reading without git commands. On a rerun it
+  # follows the mirror just brought current, or it stays at the day it was
+  # first made.
+  if [ -d "$root/source" ]; then
+    git -C "$root/source" pull --ff-only --quiet >/dev/null 2>&1
+  else
+    git clone "$root/$repo.git" "$root/source" >/dev/null 2>&1
+  fi
 
   # --- every file attached to every release ------------------------------
   page=1

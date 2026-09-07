@@ -119,6 +119,10 @@ foreach ($repo in $Repos) {
             $work = Join-Path $root 'source'
             if (-not (Test-Path $work)) {
                 Invoke-Native { git clone --quiet $mirror $work } | Out-Null
+            } else {
+                # The mirror above was just brought current; the readable copy
+                # follows it, or a rerun leaves it at the day it was first made.
+                Invoke-Native { git -C $work pull --ff-only --quiet } | Out-Null
             }
         }
     }

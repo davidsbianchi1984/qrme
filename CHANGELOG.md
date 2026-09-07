@@ -16,6 +16,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   is now asked again every few seconds for up to `BETA_VERSIONS_WAIT`
   seconds (default 120) before it is called a failure; `0` asks once.
   Two guards hold the late name and the once-only answer.
+- **A backup rerun brings the readable copy forward.** `tools/master-backup.ps1`
+  and `.sh` refreshed the full mirror on a rerun but left the `source`
+  folder beside it at the day it was first cloned. It now pulls forward
+  from the mirror, and the flag guard runs that pull against a scratch
+  repository like the other two invocations.
 
 ## [3.4.0] - 2026-09-07
 
