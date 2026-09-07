@@ -29,8 +29,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Fine-tuning fits those weights, offline, encrypted.**
   `POST /profiles/{id}/finetune` now also replays the profile's own stored
   history into window→next-turn pairs and fits the network by Adam on
-  this host, reporting `network.loss_before`, `loss_after`, `steps` and
-  `version`. The weights rest in `persona_weights` as AES-GCM ciphertext
+  this host, reporting `network.loss_before`, `loss_after`, `training_steps` and
+  `weights_build`. The weights rest in `persona_weights` as AES-GCM ciphertext
   under a key derived per deployment (`QRME_MODEL_KEY`, else the
   watermark derivation) and bound to the profile; they ride to the PDI
   vault sealed; nothing leaves the host, and under `QRME_OFFLINE` the

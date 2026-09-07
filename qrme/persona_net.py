@@ -347,14 +347,14 @@ def status(profile_id: str) -> dict:
         " length(blob) AS bytes FROM persona_weights WHERE profile_id=?",
         (profile_id,)).fetchone()
     base = {"profile_id": profile_id, "config": CONFIG,
-            "emphases": list(EMPHASES),
+            "emphasis_names": list(EMPHASES),
             "parameters": int(sum(v.size for v in init_params(0).values())),
             "encrypted_at_rest": True, "external_transmission": False}
     if row is None:
-        return {**base, "trained": False, "version": 0, "trained_on": 0,
+        return {**base, "trained": False, "weights_build": 0, "trained_on": 0,
                 "loss_before": None, "loss_after": None, "updated_at": None,
                 "sealed_bytes": 0}
-    return {**base, "trained": True, "version": row["version"],
+    return {**base, "trained": True, "weights_build": row["version"],
             "trained_on": row["trained_on"], "loss_before": row["loss_before"],
             "loss_after": row["loss_after"], "updated_at": row["updated_at"],
             "sealed_bytes": row["bytes"]}
@@ -553,8 +553,8 @@ def train(profile_id: str, *, epochs: int = 8) -> dict:
     samples = _samples(profile_id)
     p, version = load(profile_id)
     if not samples:
-        return {"trained": False, "samples": 0, "steps": 0,
-                "loss_before": None, "loss_after": None, "version": version,
+        return {"trained": False, "samples": 0, "training_steps": 0,
+                "loss_before": None, "loss_after": None, "weights_build": version,
                 "reason": "no interactor has two approved turns yet"}
     loss_before = _mean_loss(p, samples)
     opt, steps = Adam(p), 0
@@ -576,8 +576,10 @@ def train(profile_id: str, *, epochs: int = 8) -> dict:
         (profile_id, seal(profile_id, p), 1, len(samples),
          round(loss_before, 6), round(loss_after, 6), db.utcnow()))
     conn.commit()
-    return {"trained": True, "samples": len(samples), "steps": steps,
+    # `weights_build`, `training_steps`: one wire name, one type. `version`
+    # is a string on /health and `steps` a list on the task record.
+    return {"trained": True, "samples": len(samples), "training_steps": steps,
             "loss_before": round(loss_before, 6),
             "loss_after": round(loss_after, 6),
-            "version": status(profile_id)["version"],
+            "weights_build": status(profile_id)["weights_build"],
             "encrypted_at_rest": True}

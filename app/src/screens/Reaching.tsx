@@ -58,6 +58,7 @@ export function Reaching({ onPlans }: { onPlans: () => void }) {
   const [state, setState] = useState<Engagement | null>(null);
   const [rated, setRated] = useState<FeedbackResult | null>(null);
   const [embedding, setEmbedding] = useState<PersonaEmbedding | null>(null);
+  const [net, setNet] = useState<Awaited<ReturnType<typeof api.personaNet>> | null>(null);
   const [sent, setSent] = useState<ProactiveOutreach | null>(null);
   const [window_, setWindow] = useState<QuietHours | null>(null);
 
@@ -262,6 +263,35 @@ export function Reaching({ onPlans }: { onPlans: () => void }) {
               {fill(tr("rch.version", lang), {
                 v: embedding.version, when: embedding.updated_at })}
             </p>
+          </>
+        )}
+      </div>
+
+      {/* The attention layers themselves (qrme/persona_net.py), as distinct
+          from the embedding above: that is a vector rendered into the
+          prompt; this is the network that reads the recent turns. */}
+      <div className="card">
+        <h3>{tr("rch.net.title", lang)}</h3>
+        <p className="muted small">{tr("rch.net.pitch", lang)}</p>
+        <button disabled={busy || !me || !token}
+                onClick={act(async () => {
+                  setNet(await api.personaNet(me, token));
+                })}>{tr("rch.show", lang)}</button>
+        {net && (
+          <>
+            <p className="small">
+              {net.trained
+                ? fill(tr("rch.net.trained", lang),
+                       { n: net.trained_on, v: net.weights_build })
+                : tr("rch.net.initial", lang)}
+            </p>
+            {net.recent_conditioning.length > 0 && (
+              <p className="muted small">
+                {fill(tr("rch.net.recent", lang), {
+                  n: net.recent_conditioning.length,
+                  t: net.recent_conditioning[0].temperature.toFixed(2) })}
+              </p>
+            )}
           </>
         )}
       </div>

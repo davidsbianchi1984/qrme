@@ -5627,7 +5627,7 @@ public record EmbeddingCard(
 public record PersonaNetCard(
     [property: JsonPropertyName("profile_id")] string? ProfileId,
     [property: JsonPropertyName("trained")] bool Trained,
-    [property: JsonPropertyName("version")] int Version,
+    [property: JsonPropertyName("weights_build")] int WeightsBuild,
     [property: JsonPropertyName("trained_on")] int TrainedOn,
     [property: JsonPropertyName("loss_before")] double? LossBefore,
     [property: JsonPropertyName("loss_after")] double? LossAfter,

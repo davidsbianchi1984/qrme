@@ -3320,17 +3320,17 @@ export type PersonaEmbedding = {
 export type PersonaNet = {
   profile_id: string;
   trained: boolean;
-  version: number;
+  weights_build: number;
   trained_on: number;
   loss_before: number | null;
   loss_after: number | null;
   updated_at: string | null;
   sealed_bytes: number;
   parameters: number;
-  emphases: string[];
+  emphasis_names: string[];
   encrypted_at_rest: boolean;
   external_transmission: boolean;
-  recent: {
+  recent_conditioning: {
     id: string;
     interactor_id: string | null;
     surface: string;

@@ -349,6 +349,7 @@ public sealed partial class PeoplePage : Page
         PairEngagementButton.Content = L10n.T("who.engagement");
         PairNotesButton.Content = L10n.T("who.notes");
         PairEmbeddingButton.Content = L10n.T("who.embedding");
+        PairPersonaNetButton.Content = L10n.T("who.net");
         SrcTitle.Text = L10n.T("src.title");
         SrcKindBox.Header = L10n.T("src.kind");
         SrcKindBox.Text = "life_event";
@@ -2632,6 +2633,20 @@ public sealed partial class PeoplePage : Page
                 AppState.Current.Pid!, PairIdBox.Text.Trim(),
                 AppState.Current.Token!);
             StatusText.Text = "\u2713";
+        });
+
+    /// <summary>The attention layers themselves (qrme/persona_net.py):
+    /// trained or initial, from the same door every reply is conditioned
+    /// through.</summary>
+    private async void OnPairPersonaNet(object sender, RoutedEventArgs e) =>
+        await Try(async () =>
+        {
+            var net = await ApiClient.Shared.PersonaNet(
+                AppState.Current.Pid!, AppState.Current.Token!);
+            StatusText.Text = net.Trained
+                ? L10n.T("who.net.trained").Replace("{n}", net.TrainedOn.ToString())
+                                           .Replace("{v}", net.WeightsBuild.ToString())
+                : L10n.T("who.net.initial");
         });
 
     private async void OnSrcAdd(object sender, RoutedEventArgs e) =>

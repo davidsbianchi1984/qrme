@@ -6340,6 +6340,18 @@ private fun PairBlock(vm: StudioViewModel, onNote: (String?) -> Unit) {
                     onNote(r.exceptionOrNull()?.message ?: "\u2713") }
             }
         }
+        // The attention layers themselves (qrme/persona_net.py).
+        BrandButton(L10n.t("who.net", lang)) {
+            vm.call({ ApiClient.personaNet(vm.pid!!, vm.token!!) }) { r ->
+                val net = r.getOrNull()
+                onNote(when {
+                    net == null -> r.exceptionOrNull()?.message
+                    net.optBoolean("trained") -> L10n.fill("who.net.trained", lang,
+                        mapOf("n" to net.optInt("trained_on").toString(),
+                              "v" to net.optInt("weights_build").toString()))
+                    else -> L10n.t("who.net.initial", lang)
+                }) }
+        }
     }
 }
 

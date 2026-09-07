@@ -4388,9 +4388,8 @@ data class SpokenBinding(val provider: String, val voiceId: String,
 
     /** The persona network: trained or initial, and the last replies it
      *  conditioned (claims 22 and 26). */
-    suspend fun personaNet(id: String, token: String) {
-        request("/profiles/$id/persona-net", token = token)
-    }
+    suspend fun personaNet(id: String, token: String): org.json.JSONObject =
+        org.json.JSONObject(request("/profiles/$id/persona-net", token = token))
 
     suspend fun sources(id: String, token: String): List<String> {
         val arr = org.json.JSONArray(request("/profiles/$id/sources",

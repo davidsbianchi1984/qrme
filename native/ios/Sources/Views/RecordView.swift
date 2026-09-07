@@ -239,6 +239,18 @@ struct PairSection: View {
                         line = "✓"
                     }
                 }.font(.caption).disabled(busy || visitorId.isEmpty)
+                // The attention layers themselves (qrme/persona_net.py).
+                Button(L10n.t("who.net", state.language)) {
+                    run {
+                        let net = try await ApiClient.shared.personaNet(
+                            id: state.pid!, token: state.token!)
+                        line = (net.trained ?? false)
+                            ? L10n.fill("who.net.trained", state.language,
+                                        ["n": String(net.trained_on ?? 0),
+                                         "v": String(net.weights_build ?? 0)])
+                            : L10n.t("who.net.initial", state.language)
+                    }
+                }.font(.caption).disabled(busy)
             }
             if let line {
                 Text(line).font(.caption2).foregroundStyle(Theme.t2)

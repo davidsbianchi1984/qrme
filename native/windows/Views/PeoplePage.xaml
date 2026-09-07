@@ -1012,6 +1012,7 @@
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <Button x:Name="PairNotesButton" Click="OnPairNotes" />
                         <Button x:Name="PairEmbeddingButton" Click="OnPairEmbedding" />
+                        <Button x:Name="PairPersonaNetButton" Click="OnPairPersonaNet" />
                     </StackPanel>
                 </StackPanel>
             </Border>

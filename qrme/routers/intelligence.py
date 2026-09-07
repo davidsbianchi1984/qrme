@@ -56,7 +56,7 @@ def persona_net_status(profile_id: str, request: Request) -> dict:
     require_owner(profile_id, request)
     from .. import persona_net
     return {**persona_net.status(profile_id),
-            "recent": persona_net.conditioning_of(profile_id)}
+            "recent_conditioning": persona_net.conditioning_of(profile_id)}
 
 
 # -- Domain specialists (claim 24) -------------------------------------------

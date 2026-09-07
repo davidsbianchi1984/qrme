@@ -6162,7 +6162,7 @@ struct EmbeddingCard: Decodable {
 struct PersonaNetCard: Decodable {
     let profile_id: String?
     let trained: Bool?
-    let version: Int?
+    let weights_build: Int?
     let trained_on: Int?
     let loss_before: Double?
     let loss_after: Double?

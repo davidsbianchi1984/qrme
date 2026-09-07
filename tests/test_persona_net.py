@@ -117,10 +117,10 @@ def test_a_chat_reply_is_conditioned_and_says_so(client):
     user = make_interactor(client)
     _talk(client, p["id"], user, 3)
     status = client.get(f"/profiles/{p['id']}/persona-net").json()
-    assert status["trained"] is False and status["version"] == 0
+    assert status["trained"] is False and status["weights_build"] == 0
     assert status["encrypted_at_rest"] is True
     assert status["external_transmission"] is False
-    rows = [r for r in status["recent"] if r["surface"] == "reply"]
+    rows = [r for r in status["recent_conditioning"] if r["surface"] == "reply"]
     assert rows and rows[0]["interactor_id"] == user
     # The third reply attended over the three turns before it, by quote.
     assert [a["quote"][:20] for a in rows[0]["attention"]] == [
@@ -206,9 +206,9 @@ def test_finetune_trains_the_attention_weights_offline(client, monkeypatch):
     ft = ft.json()
     assert ft["offline_mode"] is True and ft["external_transmission"] is False
     net = ft["network"]
-    assert net["trained"] is True and net["samples"] == 4 and net["steps"] > 0
+    assert net["trained"] is True and net["samples"] == 4 and net["training_steps"] > 0
     assert net["loss_after"] < net["loss_before"]
-    assert net["encrypted_at_rest"] is True and net["version"] == 1
+    assert net["encrypted_at_rest"] is True and net["weights_build"] == 1
 
     after, version = pn.load(p["id"])
     assert version == 1
@@ -223,10 +223,10 @@ def test_finetune_trains_the_attention_weights_offline(client, monkeypatch):
     _talk(client, p["id"], user, 1)
     status = client.get(f"/profiles/{p['id']}/persona-net").json()
     assert status["trained"] is True and status["loss_after"] < status["loss_before"]
-    assert status["recent"][0]["weights_version"] == 1
+    assert status["recent_conditioning"][0]["weights_version"] == 1
 
     # Training again versions the artifact rather than replacing history.
-    assert client.post(f"/profiles/{p['id']}/finetune").json()["network"]["version"] == 2
+    assert client.post(f"/profiles/{p['id']}/finetune").json()["network"]["weights_build"] == 2
 
 
 def test_finetune_without_two_turns_says_why_it_did_not_train(client):
@@ -234,7 +234,7 @@ def test_finetune_without_two_turns_says_why_it_did_not_train(client):
     user = make_interactor(client)
     _talk(client, p["id"], user, 1)
     net = client.post(f"/profiles/{p['id']}/finetune").json()["network"]
-    assert net["trained"] is False and net["steps"] == 0
+    assert net["trained"] is False and net["training_steps"] == 0
     assert "two approved turns" in net["reason"]
 
 
