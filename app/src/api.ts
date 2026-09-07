@@ -3315,6 +3315,35 @@ export type PersonaEmbedding = {
   updated_at: string;
 };
 
+/** The persona network's state — trained or initial, loss before and after,
+ *  sealed size — and the last replies it conditioned. */
+export type PersonaNet = {
+  profile_id: string;
+  trained: boolean;
+  version: number;
+  trained_on: number;
+  loss_before: number | null;
+  loss_after: number | null;
+  updated_at: string | null;
+  sealed_bytes: number;
+  parameters: number;
+  emphases: string[];
+  encrypted_at_rest: boolean;
+  external_transmission: boolean;
+  recent: {
+    id: string;
+    interactor_id: string | null;
+    surface: string;
+    weights_version: number;
+    temperature: number;
+    engagement: number;
+    predicted_engagement: number;
+    attention: { turn: number; weight: number; engagement: number; quote: string }[];
+    emphases: Record<string, number>;
+    created_at: string;
+  }[];
+};
+
 /** An unprompted message that got past all three gates, with the reason the
  *  profile gave itself for sending it. */
 export type ProactiveOutreach = {
@@ -7175,6 +7204,10 @@ export const api = {
   personaEmbedding: (profileId: string, interactorId: string, token: string) =>
     req<PersonaEmbedding>(`/profiles/${profileId}/embedding/${interactorId}`,
       { token }),
+  // The persona network (claims 22 and 26): the attention weights' state and
+  // the last replies they conditioned, each with its attention row.
+  personaNet: (profileId: string, token: string) =>
+    req<PersonaNet>(`/profiles/${profileId}/persona-net`, { token }),
   reachOut: (profileId: string, interactorId: string, token: string) =>
     req<ProactiveOutreach>(`/profiles/${profileId}/proactive/${interactorId}`,
       { method: "POST", token }),

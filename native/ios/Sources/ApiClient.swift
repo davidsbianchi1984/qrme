@@ -5100,6 +5100,12 @@ extension ApiClient {
                           token: token)
     }
 
+    /// The persona network: trained or initial, and the last replies it
+    /// conditioned (claims 22 and 26).
+    func personaNet(id: String, token: String) async throws -> PersonaNetCard {
+        try await request("/profiles/\(id)/persona-net", token: token)
+    }
+
     // -- source material --
 
     func sources(id: String, token: String) async throws -> [SourceRow] {
@@ -6151,6 +6157,16 @@ struct ClinicalNote: Decodable {
 struct EmbeddingCard: Decodable {
     let profile_id: String?
     let interactor_id: String?
+}
+
+struct PersonaNetCard: Decodable {
+    let profile_id: String?
+    let trained: Bool?
+    let version: Int?
+    let trained_on: Int?
+    let loss_before: Double?
+    let loss_after: Double?
+    let sealed_bytes: Int?
 }
 
 struct SourceRow: Decodable, Identifiable {

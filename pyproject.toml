@@ -24,6 +24,7 @@ dependencies = [
     # signature module that parsed assertions without verifying them would
     # produce records that only look like evidence.
     "cryptography>=41",
+    "numpy>=1.26",       # the persona network's forward and backward passes
     # The AI mark burned into minted portraits (qrme/avatarreg.py). The
     # offline marking tool argued against an imaging library in the
     # runtime — for request-time redraws. Minting is the other case: the

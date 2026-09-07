@@ -2760,6 +2760,11 @@ public sealed class ApiClient
         Send<EmbeddingCard>(Get(
             $"/profiles/{profileId}/embedding/{interactorId}", token));
 
+    /// <summary>The persona network: trained or initial, and the last
+    /// replies it conditioned (claims 22 and 26).</summary>
+    public Task<PersonaNetCard> PersonaNet(string profileId, string token) =>
+        Send<PersonaNetCard>(Get($"/profiles/{profileId}/persona-net", token));
+
     public Task<SourceRow[]> Sources(string profileId, string token) =>
         Send<SourceRow[]>(Get($"/profiles/{profileId}/sources", token));
 
@@ -5618,6 +5623,15 @@ public record ClinicalNote(
 public record EmbeddingCard(
     [property: JsonPropertyName("profile_id")] string? ProfileId,
     [property: JsonPropertyName("interactor_id")] string? InteractorId);
+
+public record PersonaNetCard(
+    [property: JsonPropertyName("profile_id")] string? ProfileId,
+    [property: JsonPropertyName("trained")] bool Trained,
+    [property: JsonPropertyName("version")] int Version,
+    [property: JsonPropertyName("trained_on")] int TrainedOn,
+    [property: JsonPropertyName("loss_before")] double? LossBefore,
+    [property: JsonPropertyName("loss_after")] double? LossAfter,
+    [property: JsonPropertyName("sealed_bytes")] int SealedBytes);
 
 public record SourceRow(
     [property: JsonPropertyName("id")] string Id,

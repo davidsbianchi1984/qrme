@@ -451,6 +451,10 @@ def record(profile_id: str, interactor_id: str | None, surface: str,
            c: dict) -> str:
     """Keep what conditioned this reply, so it can be shown afterwards."""
     conn = db.connect()
+    # Commit only what this call opened: a caller mid-transaction keeps
+    # its own commit, and a call that opened the write must not leave the
+    # lock held for a request on another thread to run into.
+    opened = not conn.in_transaction
     cid = db.new_id("cond")
     conn.execute(
         "INSERT INTO persona_conditioning (id, profile_id, interactor_id,"
@@ -460,7 +464,7 @@ def record(profile_id: str, interactor_id: str | None, surface: str,
         (cid, profile_id, interactor_id, surface, c["version"],
          c["temperature"], c["engagement"], c["predicted_engagement"],
          json.dumps(c["attention"]), json.dumps(c["emphases"]), db.utcnow()))
-    if not conn.in_transaction:
+    if opened:
         conn.commit()
     return cid
 
