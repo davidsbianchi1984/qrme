@@ -6,6 +6,35 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **The attention layers are the platform's own, and they train.** A
+  persona network (`qrme/persona_net.py`) — a two-layer, two-head
+  transformer in numpy, forward and backward written out and
+  gradient-checked — runs over the person's last twelve turns before
+  every reply. Each turn's attention logit carries that turn's degree of
+  engagement through a learned weight, and the softmax temperature is set
+  by the current engagement, so an engaged person gets sharp attention on
+  the turns that matter and a drifting one a wide, even look. The readout
+  — expected engagement next turn and four emphases — goes into the
+  prompt as sentences, with the attended turns quoted, and into
+  `persona_conditioning` as a row per reply. It rides the one prompt
+  builder every speaking surface uses, so a chat reply, a room turn, a
+  letter, a proactive check-in and a hired seat in a company are
+  conditioned alike; the Studio Agent is conditioned on its owner's turns
+  in the console. `GET /profiles/{id}/persona-net` shows the weights'
+  state and the last replies they conditioned.
+- **Fine-tuning fits those weights, offline, encrypted.**
+  `POST /profiles/{id}/finetune` now also replays the profile's own stored
+  history into window→next-turn pairs and fits the network by Adam on
+  this host, reporting `network.loss_before`, `loss_after`, `steps` and
+  `version`. The weights rest in `persona_weights` as AES-GCM ciphertext
+  under a key derived per deployment (`QRME_MODEL_KEY`, else the
+  watermark derivation) and bound to the profile; they ride to the PDI
+  vault sealed; nothing leaves the host, and under `QRME_OFFLINE` the
+  pass still runs. Erasing a profile takes the weights and the record.
+  Mechanism 18 on the examination page.
+
 ### Changed
 
 - **The invention disclosure is retired.** The application as filed and as published, US 2025/0265659 A1, lives in `docs/patents/`, with the

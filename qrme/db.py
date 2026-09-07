@@ -1619,6 +1619,39 @@ CREATE TABLE IF NOT EXISTS finetune_runs (
     created_at  TEXT NOT NULL
 );
 
+-- The persona network (claims 22 and 26): per-profile attention weights,
+-- sealed with AES-GCM under the deployment's model key. Trained offline from
+-- the profile's own stored history by `persona_net.train`; version 0 (no row)
+-- means the profile's deterministic initial weights are in use.
+CREATE TABLE IF NOT EXISTS persona_weights (
+    profile_id   TEXT PRIMARY KEY REFERENCES profiles(id),
+    blob         BLOB NOT NULL,     -- nonce || AES-GCM ciphertext of the weights
+    version      INTEGER NOT NULL DEFAULT 1,
+    trained_on   INTEGER NOT NULL DEFAULT 0,   -- (window -> next turn) samples
+    loss_before  REAL,
+    loss_after   REAL,
+    updated_at   TEXT NOT NULL
+);
+
+-- What conditioned each reply: the attention row over the person's recent
+-- turns, the temperature the current engagement set, and the emphases the
+-- network read out — one row per prompt built, on every speaking surface.
+-- interactor_id is NULL when the profile spoke to no one in particular (a
+-- seat in a room, a letter) or to its owner through the Studio Agent.
+CREATE TABLE IF NOT EXISTS persona_conditioning (
+    id                   TEXT PRIMARY KEY,
+    profile_id           TEXT NOT NULL REFERENCES profiles(id),
+    interactor_id        TEXT,
+    surface              TEXT NOT NULL,   -- reply | room | agent | ...
+    weights_version      INTEGER NOT NULL,
+    temperature          REAL NOT NULL,
+    engagement           REAL NOT NULL,
+    predicted_engagement REAL NOT NULL,
+    attention            TEXT NOT NULL,   -- JSON: per-turn weight, engagement, quote
+    emphases             TEXT NOT NULL,   -- JSON: shared history, warmth, depth, reassurance
+    created_at           TEXT NOT NULL
+);
+
 -- Posts composed in the profile's voice (social & fan engagement), each
 -- through the same moderation pipeline as chat replies.
 -- A wearable paired over Bluetooth: a watch, a band, a ring, earbuds.

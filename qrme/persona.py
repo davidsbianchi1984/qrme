@@ -386,6 +386,31 @@ def build_system_prompt(
     # said rather than sent whole, because everything above this line is
     # already competing for the model's attention with the person in front
     # of it.
+    # The persona network (claims 22 and 26): attention over this person's
+    # recent turns, biased and tempered by their degree of engagement, read
+    # out as emphases for this reply. Here, in the one builder every speaking
+    # surface uses, so a room turn, a letter, a seat in a company and a
+    # check-in are conditioned the same way a chat reply is — and each one
+    # leaves a row in persona_conditioning saying how.
+    from . import persona_net
+    def _field(row, key):
+        # A caller hands in a dict or a sqlite Row; only one of them has .get.
+        if row is None:
+            return None
+        try:
+            return row[key]
+        except (KeyError, IndexError):
+            return None
+
+    interactor_id = (viewer_id or _field(relationship, "interactor_id")
+                     or _field(engagement, "interactor_id"))
+    conditioned = persona_net.prompt_block(
+        profile["id"], interactor_id,
+        surface=standing or ("room" if among is not None else "reply"),
+        engagement=_field(engagement, "score"))
+    if conditioned:
+        parts.append(conditioned)
+
     from . import productmap
     # A turn spoken among seats IS a room turn — the caller does not have
     # to say so, because `among` already did.

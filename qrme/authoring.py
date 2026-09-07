@@ -903,9 +903,19 @@ def converse(said: str, history: list[dict], *, app, profile_id: str,
              if t.get("role") in ("user", "assistant")]
     turns.append({"role": "user", "content": said})
 
+    # The Agent is conditioned like every other speaker (claim 22): the
+    # owner's turns in this console are the sequence, and the network's
+    # attention over them rides on the prompt. The console keeps the
+    # history, so the turns are handed in rather than read from the store.
+    from . import persona_net
+    block = persona_net.prompt_block(
+        profile_id, None, surface="agent",
+        turns=[t["content"] for t in turns if t["role"] == "user"])
+    conditioning = f"\n\n{block}" if block else ""
+
     steps: list[dict] = []
     for _ in range(STEPS):
-        reply = provider.generate(system_prompt(said), turns)
+        reply = provider.generate(system_prompt(said) + conditioning, turns)
         wanted = wants_a_tool(reply)
         if wanted is None:
             return {"reply": reply.strip(), "acted": steps,

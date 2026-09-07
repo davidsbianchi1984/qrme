@@ -1,7 +1,8 @@
 """Latent persona embeddings and offline adaptation (claims 21, 22, 26).
 
-The "multi-layer transformer" is the underlying Claude model; what QRME owns
-is the state that conditions it. Each (profile, interactor) pair carries a
+The writing model is whichever provider is configured; the attention layers
+QRME owns are in ``persona_net`` (claim 22), and the state that conditions
+them is here. Each (profile, interactor) pair carries a
 persistent **latent persona embedding** — a small named vector updated after
 every interaction — so cross-session state survives logins, devices, and
 model calls. At inference time the embedding is rendered as attention
@@ -12,9 +13,11 @@ The vector is deliberately interpretable (named dimensions, EMA updates)
 rather than opaque: v1 favors auditability over learned representations.
 
 ``finetune`` runs the offline pass of claim 26: it recomputes every
-embedding from the full stored interaction history and seals the resulting
-adaptation artifact — locally, or in the PDI vault when configured. No
-interaction data is transmitted to any external model in the process.
+embedding from the full stored interaction history, trains the profile's
+persona network (``persona_net`` — the attention layers of claim 22) on the
+same history, and seals the resulting adaptation artifact — locally, or in
+the PDI vault when configured. No interaction data is transmitted to any
+external model in the process.
 """
 
 from __future__ import annotations
@@ -150,21 +153,35 @@ def finetune(profile_id: str, pdi=None) -> dict:
         if eng:
             scores.append(eng["score"])
 
+    # The attention layers themselves (claim 26 on claim 22): fit the
+    # profile's persona network to the same stored history, on this host,
+    # and seal the weights. persona_net.train reports loss before and after.
+    from . import persona_net
+    network = persona_net.train(profile_id)
+
     run_id = db.new_id("ftr")
     vault_key = None
     pdi = storage.vault_for(tiers.plan_of_profile(profile_id), pdi)
-    if pdi is not None and artifact:
+    if pdi is not None and (artifact or network["trained"]):
         vault_key = f"qrme/{profile_id}/adaptation/{run_id}"
-        pdi.put(vault_key, json.dumps(artifact))
+        sealed = {"embeddings": artifact, "network": network}
+        if network["trained"]:
+            # The weights go to the vault as the ciphertext they are at rest.
+            row = conn.execute("SELECT blob FROM persona_weights WHERE"
+                               " profile_id=?", (profile_id,)).fetchone()
+            sealed["weights_hex"] = bytes(row["blob"]).hex()
+        pdi.put(vault_key, json.dumps(sealed))
     from . import offline
     metrics = {
         "interactors": len(interactors),
         "messages_processed": processed,
         "engagement_avg": round(sum(scores) / len(scores), 3) if scores else None,
         "external_transmission": False,
-        "computed": "locally (embeddings recomputed on-host from stored history)",
+        "computed": ("locally (embeddings recomputed and attention weights"
+                     " trained on-host from stored history)"),
         "offline_mode": offline.enabled(),
         "sealed_in_vault": vault_key is not None,
+        "network": network,
     }
     conn.execute(
         "INSERT INTO finetune_runs (id, profile_id, metrics, vault_key,"

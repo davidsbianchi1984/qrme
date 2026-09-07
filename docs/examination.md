@@ -20,7 +20,7 @@ The screens referred to below are shown in
 
 ## The mechanisms on file
 
-Seventeen numbered mechanisms. Each row
+Eighteen numbered mechanisms. Each row
 names the technical problem in the machine, the particular structure this
 code uses to solve it, what that structure changes about how the machine
 behaves, and where the structure is reduced to practice and held by a
@@ -158,6 +158,13 @@ is photographed on the screens below.
 <td valign="top">A <strong>third tier between the title and the category</strong> — the shape of the work — assigned by ordered rules over the title (first match wins, a token is a word or phrase, <code>*</code> a stem), matched exactly as categories are; the reader merges own, then group, then category, shows a shared phrase once, and never lets a group speak over a written row (<code>tools/<wbr>occupation_groups.py</code>, <code>qrme/<wbr>occupations.py</code>).</td>
 <td valign="top">65 groups reach 30,130 of 45,153 records (66.7%) without re-filing one: every row keeps the category the search index expects and stops leading with the wrong half. A recorded coverage figure may only rise, and 22 guards hold the ordering decisions and the stems refused after measurement. Ten rows are examined three ways at the foot of this page.</td>
 <td valign="top"><code>tools/<wbr>occupation_<wbr>groups.py</code>,<br><code>qrme/<wbr>occupations.py</code>,<br><code>tests/<wbr>occupation_<wbr>coverage.txt</code> — <code>test_<wbr>a_<wbr>job_<wbr>is_<wbr>not_<wbr>its_<wbr>family.py</code>,<br><code>test_<wbr>the_<wbr>examination_<wbr>page_<wbr>reads_<wbr>the_<wbr>catalogue.py</code></td>
+</tr>
+<tr>
+<td valign="top">18</td>
+<td valign="top">The model that writes a reply attends to its context by its own weights; nothing in the machine tied where it looked to how engaged the person in front of it was, and the state that should have conditioned it was rendered as a sentence and could not be trained.</td>
+<td valign="top">A <strong>persona network the platform owns</strong>: a two-layer, two-head transformer in numpy (<code>persona_net.py</code>, d_model 16, forward and backward written out and gradient-checked) run over the person's last twelve turns before every reply. Each key's attention logit carries that turn's <strong>degree of engagement</strong> through a learned <code>gamma</code>, and the softmax temperature is set by the current engagement; the last position is read out as the next turn's expected engagement and four emphases. <strong>Fine-tuning</strong> replays the profile's own stored history into window→next-turn pairs and fits the weights by Adam on this host; the weights rest as <strong>AES-GCM ciphertext</strong> under a key derived per deployment and bound to the profile, versioned on every pass, and ride to the vault sealed.</td>
+<td valign="top">Every speaking surface — chat, a room turn, a letter, a check-in, a hired seat, the Studio Agent answering its owner — is conditioned through the one prompt builder, and each reply leaves a row in <code>persona_conditioning</code> with the attention over the turns, the temperature and the emphases, so a reply can be shown to have been conditioned and by which weights. Loss before and after are kept per pass; no interaction data leaves the host, and under <code>QRME_OFFLINE</code> the pass still runs.</td>
+<td valign="top"><code>qrme/<wbr>persona_<wbr>net.py</code>,<br><code>qrme/<wbr>persona.py</code>,<br><code>qrme/<wbr>authoring.py</code>,<br><code>qrme/<wbr>adaptation.py</code> — <code>test_<wbr>persona_<wbr>net.py</code>,<br><code>test_<wbr>claims_<wbr>21_<wbr>26.py</code>,<br><code>test_<wbr>offline.py</code></td>
 </tr>
 </tbody>
 </table>

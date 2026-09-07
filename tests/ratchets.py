@@ -1117,7 +1117,7 @@ RATCHETS: tuple[Ratchet, ...] = (
             "the distinct verbs the thinnest-reading shell reports"),
     Ratchet("backup.git_calls", 5, _backup_git_calls,
             "the git invocations the backup scripts build"),
-    Ratchet("readme.files", 7, _readme_files,
+    Ratchet("readme.files", 12, _readme_files,
             "the READMEs the passage check reads"),
     Ratchet("workflow.files", 5, _workflow_files,
             "the workflow files the gating sweep reads"),

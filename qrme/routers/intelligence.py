@@ -47,6 +47,18 @@ def get_embedding(profile_id: str, interactor_id: str,
     return embedding
 
 
+@router.get("/profiles/{profile_id}/persona-net")
+def persona_net_status(profile_id: str, request: Request) -> dict:
+    """Claim 22 on the record: the profile's attention network — trained or
+    initial, loss before and after, sealed size — and the last replies it
+    conditioned, each with its attention row, temperature and emphases."""
+    profile_or_404(profile_id)
+    require_owner(profile_id, request)
+    from .. import persona_net
+    return {**persona_net.status(profile_id),
+            "recent": persona_net.conditioning_of(profile_id)}
+
+
 # -- Domain specialists (claim 24) -------------------------------------------
 
 @router.put("/profiles/{profile_id}/specialists")

@@ -142,7 +142,12 @@ def test_offline_finetune_seals_artifact(pdi_pair):
     assert run["external_transmission"] is False
     assert run["sealed_in_vault"] is True
     artifact = json.loads(fake.store[run["vault_key"]])
-    assert user in artifact
+    assert user in artifact["embeddings"]
+    # The trained attention weights ride along, as ciphertext.
+    assert artifact["network"]["trained"] is True
+    assert '"names"' not in bytes.fromhex(
+        artifact["weights_hex"]).decode(errors="ignore")
+    assert run["network"]["loss_after"] <= run["network"]["loss_before"]
     # The recomputed embedding is now the live cross-session state.
     assert client.get(f"/profiles/{p['id']}/embedding/{user}").status_code == 200
 
