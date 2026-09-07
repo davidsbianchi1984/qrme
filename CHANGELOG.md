@@ -6,6 +6,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The versions check waits for containers still starting.** Run as the
+  line after `up -d --build`, `docker/beta-versions.sh` arrived while two
+  of the three names were still coming up, read a status with no body,
+  and printed `no version in:` for containers that answered 3.4.0 a
+  minute later. A name that is not yet answering this checkout's version
+  is now asked again every few seconds for up to `BETA_VERSIONS_WAIT`
+  seconds (default 120) before it is called a failure; `0` asks once.
+  Two guards hold the late name and the once-only answer.
+
 ## [3.4.0] - 2026-09-07
 
 ### Added

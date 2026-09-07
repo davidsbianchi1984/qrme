@@ -722,6 +722,12 @@ docker compose -f docker/beta-compose.yml --env-file .env up -d --build
 sh docker/beta-versions.sh
 ```
 
+The last line waits. Run straight after the rebuild it arrives while the
+containers are still starting, so a name that is not yet answering this
+checkout's version is asked again every few seconds for up to two minutes
+before it is called a failure; `BETA_VERSIONS_WAIT=0 sh docker/beta-versions.sh`
+asks once, for a check you want answered now.
+
 The last line prints what each of the three names answers beside the
 version this checkout carries, and exits non-zero if they disagree:
 

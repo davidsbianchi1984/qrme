@@ -21,7 +21,18 @@
 # The three URLs come from the same .env the compose line uses, so this
 # reads whatever names the stack was told it has. Give it another env file
 # as the first argument to check a different one.
+#
+# It waits. Run as the line after `up -d --build`, it arrives while the
+# rebuilt containers are still starting, and the first 3.4.0 deploy read
+# `no version in:` for two names that were answering 3.4.0 a minute later.
+# So a name that is not yet answering the version in this checkout is
+# asked again every few seconds, for up to BETA_VERSIONS_WAIT seconds
+# (default 120), and only then called a failure. BETA_VERSIONS_WAIT=0 asks
+# once, for a check you want answered now.
 set -u
+
+WAIT=${BETA_VERSIONS_WAIT:-120}
+POLL=5
 
 HERE=$(cd "$(dirname "$0")" && pwd)
 ENV_FILE="${1:-$HERE/../.env}"
@@ -55,12 +66,30 @@ for pair in "QRME:QRME_PUBLIC_URL" "JIM:JIM_PUBLIC_URL" "PDI:PDI_PUBLIC_URL"; do
     continue
   fi
   host=${url#*://}
-  body=$(curl -sS --max-time 15 "$url/health" 2>&1) || {
+  started=$(date +%s)
+  waited=""
+  while :; do
+    body=$(curl -sS --max-time 15 "$url/health" 2>&1)
+    rc=$?
+    got=""
+    if [ "$rc" -eq 0 ]; then
+      got=$(printf '%s' "$body" | sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+    fi
+    [ "$got" = "$expected" ] && break
+    if [ $(( $(date +%s) - started )) -ge "$WAIT" ]; then
+      break
+    fi
+    if [ -z "$waited" ]; then
+      echo "beta-versions: $name ($host) is not answering $expected yet — asking again for up to ${WAIT}s" >&2
+      waited=1
+    fi
+    sleep "$POLL"
+  done
+  if [ "$rc" -ne 0 ]; then
     printf '%-5s %-32s %s\n' "$name" "$host" "unreachable: $body"
     status=1
     continue
-  }
-  got=$(printf '%s' "$body" | sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+  fi
   if [ -z "$got" ]; then
     printf '%-5s %-32s %s\n' "$name" "$host" "no version in: $body"
     status=1

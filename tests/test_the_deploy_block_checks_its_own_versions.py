@@ -24,9 +24,11 @@ number somebody has to notice.
 
 import http.server
 import json
+import os
 import re
 import subprocess
 import threading
+import time
 from pathlib import Path
 
 import pytest
@@ -76,9 +78,20 @@ def _version() -> str:
 
 class _Health(http.server.BaseHTTPRequestHandler):
     versions: dict[int, str] = {}
+    #: A port that is still starting until this wall-clock moment answers
+    #: the way a proxy answers for a container that is not up yet: a
+    #: status and no body — which is what the first 3.4.0 deploy printed
+    #: as `no version in:`.
+    ready_at: dict[int, float] = {}
 
     def do_GET(self):  # noqa: N802
-        v = self.versions[self.server.server_port]
+        port = self.server.server_port
+        if time.time() < self.ready_at.get(port, 0):
+            self.send_response(502)
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+            return
+        v = self.versions[port]
         body = json.dumps({"status": "ok", "version": v}).encode()
         self.send_response(200)
         self.send_header("Content-Type", "application/json")
@@ -117,9 +130,12 @@ def three_names(tmp_path):
         s.shutdown()
 
 
-def _run(env):
+def _run(env, wait=0):
+    """``wait`` is BETA_VERSIONS_WAIT: the failure cases ask once, because a
+    test that waits two minutes for a port that refuses is testing sleep."""
     return subprocess.run(["sh", str(SCRIPT), str(env)],
-                          capture_output=True, text=True, timeout=60)
+                          capture_output=True, text=True, timeout=90,
+                          env={**os.environ, "BETA_VERSIONS_WAIT": str(wait)})
 
 
 def test_three_names_answering_this_checkout_is_a_clean_exit(three_names):
@@ -166,3 +182,33 @@ def test_the_script_never_sources_the_env_file():
         code = ln.split("#", 1)[0].strip()
         assert not re.match(r"^(\.|source)\s", code), ln
     assert "QRME_PUBLIC_URL" in text and "JIM_PUBLIC_URL" in text and "PDI_PUBLIC_URL" in text
+
+
+def test_a_name_still_starting_is_asked_again_until_it_answers(three_names):
+    """The first 3.4.0 deploy: run the second after `up -d --build`, two of
+    the three names answered a status and no body, and the line read `no
+    version in:` for containers that were answering the version a minute
+    later. The script waits for a name that is not yet answering, and the
+    verdict is the one the deploy deserved."""
+    v = _version()
+    env = three_names(v, v, v)
+    # The QRME and JIM ports are still starting for the next few seconds.
+    for port in list(_Health.versions)[-3:-1]:
+        _Health.ready_at[port] = time.time() + 6
+    r = _run(env, wait=30)
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert f"all three answer {v}" in r.stdout
+    assert "not answering" in r.stderr and "asking again" in r.stderr
+    assert "no version in" not in r.stdout
+
+
+def test_asked_once_a_name_still_starting_is_the_failure_it_looked_like(three_names):
+    """BETA_VERSIONS_WAIT=0 is the old behaviour, kept for a check somebody
+    wants answered now — and it says what the deploy saw."""
+    v = _version()
+    env = three_names(v, v, v)
+    for port in list(_Health.versions)[-3:]:
+        _Health.ready_at[port] = time.time() + 30
+    r = _run(env, wait=0)
+    assert r.returncode == 1
+    assert re.search(r"^QRME\s+127\.0\.0\.1:\d+\s+no version in:", r.stdout, re.M), r.stdout
