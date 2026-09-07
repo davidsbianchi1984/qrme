@@ -964,8 +964,8 @@ phone itself): set `QRME_LAN_HOST` to this machine's address and restart.
 - [docs/beta-deploy.md](docs/beta-deploy.md) — deploying all three products
 - [docs/github/](docs/github/) — every release note and pull request body,
   checked in, so a clone carries the argument for each change
-- [docs/invention-disclosure.md](docs/invention-disclosure.md) — the
-  numbered mechanisms
+- [docs/patents/](docs/patents/) — the application as filed and as
+  published, US 2025/0265659 A1
 
 ### For examination
 
